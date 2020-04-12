@@ -86,7 +86,6 @@ namespace tcp {
 
     void TcpConnection::handle_read(const std::error_code& error, size_t bytes_transferred)
     {
-        auto ptr = shared_from_this();
         if (triggerhalt.load(std::memory_order_acquire)) {
             state = connection_state_t::halted;
             receivingHalt.trigger();
@@ -94,7 +93,7 @@ namespace tcp {
         }
         if (!error) {
             auto used =
-                dataCall(ptr, data.data(), bytes_transferred + residBufferSize);
+                dataCall(shared_from_this(), data.data(), bytes_transferred + residBufferSize);
             if (used < (bytes_transferred + residBufferSize)) {
                 if (used > 0) {
                     std::copy(
@@ -117,7 +116,7 @@ namespace tcp {
         {
             if (bytes_transferred > 0) {
                 auto used =
-                    dataCall(ptr, data.data(), bytes_transferred + residBufferSize);
+                    dataCall(shared_from_this(), data.data(), bytes_transferred + residBufferSize);
                 if (used < (bytes_transferred + residBufferSize)) {
                     if (used > 0) {
                         std::copy(
@@ -131,7 +130,7 @@ namespace tcp {
                 }
             }
             if (errorCall) {
-                if (errorCall(ptr, error)) {
+                if (errorCall(shared_from_this(), error)) {
                     state = connection_state_t::waiting;
                     startReceive();
                 } else {
