@@ -239,7 +239,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
     mFed->requestTimeComplete();
-    if (mFed->hasMessage(p3) == false) {
+    if (!mFed->hasMessage(p3)) {
         EXPECT_TRUE(mFed->hasMessage(p3));
     } else {
         auto m2 = mFed->getMessage(p3);
@@ -535,7 +535,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
         }
     }
     EXPECT_EQ(count, 1);
-    EXPECT_TRUE(actual_delay <= 4);
+    EXPECT_LE(actual_delay, 4);
 
     mFed->finalizeAsync();
     fFed->finalize();

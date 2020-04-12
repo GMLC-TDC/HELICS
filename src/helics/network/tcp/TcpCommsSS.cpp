@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+
 #include "TcpCommsSS.h"
 
 #include "../../common/AsioContextManager.h"
@@ -17,7 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace tcp {
-    using asio::ip::tcp;
     TcpCommsSS::TcpCommsSS() noexcept:
         NetworkCommsInterface(interface_type::tcp, CommsInterface::thread_generation::single)
     {
@@ -66,24 +66,22 @@ namespace tcp {
         }
     }
 
-    int TcpCommsSS::processIncomingMessage(ActionMessage&& M)
+    int TcpCommsSS::processIncomingMessage(ActionMessage&& cmd)
     {
-        if (isProtocolCommand(M)) {
-            switch (M.messageID) {
+        if (isProtocolCommand(cmd)) {
+            switch (cmd.messageID) {
                 case CLOSE_RECEIVER:
                     return (-1);
                 default:
                     break;
             }
         }
-        ActionCallback(std::move(M));
+        ActionCallback(std::move(cmd));
         return 0;
     }
 
-    size_t TcpCommsSS::dataReceive(
-        std::shared_ptr<TcpConnection> connection,
-        const char* data,
-        size_t bytes_received)
+    size_t
+        TcpCommsSS::dataReceive(TcpConnection* connection, const char* data, size_t bytes_received)
     {
         size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -142,13 +140,14 @@ namespace tcp {
         auto ioctx = AsioContextManager::getContextPointer();
         auto contextLoop = ioctx->startContextLoop();
         auto dataCall =
-            [this](TcpConnection::pointer connection, const char* data, size_t datasize) {
-                return dataReceive(connection, data, datasize);
+            [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
+                return dataReceive(connection.get(), data, datasize);
             };
         CommsInterface* ci = this;
-        auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code& error) {
-            return commErrorHandler(ci, connection, error);
-        };
+        auto errorCall =
+            [ci](const TcpConnection::pointer& connection, const std::error_code& error) {
+                return commErrorHandler(ci, connection.get(), error);
+            };
 
         if (serverMode) {
             server = TcpServer::create(

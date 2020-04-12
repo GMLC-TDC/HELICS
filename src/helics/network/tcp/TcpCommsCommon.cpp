@@ -56,7 +56,7 @@ namespace tcp {
 
     bool commErrorHandler(
         CommsInterface* comm,
-        std::shared_ptr<TcpConnection> /*connection*/,
+        TcpConnection* /*connection*/,
         const std::error_code& error)
     {
         if (comm->isConnected()) {

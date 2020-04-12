@@ -33,7 +33,7 @@ namespace tcp {
     /** do some checking and logging about errors if the interface is connected*/
     bool commErrorHandler(
         CommsInterface* comm,
-        std::shared_ptr<TcpConnection> connection,
+        TcpConnection* connection,
         const std::error_code& error);
 } // namespace tcp
 } // namespace helics

@@ -4,6 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "coreTypeOperations.hpp"
+
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
@@ -162,45 +164,45 @@ namespace core {
     }
 
 #ifndef ENABLE_ZMQ_CORE
-#    define ZMQ_AVAILABILITY false
+    static bool constexpr zmq_availability{false};
 #else
-#    define ZMQ_AVAILABILITY true
+    static bool constexpr zmq_availability{true};
 #endif
 
 #ifndef ENABLE_MPI_CORE
-#    define MPI_AVAILABILITY false
+    static bool constexpr mpi_availability{false};
 #else
-#    define MPI_AVAILABILITY true
+    static bool constexpr mpi_availability{true};
 #endif
 
 #ifndef ENABLE_TCP_CORE
-#    define TCP_AVAILABILITY false
+    static bool constexpr tcp_availability{false};
 #else
-#    define TCP_AVAILABILITY true
+    static bool constexpr tcp_availability{true};
 #endif
 
 #ifndef ENABLE_UDP_CORE
-#    define UDP_AVAILABILITY false
+    static bool constexpr udp_availability{false};
 #else
-#    define UDP_AVAILABILITY true
+    static bool constexpr udp_availability{true};
 #endif
 
 #ifndef ENABLE_IPC_CORE
-#    define IPC_AVAILABILITY false
+    static bool constexpr ipc_availability{false};
 #else
-#    define IPC_AVAILABILITY true
+    static bool constexpr ipc_availability{true};
 #endif
 
 #ifndef ENABLE_TEST_CORE
-#    define TEST_AVAILABILITY false
+    static bool constexpr test_availability{false};
 #else
-#    define TEST_AVAILABILITY true
+    static bool constexpr test_availability{true};
 #endif
 
 #ifndef ENABLE_INPROC_CORE
-#    define INPROC_AVAILABILITY false
+    static bool constexpr inproc_availability{false};
 #else
-#    define INPROC_AVAILABILITY true
+    static bool constexpr inproc_availability{true};
 #endif
 
     bool isCoreTypeAvailable(core_type type) noexcept
@@ -210,39 +212,36 @@ namespace core {
         switch (type) {
             case core_type::ZMQ:
             case core_type::ZMQ_SS:
-                available = ZMQ_AVAILABILITY;
+                available = zmq_availability;
                 break;
             case core_type::MPI:
-                available = MPI_AVAILABILITY;
+                available = mpi_availability;
                 break;
             case core_type::TEST:
-                available = TEST_AVAILABILITY;
+                available = test_availability;
                 break;
             case core_type::INTERPROCESS:
             case core_type::IPC:
-                available = IPC_AVAILABILITY;
+                available = ipc_availability;
                 break;
             case core_type::UDP:
-                available = UDP_AVAILABILITY;
+                available = udp_availability;
                 break;
             case core_type::TCP:
-                available = TCP_AVAILABILITY;
-                break;
             case core_type::TCP_SS:
-                available = TCP_AVAILABILITY;
+                available = tcp_availability;
                 break;
             case core_type::DEFAULT: // default should always be available
                 available = true;
                 break;
             case core_type::INPROC:
-                available = INPROC_AVAILABILITY;
+                available = inproc_availability;
                 break;
             case core_type::HTTP:
             case core_type::WEBSOCKET:
-                available = false;
-                break;
             case core_type::NULLCORE:
                 available = false;
+                break;
             default:
                 break;
         }

@@ -66,10 +66,10 @@ class helicsCLI11App: public CLI::App {
             last_output = parse_output::ok;
             remArgs = remaining_for_passthrough();
             if (passConfig) {
-                auto opt = get_option("--config");
+                auto* opt = get_option("--config");
                 if (opt->count() > 0) {
                     remArgs.push_back(opt->as<std::string>());
-                    remArgs.push_back("--config");
+                    remArgs.emplace_back("--config");
                 }
             }
 
@@ -134,13 +134,14 @@ class helicsCLI11App: public CLI::App {
 
     void addTypeOption()
     {
-        auto og = add_option_group("network type")->immediate_callback();
+        auto* og = add_option_group("network type")->immediate_callback();
         og->add_option_function<std::string>(
               "--coretype,-t,--type,--core",
               [this](const std::string& val) {
                   coreType = coreTypeFromString(val);
-                  if (coreType == core_type::UNRECOGNIZED)
+                  if (coreType == core_type::UNRECOGNIZED) {
                       throw CLI::ValidationError(val + " is NOT a recognized core type");
+                  }
               },
               "type of the core to connect to")
             ->default_str("(" + to_string(coreType) + ")");

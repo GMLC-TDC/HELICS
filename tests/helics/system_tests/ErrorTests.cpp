@@ -5,16 +5,11 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "helics/application_api.hpp"
 #include "helics/core/core-exceptions.hpp"
 
 #include "gtest/gtest.h"
 #include <complex>
-
-/** these test cases test out the value converters
- */
-#include "../application_api/testFixtures.hpp"
-#include "helics/application_api.hpp"
-
 #include <future>
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
