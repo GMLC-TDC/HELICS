@@ -20,7 +20,7 @@ TEST(timeCoord_tests, dependency_tests)
     ftc.addDependency(fed3);
 
     auto deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
     // test repeated inputs are dealt with correctly
@@ -32,12 +32,12 @@ TEST(timeCoord_tests, dependency_tests)
 
     ftc.removeDependency(fed2);
     deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
     // remove same one
     ftc.removeDependency(fed2);
     deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }
 
@@ -51,13 +51,13 @@ TEST(timeCoord_tests, dependency_test_message)
     addDep.source_id = fed3;
     ftc.processDependencyUpdateMessage(addDep);
     auto deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage(addDep);
     deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
 
@@ -65,14 +65,14 @@ TEST(timeCoord_tests, dependency_test_message)
     remDep.source_id = fed2;
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
     remDep.source_id = global_federate_id(10);
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependencies();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }
 
@@ -82,24 +82,24 @@ TEST(timeCoord_tests, dependent_tests)
     ftc.addDependent(fed2);
     ftc.addDependent(fed3);
     auto deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
     // test repeated inputs are dealt with correctly
     ftc.addDependent(fed3);
     // deps is a reference so it should change automatically
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
 
     ftc.removeDependent(fed2);
     deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
     // remove same one
     ftc.removeDependent(fed2);
     deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }
 
@@ -114,13 +114,13 @@ TEST(timeCoord_tests, dependent_test_message)
     addDep.source_id = fed3;
     ftc.processDependencyUpdateMessage(addDep);
     auto deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage(addDep);
     deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),2U);
+    EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
 
@@ -128,13 +128,13 @@ TEST(timeCoord_tests, dependent_test_message)
     remDep.source_id = fed2;
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
     remDep.source_id = global_federate_id(10);
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependents();
-    EXPECT_EQ(deps.size(),1U);
+    EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }

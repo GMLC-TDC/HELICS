@@ -4,9 +4,10 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "coreTypeOperations.hpp"
+
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
-#include "coreTypeOperations.hpp"
 #include "helics/helics-config.h"
 
 #include <algorithm>
@@ -163,45 +164,45 @@ namespace core {
     }
 
 #ifndef ENABLE_ZMQ_CORE
-    static bool constexpr zmq_availability{ false };
+    static bool constexpr zmq_availability{false};
 #else
-    static bool constexpr zmq_availability{ true };
+    static bool constexpr zmq_availability{true};
 #endif
 
 #ifndef ENABLE_MPI_CORE
-    static bool constexpr mpi_availability{ false };
+    static bool constexpr mpi_availability{false};
 #else
-    static bool constexpr mpi_availability{ false };
+    static bool constexpr mpi_availability{false};
 #endif
 
 #ifndef ENABLE_TCP_CORE
-    static bool constexpr tcp_availability{ false };
+    static bool constexpr tcp_availability{false};
 #else
-    static bool constexpr tcp_availability{ true };
+    static bool constexpr tcp_availability{true};
 #endif
 
 #ifndef ENABLE_UDP_CORE
-    static bool constexpr udp_availability{ false };
+    static bool constexpr udp_availability{false};
 #else
-    static bool constexpr udp_availability{ true };
+    static bool constexpr udp_availability{true};
 #endif
 
 #ifndef ENABLE_IPC_CORE
-    static bool constexpr ipc_availability{ false };
+    static bool constexpr ipc_availability{false};
 #else
-    static bool constexpr ipc_availability{ true };
+    static bool constexpr ipc_availability{true};
 #endif
 
 #ifndef ENABLE_TEST_CORE
-    static bool constexpr test_availability{ false };
+    static bool constexpr test_availability{false};
 #else
-    static bool constexpr test_availability{ true };
+    static bool constexpr test_availability{true};
 #endif
 
 #ifndef ENABLE_INPROC_CORE
-    static bool constexpr inproc_availability{ false };
+    static bool constexpr inproc_availability{false};
 #else
-    static bool constexpr inproc_availability{ true };
+    static bool constexpr inproc_availability{true};
 #endif
 
     bool isCoreTypeAvailable(core_type type) noexcept

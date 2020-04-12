@@ -63,10 +63,7 @@ namespace tcp {
         return 0;
     }
 
-    size_t TcpComms::dataReceive(
-        TcpConnection* connection,
-        const char* data,
-        size_t bytes_received)
+    size_t TcpComms::dataReceive(TcpConnection* connection, const char* data, size_t bytes_received)
     {
         size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -155,13 +152,14 @@ namespace tcp {
         }
         auto contextLoop = ioctx->startContextLoop();
         server->setDataCall(
-            [this](const TcpConnection::pointer &connection, const char* data, size_t datasize) {
+            [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
                 return dataReceive(connection.get(), data, datasize);
             });
         CommsInterface* ci = this;
-        server->setErrorCall([ci](const TcpConnection::pointer &connection, const std::error_code& error) {
-            return commErrorHandler(ci, connection.get(), error);
-        });
+        server->setErrorCall(
+            [ci](const TcpConnection::pointer& connection, const std::error_code& error) {
+                return commErrorHandler(ci, connection.get(), error);
+            });
         server->start();
         setRxStatus(connection_status::connected);
         bool loopRunning = true;
@@ -232,14 +230,14 @@ namespace tcp {
                     logWarning(
                         "initial connection to broker timed out exceeding max number of retries ");
                     return terminate(connection_status::error);
-                } 
-                    std::this_thread::yield();
-                    brokerConnection = makeConnection(
-                        ioctx->getBaseContext(),
-                        brokerTargetAddress,
-                        std::to_string(brokerPort),
-                        maxMessageSize,
-                        connectionTimeout);
+                }
+                std::this_thread::yield();
+                brokerConnection = makeConnection(
+                    ioctx->getBaseContext(),
+                    brokerTargetAddress,
+                    std::to_string(brokerPort),
+                    maxMessageSize,
+                    connectionTimeout);
             }
             //monitor the total waiting time before connections
             std::chrono::milliseconds cumulativeSleep{0};
@@ -364,7 +362,7 @@ namespace tcp {
         setTxStatus(connection_status::connected);
 
         //  std::vector<ActionMessage> txlist;
-        bool processing{ true };
+        bool processing{true};
         while (processing) {
             route_id rid;
             ActionMessage cmd;
