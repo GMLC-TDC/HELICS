@@ -142,11 +142,11 @@ namespace tcp {
         auto ioctx = AsioContextManager::getContextPointer();
         auto contextLoop = ioctx->startContextLoop();
         auto dataCall =
-            [this](TcpConnection::pointer connection, const char* data, size_t datasize) {
+            [this](const TcpConnection::pointer &connection, const char* data, size_t datasize) {
                 return dataReceive(connection.get(), data, datasize);
             };
         CommsInterface* ci = this;
-        auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code& error) {
+        auto errorCall = [ci](const TcpConnection::pointer &connection, const std::error_code& error) {
             return commErrorHandler(ci, connection.get(), error);
         };
 

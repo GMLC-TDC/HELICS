@@ -155,11 +155,11 @@ namespace tcp {
         }
         auto contextLoop = ioctx->startContextLoop();
         server->setDataCall(
-            [this](TcpConnection::pointer connection, const char* data, size_t datasize) {
+            [this](const TcpConnection::pointer &connection, const char* data, size_t datasize) {
                 return dataReceive(connection.get(), data, datasize);
             });
         CommsInterface* ci = this;
-        server->setErrorCall([ci](TcpConnection::pointer connection, const std::error_code& error) {
+        server->setErrorCall([ci](const TcpConnection::pointer &connection, const std::error_code& error) {
             return commErrorHandler(ci, connection.get(), error);
         });
         server->start();
