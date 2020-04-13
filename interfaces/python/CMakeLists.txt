@@ -15,7 +15,7 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
 
-	if(CMAKE_VERSION VERSION_LESS 3.16)
+    if(CMAKE_VERSION VERSION_LESS 3.16)
        cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
     else()
        cmake_policy(VERSION 3.16)
@@ -177,7 +177,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         # Update if necessary
         set(
             CMAKE_C_FLAGS
-            "${CMAKE_C_FLAGS} -Wno-overlength-strings -Wno-ignored-attributes"
+            "${CMAKE_C_FLAGS} -Wno-overlength-strings -Wno-ignored-attributes -Wno-deprecated-declarations"
         )
     endif()
 
@@ -231,7 +231,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     if(MSVC)
         target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "/wd4100")
     else(MSVC)
-        target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "-Wno-long-long  -Wno-deprecated-declarations")
+        target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "-Wno-long-long -Wno-deprecated-declarations")
     endif(MSVC)
 
 	message(STATUS "swig target is ${SWIG_MODULE_helics_REAL_NAME}")

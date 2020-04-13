@@ -662,7 +662,7 @@ const char* helicsEndpointGetName(helics_endpoint endpoint)
     if (endObj == nullptr) {
         return nullcstr;
     }
-    auto& type = endObj->endPtr->getName();
+    const auto& type = endObj->endPtr->getName();
     return type.c_str();
 }
 
