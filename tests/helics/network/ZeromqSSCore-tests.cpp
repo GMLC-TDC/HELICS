@@ -26,7 +26,7 @@ using namespace std::literals::chrono_literals;
 
 using helics::Core;
 
-const std::string host = "tcp://127.0.0.1";
+constexpr const char *host = "tcp://127.0.0.1";
 
 TEST(ZMQSSCore, transmit)
 {
@@ -40,7 +40,7 @@ TEST(ZMQSSCore, transmit)
     helics::zeromq::ZmqCommsSS comm2;
     comm.loadTargetInfo(host, host);
     // comm2 is the broker
-    comm2.loadTargetInfo(host, std::string());
+    comm2.loadTargetInfo(host, std::string{});
 
     comm.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm.setName("test_comms");

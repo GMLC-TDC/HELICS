@@ -19,19 +19,19 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::utilities;
 
 namespace helics {
-static const std::string doubleString("double");
-static const std::string intString("int64");
-static const std::string stringString("string");
-static const std::string complexString("complex");
-static const std::string boolString("bool");
-static const std::string doubleVecString("double_vector");
-static const std::string complexVecString("complex_vector");
-static const std::string namedPointString("named_point");
-static const std::string timeString("time");
-static const std::string nullString;
 
 const std::string& typeNameStringRef(data_type type)
 {
+    static const std::string doubleString("double");
+    static const std::string intString("int64");
+    static const std::string stringString("string");
+    static const std::string complexString("complex");
+    static const std::string boolString("bool");
+    static const std::string doubleVecString("double_vector");
+    static const std::string complexVecString("complex_vector");
+    static const std::string namedPointString("named_point");
+    static const std::string timeString("time");
+    static const std::string nullString;
     switch (type) {
         case data_type::helics_double:
             return doubleString;

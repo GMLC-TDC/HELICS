@@ -66,9 +66,6 @@ static std::string loadFile(const std::string& fileName)
     std::ifstream t(fileName);
     return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
-
-static const std::string index_page = loadFile("index.html");
-static const std::string emptyString;
 //decode a uri to clean up a string, convert character codes in a uri to the original character
 static std::string uri_decode(beast::string_view str)
 {
@@ -215,6 +212,7 @@ std::pair<return_val, std::string> generateResults(
     beast::string_view query,
     const boost::container::flat_map<std::string, std::string>& fields)
 {
+    static const std::string emptyString;
     if (command == cmd::unknown) {
         if (fields.find("command") != fields.end()) {
             auto cmdstr = fields.at("command");
@@ -400,6 +398,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
     {
+        static const std::string emptyString;
         boost::ignore_unused(bytes_transferred);
 
         // This indicates that the session was closed
@@ -473,6 +472,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 template<class Body, class Allocator, class Send>
 void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send)
 {
+    static const std::string index_page = loadFile("index.html");
     // Returns a bad request response
     auto const bad_request = [&req](beast::string_view why) {
         http::response<http::string_body> res{http::status::bad_request, req.version()};

@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 
 namespace helics {
-const std::string estring;
 
 BrokerApp::BrokerApp(
     core_type ctype,
@@ -200,11 +199,13 @@ void BrokerApp::makeConnections(const std::string& file)
 /** get the identifier of the broker*/
 const std::string& BrokerApp::getIdentifier() const
 {
+    static const std::string estring;
     return (broker) ? broker->getIdentifier() : estring;
 }
 /** get the network address of the broker*/
 const std::string& BrokerApp::getAddress() const
 {
+    static const std::string estring;
     return (broker) ? broker->getAddress() : estring;
 }
 /** make a query at the broker*/

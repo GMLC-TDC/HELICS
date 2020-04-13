@@ -25,12 +25,12 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::literals::chrono_literals;
 
 using helics::Core;
-const std::string defServer("tcp://127.0.0.1:23406");
-const std::string host = "tcp://127.0.0.1";
+constexpr const char *defServer{ "tcp://127.0.0.1:23406" };
+constexpr const char *host{ "tcp://127.0.0.1" };
 
-const std::string defRoute1("tcp://127.0.0.1:23405");
+constexpr const char *defRoute1{ "tcp://127.0.0.1:23405" };
 
-const std::string defRoute2("tcp://127.0.0.1:23407");
+constexpr const char *defRoute2{ "tcp://127.0.0.1:23407" };
 
 TEST(ZMQCore_tests, zmqComms_broker_test)
 {
