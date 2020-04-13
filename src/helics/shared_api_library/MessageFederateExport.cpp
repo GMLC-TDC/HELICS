@@ -432,7 +432,7 @@ namespace helics
             auto index = freeMessageSlots.back();
             freeMessageSlots.pop_back();
             messages[index] = std::make_unique<Message>();
-            auto *m = messages[index].get();
+            m = messages[index].get();
             m->counter = index;
             
         }

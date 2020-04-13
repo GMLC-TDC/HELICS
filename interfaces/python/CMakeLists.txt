@@ -177,7 +177,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         # Update if necessary
         set(
             CMAKE_C_FLAGS
-            "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
+            "${CMAKE_C_FLAGS} -Wno-overlength-strings -Wno-ignored-attributes"
         )
     endif()
 
@@ -231,7 +231,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     if(MSVC)
         target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "/wd4100")
     else(MSVC)
-        target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "-Wno-long-long")
+        target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "-Wno-long-long  -Wno-deprecated-declarations")
     endif(MSVC)
 
 	message(STATUS "swig target is ${SWIG_MODULE_helics_REAL_NAME}")
