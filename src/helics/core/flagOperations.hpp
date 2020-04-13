@@ -66,7 +66,7 @@ inline bool checkActionFlag(const FlagContainer& M, FlagIndex flag)
 template<class FlagContainer, class FlagIndex>
 inline void clearActionFlag(FlagContainer& M, FlagIndex flag)
 {
-    M.flags &= ~(static_cast<decltype(M.flags)>((1U) << (static_cast<uint16_t>((flag)))));
+    M.flags &= static_cast<decltype(M.flags)>(~((1U) << (static_cast<uint16_t>((flag)))));
 }
 
 /** helper function to facilitate make a flag variable*/

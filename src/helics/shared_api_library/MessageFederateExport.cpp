@@ -19,11 +19,13 @@ SPDX-License-Identifier: BSD-3-Clause
 // random integer for validation purposes of endpoints
 static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
-static inline void addEndpoint(helics_federate fed, std::unique_ptr<helics::EndpointObject> ept)
+static inline helics_endpoint addEndpoint(helics_federate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     ept->valid = EndpointValidationIdentifier;
+    helics_endpoint hept = ept.get();
     fedObj->epts.push_back(std::move(ept));
+    return hept;
 }
 
 static constexpr char nullcstr[] = "";
@@ -57,9 +59,7 @@ helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* 
         end->endPtr = &fedObj->registerEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
-        auto *ept = reinterpret_cast<helics_endpoint>(end.get());
-        addEndpoint(fed, std::move(end));
-        return ept;
+        return addEndpoint(fed, std::move(end));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -80,9 +80,7 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const 
         end->endPtr = &fedObj->registerGlobalEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
-        auto *ept = reinterpret_cast<helics_endpoint>(end.get());
-        addEndpoint(fed, std::move(end));
-        return ept;
+        return addEndpoint(fed, std::move(end));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -113,9 +111,7 @@ helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name,
         end->endPtr = &id;
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, err);
-        auto* ept = reinterpret_cast<helics_endpoint>(end.get());
-        addEndpoint(fed, std::move(end));
-        return ept;
+        return addEndpoint(fed, std::move(end));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -144,9 +140,7 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
         end->endPtr = &id;
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, err);
-        auto* ept = reinterpret_cast<helics_endpoint>(end.get());
-        addEndpoint(fed, std::move(end));
-        return ept;
+        return addEndpoint(fed, std::move(end));
     }
     // LCOV_EXCL_START
     catch (...) {

@@ -60,7 +60,7 @@ readability-*,
 performance-*
 '
 
-HeaderFilterRegex: 'src/helics/shared_api_library/*.h
+HeaderFilterRegex: 'src/helics/shared_api_library/*.h'
 
 AnalyzeTemporaryDtors: false
 CheckOptions:

@@ -154,7 +154,7 @@ class Message {
     std::string original_dest; //!< the original destination of a message
     std::int32_t counter{ 0 };  //!< indexing counter not used directly by helics
     void *backReference{ nullptr };  //!< back referencing pointer not used by helics
-  public:
+
     /** default constructor*/
     Message() = default;
     /** swap operation for the Message*/

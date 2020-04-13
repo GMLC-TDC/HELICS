@@ -224,7 +224,7 @@ class VectorSubscription2d {
     std::function<void(int, Time)>
         update_callback; //!< callback function for when a value is updated
     std::vector<X> vals; //!< storage for the values
-    std::array<int, 4> indices{ 0,0,0,0 }; //!< storage for the indices and start values
+    std::array<int, 4> indices{ { 0,0,0,0 } }; //!< storage for the indices and start values
   public:
     VectorSubscription2d() noexcept {};
 
