@@ -56,6 +56,7 @@ helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* 
         auto end = std::make_unique<helics::EndpointObject>();
         end->endPtr = &fedObj->registerEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
+        end->fed = helics::getFedObject(fed, nullptr);
         auto ret = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
         return ret;
@@ -78,6 +79,7 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const 
         auto end = std::make_unique<helics::EndpointObject>();
         end->endPtr = &fedObj->registerGlobalEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
+        end->fed = helics::getFedObject(fed, nullptr);
         auto ret = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
         return ret;
@@ -110,6 +112,7 @@ helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name,
         auto end = std::make_unique<helics::EndpointObject>();
         end->endPtr = &id;
         end->fedptr = std::move(fedObj);
+        end->fed = helics::getFedObject(fed, err);
         auto ret = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
         return ret;
@@ -140,6 +143,7 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
         auto end = std::make_unique<helics::EndpointObject>();
         end->endPtr = &id;
         end->fedptr = std::move(fedObj);
+        end->fed = helics::getFedObject(fed, err);
         auto ret = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
         return ret;
@@ -422,21 +426,26 @@ namespace helics
     }
     Message *MessageHolder::newMessage()
     {
+        Message *m{ nullptr };
         if (!freeMessageSlots.empty())
         {
             auto index = freeMessageSlots.back();
             freeMessageSlots.pop_back();
             messages[index] = std::make_unique<Message>();
-            messages[index]->messageValidation = messageKeyCode;
-            messages[index]->counter = index;
-            messages[index]->backReference = static_cast<void *>(this);
-            return messages[index].get();
+            auto *m = messages[index].get();
+            m->counter = index;
+            
         }
-        
+        else
+        {
             messages.push_back(std::make_unique<Message>());
-            messages.back()->counter = static_cast<int32_t>(messages.size()) - 1;
-            messages.back()->backReference = static_cast<void *>(this);
-            return messages.back().get();
+            m = messages.back().get();
+            m->counter = static_cast<int32_t>(messages.size()) - 1;
+        }
+            
+            m->messageValidation = messageKeyCode;
+            m->backReference = static_cast<void *>(this);
+            return m;
     }
 
     std::unique_ptr<Message> MessageHolder::extractMessage(int index)

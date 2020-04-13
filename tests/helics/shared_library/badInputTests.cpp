@@ -959,7 +959,7 @@ TEST_F(function_tests, messageFed_messageObject)
     helicsEndpointSendMessageObject(ept1, mess1, &err);
     helicsMessageSetString(mess1, "test", nullptr);
     
-    helicsEndpointSendMessageObjectZeroCopy(ept1, mess1, &err); 
+    helicsEndpointSendMessageObjectZeroCopy(ept1, mess1, &err);   
 
     helicsFederateRequestNextStep(mFed1, nullptr);
     auto cnt = helicsEndpointPendingMessages(ept1);
