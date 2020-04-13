@@ -282,15 +282,11 @@ void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_ob
     if (endObj == nullptr) {
         return;
     }
-    if (message == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = emptyMessageErrorString;
-        }
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr)
+    {
         return;
     }
-
-    auto* mess = reinterpret_cast<helics::Message*>(message);
     try {
         endObj->endPtr->send(*mess);
     }
@@ -306,15 +302,12 @@ void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_me
     if (endObj == nullptr) {
         return;
     }
-    if (message == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = emptyMessageErrorString;
-        }
+
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr)
+    {
         return;
     }
-
-    auto* mess = reinterpret_cast<helics::Message*>(message);
     auto* messages = reinterpret_cast<helics::MessageHolder *>(mess->backReference);
     if (messages!=nullptr)
     {
