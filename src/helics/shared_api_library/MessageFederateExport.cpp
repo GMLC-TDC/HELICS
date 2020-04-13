@@ -57,9 +57,9 @@ helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* 
         end->endPtr = &fedObj->registerEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
-        auto ret = reinterpret_cast<helics_endpoint>(end.get());
+        auto *ept = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
-        return ret;
+        return ept;
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -80,9 +80,9 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const 
         end->endPtr = &fedObj->registerGlobalEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
-        auto ret = reinterpret_cast<helics_endpoint>(end.get());
+        auto *ept = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
-        return ret;
+        return ept;
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -113,9 +113,9 @@ helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name,
         end->endPtr = &id;
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, err);
-        auto ret = reinterpret_cast<helics_endpoint>(end.get());
+        auto* ept = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
-        return ret;
+        return ept;
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -144,9 +144,9 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
         end->endPtr = &id;
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, err);
-        auto ret = reinterpret_cast<helics_endpoint>(end.get());
+        auto* ept = reinterpret_cast<helics_endpoint>(end.get());
         addEndpoint(fed, std::move(end));
-        return ret;
+        return ept;
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -523,7 +523,7 @@ helics_message helicsEndpointGetMessage(helics_endpoint endpoint)
 
 helics_message helicsFederateGetMessage(helics_federate fed)
 {
-    auto mFed = getMessageFed(fed, nullptr);
+    auto* mFed = getMessageFed(fed, nullptr);
     if (mFed == nullptr) {
         return emptyMessage();
     }
@@ -564,7 +564,7 @@ helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint)
 
 helics_message_object helicsFederateGetMessageObject(helics_federate fed)
 {
-    auto mFed = getMessageFed(fed, nullptr);
+    auto* mFed = getMessageFed(fed, nullptr);
     if (mFed == nullptr) {
         return nullptr;
     }
@@ -652,7 +652,7 @@ const char* helicsEndpointGetType(helics_endpoint endpoint)
     }
 
     try {
-        auto& type = endObj->endPtr->getType();
+        const auto& type = endObj->endPtr->getType();
         return type.c_str();
     }
     // LCOV_EXCL_START

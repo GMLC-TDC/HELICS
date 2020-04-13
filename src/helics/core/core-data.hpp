@@ -152,7 +152,7 @@ class Message {
     std::string source; //!< the most recent source of the message
     std::string original_source; //!< the original source of the message
     std::string original_dest; //!< the original destination of a message
-    std::int32_t counter;  //!< indexing counter not used directly by helics
+    std::int32_t counter{ 0 };  //!< indexing counter not used directly by helics
     void *backReference{ nullptr };  //!< back referencing pointer not used by helics
   public:
     /** default constructor*/

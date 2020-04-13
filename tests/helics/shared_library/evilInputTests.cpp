@@ -288,7 +288,7 @@ TEST(evil_core_test, helicsCoreClone)
 {
     //helics_core helicsCoreClone(helics_core core, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreClone(nullptr, &err);
@@ -306,7 +306,7 @@ TEST(evil_core_test, helicsCoreIsValid)
 {
     //helics_bool helicsCoreIsValid(helics_core core);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     EXPECT_NE(helicsCoreIsValid(evil_core), helics_true);
     EXPECT_NE(helicsCoreIsValid(nullptr), helics_true);
 }
@@ -315,7 +315,7 @@ TEST(evil_core_test, helicsCoreWaitForDisconnect)
 {
     //helics_bool helicsCoreWaitForDisconnect(helics_core core, int msToWait, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreWaitForDisconnect(nullptr, 1, &err);
@@ -332,7 +332,7 @@ TEST(evil_core_test, helicsCoreIsConnected)
 {
     //helics_bool helicsCoreIsConnected(helics_core core);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto res1 = helicsCoreIsConnected(evil_core);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsCoreIsConnected(nullptr);
@@ -343,7 +343,7 @@ TEST(evil_core_test, helicsCoreDataLink)
 {
     //void helicsCoreDataLink(helics_core core, const char* source, const char* target, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreDataLink(nullptr, nullptr, nullptr, &err);
@@ -358,7 +358,7 @@ TEST(evil_core_test, helicsCoreAddSourceFilterToEndpoint)
 {
     //void helicsCoreAddSourceFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreAddSourceFilterToEndpoint(nullptr, "filter", "ept", &err);
@@ -373,7 +373,7 @@ TEST(evil_core_test, helicsCoreAddDestinationFilterToEndpoint)
 {
     //void helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreAddDestinationFilterToEndpoint(nullptr, "filter", "ept", &err);
@@ -388,7 +388,7 @@ TEST(evil_core_test, helicsCoreMakeConnections)
 {
     //void helicsCoreMakeConnections(helics_core core, const char* file, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreMakeConnections(nullptr, "invalidfile.json", &err);
@@ -403,7 +403,7 @@ TEST(evil_core_test, helicsCoreGetIdentifier)
 {
     //const char*  helicsCoreGetIdentifier(helics_core core);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto res1 = helicsCoreGetIdentifier(evil_core);
     EXPECT_STREQ(res1, "");
 }
@@ -412,7 +412,7 @@ TEST(evil_core_test, helicsCoreGetAddress)
 {
     //const char*  helicsCoreGetAddress(helics_core core);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto res1 = helicsCoreGetAddress(evil_core);
     EXPECT_STREQ(res1, "");
 }
@@ -421,7 +421,7 @@ TEST(evil_core_test, helicsCoreSetReadyToInit)
 {
     //void helicsCoreSetReadyToInit(helics_core core, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreSetReadyToInit(nullptr, &err);
@@ -435,7 +435,7 @@ TEST(evil_core_test, helicsCoreConnect)
 {
     //void helicsCoreConnect(helics_core core, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res = helicsCoreConnect(nullptr, &err);
@@ -454,7 +454,7 @@ TEST(evil_core_test, helicsCoreDisconnect)
 {
     //void helicsCoreDisconnect(helics_core core, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreDisconnect(nullptr, &err);
@@ -470,7 +470,7 @@ TEST(evil_core_test, helicsCoreDestroy)
 {
     //void helicsCoreDestroy(helics_core core);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     EXPECT_NO_THROW(helicsCoreDestroy(evil_core));
     EXPECT_NO_THROW(helicsCoreFree(nullptr));
 }
@@ -479,7 +479,7 @@ TEST(evil_core_test, helicsCoreFree)
 {
     //void helicsCoreFree(helics_core core);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     EXPECT_NO_THROW(helicsCoreFree(evil_core));
     EXPECT_NO_THROW(helicsCoreFree(nullptr));
 }
@@ -488,7 +488,7 @@ TEST(evil_core_test, helicsCoreSetGlobal)
 {
     //void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* value, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreSetGlobal(nullptr, "value", "value", &err);
@@ -502,7 +502,7 @@ TEST(evil_core_test, helicsCoreSetLogFile)
 {
     //void helicsCoreSetLogFile(helics_core core, const char* logFileName, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreSetLogFile(nullptr, "unknownfile.log", &err);
@@ -516,7 +516,7 @@ TEST(evil_core_test, helicsCoreSetLoggingCallback)
 {
     //void helicsCoreSetLoggingCallback(     helics_core core,     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),     void* userdata,     helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreSetLoggingCallback(nullptr, nullptr, nullptr, &err);
@@ -532,7 +532,7 @@ TEST(evil_core_test, helicsCoreRegisterFilter)
 {
     //helics_filter helicsCoreRegisterFilter(helics_core core, helics_filter_type type, const char* name, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreRegisterFilter(nullptr, helics_filter_type_delay, "delay", &err);
@@ -550,7 +550,7 @@ TEST(evil_core_test, helicsCoreRegisterCloningFilter)
 {
     //helics_filter helicsCoreRegisterCloningFilter(helics_core core, const char* deliveryEndpoint, helics_error* err);
     char rdata[256];
-    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreRegisterCloningFilter(nullptr, "delivery", &err);
@@ -570,7 +570,7 @@ TEST(evil_broker_test, helicsBrokerClone)
 {
     //helics_broker helicsBrokerClone(helics_broker broker, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsBrokerClone(nullptr, &err);
@@ -588,7 +588,7 @@ TEST(evil_broker_test, helicsBrokerIsValid)
 {
     //helics_bool helicsBrokerIsValid(helics_broker broker);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     EXPECT_NE(helicsBrokerIsValid(evil_broker), helics_true);
     EXPECT_NE(helicsBrokerIsValid(nullptr), helics_true);
 }
@@ -597,7 +597,7 @@ TEST(evil_broker_test, helicsBrokerIsConnected)
 {
     //helics_bool helicsBrokerIsConnected(helics_broker broker);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto res1 = helicsBrokerIsConnected(evil_broker);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsBrokerIsConnected(nullptr);
@@ -608,7 +608,7 @@ TEST(evil_broker_test, helicsBrokerDataLink)
 {
     //void helicsBrokerDataLink(helics_broker broker, const char* source, const char* target, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerDataLink(nullptr, nullptr, nullptr, &err);
@@ -622,7 +622,7 @@ TEST(evil_broker_test, helicsBrokerAddSourceFilterToEndpoint)
 {
     //void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerAddSourceFilterToEndpoint(nullptr, "filter", "ept", &err);
@@ -637,7 +637,7 @@ TEST(evil_broker_test, helicsBrokerAddDestinationFilterToEndpoint)
 {
     //void helicsBrokerAddDestinationFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerAddDestinationFilterToEndpoint(nullptr, "filter", "ept", &err);
@@ -652,7 +652,7 @@ TEST(evil_broker_test, helicsBrokerMakeConnections)
 {
     //void helicsBrokerMakeConnections(helics_broker broker, const char* file, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerMakeConnections(nullptr, "invalidfile.json", &err);
@@ -667,7 +667,7 @@ TEST(evil_broker_test, helicsBrokerWaitForDisconnect)
 {
     //helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsBrokerWaitForDisconnect(nullptr, 1, &err);
@@ -684,7 +684,7 @@ TEST(evil_broker_test, helicsBrokerGetIdentifier)
 {
     //const char*  helicsBrokerGetIdentifier(helics_broker broker);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto res1 = helicsBrokerGetIdentifier(evil_broker);
     EXPECT_STREQ(res1, "");
 }
@@ -693,7 +693,7 @@ TEST(evil_broker_test, helicsBrokerGetAddress)
 {
     //const char*  helicsBrokerGetAddress(helics_broker broker);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto res1 = helicsBrokerGetAddress(evil_broker);
     EXPECT_STREQ(res1, "");
 }
@@ -702,7 +702,7 @@ TEST(evil_broker_test, helicsBrokerDisconnect)
 {
     //void helicsBrokerDisconnect(helics_broker broker, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerDisconnect(nullptr, &err);
@@ -720,7 +720,7 @@ TEST(evil_broker_test, helicsBrokerDestroy)
 {
     //void helicsBrokerDestroy(helics_broker broker);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     EXPECT_NO_THROW(helicsBrokerDestroy(evil_broker));
     EXPECT_NO_THROW(helicsBrokerFree(nullptr));
 }
@@ -729,7 +729,7 @@ TEST(evil_broker_test, helicsBrokerFree)
 {
     //void helicsBrokerFree(helics_broker broker);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     EXPECT_NO_THROW(helicsBrokerFree(evil_broker));
     EXPECT_NO_THROW(helicsBrokerFree(nullptr));
 }
@@ -738,7 +738,7 @@ TEST(evil_broker_test, helicsBrokerSetGlobal)
 {
     //void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const char* value, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerSetGlobal(nullptr, "value", "value", &err);
@@ -753,7 +753,7 @@ TEST(evil_broker_test, helicsBrokerSetLogFile)
 {
     //void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerSetLogFile(nullptr, "unknownfile.log", &err);
@@ -768,7 +768,7 @@ TEST(evil_broker_test, helicsBrokerSetLoggingCallback)
 {
     //void helicsBrokerSetLoggingCallback(     helics_broker broker,     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),     void* userdata,     helics_error* err);
     char rdata[256];
-    helics_broker evil_broker = reinterpret_cast<helics_broker>(rdata);
+    auto evil_broker = reinterpret_cast<helics_broker>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerSetLoggingCallback(nullptr, nullptr, nullptr, &err);
@@ -3116,7 +3116,7 @@ TEST(evil_message_object_test, helicsMessageGetSource)
 {
     //const char*  helicsMessageGetSource(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetSource(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsMessageGetSource(evil_mo);
@@ -3127,7 +3127,7 @@ TEST(evil_message_object_test, helicsMessageGetDestination)
 {
     //const char*  helicsMessageGetDestination(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetDestination(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsMessageGetDestination(evil_mo);
@@ -3138,7 +3138,7 @@ TEST(evil_message_object_test, helicsMessageGetOriginalSource)
 {
     //const char*  helicsMessageGetOriginalSource(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetOriginalSource(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsMessageGetOriginalSource(evil_mo);
@@ -3149,7 +3149,7 @@ TEST(evil_message_object_test, helicsMessageGetOriginalDestination)
 {
     //const char*  helicsMessageGetOriginalDestination(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetOriginalDestination(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsMessageGetOriginalDestination(evil_mo);
@@ -3160,7 +3160,7 @@ TEST(evil_message_object_test, helicsMessageGetTime)
 {
     //helics_time helicsMessageGetTime(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetTime(nullptr);
     EXPECT_EQ(res1, helics_time_invalid);
     auto res2 = helicsMessageGetTime(evil_mo);
@@ -3171,7 +3171,7 @@ TEST(evil_message_object_test, helicsMessageGetString)
 {
     //const char*  helicsMessageGetString(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetString(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsMessageGetString(evil_mo);
@@ -3182,7 +3182,7 @@ TEST(evil_message_object_test, helicsMessageGetMessageID)
 {
     //int helicsMessageGetMessageID(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetMessageID(nullptr);
     EXPECT_EQ(res1, 0);
     auto res2 = helicsMessageGetMessageID(evil_mo);
@@ -3193,7 +3193,7 @@ TEST(evil_message_object_test, helicsMessageCheckFlag)
 {
     //helics_bool helicsMessageCheckFlag(helics_message_object message, int flag);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageCheckFlag(nullptr, 5);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsMessageCheckFlag(evil_mo, 9);
@@ -3204,7 +3204,7 @@ TEST(evil_message_object_test, helicsMessageGetRawDataSize)
 {
     //int helicsMessageGetRawDataSize(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageGetRawDataSize(nullptr);
     EXPECT_EQ(res1, 0);
     auto res2 = helicsMessageGetRawDataSize(evil_mo);
@@ -3215,7 +3215,7 @@ TEST(evil_message_object_test, helicsMessageGetRawData)
 {
     //void helicsMessageGetRawData(helics_message_object message, void* data, int maxMessagelen, int* actualSize, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actSize = 98;
@@ -3234,7 +3234,7 @@ TEST(evil_message_object_test, helicsMessageIsValid)
 {
     //helics_bool helicsMessageIsValid(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto res1 = helicsMessageIsValid(nullptr);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsMessageIsValid(evil_mo);
@@ -3245,7 +3245,7 @@ TEST(evil_message_object_test, helicsMessageSetSource)
 {
     //void helicsMessageSetSource(helics_message_object message, const char* src, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetSource(nullptr, "src", &err);
@@ -3260,7 +3260,7 @@ TEST(evil_message_object_test, helicsMessageCopy)
 {
     //void helicsMessageSetSource(helics_message_object message, const char* src, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageCopy(nullptr, nullptr, &err);
@@ -3277,7 +3277,7 @@ TEST(evil_message_object_test, helicsMessageSetDestination)
 {
     //void helicsMessageSetDestination(helics_message_object message, const char* dest, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetDestination(nullptr, "dest", &err);
@@ -3292,7 +3292,7 @@ TEST(evil_message_object_test, helicsMessageSetOriginalSource)
 {
     //void helicsMessageSetOriginalSource(helics_message_object message, const char* src, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetOriginalSource(nullptr, nullptr, &err);
@@ -3307,7 +3307,7 @@ TEST(evil_message_object_test, helicsMessageSetOriginalDestination)
 {
     //void helicsMessageSetOriginalDestination(helics_message_object message, const char* dest, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetOriginalDestination(nullptr, nullptr, &err);
@@ -3322,7 +3322,7 @@ TEST(evil_message_object_test, helicsMessageSetTime)
 {
     //void helicsMessageSetTime(helics_message_object message, helics_time time, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetTime(nullptr, 1.0, &err);
@@ -3337,7 +3337,7 @@ TEST(evil_message_object_test, helicsMessageResize)
 {
     //void helicsMessageResize(helics_message_object message, int newSize, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageResize(nullptr, 5, &err);
@@ -3352,7 +3352,7 @@ TEST(evil_message_object_test, helicsMessageReserve)
 {
     //void helicsMessageReserve(helics_message_object message, int reserveSize, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageReserve(nullptr, 9999, &err);
@@ -3367,7 +3367,7 @@ TEST(evil_message_object_test, helicsMessageSetMessageID)
 {
     //void helicsMessageSetMessageID(helics_message_object message, int32_t messageID, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetMessageID(nullptr, 1, &err);
@@ -3382,7 +3382,7 @@ TEST(evil_message_object_test, helicsMessageClearFlags)
 {
     //void helicsMessageClearFlags(helics_message_object message);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     EXPECT_NO_THROW(helicsMessageClearFlags(nullptr));
     EXPECT_NO_THROW(helicsMessageClearFlags(evil_mo));
 }
@@ -3391,7 +3391,7 @@ TEST(evil_message_object_test, helicsMessageSetFlagOption)
 {
     //void helicsMessageSetFlagOption(helics_message_object message, int flag, helics_bool flagValue, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetFlagOption(nullptr, 5, helics_false, &err);
@@ -3406,7 +3406,7 @@ TEST(evil_message_object_test, helicsMessageSetString)
 {
     //void helicsMessageSetString(helics_message_object message, const char* str, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetString(nullptr, nullptr, &err);
@@ -3421,7 +3421,7 @@ TEST(evil_message_object_test, helicsMessageSetData)
 {
     //void helicsMessageSetData(helics_message_object message, const void* data, int inputDataLength, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetData(nullptr, nullptr, 99, &err);
@@ -3436,7 +3436,7 @@ TEST(evil_message_object_test, helicsMessageAppendData)
 {
     //void helicsMessageAppendData(helics_message_object message, const void* data, int inputDataLength, helics_error* err);
     char rdata[256];
-    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto evil_mo = reinterpret_cast<helics_message_object>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageAppendData(nullptr, nullptr, 89, &err);
@@ -3453,7 +3453,7 @@ TEST(evil_endpoint_test, helicsEndpointSetDefaultDestination)
 {
     //void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSetDefaultDestination(nullptr, nullptr, &err);
@@ -3468,7 +3468,7 @@ TEST(evil_endpoint_test, helicsEndpointGetDefaultDestination)
 {
     //const char*  helicsEndpointGetDefaultDestination(helics_endpoint endpoint);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointGetDefaultDestination(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsEndpointGetDefaultDestination(evil_ept);
@@ -3479,7 +3479,7 @@ TEST(evil_endpoint_test, helicsEndpointSendMessageRaw)
 {
     //void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, const void* data, int inputDataLength, helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendMessageRaw(nullptr, nullptr, nullptr, 45, &err);
@@ -3494,7 +3494,7 @@ TEST(evil_endpoint_test, helicsEndpointSendEventRaw)
 {
     //void helicsEndpointSendEventRaw(     helics_endpoint endpoint,     const char* dest,     const void* data,     int inputDataLength,     helics_time time,     helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendEventRaw(nullptr, nullptr, nullptr, 25, 3.5, &err);
@@ -3509,7 +3509,7 @@ TEST(evil_endpoint_test, helicsEndpointSendMessageObject)
 {
     //void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_object message, helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendMessageObject(nullptr, nullptr, &err);
@@ -3524,7 +3524,7 @@ TEST(evil_endpoint_test, helicsEndpointSubscribe)
 {
     //void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSubscribe(nullptr, nullptr, &err);
@@ -3539,7 +3539,7 @@ TEST(evil_endpoint_test, helicsEndpointHasMessage)
 {
     //helics_bool helicsEndpointHasMessage(helics_endpoint endpoint);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointHasMessage(nullptr);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsEndpointHasMessage(evil_ept);
@@ -3550,7 +3550,7 @@ TEST(evil_endpoint_test, helicsEndpointPendingMessages)
 {
     //int helicsEndpointPendingMessages(helics_endpoint endpoint);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointPendingMessages(nullptr);
     EXPECT_EQ(res1, 0);
     auto res2 = helicsEndpointPendingMessages(evil_ept);
@@ -3562,7 +3562,7 @@ TEST(evil_endpoint_test, helicsEndpointGetMessageObject)
 {
     //helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointGetMessageObject(nullptr);
     EXPECT_EQ(res1, nullptr);
     auto res2 = helicsEndpointGetMessageObject(evil_ept);
@@ -3573,7 +3573,7 @@ TEST(evil_endpoint_test, helicsEndpointGetType)
 {
     //const char*  helicsEndpointGetType(helics_endpoint endpoint);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointGetType(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsEndpointGetType(evil_ept);
@@ -3584,7 +3584,7 @@ TEST(evil_endpoint_test, helicsEndpointGetName)
 {
     //const char*  helicsEndpointGetName(helics_endpoint endpoint);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointGetName(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsEndpointGetName(evil_ept);
@@ -3595,7 +3595,7 @@ TEST(evil_endpoint_test, helicsEndpointGetInfo)
 {
     //const char*  helicsEndpointGetInfo(helics_endpoint end);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointGetInfo(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsEndpointGetInfo(evil_ept);
@@ -3606,7 +3606,7 @@ TEST(evil_endpoint_test, helicsEndpointSetInfo)
 {
     //void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSetInfo(nullptr, nullptr, &err);
@@ -3625,7 +3625,7 @@ TEST(evil_endpoint_test, helicsEndpointSetOption)
 {
     //void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value, helics_error* err);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSetOption(nullptr, 5, helics_false, &err);
@@ -3640,7 +3640,7 @@ TEST(evil_endpoint_test, helicsEndpointGetOption)
 {
     //helics_bool helicsEndpointGetOption(helics_endpoint end, int option);
     char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto res1 = helicsEndpointGetOption(nullptr, 5);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsEndpointGetOption(evil_ept, 0);

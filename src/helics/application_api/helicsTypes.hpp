@@ -68,11 +68,7 @@ class identifier_id_t {
         return *this;
     };
     /** copy assignment*/
-    identifier_id_t& operator=(const identifier_id_t& id) noexcept
-    {
-        ivalue = id.ivalue;
-        return *this;
-    };
+    identifier_id_t& operator=(const identifier_id_t& id) = default;
 
     /** get the underlying value*/
     BaseType value() const noexcept { return ivalue; };
