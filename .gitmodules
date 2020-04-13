@@ -27,3 +27,6 @@
 [submodule "ThirdParty/netif"]
 	path = ThirdParty/netif
 	url = https://github.com/GMLC-TDC/netif.git
+[submodule "ThirdParty/websocketpp"]
+	path = ThirdParty/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
