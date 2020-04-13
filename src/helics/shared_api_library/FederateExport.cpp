@@ -21,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 static const int fedValidationIdentifier = 0x2352188;
 static const char* invalidFedString = "federate object is not valid";
 
-static const std::string nullstr;
 static constexpr char nullcstr[] = "";
 
 namespace helics {

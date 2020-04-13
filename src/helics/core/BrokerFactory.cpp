@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cassert>
 
 namespace helics {
-static const std::string emptyString;
 
 namespace BrokerFactory {
 
@@ -83,6 +82,7 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(core_type type, const std::string& configureString)
     {
+        static const std::string emptyString;
         return create(type, emptyString, configureString);
     }
 
@@ -104,6 +104,7 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(core_type type, int argc, char* argv[])
     {
+        static const std::string emptyString;
         return create(type, emptyString, argc, argv);
     }
 
@@ -122,6 +123,7 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(core_type type, std::vector<std::string> args)
     {
+        static const std::string emptyString;
         return create(type, emptyString, std::move(args));
     }
 
@@ -252,14 +254,14 @@ need be without issue*/
     {
         if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED) {
             std::cout << "All core types have similar options\n";
-            auto brk = makeBroker(core_type::DEFAULT, emptyString);
+            auto brk = makeBroker(core_type::DEFAULT, std::string{});
             brk->configure(helpStr);
 #ifdef ENABLE_TCP_CORE
-            brk = makeBroker(core_type::TCP_SS, emptyString);
+            brk = makeBroker(core_type::TCP_SS, std::string{});
             brk->configure(helpStr);
 #endif
         } else {
-            auto brk = makeBroker(type, emptyString);
+            auto brk = makeBroker(type, std::string{});
             brk->configure(helpStr);
         }
     }

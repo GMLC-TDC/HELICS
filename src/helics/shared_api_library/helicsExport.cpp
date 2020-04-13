@@ -33,7 +33,6 @@ const char* helicsGetVersion(void)
 static constexpr const char* nullstrPtr = "";
 
 const std::string emptyStr;
-static const std::string nullstr;
 
 helics_error helicsErrorInitialize(void)
 {
@@ -358,8 +357,7 @@ helics_broker helicsCreateBroker(const char* type, const char* name, const char*
     auto broker = std::make_unique<helics::BrokerObject>();
     broker->valid = brokerValidationIdentifier;
     try {
-        broker->brokerptr = helics::BrokerFactory::create(
-            ct, (name != nullptr) ? std::string(name) : nullstr, (initString != nullptr) ? std::string(initString) : nullstr);
+        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), AS_STRING(initString));
         auto retbroker = reinterpret_cast<helics_broker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
@@ -392,7 +390,7 @@ helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int
         for (int ii = argc - 1; ii > 0; ii--) {
             args.emplace_back(argv[ii]);
         }
-        broker->brokerptr = helics::BrokerFactory::create(ct, (name != nullptr) ? std::string(name) : nullstr, args);
+        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), args);
         auto retbroker = reinterpret_cast<helics_broker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
@@ -626,7 +624,7 @@ const char* helicsBrokerGetIdentifier(helics_broker broker)
 {
     auto brk = getBroker(broker, nullptr);
     if (brk == nullptr) {
-        return nullstr.c_str();
+        return nullstrPtr;
     }
     auto& ident = brk->getIdentifier();
     return ident.c_str();
@@ -636,7 +634,7 @@ const char* helicsCoreGetIdentifier(helics_core core)
 {
     auto cr = getCore(core, nullptr);
     if (cr == nullptr) {
-        return nullstr.c_str();
+        return nullstrPtr;
     }
 
     auto& ident = cr->getIdentifier();
@@ -647,7 +645,7 @@ const char* helicsBrokerGetAddress(helics_broker broker)
 {
     auto brk = getBroker(broker, nullptr);
     if (brk == nullptr) {
-        return nullstr.c_str();
+        return nullstrPtr;
     }
 
     auto& add = brk->getAddress();
@@ -658,7 +656,7 @@ const char* helicsCoreGetAddress(helics_core core)
 {
     auto cr = getCore(core, nullptr);
     if (cr == nullptr) {
-        return nullstr.c_str();
+        return nullstrPtr;
     }
 
     auto& add = cr->getAddress();

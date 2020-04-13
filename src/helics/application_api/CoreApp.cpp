@@ -192,17 +192,20 @@ void CoreApp::makeConnections(const std::string& file)
     }
 }
 
-static const std::string estring{};
 /** get the identifier of the core*/
 const std::string& CoreApp::getIdentifier() const
 {
+    static const std::string estring;
     return (core) ? core->getIdentifier() : estring;
 }
+
 /** get the network address of the core*/
 const std::string& CoreApp::getAddress() const
 {
+    static const std::string estring;
     return (core) ? core->getAddress() : estring;
 }
+
 /** make a query at the core*/
 std::string CoreApp::query(const std::string& target, const std::string& queryStr)
 {

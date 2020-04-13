@@ -37,7 +37,7 @@ namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
-const std::string localhost{"localhost"};
+const constexpr char localhost[]="localhost";
 
 class httpTest: public ::testing::Test {
   protected:
