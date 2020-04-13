@@ -2117,7 +2117,7 @@ TEST(evil_pub_test, helicsPublicationPublishRaw)
 {
     //void helicsPublicationPublishRaw(helics_publication pub, const void* data, int inputDataLength, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishRaw(nullptr, nullptr, 85, &err);
@@ -2132,7 +2132,7 @@ TEST(evil_pub_test, helicsPublicationPublishString)
 {
     //void helicsPublicationPublishString(helics_publication pub, const char* str, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishString(nullptr, nullptr, &err);
@@ -2147,7 +2147,7 @@ TEST(evil_pub_test, helicsPublicationPublishInteger)
 {
     //void helicsPublicationPublishInteger(helics_publication pub, int64_t val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishInteger(nullptr, 1, &err);
@@ -2162,7 +2162,7 @@ TEST(evil_pub_test, helicsPublicationPublishBoolean)
 {
     //void helicsPublicationPublishBoolean(helics_publication pub, helics_bool val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishBoolean(nullptr, 0, &err);
@@ -2177,7 +2177,7 @@ TEST(evil_pub_test, helicsPublicationPublishDouble)
 {
     //void helicsPublicationPublishDouble(helics_publication pub, double val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishDouble(nullptr, 1.7, &err);
@@ -2192,7 +2192,7 @@ TEST(evil_pub_test, helicsPublicationPublishTime)
 {
     //void helicsPublicationPublishTime(helics_publication pub, helics_time val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishTime(nullptr, 4.3, &err);
@@ -2207,7 +2207,7 @@ TEST(evil_pub_test, helicsPublicationPublishChar)
 {
     //void helicsPublicationPublishChar(helics_publication pub, char val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishChar(nullptr, '\0', &err);
@@ -2222,7 +2222,7 @@ TEST(evil_pub_test, helicsPublicationPublishComplex)
 {
     //void helicsPublicationPublishComplex(helics_publication pub, double real, double imag, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishComplex(nullptr, 2.0, -6.5, &err);
@@ -2237,7 +2237,7 @@ TEST(evil_pub_test, helicsPublicationPublishVector)
 {
     //void helicsPublicationPublishVector(helics_publication pub, const double* vectorInput, int vectorLength, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishVector(nullptr, nullptr, 99, &err);
@@ -2252,7 +2252,7 @@ TEST(evil_pub_test, helicsPublicationPublishNamedPoint)
 {
     //void helicsPublicationPublishNamedPoint(helics_publication pub, const char* str, double val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishNamedPoint(nullptr, "string", 5.0, &err);
@@ -2267,7 +2267,7 @@ TEST(evil_pub_test, helicsPublicationAddTarget)
 {
     //void helicsPublicationAddTarget(helics_publication pub, const char* target, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationAddTarget(nullptr, "target", &err);
@@ -2282,7 +2282,7 @@ TEST(evil_pub_test, helicsPublicationGetType)
 {
     //const char*  helicsPublicationGetType(helics_publication pub);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto res1 = helicsPublicationGetType(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsPublicationGetType(evil_pub);
@@ -2293,7 +2293,7 @@ TEST(evil_pub_test, helicsPublicationGetKey)
 {
     //const char*  helicsPublicationGetKey(helics_publication pub);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto res1 = helicsPublicationGetKey(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsPublicationGetKey(evil_pub);
@@ -2304,7 +2304,7 @@ TEST(evil_pub_test, helicsPublicationGetUnits)
 {
     //const char*  helicsPublicationGetUnits(helics_publication pub);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto res1 = helicsPublicationGetUnits(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsPublicationGetUnits(evil_pub);
@@ -2315,7 +2315,7 @@ TEST(evil_pub_test, helicsPublicationGetInfo)
 {
     //const char*  helicsPublicationGetInfo(helics_publication pub);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto res1 = helicsPublicationGetInfo(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsPublicationGetInfo(evil_pub);
@@ -2326,7 +2326,7 @@ TEST(evil_pub_test, helicsPublicationSetInfo)
 {
     //void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationSetInfo(nullptr, "info", &err);
@@ -2341,7 +2341,7 @@ TEST(evil_pub_test, helicsPublicationSetMinimumChange)
 {
     //void helicsPublicationSetMinimumChange(helics_publication pub, double tolerance, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationSetMinimumChange(nullptr, 12.0, &err);
@@ -2356,7 +2356,7 @@ TEST(evil_pub_test, helicsPublicationGetOption)
 {
     //helics_bool helicsPublicationGetOption(helics_publication pub, int option);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto res1 = helicsPublicationGetOption(nullptr, -45);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsPublicationGetOption(evil_pub, 15);
@@ -2367,7 +2367,7 @@ TEST(evil_pub_test, helicsPublicationSetOption)
 {
     //void helicsPublicationSetOption(helics_publication pub, int option, helics_bool val, helics_error* err);
     char rdata[256];
-    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationSetOption(nullptr, -10, helics_true, &err);
@@ -2387,7 +2387,7 @@ TEST(evil_input_test, helicsInputAddTarget)
 {
     //void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputAddTarget(nullptr, nullptr, &err);
@@ -2402,7 +2402,7 @@ TEST(evil_input_test, helicsInputGetRawValueSize)
 {
     //int helicsInputGetRawValueSize(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetRawValueSize(nullptr);
     EXPECT_EQ(res1, 0);
     auto res2 = helicsInputGetRawValueSize(evil_input);
@@ -2413,7 +2413,7 @@ TEST(evil_input_test, helicsInputGetRawValue)
 {
     //void helicsInputGetRawValue(helics_input ipt, void* data, int maxDatalen, int* actualSize, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actLen = 99;
@@ -2432,7 +2432,7 @@ TEST(evil_input_test, helicsInputGetStringSize)
 {
     //int helicsInputGetStringSize(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetStringSize(nullptr);
     EXPECT_EQ(res1, 0);
     auto res2 = helicsInputGetStringSize(evil_input);
@@ -2443,7 +2443,7 @@ TEST(evil_input_test, helicsInputGetString)
 {
     //void helicsInputGetString(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actLen = 99;
@@ -2462,7 +2462,7 @@ TEST(evil_input_test, helicsInputGetInteger)
 {
     //int64_t helicsInputGetInteger(helics_input ipt, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetInteger(nullptr, &err);
@@ -2480,7 +2480,7 @@ TEST(evil_input_test, helicsInputGetBoolean)
 {
     //helics_bool helicsInputGetBoolean(helics_input ipt, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetBoolean(nullptr, &err);
@@ -2498,7 +2498,7 @@ TEST(evil_input_test, helicsInputGetDouble)
 {
     //double helicsInputGetDouble(helics_input ipt, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetDouble(nullptr, &err);
@@ -2516,7 +2516,7 @@ TEST(evil_input_test, helicsInputGetTime)
 {
     //helics_time helicsInputGetTime(helics_input ipt, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetTime(nullptr, &err);
@@ -2534,7 +2534,7 @@ TEST(evil_input_test, helicsInputGetChar)
 {
     //char helicsInputGetChar(helics_input ipt, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     char res1 = helicsInputGetChar(nullptr, &err);
@@ -2553,7 +2553,7 @@ TEST(evil_input_test, helicsInputGetComplexObject)
 {
     //helics_complex helicsInputGetComplexObject(helics_input ipt, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetComplexObject(nullptr, &err);
@@ -2571,7 +2571,7 @@ TEST(evil_input_test, helicsInputGetComplex)
 {
     //void helicsInputGetComplex(helics_input ipt, double* real, double* imag, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputGetComplex(nullptr, nullptr, nullptr, &err);
@@ -2590,7 +2590,7 @@ TEST(evil_input_test, helicsInputGetVectorSize)
 {
     //int helicsInputGetVectorSize(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetVectorSize(nullptr);
     EXPECT_EQ(res1, 0);
     auto res2 = helicsInputGetVectorSize(evil_input);
@@ -2601,7 +2601,7 @@ TEST(evil_input_test, helicsInputGetVector)
 {
     //void helicsInputGetVector(helics_input ipt, double data[], int maxlen, int* actualSize, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actLen = -56;
@@ -2619,7 +2619,7 @@ TEST(evil_input_test, helicsInputGetNamedPoint)
 {
     //void helicsInputGetNamedPoint(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, double* val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actLen = -56;
@@ -2641,7 +2641,7 @@ TEST(evil_input_test, helicsInputSetDefaultRaw)
 {
     //void helicsInputSetDefaultRaw(helics_input ipt, const void* data, int inputDataLength, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultRaw(nullptr, nullptr, -87, &err);
@@ -2656,7 +2656,7 @@ TEST(evil_input_test, helicsInputSetDefaultString)
 {
     //void helicsInputSetDefaultString(helics_input ipt, const char* str, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultString(nullptr, nullptr, &err);
@@ -2671,7 +2671,7 @@ TEST(evil_input_test, helicsInputSetDefaultInteger)
 {
     //void helicsInputSetDefaultInteger(helics_input ipt, int64_t val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultInteger(nullptr, -1798524456525, &err);
@@ -2686,7 +2686,7 @@ TEST(evil_input_test, helicsInputSetDefaultBoolean)
 {
     //void helicsInputSetDefaultBoolean(helics_input ipt, helics_bool val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultBoolean(nullptr, helics_false, &err);
@@ -2701,7 +2701,7 @@ TEST(evil_input_test, helicsInputSetDefaultTime)
 {
     //void helicsInputSetDefaultTime(helics_input ipt, helics_time val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultTime(nullptr, 5.7, &err);
@@ -2716,7 +2716,7 @@ TEST(evil_input_test, helicsInputSetDefaultChar)
 {
     //void helicsInputSetDefaultChar(helics_input ipt, char val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultChar(nullptr, 'b', &err);
@@ -2731,7 +2731,7 @@ TEST(evil_input_test, helicsInputSetDefaultDouble)
 {
     //void helicsInputSetDefaultDouble(helics_input ipt, double val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultDouble(nullptr, 1.0, &err);
@@ -2746,7 +2746,7 @@ TEST(evil_input_test, helicsInputSetDefaultComplex)
 {
     //void helicsInputSetDefaultComplex(helics_input ipt, double real, double imag, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultComplex(nullptr, 1.0, 1.0, &err);
@@ -2761,7 +2761,7 @@ TEST(evil_input_test, helicsInputSetDefaultVector)
 {
     //void helicsInputSetDefaultVector(helics_input ipt, const double* vectorInput, int vectorLength, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultVector(nullptr, nullptr, 28, &err);
@@ -2776,7 +2776,7 @@ TEST(evil_input_test, helicsInputSetDefaultNamedPoint)
 {
     //void helicsInputSetDefaultNamedPoint(helics_input ipt, const char* str, double val, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultNamedPoint(nullptr, nullptr, 0.0, &err);
@@ -2791,7 +2791,7 @@ TEST(evil_input_test, helicsInputGetType)
 {
     //const char*  helicsInputGetType(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetType(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetType(evil_input);
@@ -2802,7 +2802,7 @@ TEST(evil_input_test, helicsInputGetPublicationType)
 {
     //const char*  helicsInputGetPublicationType(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetPublicationType(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetPublicationType(evil_input);
@@ -2813,7 +2813,7 @@ TEST(evil_input_test, helicsInputGetKey)
 {
     //const char*  helicsInputGetKey(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetKey(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetKey(evil_input);
@@ -2824,7 +2824,7 @@ TEST(evil_input_test, helicsSubscriptionGetKey)
 {
     //const char*  helicsSubscriptionGetKey(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsSubscriptionGetKey(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsSubscriptionGetKey(evil_input);
@@ -2835,7 +2835,7 @@ TEST(evil_input_test, helicsInputGetUnits)
 {
     //const char*  helicsInputGetUnits(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetUnits(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetUnits(evil_input);
@@ -2846,7 +2846,7 @@ TEST(evil_input_test, helicsInputGetInjectionUnits)
 {
     //const char*  helicsInputGetInjectionUnits(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetInjectionUnits(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetInjectionUnits(evil_input);
@@ -2857,7 +2857,7 @@ TEST(evil_input_test, helicsInputGetExtractionUnits)
 {
     //const char*  helicsInputGetExtractionUnits(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetExtractionUnits(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetExtractionUnits(evil_input);
@@ -2868,7 +2868,7 @@ TEST(evil_input_test, helicsInputGetInfo)
 {
     //const char*  helicsInputGetInfo(helics_input inp);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetInfo(nullptr);
     EXPECT_STREQ(res1, "");
     auto res2 = helicsInputGetInfo(evil_input);
@@ -2879,7 +2879,7 @@ TEST(evil_input_test, helicsInputSetInfo)
 {
     //void helicsInputSetInfo(helics_input inp, const char* info, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetInfo(nullptr, nullptr, &err);
@@ -2894,7 +2894,7 @@ TEST(evil_input_test, helicsInputSetMinimumChange)
 {
     //void helicsInputSetMinimumChange(helics_input inp, double tolerance, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetMinimumChange(nullptr, 12.0, &err);
@@ -2909,7 +2909,7 @@ TEST(evil_input_test, helicsInputGetOption)
 {
     //helics_bool helicsInputGetOption(helics_input inp, int option);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputGetOption(nullptr, 99);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsInputGetOption(evil_input, 5);
@@ -2920,7 +2920,7 @@ TEST(evil_input_test, helicsInputSetOption)
 {
     //void helicsInputSetOption(helics_input inp, int option, helics_bool value, helics_error* err);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetOption(nullptr, 0, helics_true, &err);
@@ -2938,7 +2938,7 @@ TEST(evil_input_test, helicsInputIsUpdated)
 {
     //helics_bool helicsInputIsUpdated(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputIsUpdated(nullptr);
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsInputIsUpdated(evil_input);
@@ -2949,7 +2949,7 @@ TEST(evil_input_test, helicsInputLastUpdateTime)
 {
     //helics_time helicsInputLastUpdateTime(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     auto res1 = helicsInputLastUpdateTime(nullptr);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     auto res2 = helicsInputLastUpdateTime(evil_input);
@@ -2960,7 +2960,7 @@ TEST(evil_input_test, helicsInputClearUpdate)
 {
     //void helicsInputClearUpdate(helics_input ipt);
     char rdata[256];
-    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
     EXPECT_NO_THROW(helicsInputClearUpdate(nullptr));
     EXPECT_NO_THROW(helicsInputClearUpdate(evil_input));
 }

@@ -36,7 +36,7 @@ constexpr Time negEpsilon = -Time::epsilon();
 /** user defined literal for a time variable*/
 constexpr Time operator"" _t(long double val)
 {
-    return Time(static_cast<double>(val));
+    return { static_cast<double>(val) };
 } // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
