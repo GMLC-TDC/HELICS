@@ -45,7 +45,7 @@ TEST_P(mfed_simple_type_tests, endpoint_registration)
     SetupTest(helicsCreateMessageFederate, GetParam(), 1);
     auto mFed1 = GetFederateAt(0);
 
-    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err);
+    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     CE(helicsFederateEnterExecutingMode(mFed1, &err));
@@ -82,7 +82,7 @@ TEST_P(mfed_simple_type_tests, send_receive)
     SetupTest(helicsCreateMessageFederate, GetParam(), 1);
     auto mFed1 = GetFederateAt(0);
 
-    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err);
+    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
@@ -125,7 +125,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     SetupTest(helicsCreateMessageFederate, GetParam(), 1);
     auto mFed1 = GetFederateAt(0);
 
-    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err);
+    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
@@ -169,7 +169,7 @@ TEST_F(mfed_tests, message_object_tests)
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
 
-    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err);
+    auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
@@ -227,7 +227,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     auto mFed2 = GetFederateAt(1);
     helicsFederateSetIntegerProperty(mFed1, helics_property_int_console_log_level, 0, &err);
     // mFed2->setLoggingLevel(4);
-    CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err));
+    CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err));
     CE(auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed2, "ep2", "random", &err));
 
     helicsEndpointSetOption(epid, helics_handle_option_ignore_interrupts, helics_true, &err);
@@ -308,7 +308,7 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
     auto mFed2 = GetFederateAt(1);
     // mFed1->setLoggingLevel(4);
     // mFed2->setLoggingLevel(4);
-    CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err));
+    CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err));
     CE(auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed2, "ep2", "random", &err));
 
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));

@@ -158,7 +158,7 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
 
 void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -175,7 +175,7 @@ void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* d
 
 const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return nullcstr;
     }
@@ -185,7 +185,7 @@ const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint)
 
 void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, const void* data, int inputDataLength, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -217,7 +217,7 @@ void helicsEndpointSendEventRaw(
     helics_time time,
     helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -245,7 +245,7 @@ static constexpr char emptyMessageErrorString[] = "the message is NULL";
 
 void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -284,7 +284,7 @@ void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message
 
 void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_object message, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -296,7 +296,7 @@ void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_ob
         return;
     }
 
-    helics::Message* mess = reinterpret_cast<helics::Message*>(message);
+    auto* mess = reinterpret_cast<helics::Message*>(message);
     try {
         endObj->endPtr->send(*mess);
     }
@@ -308,7 +308,7 @@ void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_ob
 
 void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_message_object message, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -320,8 +320,8 @@ void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_me
         return;
     }
 
-    helics::Message* mess = reinterpret_cast<helics::Message*>(message);
-    auto messages = reinterpret_cast<helics::MessageHolder *>(mess->backReference);
+    auto* mess = reinterpret_cast<helics::Message*>(message);
+    auto* messages = reinterpret_cast<helics::MessageHolder *>(mess->backReference);
     if (messages)
     {
         auto ptr = messages->extractMessage(mess->counter);
@@ -347,7 +347,7 @@ void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_me
 
 void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return;
     }
@@ -373,7 +373,7 @@ helics_bool helicsFederateHasMessage(helics_federate fed)
 
 helics_bool helicsEndpointHasMessage(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return helics_false;
     }
@@ -391,7 +391,7 @@ int helicsFederatePendingMessages(helics_federate fed)
 
 int helicsEndpointPendingMessages(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return 0;
     }
@@ -501,7 +501,7 @@ static helics_message emptyMessage()
 
 helics_message helicsEndpointGetMessage(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return emptyMessage();
     }
@@ -550,7 +550,7 @@ helics_message helicsFederateGetMessage(helics_federate fed)
 
 helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return nullptr;
     }
@@ -593,7 +593,7 @@ helics_message_object helicsFederateCreateMessageObject(helics_federate fed, hel
 
 helics_message_object helicsEndpointCreateMessageObject(helics_endpoint endpoint, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, err);
+    auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return nullptr;
     }
@@ -632,7 +632,7 @@ helics_message_object helicsFederateGetLastMessage (helics_federate fed)
 
 helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint (endpoint, nullptr);
+    auto* endObj = verifyEndpoint (endpoint, nullptr);
     if (endObj == nullptr)
     {
         return nullptr;
@@ -648,7 +648,7 @@ helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint)
 
 const char* helicsEndpointGetType(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return nullcstr;
     }
@@ -666,7 +666,7 @@ const char* helicsEndpointGetType(helics_endpoint endpoint)
 
 const char* helicsEndpointGetName(helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return nullcstr;
     }
@@ -686,7 +686,7 @@ int helicsFederateGetEndpointCount(helics_federate fed)
 
 const char* helicsEndpointGetInfo(helics_endpoint end)
 {
-    auto endObj = verifyEndpoint(end, nullptr);
+    auto* endObj = verifyEndpoint(end, nullptr);
     if (endObj == nullptr) {
         return emptyStr.c_str();
     }
@@ -703,7 +703,7 @@ const char* helicsEndpointGetInfo(helics_endpoint end)
 
 void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* err)
 {
-    auto endObj = verifyEndpoint(end, err);
+    auto* endObj = verifyEndpoint(end, err);
     if (endObj == nullptr) {
         return;
     }
@@ -719,7 +719,7 @@ void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* 
 
 helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
 {
-    auto endObj = verifyEndpoint(end, nullptr);
+    auto* endObj = verifyEndpoint(end, nullptr);
     if (endObj == nullptr) {
         return helics_false;
     }
@@ -735,7 +735,7 @@ helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
 
 void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value, helics_error* err)
 {
-    auto endObj = verifyEndpoint(end, err);
+    auto* endObj = verifyEndpoint(end, err);
     if (endObj == nullptr) {
         return;
     }
