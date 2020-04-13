@@ -648,6 +648,11 @@ include(addfmt)
 # --------------------------------------------------------------
 # Create the target for jsoncpp
 # -----------------------------------------------------------
+include(addWebsocketpp)
+
+# --------------------------------------------------------------
+# Create the target for jsoncpp
+# -----------------------------------------------------------
 include(addJsoncpp)
 add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
 
@@ -837,6 +842,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"
     "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
+    "websocketpp"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/websocketpp/COPYING"
     "toml11"
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
