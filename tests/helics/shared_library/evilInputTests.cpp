@@ -173,7 +173,7 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     //auto res2=helicsCreateValueFederate(const char* fedName, helics_federate_info fi, nullptr);
 
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto res3 = helicsCreateValueFederate("billy", evil_fi, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
@@ -210,7 +210,7 @@ TEST(evil_creation_test, helicsCreateMessageFederate)
     EXPECT_EQ(helicsFederateIsValid(res2), helics_false);
     helicsErrorClear(&err);
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto res3 = helicsCreateMessageFederate("billy", evil_fi, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
@@ -247,7 +247,7 @@ TEST(evil_creation_test, helicsCreateCombinationFederate)
     EXPECT_EQ(helicsFederateIsValid(res2), helics_false);
     helicsErrorClear(&err);
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto res3 = helicsCreateCombinationFederate("billy", evil_fi, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
@@ -785,7 +785,7 @@ TEST(evil_broker_test, helicsBrokerSetLoggingCallback)
 TEST(evil_fedInfo_test, helicsFederateInfoClone)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res = helicsFederateInfoClone(nullptr, &err);
@@ -800,7 +800,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoClone)
 TEST(evil_fedInfo_test, helicsFederateInfoLoadFromArgs)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoLoadFromArgs(nullptr, 0, nullptr, &err);
@@ -813,7 +813,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoLoadFromArgs)
 TEST(evil_fedInfo_test, helicsFederateInfoFree)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     EXPECT_NO_THROW(helicsFederateInfoFree(nullptr));
     EXPECT_NO_THROW(helicsFederateInfoFree(evil_fi));
 }
@@ -821,7 +821,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoFree)
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreName)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreName(nullptr, "core", &err);
@@ -834,7 +834,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreName)
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreInitString)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreInitString(nullptr, "", &err);
@@ -847,7 +847,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreInitString)
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBrokerInitString(nullptr, "", &err);
@@ -864,7 +864,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreType)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreType(nullptr, -97, &err);
@@ -877,7 +877,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreType)
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreTypeFromString(nullptr, "null", &err);
@@ -897,7 +897,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
 TEST(evil_fedInfo_test, helicsFederateInfoSetBroker)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBroker(nullptr, nullptr, &err);
@@ -910,7 +910,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBroker)
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBrokerKey(nullptr, "key", &err);
@@ -928,7 +928,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBrokerPort(nullptr, 9999, &err);
@@ -949,7 +949,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
 TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetLocalPort(nullptr, "9999", &err);
@@ -970,7 +970,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
 TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetFlagOption(nullptr, 9, helics_false, &err);
@@ -988,7 +988,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
 TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetSeparator(nullptr, '-', &err);
@@ -1006,7 +1006,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
 TEST(evil_fedInfo_test, helicsFederateInfoSetTimeProperty)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetTimeProperty(nullptr, 99, 4.35, &err);
@@ -1019,7 +1019,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetTimeProperty)
 TEST(evil_fedInfo_test, helicsFederateInfoSetIntegerProperty)
 {
     char rdata[256];
-    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetIntegerProperty(nullptr, 987, -54, &err);
