@@ -179,7 +179,7 @@ HELICS_DEPRECATED_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint
  * Send a message object from a specific endpoint.
  *
  * @param endpoint The endpoint to send the data from.
- * @param message The actual message to send which will be copied
+ * @param message The actual message to send which will be copied.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -188,10 +188,10 @@ HELICS_EXPORT void helicsEndpointSendMessageObject(helics_endpoint endpoint, hel
 
 /**
  * Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
- * After the call
+ * after the call.
  *
  * @param endpoint The endpoint to send the data from.
- * @param message The actual message to send which will be copied
+ * @param message The actual message to send which will be copied.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
