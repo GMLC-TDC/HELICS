@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.5.0][] - 2020-04-15
+## [2.5.0][] - 2020-04-22
 Some library reorganization
 
 ### Changed
@@ -17,8 +17,11 @@ Some library reorganization
 ### Fixed
 
 ### Added
+-   `helicsEndpointSendMessageObjectZeroCopy` to allow transferring messages with minimal copying.
 
 ### Deprecated
+-   in the C shared library `helicsFederateGetMessage`, `helicsEndpointGetMessage`, and `helicsEndpointSendMessage` are deprecated in favor of the object version These will be removed in HELICS 3.0
+-   deprecated `helicsEndpointClearMessage` this function does nothing right now, all messages are on a federate level.  
 
 ### Removed
 

@@ -1,2 +1,5 @@
 src:*/libzmq/*
-src:*/badInputTests.cpp
+src:*/*/badInputTests*
+fun:*getMessageObj*
+[undefined]
+fun:*helicsFederateRegister*

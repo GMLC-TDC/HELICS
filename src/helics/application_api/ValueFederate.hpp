@@ -70,7 +70,6 @@ class HELICS_CXX_EXPORT ValueFederate:
      */
     explicit ValueFederate(const char* configString);
 
-  public:
     /** federate is not copyable*/
     ValueFederate(const ValueFederate& fed) = delete;
     /** default move constructor*/

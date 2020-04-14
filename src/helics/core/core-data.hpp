@@ -146,13 +146,15 @@ class Message {
     Time time = timeZero; //!< the event time the message is sent
     std::uint16_t flags{0}; //!< message flags
     std::uint16_t messageValidation{0U}; //!< extra field for user object usage, not used by HELICS
-    int32_t messageID{0}; //!< the messageID for a message
+    std::int32_t messageID{0}; //!< the messageID for a message
     data_block data; //!< the data packet for the message
     std::string dest; //!< the destination of the message
     std::string source; //!< the most recent source of the message
     std::string original_source; //!< the original source of the message
     std::string original_dest; //!< the original destination of a message
-  public:
+    std::int32_t counter{0}; //!< indexing counter not used directly by helics
+    void* backReference{nullptr}; //!< back referencing pointer not used by helics
+
     /** default constructor*/
     Message() = default;
     /** swap operation for the Message*/

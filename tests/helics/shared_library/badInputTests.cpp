@@ -917,7 +917,7 @@ TEST_F(function_tests, messageFed_event)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST_F(function_tests, messageFed_message)
+TEST_F(function_tests, messageFed_messageObject)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -933,37 +933,33 @@ TEST_F(function_tests, messageFed_message)
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
 
     // if we are sending a message it can't be null
-    helicsEndpointSendMessage(ept1, nullptr, &err);
+    helicsEndpointSendMessageObject(ept1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    helics_message mess0 = helicsEndpointGetMessage(ept1);
-    EXPECT_EQ(mess0.length, 0);
+    helics_message_object mess0 = helicsEndpointGetMessageObject(ept1);
+    EXPECT_EQ(helicsMessageGetRawDataSize(mess0), 0);
 
-    mess0 = helicsFederateGetMessage(mFed1);
-    EXPECT_EQ(mess0.length, 0);
+    mess0 = helicsFederateGetMessageObject(mFed1);
+    EXPECT_EQ(helicsMessageGetRawDataSize(mess0), 0);
 
     //send a series of different messages testing different code paths
-    helics_message mess1;
+    helics_message_object mess1 = helicsFederateCreateMessageObject(mFed1, nullptr);
 
-    mess1.time = 0.0;
-    mess1.original_source = nullptr;
-    mess1.dest = nullptr;
-    mess1.data = nullptr;
-    mess1.length = 0;
-    mess1.source = nullptr;
-    mess1.original_dest = nullptr;
-    helicsEndpointSendMessage(ept1, &mess1, &err);
-    mess1.dest = "ept1";
-    helicsEndpointSendMessage(ept1, &mess1, &err);
-    mess1.original_source = "ept4";
+    helicsMessageSetTime(mess1, 0.0, nullptr);
+    helicsMessageSetOriginalSource(mess1, nullptr, nullptr);
+    helicsMessageSetDestination(mess1, nullptr, nullptr);
+    helicsMessageSetData(mess1, nullptr, 0, nullptr);
+    helicsMessageSetSource(mess1, nullptr, nullptr);
+    helicsMessageSetOriginalDestination(mess1, nullptr, nullptr);
+    helicsEndpointSendMessageObject(ept1, mess1, &err);
+    helicsMessageSetDestination(mess1, "ept1", nullptr);
+    helicsEndpointSendMessageObject(ept1, mess1, &err);
+    helicsMessageSetOriginalSource(mess1, "ept4", nullptr);
+    helicsEndpointSendMessageObject(ept1, mess1, &err);
+    helicsMessageSetString(mess1, "test", nullptr);
 
-    char data[5] = "test";
-    helicsEndpointSendMessage(ept1, &mess1, &err);
-
-    mess1.data = data;
-    mess1.length = 4;
-    helicsEndpointSendMessage(ept1, &mess1, &err);
+    helicsEndpointSendMessageObjectZeroCopy(ept1, mess1, &err);
 
     helicsFederateRequestNextStep(mFed1, nullptr);
     auto cnt = helicsEndpointPendingMessages(ept1);
@@ -971,7 +967,7 @@ TEST_F(function_tests, messageFed_message)
 
     helicsFederateFinalize(mFed1, nullptr);
     // can't send a message after the federate is finalized
-    helicsEndpointSendMessage(ept1, &mess1, &err);
+    helicsEndpointSendMessageObject(ept1, mess1, &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -1018,7 +1014,6 @@ TEST_F(function_tests, messageFed_message_object)
     EXPECT_NE(err.error_code, 0);
 
     helicsFederateClearMessages(mFed1);
-    helicsEndpointClearMessages(ept1);
 }
 
 // test error paths for filters
