@@ -147,27 +147,26 @@ typedef enum {
 /** enumeration of return values from the C interface functions
      */
 typedef enum {
-    helics_ok = 0, /*!< the function executed successfully */
-    helics_error_registration_failure = (-1), /*!< registration has failed*/
-    helics_error_connection_failure = (-2), /*!< the operation to connect has failed*/
-    helics_error_invalid_object =
-        (-3), /*!< indicator that the object used was not a valid object */
-    helics_error_invalid_argument =
-        (-4), /*!< the parameter passed was invalid and unable to be used*/
-    helics_error_discard = (-5), /*!< the input was discarded and not used for some reason */
-    helics_error_system_failure =
-        (-6), /*!< the federate has terminated unexpectedly and the call cannot be completed*/
-    helics_warning = -8, /*!< the function issued a warning of some kind */
-    helics_error_invalid_state_transition =
-        (-9), /*!< error issued when an invalid state transition occurred */
-    helics_error_invalid_function_call =
-        (-10), /*!< the call made was invalid in the present state of the calling object*/
-    helics_error_execution_failure = (-14), /*!< the function execution has failed*/
-    helics_error_insufficient_space =
-        (-18), /*!< insufficient space is available to store requested data*/
-    helics_error_other = -101, /*!< the function produced a helics error of some other type */
     helics_error_fatal = -404, /*!< global fatal error for federation */
-    helics_error_external_type = -203 /*!< an unknown non-helics error was produced*/
+    helics_error_external_type = -203, /*!< an unknown non-helics error was produced */
+    helics_error_other = -101, /*!< the function produced a helics error of some other type */
+    helics_error_insufficient_space =
+        -18, /*!< insufficient space is available to store requested data */
+    helics_error_execution_failure = -14, /*!< the function execution has failed */
+    helics_error_invalid_function_call =
+        -10, /*!< the call made was invalid in the present state of the calling object */
+    helics_error_invalid_state_transition =
+        -9, /*!< error issued when an invalid state transition occurred */
+    helics_warning = -8, /*!< the function issued a warning of some kind */
+    helics_error_system_failure =
+        -6, /*!< the federate has terminated unexpectedly and the call cannot be completed */
+    helics_error_discard = -5, /*!< the input was discarded and not used for some reason */
+    helics_error_invalid_argument =
+        -4, /*!< the parameter passed was invalid and unable to be used */
+    helics_error_invalid_object = -3, /*!< indicator that the object used was not a valid object */
+    helics_error_connection_failure = -2, /*!< the operation to connect has failed */
+    helics_error_registration_failure = -1, /*!< registration has failed */
+    helics_ok = 0, /*!< the function executed successfully */
 } helics_error_types;
 
 /** enumeration of properties that apply to federates*/
