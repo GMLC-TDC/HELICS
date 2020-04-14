@@ -49,7 +49,7 @@ else()
         set_target_properties(${SWIG_MODULE_helicsJava_REAL_NAME} PROPERTIES FOLDER interfaces)
         # get rid of some annoying warnings coming from swig generated code
         if(NOT MSVC)
-            target_compile_options(${SWIG_MODULE_helicsJava_REAL_NAME} PRIVATE "-Wno-long-long -Wno-strict-aliasing -Wno-deprecated-declarations")
+            target_compile_options(${SWIG_MODULE_helicsJava_REAL_NAME} PRIVATE -Wno-long-long -Wno-strict-aliasing -Wno-deprecated-declarations)
         endif()
 		add_library(helics::java ALIAS ${SWIG_MODULE_helicsJava_REAL_NAME})
 		message(STATUS "java target is ${SWIG_MODULE_helicsJava_REAL_NAME}")

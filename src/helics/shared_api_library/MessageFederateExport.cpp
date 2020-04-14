@@ -441,6 +441,7 @@ namespace helics
             {
                 freeMessageSlots.push_back(index);
                 messages[index]->backReference = nullptr;
+                messages[index]->messageValidation = 0;
                 return std::move(messages[index]);
             }
         }
@@ -453,6 +454,7 @@ namespace helics
         {
             if (messages[index])
             {
+                messages[index]->messageValidation = 0;
                 messages[index].reset();
                 freeMessageSlots.push_back(index);
             }
