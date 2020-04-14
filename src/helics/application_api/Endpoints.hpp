@@ -158,8 +158,12 @@ class HELICS_CXX_EXPORT Endpoint {
         fed->sendMessage(*this, targetDest, data, sendTime);
     }
     /** send a pointer to a message object*/
-    void send(std::unique_ptr<Message> mess) const {
-        if (mess->dest.empty()) { mess->dest = targetDest; } fed->sendMessage(*this, std::move(mess));
+    void send(std::unique_ptr<Message> mess) const
+    {
+        if (mess->dest.empty()) {
+            mess->dest = targetDest;
+        }
+        fed->sendMessage(*this, std::move(mess));
     }
     /** send a message object
     @details this is to send a pre-built message

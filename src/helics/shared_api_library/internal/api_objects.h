@@ -40,8 +40,8 @@ enum class vtype : int { generic_fed, value_fed, message_fed, combination_fed, i
 class BrokerObject {
   public:
     std::shared_ptr<Broker> brokerptr;
-    int index{ -2 };
-    int valid{ 0 };
+    int index{-2};
+    int valid{0};
 };
 
 /** get the brokerObject from a helics_broker and verify it is valid*/
@@ -51,8 +51,8 @@ class CoreObject {
   public:
     std::shared_ptr<Core> coreptr;
     std::vector<std::unique_ptr<FilterObject>> filters; //!< list of filters created directly through the core
-    int index{ 0 };
-    int valid{ -2 };
+    int index{0};
+    int valid{-2};
     CoreObject() = default;
     ~CoreObject();
 };
@@ -65,23 +65,23 @@ class PublicationObject;
 class EndpointObject;
 /** generalized container for storing messages from a federate*/
 class MessageHolder {
-private:
+  private:
     std::vector<std::unique_ptr<Message>> messages;
     std::vector<int> freeMessageSlots;
-public:
-    Message *addMessage(std::unique_ptr<Message> &mess);
-    Message *newMessage();
+
+  public:
+    Message* addMessage(std::unique_ptr<Message>& mess);
+    Message* newMessage();
     std::unique_ptr<Message> extractMessage(int index);
     void freeMessage(int index);
     void clear();
-    
 };
 /** object wrapping a federate for the c-api*/
 class FedObject {
   public:
     vtype type = vtype::invalid_fed;
-    int index{ -2 };
-    int valid{ 0 };
+    int index{-2};
+    int valid{0};
     std::shared_ptr<Federate> fedptr;
     MessageHolder messages;
     std::vector<std::unique_ptr<InputObject>> inputs;
@@ -98,35 +98,34 @@ FedObject* getFedObject(helics_federate fed, helics_error* err) noexcept;
 /** object wrapping a subscription*/
 class InputObject {
   public:
-      int valid{ 0 };
+    int valid{0};
     std::shared_ptr<ValueFederate> fedptr;
-    Input* inputPtr{ nullptr };
+    Input* inputPtr{nullptr};
 };
 
 /** object wrapping a publication*/
 class PublicationObject {
   public:
-      int valid{ 0 };
+    int valid{0};
     std::shared_ptr<ValueFederate> fedptr;
     Publication* pubPtr = nullptr;
 };
 /** object wrapping and endpoint*/
 class EndpointObject {
   public:
-      Endpoint* endPtr{ nullptr };
-      FedObject *fed{ nullptr };
+    Endpoint* endPtr{nullptr};
+    FedObject* fed{nullptr};
     std::shared_ptr<MessageFederate> fedptr;
-    int valid{ 0 };
+    int valid{0};
 };
 
 /** object wrapping a source filter*/
 class FilterObject {
-public:
-    bool cloning{ false }; //!< indicator that the filter is a cloning filter
-    bool custom{false
-}; //!< indicator that the filter is a custom filter and requires a callback
-    int valid{ 0 };
-    Filter* filtPtr{ nullptr };
+  public:
+    bool cloning{false}; //!< indicator that the filter is a cloning filter
+    bool custom{false}; //!< indicator that the filter is a custom filter and requires a callback
+    int valid{0};
+    Filter* filtPtr{nullptr};
     std::unique_ptr<Filter> uFilter;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
@@ -140,8 +139,8 @@ class QueryObject {
     std::string response; //!< the response to the query
     std::shared_ptr<Federate> activeFed; //!< pointer to the fed with the active Query
     query_id_t asyncIndexCode; //!< the index to use for the queryComplete call
-    bool activeAsync{ false };
-    int valid{ 0 };
+    bool activeAsync{false};
+    int valid{0};
 };
 
 } // namespace helics

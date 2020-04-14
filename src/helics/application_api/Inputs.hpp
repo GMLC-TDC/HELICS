@@ -497,7 +497,9 @@ class InputT: public Input {
     void setInputNotificationCallback(std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->setInputNotificationCallback(*this, [=](Input& /*unused*/, Time time) { handleCallback(time); });
+        fed->setInputNotificationCallback(*this, [=](Input& /*unused*/, Time time) {
+            handleCallback(time);
+        });
     }
     /** set a default value
     @param val the value to set as the default

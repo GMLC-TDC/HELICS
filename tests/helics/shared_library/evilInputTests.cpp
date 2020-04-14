@@ -3557,7 +3557,6 @@ TEST(evil_endpoint_test, helicsEndpointPendingMessages)
     EXPECT_EQ(res2, 0);
 }
 
-
 TEST(evil_endpoint_test, helicsEndpointGetMessageObject)
 {
     //helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint);

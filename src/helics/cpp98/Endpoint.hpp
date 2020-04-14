@@ -16,87 +16,61 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helicscpp {
 
-    class Message {
-    public:
-        /** default constructor*/
-        Message() HELICS_NOTHROW : mo(HELICS_NULL_POINTER) {};
+class Message {
+  public:
+    /** default constructor*/
+    Message() HELICS_NOTHROW: mo(HELICS_NULL_POINTER){};
 
-        /** construct from a helics_message object*/
-        explicit Message(helics_message_object hmo) HELICS_NOTHROW : mo(hmo) {}
+    /** construct from a helics_message object*/
+    explicit Message(helics_message_object hmo) HELICS_NOTHROW: mo(hmo) {}
 
-        /** copy constructor*/
-        Message(const Message& mess) HELICS_NOTHROW: mo(mess.mo) {}
-        /** copy assignment*/
-        Message& operator=(const Message& mess)
-        {
-            mo = mess.mo;
-            return *this;
-        }
+    /** copy constructor*/
+    Message(const Message& mess) HELICS_NOTHROW: mo(mess.mo) {}
+    /** copy assignment*/
+    Message& operator=(const Message& mess)
+    {
+        mo = mess.mo;
+        return *this;
+    }
 
-        /** cast to a helics_message object*/
-        operator helics_message_object() { return mo; }
+    /** cast to a helics_message object*/
+    operator helics_message_object() { return mo; }
 
-        const char *source() const
-        {
-            return helicsMessageGetSource(mo);
-        }
-        void source(const std::string &src)
-        {
-            return helicsMessageSetSource(mo,src.c_str(),hThrowOnError());
-        }
+    const char* source() const { return helicsMessageGetSource(mo); }
+    void source(const std::string& src)
+    {
+        return helicsMessageSetSource(mo, src.c_str(), hThrowOnError());
+    }
 
-        const char *destination() const
-        {
-            return helicsMessageGetDestination(mo);
-        }
-        void destination(const std::string &dest)
-        {
-            return helicsMessageSetDestination(mo, dest.c_str(), hThrowOnError());
-        }
-        const char *originalSource() const
-        {
-            return helicsMessageGetOriginalSource(mo);
-        }
-        void originalSource(const std::string &osrc)
-        {
-            return helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
-        }
-        const char *originalDestination() const
-        {
-            return helicsMessageGetOriginalDestination(mo);
-        }
-        void originalDestination(const std::string &odest)
-        {
-            return helicsMessageSetOriginalDestination(mo, odest.c_str(), hThrowOnError());
-        }
+    const char* destination() const { return helicsMessageGetDestination(mo); }
+    void destination(const std::string& dest)
+    {
+        return helicsMessageSetDestination(mo, dest.c_str(), hThrowOnError());
+    }
+    const char* originalSource() const { return helicsMessageGetOriginalSource(mo); }
+    void originalSource(const std::string& osrc)
+    {
+        return helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
+    }
+    const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
+    void originalDestination(const std::string& odest)
+    {
+        return helicsMessageSetOriginalDestination(mo, odest.c_str(), hThrowOnError());
+    }
 
-        int size() const
-        {
-            return helicsMessageGetRawDataSize(mo);
-        }
+    int size() const { return helicsMessageGetRawDataSize(mo); }
 
-        void *data() const
-        {
-            return helicsMessageGetRawDataPointer(mo);
-        }
+    void* data() const { return helicsMessageGetRawDataPointer(mo); }
 
-        const char *c_str() const
-        {
-            return helicsMessageGetString(mo);
-        }
+    const char* c_str() const { return helicsMessageGetString(mo); }
 
-        helics_time time() const
-        {
-            return helicsMessageGetTime(mo);
-        }
+    helics_time time() const { return helicsMessageGetTime(mo); }
 
-        void time(helics_time val)
-        {
-            return helicsMessageSetTime(mo,val,hThrowOnError());
-        }
-    private:
-        helics_message_object mo;
-    };
+    void time(helics_time val) { return helicsMessageSetTime(mo, val, hThrowOnError()); }
+
+  private:
+    helics_message_object mo;
+};
 
 class Endpoint {
   public:
