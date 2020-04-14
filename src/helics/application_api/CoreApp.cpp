@@ -97,7 +97,7 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser()
         app->add_option("--name,-n", name, "name of the core");
     }
     app->allow_extras();
-    auto app_p = app.get();
+    auto* app_p = app.get();
     app->footer([app_p]() {
         auto coreType = helics::core::coreTypeFromString((*app_p)["--core"]->as<std::string>());
         CoreFactory::displayHelp(coreType);

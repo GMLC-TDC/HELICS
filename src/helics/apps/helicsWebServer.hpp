@@ -41,7 +41,7 @@ namespace apps {
         std::thread mainLoopThread;
         std::mutex threadGuard;
 
-        const Json::Value* config_{nullptr};
+        const Json::Value* config{nullptr};
         const std::string name_;
         std::string httpAddress_{"127.0.0.1"};
         int httpPort_{80};

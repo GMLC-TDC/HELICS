@@ -67,7 +67,7 @@ namespace BrokerFactory {
  *
  * Invokes initialize() on the instantiated Core object.
  */
-    std::shared_ptr<Broker> create(core_type type, const std::string& initializationString);
+    std::shared_ptr<Broker> create(core_type type, const std::string& configureString);
     /** Create a broker from command line arguments*/
     std::shared_ptr<Broker> create(core_type type, int argc, char* argv[]);
     /** Create a broker from command line arguments in a vector*/
@@ -75,15 +75,15 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(
         core_type type,
-        const std::string& broker_name,
-        const std::string& initializationString);
+        const std::string& brokerName,
+        const std::string& configureString);
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, int argc, char* argv[]);
+        create(core_type type, const std::string& brokerName, int argc, char* argv[]);
 
     /** Create a broker from command line arguments in a vector*/
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, std::vector<std::string> args);
+        create(core_type type, const std::string& brokerName, std::vector<std::string> args);
 
     /** locate a coreBroker by name
 @param brokerName the name of the broker

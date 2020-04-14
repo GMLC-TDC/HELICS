@@ -44,7 +44,7 @@ TEST(ZMQCore_tests, zmqComms_broker_test)
     repSocket.setsockopt(ZMQ_LINGER, 200);
     repSocket.bind(defServer);
 
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage &/*m*/) { ++counter; });
     comm.setBrokerPort(23405);
     comm.setName("tests");
     auto confut = std::async(std::launch::async, [&comm]() { return comm.connect(); });
@@ -53,7 +53,7 @@ TEST(ZMQCore_tests, zmqComms_broker_test)
 
     repSocket.recv(rxmsg);
 
-    EXPECT_GT(rxmsg.size(), 32u);
+    EXPECT_GT(rxmsg.size(), 32U);
 
     helics::ActionMessage rM(static_cast<char*>(rxmsg.data()), rxmsg.size());
     EXPECT_TRUE(helics::isProtocolCommand(rM));
@@ -260,7 +260,7 @@ TEST(ZMQCore_tests, zmqComms_broker_test_transmit)
     }
 
     pullSocket.setsockopt(ZMQ_LINGER, 100);
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage &/*m*/) { ++counter; });
     comm.setBrokerPort(23405);
     comm.setPortNumber(23407);
     comm.setName("tests");
@@ -314,7 +314,7 @@ TEST(ZMQCore_tests, zmqComms_rx_test)
     comm.setBrokerPort(23405);
     comm.setPortNumber(23407);
     comm.setName("tests");
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
@@ -366,11 +366,11 @@ TEST(ZMQCore_tests, zmqComm_transmit_through)
     comm2.setPortNumber(23405);
     comm.setPortNumber(23407);
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
         ++counter2;
         act2 = m;
     });
@@ -423,15 +423,15 @@ TEST(ZMQCore_tests, zmqComm_transmit_add_route)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback([&counter3, &act3](helics::ActionMessage m) {
+    comm3.setCallback([&counter3, &act3](const helics::ActionMessage &m) {
         ++counter3;
         act3 = m;
     });
@@ -545,7 +545,7 @@ TEST(ZMQCore_tests, zmqCore_initialization_test)
 
     pullSocket.recv(rxmsg);
 
-    EXPECT_GT(rxmsg.size(), 32u);
+    EXPECT_GT(rxmsg.size(), 32U);
     helics::ActionMessage rM(static_cast<char*>(rxmsg.data()), rxmsg.size());
 
     EXPECT_EQ(rM.name, "core1");

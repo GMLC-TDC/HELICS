@@ -74,7 +74,7 @@ void MessageFederateManager::subscribe(const Endpoint& ept, const std::string& n
 bool MessageFederateManager::hasMessage() const
 {
     auto eptDat = eptData.lock_shared();
-    for (auto& mq : eptDat) {
+    for (const auto& mq : eptDat) {
         if (!mq->messages.empty()) {
             return true;
         }
@@ -85,7 +85,7 @@ bool MessageFederateManager::hasMessage() const
 bool MessageFederateManager::hasMessage(const Endpoint& ept) const
 {
     if (ept.dataReference != nullptr) {
-        auto eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
+        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
         return (!eptDat->messages.empty());
     }
     return false;
@@ -97,7 +97,7 @@ bool MessageFederateManager::hasMessage(const Endpoint& ept) const
 uint64_t MessageFederateManager::pendingMessages(const Endpoint& ept) const
 {
     if (ept.dataReference != nullptr) {
-        auto eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
+        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
         return eptDat->messages.size();
     }
     return 0;
@@ -111,7 +111,7 @@ uint64_t MessageFederateManager::pendingMessages() const
 {
     auto eptDat = eptData.lock_shared();
     uint64_t sz = 0;
-    for (auto& mq : eptDat) {
+    for (const auto& mq : eptDat) {
         sz += mq->messages.size();
     }
     return sz;
@@ -120,7 +120,7 @@ uint64_t MessageFederateManager::pendingMessages() const
 std::unique_ptr<Message> MessageFederateManager::getMessage(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
-        auto eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
+        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
         auto mv = eptDat->messages.pop();
         if (mv) {
             return std::move(*mv);
@@ -293,7 +293,7 @@ void MessageFederateManager::setEndpointNotificationCallback(
     const std::function<void(Endpoint&, Time)>& callback)
 {
     if (ept.dataReference != nullptr) {
-        auto eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
+        auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
         eptDat->callback = callback;
     }
 }

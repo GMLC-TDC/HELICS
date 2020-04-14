@@ -631,7 +631,7 @@ data_block typeConvert(data_type type, int64_t val)
             return std::to_string(val);
         case data_type::helics_named_point:
             if (static_cast<uint64_t>(std::abs(val)) >
-                (2ull << 51u)) // this checks whether the actual value will fit in a double
+                (2ULL << 51U)) // this checks whether the actual value will fit in a double
             {
                 return ValueConverter<NamedPoint>::convert(
                     NamedPoint{std::to_string(val), std::nan("0")});
@@ -820,7 +820,7 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
         case data_type::helics_vector: {
             std::vector<double> DV;
             DV.reserve(val.size() * 2);
-            for (auto& vali : val) {
+            for (const auto& vali : val) {
                 DV.push_back(vali.real());
                 DV.push_back(vali.imag());
             }

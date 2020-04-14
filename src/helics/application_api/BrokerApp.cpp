@@ -40,8 +40,8 @@ BrokerApp::BrokerApp(std::vector<std::string> args):
 {
 }
 
-BrokerApp::BrokerApp(core_type ctype, const std::string& broker_name, int argc, char* argv[]):
-    name(broker_name)
+BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, int argc, char* argv[]):
+    name(brokerName)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
@@ -60,8 +60,8 @@ BrokerApp::BrokerApp(int argc, char* argv[]):
 {
 }
 
-BrokerApp::BrokerApp(core_type ctype, const std::string& broker_name, const std::string& argString):
-    name(broker_name)
+BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, const std::string& argString):
+    name(brokerName)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
@@ -113,7 +113,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser()
         app->add_option("--name,-n", name, "name of the broker");
     }
     app->allow_extras();
-    auto app_p = app.get();
+    auto* app_p = app.get();
     app->footer([app_p]() {
         auto coreType = coreTypeFromString((*app_p)["--core"]->as<std::string>());
         BrokerFactory::displayHelp(coreType);

@@ -66,18 +66,20 @@ static std::string loadFile(const std::string& fileName)
     std::ifstream t(fileName);
     return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
-//decode a uri to clean up a string, convert character codes in a uri to the original character
-static std::string uri_decode(beast::string_view str)
+//decode a URI to clean up a string, convert character codes in a URI to the original character
+static std::string uriDecode(beast::string_view str)
 {
     std::string ret;
     size_t len = str.length();
 
     for (size_t ii = 0; ii < len; ii++) {
         if (str[ii] != '%') {
-            if (str[ii] == '+')
+            if (str[ii] == '+') {
                 ret.push_back(' ');
-            else
+            }
+            else {
                 ret.push_back(str[ii]);
+            }
         } else {
             unsigned int spchar;
             auto converted = sscanf(std::string(str.substr(ii + 1, 2)).c_str(), "%x", &spchar);
@@ -94,7 +96,7 @@ static std::string uri_decode(beast::string_view str)
 
 // function to extract the request parameters and clean up the target
 static std::pair<beast::string_view, boost::container::flat_map<std::string, std::string>>
-    process_request_parameters(beast::string_view target, beast::string_view body)
+    processRequestParameters(beast::string_view target, beast::string_view body)
 {
     std::pair<beast::string_view, boost::container::flat_map<std::string, std::string>> results;
     auto param_mark = target.find('?');
@@ -145,7 +147,7 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
 
     for (auto& param : parameters) {
         auto eq_loc = param.find_first_of('=');
-        results.second[param.substr(0, eq_loc).to_string()] = uri_decode(param.substr(eq_loc + 1));
+        results.second[param.substr(0, eq_loc).to_string()] = uriDecode(param.substr(eq_loc + 1));
     }
     return results;
 }
@@ -347,12 +349,12 @@ static void fail(beast::error_code ec, char const* what)
 
 // Echoes back all received WebSocket messages
 class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
-    websocket::stream<beast::tcp_stream> ws_;
-    beast::flat_buffer buffer_;
+    websocket::stream<beast::tcp_stream> ws;
+    beast::flat_buffer buffer;
 
   public:
     // Take ownership of the socket
-    explicit WebSocketsession(tcp::socket&& socket): ws_(std::move(socket)) {}
+    explicit WebSocketsession(tcp::socket&& socket): ws(std::move(socket)) {}
 
     // Get on the correct executor
     void run()
@@ -362,7 +364,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         // for single-threaded contexts, this example code is written to be
         // thread-safe by default.
         net::dispatch(
-            ws_.get_executor(),
+            ws.get_executor(),
             beast::bind_front_handler(&WebSocketsession::on_run, shared_from_this()));
     }
 
@@ -370,20 +372,20 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     void on_run()
     {
         // Set suggested timeout settings for the websocket
-        ws_.set_option(websocket::stream_base::timeout::suggested(beast::role_type::server));
+        ws.set_option(websocket::stream_base::timeout::suggested(beast::role_type::server));
 
         // Set a decorator to change the Server of the handshake
-        ws_.set_option(websocket::stream_base::decorator([](websocket::response_type& res) {
+        ws.set_option(websocket::stream_base::decorator([](websocket::response_type& res) {
             res.set(http::field::server, std::string("HELICS_WEB_SERVER" HELICS_VERSION_STRING));
         }));
         // Accept the websocket handshake
-        ws_.async_accept(
+        ws.async_accept(
             beast::bind_front_handler(&WebSocketsession::on_accept, shared_from_this()));
     }
 
     void on_accept(beast::error_code ec)
     {
-        if (ec) return fail(ec, "accept");
+        if (ec) { return fail(ec, "accept"); }
 
         // Read a message
         do_read();
@@ -392,8 +394,8 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     void do_read()
     {
         // Read a message into our buffer
-        ws_.async_read(
-            buffer_, beast::bind_front_handler(&WebSocketsession::on_read, shared_from_this()));
+        ws.async_read(
+            buffer, beast::bind_front_handler(&WebSocketsession::on_read, shared_from_this()));
     }
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -406,22 +408,22 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         if (ec) fail(ec, "read");
 
-        beast::string_view result{boost::asio::buffer_cast<const char*>(buffer_.data()),
-                                  buffer_.size()};
+        beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+                                  buffer.size()};
         // Echo the message
-        auto reqpr = process_request_parameters("", result);
+        auto reqpr = processRequestParameters("", result);
 
         cmd command{cmd::unknown};
 
         auto res = generateResults(command, emptyString, emptyString, emptyString, reqpr.second);
         // Clear the buffer
-        buffer_.consume(buffer_.size());
+        buffer.consume(buffer.size());
 
-        ws_.text(true);
+        ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer_) << res.second;
-            ws_.async_write(
-                buffer_.data(),
+            boost::beast::ostream(buffer) << res.second;
+            ws.async_write(
+                buffer.data(),
                 beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
             return;
         }
@@ -445,9 +447,9 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer_) << generateJsonString(response);
-        ws_.async_write(
-            buffer_.data(),
+        boost::beast::ostream(buffer) << generateJsonString(response);
+        ws.async_write(
+            buffer.data(),
             beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
     }
 
@@ -458,7 +460,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         if (ec) return fail(ec, "write");
 
         // Clear the buffer
-        buffer_.consume(buffer_.size());
+        buffer.consume(buffer.size());
 
         // Do another read
         do_read();
@@ -565,7 +567,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         return send(main_page());
     }
 
-    auto reqpr = process_request_parameters(target, req.body());
+    auto reqpr = processRequestParameters(target, req.body());
     std::string brokerName, query, targetObj;
 
     partitionTarget(reqpr.first, brokerName, query, targetObj);
@@ -603,13 +605,13 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 //------------------------------------------------------------------------------
 
 // Handles an HTTP server connection
-class httpSession: public std::enable_shared_from_this<httpSession> {
+class HttpSession: public std::enable_shared_from_this<HttpSession> {
     // This is the C++11 equivalent of a generic lambda.
     // The function object is used to send an HTTP message.
     struct send_lambda {
-        httpSession& self_;
+        HttpSession& self;
 
-        explicit send_lambda(httpSession& self): self_(self) {}
+        explicit send_lambda(HttpSession& self): self(self) {}
 
         template<bool isRequest, class Body, class Fields>
         void operator()(http::message<isRequest, Body, Fields>&& msg) const
@@ -621,26 +623,26 @@ class httpSession: public std::enable_shared_from_this<httpSession> {
 
             // Store a type-erased version of the shared
             // pointer in the class to keep it alive.
-            self_.res_ = sp;
+            self.res = sp;
 
             // Write the response
             http::async_write(
-                self_.stream_,
+                self.stream,
                 *sp,
                 beast::bind_front_handler(
-                    &httpSession::on_write, self_.shared_from_this(), sp->need_eof()));
+                    &HttpSession::on_write, self.shared_from_this(), sp->need_eof()));
         }
     };
 
-    beast::tcp_stream stream_;
-    beast::flat_buffer buffer_;
-    http::request<http::string_body> req_;
-    std::shared_ptr<void> res_;
-    send_lambda lambda_;
+    beast::tcp_stream stream;
+    beast::flat_buffer buffer;
+    http::request<http::string_body> req;
+    std::shared_ptr<void> res;
+    send_lambda lambda;
 
   public:
     // Take ownership of the stream
-    explicit httpSession(tcp::socket&& socket): stream_(std::move(socket)), lambda_(*this) {}
+    explicit HttpSession(tcp::socket&& socket): stream(std::move(socket)), lambda(*this) {}
 
     // Start the asynchronous operation
     void run() { do_read(); }
@@ -649,17 +651,17 @@ class httpSession: public std::enable_shared_from_this<httpSession> {
     {
         // Make the request empty before reading,
         // otherwise the operation behavior is undefined.
-        req_ = {};
+        req = {};
 
         // Set the timeout.
-        stream_.expires_after(std::chrono::seconds(30));
+        stream.expires_after(std::chrono::seconds(30));
 
         // Read a request
         http::async_read(
-            stream_,
-            buffer_,
-            req_,
-            beast::bind_front_handler(&httpSession::on_read, shared_from_this()));
+            stream,
+            buffer,
+            req,
+            beast::bind_front_handler(&HttpSession::on_read, shared_from_this()));
     }
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -677,14 +679,14 @@ class httpSession: public std::enable_shared_from_this<httpSession> {
         }
 
         // Send the response
-        handle_request(std::move(req_), lambda_);
+        handle_request(std::move(req), lambda);
     }
 
     void on_write(bool close, beast::error_code ec, std::size_t bytes_transferred)
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) return fail(ec, "write");
+        if (ec) { return fail(ec, "write"); }
 
         if (close) {
             // This means we should close the connection, usually because
@@ -693,7 +695,7 @@ class httpSession: public std::enable_shared_from_this<httpSession> {
         }
 
         // We're done with the response so delete it
-        res_ = nullptr;
+        res = nullptr;
 
         // Read another request
         do_read();
@@ -703,7 +705,7 @@ class httpSession: public std::enable_shared_from_this<httpSession> {
     {
         // Send a TCP shutdown
         beast::error_code ec;
-        stream_.socket().shutdown(tcp::socket::shutdown_send, ec);
+        stream.socket().shutdown(tcp::socket::shutdown_send, ec);
 
         // At this point the connection is closed gracefully
     }
@@ -713,39 +715,39 @@ class httpSession: public std::enable_shared_from_this<httpSession> {
 
 // Accepts incoming connections and launches the sessions
 class listener: public std::enable_shared_from_this<listener> {
-    net::io_context& ioc_;
-    tcp::acceptor acceptor_;
+    net::io_context& ioc;
+    tcp::acceptor acceptor;
     bool websocket_{false};
 
   public:
     listener(net::io_context& ioc, tcp::endpoint endpoint, bool webs = false):
-        ioc_(ioc), acceptor_(net::make_strand(ioc)), websocket_{webs}
+        ioc(ioc), acceptor(net::make_strand(ioc)), websocket_{webs}
     {
         beast::error_code ec;
 
         // Open the acceptor
-        acceptor_.open(endpoint.protocol(), ec);
+        acceptor.open(endpoint.protocol(), ec);
         if (ec) {
             fail(ec, "open");
             return;
         }
 
         // Allow address reuse
-        acceptor_.set_option(net::socket_base::reuse_address(true), ec);
+        acceptor.set_option(net::socket_base::reuse_address(true), ec);
         if (ec) {
             fail(ec, "set_option");
             return;
         }
 
         // Bind to the server address
-        acceptor_.bind(endpoint, ec);
+        acceptor.bind(endpoint, ec);
         if (ec) {
             fail(ec, "bind");
             return;
         }
 
         // Start listening for connections
-        acceptor_.listen(net::socket_base::max_listen_connections, ec);
+        acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
             fail(ec, "listen");
             return;
@@ -759,8 +761,8 @@ class listener: public std::enable_shared_from_this<listener> {
     void do_accept()
     {
         // The new connection gets its own strand
-        acceptor_.async_accept(
-            net::make_strand(ioc_),
+        acceptor.async_accept(
+            net::make_strand(ioc),
             beast::bind_front_handler(&listener::on_accept, shared_from_this()));
     }
 
@@ -774,7 +776,7 @@ class listener: public std::enable_shared_from_this<listener> {
                 std::make_shared<WebSocketsession>(std::move(socket))->run();
             } else {
                 // Create the session and run it
-                std::make_shared<httpSession>(std::move(socket))->run();
+                std::make_shared<HttpSession>(std::move(socket))->run();
             }
         }
 
@@ -792,7 +794,7 @@ namespace apps {
     void WebServer::startServer(const Json::Value* val)
     {
         logMessage("starting broker web server");
-        config_ = (val != nullptr) ? val : &null;
+        config = (val != nullptr) ? val : &null;
         bool exp{false};
         if (running.compare_exchange_strong(exp, true)) {
             // The io_context is required for all I/O
@@ -823,8 +825,8 @@ namespace apps {
     void WebServer::mainLoop()
     {
         if (http_enabled_) {
-            if (config_->isMember("http")) {
-                auto V = (*config_)["http"];
+            if (config->isMember("http")) {
+                auto V = (*config)["http"];
                 replaceIfMember(V, "interface", httpAddress_);
                 replaceIfMember(V, "port", httpPort_);
             }
@@ -836,8 +838,8 @@ namespace apps {
         }
 
         if (websocket_enabled_) {
-            if (config_->isMember("websocket")) {
-                auto V = (*config_)["websocket"];
+            if (config->isMember("websocket")) {
+                auto V = (*config)["websocket"];
                 replaceIfMember(V, "interface", websocketAddress_);
                 replaceIfMember(V, "port", websocketPort_);
             }
