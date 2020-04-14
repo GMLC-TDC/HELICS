@@ -165,7 +165,7 @@ HELICS_EXPORT void helicsEndpointSendEventRaw(
 
 /**
  * Send a message object from a specific endpoint.
- * @deprecated use helicsEndpointSendMessageObject_instead
+ * @deprecated Use helicsEndpointSendMessageObject instead.
  * @param endpoint The endpoint to send the data from.
  * @param message The actual message to send.
  * @forcpponly
@@ -243,9 +243,9 @@ HELICS_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpoint);
 
 /**
  * Receive a packet from a particular endpoint.
-  *
- * @deprecated This function is deprecated and will be removed in Helics 3.0
- *             use helicsEndpointGetMessageObject instead
+ *
+ * @deprecated This function is deprecated and will be removed in Helics 3.0.
+ *             Use helicsEndpointGetMessageObject instead
  *
  * @param[in] endpoint The identifier for the endpoint.
  *
@@ -265,8 +265,8 @@ HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoi
 /**
  * Receive a communication message for any endpoint in the federate.
  *
- * @deprecated This function is deprecated and will be removed in Helics 3.0
- *             use helicsFederateGetMessageObject instead
+ * @deprecated This function is deprecated and will be removed in Helics 3.0.
+ *             Use helicsFederateGetMessageObject instead
  *
  * @details The return order will be in order of endpoint creation.
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
@@ -308,8 +308,9 @@ HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
 /**
  * Clear all message from an endpoint.
  *
- * @deprecated This function does nothing and can be removed, use helicsFederateClearMessages to free all messages,
- *             or helicsMessageFree to clear an individual message
+ * @deprecated This function does nothing and will be removed. 
+ *             Use helicsFederateClearMessages to free all messages,
+ *             or helicsMessageFree to clear an individual message.
  * 
  * @param endpoint The endpoint object to operate on.
  */
