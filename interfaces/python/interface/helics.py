@@ -190,36 +190,36 @@ helics_log_level_data = _helics.helics_log_level_data
 r""" timing+ data transfer notices"""
 helics_log_level_trace = _helics.helics_log_level_trace
 r""" all internal messages"""
-helics_ok = _helics.helics_ok
-r""" the function executed successfully"""
-helics_error_registration_failure = _helics.helics_error_registration_failure
-r""" registration has failed"""
-helics_error_connection_failure = _helics.helics_error_connection_failure
-r""" the operation to connect has failed"""
-helics_error_invalid_object = _helics.helics_error_invalid_object
-r""" indicator that the object used was not a valid object"""
-helics_error_invalid_argument = _helics.helics_error_invalid_argument
-r""" the parameter passed was invalid and unable to be used"""
-helics_error_discard = _helics.helics_error_discard
-r""" the input was discarded and not used for some reason"""
-helics_error_system_failure = _helics.helics_error_system_failure
-r""" the federate has terminated unexpectedly and the call cannot be completed"""
-helics_warning = _helics.helics_warning
-r""" the function issued a warning of some kind"""
-helics_error_invalid_state_transition = _helics.helics_error_invalid_state_transition
-r""" error issued when an invalid state transition occurred"""
-helics_error_invalid_function_call = _helics.helics_error_invalid_function_call
-r""" the call made was invalid in the present state of the calling object"""
-helics_error_execution_failure = _helics.helics_error_execution_failure
-r""" the function execution has failed"""
-helics_error_insufficient_space = _helics.helics_error_insufficient_space
-r""" insufficient space is available to store requested data"""
-helics_error_other = _helics.helics_error_other
-r""" the function produced a helics error of some other type"""
 helics_error_fatal = _helics.helics_error_fatal
 r""" global fatal error for federation"""
 helics_error_external_type = _helics.helics_error_external_type
 r""" an unknown non-helics error was produced"""
+helics_error_other = _helics.helics_error_other
+r""" the function produced a helics error of some other type"""
+helics_error_insufficient_space = _helics.helics_error_insufficient_space
+r""" insufficient space is available to store requested data"""
+helics_error_execution_failure = _helics.helics_error_execution_failure
+r""" the function execution has failed"""
+helics_error_invalid_function_call = _helics.helics_error_invalid_function_call
+r""" the call made was invalid in the present state of the calling object"""
+helics_error_invalid_state_transition = _helics.helics_error_invalid_state_transition
+r""" error issued when an invalid state transition occurred"""
+helics_warning = _helics.helics_warning
+r""" the function issued a warning of some kind"""
+helics_error_system_failure = _helics.helics_error_system_failure
+r""" the federate has terminated unexpectedly and the call cannot be completed"""
+helics_error_discard = _helics.helics_error_discard
+r""" the input was discarded and not used for some reason"""
+helics_error_invalid_argument = _helics.helics_error_invalid_argument
+r""" the parameter passed was invalid and unable to be used"""
+helics_error_invalid_object = _helics.helics_error_invalid_object
+r""" indicator that the object used was not a valid object"""
+helics_error_connection_failure = _helics.helics_error_connection_failure
+r""" the operation to connect has failed"""
+helics_error_registration_failure = _helics.helics_error_registration_failure
+r""" registration has failed"""
+helics_ok = _helics.helics_ok
+r""" the function executed successfully"""
 helics_property_time_delta = _helics.helics_property_time_delta
 r""" the property controlling the minimum time delta for a federate"""
 helics_property_time_period = _helics.helics_property_time_period
@@ -347,7 +347,7 @@ class helics_message(object):
     r"""
      Message_t mapped to a c compatible structure
 
-    this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
+    use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
     """
 
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
@@ -2982,7 +2982,7 @@ def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dest: "char const *"
 def helicsEndpointSendMessage(endpoint: "helics_endpoint", message: "helics_message") -> "void":
     r"""
     Send a message object from a specific endpoint.
-
+    Deprecated: Use helicsEndpointSendMessageObject instead.
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
     :type message: :py:class:`helics_message`
@@ -2997,9 +2997,21 @@ def helicsEndpointSendMessageObject(endpoint: "helics_endpoint", message: "helic
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
     :type message: void
-    :param message: The actual message to send.
+    :param message: The actual message to send which will be copied.
     """
     return _helics.helicsEndpointSendMessageObject(endpoint, message)
+
+def helicsEndpointSendMessageObjectZeroCopy(endpoint: "helics_endpoint", message: "helics_message_object") -> "void":
+    r"""
+    Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
+    after the call.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type message: void
+    :param message: The actual message to send which will be copied.
+    """
+    return _helics.helicsEndpointSendMessageObjectZeroCopy(endpoint, message)
 
 def helicsEndpointSubscribe(endpoint: "helics_endpoint", key: "char const *") -> "void":
     r"""
@@ -3058,6 +3070,9 @@ def helicsEndpointGetMessage(endpoint: "helics_endpoint") -> "helics_message":
     r"""
     Receive a packet from a particular endpoint.
 
+    Deprecated: This function is deprecated and will be removed in Helics 3.0.
+                Use helicsEndpointGetMessageObject instead.
+
     endpoint The identifier for the endpoint.
 
     :rtype: :py:class:`helics_message`
@@ -3079,6 +3094,9 @@ def helicsEndpointGetMessageObject(endpoint: "helics_endpoint") -> "helics_messa
 def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
     r"""
     Receive a communication message for any endpoint in the federate.
+
+    Deprecated: This function is deprecated and will be removed in Helics 3.0.
+                Use helicsFederateGetMessageObject instead.
 
     The return order will be in order of endpoint creation.
              So all messages that are available for the first endpoint, then all for the second, and so on.
@@ -3127,6 +3145,10 @@ def helicsFederateClearMessages(fed: "helics_federate") -> "void":
 def helicsEndpointClearMessages(endpoint: "helics_endpoint") -> "void":
     r"""
     Clear all message from an endpoint.
+
+    Deprecated: This function does nothing and will be removed.
+                Use helicsFederateClearMessages to free all messages,
+                or helicsMessageFree to clear an individual message.
 
     :type endpoint: void
     :param endpoint: The endpoint object to operate on.
