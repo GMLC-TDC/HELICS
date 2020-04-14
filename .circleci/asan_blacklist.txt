@@ -1,2 +1,2 @@
 src:*/libzmq/*
-src:*/badInputTests.cpp
+src:*/*/badInputTests*
