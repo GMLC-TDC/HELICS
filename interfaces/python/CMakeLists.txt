@@ -272,7 +272,9 @@ else()
 
     target_link_libraries(helicsPYTHON PUBLIC HELICS::helicsSharedLib)
     set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
-
+    if(NOT MSVC)
+            target_compile_options(helicsPYTHON PRIVATE -Wno-long-long -Wno-strict-aliasing -Wno-deprecated-declarations)
+        endif()
     install(
         TARGETS
         helicsPYTHON
