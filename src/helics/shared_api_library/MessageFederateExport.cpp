@@ -283,8 +283,7 @@ void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_ob
         return;
     }
     auto* mess = getMessageObj(message, err);
-    if (mess == nullptr)
-    {
+    if (mess == nullptr) {
         return;
     }
     try {
@@ -295,7 +294,6 @@ void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_ob
     }
 }
 
-
 void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_message_object message, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
@@ -304,16 +302,13 @@ void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_me
     }
 
     auto* mess = getMessageObj(message, err);
-    if (mess == nullptr)
-    {
+    if (mess == nullptr) {
         return;
     }
-    auto* messages = reinterpret_cast<helics::MessageHolder *>(mess->backReference);
-    if (messages!=nullptr)
-    {
+    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
+    if (messages != nullptr) {
         auto ptr = messages->extractMessage(mess->counter);
-        if (ptr)
-        {
+        if (ptr) {
             try {
                 endObj->endPtr->send(std::move(ptr));
             }
@@ -321,13 +316,10 @@ void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_me
                 helicsErrorHandler(err);
             }
         }
-    }
-    else if (err!=nullptr)
-    {
+    } else if (err != nullptr) {
         err->error_code = helics_error_invalid_argument;
         err->message = emptyMessageErrorString;
     }
-    
 }
 
 void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, helics_error* err)
@@ -384,88 +376,76 @@ int helicsEndpointPendingMessages(helics_endpoint endpoint)
 }
 static constexpr uint16_t messageKeyCode = 0xB3;
 
-namespace helics
+namespace helics {
+
+Message* MessageHolder::addMessage(std::unique_ptr<helics::Message>& mess)
 {
-
-    Message *MessageHolder::addMessage(std::unique_ptr<helics::Message> &mess)
-    {
-        if (!mess)
-        {
-            return nullptr;
-        }
-        Message *m = mess.get();
-        mess->backReference = static_cast<void *>(this);
-        if (!freeMessageSlots.empty())
-        {
-            auto index = freeMessageSlots.back();
-            freeMessageSlots.pop_back();
-            mess->counter = index;
-            messages[index] = std::move(mess);
-        }
-        else
-        {
-            mess->counter = static_cast<int32_t>(messages.size());
-            messages.push_back(std::move(mess));
-        }
-        return m;
-    }
-    Message *MessageHolder::newMessage()
-    {
-        Message *m{ nullptr };
-        if (!freeMessageSlots.empty())
-        {
-            auto index = freeMessageSlots.back();
-            freeMessageSlots.pop_back();
-            messages[index] = std::make_unique<Message>();
-            m = messages[index].get();
-            m->counter = index;
-            
-        }
-        else
-        {
-            messages.push_back(std::make_unique<Message>());
-            m = messages.back().get();
-            m->counter = static_cast<int32_t>(messages.size()) - 1;
-        }
-            
-            m->messageValidation = messageKeyCode;
-            m->backReference = static_cast<void *>(this);
-            return m;
-    }
-
-    std::unique_ptr<Message> MessageHolder::extractMessage(int index)
-    {
-        if (isValidIndex(index, messages))
-        {
-            if (messages[index])
-            {
-                freeMessageSlots.push_back(index);
-                messages[index]->backReference = nullptr;
-                messages[index]->messageValidation = 0;
-                return std::move(messages[index]);
-            }
-        }
+    if (!mess) {
         return nullptr;
     }
+    Message* m = mess.get();
+    mess->backReference = static_cast<void*>(this);
+    if (!freeMessageSlots.empty()) {
+        auto index = freeMessageSlots.back();
+        freeMessageSlots.pop_back();
+        mess->counter = index;
+        messages[index] = std::move(mess);
+    } else {
+        mess->counter = static_cast<int32_t>(messages.size());
+        messages.push_back(std::move(mess));
+    }
+    return m;
+}
+Message* MessageHolder::newMessage()
+{
+    Message* m{nullptr};
+    if (!freeMessageSlots.empty()) {
+        auto index = freeMessageSlots.back();
+        freeMessageSlots.pop_back();
+        messages[index] = std::make_unique<Message>();
+        m = messages[index].get();
+        m->counter = index;
 
-    void MessageHolder::freeMessage(int index)
-    {
-        if (isValidIndex(index, messages))
-        {
-            if (messages[index])
-            {
-                messages[index]->messageValidation = 0;
-                messages[index].reset();
-                freeMessageSlots.push_back(index);
-            }
+    } else {
+        messages.push_back(std::make_unique<Message>());
+        m = messages.back().get();
+        m->counter = static_cast<int32_t>(messages.size()) - 1;
+    }
+
+    m->messageValidation = messageKeyCode;
+    m->backReference = static_cast<void*>(this);
+    return m;
+}
+
+std::unique_ptr<Message> MessageHolder::extractMessage(int index)
+{
+    if (isValidIndex(index, messages)) {
+        if (messages[index]) {
+            freeMessageSlots.push_back(index);
+            messages[index]->backReference = nullptr;
+            messages[index]->messageValidation = 0;
+            return std::move(messages[index]);
         }
     }
+    return nullptr;
+}
 
-    void MessageHolder::clear()
-    {
-        freeMessageSlots.clear();
-        messages.clear();
+void MessageHolder::freeMessage(int index)
+{
+    if (isValidIndex(index, messages)) {
+        if (messages[index]) {
+            messages[index]->messageValidation = 0;
+            messages[index].reset();
+            freeMessageSlots.push_back(index);
+        }
     }
+}
+
+void MessageHolder::clear()
+{
+    freeMessageSlots.clear();
+    messages.clear();
+}
 
 } // namespace helics
 
@@ -565,8 +545,8 @@ helics_message_object helicsFederateGetMessageObject(helics_federate fed)
     if (!message) {
         return nullptr;
     }
-        message->messageValidation = messageKeyCode;
-        return fedObj->messages.addMessage(message);
+    message->messageValidation = messageKeyCode;
+    return fedObj->messages.addMessage(message);
 }
 
 helics_message_object helicsFederateCreateMessageObject(helics_federate fed, helics_error* err)
@@ -584,7 +564,7 @@ helics_message_object helicsEndpointCreateMessageObject(helics_endpoint endpoint
     if (endObj == nullptr) {
         return nullptr;
     }
-    return endObj->fed->messages.newMessage(); 
+    return endObj->fed->messages.newMessage();
 }
 
 void helicsFederateClearMessages(helics_federate fed)
@@ -596,10 +576,7 @@ void helicsFederateClearMessages(helics_federate fed)
     fedObj->messages.clear();
 }
 
-void helicsEndpointClearMessages(helics_endpoint /*endpoint*/)
-{
-
-}
+void helicsEndpointClearMessages(helics_endpoint /*endpoint*/) {}
 
 /* this function has been removed but may be added back in the future
 helics_message_object helicsFederateGetLastMessage (helics_federate fed)
