@@ -245,7 +245,7 @@ HELICS_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpoint);
  * Receive a packet from a particular endpoint.
  *
  * @deprecated This function is deprecated and will be removed in Helics 3.0.
- *             Use helicsEndpointGetMessageObject instead
+ *             Use helicsEndpointGetMessageObject instead.
  *
  * @param[in] endpoint The identifier for the endpoint.
  *
@@ -266,7 +266,7 @@ HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoi
  * Receive a communication message for any endpoint in the federate.
  *
  * @deprecated This function is deprecated and will be removed in Helics 3.0.
- *             Use helicsFederateGetMessageObject instead
+ *             Use helicsFederateGetMessageObject instead.
  *
  * @details The return order will be in order of endpoint creation.
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
