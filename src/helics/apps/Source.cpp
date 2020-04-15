@@ -28,8 +28,6 @@ namespace apps {
     /** set a string parameter*/
     void SignalGenerator::setString(const std::string& /*parameter*/, const std::string& /*val*/) {}
 
-    using namespace std::string_literals;
-
     Source::Source(int argc, char* argv[]): App("source", argc, argv) { processArgs(); }
 
     Source::Source(std::vector<std::string> args): App("source", std::move(args)) { processArgs(); }

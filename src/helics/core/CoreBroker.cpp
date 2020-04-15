@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 
 namespace helics {
-using namespace std::string_literals;
+    using std::string_literals::operator"" s;
 
 constexpr char universalKey[] = "**";
 

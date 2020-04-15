@@ -59,7 +59,7 @@ static void BMphold_singleCore(benchmark::State& state)
         state.counters["EvCount"] = totalEvCount;
 
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }
@@ -122,7 +122,7 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
         broker.reset();
         cores.clear();
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
 
         state.ResumeTiming();
     }

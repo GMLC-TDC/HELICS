@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <random>
 
-using namespace helics;
 /** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate: public BenchmarkFederate {
   public:
