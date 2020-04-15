@@ -19,7 +19,7 @@ namespace helicscpp {
 class Message {
   public:
     /** default constructor*/
-    Message() HELICS_NOTHROW: mo(HELICS_NULL_POINTER){};
+    Message() HELICS_NOTHROW: mo(HELICS_NULL_POINTER) {}
 
     /** construct from a helics_message object*/
     explicit Message(helics_message_object hmo) HELICS_NOTHROW: mo(hmo) {}
@@ -77,7 +77,7 @@ class Endpoint {
     /** construct from a helics_endpoint object*/
     explicit Endpoint(helics_endpoint hep) HELICS_NOTHROW: ep(hep) {}
     /** default constructor*/
-    Endpoint() HELICS_NOTHROW: ep(HELICS_NULL_POINTER){};
+    Endpoint() HELICS_NOTHROW: ep(HELICS_NULL_POINTER) {}
     /** copy constructor*/
     Endpoint(const Endpoint& endpoint) HELICS_NOTHROW: ep(endpoint.ep) {}
     /** copy assignment*/

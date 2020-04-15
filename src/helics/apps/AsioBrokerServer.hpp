@@ -41,7 +41,7 @@ namespace apps {
         /** stop the server*/
         virtual void stopServer() override;
         void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
-        void enableUdpServer(bool enabled) { udp_enabled_ = enabled; };
+        void enableUdpServer(bool enabled) { udp_enabled_ = enabled; }
 
       private:
         void mainLoop();

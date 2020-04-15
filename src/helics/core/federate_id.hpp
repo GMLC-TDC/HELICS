@@ -25,21 +25,21 @@ class local_federate_id {
     /** default constructor*/
     constexpr local_federate_id() = default;
     /** convert a base type value into a local_federate id*/
-    constexpr explicit local_federate_id(base_type val) noexcept: fid(val){};
+    constexpr explicit local_federate_id(base_type val) noexcept: fid(val) {}
     /** extract the base value of the id code*/
     constexpr base_type baseValue() const { return fid; }
     /** equality operator*/
-    bool operator==(local_federate_id id) const noexcept { return (fid == id.fid); };
+    bool operator==(local_federate_id id) const noexcept { return (fid == id.fid); }
     /** inequality operator*/
-    bool operator!=(local_federate_id id) const noexcept { return (fid != id.fid); };
+    bool operator!=(local_federate_id id) const noexcept { return (fid != id.fid); }
     /** less than operator for sorting*/
-    bool operator<(local_federate_id id) const noexcept { return (fid < id.fid); };
+    bool operator<(local_federate_id id) const noexcept { return (fid < id.fid); }
     /** check if the operator is valid
     @details valid operators have been set to something other than the default value*/
     bool isValid() const { return (fid != invalid_fid); }
 
   private:
-    static constexpr base_type invalid_fid = -2'000'000'000; //!< defined invalid handle
+    static constexpr base_type invalid_fid{-2'000'000'000}; //!< defined invalid handle
     base_type fid{invalid_fid}; //!< the underlying index value
 };
 
@@ -63,16 +63,16 @@ class interface_handle {
     /** default constructor*/
     constexpr interface_handle() = default;
 
-    constexpr explicit interface_handle(base_type val) noexcept: hid(val){};
+    constexpr explicit interface_handle(base_type val) noexcept: hid(val) {}
     /** extract the base value of the id code*/
     constexpr base_type baseValue() const { return hid; }
     /** equality operator*/
-    bool operator==(interface_handle id) const noexcept { return (hid == id.hid); };
+    bool operator==(interface_handle id) const noexcept { return (hid == id.hid); }
     /** inequality operator*/
-    bool operator!=(interface_handle id) const noexcept { return (hid != id.hid); };
+    bool operator!=(interface_handle id) const noexcept { return (hid != id.hid); }
     /** comparison operator for sorting*/
-    bool operator<(interface_handle id) const noexcept { return (hid < id.hid); };
-    bool operator>(interface_handle id) const noexcept { return (hid > id.hid); };
+    bool operator<(interface_handle id) const noexcept { return (hid < id.hid); }
+    bool operator>(interface_handle id) const noexcept { return (hid > id.hid); }
     bool isValid() const { return (hid != invalid_handle); }
 
   private:
@@ -86,8 +86,8 @@ class interface_handle {
 std::ostream& operator<<(std::ostream& os, interface_handle handle);
 #endif
 
-constexpr interface_handle direct_send_handle = interface_handle(
-    -1'745'234); //!< this special handle can be used to directly send a message in a core
+constexpr interface_handle direct_send_handle{
+    -1'745'234}; //!< this special handle can be used to directly send a message in a core
 
 } // namespace helics
 

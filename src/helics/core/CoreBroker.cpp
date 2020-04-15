@@ -264,8 +264,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     noInit.source_id = global_broker_id_local;
                     transmit(parent_route_id, noInit);
                 }
-            } else // we are initialized already
-            {
+            } else {
+                // we are initialized already
                 ActionMessage badInit(CMD_FED_ACK);
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;
@@ -356,8 +356,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     noInit.source_id = global_broker_id_local;
                     transmit(parent_route_id, noInit);
                 }
-            } else // we are initialized already
-            {
+            } else {
+                // we are initialized already
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {

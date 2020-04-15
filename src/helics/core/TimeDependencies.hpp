@@ -40,7 +40,7 @@ class DependencyInfo {
     /** default constructor*/
     DependencyInfo() = default;
     /** construct from a federate id*/
-    explicit DependencyInfo(global_federate_id id): fedID(id){};
+    explicit DependencyInfo(global_federate_id id): fedID(id) {}
 
     /** process a dependency related message
     @param m  a reference to an action message that contains some instructions for modifying dependencies

@@ -31,7 +31,7 @@ namespace apps {
         /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
         /** enable the websocket server*/
-        void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; };
+        void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; }
 
       private:
         void mainLoop();

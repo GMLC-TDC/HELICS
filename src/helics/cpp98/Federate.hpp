@@ -160,7 +160,7 @@ typedef struct {
 class Federate {
   public:
     /// Default constructor
-    Federate() HELICS_NOTHROW: fed(NULL), exec_async_iterate(false){};
+    Federate() HELICS_NOTHROW: fed(NULL), exec_async_iterate(false) {}
     /// Copy constructor
     Federate(const Federate& fedObj): exec_async_iterate(fedObj.exec_async_iterate)
     {

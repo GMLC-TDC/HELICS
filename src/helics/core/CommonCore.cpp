@@ -3404,9 +3404,8 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
                 }
             }
         }
-    }
-    // just forward these to the appropriate federate
-    else if (command.dest_id == global_broker_id_local) {
+    } else if (command.dest_id == global_broker_id_local) {
+        // just forward these to the appropriate federate
         if (command.action() == CMD_ADD_ENDPOINT) {
             auto filtI = filters.find(global_handle(global_broker_id_local, command.dest_handle));
             if (filtI != nullptr) {
@@ -4308,8 +4307,8 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
                         deliverMessage(cmd);
                     }
                 }
-            } else // the filter didn't have a function or was deactivated but still was requested to process
-            {
+            } else {
+                // the filter didn't have a function or was deactivated but still was requested to process
                 bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                 bool returnToSender =
                     ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);

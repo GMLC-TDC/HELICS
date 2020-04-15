@@ -18,7 +18,7 @@ class Input {
     /** construct from a helics_input object*/
     explicit Input(helics_input hsub) HELICS_NOTHROW: inp(hsub) {}
     /** default constructor*/
-    Input() HELICS_NOTHROW: inp(HELICS_NULL_POINTER){};
+    Input() HELICS_NOTHROW: inp(HELICS_NULL_POINTER) {}
     /** copy constructor*/
     Input(const Input& inputs) HELICS_NOTHROW: inp(inputs.inp) {}
     /** copy assign*/

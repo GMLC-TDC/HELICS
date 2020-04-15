@@ -209,8 +209,8 @@ void Federate::enterInitializingModeAsync()
         }
     } else if (cm == modes::pending_init) {
         return;
-    } else if (cm != modes::initializing) // if we are already in initialization do nothing
-    {
+    } else if (cm != modes::initializing) {
+        // if we are already in initialization do nothing
         throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
     }
 }

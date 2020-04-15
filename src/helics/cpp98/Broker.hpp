@@ -19,7 +19,7 @@ namespace helicscpp {
 class Broker {
   public:
     /** Default constructor */
-    Broker() HELICS_NOTHROW: broker(HELICS_NULL_POINTER){};
+    Broker() HELICS_NOTHROW: broker(HELICS_NULL_POINTER) {}
     /** construct broker 
 	@param type string with the type of the broker to create
 	@param name the name of the broker

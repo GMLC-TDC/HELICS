@@ -48,7 +48,7 @@ class ActionMessage {
     std::vector<std::string> stringData; //!< container for extra string data
   public:
     /** default constructor*/
-    ActionMessage() noexcept: name(payload){};
+    ActionMessage() noexcept: name(payload) {}
     /** construct from an action type
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition

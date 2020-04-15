@@ -112,8 +112,8 @@ namespace tcp {
             state = connection_state_t::halted;
             receivingHalt.trigger();
             return;
-        } else // there was an error
-        {
+        } else {
+            // there was an error
             if (bytes_transferred > 0) {
                 auto used =
                     dataCall(shared_from_this(), data.data(), bytes_transferred + residBufferSize);

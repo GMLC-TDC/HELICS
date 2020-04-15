@@ -20,7 +20,7 @@ namespace helicscpp {
 class Core {
   public:
     /** Default constructor*/
-    Core() HELICS_NOTHROW: core(HELICS_NULL_POINTER){};
+    Core() HELICS_NOTHROW: core(HELICS_NULL_POINTER) {}
     /** construct with type, core name and initialization string */
     Core(const std::string& type, const std::string& name, const std::string& initString)
     {

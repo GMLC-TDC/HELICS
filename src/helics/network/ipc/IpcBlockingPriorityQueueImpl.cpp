@@ -278,8 +278,8 @@ will block and wait.
         T pop(Functor callOnWaitFunction)
         {
             auto val = try_pop();
-            while (!val) // may be spurious so make sure actually have a value
-            {
+            while (!val) {
+                // may be spurious so make sure actually have a value
                 callOnWaitFunction();
                 std::unique_lock<std::mutex> pullLock(m_pullLock); // first pullLock
                 if (!priorityQueue.empty()) {
@@ -287,9 +287,8 @@ will block and wait.
                     priorityQueue.pop();
                     return actval;
                 }
-                if (!pullElements.empty())
-
-                { // the callback may fill the queue or it may have been filled in the meantime
+                if (!pullElements.empty()) {
+                    // the callback may fill the queue or it may have been filled in the meantime
                     auto actval = std::move(pullElements.back());
                     pullElements.pop_back();
                     return actval;

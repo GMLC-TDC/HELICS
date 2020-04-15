@@ -36,7 +36,7 @@ namespace apps {
         /** stop the server*/
         virtual void stopServer() override;
         void enableZmqServer(bool enabled) { zmq_enabled_ = enabled; }
-        void enableZmqSsServer(bool enabled) { zmqss_enabled_ = enabled; };
+        void enableZmqSsServer(bool enabled) { zmqss_enabled_ = enabled; }
 
       private:
         struct zmqServerData {
