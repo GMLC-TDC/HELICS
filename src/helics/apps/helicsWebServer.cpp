@@ -422,7 +422,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second << std::endl;  //NOLINT
+            boost::beast::ostream(buffer) << res.second;  //NOLINT
             ws.async_write(
                 buffer.data(),
                 beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
@@ -448,7 +448,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer) << generateJsonString(response) << std::endl; //NOLINT
+        boost::beast::ostream(buffer) << generateJsonString(response); //NOLINT
         ws.async_write(
             buffer.data(),
             beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
@@ -612,9 +612,9 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
     // This is the C++11 equivalent of a generic lambda.
     // The function object is used to send an HTTP message.
     struct send_lambda {
-        HttpSession& self;
+        HttpSession& self_ref;
 
-        explicit send_lambda(HttpSession& self): self(self) {}
+        explicit send_lambda(HttpSession& self): self_ref(self) {}
 
         template<bool isRequest, class Body, class Fields>
         void operator()(http::message<isRequest, Body, Fields>&& msg) const
@@ -626,14 +626,14 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
 
             // Store a type-erased version of the shared
             // pointer in the class to keep it alive.
-            self.res = sp;
+            self_ref.res = sp;
 
             // Write the response
             http::async_write(
-                self.stream,
+                self_ref.stream,
                 *sp,
                 beast::bind_front_handler(
-                    &HttpSession::on_write, self.shared_from_this(), sp->need_eof()));
+                    &HttpSession::on_write, self_ref.shared_from_this(), sp->need_eof()));
         }
     };
 
@@ -723,8 +723,8 @@ class Listener: public std::enable_shared_from_this<Listener> {
     bool websocket{false};
 
   public:
-    Listener(net::io_context& ioc, const tcp::endpoint &endpoint, bool webs = false):
-        ioc(ioc), acceptor(net::make_strand(ioc)), websocket{webs}
+    Listener(net::io_context& context, const tcp::endpoint &endpoint, bool webs = false):
+        ioc(context), acceptor(net::make_strand(ioc)), websocket{webs}
     {
         beast::error_code ec;
 
