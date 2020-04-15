@@ -66,32 +66,32 @@ class global_federate_id {
     /** default constructor*/
     constexpr global_federate_id() = default;
 
-    constexpr explicit global_federate_id(base_type val) noexcept: gid(val){};
+    constexpr explicit global_federate_id(base_type val) noexcept: gid(val){}
     /** implicit conversion from global_id*/
-    constexpr global_federate_id(global_broker_id id) noexcept: gid(id.gid){}; // NOLINT
+    constexpr global_federate_id(global_broker_id id) noexcept: gid(id.gid){} // NOLINT
 
     constexpr operator global_broker_id() const noexcept
     {
-        return global_broker_id(gid);
-    }; // NOLINT
+        return global_broker_id{ gid };
+    } // NOLINT
     /** conversion to the base_type*/
-    constexpr base_type baseValue() const { return gid; };
+    constexpr base_type baseValue() const { return gid; }
     /** equality operator*/
-    bool operator==(global_federate_id id) const noexcept { return (gid == id.gid); };
+    bool operator==(global_federate_id id) const noexcept { return (gid == id.gid); }
     /** inequality operator*/
-    bool operator!=(global_federate_id id) const noexcept { return (gid != id.gid); };
+    bool operator!=(global_federate_id id) const noexcept { return (gid != id.gid); }
     /** less than operator for sorting*/
-    bool operator<(global_federate_id id) const noexcept { return (gid < id.gid); };
+    bool operator<(global_federate_id id) const noexcept { return (gid < id.gid); }
     /** greater than operator for sorting*/
-    bool operator>(global_federate_id id) const noexcept { return (gid > id.gid); };
+    bool operator>(global_federate_id id) const noexcept { return (gid > id.gid); }
     /** equality operator*/
-    bool operator==(global_broker_id id) const noexcept { return (gid == id.gid); };
+    bool operator==(global_broker_id id) const noexcept { return (gid == id.gid); }
     /** inequality operator*/
-    bool operator!=(global_broker_id id) const noexcept { return (gid != id.gid); };
+    bool operator!=(global_broker_id id) const noexcept { return (gid != id.gid); }
     /** less than operator for sorting*/
-    bool operator<(global_broker_id id) const noexcept { return (gid < id.gid); };
+    bool operator<(global_broker_id id) const noexcept { return (gid < id.gid); }
     /** greater than operator for sorting*/
-    bool operator>(global_broker_id id) const noexcept { return (gid > id.gid); };
+    bool operator>(global_broker_id id) const noexcept { return (gid > id.gid); }
     /** return true if the broker_id is a valid federate id code*/
     bool isFederate() const
     {
