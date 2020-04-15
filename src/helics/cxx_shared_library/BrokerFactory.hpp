@@ -125,6 +125,6 @@ registered or when the clean up function is called this prevents some odd thread
     }
 
     /** display the help listing for a particular core_type*/
-    HELICS_SHARED_DEPRECATED void displayHelp(core_type type = core_type::UNRECOGNIZED){}
+    HELICS_SHARED_DEPRECATED void displayHelp(core_type type = core_type::UNRECOGNIZED) {}
 } // namespace BrokerFactory
 } // namespace helics

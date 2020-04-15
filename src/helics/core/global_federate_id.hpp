@@ -15,9 +15,9 @@ namespace helics {
     268,435,455 brokers allowed  if we need more than that this, program has been phenomenally successful beyond
     all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
     */
-    constexpr identififier_base_type global_federate_id_shift{ 0x0002'0000 };
+constexpr identififier_base_type global_federate_id_shift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-    constexpr identififier_base_type global_broker_id_shift{ 0x7000'0000 };
+constexpr identififier_base_type global_broker_id_shift{0x7000'0000};
 
 /** class holding a globally unique identifier for brokers
     @details the class is fully compatible with global_federate_id*/
@@ -27,7 +27,7 @@ class global_broker_id {
     /** default constructor*/
     constexpr global_broker_id() = default;
 
-    constexpr explicit global_broker_id(base_type val) noexcept: gid(val){}
+    constexpr explicit global_broker_id(base_type val) noexcept: gid(val) {}
     /** extract the base value of the id code*/
     constexpr base_type baseValue() const { return gid; }
     /** equality operator*/
@@ -66,14 +66,11 @@ class global_federate_id {
     /** default constructor*/
     constexpr global_federate_id() = default;
 
-    constexpr explicit global_federate_id(base_type val) noexcept: gid(val){}
+    constexpr explicit global_federate_id(base_type val) noexcept: gid(val) {}
     /** implicit conversion from global_id*/
-    constexpr global_federate_id(global_broker_id id) noexcept: gid(id.gid){} // NOLINT
+    constexpr global_federate_id(global_broker_id id) noexcept: gid(id.gid) {} // NOLINT
 
-    constexpr operator global_broker_id() const noexcept
-    {
-        return global_broker_id{ gid };
-    } // NOLINT
+    constexpr operator global_broker_id() const noexcept { return global_broker_id{gid}; } // NOLINT
     /** conversion to the base_type*/
     constexpr base_type baseValue() const { return gid; }
     /** equality operator*/
@@ -125,7 +122,9 @@ class global_handle {
     constexpr global_handle() = default;
     /** construct directly from a federate_id and interface_handle*/
     constexpr global_handle(global_federate_id fed, interface_handle hand):
-        fed_id(fed), handle(hand){}
+        fed_id(fed), handle(hand)
+    {
+    }
     /** convert to a uint64_t
         @details for use in maps and other things*/
     explicit operator uint64_t() const
@@ -164,7 +163,7 @@ class route_id {
     /** default constructor*/
     constexpr route_id() = default;
     /** construct from a base_type value*/
-    constexpr explicit route_id(base_type val) noexcept: rid(val){}
+    constexpr explicit route_id(base_type val) noexcept: rid(val) {}
     /** explicitly convert to a base value */
     constexpr base_type baseValue() const { return rid; }
     /** equality operator*/

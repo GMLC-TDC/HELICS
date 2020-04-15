@@ -327,7 +327,7 @@ class BlockingPriorityQueue {
                 priorityQueue.pop();
                 return actval;
             }
-            if (!pullElements.empty()){
+            if (!pullElements.empty()) {
                 // the callback may fill the queue or it may have been filled in the meantime
                 auto actval = std::move(pullElements.back());
                 pullElements.pop_back();

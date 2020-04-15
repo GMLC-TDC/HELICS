@@ -30,20 +30,22 @@ struct publication_info {
     std::string units; //!< publication units
     interface_handle coreID; //!< Handle from the core
     publication_id_t id; //!< the id used as the identifier
-    int size{ -1 }; //!< required size of a publication
-    bool forward{ true };
+    int size{-1}; //!< required size of a publication
+    bool forward{true};
     publication_info(
         const std::string& n_name,
         const std::string& n_type,
         const std::string& n_units):
         name(n_name),
-        type(n_type), units(n_units){}
+        type(n_type), units(n_units)
+    {
+    }
 };
 /** structure used to contain information about a subscription*/
 struct input_info {
     data_view lastData; //!< the last published data from a target
-    Time lastUpdate{ 0.0 }; //!< the time the subscription was last updated
-    Time lastQuery{ 0.0 }; //!< the time the query was made
+    Time lastUpdate{0.0}; //!< the time the subscription was last updated
+    Time lastQuery{0.0}; //!< the time the query was made
     std::string name; //!< subscription name
     std::string type; //!< subscription type
     std::string units; //!< subscription units
@@ -54,7 +56,9 @@ struct input_info {
     std::function<void(Input&, Time)> callback; //!< callback to trigger on update
     bool hasUpdate = false; //!< indicator that there was an update
     input_info(const std::string& n_name, const std::string& n_type, const std::string& n_units):
-        name(n_name), type(n_type), units(n_units){}
+        name(n_name), type(n_type), units(n_units)
+    {
+    }
 };
 
 /** class handling the implementation details of a value Federate*/
