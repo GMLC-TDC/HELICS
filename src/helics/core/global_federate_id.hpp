@@ -125,7 +125,7 @@ class global_handle {
     constexpr global_handle() = default;
     /** construct directly from a federate_id and interface_handle*/
     constexpr global_handle(global_federate_id fed, interface_handle hand):
-        fed_id(fed), handle(hand){};
+        fed_id(fed), handle(hand){}
     /** convert to a uint64_t
         @details for use in maps and other things*/
     explicit operator uint64_t() const
@@ -164,15 +164,15 @@ class route_id {
     /** default constructor*/
     constexpr route_id() = default;
     /** construct from a base_type value*/
-    constexpr explicit route_id(base_type val) noexcept: rid(val){};
+    constexpr explicit route_id(base_type val) noexcept: rid(val){}
     /** explicitly convert to a base value */
     constexpr base_type baseValue() const { return rid; }
     /** equality operator*/
-    bool operator==(route_id id) const noexcept { return (rid == id.rid); };
+    bool operator==(route_id id) const noexcept { return (rid == id.rid); }
     /** inequality operator*/
-    bool operator!=(route_id id) const noexcept { return (rid != id.rid); };
+    bool operator!=(route_id id) const noexcept { return (rid != id.rid); }
     /** less than operator for sorting*/
-    bool operator<(route_id id) const noexcept { return (rid < id.rid); };
+    bool operator<(route_id id) const noexcept { return (rid < id.rid); }
     /** check if the route is valid*/
     bool isValid() const { return (rid != invalid_route_id); }
 
