@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cassert>
 
 namespace helics {
-static const std::string emptyString;
 
 namespace BrokerFactory {
 
@@ -46,7 +45,7 @@ namespace BrokerFactory {
         }
         static const std::shared_ptr<BrokerBuilder>& getIndexedBuilder(std::size_t index)
         {
-            auto& blder = instance();
+            const auto& blder = instance();
             if (blder->builders.size() <= index) {
                 throw(HelicsException("broker type index is not available"));
             }
@@ -83,13 +82,14 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(core_type type, const std::string& configureString)
     {
+        static const std::string emptyString;
         return create(type, emptyString, configureString);
     }
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, const std::string& configureString)
+        create(core_type type, const std::string& brokerName, const std::string& configureString)
     {
-        auto broker = makeBroker(type, broker_name);
+        auto broker = makeBroker(type, brokerName);
         if (!broker) {
             throw(helics::RegistrationFailure("unable to create broker"));
         }
@@ -104,13 +104,14 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(core_type type, int argc, char* argv[])
     {
+        static const std::string emptyString;
         return create(type, emptyString, argc, argv);
     }
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, int argc, char* argv[])
+        create(core_type type, const std::string& brokerName, int argc, char* argv[])
     {
-        auto broker = makeBroker(type, broker_name);
+        auto broker = makeBroker(type, brokerName);
         broker->configureFromArgs(argc, argv);
         bool reg = registerBroker(broker);
         if (!reg) {
@@ -122,13 +123,14 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> create(core_type type, std::vector<std::string> args)
     {
+        static const std::string emptyString;
         return create(type, emptyString, std::move(args));
     }
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, std::vector<std::string> args)
+        create(core_type type, const std::string& brokerName, std::vector<std::string> args)
     {
-        auto broker = makeBroker(type, broker_name);
+        auto broker = makeBroker(type, brokerName);
         broker->configureFromVector(std::move(args));
         bool reg = registerBroker(broker);
         if (!reg) {
@@ -252,14 +254,14 @@ need be without issue*/
     {
         if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED) {
             std::cout << "All core types have similar options\n";
-            auto brk = makeBroker(core_type::DEFAULT, emptyString);
+            auto brk = makeBroker(core_type::DEFAULT, std::string{});
             brk->configure(helpStr);
 #ifdef ENABLE_TCP_CORE
-            brk = makeBroker(core_type::TCP_SS, emptyString);
+            brk = makeBroker(core_type::TCP_SS, std::string{});
             brk->configure(helpStr);
 #endif
         } else {
-            auto brk = makeBroker(type, emptyString);
+            auto brk = makeBroker(type, std::string{});
             brk->configure(helpStr);
         }
     }

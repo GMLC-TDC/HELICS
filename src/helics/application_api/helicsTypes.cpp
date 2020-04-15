@@ -19,19 +19,19 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace gmlc::utilities;
 
 namespace helics {
-static const std::string doubleString("double");
-static const std::string intString("int64");
-static const std::string stringString("string");
-static const std::string complexString("complex");
-static const std::string boolString("bool");
-static const std::string doubleVecString("double_vector");
-static const std::string complexVecString("complex_vector");
-static const std::string namedPointString("named_point");
-static const std::string timeString("time");
-static const std::string nullString;
 
 const std::string& typeNameStringRef(data_type type)
 {
+    static const std::string doubleString("double");
+    static const std::string intString("int64");
+    static const std::string stringString("string");
+    static const std::string complexString("complex");
+    static const std::string boolString("bool");
+    static const std::string doubleVecString("double_vector");
+    static const std::string complexVecString("complex_vector");
+    static const std::string namedPointString("named_point");
+    static const std::string timeString("time");
+    static const std::string nullString;
     switch (type) {
         case data_type::helics_double:
             return doubleString;
@@ -631,7 +631,7 @@ data_block typeConvert(data_type type, int64_t val)
             return std::to_string(val);
         case data_type::helics_named_point:
             if (static_cast<uint64_t>(std::abs(val)) >
-                (2ull << 51u)) // this checks whether the actual value will fit in a double
+                (2ULL << 51U)) // this checks whether the actual value will fit in a double
             {
                 return ValueConverter<NamedPoint>::convert(
                     NamedPoint{std::to_string(val), std::nan("0")});
@@ -820,7 +820,7 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
         case data_type::helics_vector: {
             std::vector<double> DV;
             DV.reserve(val.size() * 2);
-            for (auto& vali : val) {
+            for (const auto& vali : val) {
                 DV.push_back(vali.real());
                 DV.push_back(vali.imag());
             }

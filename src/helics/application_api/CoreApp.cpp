@@ -97,7 +97,7 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser()
         app->add_option("--name,-n", name, "name of the core");
     }
     app->allow_extras();
-    auto app_p = app.get();
+    auto* app_p = app.get();
     app->footer([app_p]() {
         auto coreType = helics::core::coreTypeFromString((*app_p)["--core"]->as<std::string>());
         CoreFactory::displayHelp(coreType);
@@ -192,17 +192,20 @@ void CoreApp::makeConnections(const std::string& file)
     }
 }
 
-static const std::string estring{};
 /** get the identifier of the core*/
 const std::string& CoreApp::getIdentifier() const
 {
+    static const std::string estring;
     return (core) ? core->getIdentifier() : estring;
 }
+
 /** get the network address of the core*/
 const std::string& CoreApp::getAddress() const
 {
+    static const std::string estring;
     return (core) ? core->getAddress() : estring;
 }
+
 /** make a query at the core*/
 std::string CoreApp::query(const std::string& target, const std::string& queryStr)
 {

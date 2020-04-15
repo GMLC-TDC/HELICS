@@ -166,7 +166,7 @@ typedef enum {
     helics_error_invalid_object = -3, /*!< indicator that the object used was not a valid object */
     helics_error_connection_failure = -2, /*!< the operation to connect has failed */
     helics_error_registration_failure = -1, /*!< registration has failed */
-    helics_ok = 0, /*!< the function executed successfully */
+    helics_ok = 0 /*!< the function executed successfully */
 } helics_error_types;
 
 /** enumeration of properties that apply to federates*/

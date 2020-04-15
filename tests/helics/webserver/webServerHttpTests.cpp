@@ -37,7 +37,7 @@ namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
-const std::string localhost{"localhost"};
+const constexpr char localhost[] = "localhost";
 
 class httpTest: public ::testing::Test {
   protected:
@@ -56,7 +56,7 @@ class httpTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<beast::tcp_stream>(ioc);
+        stream = std::make_unique<beast::tcp_stream>(ioc); //NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26242");
@@ -78,9 +78,9 @@ class httpTest: public ::testing::Test {
     }
 
     // You can define per-test set-up logic as usual.
-    virtual void SetUp() {}
+    void SetUp() final {}
 
-    std::string sendGet(const std::string& target)
+    static std::string sendGet(const std::string& target)
     {
         // Set up an HTTP GET request message
         http::request<http::string_body> req{http::verb::get, target, 11};
@@ -98,7 +98,8 @@ class httpTest: public ::testing::Test {
         return res.body();
     }
 
-    std::string sendCommand(http::verb command, const std::string& target, const std::string& body)
+    static std::string
+        sendCommand(http::verb command, const std::string& target, const std::string& body)
     {
         // Set up an HTTP command message
         http::request<http::string_body> req{command, target, 11};
@@ -163,7 +164,7 @@ class httpTest: public ::testing::Test {
         helics::BrokerFactory::cleanUpBrokers();
     }
     // You can define per-test tear-down logic as usual.
-    virtual void TearDown() {}
+    void TearDown() final {}
 
   private:
     // Some expensive resource shared by all tests.
