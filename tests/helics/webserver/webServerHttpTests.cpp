@@ -37,7 +37,7 @@ namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
-const constexpr char localhost[]="localhost";
+const constexpr char localhost[] = "localhost";
 
 class httpTest: public ::testing::Test {
   protected:
@@ -78,7 +78,7 @@ class httpTest: public ::testing::Test {
     }
 
     // You can define per-test set-up logic as usual.
-    void SetUp() final{}
+    void SetUp() final {}
 
     static std::string sendGet(const std::string& target)
     {
@@ -98,7 +98,8 @@ class httpTest: public ::testing::Test {
         return res.body();
     }
 
-    static std::string sendCommand(http::verb command, const std::string& target, const std::string& body)
+    static std::string
+        sendCommand(http::verb command, const std::string& target, const std::string& body)
     {
         // Set up an HTTP command message
         http::request<http::string_body> req{command, target, 11};
@@ -163,7 +164,7 @@ class httpTest: public ::testing::Test {
         helics::BrokerFactory::cleanUpBrokers();
     }
     // You can define per-test tear-down logic as usual.
-    void TearDown() final{}
+    void TearDown() final {}
 
   private:
     // Some expensive resource shared by all tests.
