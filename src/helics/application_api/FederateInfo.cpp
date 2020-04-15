@@ -275,8 +275,6 @@ int getOptionIndex(std::string val)
     return -1;
 }
 
-using namespace std::string_literals;
-
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");

@@ -184,7 +184,7 @@ namespace apps {
     void Player::loadTextFile(const std::string& filename)
     {
         App::loadTextFile(filename);
-        using namespace gmlc::utilities::stringOps;
+        using namespace gmlc::utilities::stringOps; //NOLINT
         std::ifstream infile(filename);
         std::string str;
 
