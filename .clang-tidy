@@ -61,6 +61,7 @@ hicpp-*,
 -hicpp-avoid-c-arrays,
 -hicpp-no-array-decay,
 clang-analyzer-*,
+-clang-analyzer-optin.cplusplus.VirtualCall
 bugprone-*,
 -bugprone-narrowing-conversions,
 misc-*,
