@@ -56,7 +56,7 @@ class httpTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<beast::tcp_stream>(ioc);
+        stream = std::make_unique<beast::tcp_stream>(ioc); //NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26242");

@@ -81,9 +81,11 @@ static std::string uriDecode(beast::string_view str)
                 ret.push_back(str[ii]);
             }
         } else {
-            unsigned int spchar;
-            auto converted = sscanf(std::string(str.substr(ii + 1, 2)).c_str(), "%x", &spchar);
-            if (converted == 1) {
+           
+            const std::array<char, 3> exp{ {str[ii + 1],str[ii + 2],'\0'} };
+            char *loc{ nullptr };
+            unsigned int spchar = strtoul(exp.data(), &loc, 16);
+            if (loc-exp.data() >= 2) {
                 ret.push_back(static_cast<char>(spchar));
                 ii = ii + 2;
             } else {
@@ -446,7 +448,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer) << generateJsonString(response);
+        boost::beast::ostream(buffer) << generateJsonString(response) << std::endl;
         ws.async_write(
             buffer.data(),
             beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
