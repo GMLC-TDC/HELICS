@@ -29,7 +29,7 @@ namespace inproc {
         virtual void queue_tx_function() override; //!< the loop for transmitting data
       public:
         /** return a dummy port number*/
-        int getPort() const { return -1; };
+        int getPort() const { return -1; }
 
         std::string getAddress() const;
     };

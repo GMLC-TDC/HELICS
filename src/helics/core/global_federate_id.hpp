@@ -15,9 +15,9 @@ namespace helics {
     268,435,455 brokers allowed  if we need more than that this, program has been phenomenally successful beyond
     all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
     */
-constexpr identififier_base_type global_federate_id_shift = 0x0002'0000;
+    constexpr identififier_base_type global_federate_id_shift{ 0x0002'0000 };
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr identififier_base_type global_broker_id_shift = 0x7000'0000;
+    constexpr identififier_base_type global_broker_id_shift{ 0x7000'0000 };
 
 /** class holding a globally unique identifier for brokers
     @details the class is fully compatible with global_federate_id*/
@@ -27,15 +27,15 @@ class global_broker_id {
     /** default constructor*/
     constexpr global_broker_id() = default;
 
-    constexpr explicit global_broker_id(base_type val) noexcept: gid(val){};
+    constexpr explicit global_broker_id(base_type val) noexcept: gid(val){}
     /** extract the base value of the id code*/
     constexpr base_type baseValue() const { return gid; }
     /** equality operator*/
-    bool operator==(global_broker_id id) const noexcept { return (gid == id.gid); };
+    bool operator==(global_broker_id id) const noexcept { return (gid == id.gid); }
     /** inequality operator*/
-    bool operator!=(global_broker_id id) const noexcept { return (gid != id.gid); };
+    bool operator!=(global_broker_id id) const noexcept { return (gid != id.gid); }
     /** less than operator for sorting*/
-    bool operator<(global_broker_id id) const noexcept { return (gid < id.gid); };
+    bool operator<(global_broker_id id) const noexcept { return (gid < id.gid); }
 
     bool isFederate() const
     {
@@ -138,19 +138,19 @@ class global_handle {
     bool operator==(global_handle id) const noexcept
     {
         return ((fed_id == id.fed_id) && (handle == id.handle));
-    };
+    }
     /** inequality operator*/
     bool operator!=(global_handle id) const noexcept
     {
         return ((fed_id != id.fed_id) || (handle != id.handle));
-    };
+    }
     /** less than operator for sorting*/
     bool operator<(global_handle id) const noexcept
     {
         return (fed_id < id.fed_id) ? true : ((fed_id != id.fed_id) ? false : (handle < id.handle));
-    };
+    }
     /** check if the handle points to a validly specified interface*/
-    bool isValid() const { return fed_id.isValid() && handle.isValid(); };
+    bool isValid() const { return fed_id.isValid() && handle.isValid(); }
 };
 
 /** stream operator for a federate_id

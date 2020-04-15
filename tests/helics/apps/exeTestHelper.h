@@ -17,7 +17,7 @@
 class exeTestRunner {
   private:
     std::string exeString;
-    bool active = false;
+    bool active{ false };
     static int counter;
     std::string outFile;
 
@@ -29,7 +29,7 @@ class exeTestRunner {
         const std::string& baseLocation2,
         const std::string& target);
     bool findFileLocation(const std::string& baseLocation, const std::string& target);
-    bool isActive() const { return active; };
+    bool isActive() const { return active; }
 
     int run(const std::string& args) const;
     /** run the executable in an async context with the given args and return a future of the return code

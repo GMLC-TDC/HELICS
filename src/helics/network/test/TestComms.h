@@ -31,7 +31,7 @@ namespace testcore {
         /** user function in the test comms to force the communication to stop immediately for testing purposes*/
         void haltComms();
         /** return a dummy port number*/
-        int getPort() const { return -1; };
+        int getPort() const { return -1; }
 
         std::string getAddress() const;
     };

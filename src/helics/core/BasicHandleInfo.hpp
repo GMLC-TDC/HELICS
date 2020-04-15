@@ -34,7 +34,7 @@ enum handle_flag_definitions {
 class BasicHandleInfo {
   public:
     /** default constructor*/
-    BasicHandleInfo() noexcept: type_in(type), type_out(units){};
+    BasicHandleInfo() noexcept: type_in(type), type_out(units){}
     /** construct from the data*/
     BasicHandleInfo(
         global_federate_id federate_id,
