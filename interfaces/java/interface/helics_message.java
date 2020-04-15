@@ -11,7 +11,7 @@ package com.java.helics;
 /**
  *  Message_t mapped to a c compatible structure<br>
  * <br>
- * this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
+ * use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
  */
 public class helics_message {
   private transient long swigCPtr;

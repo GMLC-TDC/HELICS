@@ -13301,6 +13301,51 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsEndpointSendMessageObjectZeroCopy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_message_object arg2 = (helics_message_object) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsEndpointSendMessageObjectZeroCopy", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendMessageObjectZeroCopy" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_ConvertPtr(swig_obj[1],SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessageObjectZeroCopy" "', argument " "2"" of type '" "helics_message_object""'"); 
+  }
+  helicsEndpointSendMessageObjectZeroCopy(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsEndpointSubscribe(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
@@ -17773,7 +17818,7 @@ static PyMethodDef SwigMethods[] = {
 		""},
 	 { "helicsEndpointSendMessage", _wrap_helicsEndpointSendMessage, METH_VARARGS, "\n"
 		"Send a message object from a specific endpoint.\n"
-		"\n"
+		"Deprecated: Use helicsEndpointSendMessageObject instead.\n"
 		":type endpoint: void\n"
 		":param endpoint: The endpoint to send the data from.\n"
 		":type message: :py:class:`helics_message`\n"
@@ -17785,7 +17830,16 @@ static PyMethodDef SwigMethods[] = {
 		":type endpoint: void\n"
 		":param endpoint: The endpoint to send the data from.\n"
 		":type message: void\n"
-		":param message: The actual message to send.\n"
+		":param message: The actual message to send which will be copied.\n"
+		""},
+	 { "helicsEndpointSendMessageObjectZeroCopy", _wrap_helicsEndpointSendMessageObjectZeroCopy, METH_VARARGS, "\n"
+		"Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid\n"
+		"after the call.\n"
+		"\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint to send the data from.\n"
+		":type message: void\n"
+		":param message: The actual message to send which will be copied.\n"
 		""},
 	 { "helicsEndpointSubscribe", _wrap_helicsEndpointSubscribe, METH_VARARGS, "\n"
 		"Subscribe an endpoint to a publication.\n"
@@ -17828,6 +17882,9 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsEndpointGetMessage", _wrap_helicsEndpointGetMessage, METH_O, "\n"
 		"Receive a packet from a particular endpoint.\n"
 		"\n"
+		"Deprecated: This function is deprecated and will be removed in Helics 3.0.\n"
+		"            Use helicsEndpointGetMessageObject instead.\n"
+		"\n"
 		"endpoint The identifier for the endpoint.\n"
 		"\n"
 		":rtype: :py:class:`helics_message`\n"
@@ -17843,6 +17900,9 @@ static PyMethodDef SwigMethods[] = {
 		""},
 	 { "helicsFederateGetMessage", _wrap_helicsFederateGetMessage, METH_O, "\n"
 		"Receive a communication message for any endpoint in the federate.\n"
+		"\n"
+		"Deprecated: This function is deprecated and will be removed in Helics 3.0.\n"
+		"            Use helicsFederateGetMessageObject instead.\n"
 		"\n"
 		"The return order will be in order of endpoint creation.\n"
 		"         So all messages that are available for the first endpoint, then all for the second, and so on.\n"
@@ -17879,6 +17939,10 @@ static PyMethodDef SwigMethods[] = {
 		""},
 	 { "helicsEndpointClearMessages", _wrap_helicsEndpointClearMessages, METH_O, "\n"
 		"Clear all message from an endpoint.\n"
+		"\n"
+		"Deprecated: This function does nothing and will be removed.\n"
+		"            Use helicsFederateClearMessages to free all messages,\n"
+		"            or helicsMessageFree to clear an individual message.\n"
 		"\n"
 		":type endpoint: void\n"
 		":param endpoint: The endpoint object to operate on.\n"
@@ -19284,21 +19348,21 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_log_level_timing",SWIG_From_int((int)(helics_log_level_timing)));
   SWIG_Python_SetConstant(d, "helics_log_level_data",SWIG_From_int((int)(helics_log_level_data)));
   SWIG_Python_SetConstant(d, "helics_log_level_trace",SWIG_From_int((int)(helics_log_level_trace)));
-  SWIG_Python_SetConstant(d, "helics_ok",SWIG_From_int((int)(helics_ok)));
-  SWIG_Python_SetConstant(d, "helics_error_registration_failure",SWIG_From_int((int)(helics_error_registration_failure)));
-  SWIG_Python_SetConstant(d, "helics_error_connection_failure",SWIG_From_int((int)(helics_error_connection_failure)));
-  SWIG_Python_SetConstant(d, "helics_error_invalid_object",SWIG_From_int((int)(helics_error_invalid_object)));
-  SWIG_Python_SetConstant(d, "helics_error_invalid_argument",SWIG_From_int((int)(helics_error_invalid_argument)));
-  SWIG_Python_SetConstant(d, "helics_error_discard",SWIG_From_int((int)(helics_error_discard)));
-  SWIG_Python_SetConstant(d, "helics_error_system_failure",SWIG_From_int((int)(helics_error_system_failure)));
-  SWIG_Python_SetConstant(d, "helics_warning",SWIG_From_int((int)(helics_warning)));
-  SWIG_Python_SetConstant(d, "helics_error_invalid_state_transition",SWIG_From_int((int)(helics_error_invalid_state_transition)));
-  SWIG_Python_SetConstant(d, "helics_error_invalid_function_call",SWIG_From_int((int)(helics_error_invalid_function_call)));
-  SWIG_Python_SetConstant(d, "helics_error_execution_failure",SWIG_From_int((int)(helics_error_execution_failure)));
-  SWIG_Python_SetConstant(d, "helics_error_insufficient_space",SWIG_From_int((int)(helics_error_insufficient_space)));
-  SWIG_Python_SetConstant(d, "helics_error_other",SWIG_From_int((int)(helics_error_other)));
   SWIG_Python_SetConstant(d, "helics_error_fatal",SWIG_From_int((int)(helics_error_fatal)));
   SWIG_Python_SetConstant(d, "helics_error_external_type",SWIG_From_int((int)(helics_error_external_type)));
+  SWIG_Python_SetConstant(d, "helics_error_other",SWIG_From_int((int)(helics_error_other)));
+  SWIG_Python_SetConstant(d, "helics_error_insufficient_space",SWIG_From_int((int)(helics_error_insufficient_space)));
+  SWIG_Python_SetConstant(d, "helics_error_execution_failure",SWIG_From_int((int)(helics_error_execution_failure)));
+  SWIG_Python_SetConstant(d, "helics_error_invalid_function_call",SWIG_From_int((int)(helics_error_invalid_function_call)));
+  SWIG_Python_SetConstant(d, "helics_error_invalid_state_transition",SWIG_From_int((int)(helics_error_invalid_state_transition)));
+  SWIG_Python_SetConstant(d, "helics_warning",SWIG_From_int((int)(helics_warning)));
+  SWIG_Python_SetConstant(d, "helics_error_system_failure",SWIG_From_int((int)(helics_error_system_failure)));
+  SWIG_Python_SetConstant(d, "helics_error_discard",SWIG_From_int((int)(helics_error_discard)));
+  SWIG_Python_SetConstant(d, "helics_error_invalid_argument",SWIG_From_int((int)(helics_error_invalid_argument)));
+  SWIG_Python_SetConstant(d, "helics_error_invalid_object",SWIG_From_int((int)(helics_error_invalid_object)));
+  SWIG_Python_SetConstant(d, "helics_error_connection_failure",SWIG_From_int((int)(helics_error_connection_failure)));
+  SWIG_Python_SetConstant(d, "helics_error_registration_failure",SWIG_From_int((int)(helics_error_registration_failure)));
+  SWIG_Python_SetConstant(d, "helics_ok",SWIG_From_int((int)(helics_ok)));
   SWIG_Python_SetConstant(d, "helics_property_time_delta",SWIG_From_int((int)(helics_property_time_delta)));
   SWIG_Python_SetConstant(d, "helics_property_time_period",SWIG_From_int((int)(helics_property_time_period)));
   SWIG_Python_SetConstant(d, "helics_property_time_offset",SWIG_From_int((int)(helics_property_time_offset)));
