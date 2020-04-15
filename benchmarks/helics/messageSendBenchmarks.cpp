@@ -92,7 +92,7 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
         broker.reset();
         cores.clear();
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
 
         state.ResumeTiming();
     }

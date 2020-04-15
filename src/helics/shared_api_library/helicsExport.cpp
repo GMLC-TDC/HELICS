@@ -811,10 +811,9 @@ helics::CoreObject::~CoreObject()
 
 void helicsCloseLibrary(void)
 {
-    using namespace std::literals::chrono_literals;
     clearAllObjects();
-    auto ret = std::async(std::launch::async, []() { helics::CoreFactory::cleanUpCores(2000ms); });
-    helics::BrokerFactory::cleanUpBrokers(2000ms);
+    auto ret = std::async(std::launch::async, []() { helics::CoreFactory::cleanUpCores(std::chrono::milliseconds(2000)); });
+    helics::BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(2000));
     ret.get();
 
     helics::LoggerManager::closeLogger();

@@ -18,8 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 //#include <csignal>
 #include <memory>
 
-using namespace std::chrono;
-
 namespace helics {
 namespace zeromq {
     void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)

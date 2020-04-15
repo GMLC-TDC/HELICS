@@ -154,7 +154,7 @@ namespace apps {
 
     void Recorder::loadTextFile(const std::string& textFile)
     {
-        using namespace gmlc::utilities::stringOps;
+        using namespace gmlc::utilities::stringOps; //NOLINT
 
         std::ifstream infile(textFile);
         std::string str;

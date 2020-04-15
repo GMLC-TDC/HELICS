@@ -49,7 +49,7 @@ static void BMring2_singleCore(benchmark::State& state)
                       << ") instead of 5000" << std::endl;
         }
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }
@@ -70,7 +70,7 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
         broker->setLoggingLevel(helics_log_level_no_print);
 
         std::vector<RingTransmit> links(feds);
-        std::vector<std::shared_ptr<Core>> cores(feds);
+        std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
                 cType,
@@ -104,7 +104,7 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
         broker->disconnect();
         broker.reset();
         cores.clear();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }

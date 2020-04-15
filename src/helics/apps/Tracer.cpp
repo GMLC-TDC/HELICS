@@ -139,7 +139,7 @@ namespace apps {
 
     void Tracer::loadTextFile(const std::string& textFile)
     {
-        using namespace gmlc::utilities::stringOps;
+        using namespace gmlc::utilities::stringOps;  //NOLINT
         App::loadTextFile(textFile);
         std::ifstream infile(textFile);
         std::string str;
@@ -437,7 +437,8 @@ namespace apps {
 
     std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp()
     {
-        using namespace gmlc::utilities;
+        using gmlc::utilities::stringOps::removeQuotes;
+        using gmlc::utilities::stringOps::splitlineQuotes;
 
         auto app = std::make_shared<helicsCLI11App>("Command line options for the Tracer App");
         app->add_flag("--allow_iteration", allow_iteration, "allow iteration on values")
@@ -480,9 +481,9 @@ namespace apps {
                 "--tag,--publication,--pub",
                 "tags(publications) to record, this argument may be specified any number of times")
             ->each([this](const std::string& tag) {
-                auto taglist = stringOps::splitlineQuotes(tag);
+                auto taglist = splitlineQuotes(tag);
                 for (const auto& tagname : taglist) {
-                    subkeys.emplace(stringOps::removeQuotes(tagname), -1);
+                    subkeys.emplace(removeQuotes(tagname), -1);
                 }
             })
             ->type_size(-1);
@@ -491,9 +492,9 @@ namespace apps {
             ->add_option(
                 "--endpoints", "endpoints to capture, this argument may be specified multiple time")
             ->each([this](const std::string& ept) {
-                auto eptlist = stringOps::splitlineQuotes(ept);
+                auto eptlist = splitlineQuotes(ept);
                 for (const auto& eptname : eptlist) {
-                    eptNames.emplace(stringOps::removeQuotes(eptname), -1);
+                    eptNames.emplace(removeQuotes(eptname), -1);
                 }
             })
             ->type_size(-1);
@@ -504,9 +505,9 @@ namespace apps {
                 "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
                 "supports multiple arguments or a semicolon/comma separated list")
             ->each([this](const std::string& capt) {
-                auto captFeds = stringOps::splitlineQuotes(capt);
+                auto captFeds = splitlineQuotes(capt);
                 for (auto& captFed : captFeds) {
-                    auto actCapt = stringOps::removeQuotes(captFed);
+                    auto actCapt = removeQuotes(captFed);
                     captureInterfaces.push_back(actCapt);
                 }
             })

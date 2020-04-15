@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace tcp {
     using asio::ip::tcp;
-    using namespace std::literals::chrono_literals;
+    using std::chrono_literals::operator"" ms;
 
     std::atomic<int> TcpConnection::idcounter{10};
 
