@@ -26,7 +26,7 @@ using namespace std::literals::chrono_literals;
 
 using helics::Core;
 
-constexpr const char *host = "tcp://127.0.0.1";
+constexpr const char* host = "tcp://127.0.0.1";
 
 TEST(ZMQSSCore, transmit)
 {
@@ -49,11 +49,11 @@ TEST(ZMQSSCore, transmit)
     comm2.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm2.setServerMode(true);
 
-    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage& m) {
         ++counter2;
         act2 = m;
     });
@@ -113,15 +113,15 @@ TEST(ZMQSSCore, addroute)
     comm3.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm3.setServerMode(true);
 
-    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage& m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback([&counter3, &act3](const helics::ActionMessage &m) {
+    comm3.setCallback([&counter3, &act3](const helics::ActionMessage& m) {
         ++counter3;
         act3 = m;
     });
@@ -174,7 +174,7 @@ TEST(ZMQSSCore, initialization)
     comm.setName("test_broker");
     comm.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm.setServerMode(true);
-    comm.setCallback([&counter, &msgs, &msgLock](const helics::ActionMessage &m) {
+    comm.setCallback([&counter, &msgs, &msgLock](const helics::ActionMessage& m) {
         ++counter;
         std::lock_guard<std::mutex> lock(msgLock);
         msgs.push_back(m);

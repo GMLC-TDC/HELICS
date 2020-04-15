@@ -547,7 +547,7 @@ helics_federate helicsFederateClone(helics_federate fed, helics_error* err)
 
 helics_bool helicsFederateIsValid(helics_federate fed)
 {
-    auto *fedObj = getFed(fed, nullptr);
+    auto* fedObj = getFed(fed, nullptr);
     return (fedObj == nullptr) ? helics_false : helics_true;
 }
 

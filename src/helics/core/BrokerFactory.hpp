@@ -73,10 +73,8 @@ namespace BrokerFactory {
     /** Create a broker from command line arguments in a vector*/
     std::shared_ptr<Broker> create(core_type type, std::vector<std::string> args);
 
-    std::shared_ptr<Broker> create(
-        core_type type,
-        const std::string& brokerName,
-        const std::string& configureString);
+    std::shared_ptr<Broker>
+        create(core_type type, const std::string& brokerName, const std::string& configureString);
 
     std::shared_ptr<Broker>
         create(core_type type, const std::string& brokerName, int argc, char* argv[]);

@@ -76,16 +76,14 @@ static std::string uriDecode(beast::string_view str)
         if (str[ii] != '%') {
             if (str[ii] == '+') {
                 ret.push_back(' ');
-            }
-            else {
+            } else {
                 ret.push_back(str[ii]);
             }
         } else {
-           
-            const std::array<char, 3> exp{ {str[ii + 1],str[ii + 2],'\0'} };
-            char *loc{ nullptr };
+            const std::array<char, 3> exp{{str[ii + 1], str[ii + 2], '\0'}};
+            char* loc{nullptr};
             unsigned int spchar = strtoul(exp.data(), &loc, 16);
-            if (loc-exp.data() >= 2) {
+            if (loc - exp.data() >= 2) {
                 ret.push_back(static_cast<char>(spchar));
                 ii = ii + 2;
             } else {
@@ -387,7 +385,9 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
     void on_accept(beast::error_code ec)
     {
-        if (ec) { return fail(ec, "accept"); }
+        if (ec) {
+            return fail(ec, "accept");
+        }
 
         // Read a message
         do_read();
@@ -405,9 +405,13 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         boost::ignore_unused(bytes_transferred);
 
         // This indicates that the session was closed
-        if (ec == websocket::error::closed) { return; }
+        if (ec == websocket::error::closed) {
+            return;
+        }
 
-        if (ec) { fail(ec, "read"); }
+        if (ec) {
+            fail(ec, "read");
+        }
 
         beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
                                   buffer.size()};
@@ -422,7 +426,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second;  //NOLINT
+            boost::beast::ostream(buffer) << res.second; //NOLINT
             ws.async_write(
                 buffer.data(),
                 beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
@@ -458,7 +462,9 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) { return fail(ec, "write"); }
+        if (ec) {
+            return fail(ec, "write");
+        }
 
         // Clear the buffer
         buffer.consume(buffer.size());
@@ -672,7 +678,9 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream) { return do_close(); }
+        if (ec == http::error::end_of_stream) {
+            return do_close();
+        }
 
         if (ec) {
             if (beast::error::timeout != ec) {
@@ -689,7 +697,9 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) { return fail(ec, "write"); }
+        if (ec) {
+            return fail(ec, "write");
+        }
 
         if (close) {
             // This means we should close the connection, usually because
@@ -723,7 +733,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
     bool websocket{false};
 
   public:
-    Listener(net::io_context& context, const tcp::endpoint &endpoint, bool webs = false):
+    Listener(net::io_context& context, const tcp::endpoint& endpoint, bool webs = false):
         ioc(context), acceptor(net::make_strand(ioc)), websocket{webs}
     {
         beast::error_code ec;
