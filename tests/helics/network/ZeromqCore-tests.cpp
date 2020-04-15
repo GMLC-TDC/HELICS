@@ -112,7 +112,7 @@ TEST(ZMQCore_tests, zmqRequestSet_test1)
     repSocket2.recv(msg);
 
     repSocket2.send(msg, zmq::send_flags::none);
-    msgCnt = reqset.checkForMessages(100ms);
+    reqset.checkForMessages(100ms);
 
     EXPECT_TRUE(reqset.waiting());
     repSocket2.recv(msg);
@@ -271,7 +271,7 @@ TEST(ZMQCore_tests, zmqComms_broker_test_transmit)
 
     pullSocket.recv(rxmsg);
 
-    EXPECT_GT(rxmsg.size(), 32u);
+    EXPECT_GT(rxmsg.size(), 32U);
     helics::ActionMessage rM(static_cast<char*>(rxmsg.data()), rxmsg.size());
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect();
@@ -356,7 +356,9 @@ TEST(ZMQCore_tests, zmqComm_transmit_through)
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
 
-    helics::zeromq::ZmqComms comm, comm2;
+    helics::zeromq::ZmqComms comm;
+    helics::zeromq::ZmqComms comm2;
+
     comm.loadTargetInfo(host, host);
     comm2.loadTargetInfo(host, "");
 
@@ -403,7 +405,9 @@ TEST(ZMQCore_tests, zmqComm_transmit_add_route)
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
-    helics::zeromq::ZmqComms comm, comm2, comm3;
+    helics::zeromq::ZmqComms comm;
+    helics::zeromq::ZmqComms comm2;
+    helics::zeromq::ZmqComms comm3;
 
     comm.loadTargetInfo(host, host);
     comm2.loadTargetInfo(host, std::string());

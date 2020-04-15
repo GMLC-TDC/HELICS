@@ -400,13 +400,12 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
     {
-        static const std::string emptyString;
         boost::ignore_unused(bytes_transferred);
 
         // This indicates that the session was closed
-        if (ec == websocket::error::closed) return;
+        if (ec == websocket::error::closed) { return; }
 
-        if (ec) fail(ec, "read");
+        if (ec) { fail(ec, "read"); }
 
         beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
                                   buffer.size()};
@@ -415,13 +414,13 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         cmd command{cmd::unknown};
 
-        auto res = generateResults(command, emptyString, emptyString, emptyString, reqpr.second);
+        auto res = generateResults(command, {}, "", "", reqpr.second);
         // Clear the buffer
         buffer.consume(buffer.size());
 
         ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second;
+            boost::beast::ostream(buffer) << res.second << std::endl;
             ws.async_write(
                 buffer.data(),
                 beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
@@ -457,7 +456,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     {
         boost::ignore_unused(bytes_transferred);
 
-        if (ec) return fail(ec, "write");
+        if (ec) { return fail(ec, "write"); }
 
         // Clear the buffer
         buffer.consume(buffer.size());
@@ -568,7 +567,9 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     }
 
     auto reqpr = processRequestParameters(target, req.body());
-    std::string brokerName, query, targetObj;
+    std::string brokerName;
+    std::string query;
+    std::string targetObj;
 
     partitionTarget(reqpr.first, brokerName, query, targetObj);
 
@@ -669,7 +670,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream) return do_close();
+        if (ec == http::error::end_of_stream) { return do_close(); }
 
         if (ec) {
             if (beast::error::timeout != ec) {
@@ -714,14 +715,14 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
 //------------------------------------------------------------------------------
 
 // Accepts incoming connections and launches the sessions
-class listener: public std::enable_shared_from_this<listener> {
+class Listener: public std::enable_shared_from_this<Listener> {
     net::io_context& ioc;
     tcp::acceptor acceptor;
-    bool websocket_{false};
+    bool websocket{false};
 
   public:
-    listener(net::io_context& ioc, tcp::endpoint endpoint, bool webs = false):
-        ioc(ioc), acceptor(net::make_strand(ioc)), websocket_{webs}
+    Listener(net::io_context& ioc, const tcp::endpoint &endpoint, bool webs = false):
+        ioc(ioc), acceptor(net::make_strand(ioc)), websocket{webs}
     {
         beast::error_code ec;
 
@@ -763,7 +764,7 @@ class listener: public std::enable_shared_from_this<listener> {
         // The new connection gets its own strand
         acceptor.async_accept(
             net::make_strand(ioc),
-            beast::bind_front_handler(&listener::on_accept, shared_from_this()));
+            beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
     }
 
     void on_accept(beast::error_code ec, tcp::socket socket)
@@ -771,7 +772,7 @@ class listener: public std::enable_shared_from_this<listener> {
         if (ec) {
             fail(ec, "accept");
         } else {
-            if (websocket_) {
+            if (websocket) {
                 // Create the session and run it
                 std::make_shared<WebSocketsession>(std::move(socket))->run();
             } else {
@@ -832,7 +833,7 @@ namespace apps {
             }
             auto const address = net::ip::make_address(httpAddress_);
             // Create and launch a listening port
-            std::make_shared<listener>(
+            std::make_shared<Listener>(
                 context->ioc, tcp::endpoint{address, static_cast<std::uint16_t>(httpPort_)})
                 ->run();
         }
@@ -845,7 +846,7 @@ namespace apps {
             }
             auto const address = net::ip::make_address(websocketAddress_);
             // Create and launch a listening port
-            std::make_shared<listener>(
+            std::make_shared<Listener>(
                 context->ioc,
                 tcp::endpoint{address, static_cast<std::uint16_t>(websocketPort_)},
                 true)

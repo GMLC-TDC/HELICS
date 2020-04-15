@@ -281,7 +281,7 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
         }
         core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
 
-        auto retcore = reinterpret_cast<helics_core>(core.get());
+        auto* retcore = reinterpret_cast<helics_core>(core.get());
         getMasterHolder()->addCore(std::move(core));
 
         return retcore;
@@ -301,7 +301,7 @@ helics_core helicsCoreClone(helics_core core, helics_error* err)
     auto coreClone = std::make_unique<helics::CoreObject>();
     coreClone->valid = coreValidationIdentifier;
     coreClone->coreptr = coreObj->coreptr;
-    auto retcore = reinterpret_cast<helics_core>(coreClone.get());
+    auto* retcore = reinterpret_cast<helics_core>(coreClone.get());
     getMasterHolder()->addCore(std::move(coreClone));
 
     return retcore;
@@ -391,7 +391,7 @@ helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int
             args.emplace_back(argv[ii]);
         }
         broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), args);
-        auto retbroker = reinterpret_cast<helics_broker>(broker.get());
+        auto* retbroker = reinterpret_cast<helics_broker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
     }
@@ -403,14 +403,14 @@ helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int
 
 helics_broker helicsBrokerClone(helics_broker broker, helics_error* err)
 {
-    auto brokerObj = helics::getBrokerObject(broker, err);
+    auto* brokerObj = helics::getBrokerObject(broker, err);
     if (brokerObj == nullptr) {
         return nullptr;
     }
     auto brokerClone = std::make_unique<helics::BrokerObject>();
     brokerClone->valid = brokerValidationIdentifier;
     brokerClone->brokerptr = brokerObj->brokerptr;
-    auto retbroker = reinterpret_cast<helics_broker>(brokerClone.get());
+    auto* retbroker = reinterpret_cast<helics_broker>(brokerClone.get());
     getMasterHolder()->addBroker(std::move(brokerClone));
     return retbroker;
 }
@@ -908,7 +908,7 @@ const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, h
         return invalidStringConst;
     }
 
-    auto queryObj = getQueryObj(query, err);
+    auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
         return invalidStringConst;
     }

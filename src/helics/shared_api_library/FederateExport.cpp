@@ -459,7 +459,7 @@ helics_federate helicsCreateMessageFederate(const char* fedName, helics_federate
     }
     FedI->type = helics::vtype::message_fed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<helics_federate>(FedI.get());
+    auto* fed = reinterpret_cast<helics_federate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
     return (fed);
 }
@@ -478,7 +478,7 @@ helics_federate helicsCreateMessageFederateFromConfig(const char* configFile, he
     }
     FedI->type = helics::vtype::message_fed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<helics_federate>(FedI.get());
+    auto* fed = reinterpret_cast<helics_federate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
     return (fed);
 }
@@ -492,7 +492,7 @@ helics_federate helicsCreateCombinationFederate(const char* fedName, helics_fede
         if (fi == nullptr) {
             FedI->fedptr = std::make_shared<helics::CombinationFederate>(AS_STRING(fedName), helics::FederateInfo());
         } else {
-            auto info = getFedInfo(fi, err);
+            auto* info = getFedInfo(fi, err);
             if (info == nullptr) {
                 return nullptr;
             }
@@ -547,7 +547,7 @@ helics_federate helicsFederateClone(helics_federate fed, helics_error* err)
 
 helics_bool helicsFederateIsValid(helics_federate fed)
 {
-    auto fedObj = getFed(fed, nullptr);
+    auto *fedObj = getFed(fed, nullptr);
     return (fedObj == nullptr) ? helics_false : helics_true;
 }
 

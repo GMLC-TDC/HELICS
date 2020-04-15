@@ -82,7 +82,7 @@ bool MessageFederateManager::hasMessage() const
     return false;
 }
 
-bool MessageFederateManager::hasMessage(const Endpoint& ept) const
+bool MessageFederateManager::hasMessage(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
         auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
@@ -94,7 +94,7 @@ bool MessageFederateManager::hasMessage(const Endpoint& ept) const
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
-uint64_t MessageFederateManager::pendingMessages(const Endpoint& ept) const
+uint64_t MessageFederateManager::pendingMessages(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
         auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
@@ -224,11 +224,6 @@ std::string MessageFederateManager::localQuery(const std::string& queryStr) cons
             [](const auto& info) { return (!info.actualName.empty()); });
     }
     return ret;
-}
-
-const std::string& MessageFederateManager::getEndpointName(const Endpoint& ept) const
-{
-    return ept.actualName;
 }
 
 static const Endpoint invalidEpt{};
