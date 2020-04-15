@@ -422,7 +422,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second << std::endl;  // NOLINT
+            boost::beast::ostream(buffer) << res.second << std::endl;  //NOLINT
             ws.async_write(
                 buffer.data(),
                 beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
@@ -448,7 +448,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer) << generateJsonString(response) << std::endl;
+        boost::beast::ostream(buffer) << generateJsonString(response) << std::endl; //NOLINT
         ws.async_write(
             buffer.data(),
             beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
