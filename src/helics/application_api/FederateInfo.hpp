@@ -39,7 +39,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     FederateInfo() = default;
     /** construct from a type
     @param cType the type of core to use for the federate*/
-    explicit FederateInfo(core_type cType): coreType(cType){};
+    explicit FederateInfo(core_type cType): coreType(cType){}
     /** load a federateInfo object from command line arguments in a string
     @details calls /ref loadInfoFromArgs in the constructor
     @param args a string containing the command line arguments

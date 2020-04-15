@@ -31,7 +31,7 @@ namespace ipc {
 
       public:
         /** get the port number of the comms object to push message to*/
-        int getPort() const { return -1; };
+        int getPort() const { return -1; }
 
         std::string getAddress() const;
     };

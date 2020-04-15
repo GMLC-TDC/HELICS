@@ -120,6 +120,6 @@ class ForwardingTimeCoordinator {
     /** check if there are any active Time dependencies*/
     bool hasActiveTimeDependencies() const;
     /** get the current next time*/
-    Time getNextTime() const { return time_next; };
+    Time getNextTime() const { return time_next; }
 };
 } // namespace helics

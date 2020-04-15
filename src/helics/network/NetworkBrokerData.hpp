@@ -65,7 +65,7 @@ class NetworkBrokerData {
   public:
     NetworkBrokerData() = default;
     /** constructor from the allowed type*/
-    explicit NetworkBrokerData(interface_type type): allowedType(type){};
+    explicit NetworkBrokerData(interface_type type): allowedType(type){}
 
     /** generate a command line argument parser for the network broker data
      @param localAddress a predefined string containing the desired local only address

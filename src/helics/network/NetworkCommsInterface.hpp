@@ -75,7 +75,7 @@ class NetworkCommsInterface: public CommsInterface {
 
   public:
     /** get the port number of the comms object to push message to*/
-    int getPort() const { return PortNumber; };
+    int getPort() const { return PortNumber; }
     /** get the network address of the comms interface*/
     std::string getAddress() const;
     /** return the default Broker port*/

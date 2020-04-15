@@ -37,9 +37,9 @@ class data_view {
     data_view(data_view&& dv) noexcept: dblock(dv.dblock), ref(std::move(dv.ref)){};
 
     /** construct from a string*/
-    data_view(const char* dt) noexcept: dblock(dt){}; // NOLINT
+    data_view(const char* dt) noexcept: dblock(dt){} // NOLINT
     /** construct from a char Pointer and length*/
-    data_view(const char* dt, size_t len) noexcept: dblock(dt, len){};
+    data_view(const char* dt, size_t len) noexcept: dblock(dt, len){}
     /** construct from a string*/
     data_view(const std::string& str) noexcept: dblock(str){}; // NOLINT
     /** construct from a rValue to a string*/

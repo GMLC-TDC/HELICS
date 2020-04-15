@@ -56,30 +56,30 @@ class identifier_id_t {
     static const identifiers identity{ID}; //!< the type of the identifier
     using underlyingType = BaseType;
     /** default constructor*/
-    constexpr identifier_id_t() noexcept: ivalue(invalidValue){};
+    constexpr identifier_id_t() noexcept: ivalue(invalidValue){}
     /** value based constructor*/
-    constexpr explicit identifier_id_t(BaseType val) noexcept: ivalue(val){};
+    constexpr explicit identifier_id_t(BaseType val) noexcept: ivalue(val){}
     /** copy constructor*/
-    constexpr identifier_id_t(const identifier_id_t& id) noexcept: ivalue(id.ivalue){};
+    constexpr identifier_id_t(const identifier_id_t& id) noexcept: ivalue(id.ivalue){}
     /** assignment from number*/
     identifier_id_t& operator=(BaseType val) noexcept
     {
         ivalue = val;
         return *this;
-    };
+    }
     /** copy assignment*/
     identifier_id_t& operator=(const identifier_id_t& id) = default;
 
     /** get the underlying value*/
     BaseType value() const noexcept { return ivalue; };
     /** equality operator*/
-    bool operator==(identifier_id_t id) const noexcept { return (ivalue == id.ivalue); };
+    bool operator==(identifier_id_t id) const noexcept { return (ivalue == id.ivalue); }
     /** inequality operator*/
-    bool operator!=(identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
+    bool operator!=(identifier_id_t id) const noexcept { return (ivalue != id.ivalue); }
     /** less than operator for sorting*/
-    bool operator<(identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
+    bool operator<(identifier_id_t id) const noexcept { return (ivalue < id.ivalue); }
     // check if the current value is not the invalidValue
-    bool isValid() const noexcept { return (ivalue != invalidValue); };
+    bool isValid() const noexcept { return (ivalue != invalidValue); }
 };
 } // namespace helics
 

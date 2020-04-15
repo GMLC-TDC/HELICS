@@ -20,7 +20,7 @@ class Filter {
     /** construct from C level helics_filter object*/
     explicit Filter(helics_filter hfilt) HELICS_NOTHROW: filt(hfilt) {}
     /** default constructor*/
-    Filter() HELICS_NOTHROW: filt(HELICS_NULL_POINTER){};
+    Filter() HELICS_NOTHROW: filt(HELICS_NULL_POINTER){}
     /** copy constructor*/
     Filter(const Filter& filter): filt(filter.filt) {}
     /** copy assignment*/

@@ -48,16 +48,16 @@ class PholdFederate: public BenchmarkFederate {
     PholdFederate(): BenchmarkFederate("PHOLD") {}
 
     // functions for setting parameters
-    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; };
-    void setRandomSeed(unsigned int s) { seed = s; };
-    void setRandomTimeMean(double mean) { randTimeMean_ = mean; };
-    void setInitialEventCount(unsigned int count) { initEvCount_ = count; };
-    void setLocalProbability(double p) { localProbability_ = p; };
-    void setLookahead(double v) { lookahead_ = v; };
+    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; }
+    void setRandomSeed(unsigned int s) { seed = s; }
+    void setRandomTimeMean(double mean) { randTimeMean_ = mean; }
+    void setInitialEventCount(unsigned int count) { initEvCount_ = count; }
+    void setLocalProbability(double p) { localProbability_ = p; }
+    void setLookahead(double v) { lookahead_ = v; }
 
     // functions for setting callbacks
-    void setBeforeFinalizeCallback(std::function<void()> cb = nullptr) { callBeforeFinalize = cb; };
-    void setAfterFinalizeCallback(std::function<void()> cb = nullptr) { callAfterFinalize = cb; };
+    void setBeforeFinalizeCallback(std::function<void()> cb = nullptr) { callBeforeFinalize = cb; }
+    void setAfterFinalizeCallback(std::function<void()> cb = nullptr) { callAfterFinalize = cb; }
 
     std::string getName() override { return "phold_" + std::to_string(index); }
 

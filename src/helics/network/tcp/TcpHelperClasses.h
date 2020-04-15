@@ -134,7 +134,7 @@ namespace tcp {
     */
         bool waitUntilConnected(std::chrono::milliseconds timeOut);
         /** get the id code for the socket*/
-        int getIdentifier() const { return idcode; };
+        int getIdentifier() const { return idcode; }
 
       private:
         TcpConnection(asio::io_context& io_context, size_t bufferSize):
@@ -204,7 +204,7 @@ namespace tcp {
                 close();
             }
             catch (...) {
-            };
+            }
         }
 
         /** connect the acceptor to the socket*/
