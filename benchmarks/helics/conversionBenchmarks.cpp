@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <benchmark/benchmark.h>
 
-using namespace helics;
 template<class T>
 static void BMconversion(benchmark::State& state, const T& arg)
 {
@@ -48,10 +47,10 @@ static void BMinterpret(benchmark::State& state, const T& arg)
     T val{arg};
     helics::data_block store;
     helics::ValueConverter<T>::convert(val, store);
-    data_view stv{store};
+    helics::data_view stv{store};
     T val2;
     for (auto _ : state) {
-        ValueConverter<T>::interpret(stv, val2);
+        helics::ValueConverter<T>::interpret(stv, val2);
     }
 }
 

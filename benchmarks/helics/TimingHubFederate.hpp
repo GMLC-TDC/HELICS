@@ -12,8 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-using helics::operator"" _t;
-using namespace helics;
 /** class implementing the hub for a timing test*/
 class TimingHub: public BenchmarkFederate {
   private:

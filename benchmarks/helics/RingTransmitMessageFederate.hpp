@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 
 using helics::operator"" _t;
-using namespace helics;
 /** class implementing a token ring using messages as the transmission mechanism*/
 class RingTransmitMessage: public BenchmarkFederate {
   public:

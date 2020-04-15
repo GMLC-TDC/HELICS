@@ -90,7 +90,7 @@ static const std::string emptyStr;
 #    define LOG_TRACE(message) ((void)0)
 #endif // LOGGING_DISABLED
 
-using namespace std::chrono_literals;
+using namespace std::chrono_literals; //NOLINT
 
 namespace helics {
 FederateState::FederateState(const std::string& name_, const CoreFederateInfo& info_):

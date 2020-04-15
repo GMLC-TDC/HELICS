@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cctype>
 #include <map>
-using namespace zmq;
+using zmq::socket_type;
 /*
 req = ZMQ_REQ,
 rep = ZMQ_REP,
@@ -42,7 +42,7 @@ pull = ZMQ_PULL,
     */
 
 /* *INDENT-OFF* */
-static const std::map<std::string, zmq::socket_type> socketMap{{"req", socket_type::req},
+static const std::map<std::string, socket_type> socketMap{{"req", socket_type::req},
                                                                {"request", socket_type::req},
                                                                {"rep", socket_type::rep},
                                                                {"reply", socket_type::rep},

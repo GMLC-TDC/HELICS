@@ -130,7 +130,7 @@ namespace apps {
 
     void App::loadTextFile(const std::string& textFile)
     {
-        using namespace gmlc::utilities::stringOps;
+        //using namespace gmlc::utilities::stringOps;
         std::ifstream infile(textFile);
         std::string str;
 

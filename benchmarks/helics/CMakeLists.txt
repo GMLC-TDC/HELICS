@@ -25,6 +25,7 @@ set(HELICS_MULTINODE_BENCHMARKS
     PholdFederate
     MessageExchangeFederate
     RingTransmitFederate
+    RingTransmitMessageFederate
     EchoHubFederate
     EchoLeafFederate
     EchoMessageHubFederate

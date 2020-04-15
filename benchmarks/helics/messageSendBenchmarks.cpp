@@ -19,8 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <random>
 #include <thread>
 
-using namespace helics;
-
 static void BMsendMessage(benchmark::State& state, core_type cType, bool singleCore = false)
 {
     for (auto _ : state) {
