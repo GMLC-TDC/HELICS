@@ -56,11 +56,11 @@ class identifier_id_t {
     static const identifiers identity{ID}; //!< the type of the identifier
     using underlyingType = BaseType;
     /** default constructor*/
-    constexpr identifier_id_t() noexcept: ivalue(invalidValue){}
+    constexpr identifier_id_t() noexcept: ivalue(invalidValue) {}
     /** value based constructor*/
-    constexpr explicit identifier_id_t(BaseType val) noexcept: ivalue(val){}
+    constexpr explicit identifier_id_t(BaseType val) noexcept: ivalue(val) {}
     /** copy constructor*/
-    constexpr identifier_id_t(const identifier_id_t& id) noexcept: ivalue(id.ivalue){}
+    constexpr identifier_id_t(const identifier_id_t& id) noexcept: ivalue(id.ivalue) {}
     /** assignment from number*/
     identifier_id_t& operator=(BaseType val) noexcept
     {

@@ -24,15 +24,15 @@ namespace apps {
         int generatorIndex{-1};
         std::string generatorName;
         SourceObject() = default;
-        SourceObject(const Publication& p, Time per): pub(p), period(per){}
+        SourceObject(const Publication& p, Time per): pub(p), period(per) {}
         // source type
     };
 
     /** parent class for a signal generator which generates values to feed into a helics federation*/
     class HELICS_CXX_EXPORT SignalGenerator {
       protected:
-          Time lastTime{ timeZero };
-        Time keyTime{ timeZero };
+        Time lastTime{timeZero};
+        Time keyTime{timeZero};
 
       public:
         SignalGenerator() = default;

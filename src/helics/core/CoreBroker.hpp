@@ -50,7 +50,7 @@ class BasicFedInfo {
     route_id route; //!< the routing information for data to be sent to the federate
     global_broker_id parent; //!< the id of the parent broker/core
     connection_state state{connection_state::connected};
-    explicit BasicFedInfo(const std::string& fedname): name(fedname){}
+    explicit BasicFedInfo(const std::string& fedname): name(fedname) {}
 };
 
 /** class defining the common information about a broker federate*/
@@ -74,7 +74,7 @@ class BasicBrokerInfo {
     bool _disable_ping{false}; //!< indicator that the broker doesn't respond to pings
     // 1 byte gap
     std::string routeInfo; //!< string describing the connection information for the route
-    explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName){}
+    explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName) {}
 };
 
 class TimeCoordinator;

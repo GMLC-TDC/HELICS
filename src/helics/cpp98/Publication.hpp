@@ -18,7 +18,7 @@ class Publication {
     /** construct from a helics_publication*/
     explicit Publication(helics_publication hpub) HELICS_NOTHROW: pub(hpub) {}
     /** default constructor*/
-    Publication() HELICS_NOTHROW: pub(HELICS_NULL_POINTER){}
+    Publication() HELICS_NOTHROW: pub(HELICS_NULL_POINTER) {}
     /** copy constructor*/
     Publication(const Publication& publication): pub(publication.pub) {}
     /** copy assignment*/

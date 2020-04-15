@@ -50,7 +50,7 @@ class FedInfo {
     operation_state state{operation_state::operating};
 
     constexpr FedInfo() = default;
-    constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed){}
+    constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed) {}
     FederateState* operator->() noexcept { return fed; }
     const FederateState* operator->() const noexcept { return fed; }
     operator bool() const noexcept { return (fed != nullptr); }
