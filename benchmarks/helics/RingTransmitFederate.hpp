@@ -12,8 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 
-using helics::operator"" _t;
-using namespace helics;
 /** class implementing a token ring using a value being passed as the token*/
 class RingTransmit: public BenchmarkFederate {
   public:

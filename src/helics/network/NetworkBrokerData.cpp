@@ -21,8 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <iostream>
 
-using namespace std::string_literals;
-
 namespace helics {
 std::shared_ptr<helicsCLI11App>
     NetworkBrokerData::commandLineParser(const std::string& localAddress)

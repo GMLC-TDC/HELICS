@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static const int TX_RX_MSG_COUNT = 20;
 
-using namespace std::chrono;
-
 namespace helics {
 namespace zeromq {
     void ZmqCommsSS::loadNetworkInfo(const NetworkBrokerData& netInfo)

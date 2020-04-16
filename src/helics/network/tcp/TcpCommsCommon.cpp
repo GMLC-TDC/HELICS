@@ -23,8 +23,10 @@ namespace tcp {
         size_t bufferSize,
         std::chrono::milliseconds timeOut)
     {
-        using namespace std::chrono;
-        using namespace std::chrono_literals;
+        using std::chrono::milliseconds;
+        using std::chrono::steady_clock;
+
+        using namespace std::chrono_literals; //NOLINT
         auto tick = steady_clock::now();
         milliseconds timeRemaining(timeOut);
         milliseconds timeRemPrev(timeOut);
@@ -33,7 +35,8 @@ namespace tcp {
         int trycnt = 1;
         while (!connectionPtr->waitUntilConnected(timeRemaining)) {
             auto tock = steady_clock::now();
-            timeRemaining = milliseconds(timeOut) - duration_cast<milliseconds>(tock - tick);
+            timeRemaining =
+                milliseconds(timeOut) - std::chrono::duration_cast<milliseconds>(tock - tick);
             if ((timeRemaining < 0ms) && (trycnt > 1)) {
                 connectionPtr = nullptr;
                 break;

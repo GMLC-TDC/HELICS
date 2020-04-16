@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
-using namespace helics;
 
 static void BMecho_singleCore(benchmark::State& state)
 {
@@ -54,7 +53,7 @@ static void BMecho_singleCore(benchmark::State& state)
             thrd.join();
         }
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }
@@ -109,7 +108,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
         broker.reset();
         cores.clear();
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
 
         state.ResumeTiming();
     }

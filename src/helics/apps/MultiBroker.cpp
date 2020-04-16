@@ -32,8 +32,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsCLI11.hpp"
 #include "../network/NetworkBrokerData.hpp"
 
-using namespace std::string_literals;
-
 namespace helics {
 static void loadTypeSpecificArgs(
     helics::core_type ctype,

@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 
-using helics::operator"" _t;
 /** class implementing the hub for an echo test*/
 class EchoHub: public BenchmarkFederate {
   private:
@@ -45,7 +44,7 @@ class EchoHub: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        auto cTime = 0.0_t;
+        helics::Time cTime{0.0};
         while (cTime <= finalTime) {
             for (int ii = 0; ii < num_leafs; ++ii) {
                 if (fed->isUpdated(subs[ii])) {

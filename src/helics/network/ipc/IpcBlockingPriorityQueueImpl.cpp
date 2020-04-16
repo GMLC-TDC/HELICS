@@ -28,7 +28,7 @@ namespace ipc {
         /** reverse the order in which the data will be extracted*/
         void dataBlock::reverse() {}
 
-        using namespace boost::interprocess;
+        using namespace boost::interprocess; //NOLINT
 
         /** default constructor*/
         IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(

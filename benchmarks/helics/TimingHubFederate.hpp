@@ -12,8 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-using helics::operator"" _t;
-using namespace helics;
 /** class implementing the hub for a timing test*/
 class TimingHub: public BenchmarkFederate {
   private:
@@ -46,7 +44,7 @@ class TimingHub: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        auto cTime = 0.0_t;
+        helics::Time cTime{0.0};
         while (cTime <= finalTime) {
             cTime = fed->requestTime(finalTime + 0.05);
         }

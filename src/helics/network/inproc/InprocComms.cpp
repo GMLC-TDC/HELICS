@@ -20,7 +20,6 @@ namespace helics {
 namespace inproc {
     InprocComms::InprocComms(): CommsInterface(CommsInterface::thread_generation::single) {}
 
-    using namespace std::chrono;
     /** destructor*/
     InprocComms::~InprocComms() { disconnect(); }
 
@@ -47,6 +46,7 @@ namespace inproc {
 
     void InprocComms::queue_tx_function()
     {
+        using std::chrono::milliseconds;
         // make sure the link to the localTargetAddress is in place
         if (name != localTargetAddress) {
             if (!brokerName.empty()) {

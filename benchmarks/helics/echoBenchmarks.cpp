@@ -50,7 +50,7 @@ static void BMecho_singleCore(benchmark::State& state)
             thrd.join();
         }
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }
@@ -104,7 +104,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
         broker.reset();
         cores.clear();
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
 
         state.ResumeTiming();
     }

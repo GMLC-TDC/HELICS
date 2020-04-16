@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics_benchmark_main.h"
 
-using namespace helics;
+using namespace helics; //NOLINT
 
 static void BMtoString(benchmark::State& state)
 {

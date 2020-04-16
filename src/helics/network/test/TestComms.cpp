@@ -20,7 +20,6 @@ namespace helics {
 namespace testcore {
     TestComms::TestComms(): CommsInterface(CommsInterface::thread_generation::single) {}
 
-    using namespace std::chrono;
     /** destructor*/
     TestComms::~TestComms() { disconnect(); }
 
@@ -47,6 +46,7 @@ namespace testcore {
 
     void TestComms::queue_tx_function()
     {
+        using std::chrono::milliseconds;
         // make sure the link to the localTargetAddress is in place
         if (name != localTargetAddress) {
             if (!brokerName.empty()) {
