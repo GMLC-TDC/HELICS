@@ -20,10 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "cppzmq/zmq.hpp"
 
-#include <utility>
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <utility>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
