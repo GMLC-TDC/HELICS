@@ -28,7 +28,7 @@ namespace helics {
 //a key link that does very little yet, but forces linking to a particular file
 static const auto ldcores = loadCores();
 
-using std::literals::chrono_literals::operator"" ms;
+using namespace std::chrono_literals; //NOLINT
 void cleanupHelicsLibrary()
 {
     BrokerFactory::cleanUpBrokers(100ms);

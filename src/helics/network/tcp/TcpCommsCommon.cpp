@@ -26,7 +26,7 @@ namespace tcp {
         using std::chrono::milliseconds;
         using std::chrono::steady_clock;
 
-        using std::chrono_literals::operator"" ms;
+        using namespace std::chrono_literals; //NOLINT
         auto tick = steady_clock::now();
         milliseconds timeRemaining(timeOut);
         milliseconds timeRemPrev(timeOut);
