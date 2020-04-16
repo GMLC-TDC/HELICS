@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../api-data.h"
 #include "gmlc/concurrency/TripWire.hpp"
 
-#include <string>
-#include <vector>
 #include <deque>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int coreValidationIdentifier = 0x378424EC;

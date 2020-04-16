@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 
-#include <utility>
 #include <atomic>
 #include <future>
 #include <mutex>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {

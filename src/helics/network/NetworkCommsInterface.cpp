@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace helics {
 NetworkCommsInterface::NetworkCommsInterface(

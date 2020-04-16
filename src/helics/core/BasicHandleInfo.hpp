@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <string>
 #include "basic_core_types.hpp"
 #include "flagOperations.hpp"
+
+#include <string>
 
 namespace helics {
 /** define the type of the handle*/

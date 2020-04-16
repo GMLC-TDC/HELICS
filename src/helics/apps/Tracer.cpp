@@ -19,16 +19,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/stringOps.h"
 
-#include <string>
-#include <utility>
-#include <vector>
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <regex>
 #include <stdexcept>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace apps {

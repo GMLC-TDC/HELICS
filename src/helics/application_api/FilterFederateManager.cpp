@@ -4,12 +4,13 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <utility>
 #include "FilterFederateManager.hpp"
 
 #include "../core/Core.hpp"
 #include "Federate.hpp"
 #include "helics/core/core-exceptions.hpp"
+
+#include <utility>
 
 namespace helics {
 FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, local_federate_id id):

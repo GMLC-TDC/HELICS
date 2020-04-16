@@ -19,10 +19,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "cppzmq/zmq_addon.hpp"
 
-#include <utility>
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 /** enumeration of possible operations on a socket*/

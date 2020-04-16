@@ -5,9 +5,9 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include <utility>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 /** @file
 @details definitions of exceptions used in HELICS

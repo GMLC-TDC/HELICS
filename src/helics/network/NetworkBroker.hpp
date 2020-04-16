@@ -6,11 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <string>
-#include <memory>
 #include "CommsBroker.hpp"
 #include "NetworkBrokerData.hpp"
 #include "helics/core/CoreBroker.hpp"
+
+#include <memory>
+#include <string>
 
 namespace helics {
 template<class COMMS, interface_type baseline, int tcode = 0>

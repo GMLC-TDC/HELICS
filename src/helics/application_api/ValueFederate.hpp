@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueConverter.hpp"
 #include "data_view.hpp"
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 namespace helics {
 class Publication;

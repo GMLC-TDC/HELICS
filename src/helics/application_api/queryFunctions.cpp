@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "gmlc/utilities/stringOps.h"
 
-#include <utility>
 #include <algorithm>
 #include <thread>
+#include <utility>
 
 namespace helics {
 std::vector<std::string> vectorizeQueryResult(std::string&& queryres)

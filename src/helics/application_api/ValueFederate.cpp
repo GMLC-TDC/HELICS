@@ -16,11 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederateManager.hpp"
 #include "helicsTypes.hpp"
 
-#include <string>
-#include <vector>
-#include <memory>
 #include <deque>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace helics {
 /**constructor taking a core engine and federate info structure

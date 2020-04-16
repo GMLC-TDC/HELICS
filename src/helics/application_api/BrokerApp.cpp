@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 #include "../core/helicsCLI11.hpp"
 
-#include <utility>
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 namespace helics {
 

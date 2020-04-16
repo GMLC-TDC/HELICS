@@ -12,10 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../helics.hpp"
 #include "internal/api_objects.h"
 
-#include <string>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 void helicsBrokerSetLoggingCallback(

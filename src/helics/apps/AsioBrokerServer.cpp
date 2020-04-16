@@ -18,11 +18,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include <asio/ip/udp.hpp>
 #endif
 
+#include <array>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
-#include <array>
-#include <iostream>
 
 namespace helics {
 

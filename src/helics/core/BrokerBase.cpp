@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #    endif
 #endif
 
+#include <iostream>
+#include <map>
 #include <utility>
 #include <vector>
-#include <map>
-#include <iostream>
 
 static inline std::string genId()
 {

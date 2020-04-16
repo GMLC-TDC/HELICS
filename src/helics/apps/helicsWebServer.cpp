@@ -26,7 +26,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
 
-#include <utility>
 #include <algorithm>
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/strand.hpp>
@@ -45,6 +44,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <streambuf>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace beast = boost::beast; // from <boost/beast.hpp>

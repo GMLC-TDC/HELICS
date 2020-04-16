@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeDependencies.hpp"
 
 #include "json/forwards.h"
-#include <string>
-#include <vector>
-#include <utility>
 #include <atomic>
 #include <deque>
 #include <functional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /** enumeration of possible processing results*/

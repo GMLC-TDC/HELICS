@@ -15,14 +15,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helics-time.hpp"
 
-#include <string>
-#include <utility>
-#include <memory>
-#include <deque>
 #include <atomic>
 #include <chrono>
+#include <deque>
 #include <map>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace helics {

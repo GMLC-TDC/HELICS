@@ -12,12 +12,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/stringOps.h"
 
-#include <string>
-#include <memory>
-#include <utility>
-#include <vector>
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 // static const std::regex creg
 // (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 

@@ -8,11 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-data.hpp"
 #include "helics_cxx_export.h"
 
-#include <utility>
 #include <complex>
 #include <limits>
 #include <string>
 #include <typeinfo>
+#include <utility>
 #include <vector>
 /** @file
 @details basic type information and control for HELICS

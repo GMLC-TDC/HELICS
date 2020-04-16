@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <string>
-#include <utility>
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
+
+#include <string>
+#include <utility>
 
 /** class implementing a token ring using messages as the transmission mechanism*/
 class RingTransmitMessage: public BenchmarkFederate {

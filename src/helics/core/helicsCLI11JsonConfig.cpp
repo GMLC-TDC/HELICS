@@ -5,11 +5,12 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <string>
-#include <vector>
 #include "helicsCLI11JsonConfig.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+
+#include <string>
+#include <vector>
 
 namespace helics {
 

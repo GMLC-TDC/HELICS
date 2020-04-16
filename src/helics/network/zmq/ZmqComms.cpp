@@ -5,7 +5,6 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 
 */
-#include <utility>
 #include "ZmqComms.h"
 
 #include "../../common/zmqContextManager.h"
@@ -16,11 +15,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
-//#include <utility>
-#include <map>
-#include <vector>
+
 #include <csignal>
+#include <map>
 #include <memory>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace zeromq {

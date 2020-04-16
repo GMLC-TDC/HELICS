@@ -18,12 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "AsioContextManager.h"
 
-#include <utility>
 #include <chrono>
 #include <iostream>
 #include <map>
 #include <mutex>
 #include <stdexcept>
+#include <utility>
 
 /** a storage system for the available core objects allowing references by name to the core
  */

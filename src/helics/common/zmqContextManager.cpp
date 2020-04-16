@@ -16,14 +16,14 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
-#include <utility>
 #include "zmqContextManager.h"
 
 #include "cppzmq/zmq.hpp"
-//#include <utility>
+
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <utility>
 
 /** a storage system for the available core objects allowing references by name to the core
  */

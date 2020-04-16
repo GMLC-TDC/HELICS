@@ -6,10 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "../application_api/CombinationFederate.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
-#include "../application_api/CombinationFederate.hpp"
 
 namespace CLI {
 class App;

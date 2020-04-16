@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommsInterface.hpp"
 #include "helics/helics-config.h"
 
-#include <string>
 #include <map>
 #include <set>
+#include <string>
 
 namespace helics {
 /** implementation for the communication interface that uses ZMQ messages to communicate*/

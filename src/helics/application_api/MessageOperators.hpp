@@ -10,11 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "data_view.hpp"
 #include "helics_cxx_export.h"
 
-#include <memory>
-#include <vector>
-#include <string>
 #include <atomic>
 #include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 /** @file
 @brief define helper classes to scope filter operations
 */

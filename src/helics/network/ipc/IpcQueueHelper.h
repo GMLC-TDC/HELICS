@@ -9,8 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/extra/optional.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -18,7 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cctype>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <thread>
+#include <vector>
 
 using ipc_queue = boost::interprocess::message_queue;
 using ipc_state = boost::interprocess::shared_memory_object;
