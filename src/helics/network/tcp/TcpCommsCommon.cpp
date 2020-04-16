@@ -35,7 +35,8 @@ namespace tcp {
         int trycnt = 1;
         while (!connectionPtr->waitUntilConnected(timeRemaining)) {
             auto tock = steady_clock::now();
-            timeRemaining = milliseconds(timeOut) - std::chrono::duration_cast<milliseconds>(tock - tick);
+            timeRemaining =
+                milliseconds(timeOut) - std::chrono::duration_cast<milliseconds>(tock - tick);
             if ((timeRemaining < 0ms) && (trycnt > 1)) {
                 connectionPtr = nullptr;
                 break;

@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <regex>
 #include <unordered_map>
 
-using namespace gmlc::utilities;  //NOLINT
+using namespace gmlc::utilities; //NOLINT
 
 namespace helics {
 

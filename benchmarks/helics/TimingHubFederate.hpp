@@ -44,7 +44,7 @@ class TimingHub: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        helics::Time cTime{ 0.0 };
+        helics::Time cTime{0.0};
         while (cTime <= finalTime) {
             cTime = fed->requestTime(finalTime + 0.05);
         }

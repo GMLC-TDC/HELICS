@@ -139,7 +139,7 @@ namespace apps {
 
     void Tracer::loadTextFile(const std::string& textFile)
     {
-        using namespace gmlc::utilities::stringOps;  //NOLINT
+        using namespace gmlc::utilities::stringOps; //NOLINT
         App::loadTextFile(textFile);
         std::ifstream infile(textFile);
         std::string str;
