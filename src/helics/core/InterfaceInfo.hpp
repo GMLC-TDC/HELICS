@@ -13,10 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/DualMappedPointerVector.hpp"
 
 #include "json/forwards.h"
-#include <string>
-#include <vector>
-#include <utility>
 #include <atomic>
+#include <string>
+#include <utility>
+#include <vector>
 
 /** @file container for keeping the set of different interfaces information for a federate
  */

@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <string>
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/core/ActionMessage.hpp"
+
+#include <string>
 
 /** class implementing the leaf for a timing test*/
 class TimingLeaf: public BenchmarkFederate {

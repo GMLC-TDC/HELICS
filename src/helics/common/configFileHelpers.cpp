@@ -5,8 +5,9 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <string>
 #include "configFileHelpers.hpp"
+
+#include <string>
 
 bool looksLikeFile(const std::string& configString)
 {

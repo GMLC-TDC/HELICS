@@ -6,11 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "../../core/core-types.hpp"
+#include "../NetworkBroker.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
-#include "../../core/core-types.hpp"
-#include "../NetworkBroker.hpp"
 
 namespace helics {
 namespace tcp {

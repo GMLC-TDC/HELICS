@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include <utility>
-#include <string>
-#include <vector>
 #include "helicsCLI11.hpp"
 
 #include "json/forwards.h"
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /// Define a json parser for the config files for CLI11

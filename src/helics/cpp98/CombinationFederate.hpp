@@ -8,9 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_COMBINATION_FEDERATE_HPP_
 #pragma once
 
-#include <string>
 #include "MessageFederate.hpp"
 #include "ValueFederate.hpp"
+
+#include <string>
 
 namespace helicscpp {
 /** combination federate object in the C++98 API

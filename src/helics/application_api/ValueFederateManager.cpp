@@ -4,7 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <utility>
 #include "ValueFederateManager.hpp"
 
 #include "../common/JsonBuilder.hpp"
@@ -12,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+
+#include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id):
     coreObject(coreOb), fed(vfed), fedID(id)

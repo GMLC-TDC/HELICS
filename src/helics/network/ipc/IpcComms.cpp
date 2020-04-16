@@ -11,15 +11,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/helics_definitions.hpp"
 #include "IpcQueueHelper.h"
 
-#include <string>
-#include <utility>
-#include <map>
 #include <algorithm>
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <cctype>
+#include <map>
 #include <memory>
+#include <string>
+#include <utility>
 
 #define SET_TO_OPERATING 135111
 

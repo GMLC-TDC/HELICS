@@ -18,12 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include <string>
-#include <utility>
 #include <atomic>
 #include <fstream>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
 
 namespace helics {
 class LoggingCore;

@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../CommsInterface.hpp"
 #include "helics/helics-config.h"
 
-#include <string>
 #include <future>
 #include <set>
+#include <string>
 
 namespace helics {
 namespace inproc {

@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../src/helics/cpp98/Federate.hpp"
 #include "helics/helics-config.h"
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #define HELICS_SIZE_MAX 512
 

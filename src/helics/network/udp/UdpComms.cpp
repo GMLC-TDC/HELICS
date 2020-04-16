@@ -12,12 +12,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 
-#include <string>
-#include <vector>
-#include <map>
-#include <utility>
 #include <asio/ip/udp.hpp>
+#include <map>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace udp {

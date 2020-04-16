@@ -8,10 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_INPUT_HPP_
 #pragma once
 
-#include <string>
-#include <vector>
 #include "../shared_api_library/ValueFederate.h"
 #include "helicsExceptions.hpp"
+
+#include <string>
+#include <vector>
 
 namespace helicscpp {
 /** C++98 interface for a helics Input*/

@@ -12,10 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-#include <utility>
-#include <string>
 #include <functional>
+#include <string>
 #include <thread>
+#include <utility>
 
 namespace helics {
 enum class interface_networks : char;

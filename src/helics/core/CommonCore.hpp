@@ -24,15 +24,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include "json/forwards.h"
-#include <string>
-#include <memory>
-#include <map>
-#include <vector>
-#include <tuple>
-#include <unordered_map>
 #include <array>
 #include <atomic>
+#include <map>
+#include <memory>
 #include <set>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
 
 namespace helics {
 class TestHandle;

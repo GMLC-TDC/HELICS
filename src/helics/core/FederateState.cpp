@@ -18,13 +18,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
 
-#include <string>
-#include <utility>
-#include <memory>
 #include <algorithm>
 #include <chrono>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "MessageTimer.hpp"

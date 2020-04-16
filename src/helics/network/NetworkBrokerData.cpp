@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include <asio/ip/tcp.hpp>
 #endif
 
-#include <utility>
 #include <algorithm>
 #include <iostream>
+#include <utility>
 
 namespace helics {
 std::shared_ptr<helicsCLI11App>

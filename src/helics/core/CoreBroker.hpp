@@ -22,17 +22,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/SimpleQueue.hpp"
 #include "helics/external/any.hpp"
 
-#include <string>
-#include <vector>
-#include <tuple>
-#include <utility>
 #include <array>
 #include <atomic>
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <thread>
+#include <tuple>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace helics {
 

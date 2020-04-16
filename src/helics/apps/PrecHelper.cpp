@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Federate.hpp"
 #include "gmlc/utilities/stringOps.h"
 
-#include <string>
 #include <algorithm>
+#include <string>
 using helics::data_type;
 
 data_type getType(const std::string& typeString)

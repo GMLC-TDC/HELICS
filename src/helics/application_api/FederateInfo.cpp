@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsVersion.hpp"
 #include "gmlc/utilities/stringOps.h"
 
-#include <utility>
-#include <map>
 #include <iostream>
+#include <map>
 #include <set>
+#include <utility>
 
 namespace helics {
 FederateInfo::FederateInfo(int argc, char* argv[])

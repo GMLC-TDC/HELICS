@@ -4,9 +4,10 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "CombinationFederate.hpp"
+
 #include <memory>
 #include <string>
-#include "CombinationFederate.hpp"
 
 namespace helics {
 CombinationFederate::CombinationFederate() = default;

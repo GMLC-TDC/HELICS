@@ -6,10 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "../NetworkCore.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
-#include "../NetworkCore.hpp"
 
 namespace helics {
 namespace tcp {

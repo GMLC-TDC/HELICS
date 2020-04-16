@@ -14,16 +14,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 
-#include <vector>
-#include <string>
 #include <cstdint>
 #include <deque>
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 namespace helics {
 class Core;
 class MessageFederate;

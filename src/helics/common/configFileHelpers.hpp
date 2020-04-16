@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <string>
 #include "JsonProcessingFunctions.hpp"
 #include "TomlProcessingFunctions.hpp"
+
+#include <string>
 
 /** check if a string looks like a recognized file or a command line of some kind
 Does not check actual file existence or do any other verification other than do a preliminary check if the string

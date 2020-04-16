@@ -15,11 +15,11 @@ and some common methods used cores and brokers
 #include "federate_id_extra.hpp"
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 
-#include <vector>
 #include <atomic>
 #include <memory>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace helics {
 class Logger;

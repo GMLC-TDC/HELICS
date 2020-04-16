@@ -13,11 +13,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Input.hpp"
 #include "Publication.hpp"
 
-#include <string>
-#include <vector>
-#include <utility>
 #include <exception>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helicscpp {
 /** enumeration of the available types of publications and inputs*/

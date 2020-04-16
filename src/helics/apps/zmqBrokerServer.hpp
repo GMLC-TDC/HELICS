@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TypedBrokerServer.hpp"
 
-#include <string>
-#include <memory>
-#include <utility>
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
 
 #ifdef ENABLE_ZMQ_CORE
 namespace zmq {

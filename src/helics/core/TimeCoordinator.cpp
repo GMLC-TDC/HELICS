@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 
 #include "json/json.h"
-#include <vector>
-#include <string>
-#include <utility>
 #include <algorithm>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 static auto nullMessageFunction = [](const ActionMessage&) {};

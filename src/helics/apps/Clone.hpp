@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 
-#include <vector>
-#include <string>
-#include <utility>
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 class CloningFilter;

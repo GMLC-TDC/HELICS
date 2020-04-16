@@ -5,13 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <utility>
 #include "TypedBrokerServer.hpp"
 
 #include "../common/loggerCore.hpp"
 #include "../core/ActionMessage.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../network/NetworkBrokerData.hpp"
+
+#include <utility>
 
 namespace helics {
 namespace apps {

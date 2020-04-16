@@ -9,11 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_MESSAGE_FEDERATE_HPP_
 #pragma once
 
-#include <string>
-#include <vector>
 #include "../shared_api_library/MessageFederate.h"
 #include "Endpoint.hpp"
 #include "Federate.hpp"
+
+#include <string>
+#include <vector>
 
 namespace helicscpp {
 /** class defining the block communication based interface */
