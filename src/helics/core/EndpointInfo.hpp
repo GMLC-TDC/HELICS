@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "basic_core_types.hpp"
 
+#include <memory>
+#include <string>
 #include <deque>
 namespace helics {
 /** data class containing the information about an endpoint*/

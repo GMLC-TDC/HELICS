@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 
+#include <string>
 #include <cctype>
 #include <iostream>
 

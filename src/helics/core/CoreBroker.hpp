@@ -22,6 +22,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/SimpleQueue.hpp"
 #include "helics/external/any.hpp"
 
+#include <string>
+#include <vector>
+#include <tuple>
+#include <utility>
 #include <array>
 #include <atomic>
 #include <functional>

@@ -19,7 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "zmqContextManager.h"
 
 #include "cppzmq/zmq.hpp"
-//#include <iostream>
+//#include <utility>
+#include <iostream>
 #include <map>
 #include <mutex>
 

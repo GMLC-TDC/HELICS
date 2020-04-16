@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Source.hpp"
 
+#include <string>
 #include <complex>
 
 namespace helics {

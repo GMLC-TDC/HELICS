@@ -12,6 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 
+#include <utility>
+#include <vector>
+#include <string>
 #include <memory>
 
 namespace helics {

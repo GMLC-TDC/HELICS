@@ -15,6 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/timeStringOps.hpp"
 
+#include <utility>
+#include <string>
+#include <vector>
 #include <algorithm>
 #include <fstream>
 #include <iostream>

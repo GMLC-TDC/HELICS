@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "cppzmq/zmq.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <map>
 using zmq::socket_type;

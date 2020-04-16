@@ -21,6 +21,7 @@ using the toml library
 #    pragma GCC diagnostic pop
 #endif
 
+#include <string>
 #include <functional>
 
 /** load a TOML string or filename that points to a TOML file and return a

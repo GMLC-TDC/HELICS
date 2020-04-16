@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 
+#include <vector>
+#include <string>
 #include <cstdint>
 #include <deque>
 #include <functional>

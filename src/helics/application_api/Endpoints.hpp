@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "MessageFederate.hpp"
 
+#include <string>
+#include <utility>
+#include <memory>
 #include <type_traits>
 
 namespace helics {

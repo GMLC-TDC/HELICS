@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+#include <string>
 #include <future>
 #include <gtest/gtest.h>
 

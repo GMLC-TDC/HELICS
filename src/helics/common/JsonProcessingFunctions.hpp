@@ -14,6 +14,7 @@ using the jsoncpp library
 #include "../core/helics-time.hpp"
 
 #include "json/json.h"
+#include <string>
 #include <functional>
 /** check if the file has a valid JSON extension*/
 bool hasJsonExtension(const std::string& jsonString);

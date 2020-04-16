@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueConverter.hpp"
 #include "data_view.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
 #include <functional>
 
 namespace helics {

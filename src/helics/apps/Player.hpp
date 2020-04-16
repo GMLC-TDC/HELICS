@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Publications.hpp"
 #include "helicsApp.hpp"
 
+#include <string>
+#include <vector>
+#include <memory>
 #include <map>
 #include <set>
 

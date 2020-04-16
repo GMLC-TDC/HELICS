@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 #include "helics_cxx_export.h"
 
+#include <utility>
 #include <cmath>
 #include <complex>
 #include <cstdint>

@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include "helics/core/ActionMessage.hpp"
 
+#include <utility>
+#include <string>
 #include <functional>
 #include <thread>
 

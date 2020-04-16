@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "loggerCore.hpp"
 
+#include <string>
+#include <utility>
 #include <iostream>
 #include <tuple>
 

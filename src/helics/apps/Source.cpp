@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "SignalGenerators.hpp"
 #include "gmlc/utilities/stringOps.h"
 
+#include <string>
+#include <utility>
+#include <vector>
 #include <algorithm>
 #include <fstream>
 #include <iostream>

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TcpHelperClasses.h"
 
+#include <utility>
 #include <algorithm>
 #include <iostream>
 #include <thread>

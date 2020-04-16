@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
+#include <string>
+#include <utility>
 #include <atomic>
 #include <fstream>
 #include <memory>

@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EndpointInfo.hpp"
 //#include "core/core-data.hpp"
 
+#include <utility>
+#include <memory>
 #include <algorithm>
 #include <cstring>
 

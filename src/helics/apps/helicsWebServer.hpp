@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TypedBrokerServer.hpp"
 
+#include <string>
+#include <utility>
 #include <atomic>
 #include <memory>
 #include <mutex>

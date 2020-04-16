@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "basic_core_types.hpp"
 
+#include <string>
+#include <memory>
+#include <utility>
 #include <tuple>
 #include <vector>
 

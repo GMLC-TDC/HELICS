@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 
+#include <string>
+#include <vector>
 #include <algorithm>
 #include <array>
 #include <cassert>

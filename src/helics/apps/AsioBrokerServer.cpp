@@ -18,6 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include <asio/ip/udp.hpp>
 #endif
 
+#include <memory>
+#include <string>
+#include <utility>
 #include <array>
 #include <iostream>
 

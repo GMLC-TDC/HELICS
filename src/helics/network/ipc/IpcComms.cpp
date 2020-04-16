@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/helics_definitions.hpp"
 #include "IpcQueueHelper.h"
 
+#include <string>
+#include <utility>
+#include <map>
 #include <algorithm>
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>

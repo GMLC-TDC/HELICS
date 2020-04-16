@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
 
+#include <memory>
+#include <string>
 #include <iostream>
 
 namespace helics {

@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Inputs.hpp"
 
+#include <utility>
+#include <vector>
+#include <string>
 #include <array>
 
 /** @file

@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 
+#include <string>
+#include <vector>
+#include <utility>
 #include <atomic>
 #include <functional>
 

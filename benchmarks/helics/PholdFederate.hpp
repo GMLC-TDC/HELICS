@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics/helics-config.h"
 
+#include <string>
 #include <random>
 
 /** class implementing a federate for the PHOLD benchmark*/

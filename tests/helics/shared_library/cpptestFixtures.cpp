@@ -12,6 +12,7 @@ Livermore National Security, LLC.
 
 #include "../src/helics/cpp98/Broker.hpp"
 
+#include <string>
 #include <cctype>
 
 static bool hasIndexCode(const std::string& type_name)

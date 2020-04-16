@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/coreTypeOperations.hpp"
 
+#include <string>
+#include <vector>
 #include <iostream>
 #include <memory>
 #include <stdexcept>

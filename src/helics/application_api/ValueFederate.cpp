@@ -16,6 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederateManager.hpp"
 #include "helicsTypes.hpp"
 
+#include <string>
+#include <vector>
+#include <memory>
 #include <deque>
 #include <utility>
 

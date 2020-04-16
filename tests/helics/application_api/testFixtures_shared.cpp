@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/typeOperations.hpp"
 
+#include <string>
 #include <cctype>
 #include <iostream>
 

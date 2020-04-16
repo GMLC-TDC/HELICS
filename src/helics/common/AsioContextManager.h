@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
+#include <utility>
 #include <atomic>
 #include <future>
 #include <map>

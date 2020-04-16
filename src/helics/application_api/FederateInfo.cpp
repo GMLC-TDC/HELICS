@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsVersion.hpp"
 #include "gmlc/utilities/stringOps.h"
 
+#include <utility>
+#include <map>
 #include <iostream>
 #include <set>
 

@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "helics_definitions.hpp"
 
+#include <utility>
+#include <vector>
+#include <string>
 #include <sstream>
 
 namespace helics {

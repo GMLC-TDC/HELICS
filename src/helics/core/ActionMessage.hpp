@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessageDefintions.hpp"
 #include "basic_core_types.hpp"
 
+#include <vector>
+#include <utility>
 #include <memory>
 #include <string>
 

@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Endpoints.hpp"
 #include "helicsApp.hpp"
 
+#include <vector>
+#include <string>
+#include <memory>
 #include <mutex>
 
 namespace helics {

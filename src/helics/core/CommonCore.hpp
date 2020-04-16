@@ -24,6 +24,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include "json/forwards.h"
+#include <string>
+#include <memory>
+#include <map>
+#include <vector>
+#include <tuple>
+#include <unordered_map>
 #include <array>
 #include <atomic>
 #include <set>

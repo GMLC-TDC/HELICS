@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
 
+#include <utility>
+#include <string>
+#include <vector>
 #include <memory>
 
 namespace units {

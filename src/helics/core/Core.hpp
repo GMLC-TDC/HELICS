@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-data.hpp"
 #include "federate_id.hpp"
 
+#include <string>
+#include <memory>
+#include <vector>
 #include <functional>
 #include <utility>
 

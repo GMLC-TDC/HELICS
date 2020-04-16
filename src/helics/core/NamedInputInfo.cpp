@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "units/units/units.hpp"
 
+#include <string>
+#include <utility>
+#include <memory>
 #include <algorithm>
 #include <set>
 

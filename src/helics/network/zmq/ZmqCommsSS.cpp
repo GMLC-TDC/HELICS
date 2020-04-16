@@ -14,7 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
-//#include <csignal>
+//#include <map>
+#include <utility>
+#include <vector>
+#include <csignal>
 #include <iostream>
 #include <memory>
 

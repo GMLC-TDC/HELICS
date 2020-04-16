@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "data_view.hpp"
 
+#include <memory>
+#include <string>
 #include <functional>
 
 namespace helics {

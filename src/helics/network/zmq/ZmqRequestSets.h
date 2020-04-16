@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "cppzmq/zmq.hpp"
 #include "gmlc/containers/extra/optional.hpp"
 
+#include <memory>
+#include <vector>
+#include <utility>
 #include <deque>
 #include <map>
 #include <string>

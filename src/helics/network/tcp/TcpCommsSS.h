@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../NetworkCommsInterface.hpp"
 
+#include <vector>
 #include <atomic>
 #include <set>
 #include <string>

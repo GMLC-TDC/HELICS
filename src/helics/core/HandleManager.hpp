@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Core.hpp"
 #include "helics-time.hpp"
 
+#include <string>
 #include <deque>
 #include <unordered_map>
 #include <utility>

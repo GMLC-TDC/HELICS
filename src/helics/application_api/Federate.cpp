@@ -21,6 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Filters.hpp"
 #include "helics/helics-config.h"
 
+#include <string>
+#include <utility>
 #include <cassert>
 #include <iostream>
 

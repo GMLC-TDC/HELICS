@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 
+#include <utility>
+#include <vector>
 #include <algorithm>
 #include <complex>
 #include <cstring>

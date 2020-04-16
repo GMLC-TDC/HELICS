@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/typeOperations.hpp"
 
+#include <string>
+#include <vector>
 #include <iostream>
 #include <memory>
 #include <stdexcept>

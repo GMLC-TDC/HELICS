@@ -12,6 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/stringOps.h"
 
+#include <string>
+#include <memory>
+#include <utility>
+#include <vector>
 #include <fstream>
 #include <iostream>
 // static const std::regex creg

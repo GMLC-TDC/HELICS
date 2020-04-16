@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/external/optional.hpp"
 
+#include <utility>
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>

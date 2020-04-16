@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/extra/optional.hpp"
 #include "helics/core/ActionMessage.hpp"
 
+#include <string>
+#include <vector>
 #include <algorithm>
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>

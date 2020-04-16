@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helics-time.hpp"
 #include "../utilities/timeStringOps.hpp"
 
+#include <memory>
+#include <string>
 #include <fstream>
 #include <sstream>
 

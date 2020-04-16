@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../CommsInterface.hpp"
 
+#include <string>
 #include <atomic>
 
 namespace helics {

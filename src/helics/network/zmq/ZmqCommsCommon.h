@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "cppzmq/zmq.hpp"
 
+#include <string>
 #include <chrono>
 class AsioContextManager;
 

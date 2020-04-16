@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsCLI11.hpp"
 #include "NetworkBroker.hpp"
 
+#include <string>
+#include <memory>
 #include <iostream>
 
 namespace helics {

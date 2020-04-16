@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
+#include <vector>
+#include <string>
 #include <algorithm>
 #include <set>
 namespace helics {
