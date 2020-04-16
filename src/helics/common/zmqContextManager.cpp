@@ -21,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "cppzmq/zmq.hpp"
 
 #include <utility>
-//#include <utility>
 #include <iostream>
 #include <map>
 #include <mutex>

@@ -17,7 +17,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ZmqRequestSets.h"
 
 #include <utility>
-//#include <utility>
 #include <csignal>
 #include <map>
 #include <memory>
