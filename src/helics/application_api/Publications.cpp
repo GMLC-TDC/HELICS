@@ -5,14 +5,15 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <memory>
-#include <utility>
-#include <string>
-#include <vector>
 #include "Publications.hpp"
 
 #include "../core/core-exceptions.hpp"
 #include "units/units/units.hpp"
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 Publication::Publication(

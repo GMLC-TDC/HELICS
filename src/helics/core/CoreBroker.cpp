@@ -20,10 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 
-#include <utility>
-#include <string>
-#include <vector>
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 

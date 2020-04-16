@@ -7,7 +7,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/external/optional.hpp"
 
-#include <utility>
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
@@ -15,6 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <queue>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 /** class implementing a blocking queue with a priority channel

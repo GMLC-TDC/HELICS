@@ -4,7 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <utility>
 #include "MessageFederate.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
@@ -15,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helics_definitions.hpp"
 #include "Endpoints.hpp"
 #include "MessageFederateManager.hpp"
+
+#include <utility>
 
 namespace helics {
 MessageFederate::MessageFederate(const std::string& fedName, const FederateInfo& fi):

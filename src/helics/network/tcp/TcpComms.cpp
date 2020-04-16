@@ -13,10 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 
-#include <utility>
 #include <map>
-#include <vector>
 #include <memory>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace tcp {

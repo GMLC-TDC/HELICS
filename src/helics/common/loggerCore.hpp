@@ -21,14 +21,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/TripWire.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 
-#include <string>
-#include <utility>
-#include <vector>
 #include <atomic>
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /** class to manage a single thread for all logging*/

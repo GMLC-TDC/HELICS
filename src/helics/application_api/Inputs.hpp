@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
 
-#include <utility>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace units {
 class precise_unit;

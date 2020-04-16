@@ -10,12 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommsInterface.hpp"
 #include "helics/core/BrokerBase.hpp"
 
-#include <string>
-#include <utility>
-#include <memory>
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
 namespace helics {
 template<class COMMS, class BrokerT>
 CommsBroker<COMMS, BrokerT>::CommsBroker() noexcept

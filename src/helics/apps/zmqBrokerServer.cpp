@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/networkDefaults.hpp"
 
-#include <vector>
-#include <string>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #ifdef ENABLE_ZMQ_CORE
 #    include "../common/zmqContextManager.h"

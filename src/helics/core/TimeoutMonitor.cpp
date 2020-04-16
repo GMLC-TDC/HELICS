@@ -5,13 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <string>
-#include <utility>
 #include "TimeoutMonitor.h"
 
 #include "CommonCore.hpp"
 #include "CoreBroker.hpp"
 #include "loggingHelper.hpp"
+
+#include <string>
+#include <utility>
 
 namespace helics {
 void TimeoutMonitor::tick(CommonCore* core)

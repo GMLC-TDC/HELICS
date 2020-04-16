@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <string>
 #include "../core/core-exceptions.hpp"
 #include "HelicsPrimaryTypes.hpp"
 #include "ValueFederate.hpp"
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace units {
 class precise_unit;

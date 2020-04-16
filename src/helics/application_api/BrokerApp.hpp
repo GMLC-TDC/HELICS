@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-types.hpp"
 #include "helics_cxx_export.h"
 
-#include <utility>
 #include <chrono>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {

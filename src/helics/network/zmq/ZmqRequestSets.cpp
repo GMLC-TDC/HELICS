@@ -7,10 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ZmqRequestSets.h"
 
-#include <utility>
-#include <memory>
 #include <algorithm>
 #include <iostream>
+#include <memory>
+#include <utility>
 
 namespace helics {
 namespace zeromq {

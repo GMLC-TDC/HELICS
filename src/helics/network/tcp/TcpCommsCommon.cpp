@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../NetworkBrokerData.hpp"
 #include "TcpHelperClasses.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace helics {
 namespace tcp {

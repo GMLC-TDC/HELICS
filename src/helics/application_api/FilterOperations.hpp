@@ -14,8 +14,8 @@ file defines some common filter operations
 #include "../core/helics-time.hpp"
 #include "gmlc/libguarded/cow_guarded.hpp"
 
-#include <memory>
 #include <atomic>
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>

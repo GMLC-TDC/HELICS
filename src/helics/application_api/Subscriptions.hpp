@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Inputs.hpp"
 
+#include <array>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
-#include <array>
 
 /** @file
 @details helper function for generate subscriptions of specify types

@@ -5,13 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <string>
 #include "ZmqBroker.h"
 
 #include "../../common/zmqContextManager.h"
 #include "../NetworkBroker_impl.hpp"
 #include "ZmqComms.h"
 #include "ZmqCommsSS.h"
+
+#include <string>
 
 namespace helics {
 namespace zeromq {

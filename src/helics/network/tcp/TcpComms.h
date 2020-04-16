@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../NetworkCommsInterface.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 
-#include <memory>
 #include <atomic>
+#include <memory>
 #include <set>
 #include <string>
 

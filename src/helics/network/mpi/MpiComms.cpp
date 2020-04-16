@@ -11,11 +11,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/ActionMessage.hpp"
 #include "MpiService.h"
 
-#include <utility>
 #include <boost/scope_exit.hpp>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <utility>
 
 namespace helics {
 namespace mpi {

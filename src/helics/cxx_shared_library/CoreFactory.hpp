@@ -6,11 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <string>
 #include "../application_api/CoreApp.hpp"
 #include "Core.hpp"
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace helics {
 #define HELICS_SHARED_DEPRECATED_CORE                                                                 \

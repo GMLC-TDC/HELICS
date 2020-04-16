@@ -10,11 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 
-#include <string>
-#include <vector>
-#include <utility>
 #include <atomic>
 #include <functional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /** class managing the coordination of time in HELICS for forwarding object (cores, brokers)

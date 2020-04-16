@@ -9,13 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/GuardedTypes.hpp"
 #include "gmlc/concurrency/TriggerVariable.hpp"
 
-#include <vector>
-#include <utility>
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 /** @file
 various helper classes and functions for handling TCP connections

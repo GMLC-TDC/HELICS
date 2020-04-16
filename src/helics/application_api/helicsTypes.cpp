@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 
-#include <functional>
 #include <algorithm>
+#include <functional>
 #include <numeric>
 #include <regex>
 #include <unordered_map>

@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
 
-#include <utility>
-#include <tuple>
 #include <cassert>
+#include <tuple>
+#include <utility>
 
 namespace helics {
 

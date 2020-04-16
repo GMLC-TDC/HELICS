@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helics-time.hpp"
 #include "../utilities/timeStringOps.hpp"
 
-#include <string>
 #include <fstream>
+#include <string>
 
 bool hasTomlExtension(const std::string& tomlString)
 {

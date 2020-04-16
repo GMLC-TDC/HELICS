@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 #include "helics_cxx_export.h"
 
-#include <utility>
 #include <cmath>
 #include <complex>
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
