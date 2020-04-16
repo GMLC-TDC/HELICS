@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include <string>
+#include <utility>
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/core/ActionMessage.hpp"

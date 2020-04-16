@@ -5,6 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include <utility>
 #include "TypedBrokerServer.hpp"
 
 #include "../common/loggerCore.hpp"

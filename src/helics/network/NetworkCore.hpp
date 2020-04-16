@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include <string>
+#include <memory>
 #include "CommsBroker.hpp"
 #include "NetworkBrokerData.hpp"
 #include "helics/core/CommonCore.hpp"

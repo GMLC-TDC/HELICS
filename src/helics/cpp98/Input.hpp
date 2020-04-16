@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_INPUT_HPP_
 #pragma once
 
+#include <string>
+#include <vector>
 #include "../shared_api_library/ValueFederate.h"
 #include "helicsExceptions.hpp"
 

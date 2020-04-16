@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
+#include <utility>
 #include "zmqContextManager.h"
 
 #include "cppzmq/zmq.hpp"

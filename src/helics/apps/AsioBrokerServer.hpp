@@ -7,6 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
+#include <utility>
+#include <memory>
+#include <string>
 #include "TypedBrokerServer.hpp"
 
 #if defined(ENABLE_TCP_CORE) || defined(ENABLE_UDP_CORE)

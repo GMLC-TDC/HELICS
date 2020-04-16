@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include <memory>
+#include <string>
 #include "../core/helicsCLI11.hpp"
 #include "NetworkCore.hpp"
 

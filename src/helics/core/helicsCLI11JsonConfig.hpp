@@ -7,6 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
+#include <utility>
+#include <string>
+#include <vector>
 #include "helicsCLI11.hpp"
 
 #include "json/forwards.h"
