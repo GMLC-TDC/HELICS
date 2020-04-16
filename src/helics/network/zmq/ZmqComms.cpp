@@ -16,10 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
 
-#include <utility>
 #include <csignal>
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace helics {
