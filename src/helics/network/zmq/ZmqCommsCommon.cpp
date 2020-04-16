@@ -29,7 +29,7 @@ namespace hzmq {
                 bindsuccess = true;
             }
             catch (const zmq::error_t&) {
-                if (tcount == milliseconds{ 0 }) {
+                if (tcount == milliseconds{0}) {
                     // std::cerr << "zmq binding error on socket sleeping then will try again \n";
                 }
                 if (tcount > timeout) {

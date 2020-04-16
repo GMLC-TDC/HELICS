@@ -44,7 +44,7 @@ class EchoHub: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        helics::Time cTime{ 0.0 };
+        helics::Time cTime{0.0};
         while (cTime <= finalTime) {
             for (int ii = 0; ii < num_leafs; ++ii) {
                 if (fed->isUpdated(subs[ii])) {
