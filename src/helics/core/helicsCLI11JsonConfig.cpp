@@ -22,9 +22,11 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
     if (!skip_json_) {
         Json::Value config;
         if (Json::parseFromStream(rbuilder, input, &config, &errs)) {
-            if (!keyPaths.empty()) {
-                for (auto& kp : keyPaths) {
-                    config = config[kp];
+            if (!section().empty()) {
+                auto cfg = config[section()];
+                if (cfg.isObject())
+                {
+                    config = std::move(cfg);
                 }
             }
             return _from_config(config);

@@ -26,12 +26,9 @@ class HelicsConfigJSON: public CLI::ConfigBase {
             const;
     /// skip checking the JSON and go directory to the TOML processing
     void skipJson(bool skj = true) { skip_json_ = skj; }
-    /// set a specific path to check and ignore others
-    void setKeyPath(std::vector<std::string> paths) { keyPaths = std::move(paths); }
 
   private:
     bool skip_json_{false};
-    std::vector<std::string> keyPaths;
 };
 
 } // namespace helics
