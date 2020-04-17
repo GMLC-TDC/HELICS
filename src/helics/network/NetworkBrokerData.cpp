@@ -24,17 +24,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 std::shared_ptr<helicsCLI11App>
-    NetworkBrokerData::commandLineParser(const std::string& localAddress)
+    NetworkBrokerData::commandLineParser(const std::string& localAddress, bool enableConfig)
 {
     auto nbparser = std::make_shared<helicsCLI11App>(
         "Network connection information \n(arguments allow '_' characters in the names and ignore them)");
-    nbparser->allow_config_extras(CLI::config_extras_mode::ignore_all);
-    nbparser->set_config(
-        "--config-file,--config,config", "helicsConfig.ini", "specify a configuration file");
-    auto fmtr = std::make_shared<HelicsConfigJSON>();
-    fmtr->maxLayers(0);
-    nbparser->add_option("--config_section",fmtr->sectionRef(), "specify the section of the config file to use");
-    nbparser->config_formatter(std::move(fmtr));
+    if (enableConfig)
+    {
+        auto fmtr = std::make_shared<HelicsConfigJSON>();
+        fmtr->maxLayers(0);
+        nbparser->add_option("--config_section", fmtr->sectionRef(), "specify the section of the config file to use");
+        nbparser->config_formatter(std::move(fmtr));
+    }
     nbparser->option_defaults()->ignore_underscore();
     
     nbparser

@@ -97,15 +97,14 @@ class CommsInterface {
     void logMessage(const std::string& message) const;
 
   protected:
-    // enumeration of the connection status flags for more immediate feedback from the processing threads
+    /// enumeration of the connection status flags for more immediate feedback from the processing threads
     enum class connection_status : int {
 
         startup = -1, //!< the connection is in startup mode
         connected = 0, //!< we are connected
         reconnecting = 1, //!< we are trying reconnect
         terminated = 2, //!< the connection has been terminated
-        error = 4, //!< some error occurred on the connection
-
+        error = 4 //!< some error occurred on the connection
     };
 
   private:
@@ -125,7 +124,7 @@ class CommsInterface {
         connection_status::startup}; //!< the status of the transmitter thread
     gmlc::concurrency::TriggerVariable txTrigger;
     std::atomic<bool> operating{false}; //!< the comms interface is in startup mode
-    const bool singleThread{false};
+    const bool singleThread{false}; //!< specify that the interface should operate a single thread
 
   protected:
     bool serverMode = true; //!< some comms have a server mode and non-server mode

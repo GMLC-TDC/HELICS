@@ -37,7 +37,7 @@ template<class COMMS, interface_type baseline>
 std::shared_ptr<helicsCLI11App> NetworkCore<COMMS, baseline>::generateCLI()
 {
     auto app = CommonCore::generateCLI();
-    CLI::App_p netApp = netInfo.commandLineParser(defLocalInterface[static_cast<int>(baseline)]);
+    CLI::App_p netApp = netInfo.commandLineParser(defLocalInterface[static_cast<int>(baseline)],false);
     app->add_subcommand(netApp);
     return app;
 }
