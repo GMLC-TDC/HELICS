@@ -11,7 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../utilities/timeStringOps.hpp"
 
 #include <fstream>
+#include <memory>
 #include <sstream>
+#include <string>
 
 bool hasJsonExtension(const std::string& jsonString)
 {

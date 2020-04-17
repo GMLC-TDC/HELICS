@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
 
+#include <memory>
+#include <string>
+
 namespace helics {
 /** class defining a federate that can use both the value and message interfaces */
 class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public MessageFederate {

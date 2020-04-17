@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/core/ActionMessage.hpp"
 
+#include <string>
+
 /** class implementing the leaf for a timing test*/
 class TimingLeaf: public BenchmarkFederate {
   private:

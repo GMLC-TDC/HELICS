@@ -10,7 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <memory>
+#include <string>
 #include <thread>
+#include <tuple>
+#include <vector>
 
 namespace Json {
 class Value;

@@ -12,6 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/networkDefaults.hpp"
 
 #include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #ifdef ENABLE_ZMQ_CORE
 #    include "../common/zmqContextManager.h"

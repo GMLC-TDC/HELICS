@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #define HELICS_SIZE_MAX 512
 

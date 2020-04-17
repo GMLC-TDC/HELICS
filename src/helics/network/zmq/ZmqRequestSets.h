@@ -13,7 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <deque>
 #include <map>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace zeromq {

@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <tuple>
+#include <utility>
 
 namespace helics {
 

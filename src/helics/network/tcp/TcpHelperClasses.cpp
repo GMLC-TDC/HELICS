@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <iostream>
 #include <thread>
+#include <utility>
 
 namespace helics {
 namespace tcp {

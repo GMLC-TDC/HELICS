@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
 
+#include <memory>
+#include <string>
+
 namespace helics {
 template class NetworkCore<tcp::TcpComms, interface_type::tcp>;
 namespace tcp {

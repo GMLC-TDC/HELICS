@@ -16,7 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cctype>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <thread>
+#include <vector>
 
 using ipc_queue = boost::interprocess::message_queue;
 using ipc_state = boost::interprocess::shared_memory_object;

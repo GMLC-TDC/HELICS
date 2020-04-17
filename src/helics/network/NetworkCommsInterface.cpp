@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 
 #include <memory>
+#include <string>
 
 namespace helics {
 NetworkCommsInterface::NetworkCommsInterface(

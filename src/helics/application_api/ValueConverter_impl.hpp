@@ -25,8 +25,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <helics/external/cereal/types/vector.hpp>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 //#include <helics/external/cereal/archives/binary.hpp>
 #include <helics/external/cereal/types/string.hpp>
 

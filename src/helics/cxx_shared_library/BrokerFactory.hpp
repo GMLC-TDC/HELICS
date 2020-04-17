@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/BrokerApp.hpp"
 #include "Broker.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace helics {
 /**
  * Factory for building Core API instances.

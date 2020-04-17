@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "configFileHelpers.hpp"
 
+#include <string>
+
 bool looksLikeFile(const std::string& configString)
 {
     if (hasTomlExtension(configString)) {

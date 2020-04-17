@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonProcessingFunctions.hpp"
 #include "TomlProcessingFunctions.hpp"
 
+#include <string>
+
 /** check if a string looks like a recognized file or a command line of some kind
 Does not check actual file existence or do any other verification other than do a preliminary check if the string
 could be a json|toml|ini file or looks like a json string, and if it does return true otherwise return false

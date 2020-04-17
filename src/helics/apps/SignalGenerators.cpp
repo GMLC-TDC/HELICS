@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "SignalGenerators.hpp"
 
 #include <cmath>
+#include <string>
 
 constexpr double pi = 3.14159265358979323846;
 

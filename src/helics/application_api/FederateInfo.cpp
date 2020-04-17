@@ -16,7 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #include <iostream>
+#include <map>
 #include <set>
+#include <utility>
 
 namespace helics {
 FederateInfo::FederateInfo(int argc, char* argv[])

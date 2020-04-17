@@ -14,6 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <queue>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 /** class implementing a blocking queue with a priority channel

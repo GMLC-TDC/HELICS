@@ -8,6 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "../core/CoreBroker.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace helics {
 class ActionMessage;
 class CommsInterface;

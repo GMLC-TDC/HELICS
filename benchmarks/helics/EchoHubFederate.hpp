@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 
+#include <string>
+#include <vector>
+
 /** class implementing the hub for an echo test*/
 class EchoHub: public BenchmarkFederate {
   private:

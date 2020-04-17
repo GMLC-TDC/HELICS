@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Source.hpp"
 
 #include <complex>
+#include <string>
 
 namespace helics {
 namespace apps {

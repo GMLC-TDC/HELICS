@@ -14,7 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/CoreFactory.hpp"
 #include "../NetworkBrokerData.hpp"
 
+#include <map>
 #include <memory>
+#include <string>
+#include <utility>
 
 namespace helics {
 namespace inproc {

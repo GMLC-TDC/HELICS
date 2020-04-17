@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "json/json.h"
 #include <algorithm>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 static auto nullMessageFunction = [](const ActionMessage&) {};

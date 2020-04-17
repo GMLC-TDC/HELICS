@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units/units.hpp"
 
 #include <algorithm>
+#include <string>
+#include <vector>
 
 namespace helics {
 Input::Input(

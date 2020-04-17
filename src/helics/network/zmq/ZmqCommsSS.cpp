@@ -14,9 +14,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
-//#include <csignal>
+
 #include <iostream>
+#include <map>
 #include <memory>
+#include <utility>
+#include <vector>
 
 static const int TX_RX_MSG_COUNT = 20;
 

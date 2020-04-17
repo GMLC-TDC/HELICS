@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <iostream>
+#include <utility>
 
 namespace helics {
 std::shared_ptr<helicsCLI11App>

@@ -13,6 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /** class containing a constant view of data block*/

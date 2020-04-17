@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "AsioBrokerServer.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "zmqBrokerServer.hpp"
+
+#include <utility>
 #ifdef HELICS_ENABLE_WEBSERVER
 #    include "helicsWebServer.hpp"
 #endif

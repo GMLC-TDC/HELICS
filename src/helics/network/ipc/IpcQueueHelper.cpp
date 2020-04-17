@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "IpcQueueHelper.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <string>
 #include <thread>
 
 namespace boostipc = boost::interprocess;

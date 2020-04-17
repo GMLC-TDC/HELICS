@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics-time.hpp"
 
+#include <utility>
 #include <vector>
 
 namespace helics {

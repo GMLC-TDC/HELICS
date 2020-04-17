@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/helicsTypes.hpp"
 
+#include <string>
+
 namespace helics {
 class FederateInfo;
 } // namespace helics

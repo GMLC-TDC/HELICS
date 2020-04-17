@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/CoreBroker.hpp"
 #include "../CommsBroker.hpp"
 
+#include <memory>
+#include <string>
+
 namespace helics {
 namespace mpi {
     class MpiComms;

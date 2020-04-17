@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <random>
+#include <string>
 
 /** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate: public BenchmarkFederate {

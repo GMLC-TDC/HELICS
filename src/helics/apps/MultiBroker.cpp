@@ -10,8 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/CommsInterface.hpp"
 
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 #ifdef ENABLE_UDP_CORE
 #    include "../network/udp/UdpComms.h"
 #endif

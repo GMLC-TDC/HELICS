@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_core_types.hpp"
 #include "flagOperations.hpp"
 
+#include <string>
+
 namespace helics {
 /** define the type of the handle*/
 enum class handle_type : char {

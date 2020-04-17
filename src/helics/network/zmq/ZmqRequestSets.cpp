@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
+#include <utility>
 
 namespace helics {
 namespace zeromq {

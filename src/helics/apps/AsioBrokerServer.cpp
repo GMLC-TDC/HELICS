@@ -20,6 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <array>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace helics {
 

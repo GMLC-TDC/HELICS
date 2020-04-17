@@ -20,6 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
 #include <cstring>
+#include <tuple>
+#include <utility>
 
 namespace helics {
 

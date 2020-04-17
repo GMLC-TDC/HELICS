@@ -13,7 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 
 #include <functional>
+#include <string>
 #include <thread>
+#include <utility>
 
 namespace helics {
 enum class interface_networks : char;

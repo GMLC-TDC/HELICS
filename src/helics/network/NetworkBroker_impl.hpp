@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBroker.hpp"
 
 #include <iostream>
+#include <memory>
+#include <string>
 
 namespace helics {
 constexpr const char* tstr[] = {"default",

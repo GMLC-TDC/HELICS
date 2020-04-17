@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 
 #include <iostream>
+#include <string>
+#include <utility>
 
 namespace helics {
 CommsInterface::CommsInterface(thread_generation threads):

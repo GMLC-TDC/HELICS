@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+
+#include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id):
     coreObject(coreOb), fed(vfed), fedID(id)

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <asio/steady_timer.hpp>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 namespace helics {
 /** class containing a message timer for sending messages at particular points in time

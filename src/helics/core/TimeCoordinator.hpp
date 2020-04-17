@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <deque>
 #include <functional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /** enumeration of possible processing results*/

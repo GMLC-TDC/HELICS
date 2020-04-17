@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cctype>
 #include <iostream>
+#include <string>
 
 bool hasIndexCode(const std::string& type_name)
 {

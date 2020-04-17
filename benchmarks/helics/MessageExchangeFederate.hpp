@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics/helics-config.h"
 
+#include <string>
+
 using helics::operator"" _t;
 /** class implementing a federate that sends messages to another (and vice versa)*/
 class MessageExchangeFederate: public BenchmarkFederate {

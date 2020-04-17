@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../NetworkCore.hpp"
+
+#include <string>
 namespace helics {
 namespace zeromq {
     class ZmqComms;

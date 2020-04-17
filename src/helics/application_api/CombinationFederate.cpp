@@ -6,6 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CombinationFederate.hpp"
 
+#include <memory>
+#include <string>
+
 namespace helics {
 CombinationFederate::CombinationFederate() = default;
 CombinationFederate::CombinationFederate(const std::string& fedName, const FederateInfo& fi):

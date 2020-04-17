@@ -16,6 +16,7 @@ the purpose of these objects are to convert a specific type into a data block fo
 #include "helicsTypes.hpp"
 
 #include <string>
+#include <utility>
 namespace helics {
 /** converter for a basic value*/
 template<class X>

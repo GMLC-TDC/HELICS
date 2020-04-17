@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 #include "helics/core/CommonCore.hpp"
 
+#include <memory>
+#include <string>
+
 namespace helics {
 template<class COMMS, interface_type baseline = interface_type::ip>
 class NetworkCore: public CommsBroker<COMMS, CommonCore> {

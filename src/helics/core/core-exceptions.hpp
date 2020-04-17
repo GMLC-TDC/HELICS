@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 /** @file
 @details definitions of exceptions used in HELICS

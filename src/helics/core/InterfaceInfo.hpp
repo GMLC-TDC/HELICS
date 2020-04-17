@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "json/forwards.h"
 #include <atomic>
+#include <string>
+#include <utility>
+#include <vector>
 
 /** @file container for keeping the set of different interfaces information for a federate
  */

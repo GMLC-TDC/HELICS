@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringConversion.h"
 
 #include <algorithm>
+#include <functional>
 #include <numeric>
 #include <regex>
 #include <unordered_map>

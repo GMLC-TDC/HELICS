@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../utilities/timeStringOps.hpp"
 
 #include <fstream>
+#include <string>
 
 bool hasTomlExtension(const std::string& tomlString)
 {

@@ -19,6 +19,7 @@ and some common methods used cores and brokers
 #include <memory>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace helics {
 class Logger;

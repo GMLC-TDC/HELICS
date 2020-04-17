@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ZmqComms.h"
 #include "ZmqCommsSS.h"
 
+#include <string>
+
 namespace helics {
 namespace zeromq {
     ZmqCore::ZmqCore() noexcept

@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <algorithm>
 #include <boost/interprocess/sync/scoped_lock.hpp>
+#include <utility>
 
 namespace helics {
 namespace ipc {

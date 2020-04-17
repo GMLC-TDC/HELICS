@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 
 #include <cassert>
+#include <string>
 
 namespace helics {
 MessageFederateManager::MessageFederateManager(

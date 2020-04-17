@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 #include <set>
+#include <string>
 
 namespace helics {
 namespace inproc {

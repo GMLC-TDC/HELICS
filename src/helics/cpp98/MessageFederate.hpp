@@ -13,6 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Endpoint.hpp"
 #include "Federate.hpp"
 
+#include <string>
+#include <vector>
+
 namespace helicscpp {
 /** class defining the block communication based interface */
 

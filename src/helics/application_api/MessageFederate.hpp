@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "data_view.hpp"
 
 #include <functional>
+#include <memory>
+#include <string>
 
 namespace helics {
 class MessageFederateManager;

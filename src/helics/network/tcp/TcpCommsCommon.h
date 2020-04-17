@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpHelperClasses.h"
 
 #include <chrono>
+#include <string>
 
 class AsioContextManager;
 namespace asio {

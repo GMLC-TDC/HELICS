@@ -22,6 +22,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 /** enumeration of possible operations on a socket*/

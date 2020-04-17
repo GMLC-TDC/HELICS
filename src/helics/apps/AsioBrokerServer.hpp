@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TypedBrokerServer.hpp"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #if defined(ENABLE_TCP_CORE) || defined(ENABLE_UDP_CORE)
 
 #    include "helics/common/AsioContextManager.h"

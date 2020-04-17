@@ -25,7 +25,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <regex>
 #include <set>
 #include <stdexcept>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace apps {

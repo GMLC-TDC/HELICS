@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/core-types.hpp"
 #include "../NetworkBroker.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace helics {
 namespace tcp {
     class TcpComms;

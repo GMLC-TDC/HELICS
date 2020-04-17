@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {

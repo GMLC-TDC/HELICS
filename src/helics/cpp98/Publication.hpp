@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../shared_api_library/ValueFederate.h"
 #include "helicsExceptions.hpp"
 
+#include <string>
+#include <vector>
+
 namespace helicscpp {
 /** C++98 interface for a publication object*/
 class Publication {

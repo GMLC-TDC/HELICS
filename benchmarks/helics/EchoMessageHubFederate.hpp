@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/core/ActionMessage.hpp"
 
+#include <string>
+#include <utility>
+
 using helics::operator"" _t;
 /** class implementing the hub for an echo test*/
 class EchoMessageHub: public BenchmarkFederate {

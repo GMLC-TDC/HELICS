@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <set>
 #include <string>
+#include <vector>
 
 class AsioContextManager;
 namespace asio {

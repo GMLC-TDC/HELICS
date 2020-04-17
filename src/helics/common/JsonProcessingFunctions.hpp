@@ -15,6 +15,7 @@ using the jsoncpp library
 
 #include "json/json.h"
 #include <functional>
+#include <string>
 /** check if the file has a valid JSON extension*/
 bool hasJsonExtension(const std::string& jsonString);
 

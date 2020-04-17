@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 
+#include <string>
+#include <vector>
+
 namespace helics {
 
 std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) const

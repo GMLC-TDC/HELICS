@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 /** @file
 various helper classes and functions for handling TCP connections
