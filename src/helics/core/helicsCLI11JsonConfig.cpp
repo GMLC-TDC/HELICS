@@ -36,7 +36,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
 }
 
 std::vector<CLI::ConfigItem>
-    HelicsConfigJSON::_from_config(Json::Value j, std::string name, std::vector<std::string> prefix)
+    HelicsConfigJSON::_from_config(Json::Value j, const std::string &name, std::vector<std::string> prefix)
         const
 {
     std::vector<CLI::ConfigItem> results;
@@ -68,9 +68,9 @@ std::vector<CLI::ConfigItem>
         } else if (j.isString()) {
             res.inputs = {j.asString()};
         } else if (j.isArray()) {
-            for (Json::ArrayIndex ii = 0; ii < j.size(); ++ii) {
-                if (j[ii].isString()) {
-                    res.inputs.push_back(j[ii].asString());
+            for (const auto &obj:j){
+                if (obj.isString()) {
+                    res.inputs.push_back(obj.asString());
                 } else {
                     break;
                 }

@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
-#include "helicsCLI11.hpp"
 #include "helics/core/helicsCLI11JsonConfig.hpp"
+#include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
 #ifndef HELICS_DISABLE_ASIO
 #    include "../common/AsioContextManager.h"
@@ -116,13 +116,14 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     auto hApp = std::make_shared<helicsCLI11App>("Arguments applying to all Brokers and Cores");
     auto fmtr = std::make_shared<HelicsConfigJSON>();
     fmtr->maxLayers(0);
-    hApp->add_option("--config_section", fmtr->sectionRef(), "specify the section of the config file to use");
+    hApp->add_option(
+        "--config_section", fmtr->sectionRef(), "specify the section of the config file to use");
     hApp->config_formatter(std::move(fmtr));
     hApp->option_defaults()->ignore_underscore()->ignore_case();
     hApp->add_option(
-            "--federates,-f,--minfederates,--minfed,-m",
-            minFederateCount,
-            "the minimum number of federates that will be connecting");
+        "--federates,-f,--minfederates,--minfed,-m",
+        minFederateCount,
+        "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier", identifier, "the name of the broker/core");
     hApp->add_option(
             "--maxiter,--maxiterations",
@@ -149,7 +150,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--terminate_on_error,--halt_on_error",
         terminate_on_error,
         "specify that a broker should cause the federation to terminate on an error");
-    auto logging_group =
+    auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->add_flag(
         "--force_logging_flush", forceLoggingFlush, "flush the log after every message");
