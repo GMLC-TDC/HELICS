@@ -181,7 +181,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
 
-    auto timeout_group =
+    auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
     timeout_group->add_option(
         "--tick",
