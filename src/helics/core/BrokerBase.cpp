@@ -114,11 +114,8 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
     auto hApp = std::make_shared<helicsCLI11App>("Arguments applying to all Brokers and Cores");
-    auto fmtr = std::make_shared<HelicsConfigJSON>();
+    auto* fmtr = addJsonConfig(hApp.get());
     fmtr->maxLayers(0);
-    hApp->add_option(
-        "--config_section", fmtr->sectionRef(), "specify the section of the config file to use");
-    hApp->config_formatter(std::move(fmtr));
     hApp->option_defaults()->ignore_underscore()->ignore_case();
     hApp->add_option(
         "--federates,-f,--minfederates,--minfed,-m",

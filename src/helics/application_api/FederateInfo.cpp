@@ -284,9 +284,8 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
     app->set_config(
         "--config-file,--config,config", "helicsConfig.ini", "specify a configuration file");
-    auto fmtr = std::make_shared<HelicsConfigJSON>();
+    auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);
-    app->config_formatter(std::move(fmtr));
     app->add_option("--name,-n", defName, "name of the federate");
     auto og = app->add_option_group("network type")->immediate_callback();
     og->add_option_function<std::string>(

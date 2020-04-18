@@ -29,5 +29,7 @@ class HelicsConfigJSON: public CLI::ConfigBase {
         _from_config(Json::Value j, const std::string &name = {}, const std::vector<std::string> &prefix = {})
         const;
 };
+/// Add the HELICS JSON configuration processor to the app
+HelicsConfigJSON *addJsonConfig(CLI::App *app);
 
 } // namespace helics

@@ -28,6 +28,10 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
                 {
                     config = std::move(cfg);
                 }
+                if (cfg.isArray())
+                {
+                    config = cfg[configIndex];
+                }
             }
             return _from_config(config);
         }
@@ -85,4 +89,20 @@ std::vector<CLI::ConfigItem>
     return results;
 }
 
+
+HelicsConfigJSON *addJsonConfig(CLI::App *app)
+{
+    auto fmtr = std::make_shared<HelicsConfigJSON>();
+    auto *fmtrRet = fmtr.get();
+    app->add_option(
+        "--config_section",
+        fmtr->sectionRef(),
+        "specify the section of the config file to use")->configurable(false);
+    app->add_option(
+        "--config_index",
+        fmtr->indexRef(),
+        "specify the section index of the config file to use for configuration arrays")->configurable(false);
+    app->config_formatter(std::move(fmtr));
+    return fmtrRet;
+}
 } // namespace helics

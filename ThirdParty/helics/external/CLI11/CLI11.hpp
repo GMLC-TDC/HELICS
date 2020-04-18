@@ -2461,7 +2461,7 @@ class ConfigBase : public Config {
     /// the maximum number of layers to allow
     uint8_t maxLayers_{255};
     /// Specify the configuration index to use for arrayed sections
-    uint8_t configIndex{0};
+    uint16_t configIndex{0};
     /// Specify the configuration section that should be used
     std::string configSection;
 
@@ -2502,6 +2502,13 @@ class ConfigBase : public Config {
     const std::string& section() const { return configSection; }
     /// specify a particular section of the configuration file to use
     void section(const std::string &sectionName) { configSection = sectionName; }
+
+    /// get a reference to the configuration index
+    uint16_t& indexRef() { return configIndex; }
+    /// get the section index
+    const uint16_t index() const { return configIndex; }
+    /// specify a particular index in the section to use
+    void index(uint16_t sectionIndex) { configIndex = sectionIndex; }
 };
 
 /// the default Config is the TOML file format
