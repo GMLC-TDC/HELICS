@@ -140,7 +140,7 @@ static const std::set<std::string> validFlagOptions{"interruptible",
                                                     "buffer_data",
                                                     "slow_response",
                                                     "slow_responding",
-                                                    "disable_ping"
+                                                    "disable_ping",
                                                     "no_ping",
                                                     "slow",
                                                     "required",
@@ -287,12 +287,12 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);
     app->add_option("--name,-n", defName, "name of the federate");
-    auto og = app->add_option_group("network type")->immediate_callback();
+    auto* og = app->add_option_group("network type")->immediate_callback();
     og->add_option_function<std::string>(
           "--core",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
-              if (coreType == core_type::UNRECOGNIZED) coreName = val;
+              if (coreType == core_type::UNRECOGNIZED) { coreName = val; }
           },
           "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
@@ -300,8 +300,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           "--coretype,-t,--type",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
-              if (coreType == core_type::UNRECOGNIZED)
+              if (coreType == core_type::UNRECOGNIZED) {
                   throw CLI::ValidationError(val + " is NOT a recognized core type");
+              }
           },
           "type  of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
@@ -336,10 +337,12 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option_function<int>(
            "--port",
            [this](int port) {
-               if (brokerPort > 0)
-                   localport = std::to_string(port);
-               else
-                   brokerPort = port;
+            if (brokerPort > 0) {
+                localport = std::to_string(port);
+            }
+            else {
+                brokerPort = port;
+            }
            },
            "Specify the port number to use")
         ->check(CLI::PositiveNumber);
@@ -367,7 +370,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "The minimum time between time grants for a Federate (default in ms)")
         ->ignore_underscore()
         ->configurable(false);
-    auto rtgroup = app->add_option_group("realtime");
+    auto* rtgroup = app->add_option_group("realtime");
     rtgroup->option_defaults()->ignore_underscore();
     rtgroup
         ->add_option_function<Time>(
@@ -484,13 +487,15 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
 
 void FederateInfo::config_additional(helicsCLI11App* app)
 {
-    auto opt = app->get_option("--config");
+    auto* opt = app->get_option("--config");
     if (opt->count() > 0) {
         auto configString = opt->as<std::string>();
         if (hasTomlExtension(configString)) {
             loadInfoFromToml(configString, false);
+            fileInUse = configString;
         } else if (hasJsonExtension(configString)) {
             loadInfoFromJson(configString, false);
+            fileInUse = configString;
         }
     }
 }
@@ -501,13 +506,15 @@ FederateInfo loadFederateInfo(const std::string& configString)
 
     if (hasTomlExtension(configString)) {
         ret.loadInfoFromToml(configString);
-    } else if (
-        (hasJsonExtension(configString)) ||
-        (configString.find_first_of('{') != std::string::npos)) {
+        ret.fileInUse = configString;
+    }else if (hasJsonExtension(configString)) {
+        ret.loadInfoFromJson(configString);
+        ret.fileInUse = configString;
+    } else if (configString.find_first_of('{') != std::string::npos) {
         ret.loadInfoFromJson(configString);
     } else if (configString.find("--") != std::string::npos) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
-    } else if (configString.find("=") != std::string::npos) {
+    } else if (configString.find('=') != std::string::npos) {
         ret.loadInfoFromToml(configString);
     } else {
         ret.defName = configString;
@@ -530,7 +537,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
             setProperty(propStringsTranslations.at(fname), arg);
         };
 
-    for (auto& prop : validTimeProperties) {
+    for (const auto& prop : validTimeProperties) {
         callIfMember(doc, prop, timeCall);
     }
     if (runArgParser) {
@@ -566,7 +573,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
             setProperty(propStringsTranslations.at(fname), arg);
         };
 
-    for (auto& prop : validTimeProperties) {
+    for (const auto& prop : validTimeProperties) {
         callIfMember(doc, prop, timeCall);
     }
     if (runArgParser) {
@@ -616,6 +623,11 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     if (!fi.key.empty()) {
         res += " --key=";
         res.append(fi.key);
+    }
+    if (fi.fileInUse.empty())
+    { //we used the file, specify a core section
+        res += " --config_section=core --config_file=";
+        res.append(fi.fileInUse);
     }
     return res;
 }

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace helics {
 
@@ -28,7 +29,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
                 {
                     config = std::move(cfg);
                 }
-                if (cfg.isArray())
+                else if (cfg.isArray())
                 {
                     config = cfg[configIndex];
                 }
