@@ -292,7 +292,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           "--core",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
-              if (coreType == core_type::UNRECOGNIZED) { coreName = val; }
+              if (coreType == core_type::UNRECOGNIZED) {
+                  coreName = val;
+              }
           },
           "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
@@ -337,12 +339,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option_function<int>(
            "--port",
            [this](int port) {
-            if (brokerPort > 0) {
-                localport = std::to_string(port);
-            }
-            else {
-                brokerPort = port;
-            }
+               if (brokerPort > 0) {
+                   localport = std::to_string(port);
+               } else {
+                   brokerPort = port;
+               }
            },
            "Specify the port number to use")
         ->check(CLI::PositiveNumber);
@@ -507,7 +508,7 @@ FederateInfo loadFederateInfo(const std::string& configString)
     if (hasTomlExtension(configString)) {
         ret.loadInfoFromToml(configString);
         ret.fileInUse = configString;
-    }else if (hasJsonExtension(configString)) {
+    } else if (hasJsonExtension(configString)) {
         ret.loadInfoFromJson(configString);
         ret.fileInUse = configString;
     } else if (configString.find_first_of('{') != std::string::npos) {
@@ -624,8 +625,7 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
         res += " --key=";
         res.append(fi.key);
     }
-    if (fi.fileInUse.empty())
-    { //we used the file, specify a core section
+    if (fi.fileInUse.empty()) { //we used the file, specify a core section
         res += " --config_section=core --config_file=";
         res.append(fi.fileInUse);
     }

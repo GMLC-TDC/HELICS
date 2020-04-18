@@ -26,7 +26,7 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     bool skip_json_{false};
     /// Internal parser for the configuration
     std::vector<CLI::ConfigItem>
-        _from_config(Json::Value j, const std::string &name = {}, const std::vector<std::string> &prefix = {})
+        fromConfigInternal(Json::Value j, const std::string &name = {}, const std::vector<std::string> &prefix = {})
         const;
 };
 /// Add the HELICS JSON configuration processor to the app

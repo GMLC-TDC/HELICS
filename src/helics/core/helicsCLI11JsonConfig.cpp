@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace helics {
 
@@ -25,12 +25,9 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
         if (Json::parseFromStream(rbuilder, input, &config, &errs)) {
             if (!section().empty()) {
                 auto cfg = config[section()];
-                if (cfg.isObject())
-                {
+                if (cfg.isObject()) {
                     config = std::move(cfg);
-                }
-                else if (cfg.isArray())
-                {
+                } else if (cfg.isArray()) {
                     config = cfg[configIndex];
                 }
             }
@@ -40,9 +37,10 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
     return ConfigBase::from_config(input);
 }
 
-std::vector<CLI::ConfigItem>
-    HelicsConfigJSON::_from_config(Json::Value j, const std::string &name, const std::vector<std::string> &prefix)
-        const
+std::vector<CLI::ConfigItem> HelicsConfigJSON::_from_config(
+    Json::Value j,
+    const std::string& name,
+    const std::vector<std::string>& prefix) const
 {
     std::vector<CLI::ConfigItem> results;
 
@@ -73,7 +71,7 @@ std::vector<CLI::ConfigItem>
         } else if (j.isString()) {
             res.inputs = {j.asString()};
         } else if (j.isArray()) {
-            for (const auto &obj:j){
+            for (const auto& obj : j) {
                 if (obj.isString()) {
                     res.inputs.push_back(obj.asString());
                 } else {
@@ -90,19 +88,18 @@ std::vector<CLI::ConfigItem>
     return results;
 }
 
-
-HelicsConfigJSON *addJsonConfig(CLI::App *app)
+HelicsConfigJSON* addJsonConfig(CLI::App* app)
 {
     auto fmtr = std::make_shared<HelicsConfigJSON>();
-    auto *fmtrRet = fmtr.get();
+    auto* fmtrRet = fmtr.get();
     app->add_option(
-        "--config_section",
-        fmtr->sectionRef(),
-        "specify the section of the config file to use")->configurable(false);
+           "--config_section", fmtr->sectionRef(), "specify the section of the config file to use")
+        ->configurable(false);
     app->add_option(
-        "--config_index",
-        fmtr->indexRef(),
-        "specify the section index of the config file to use for configuration arrays")->configurable(false);
+           "--config_index",
+           fmtr->indexRef(),
+           "specify the section index of the config file to use for configuration arrays")
+        ->configurable(false);
     app->config_formatter(std::move(fmtr));
     return fmtrRet;
 }
