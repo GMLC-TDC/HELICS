@@ -29,15 +29,17 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
                     config = std::move(cfg);
                 } else if (cfg.isArray()) {
                     config = cfg[configIndex];
+                } else {
+                    return {};
                 }
             }
-            return _from_config(config);
+            return fromConfigInternal(config);
         }
     }
     return ConfigBase::from_config(input);
 }
 
-std::vector<CLI::ConfigItem> HelicsConfigJSON::_from_config(
+std::vector<CLI::ConfigItem> HelicsConfigJSON::fromConfigInternal(
     Json::Value j,
     const std::string& name,
     const std::vector<std::string>& prefix) const
@@ -54,7 +56,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::_from_config(
             if (!name.empty()) {
                 copy_prefix.push_back(name);
             }
-            auto sub_results = _from_config(j[fld], fld, copy_prefix);
+            auto sub_results = fromConfigInternal(j[fld], fld, copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());
         }
     } else if (!name.empty()) {
@@ -92,14 +94,15 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
 {
     auto fmtr = std::make_shared<HelicsConfigJSON>();
     auto* fmtrRet = fmtr.get();
+    app->allow_config_extras(CLI::config_extras_mode::ignore_all);
     app->add_option(
-           "--config_section", fmtr->sectionRef(), "specify the section of the config file to use")
-        ->configurable(false);
+        "--config_section", fmtr->sectionRef(), "specify the section of the config file to use")
+        ->configurable(false)->trigger_on_parse();
     app->add_option(
            "--config_index",
            fmtr->indexRef(),
            "specify the section index of the config file to use for configuration arrays")
-        ->configurable(false);
+        ->configurable(false)->trigger_on_parse();
     app->config_formatter(std::move(fmtr));
     return fmtrRet;
 }

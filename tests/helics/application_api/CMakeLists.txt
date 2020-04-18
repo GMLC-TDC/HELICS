@@ -69,8 +69,8 @@ set(
     ValueFederateKeyTests.cpp
     FilterTests.cpp
     testFixtures_shared.cpp
-	testFixtures_shared.hpp
-	) 
+    testFixtures_shared.hpp
+    )
 
 add_executable(shared_cxx-tests ${shared_cxx_test_sources})
 
@@ -83,6 +83,6 @@ set_property(TEST shared_cxx-tests PROPERTY LABELS ApplicationApi Coverage Daily
 
 target_compile_definitions(shared_cxx-tests PRIVATE
                            "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
-						   
+
 copy_shared_target(shared_cxx-tests helics-shared)
 endif()
