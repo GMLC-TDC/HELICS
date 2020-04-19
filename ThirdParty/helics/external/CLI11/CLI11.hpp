@@ -2506,7 +2506,7 @@ class ConfigBase : public Config {
     /// get a reference to the configuration index
     uint16_t& indexRef() { return configIndex; }
     /// get the section index
-    const uint16_t index() const { return configIndex; }
+    uint16_t index() const { return configIndex; }
     /// specify a particular index in the section to use
     void index(uint16_t sectionIndex) { configIndex = sectionIndex; }
 };
@@ -8518,6 +8518,12 @@ inline std::vector<ConfigItem> ConfigBase::from_config(std::istream &input) cons
         std::vector<std::string> parents = detail::generate_parents(section, name);
         if(parents.size() > maxLayers_) {
             continue;
+        }
+        if(!configSection.empty()) {
+            if(parents.empty() || parents.front() != configSection) {
+                continue;
+            }
+            parents.erase(parents.begin());
         }
         if(!output.empty() && name == output.back().name && parents == output.back().parents) {
             output.back().inputs.insert(output.back().inputs.end(), items_buffer.begin(), items_buffer.end());
