@@ -93,14 +93,6 @@ TEST(CoreFactory_tests, tcpCore_test)
     core->disconnect();
     core = nullptr;
 }
-#else
-TEST(CoreFactory_tests, tcpCore_test)
-{
-    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP), false);
-}
-#endif
-
-#ifdef ENABLE_TCP_CORE
 TEST(CoreFactory_tests, tcpSSCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP_SS), true);
@@ -111,6 +103,10 @@ TEST(CoreFactory_tests, tcpSSCore_test)
     core = nullptr;
 }
 #else
+TEST(CoreFactory_tests, tcpCore_test)
+{
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP), false);
+}
 TEST(CoreFactory_tests, tcpSSCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP_SS), false);

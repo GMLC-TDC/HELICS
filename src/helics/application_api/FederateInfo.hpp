@@ -34,7 +34,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     std::string key; //!< key for the broker
     std::string
         localport; //!< string for defining the local port to use usually a number but other strings are possible
-
+    std::string fileInUse; //!< string containing a configuration file that was used
     /** default constructor*/
     FederateInfo() = default;
     /** construct from a type

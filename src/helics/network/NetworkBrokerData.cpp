@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/netif/NetIF.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/helicsCLI11.hpp"
+#include "helics/core/helicsCLI11JsonConfig.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "../common/AsioContextManager.h"
@@ -24,11 +25,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 std::shared_ptr<helicsCLI11App>
-    NetworkBrokerData::commandLineParser(const std::string& localAddress)
+    NetworkBrokerData::commandLineParser(const std::string& localAddress, bool enableConfig)
 {
     auto nbparser = std::make_shared<helicsCLI11App>(
         "Network connection information \n(arguments allow '_' characters in the names and ignore them)");
+    if (enableConfig) {
+        auto* fmtr = addJsonConfig(nbparser.get());
+        fmtr->maxLayers(0);
+    }
     nbparser->option_defaults()->ignore_underscore();
+
     nbparser
         ->add_flag(
             "--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
@@ -310,20 +316,20 @@ std::vector<std::string>
     std::vector<std::string> result;
 
     // Top choice: addresses that both lists contain (resolver + OS)
-    for (auto r_addr : low) {
+    for (const auto& r_addr : low) {
         if (std::find(high.begin(), high.end(), r_addr) != high.end()) {
             result.push_back(r_addr);
         }
     }
     // Second choice: high-priority addresses found by the OS (likely link-local addresses or loop-back)
-    for (auto i_addr : high) {
+    for (const auto& i_addr : high) {
         // add the address if it isn't already in the list
         if (std::find(result.begin(), result.end(), i_addr) == result.end()) {
             result.push_back(i_addr);
         }
     }
     // Last choice: low-priority addresses returned by the resolver (OS doesn't know about them so may be invalid)
-    for (auto r_addr : low) {
+    for (const auto& r_addr : low) {
         // add the address if it isn't already in the list
         if (std::find(low.begin(), low.end(), r_addr) == low.end()) {
             result.push_back(r_addr);
@@ -370,7 +376,7 @@ std::string getLocalExternalAddressV4()
     }
 
     // Use the resolved address if it matches one of the interface addresses
-    for (auto addr : interface_addresses) {
+    for (const auto& addr : interface_addresses) {
         if (addr == resolved_address) {
             return resolved_address;
         }
@@ -383,7 +389,8 @@ std::string getLocalExternalAddressV4()
         if (addr.rfind("127.", 0) != 0) {
             if (addr.rfind("169.254.", 0) != 0) {
                 return addr;
-            } else if (link_local_addr.empty()) {
+            }
+            if (link_local_addr.empty()) {
                 link_local_addr = addr;
             }
         }
@@ -474,10 +481,9 @@ std::string getLocalExternalAddressV6()
     }
 
     // Use the resolved address if it matches one of the interface addresses
-    for (auto addr : interface_addresses) {
-        if (addr == resolved_address) {
-            return resolved_address;
-        }
+    if (std::find(interface_addresses.begin(), interface_addresses.end(), resolved_address) !=
+        interface_addresses.end()) {
+        return resolved_address;
     }
 
     // Pick an interface that isn't the IPv6 loopback address, ::1/128
@@ -487,7 +493,8 @@ std::string getLocalExternalAddressV6()
         if (addr != "::1") {
             if (addr.rfind("fe80:", 0) != 0) {
                 return addr;
-            } else if (link_local_addr.empty()) {
+            }
+            if (link_local_addr.empty()) {
                 link_local_addr = addr;
             }
         }

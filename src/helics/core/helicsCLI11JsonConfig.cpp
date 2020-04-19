@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -22,20 +23,26 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
     if (!skip_json_) {
         Json::Value config;
         if (Json::parseFromStream(rbuilder, input, &config, &errs)) {
-            if (!keyPaths.empty()) {
-                for (auto& kp : keyPaths) {
-                    config = config[kp];
+            if (!section().empty()) {
+                auto cfg = config[section()];
+                if (cfg.isObject()) {
+                    config = std::move(cfg);
+                } else if (cfg.isArray()) {
+                    config = cfg[configIndex];
+                } else {
+                    return {};
                 }
             }
-            return _from_config(config);
+            return fromConfigInternal(config);
         }
     }
     return ConfigBase::from_config(input);
 }
 
-std::vector<CLI::ConfigItem>
-    HelicsConfigJSON::_from_config(Json::Value j, std::string name, std::vector<std::string> prefix)
-        const
+std::vector<CLI::ConfigItem> HelicsConfigJSON::fromConfigInternal(
+    Json::Value j,
+    const std::string& name,
+    const std::vector<std::string>& prefix) const
 {
     std::vector<CLI::ConfigItem> results;
 
@@ -49,7 +56,7 @@ std::vector<CLI::ConfigItem>
             if (!name.empty()) {
                 copy_prefix.push_back(name);
             }
-            auto sub_results = _from_config(j[fld], fld, copy_prefix);
+            auto sub_results = fromConfigInternal(j[fld], fld, copy_prefix);
             results.insert(results.end(), sub_results.begin(), sub_results.end());
         }
     } else if (!name.empty()) {
@@ -66,9 +73,9 @@ std::vector<CLI::ConfigItem>
         } else if (j.isString()) {
             res.inputs = {j.asString()};
         } else if (j.isArray()) {
-            for (Json::ArrayIndex ii = 0; ii < j.size(); ++ii) {
-                if (j[ii].isString()) {
-                    res.inputs.push_back(j[ii].asString());
+            for (const auto& obj : j) {
+                if (obj.isString()) {
+                    res.inputs.push_back(obj.asString());
                 } else {
                     break;
                 }
@@ -83,4 +90,22 @@ std::vector<CLI::ConfigItem>
     return results;
 }
 
+HelicsConfigJSON* addJsonConfig(CLI::App* app)
+{
+    auto fmtr = std::make_shared<HelicsConfigJSON>();
+    auto* fmtrRet = fmtr.get();
+    app->allow_config_extras(CLI::config_extras_mode::ignore_all);
+    app->add_option(
+           "--config_section", fmtr->sectionRef(), "specify the section of the config file to use")
+        ->configurable(false)
+        ->trigger_on_parse();
+    app->add_option(
+           "--config_index",
+           fmtr->indexRef(),
+           "specify the section index of the config file to use for configuration arrays")
+        ->configurable(false)
+        ->trigger_on_parse();
+    app->config_formatter(std::move(fmtr));
+    return fmtrRet;
+}
 } // namespace helics

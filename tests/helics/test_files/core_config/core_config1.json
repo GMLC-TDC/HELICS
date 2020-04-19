@@ -1,0 +1,6 @@
+{
+    "name":"core_name1",
+    "federates":4,
+    "autobroker":true,
+    "timeout":"230ms"
+}

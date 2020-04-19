@@ -20,6 +20,7 @@ set(
     data-block-tests.cpp
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
+    CoreConfigureTests.cpp
 )
 
 if (NOT HELICS_DISABLE_ASIO)
@@ -31,6 +32,10 @@ target_link_libraries(core-tests helics_network helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(core-tests PRIVATE BOOST_DATE_TIME_NO_LIB)
+
+target_compile_definitions(core-tests PRIVATE
+                           "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
+
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests)

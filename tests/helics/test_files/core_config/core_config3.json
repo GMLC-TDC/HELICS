@@ -1,0 +1,14 @@
+{
+"core":[{
+    "name":"core_name8",
+    "federates":3,
+    "autobroker":true,
+    "timeout":"2350"
+    },
+    {
+    "name":"core_name10",
+    "federates":2,
+    "autobroker":true,
+    "timeout":"2350"
+    }]
+}

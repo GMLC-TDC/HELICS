@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
+#include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
 #ifndef HELICS_DISABLE_ASIO
@@ -113,12 +114,13 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
     auto hApp = std::make_shared<helicsCLI11App>("Arguments applying to all Brokers and Cores");
+    auto* fmtr = addJsonConfig(hApp.get());
+    fmtr->maxLayers(0);
     hApp->option_defaults()->ignore_underscore()->ignore_case();
     hApp->add_option(
-            "--federates,-f,--minfederates,--minfed,-m",
-            minFederateCount,
-            "the minimum number of federates that will be connecting")
-        ->ignore_underscore();
+        "--federates,-f,--minfederates,--minfed,-m",
+        minFederateCount,
+        "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier", identifier, "the name of the broker/core");
     hApp->add_option(
             "--maxiter,--maxiterations",
@@ -145,9 +147,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--terminate_on_error,--halt_on_error",
         terminate_on_error,
         "specify that a broker should cause the federation to terminate on an error");
-    auto logging_group =
+    auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
-    logging_group->option_defaults()->ignore_underscore();
     logging_group->add_flag(
         "--force_logging_flush", forceLoggingFlush, "flush the log after every message");
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
@@ -177,9 +178,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
 
-    auto timeout_group =
+    auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
-    timeout_group->option_defaults()->ignore_underscore()->ignore_case();
     timeout_group->add_option(
         "--tick",
         tickTimer,
