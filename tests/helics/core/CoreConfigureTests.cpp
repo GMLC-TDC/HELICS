@@ -14,10 +14,9 @@ TEST(CoreConfig, test1)
     std::string configString = "--config=";
     configString.append(TEST_DIR);
     configString.append("core_config/core_config1.json");
-    auto cr = helics::CoreFactory::create(helics::core_type::TEST,configString);
+    auto cr = helics::CoreFactory::create(helics::core_type::TEST, configString);
     EXPECT_EQ(cr->getIdentifier(), "core_name1");
     cr->disconnect();
-
 }
 
 TEST(CoreConfig, test2)
@@ -28,7 +27,6 @@ TEST(CoreConfig, test2)
     auto cr = helics::CoreFactory::create(helics::core_type::TEST, configString);
     EXPECT_EQ(cr->getIdentifier(), "core_name2");
     cr->disconnect();
-
 }
 
 TEST(CoreConfig, test3)
@@ -39,5 +37,4 @@ TEST(CoreConfig, test3)
     auto cr = helics::CoreFactory::create(helics::core_type::TEST, configString);
     EXPECT_EQ(cr->getIdentifier(), "core_name10");
     cr->disconnect();
-
 }

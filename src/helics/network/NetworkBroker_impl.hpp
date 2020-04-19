@@ -61,7 +61,7 @@ template<class COMMS, interface_type baseline, int tcode>
 std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateCLI()
 {
     auto app = CoreBroker::generateCLI();
-    CLI::App_p netApp = netInfo.commandLineParser(defInterface[static_cast<int>(baseline)],false);
+    CLI::App_p netApp = netInfo.commandLineParser(defInterface[static_cast<int>(baseline)], false);
     app->add_subcommand(netApp);
     return app;
 }

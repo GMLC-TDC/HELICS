@@ -22,14 +22,16 @@ class HelicsConfigJSON: public CLI::ConfigBase {
 
     /// skip checking the JSON and go directory to the TOML processing
     void skipJson(bool skj = true) { skip_json_ = skj; }
+
   private:
     bool skip_json_{false};
     /// Internal parser for the configuration
-    std::vector<CLI::ConfigItem>
-        fromConfigInternal(Json::Value j, const std::string &name = {}, const std::vector<std::string> &prefix = {})
-        const;
+    std::vector<CLI::ConfigItem> fromConfigInternal(
+        Json::Value j,
+        const std::string& name = {},
+        const std::vector<std::string>& prefix = {}) const;
 };
 /// Add the HELICS JSON configuration processor to the app
-HelicsConfigJSON *addJsonConfig(CLI::App *app);
+HelicsConfigJSON* addJsonConfig(CLI::App* app);
 
 } // namespace helics

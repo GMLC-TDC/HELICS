@@ -96,13 +96,15 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
     auto* fmtrRet = fmtr.get();
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
     app->add_option(
-        "--config_section", fmtr->sectionRef(), "specify the section of the config file to use")
-        ->configurable(false)->trigger_on_parse();
+           "--config_section", fmtr->sectionRef(), "specify the section of the config file to use")
+        ->configurable(false)
+        ->trigger_on_parse();
     app->add_option(
            "--config_index",
            fmtr->indexRef(),
            "specify the section index of the config file to use for configuration arrays")
-        ->configurable(false)->trigger_on_parse();
+        ->configurable(false)
+        ->trigger_on_parse();
     app->config_formatter(std::move(fmtr));
     return fmtrRet;
 }
