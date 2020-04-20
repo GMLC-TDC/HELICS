@@ -174,18 +174,17 @@ class CommsInterface {
         tripDetector; //!< try to detect if everything is shutting down
 };
 
-
 namespace CommFactory {
     /** builder for Comm Objects*/
     class CommBuilder {
-    public:
+      public:
         virtual std::unique_ptr<CommsInterface> build() = 0;
     };
 
     /** template for making a Core builder*/
     template<class CommTYPE>
-    class CommTypeBuilder final : public CommBuilder {
-    public:
+    class CommTypeBuilder final: public CommBuilder {
+      public:
         static_assert(
             std::is_base_of<CommsInterface, CommTYPE>::value,
             "Type does not inherit from helics::CommsInterface");
@@ -213,10 +212,8 @@ namespace CommFactory {
         return cbld;
     }
 
-    std::unique_ptr<CommsInterface> create(
-        core_type type);
-    std::unique_ptr<CommsInterface> create(
-        const std::string &type);
+    std::unique_ptr<CommsInterface> create(core_type type);
+    std::unique_ptr<CommsInterface> create(const std::string& type);
 
 } // namespace CommFactory
 
