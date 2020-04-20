@@ -248,6 +248,6 @@ TEST(ZMQSSCore, commFactory)
     auto comm = helics::CommFactory::create("zmqss");
     auto comm2 = helics::CommFactory::create(helics::core_type::ZMQ_SS);
 
-    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqCommsSS *>(comm.get()) != nullptr);
-    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqCommsSS *>(comm2.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqCommsSS*>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqCommsSS*>(comm2.get()) != nullptr);
 }

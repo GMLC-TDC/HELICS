@@ -589,12 +589,11 @@ TEST(ZMQCore, zmqCore_core_broker_default)
     helics::BrokerFactory::cleanUpBrokers(200ms);
 }
 
-
 TEST(ZMQCore, commFactory)
 {
     auto comm = helics::CommFactory::create("zmq");
     auto comm2 = helics::CommFactory::create(helics::core_type::ZMQ);
 
-    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms *>(comm.get()) != nullptr);
-    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms *>(comm2.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms*>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms*>(comm2.get()) != nullptr);
 }
