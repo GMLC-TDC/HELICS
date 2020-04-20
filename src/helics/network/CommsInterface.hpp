@@ -64,7 +64,7 @@ class CommsInterface {
     /** try reconnected from a mismatched or disconnection*/
     bool reconnect();
     /** set the name of the communicator*/
-    void setName(const std::string& name);
+    void setName(const std::string& commName);
     /** set the callback for processing the messages
      */
     void setCallback(std::function<void(ActionMessage&&)> callback);
@@ -196,7 +196,7 @@ namespace CommFactory {
         }
     };
 
-    //** define a new Core Builder from the builder give a name and build code*/
+    /** define a new Comm Builder from the builder give a name and build code*/
     void defineCommBuilder(
         std::shared_ptr<CommBuilder> cb,
         const std::string& commTypeName,

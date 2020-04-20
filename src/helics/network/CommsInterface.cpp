@@ -6,22 +6,24 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommsInterface.hpp"
 
-#include "NetworkBrokerData.hpp"
 #include "../core/core-exceptions.hpp"
+#include "NetworkBrokerData.hpp"
 
 #include <iostream>
+#include <memory>
 #include <string>
+#include <tuple>
 #include <utility>
+#include <vector>
 
 namespace helics {
 
-    namespace CommFactory
-    {
+namespace CommFactory {
     /*** class to hold the set of builders for comm interfaces
        @details this doesn't work as a global since it tends to get initialized after some of the things that call it
        so it needs to be a static member of function call*/
     class MasterCommBuilder {
-    public:
+      public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
 
         static void addBuilder(std::shared_ptr<CommBuilder> cb, const std::string& name, int code)
@@ -38,7 +40,7 @@ namespace helics {
             throw(HelicsException("comm type is not available"));
         }
 
-        static const std::shared_ptr<CommBuilder>& getBuilder(const std::string &type)
+        static const std::shared_ptr<CommBuilder>& getBuilder(const std::string& type)
         {
             for (auto& bb : instance()->builders) {
                 if (std::get<1>(bb) == type) {
@@ -49,7 +51,7 @@ namespace helics {
         }
         static const std::shared_ptr<CommBuilder>& getIndexedBuilder(std::size_t index)
         {
-            auto& blder = instance();
+            const auto& blder = instance();
             if (blder->builders.size() <= index) {
                 throw(HelicsException("comm type index is not available"));
             }
@@ -61,7 +63,7 @@ namespace helics {
             return iptr;
         }
 
-    private:
+      private:
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCommBuilder() = default;
@@ -73,21 +75,19 @@ namespace helics {
         MasterCommBuilder::addBuilder(std::move(cb), name, code);
     }
 
-    std::unique_ptr<CommsInterface> create(
-        core_type type)
+    std::unique_ptr<CommsInterface> create(core_type type)
     {
-        auto &builder = MasterCommBuilder::getBuilder(static_cast<int>(type));
+        const auto& builder = MasterCommBuilder::getBuilder(static_cast<int>(type));
         return builder->build();
     }
 
-    std::unique_ptr<CommsInterface> create(
-        const std::string &type)
+    std::unique_ptr<CommsInterface> create(const std::string& type)
     {
-        auto &builder = MasterCommBuilder::getBuilder(type);
+        const auto& builder = MasterCommBuilder::getBuilder(type);
         return builder->build();
     }
 
-} // CommFactory
+} // namespace CommFactory
 
 CommsInterface::CommsInterface(thread_generation threads):
     singleThread(threads == thread_generation::single)
@@ -348,10 +348,10 @@ bool CommsInterface::connect()
     return true;
 }
 
-void CommsInterface::setName(const std::string& name_)
+void CommsInterface::setName(const std::string& commName)
 {
     if (propertyLock()) {
-        name = name_;
+        name = commName;
         propertyUnLock();
     }
 }
@@ -385,7 +385,7 @@ void CommsInterface::disconnect()
             continue;
         }
         ++cnt;
-        if ((cnt & 3) == 0) // call this every 2400 milliseconds
+        if ((cnt % 4) == 0) // call this every 2400 milliseconds
         {
             // try calling closeReceiver again
             closeReceiver();
@@ -408,7 +408,7 @@ void CommsInterface::disconnect()
             continue;
         }
         ++cnt;
-        if ((cnt & 3) == 0) // call this every 2400 milliseconds
+        if ((cnt % 4) == 0) // call this every 2400 milliseconds
         {
             // try calling closeTransmitter again
             closeTransmitter();

@@ -34,7 +34,7 @@ TEST(IPCCore, ipccomms_broker)
     bool mqConn = mq.connect(brokerLoc, 1024, 1024);
     ASSERT_TRUE(mqConn);
 
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage &/*m*/) { ++counter; });
 
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
@@ -55,7 +55,7 @@ TEST(IPCCore, ipccomms_rx)
     helics::ipc::IpcComms comm;
     comm.loadTargetInfo(localLoc, brokerLoc);
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
@@ -90,11 +90,11 @@ TEST(IPCCore, ipcComm_transmit_through)
     helics::ipc::IpcComms comm2;
     comm2.loadTargetInfo(brokerLoc, std::string());
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
         ++counter2;
         act2 = m;
     });
@@ -142,15 +142,15 @@ TEST(IPCCore, ipcComm_transmit_add_route)
     comm2.loadTargetInfo(brokerLoc, std::string());
     comm3.loadTargetInfo(localLocB, brokerLoc);
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback([&counter3, &act3](helics::ActionMessage m) {
+    comm3.setCallback([&counter3, &act3](const helics::ActionMessage &m) {
         ++counter3;
         act3 = m;
     });

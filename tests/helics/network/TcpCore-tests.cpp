@@ -43,13 +43,13 @@ TEST(TcpCore, tcpComms_broker)
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     server->setDataCall(
-        [&counter](helics::tcp::TcpConnection::pointer, const char*, size_t data_avail) {
+        [&counter](const helics::tcp::TcpConnection::pointer &, const char*, size_t data_avail) {
             ++counter;
             return data_avail;
         });
     server->start();
 
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage & /*m*/) { ++counter; });
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setName("tests");
     comm.setTimeout(200ms);
@@ -79,7 +79,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     server->setDataCall(
         [&data,
          &counter,
-         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
+         &len](const helics::tcp::TcpConnection::pointer &, const char* data_rec, size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
             len = data_Size;
             ++counter;
@@ -88,7 +88,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     ASSERT_TRUE(server->isReady());
     server->start();
 
-    comm.setCallback([](helics::ActionMessage /*m*/) {});
+    comm.setCallback([](const helics::ActionMessage &/*m*/) {});
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
@@ -109,7 +109,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
         }
         EXPECT_EQ(counter, 1);
 
-        EXPECT_GT(len, 32u);
+        EXPECT_GT(len, 32U);
         helics::ActionMessage rM(data.data(), len);
         EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     }
@@ -138,7 +138,7 @@ TEST(TcpCore, tcpComms_rx)
     server->setDataCall(
         [&data,
          &ServerCounter,
-         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
+         &len](const helics::tcp::TcpConnection::pointer &, const char* data_rec, size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
             len = data_Size;
             ++ServerCounter;
@@ -150,7 +150,7 @@ TEST(TcpCore, tcpComms_rx)
     comm.setCallback([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
         std::lock_guard<std::mutex> lock(actguard);
-        act = m;
+        act = std::move(m);
     });
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
@@ -196,7 +196,7 @@ TEST(TcpCore, tcpServerConnections1)
 
     auto dataCheck =
         [&counter,
-         &validData](helics::tcp::TcpConnection::pointer, const char* datablock, size_t datasize) {
+         &validData](const helics::tcp::TcpConnection::pointer & /*unused*/, const char* datablock, size_t datasize) {
             size_t used = 0;
             while (datasize - used >= 20) {
                 ++counter;
@@ -290,11 +290,11 @@ TEST(TcpCore, tcpComm_transmit_through)
     comm2.setFlag("reuse_address", true);
     comm.setPortNumber(TCP_SECONDARY_PORT);
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage &m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage &m) {
         ++counter2;
         act2 = m;
     });
