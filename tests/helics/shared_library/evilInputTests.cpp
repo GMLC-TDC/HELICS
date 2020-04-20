@@ -3474,7 +3474,7 @@ TEST(evil_endpoint_test, helicsEndpointIsValid)
     char rdata[256];
     auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     EXPECT_NE(helicsEndpointIsValid(nullptr), helics_true);
-    
+
     //auto res2=helicsEndpointSetDefaultDestination(nullptr, const char* dest, nullptr);
     EXPECT_NE(helicsEndpointIsValid(evil_ept), helics_true);
 }

@@ -37,10 +37,7 @@ class Publication {
     helics_publication baseObject() const { return pub; }
 
     /** check if the publication is valid */
-    bool isValid() const
-    {
-        return (helicsPublicationIsValid(pub) == helics_true);
-    }
+    bool isValid() const { return (helicsPublicationIsValid(pub) == helics_true); }
 
     /** Methods to publish values **/
 

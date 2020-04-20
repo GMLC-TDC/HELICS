@@ -296,7 +296,7 @@ HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* js
  * @{
  */
 
- /**
+/**
   * Check if a publication is valid.
   *
   * @param pub The publication to check.
