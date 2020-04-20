@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <thread>
 #include <utility>
@@ -64,7 +65,7 @@ class CommsInterface {
     /** try reconnected from a mismatched or disconnection*/
     bool reconnect();
     /** set the name of the communicator*/
-    void setName(const std::string& name);
+    void setName(const std::string& commName);
     /** set the callback for processing the messages
      */
     void setCallback(std::function<void(ActionMessage&&)> callback);
@@ -172,6 +173,49 @@ class CommsInterface {
     gmlc::concurrency::TripWireDetector
         tripDetector; //!< try to detect if everything is shutting down
 };
+
+namespace CommFactory {
+    /** builder for Comm Objects*/
+    class CommBuilder {
+      public:
+        virtual std::unique_ptr<CommsInterface> build() = 0;
+    };
+
+    /** template for making a Core builder*/
+    template<class CommTYPE>
+    class CommTypeBuilder final: public CommBuilder {
+      public:
+        static_assert(
+            std::is_base_of<CommsInterface, CommTYPE>::value,
+            "Type does not inherit from helics::CommsInterface");
+
+        using comm_build_type = CommTYPE;
+        virtual std::unique_ptr<CommsInterface> build() override
+        {
+            return std::make_unique<CommTYPE>();
+        }
+    };
+
+    /** define a new Comm Builder from the builder give a name and build code*/
+    void defineCommBuilder(
+        std::shared_ptr<CommBuilder> cb,
+        const std::string& commTypeName,
+        int code);
+
+    /** template function to create a builder and link it into the library*/
+    template<class CommTYPE>
+    std::shared_ptr<CommBuilder> addCommType(const std::string& commTypeName, int code)
+    {
+        auto bld = std::make_shared<CommTypeBuilder<CommTYPE>>();
+        std::shared_ptr<CommBuilder> cbld = std::static_pointer_cast<CommBuilder>(bld);
+        defineCommBuilder(cbld, commTypeName, code);
+        return cbld;
+    }
+
+    std::unique_ptr<CommsInterface> create(core_type type);
+    std::unique_ptr<CommsInterface> create(const std::string& type);
+
+} // namespace CommFactory
 
 template<class X>
 class ConditionalChangeOnDestroy {

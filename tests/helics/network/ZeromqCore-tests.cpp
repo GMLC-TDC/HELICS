@@ -32,7 +32,7 @@ constexpr const char* defRoute1{"tcp://127.0.0.1:23405"};
 
 constexpr const char* defRoute2{"tcp://127.0.0.1:23407"};
 
-TEST(ZMQCore_tests, zmqComms_broker_test)
+TEST(ZMQCore, zmqComms_broker)
 {
     std::atomic<int> counter{0};
 
@@ -65,7 +65,7 @@ TEST(ZMQCore_tests, zmqComms_broker_test)
 }
 
 /** test the request set class with various scenarios*/
-TEST(ZMQCore_tests, zmqRequestSet_test1)
+TEST(ZMQCore, zmqRequestSet1)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(500ms);
@@ -130,7 +130,7 @@ TEST(ZMQCore_tests, zmqRequestSet_test1)
 }
 
 /** test the request set class with various scenarios*/
-TEST(ZMQCore_tests, zmqRequestSet_test2)
+TEST(ZMQCore, zmqRequestSet2)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(500ms);
@@ -229,7 +229,7 @@ TEST(ZMQCore_tests, zmqRequestSet_test2)
     std::this_thread::sleep_for(200ms);
 }
 
-TEST(ZMQCore_tests, zmqComms_broker_test_transmit)
+TEST(ZMQCore, zmqComms_broker_test_transmit)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(500ms);
@@ -280,7 +280,7 @@ TEST(ZMQCore_tests, zmqComms_broker_test_transmit)
     std::this_thread::sleep_for(200ms);
 }
 
-TEST(ZMQCore_tests, zmqComms_rx_test)
+TEST(ZMQCore, zmqComms_rx)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(400ms);
@@ -347,7 +347,7 @@ TEST(ZMQCore_tests, zmqComms_rx_test)
     std::this_thread::sleep_for(200ms);
 }
 
-TEST(ZMQCore_tests, zmqComm_transmit_through)
+TEST(ZMQCore, zmqComm_transmit_through)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(300ms);
@@ -398,7 +398,7 @@ TEST(ZMQCore_tests, zmqComm_transmit_through)
     std::this_thread::sleep_for(200ms);
 }
 
-TEST(ZMQCore_tests, zmqComm_transmit_add_route)
+TEST(ZMQCore, zmqComm_transmit_add_route)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(300ms);
@@ -510,7 +510,7 @@ TEST(ZMQCore_tests, zmqComm_transmit_add_route)
     std::this_thread::sleep_for(200ms);
 }
 
-TEST(ZMQCore_tests, zmqCore_initialization_test)
+TEST(ZMQCore, zmqCore_initialization)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(400ms);
@@ -566,7 +566,7 @@ TEST(ZMQCore_tests, zmqCore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-TEST(ZMQCore_tests, zmqCore_core_broker_default_test)
+TEST(ZMQCore, zmqCore_core_broker_default)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for(400ms);
@@ -587,4 +587,13 @@ TEST(ZMQCore_tests, zmqCore_core_broker_default_test)
     EXPECT_TRUE(!broker->isConnected());
     helics::CoreFactory::cleanUpCores(200ms);
     helics::BrokerFactory::cleanUpBrokers(200ms);
+}
+
+TEST(ZMQCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("zmq");
+    auto comm2 = helics::CommFactory::create(helics::core_type::ZMQ);
+
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms*>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms*>(comm2.get()) != nullptr);
 }

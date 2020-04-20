@@ -37,7 +37,7 @@ TEST(UdpCore, udpComms_broker)
 
     udp::socket rxSocket(AsioContextManager::getContext(), udp::endpoint(udp::v4(), 23901));
 
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage& /*m*/) { ++counter; });
     comm.setBrokerPort(UDP_BROKER_PORT);
     comm.setName("tests");
 
@@ -50,7 +50,7 @@ TEST(UdpCore, udpComms_broker)
     auto len = rxSocket.receive_from(asio::buffer(data), remote_endpoint, 0, error);
 
     EXPECT_TRUE(!error);
-    EXPECT_GT(len, 32u);
+    EXPECT_GT(len, 32U);
 
     helics::ActionMessage rM(data.data(), len);
     EXPECT_TRUE(helics::isProtocolCommand(rM));
@@ -76,7 +76,7 @@ TEST(UdpCore, udpComms_broker_test_transmit)
     udp::socket rxSocket(AsioContextManager::getContext(), udp::endpoint(udp::v4(), 23901));
 
     EXPECT_TRUE(rxSocket.is_open());
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage& /*m*/) { ++counter; });
     comm.setBrokerPort(UDP_BROKER_PORT);
     comm.setPortNumber(UDP_SECONDARY_PORT);
     comm.setName("tests");
@@ -91,7 +91,7 @@ TEST(UdpCore, udpComms_broker_test_transmit)
     asio::error_code error;
     auto len = rxSocket.receive_from(asio::buffer(data), remote_endpoint, 0, error);
 
-    EXPECT_GT(len, 32u);
+    EXPECT_GT(len, 32U);
     helics::ActionMessage rM(data.data(), len);
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     rxSocket.close();
@@ -114,7 +114,7 @@ TEST(UdpCore, udpComms_rx)
     udp::socket rxSocket(AsioContextManager::getContext(), udp::endpoint(udp::v4(), 23901));
 
     EXPECT_TRUE(rxSocket.is_open());
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
         ++counter;
         act = m;
     });
@@ -163,11 +163,11 @@ TEST(UdpCore, udpComm_transmit_through)
     comm2.setPortNumber(UDP_BROKER_PORT);
     comm.setPortNumber(UDP_SECONDARY_PORT);
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage& m) {
         ++counter2;
         act2 = m;
     });
@@ -202,7 +202,9 @@ TEST(UdpCore, udpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::udp::UdpComms comm, comm2, comm3;
+    helics::udp::UdpComms comm;
+    helics::udp::UdpComms comm2;
+    helics::udp::UdpComms comm3;
     comm.loadTargetInfo(host, host);
     comm2.loadTargetInfo(host, "");
     comm3.loadTargetInfo(host, host);
@@ -243,7 +245,7 @@ TEST(UdpCore, udpComm_transmit_add_route)
     connected = comm.connect();
     ASSERT_TRUE(connected);
     connected = comm3.connect();
-
+    EXPECT_TRUE(connected);
     comm.transmit(helics::route_id(0), helics::CMD_ACK);
 
     std::this_thread::sleep_for(250ms);
@@ -309,7 +311,7 @@ TEST(UdpCore, udpCore_initialization)
 
     auto len = rxSocket.receive_from(asio::buffer(data), remote_endpoint, 0, error);
     ASSERT_TRUE(!error);
-    EXPECT_GT(len, 32u);
+    EXPECT_GT(len, 32U);
     helics::ActionMessage rM(data.data(), len);
 
     EXPECT_EQ(rM.name, "core1");
@@ -349,4 +351,13 @@ TEST(UdpCore, udpCore_core_broker_default)
     broker = nullptr;
     helics::CoreFactory::cleanUpCores(100ms);
     helics::BrokerFactory::cleanUpBrokers(100ms);
+}
+
+TEST(UdpCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("udp");
+    auto comm2 = helics::CommFactory::create(helics::core_type::UDP);
+
+    EXPECT_TRUE(dynamic_cast<helics::udp::UdpComms*>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::udp::UdpComms*>(comm2.get()) != nullptr);
 }

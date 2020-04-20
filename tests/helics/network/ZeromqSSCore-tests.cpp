@@ -242,3 +242,12 @@ TEST(ZMQSSCore, core_broker_default)
     helics::CoreFactory::cleanUpCores(200ms);
     helics::BrokerFactory::cleanUpBrokers(200ms);
 }
+
+TEST(ZMQSSCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("zmqss");
+    auto comm2 = helics::CommFactory::create(helics::core_type::ZMQ_SS);
+
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqCommsSS*>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqCommsSS*>(comm2.get()) != nullptr);
+}

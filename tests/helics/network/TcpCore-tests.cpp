@@ -42,14 +42,16 @@ TEST(TcpCore, tcpComms_broker)
         helics::tcp::TcpServer::create(srv->getBaseContext(), DEFAULT_TCP_BROKER_PORT_NUMBER);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall(
-        [&counter](helics::tcp::TcpConnection::pointer, const char*, size_t data_avail) {
-            ++counter;
-            return data_avail;
-        });
+    server->setDataCall([&counter](
+                            const helics::tcp::TcpConnection::pointer& /*unused*/,
+                            const char* /*unused*/,
+                            size_t data_avail) {
+        ++counter;
+        return data_avail;
+    });
     server->start();
 
-    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback([&counter](const helics::ActionMessage& /*m*/) { ++counter; });
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setName("tests");
     comm.setTimeout(200ms);
@@ -76,19 +78,19 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
         helics::tcp::TcpServer::create(srv->getBaseContext(), host, DEFAULT_TCP_BROKER_PORT_NUMBER);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall(
-        [&data,
-         &counter,
-         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
-            std::copy(data_rec, data_rec + data_Size, data.begin());
-            len = data_Size;
-            ++counter;
-            return data_Size;
-        });
+    server->setDataCall([&data, &counter, &len](
+                            const helics::tcp::TcpConnection::pointer& /*unused*/,
+                            const char* data_rec,
+                            size_t data_Size) {
+        std::copy(data_rec, data_rec + data_Size, data.begin());
+        len = data_Size;
+        ++counter;
+        return data_Size;
+    });
     ASSERT_TRUE(server->isReady());
     server->start();
 
-    comm.setCallback([](helics::ActionMessage /*m*/) {});
+    comm.setCallback([](const helics::ActionMessage& /*m*/) {});
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
@@ -109,7 +111,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
         }
         EXPECT_EQ(counter, 1);
 
-        EXPECT_GT(len, 32u);
+        EXPECT_GT(len, 32U);
         helics::ActionMessage rM(data.data(), len);
         EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     }
@@ -135,22 +137,22 @@ TEST(TcpCore, tcpComms_rx)
         helics::tcp::TcpServer::create(srv->getBaseContext(), host, TCP_BROKER_PORT_STRING);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall(
-        [&data,
-         &ServerCounter,
-         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
-            std::copy(data_rec, data_rec + data_Size, data.begin());
-            len = data_Size;
-            ++ServerCounter;
-            return data_Size;
-        });
+    server->setDataCall([&data, &ServerCounter, &len](
+                            const helics::tcp::TcpConnection::pointer& /*unused*/,
+                            const char* data_rec,
+                            size_t data_Size) {
+        std::copy(data_rec, data_rec + data_Size, data.begin());
+        len = data_Size;
+        ++ServerCounter;
+        return data_Size;
+    });
     ASSERT_TRUE(server->isReady());
     server->start();
 
     comm.setCallback([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
         std::lock_guard<std::mutex> lock(actguard);
-        act = m;
+        act = std::move(m);
     });
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
@@ -194,25 +196,26 @@ TEST(TcpCore, tcpServerConnections1)
     std::vector<char> data(1024);
     std::atomic<bool> validData{true};
 
-    auto dataCheck =
-        [&counter,
-         &validData](helics::tcp::TcpConnection::pointer, const char* datablock, size_t datasize) {
-            size_t used = 0;
-            while (datasize - used >= 20) {
-                ++counter;
-                if (datasize < 20) {
+    auto dataCheck = [&counter, &validData](
+                         const helics::tcp::TcpConnection::pointer& /*unused*/,
+                         const char* datablock,
+                         size_t datasize) {
+        size_t used = 0;
+        while (datasize - used >= 20) {
+            ++counter;
+            if (datasize < 20) {
+                validData = false;
+            }
+            for (int ii = 1; ii < 20; ++ii) {
+                if (ii + datablock[used + 0] != datablock[used + ii]) {
                     validData = false;
                 }
-                for (int ii = 1; ii < 20; ++ii) {
-                    if (ii + datablock[used + 0] != datablock[used + ii]) {
-                        validData = false;
-                    }
-                }
-                used += 20;
             }
+            used += 20;
+        }
 
-            return used;
-        };
+        return used;
+    };
 
     server->setDataCall(dataCheck);
     server->start();
@@ -234,7 +237,7 @@ TEST(TcpCore, tcpServerConnections1)
     res = conn4->waitUntilConnected(1000ms);
     EXPECT_EQ(res, true);
 
-    auto transmitFunc = [](helics::tcp::TcpConnection::pointer obj) {
+    auto transmitFunc = [](const helics::tcp::TcpConnection::pointer& obj) {
         std::vector<char> dataB(20);
         for (char ii = 0; ii < 50; ++ii) {
             std::iota(dataB.begin(), dataB.end(), ii);
@@ -290,11 +293,11 @@ TEST(TcpCore, tcpComm_transmit_through)
     comm2.setFlag("reuse_address", true);
     comm.setPortNumber(TCP_SECONDARY_PORT);
 
-    comm.setCallback([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](const helics::ActionMessage& m) {
         ++counter2;
         act2 = m;
     });
@@ -333,7 +336,10 @@ TEST(TcpCore, tcpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::tcp::TcpComms comm, comm2, comm3;
+    helics::tcp::TcpComms comm;
+    helics::tcp::TcpComms comm2;
+    helics::tcp::TcpComms comm3;
+
     comm.loadTargetInfo(host, host);
     comm2.loadTargetInfo(host, std::string());
     comm3.loadTargetInfo(host, host);
@@ -431,15 +437,15 @@ TEST(TcpCore, tcpCore_initialization)
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     std::atomic<size_t> len{0};
-    server->setDataCall(
-        [&data,
-         &counter,
-         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
-            std::copy(data_rec, data_rec + data_Size, data.begin());
-            len = data_Size;
-            ++counter;
-            return data_Size;
-        });
+    server->setDataCall([&data, &counter, &len](
+                            const helics::tcp::TcpConnection::pointer& /*unused*/,
+                            const char* data_rec,
+                            size_t data_Size) {
+        std::copy(data_rec, data_rec + data_Size, data.begin());
+        len = data_Size;
+        ++counter;
+        return data_Size;
+    });
     server->setPortReuse(true);
     EXPECT_TRUE(server->start());
     bool connected = core->connect();
@@ -456,7 +462,7 @@ TEST(TcpCore, tcpCore_initialization)
         }
         EXPECT_EQ(counter, 1);
 
-        EXPECT_GT(len, 32u);
+        EXPECT_GT(len, 32U);
         helics::ActionMessage rM(data.data(), len);
 
         EXPECT_EQ(rM.name, "core1");
@@ -501,4 +507,13 @@ TEST(TcpCore, tcpCore_core_broker_default)
     broker = nullptr;
     helics::CoreFactory::cleanUpCores(100ms);
     helics::BrokerFactory::cleanUpBrokers(100ms);
+}
+
+TEST(TcpCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("tcp");
+    auto comm2 = helics::CommFactory::create(helics::core_type::TCP);
+
+    EXPECT_TRUE(dynamic_cast<helics::tcp::TcpComms*>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::tcp::TcpComms*>(comm2.get()) != nullptr);
 }
