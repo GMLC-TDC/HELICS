@@ -96,11 +96,11 @@ HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(helics_federate fed, con
 HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index, helics_error* err);
 
 /**
- * check if an endpoint is valid
+ * Check if an endpoint is valid.
  *
  * @param endpoint The endpoint object to check.
  *
- * @return helics_true if the Endpoint object represents a valid endpoint
+ * @return helics_true if the Endpoint object represents a valid endpoint.
  */
 HELICS_EXPORT helics_bool helicsEndpointIsValid(helics_endpoint endpoint);
 

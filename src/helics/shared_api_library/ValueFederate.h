@@ -297,11 +297,11 @@ HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* js
  */
 
  /**
-  * check if a publication is valid
+  * Check if a publication is valid.
   *
   * @param pub The publication to check.
   *
-  * @return helics_true if the publication is a valid publication
+  * @return helics_true if the publication is a valid publication.
   */
 HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
 
@@ -431,11 +431,11 @@ HELICS_EXPORT void helicsPublicationPublishNamedPoint(helics_publication pub, co
 HELICS_EXPORT void helicsPublicationAddTarget(helics_publication pub, const char* target, helics_error* err);
 
 /**
- * check if an input is valid
+ * Check if an input is valid.
  *
  * @param ipt The input to check.
  *
- * @return helics_true if the Input object represents a valid input
+ * @return helics_true if the Input object represents a valid input.
  */
 HELICS_EXPORT helics_bool helicsInputIsValid(helics_input ipt);
 
