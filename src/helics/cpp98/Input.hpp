@@ -35,10 +35,7 @@ class Input {
     /** extract the base object*/
     helics_input baseObject() const { return inp; }
     /** check if the input is valid */
-    bool isValid() const
-    {
-        return (helicsInputIsValid(inp) == helics_true);
-    }
+    bool isValid() const { return (helicsInputIsValid(inp) == helics_true); }
     /** Methods to set default values for inputs **/
     /** set the default value as a raw data with length*/
     void setDefault(const char* data, int len) { helicsInputSetDefaultRaw(inp, data, len, NULL); }
@@ -64,7 +61,6 @@ class Input {
         helicsInputSetDefaultVector(
             inp, data.data(), static_cast<int>(data.size() * sizeof(double)), NULL);
     }
-
 
     /** Methods to get subscription values **/
     /** get a raw value as a character vector*/
@@ -166,6 +162,7 @@ class Input {
     {
         helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
     }
+
   private:
     helics_input inp; //!< the reference to the underlying publication
 };

@@ -91,10 +91,7 @@ class Endpoint {
     /** get the base helics_endpoint object for use in the c API functions*/
     helics_endpoint baseObject() const { return ep; }
     /** check if the input is valid */
-    bool isValid() const
-    {
-        return (helicsEndpointIsValid(ep) == helics_true);
-    }
+    bool isValid() const { return (helicsEndpointIsValid(ep) == helics_true); }
     /* Checks if endpoint has unread messages **/
     bool hasMessage() const
     {
