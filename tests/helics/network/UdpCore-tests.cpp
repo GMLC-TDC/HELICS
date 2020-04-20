@@ -350,3 +350,12 @@ TEST(UdpCore, udpCore_core_broker_default)
     helics::CoreFactory::cleanUpCores(100ms);
     helics::BrokerFactory::cleanUpBrokers(100ms);
 }
+
+TEST(UdpCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("udp");
+    auto comm2 = helics::CommFactory::create(helics::core_type::UDP);
+
+    EXPECT_TRUE(dynamic_cast<helics::udp::UdpComms *>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::udp::UdpComms *>(comm2.get()) != nullptr);
+}

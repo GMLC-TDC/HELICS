@@ -502,3 +502,12 @@ TEST(TcpCore, tcpCore_core_broker_default)
     helics::CoreFactory::cleanUpCores(100ms);
     helics::BrokerFactory::cleanUpBrokers(100ms);
 }
+
+TEST(TcpCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("tcp");
+    auto comm2 = helics::CommFactory::create(helics::core_type::TCP);
+
+    EXPECT_TRUE(dynamic_cast<helics::tcp::TcpComms *>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::tcp::TcpComms *>(comm2.get()) != nullptr);
+}

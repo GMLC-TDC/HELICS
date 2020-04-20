@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std::literals::chrono_literals;
 
-TEST(IPCCore_tests, ipccomms_broker_test)
+TEST(IPCCore, ipccomms_broker)
 {
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
@@ -46,7 +46,7 @@ TEST(IPCCore_tests, ipccomms_broker_test)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(IPCCore_tests, ipccomms_rx_test)
+TEST(IPCCore, ipccomms_rx)
 {
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
@@ -75,7 +75,7 @@ TEST(IPCCore_tests, ipccomms_rx_test)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(IPCCore_tests, ipcComm_transmit_through)
+TEST(IPCCore, ipcComm_transmit_through)
 {
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
@@ -119,7 +119,7 @@ TEST(IPCCore_tests, ipcComm_transmit_through)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(IPCCore_tests, ipcComm_transmit_add_route)
+TEST(IPCCore, ipcComm_transmit_add_route)
 {
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
@@ -216,7 +216,7 @@ TEST(IPCCore_tests, ipcComm_transmit_add_route)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(IPCCore_tests, ipccore_initialization_test)
+TEST(IPCCore, ipccore_initialization)
 {
     std::string initializationString = "--broker_address=testBroker --name=core1";
     auto core = helics::CoreFactory::create(helics::core_type::INTERPROCESS, initializationString);
@@ -243,7 +243,7 @@ TEST(IPCCore_tests, ipccore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-TEST(IPCCore_tests, ipcCore_core_broker_default_test)
+TEST(IPCCore, ipcCore_core_broker_default)
 {
     std::string initializationString = "-f 1";
 
@@ -262,4 +262,16 @@ TEST(IPCCore_tests, ipcCore_core_broker_default_test)
     broker = nullptr;
     helics::CoreFactory::cleanUpCores(100ms);
     helics::BrokerFactory::cleanUpBrokers(100ms);
+}
+
+
+TEST(IPCCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("ipc");
+    auto comm2 = helics::CommFactory::create(helics::core_type::IPC);
+    auto comm3 = helics::CommFactory::create(helics::core_type::INTERPROCESS);
+
+    EXPECT_TRUE(dynamic_cast<helics::ipc::IpcComms *>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::ipc::IpcComms *>(comm2.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::ipc::IpcComms *>(comm3.get()) != nullptr);
 }

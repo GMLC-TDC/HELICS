@@ -31,7 +31,7 @@ using helics::Core;
 #define TCP_BROKER_PORT_ALT 33134
 #define TCP_BROKER_PORT_ALT_STRING "33134"
 
-TEST(TcpSSCore_tests, tcpSSComms_broker_test)
+TEST(TcpSSCore, tcpSSComms_broker)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
@@ -73,7 +73,7 @@ TEST(TcpSSCore_tests, tcpSSComms_broker_test)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpSSCore_tests, tcpSSComms_broker_test_transmit)
+TEST(TcpSSCore, tcpSSComms_broker_test_transmit)
 {
     std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
@@ -135,7 +135,7 @@ TEST(TcpSSCore_tests, tcpSSComms_broker_test_transmit)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpSSCore_tests, tcpSSComms_rx_test)
+TEST(TcpSSCore, tcpSSComms_rx)
 {
     std::this_thread::sleep_for(400ms);
     // std::atomic<int> ServerCounter{0};
@@ -181,7 +181,7 @@ TEST(TcpSSCore_tests, tcpSSComms_rx_test)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpSSCore_tests, tcpSSComm_transmit_through)
+TEST(TcpSSCore, tcpSSComm_transmit_through)
 {
     std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
@@ -239,7 +239,7 @@ TEST(TcpSSCore_tests, tcpSSComm_transmit_through)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpSSCore_tests, tcpSSComm_transmit_add_route)
+TEST(TcpSSCore, tcpSSComm_transmit_add_route)
 {
     std::this_thread::sleep_for(500ms);
     std::atomic<int> counter{0};
@@ -329,7 +329,7 @@ TEST(TcpSSCore_tests, tcpSSComm_transmit_add_route)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpSSCore_tests, tcpSSCore_initialization_test)
+TEST(TcpSSCore, tcpSSCore_initialization)
 {
     std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
@@ -414,7 +414,7 @@ TEST(TcpSSCore_tests, tcpSSCore_initialization_test)
 also tests the automatic port determination for cores
 */
 
-TEST(TcpSSCore_tests, tcpSSCore_core_broker_default_test)
+TEST(TcpSSCore, tcpSSCore_core_broker_default)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(400));
     std::string initializationString = "-f 1";
@@ -437,4 +437,13 @@ TEST(TcpSSCore_tests, tcpSSCore_core_broker_default_test)
     broker = nullptr;
     helics::CoreFactory::cleanUpCores(100ms);
     helics::BrokerFactory::cleanUpBrokers(100ms);
+}
+
+TEST(TcpSSCore, commFactory)
+{
+    auto comm = helics::CommFactory::create("tcpss");
+    auto comm2 = helics::CommFactory::create(helics::core_type::TCP_SS);
+
+    EXPECT_TRUE(dynamic_cast<helics::tcp::TcpCommsSS *>(comm.get()) != nullptr);
+    EXPECT_TRUE(dynamic_cast<helics::tcp::TcpCommsSS *>(comm2.get()) != nullptr);
 }
