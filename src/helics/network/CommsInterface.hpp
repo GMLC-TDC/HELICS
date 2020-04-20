@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <thread>
 #include <utility>

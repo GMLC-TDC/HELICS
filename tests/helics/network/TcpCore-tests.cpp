@@ -43,7 +43,7 @@ TEST(TcpCore, tcpComms_broker)
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     server->setDataCall(
-        [&counter](const helics::tcp::TcpConnection::pointer &, const char*, size_t data_avail) {
+        [&counter](const helics::tcp::TcpConnection::pointer & /*unused*/, const char* /*unused*/, size_t data_avail) {
             ++counter;
             return data_avail;
         });
@@ -138,7 +138,7 @@ TEST(TcpCore, tcpComms_rx)
     server->setDataCall(
         [&data,
          &ServerCounter,
-         &len](const helics::tcp::TcpConnection::pointer &, const char* data_rec, size_t data_Size) {
+         &len](const helics::tcp::TcpConnection::pointer & /*unused*/, const char* data_rec, size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
             len = data_Size;
             ++ServerCounter;
@@ -234,7 +234,7 @@ TEST(TcpCore, tcpServerConnections1)
     res = conn4->waitUntilConnected(1000ms);
     EXPECT_EQ(res, true);
 
-    auto transmitFunc = [](helics::tcp::TcpConnection::pointer obj) {
+    auto transmitFunc = [](const helics::tcp::TcpConnection::pointer &obj) {
         std::vector<char> dataB(20);
         for (char ii = 0; ii < 50; ++ii) {
             std::iota(dataB.begin(), dataB.end(), ii);
@@ -333,7 +333,10 @@ TEST(TcpCore, tcpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::tcp::TcpComms comm, comm2, comm3;
+    helics::tcp::TcpComms comm;
+    helics::tcp::TcpComms comm2;
+    helics::tcp::TcpComms comm3;
+
     comm.loadTargetInfo(host, host);
     comm2.loadTargetInfo(host, std::string());
     comm3.loadTargetInfo(host, host);
@@ -434,7 +437,7 @@ TEST(TcpCore, tcpCore_initialization)
     server->setDataCall(
         [&data,
          &counter,
-         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
+         &len](const helics::tcp::TcpConnection::pointer & /*unused*/, const char* data_rec, size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
             len = data_Size;
             ++counter;
@@ -456,7 +459,7 @@ TEST(TcpCore, tcpCore_initialization)
         }
         EXPECT_EQ(counter, 1);
 
-        EXPECT_GT(len, 32u);
+        EXPECT_GT(len, 32U);
         helics::ActionMessage rM(data.data(), len);
 
         EXPECT_EQ(rM.name, "core1");

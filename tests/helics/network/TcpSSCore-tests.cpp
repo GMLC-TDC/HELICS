@@ -249,7 +249,9 @@ TEST(TcpSSCore, tcpSSComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::tcp::TcpCommsSS comm, comm2, comm3;
+    helics::tcp::TcpCommsSS comm;
+    helics::tcp::TcpCommsSS comm2;
+    helics::tcp::TcpCommsSS comm3;
     auto srv = AsioContextManager::getContextPointer();
     auto contextLoop = srv->startContextLoop();
     comm.loadTargetInfo(host, host);
@@ -374,7 +376,7 @@ TEST(TcpSSCore, tcpSSCore_initialization)
         }
         EXPECT_GE(counter, 1);
 
-        EXPECT_GT(len, 32u);
+        EXPECT_GT(len, 32U);
         helics::ActionMessage rM;
         helics::ActionMessage rM2;
         auto used = rM.depacketize(data.data(), static_cast<int>(len.load()));

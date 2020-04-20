@@ -91,7 +91,7 @@ TEST(UdpCore, udpComms_broker_test_transmit)
     asio::error_code error;
     auto len = rxSocket.receive_from(asio::buffer(data), remote_endpoint, 0, error);
 
-    EXPECT_GT(len, 32u);
+    EXPECT_GT(len, 32U);
     helics::ActionMessage rM(data.data(), len);
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     rxSocket.close();
@@ -245,7 +245,7 @@ TEST(UdpCore, udpComm_transmit_add_route)
     connected = comm.connect();
     ASSERT_TRUE(connected);
     connected = comm3.connect();
-
+    EXPECT_TRUE(connected);
     comm.transmit(helics::route_id(0), helics::CMD_ACK);
 
     std::this_thread::sleep_for(250ms);
@@ -311,7 +311,7 @@ TEST(UdpCore, udpCore_initialization)
 
     auto len = rxSocket.receive_from(asio::buffer(data), remote_endpoint, 0, error);
     ASSERT_TRUE(!error);
-    EXPECT_GT(len, 32u);
+    EXPECT_GT(len, 32U);
     helics::ActionMessage rM(data.data(), len);
 
     EXPECT_EQ(rM.name, "core1");

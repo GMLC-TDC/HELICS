@@ -136,7 +136,9 @@ TEST(IPCCore, ipcComm_transmit_add_route)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    helics::ipc::IpcComms comm, comm2, comm3;
+    helics::ipc::IpcComms comm;
+    helics::ipc::IpcComms comm2;
+    helics::ipc::IpcComms comm3;
     comm.loadTargetInfo(localLoc, brokerLoc);
 
     comm2.loadTargetInfo(brokerLoc, std::string());
