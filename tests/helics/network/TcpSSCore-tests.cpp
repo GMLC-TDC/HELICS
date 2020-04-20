@@ -125,7 +125,7 @@ TEST(TcpSSCore, tcpSSComms_broker_test_transmit)
     }
     EXPECT_GE(counter, 1);
 
-    EXPECT_GT(len.load(), 50u);
+    EXPECT_GT(len.load(), 50U);
     helics::ActionMessage rM;
     auto loc = rM.depacketize(data.data(), static_cast<int>(len));
     if ((counter == 1) && (loc < static_cast<int>(len.load()))) {
