@@ -181,7 +181,7 @@ helics_filter helicsCoreRegisterCloningFilter(helics_core cr, const char* name, 
         filt->filtPtr = filt->uFilter.get();
         filt->corePtr = std::move(core);
         filt->cloning = true;
-        auto ret = reinterpret_cast<helics_filter>(filt.get());
+        auto* ret = reinterpret_cast<helics_filter>(filt.get());
         coreAddFilter(cr, std::move(filt));
         return ret;
     }
@@ -212,7 +212,7 @@ helics_filter helicsFederateGetFilter(helics_federate fed, const char* name, hel
         filt->filtPtr = &id;
         filt->cloning = id.isCloningFilter();
         filt->fedptr = std::move(fedObj);
-        auto ret = reinterpret_cast<helics_filter>(filt.get());
+        auto* ret = reinterpret_cast<helics_filter>(filt.get());
         federateAddFilter(fed, std::move(filt));
         return ret;
     }
@@ -250,7 +250,7 @@ helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, hel
         filt->filtPtr = &id;
         filt->fedptr = std::move(fedObj);
         filt->cloning = id.isCloningFilter();
-        auto ret = reinterpret_cast<helics_filter>(filt.get());
+        auto* ret = reinterpret_cast<helics_filter>(filt.get());
         federateAddFilter(fed, std::move(filt));
         return ret;
     }
@@ -264,7 +264,7 @@ helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, hel
 
 static helics::Filter* getFilter(helics_filter filt, helics_error* err)
 {
-    auto fObj = getFilterObj(filt, err);
+    auto* fObj = getFilterObj(filt, err);
     if (fObj == nullptr) {
         return nullptr;
     }
@@ -273,7 +273,7 @@ static helics::Filter* getFilter(helics_filter filt, helics_error* err)
 
 static helics::CloningFilter* getCloningFilter(helics_filter filt, helics_error* err)
 {
-    auto fObj = getFilterObj(filt, err);
+    auto* fObj = getFilterObj(filt, err);
     if (fObj == nullptr) {
         return nullptr;
     }
@@ -425,7 +425,7 @@ void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* delivery
 
 const char* helicsFilterGetInfo(helics_filter filt)
 {
-    auto filtObj = getFilterObj(filt, nullptr);
+    auto* filtObj = getFilterObj(filt, nullptr);
     if (filtObj == nullptr) {
         return emptyStr.c_str();
     }
@@ -442,7 +442,7 @@ const char* helicsFilterGetInfo(helics_filter filt)
 
 void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err)
 {
-    auto filtObj = getFilterObj(filt, err);
+    auto* filtObj = getFilterObj(filt, err);
     if (filtObj == nullptr) {
         return;
     }
@@ -458,7 +458,7 @@ void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err
 
 void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, helics_error* err)
 {
-    auto filtObj = getFilterObj(filt, err);
+    auto* filtObj = getFilterObj(filt, err);
     if (filtObj == nullptr) {
         return;
     }
@@ -474,7 +474,7 @@ void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, he
 
 helics_bool helicsFilterGetOption(helics_filter filt, int option)
 {
-    auto filtObj = getFilterObj(filt, nullptr);
+    auto* filtObj = getFilterObj(filt, nullptr);
     if (filtObj == nullptr) {
         return helics_false;
     }
@@ -494,7 +494,7 @@ void helicsFilterSetCustomCallback(
     void* userdata,
     helics_error* err)
 {
-    auto fObj = getFilterObj(filt, err);
+    auto* fObj = getFilterObj(filt, err);
     if (fObj == nullptr || fObj->filtPtr == nullptr) {
         return;
     }
@@ -509,7 +509,7 @@ void helicsFilterSetCustomCallback(
     }
     auto op = std::make_shared<helics::CustomMessageOperator>();
     op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
-        auto ms = createMessageObject(message);
+        auto* ms = createMessageObject(message);
         if (filtCall != nullptr) {
             filtCall(ms, userdata);
         }
