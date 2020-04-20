@@ -2113,6 +2113,15 @@ TEST(evil_value_federate_test, helicsFederateGetInputCount)
 
 //section Publication interface Functions
 //functions applying to a \ref helics_publication object
+
+TEST(evil_pub_test, helicsPublicationIsValid)
+{
+    char rdata[256];
+    auto evil_pub = reinterpret_cast<helics_publication>(rdata);
+    EXPECT_NE(helicsPublicationIsValid(nullptr), helics_true);
+    EXPECT_NE(helicsPublicationIsValid(evil_pub), helics_true);
+}
+
 TEST(evil_pub_test, helicsPublicationPublishRaw)
 {
     //void helicsPublicationPublishRaw(helics_publication pub, const void* data, int inputDataLength, helics_error* err);
@@ -2383,6 +2392,15 @@ TEST(evil_pub_test, helicsPublicationSetOption)
 
 //section Input interface Functions
 //functions applying to a \ref helics_input object
+
+TEST(evil_input_test, helicsInputIsValid)
+{
+    char rdata[256];
+    auto evil_input = reinterpret_cast<helics_input>(rdata);
+    EXPECT_NE(helicsInputIsValid(nullptr), helics_true);
+    EXPECT_NE(helicsInputIsValid(evil_input), helics_true);
+}
+
 TEST(evil_input_test, helicsInputAddTarget)
 {
     //void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* err);
@@ -3449,6 +3467,18 @@ TEST(evil_message_object_test, helicsMessageAppendData)
 
 //section Endpoint interface Functions
 //functions applying to a \ref helics_endpoint object
+
+TEST(evil_endpoint_test, helicsEndpointIsValid)
+{
+    //void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err);
+    char rdata[256];
+    auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
+    EXPECT_NE(helicsEndpointIsValid(nullptr), helics_true);
+    
+    //auto res2=helicsEndpointSetDefaultDestination(nullptr, const char* dest, nullptr);
+    EXPECT_NE(helicsEndpointIsValid(evil_ept), helics_true);
+}
+
 TEST(evil_endpoint_test, helicsEndpointSetDefaultDestination)
 {
     //void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err);
@@ -3771,6 +3801,15 @@ TEST(evil_filter_fed_test, helicsFederateGetFilterByIndex)
 
 //section Filter interface Functions
 //Functions applying to a \ref helics_filter object
+
+TEST(evil_filter_test, helicsFilterIsValid)
+{
+    char rdata[256];
+    auto evil_filt = reinterpret_cast<helics_filter>(rdata);
+    EXPECT_NE(helicsFilterIsValid(nullptr), helics_true);
+    EXPECT_NE(helicsFilterIsValid(evil_filt), helics_true);
+}
+
 TEST(evil_filter_test, helicsFilterGetName)
 {
     //const char*  helicsFilterGetName(helics_filter filt);

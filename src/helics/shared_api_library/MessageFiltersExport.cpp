@@ -288,6 +288,15 @@ static helics::CloningFilter* getCloningFilter(helics_filter filt, helics_error*
     return dynamic_cast<helics::CloningFilter*>(fObj->filtPtr);
 }
 
+helics_bool helicsFilterIsValid(helics_filter filt)
+{
+    auto filter = getFilter(filt, nullptr);
+    if (filter == nullptr) {
+        return helics_false;
+    }
+    return (filter->isValid()) ? helics_true : helics_false;
+}
+
 /** get the name of the filter*/
 const char* helicsFilterGetName(helics_filter filt)
 {

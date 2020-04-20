@@ -154,6 +154,15 @@ HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const c
 HELICS_EXPORT helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, helics_error* err);
 
 /**
+ * check if a filter is valid
+ *
+ * @param filt The filter object to check.
+ *
+ * @return helics_true if the Filter object represents a valid filter
+ */
+HELICS_EXPORT helics_bool helicsFilterIsValid(helics_filter filt);
+
+/**
  * Get the name of the filter and store in the given string.
  *
  * @param filt The given filter.

@@ -701,6 +701,24 @@ void helicsPublicationAddTarget(helics_publication pub, const char* target, heli
     pubObj->pubPtr->addTarget(target);
 }
 
+helics_bool helicsPublicationIsValid(helics_publication pub)
+{
+    auto pubObj = verifyPublication(pub, nullptr);
+    if (pubObj == nullptr) {
+        return helics_false;
+    }
+    return (pubObj->pubPtr->isValid()) ? helics_true : helics_false;
+}
+
+helics_bool helicsInputIsValid(helics_input ipt)
+{
+    auto inpObj = verifyInput(ipt, nullptr);
+    if (inpObj == nullptr) {
+        return helics_false;
+    }
+    return (inpObj->inputPtr->isValid()) ? helics_true : helics_false;
+}
+
 void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* err)
 {
     auto inpObj = verifyInput(ipt, err);

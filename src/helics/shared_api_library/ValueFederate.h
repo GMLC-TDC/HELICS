@@ -296,6 +296,15 @@ HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* js
  * @{
  */
 
+ /**
+  * check if a publication is valid
+  *
+  * @param pub The publication to check.
+  *
+  * @return helics_true if the publication is a valid publication
+  */
+HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
+
 /**
  * Publish raw data from a char * and length.
  *
@@ -420,6 +429,15 @@ HELICS_EXPORT void helicsPublicationPublishNamedPoint(helics_publication pub, co
  * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationAddTarget(helics_publication pub, const char* target, helics_error* err);
+
+/**
+ * check if an input is valid
+ *
+ * @param ipt The input to check.
+ *
+ * @return helics_true if the Input object represents a valid input
+ */
+HELICS_EXPORT helics_bool helicsInputIsValid(helics_input ipt);
 
 /**
  * Add a publication to the list of data that an input subscribes to.

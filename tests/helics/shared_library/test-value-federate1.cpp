@@ -267,12 +267,13 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsInputSetDefaultDouble(inp_double, 10000.0, &err);
 
     helicsInputSetOption(inp_double2, helics_handle_option_connection_required, helics_true, &err);
-
+    EXPECT_EQ(helicsInputIsValid(inp_double2), helics_true);
     //anonymous publication
     auto pub = helicsFederateRegisterPublication(vFed1, nullptr, helics_data_type_int, "MW", &err);
     helicsPublicationSetOption(pub, helics_handle_option_connection_required, helics_true, &err);
     helicsPublicationAddTarget(pub, "fed0/key7", &err);
     helicsPublicationAddTarget(pub, "fed0/key8", &err);
+    EXPECT_EQ(helicsPublicationIsValid(pub), helics_true);
 
     helicsInputSetDefaultRaw(inp_raw1, nullptr, -2, &err);
     EXPECT_EQ(err.error_code, 0);
