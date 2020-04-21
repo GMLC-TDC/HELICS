@@ -29,7 +29,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
                     config = std::move(cfg);
                 } else if (cfg.isArray()) {
                     config = cfg[configIndex];
-                } else {
+                } else if (!fallback_to_default_){
                     return {};
                 }
             }

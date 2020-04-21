@@ -21,12 +21,25 @@ communication methods*/
 class MultiBroker: public CoreBroker {
   protected:
     std::atomic<int> disconnectionStage{0}; //!< the stage of disconnection
-    std::vector<std::unique_ptr<CommsInterface>> comms; //!< the actual comms object
-    std::unique_ptr<CommsInterface> masterComm;
+    std::vector<std::unique_ptr<CommsInterface>> comms; //!< the actual comms objects
+    std::unique_ptr<CommsInterface> masterComm; //!< the primary comms object or the one that links with the master
     std::atomic<bool> brokerInitialized{false}; //!< atomic protecting local initialization
   public:
     /** default constructor*/
     MultiBroker() noexcept;
+    
+    /** construct from command line arguments
+    @param brokerName the name of the broker
+    @param argc the number of arguments
+    @param argv the strings in the input
+    */
+    MultiBroker(const std::string &brokerName, int argc, char* argv[]);
+
+    /** construct from command line arguments parsed as a single string
+    @param brokerName the name of the broker
+    @param argString a merged string with all the arguments
+    */
+    MultiBroker(const std::string &brokerName, const std::string& configFile);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -36,10 +49,12 @@ class MultiBroker: public CoreBroker {
     @param argString a merged string with all the arguments
     */
     explicit MultiBroker(const std::string& argString);
+
     /** destructor*/
     ~MultiBroker();
 
   private:
+    virtual bool brokerConnect() override;
     virtual void brokerDisconnect() override;
     virtual bool tryReconnect() override;
     /** disconnect the comm object*/
