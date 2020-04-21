@@ -20,7 +20,18 @@ namespace helicscpp {
 /** get a string with the helics version info*/
 std::string getHelicsVersionString()
 {
-    return std::string(helicsGetVersion());
+    return std::string{helicsGetVersion()};
+}
+/** get a string with the helics version info*/
+std::string version()
+{
+    return std::string{helicsGetVersion()};
+}
+
+/** do a cleanup of the brokers and cores currently in the library*/
+void cleanupHelicsLibrary()
+{
+    helicsCleanupLibrary();
 }
 
 } // namespace helicscpp
