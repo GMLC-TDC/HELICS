@@ -35,6 +35,10 @@ class Publication {
     operator helics_publication() const { return pub; }
     /** return the underlying helics_publication object*/
     helics_publication baseObject() const { return pub; }
+
+    /** check if the publication is valid */
+    bool isValid() const { return (helicsPublicationIsValid(pub) == helics_true); }
+
     /** Methods to publish values **/
 
     /** publish raw data from a pointer and length*/

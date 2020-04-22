@@ -267,12 +267,13 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsInputSetDefaultDouble(inp_double, 10000.0, &err);
 
     helicsInputSetOption(inp_double2, helics_handle_option_connection_required, helics_true, &err);
-
+    EXPECT_EQ(helicsInputIsValid(inp_double2), helics_true);
     //anonymous publication
     auto pub = helicsFederateRegisterPublication(vFed1, nullptr, helics_data_type_int, "MW", &err);
     helicsPublicationSetOption(pub, helics_handle_option_connection_required, helics_true, &err);
     helicsPublicationAddTarget(pub, "fed0/key7", &err);
     helicsPublicationAddTarget(pub, "fed0/key8", &err);
+    EXPECT_EQ(helicsPublicationIsValid(pub), helics_true);
 
     helicsInputSetDefaultRaw(inp_raw1, nullptr, -2, &err);
     EXPECT_EQ(err.error_code, 0);
@@ -685,7 +686,7 @@ void runFederateTestVectorD(
     helics_time gtime;
     int maxlen = (len1 > len2) ? len1 : len2;
     maxlen = (maxlen > len) ? maxlen : len;
-    double* val = new double[maxlen];
+    auto* val = new double[maxlen];
     helics_error err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
@@ -891,36 +892,32 @@ TEST_P(vfed_type_tests, single_transfer_vector2)
 
 TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
 {
-    helics_publication pubid, pubid2, pubid3;
-    helics_input subid, subid2, subid3;
-    const char *pubname, *pubname2, *pubname3, *pubtype, *pubunit3;
-    const char *subname, *subname2, *subname3;
-    const char* subunit3;
-
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
 
-    helicsFederateSetFlagOption(vFed, helics_handle_option_connection_optional, true, &err);
+    helicsFederateSetFlagOption(vFed, helics_handle_option_connection_optional, helics_true, &err);
     // register the publications
-    pubid = helicsFederateRegisterTypePublication(vFed, "pub1", "", "", &err);
-    pubid2 = helicsFederateRegisterGlobalTypePublication(vFed, "pub2", "int", "", &err);
-    pubid3 = helicsFederateRegisterPublication(vFed, "pub3", helics_data_type_double, "V", &err);
+    helics_publication pubid = helicsFederateRegisterTypePublication(vFed, "pub1", "", "", &err);
+    helics_publication pubid2 =
+        helicsFederateRegisterGlobalTypePublication(vFed, "pub2", "int", "", &err);
+    helics_publication pubid3 =
+        helicsFederateRegisterPublication(vFed, "pub3", helics_data_type_double, "V", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     // these aren't meant to match the publications
-    subid = helicsFederateRegisterSubscription(vFed, "sub1", "", &err);
-    subid2 = helicsFederateRegisterSubscription(vFed, "sub2", "", &err);
-    subid3 = helicsFederateRegisterSubscription(vFed, "sub3", "V", &err);
+    auto subid = helicsFederateRegisterSubscription(vFed, "sub1", "", &err);
+    auto subid2 = helicsFederateRegisterSubscription(vFed, "sub2", "", &err);
+    auto subid3 = helicsFederateRegisterSubscription(vFed, "sub3", "V", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     // enter execution
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
     // check subscriptions
-    subname = helicsSubscriptionGetKey(subid);
-    subname2 = helicsSubscriptionGetKey(subid2);
+    const char* subname = helicsSubscriptionGetKey(subid);
+    const char* subname2 = helicsSubscriptionGetKey(subid2);
 
     EXPECT_STREQ(subname, "sub1");
     EXPECT_STREQ(subname2, "sub2");
-    subname3 = helicsSubscriptionGetKey(subid3);
+    const char* subname3 = helicsSubscriptionGetKey(subid3);
     EXPECT_STREQ(subname3, "sub3");
 
     // subtype=helicsInputGetType (subid);
@@ -929,21 +926,21 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     // EXPECT_EQ (subtype2, "int64");
     // subtype3=helicsInputGetType (subid3);
     // EXPECT_EQ (subtype3, "def");
-    subunit3 = helicsInputGetUnits(subid3);
+    auto subunit3 = helicsInputGetUnits(subid3);
     EXPECT_STREQ(subunit3, "V");
 
     // check publications
-    pubname = helicsPublicationGetKey(pubid);
-    pubname2 = helicsPublicationGetKey(pubid2);
+    const char* pubname = helicsPublicationGetKey(pubid);
+    const char* pubname2 = helicsPublicationGetKey(pubid2);
 
     EXPECT_STREQ(pubname, "fed0/pub1");
     EXPECT_STREQ(pubname2, "pub2");
-    pubname3 = helicsPublicationGetKey(pubid3);
+    const char* pubname3 = helicsPublicationGetKey(pubid3);
     EXPECT_STREQ(pubname3, "fed0/pub3");
 
-    pubtype = helicsPublicationGetType(pubid3);
+    const char* pubtype = helicsPublicationGetType(pubid3);
     EXPECT_STREQ(pubtype, "double");
-    pubunit3 = helicsPublicationGetUnits(pubid3);
+    const char* pubunit3 = helicsPublicationGetUnits(pubid3);
     EXPECT_STREQ(pubunit3, "V");
 
     CE(helicsFederateFinalize(vFed, &err));
@@ -998,7 +995,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
 {
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
-    helicsFederateSetFlagOption(vFed, helics_handle_option_connection_optional, true, &err);
+    helicsFederateSetFlagOption(vFed, helics_handle_option_connection_optional, helics_true, &err);
     // register the publications/subscriptions
 
     auto subid1 = helicsFederateRegisterSubscription(vFed, "sub1", "", &err);

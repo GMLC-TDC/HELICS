@@ -47,6 +47,7 @@ TEST_P(filter_type_tests, registration)
     CE(auto ep1 = helicsFederateRegisterEndpoint(fFed, "fout", "", &err));
     EXPECT_TRUE(ep1 != nullptr);
     CE(auto f3 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "c4", &err));
+    EXPECT_EQ(helicsFilterIsValid(f3), helics_true);
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
     EXPECT_TRUE(f3 != f2);
 

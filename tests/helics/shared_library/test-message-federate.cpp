@@ -311,6 +311,7 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
     CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err));
     CE(auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed2, "ep2", "random", &err));
 
+    EXPECT_EQ(helicsEndpointIsValid(epid), helics_true);
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
     CE(helicsFederateSetTimeProperty(mFed2, helics_property_time_delta, 1.0, &err));
 

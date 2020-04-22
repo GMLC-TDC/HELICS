@@ -150,6 +150,15 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
     // LCOV_EXCL_STOP
 }
 
+helics_bool helicsEndpointIsValid(helics_endpoint endpoint)
+{
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
+    if (endObj == nullptr) {
+        return helics_false;
+    }
+    return (endObj->endPtr->isValid()) ? helics_true : helics_false;
+}
+
 void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);

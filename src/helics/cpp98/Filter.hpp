@@ -34,6 +34,8 @@ class Filter {
     operator helics_filter() const { return filt; }
     /** get the underlying helics_filter object*/
     helics_filter baseObject() const { return filt; }
+    /** check if the filter is valid */
+    bool isValid() const { return (helicsFilterIsValid(filt) == helics_true); }
     /** get the name for the filter*/
     const char* getName() const { return helicsFilterGetName(filt); }
     /** set a property on a filter
