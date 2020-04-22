@@ -242,7 +242,7 @@ def main():
     for filePath in fileList:
         try:
             os.remove(filePath)
-        except:
+        except OSError as e:
             print("Error while deleting file : ", filePath)
 
     print("> Done.")
