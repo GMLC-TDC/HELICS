@@ -5720,6 +5720,20 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederatePublishJSON
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_publication arg1 = (helics_publication) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_publication *)&jarg1; 
+  result = (helics_bool)helicsPublicationIsValid(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   helics_publication arg1 = (helics_publication) 0 ;
   void *arg2 = (void *) 0 ;
@@ -6032,6 +6046,20 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationAddTarge
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_input arg1 = (helics_input) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_input *)&jarg1; 
+  result = (helics_bool)helicsInputIsValid(arg1);
+  jresult = (jint)result; 
+  return jresult;
 }
 
 
@@ -7408,6 +7436,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetEndpoin
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_endpoint *)&jarg1; 
+  result = (helics_bool)helicsEndpointIsValid(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetDefaultDestination(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
@@ -8742,6 +8784,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetFilterB
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFilterIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_filter arg1 = (helics_filter) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_filter *)&jarg1; 
+  result = (helics_bool)helicsFilterIsValid(arg1);
+  jresult = (jint)result; 
   return jresult;
 }
 

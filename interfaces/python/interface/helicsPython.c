@@ -10207,6 +10207,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsPublicationIsValid(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_publication arg1 = (helics_publication) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  helics_bool result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationIsValid" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  result = (helics_bool)helicsPublicationIsValid(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsPublicationPublishRaw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
@@ -10797,6 +10818,27 @@ fail:
       return NULL;
     }
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsInputIsValid(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  helics_bool result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputIsValid" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (helics_bool)helicsInputIsValid(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -12958,6 +13000,27 @@ fail:
       return NULL;
     }
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointIsValid(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  helics_bool result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointIsValid" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (helics_bool)helicsEndpointIsValid(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -15252,6 +15315,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFilterIsValid(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_filter arg1 = (helics_filter) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  helics_bool result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterIsValid" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  result = (helics_bool)helicsFilterIsValid(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFilterGetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_filter arg1 = (helics_filter) 0 ;
@@ -17185,6 +17269,15 @@ static PyMethodDef SwigMethods[] = {
 		"This would be the same JSON that would be used to publish data.\n"
 		""},
 	 { "helicsFederatePublishJSON", _wrap_helicsFederatePublishJSON, METH_VARARGS, "Publish data contained in a json file or string."},
+	 { "helicsPublicationIsValid", _wrap_helicsPublicationIsValid, METH_O, "\n"
+		"Check if a publication is valid.\n"
+		"\n"
+		":type pub: void\n"
+		":param pub: The publication to check.\n"
+		"\n"
+		":rtype: int\n"
+		":return: helics_true if the publication is a valid publication.\n"
+		""},
 	 { "helicsPublicationPublishRaw", _wrap_helicsPublicationPublishRaw, METH_VARARGS, "\n"
 		"Publish raw data from a char * and length.\n"
 		"\n"
@@ -17278,6 +17371,15 @@ static PyMethodDef SwigMethods[] = {
 		":param pub: The publication to add the target for.\n"
 		":type target: string\n"
 		":param target: The name of an input that the data should be sent to.\n"
+		""},
+	 { "helicsInputIsValid", _wrap_helicsInputIsValid, METH_O, "\n"
+		"Check if an input is valid.\n"
+		"\n"
+		":type ipt: void\n"
+		":param ipt: The input to check.\n"
+		"\n"
+		":rtype: int\n"
+		":return: helics_true if the Input object represents a valid input.\n"
 		""},
 	 { "helicsInputAddTarget", _wrap_helicsInputAddTarget, METH_VARARGS, "\n"
 		"Add a publication to the list of data that an input subscribes to.\n"
@@ -17767,6 +17869,15 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":rtype: void\n"
 		":return: A helics_endpoint.\n"
+		""},
+	 { "helicsEndpointIsValid", _wrap_helicsEndpointIsValid, METH_O, "\n"
+		"Check if an endpoint is valid.\n"
+		"\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint object to check.\n"
+		"\n"
+		":rtype: int\n"
+		":return: helics_true if the Endpoint object represents a valid endpoint.\n"
 		""},
 	 { "helicsEndpointSetDefaultDestination", _wrap_helicsEndpointSetDefaultDestination, METH_VARARGS, "\n"
 		"Set the default destination for an endpoint if no other endpoint is given.\n"
@@ -18352,6 +18463,15 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":rtype: void\n"
 		":return: A helics_filter, which will be NULL if an invalid index is given.\n"
+		""},
+	 { "helicsFilterIsValid", _wrap_helicsFilterIsValid, METH_O, "\n"
+		"Check if a filter is valid.\n"
+		"\n"
+		":type filt: void\n"
+		":param filt: The filter object to check.\n"
+		"\n"
+		":rtype: int\n"
+		":return: helics_true if the Filter object represents a valid filter.\n"
 		""},
 	 { "helicsFilterGetName", _wrap_helicsFilterGetName, METH_O, "\n"
 		"Get the name of the filter and store in the given string.\n"
