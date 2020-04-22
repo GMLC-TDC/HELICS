@@ -74,8 +74,8 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
     for i in range(releases.totalCount):
         release = releases.get_page(i)[0]
         if release.tag_name == RELEASE:
-            assets = release.get_assets()
             found = True
+            break
     if not found:
         print("release " + RELEASE + " not found!")
         sys.exit(1)
