@@ -9,7 +9,6 @@
 import os
 import sys
 import github
-import argparse
 import git
 import shutil
 import shlex
@@ -18,7 +17,7 @@ import tarfile
 from urllib.parse import urlparse
 from subprocess import Popen, PIPE
 from git import Repo
-from argparse import RawTextHelpFormatter
+from argparse import ArgumentParser, RawTextHelpFormatter
 import tempfile
 
 ####
@@ -124,7 +123,7 @@ def main():
            - Using GIT_CLIENTID and GIT_CLIENTSECRET you can increase up to 5000 upload/requests per hour.
 
     """
-    parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(description=DESCRIPTION, formatter_class=RawTextHelpFormatter)
     parser.add_argument('--clone', action='store', dest="CLONE",
                         help="clone a github repository [https://github.com/GMLC-TDC/HELICS.git]")
     parser.add_argument("--to_path", action='store', dest="TOPATH", help="clone into a directory [helics_tar_generate")
@@ -205,7 +204,7 @@ def main():
     print(os.getcwd())
     cmd = "scripts/git-archive.sh " + "-d . " + " -p " + PREFIX + " -n " + HELICSTAG.name
     print(cmd)
-    stdoutdata, stderrdata = runcmd(cmd)
+    runcmd(cmd)
 
     # Delete pre-existing work
     #
