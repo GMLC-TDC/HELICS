@@ -166,10 +166,10 @@ class HELICS_CXX_EXPORT Federate {
     virtual void disconnect();
     /** specify the simulator had an unrecoverable error
      */
-    void error(int errorcode);
+    [[deprecated("please use localError method")]] void error(int errorcode);
     /** specify the simulator had an error with error code and message
      */
-    void error(int errorcode, const std::string& message);
+    [[deprecated("please use localError method")]] void error(int errorcode, const std::string& message);
     /** specify the simulator had a local error with error code and message
     */
     void localError(int errorcode, const std::string& message);
@@ -177,6 +177,14 @@ class HELICS_CXX_EXPORT Federate {
     /** specify the simulator had a local error with error code and message
     */
     void globalError(int errorcode, const std::string& message);
+
+    /** specify the simulator had a local error with error code
+    */
+    void localError(int errorcode);
+
+    /** specify the simulator had a local error with error code
+    */
+    void globalError(int errorcode);
 
     /** specify a separator to use for naming separation between the federate name and the interface name
      setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
