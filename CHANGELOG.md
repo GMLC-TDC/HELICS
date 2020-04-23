@@ -7,17 +7,29 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.5.0][] - 2020-04-22
-Some library reorganization
+## [2.5.0][] - 2020-04-25
+Some library reorganization, additional static analysis(CppLint and clang-tidy), multiBroker
 
 ### Changed
--   Split the helics core library into a separate core and network library
+-   Split the HELICS core library into a separate core and network library
 -   Update FMT library to version 6.2.0
+-   The core and broker Factories use a map instead of a fixed list which is a step toward allowing user defined cores
+-   Updated CLI11 included code to customized version to allow configuration of cores and brokers through Json files
+-   The ordering of the helics_error_types enum is in ascending order.  
 
 ### Fixed
+-   Added CPPlint and fixed a number of issues that check identified.
 
 ### Added
 -   `helicsEndpointSendMessageObjectZeroCopy` to allow transferring messages with minimal copying.
+-   `helics<Interface>IsValid` functions to the C API
+-   `helicscpp::cleanHelicsLibrary` to the C++98 API.
+-   a Comm factory to the Core to enable constructing Comm interfaces directly from the type.
+-   The REST API in the webserver was updated to include ability to create and destroy brokers.
+-   A websocket server similar to the REST API but will respond to JSON queries.
+-   A test suite for the HTTP and websocket servers.
+-   A Multibroker that can allow multiple communication types to interact together.
+-   Support for `HELICS_BUILD_CONFIGURATION` cmake variable for building on unique platforms.  The only supported one right now is "PI" for building on raspberry pi platforms.
 
 ### Deprecated
 -   in the C shared library `helicsFederateGetMessage`, `helicsEndpointGetMessage`, and `helicsEndpointSendMessage` are deprecated in favor of the object version These will be removed in HELICS 3.0

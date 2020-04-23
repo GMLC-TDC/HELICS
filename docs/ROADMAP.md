@@ -4,22 +4,16 @@
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
 
-## \[2.5\] ~ 2020-04-15
+## \[2.5.1\] ~ 2020-05-25
 It is unlikely all of this will be in place for the 2.5 release but some/most of the remaining will come on the 2.5.X release
 
--   Multi-broker to allow multiple communication cores to be connected in the same federation
 -   Some dynamic federation support
--   C API callbacks for custom filters
--   Improved REST API support
 -   Clarification and API support for multiple publications to a single input N-1 value based
 -   Websocket based core type
 -   Separate out additional networking library components
--   Split core library between comms layer components and actual core API
 -   Debugging tools (Global time synchronization points)
--   Additional package manager integration
 -   Performance improvements and tests
 -   Increased code Coverage (target 80%)
--   Deprecate C api message structure
 
 ## \[2.6\] ~ 2020-07-15
 This will be the last of the 2.X series releases, there will likely be at least one patch release after this before fully moving to 3.0
