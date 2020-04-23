@@ -73,6 +73,7 @@ readability-*,
 -readability-magic-numbers,
 -readability-identifier-naming,
 performance-*
+-performance-unnecessary-value-param
 '
 
 HeaderFilterRegex: 'src/helics/*.hp?p?'

@@ -346,7 +346,6 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
             asyncInfo->execFuture = std::async(std::launch::async, eExecFunc);
         } break;
         case modes::pending_exec:
-            break;
         case modes::executing:
         case modes::pending_time:
         case modes::pending_iterative_time:
