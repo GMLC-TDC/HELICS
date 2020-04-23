@@ -560,7 +560,7 @@ void Federate::error(int errorcode)
 
 void Federate::error(int errorcode, const std::string& message)
 {
-    localError(errorcode,message);
+    localError(errorcode, message);
 }
 
 void Federate::localError(int errorcode)
