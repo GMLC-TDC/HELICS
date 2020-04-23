@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
     bool runterminal{false};
     bool autorestart{false};
     bool http_webserver{false};
+    bool websocket_server{false};
 
     helics::helicsCLI11App cmdLine("helics broker command line");
     auto term =
@@ -47,6 +48,10 @@ int main(int argc, char* argv[])
         "--http",
         http_webserver,
         "start an http webserver that can respond to queries on the broker");
+    cmdLine.add_flag(
+        "--web",
+        websocket_server,
+        "start an websocket webserver that can respond to queries on the broker");
     cmdLine
         .footer(
             "helics_broker <broker args ..> starts a broker with the given args and waits for it to "
@@ -70,17 +75,16 @@ int main(int argc, char* argv[])
     }
 #ifdef HELICS_ENABLE_WEBSERVER
     std::unique_ptr<helics::apps::WebServer> webserver;
-    if (http_webserver) {
+    if (http_webserver || websocket_server) {
         webserver = std::make_unique<helics::apps::WebServer>();
-        webserver->enableHttpServer(true);
+        webserver->enableHttpServer(http_webserver);
+        webserver->enableWebSocketServer(websocket_server);
         webserver->startServer(nullptr);
     }
 #else
-    {
-        if (http_webserver) {
-            std::cout << "the http webserver is not available in this build" << std::endl;
+        if (http_webserver || websocket_server) {
+            std::cout << "the http webserver and websocket server are not available in this build" << std::endl;
         }
-    }
 #endif
     try {
         if (runterminal) {

@@ -23,6 +23,7 @@ set(
     BrokerServerTests.cpp
     CoreAppTests.cpp
     BrokerAppTests.cpp
+    MultiBrokerTests.cpp
     exeTestHelper.h
 )
 

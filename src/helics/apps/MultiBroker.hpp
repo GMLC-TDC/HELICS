@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 #include "../core/CoreBroker.hpp"
+#include "../network/NetworkBroker.hpp"
 
 #include <memory>
 #include <string>
@@ -22,33 +23,21 @@ class MultiBroker: public CoreBroker {
   protected:
     std::atomic<int> disconnectionStage{0}; //!< the stage of disconnection
     std::vector<std::unique_ptr<CommsInterface>> comms; //!< the actual comms objects
-    std::unique_ptr<CommsInterface> masterComm; //!< the primary comms object or the one that links with the master
+    std::unique_ptr<CommsInterface>
+        masterComm; //!< the primary comms object or the one that links with the master
+    NetworkBrokerData netInfo{
+        interface_type::tcp}; //!< structure containing the networking information
+    std::string configFile; //!< the name of the config file in use
     std::atomic<bool> brokerInitialized{false}; //!< atomic protecting local initialization
+    core_type type{core_type::ZMQ}; //!< the core type of the master controller
   public:
     /** default constructor*/
     MultiBroker() noexcept;
-    
-    /** construct from command line arguments
-    @param brokerName the name of the broker
-    @param argc the number of arguments
-    @param argv the strings in the input
-    */
-    MultiBroker(const std::string &brokerName, int argc, char* argv[]);
 
-    /** construct from command line arguments parsed as a single string
-    @param brokerName the name of the broker
-    @param argString a merged string with all the arguments
-    */
-    MultiBroker(const std::string &brokerName, const std::string& configFile);
     /** construct from command line arguments
-    @param argc the number of arguments
-    @param argv the strings in the input
+    @param brokerName the name of the broker
     */
-    MultiBroker(int argc, char* argv[]);
-    /** construct from command line arguments parsed as a single string
-    @param argString a merged string with all the arguments
-    */
-    explicit MultiBroker(const std::string& argString);
+    MultiBroker(const std::string& brokerName);
 
     /** destructor*/
     ~MultiBroker();
@@ -57,14 +46,20 @@ class MultiBroker: public CoreBroker {
     virtual bool brokerConnect() override;
     virtual void brokerDisconnect() override;
     virtual bool tryReconnect() override;
-    /** disconnect the comm object*/
-    void commDisconnect();
     void loadComms();
+    /** generate a CLI11 Application for subprocesses for processing of command line arguments*/
+    virtual std::shared_ptr<helicsCLI11App> generateCLI();
+
+  protected:
+    /** generate the local address information*/
+    virtual std::string generateLocalAddressString() const override;
 
   public:
     virtual void transmit(route_id rid, const ActionMessage& cmd) override;
     virtual void transmit(route_id rid, ActionMessage&& cmd) override;
 
     virtual void addRoute(route_id rid, const std::string& routeInfo) override;
+
+    virtual void removeRoute(route_id rid) override;
 };
 } // namespace helics

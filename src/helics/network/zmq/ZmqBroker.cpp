@@ -21,7 +21,7 @@ namespace zeromq {
         netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active;
     }
 
-    ZmqBroker::ZmqBroker(const std::string& broker_name): NetworkBroker(broker_name)
+    ZmqBroker::ZmqBroker(const std::string& brokerName): NetworkBroker(brokerName)
     {
         netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active;
     }
