@@ -758,7 +758,7 @@ TEST(federate_tests, forceErrorExec)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterExecutingMode();
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
@@ -775,7 +775,7 @@ TEST(federate_tests, forceErrorExecAsync)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterExecutingModeAsync(helics::iteration_request::force_iteration);
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
@@ -792,7 +792,7 @@ TEST(federate_tests, forceErrorInitAsync)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterInitializingModeAsync();
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
@@ -810,7 +810,7 @@ TEST(federate_tests, forceErrorPendingTimeAsync)
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
-    Fed1->error(9827);
+    Fed1->globalError(9827);
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::InvalidFunctionCall);
 
@@ -921,7 +921,7 @@ TEST(federate_tests, forceErrorPendingTimeIterativeAsync)
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(2.0, helics::iteration_request::no_iterations);
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::InvalidFunctionCall);
 
@@ -938,7 +938,7 @@ TEST(federate_tests, forceErrorFinalizeAsync)
 
     Fed1->enterExecutingMode();
     Fed1->finalizeAsync();
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::InvalidFunctionCall);
 
@@ -978,7 +978,8 @@ TEST(federate_tests, error_after_disconnect)
         helics::InvalidFunctionCall);
     EXPECT_THROW(
         Fed1->setInfo(helics::interface_handle{0}, "information"), helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->error(99), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->localError(99), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->globalError(99), helics::InvalidFunctionCall);
 }
 
 static constexpr const char* simple_global_files[] = {"example_globals1.json",

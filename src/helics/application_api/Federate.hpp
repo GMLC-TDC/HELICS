@@ -165,18 +165,41 @@ class HELICS_CXX_EXPORT Federate {
     /** disconnect a simulation from the core (will also call finalize before disconnecting if necessary)*/
     virtual void disconnect();
     /** specify the simulator had an unrecoverable error
-     */
-    void error(int errorcode);
+    @param errorcode an integral code for the error
+    @deprecated please use localError instead
+    */
+    [[deprecated("please use localError method")]] void error(int errorcode);
+
     /** specify the simulator had an error with error code and message
+    @param errorcode an integral code for the error
+    @param message a string describing the error to display in a log
+    @deprecated please use localError instead
      */
-    void error(int errorcode, const std::string& message);
+    [[deprecated("please use localError method")]] void
+        error(int errorcode, const std::string& message);
+
     /** specify the simulator had a local error with error code and message
+    @param errorcode an integral code for the error
+    @param message a string describing the error to display in a log
     */
     void localError(int errorcode, const std::string& message);
 
-    /** specify the simulator had a local error with error code and message
+    /** specify the simulator had a global error with error code and message
+    @details global errors propagate through the entire federation and will halt operations
+    @param errorcode an integral code for the error
+    @param message a string describing the error to display in the log
     */
     void globalError(int errorcode, const std::string& message);
+
+    /** specify the simulator had a local error with error code
+    @param errorcode an integral code for the error
+    */
+    void localError(int errorcode);
+
+    /** specify the simulator had a global error with error code
+    @param errorcode an integral code for the error
+    */
+    void globalError(int errorcode);
 
     /** specify a separator to use for naming separation between the federate name and the interface name
      setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
