@@ -172,18 +172,19 @@ class HELICS_CXX_EXPORT Federate {
 
     /** specify the simulator had an error with error code and message
     @param errorcode an integral code for the error
-    @param message a string describing the error to display in the log
+    @param message a string describing the error to display in a log
     @deprecated please use localError instead
      */
     [[deprecated("please use localError method")]] void error(int errorcode, const std::string& message);
 
     /** specify the simulator had a local error with error code and message
     @param errorcode an integral code for the error
-    @param message a string describing the error to display in the log
+    @param message a string describing the error to display in a log
     */
     void localError(int errorcode, const std::string& message);
 
     /** specify the simulator had a global error with error code and message
+    @details global errors propagate through the entire federation and will halt operations
     @param errorcode an integral code for the error
     @param message a string describing the error to display in the log
     */
