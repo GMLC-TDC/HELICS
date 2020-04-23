@@ -1,8 +1,8 @@
-Ubuntu Installation
-===================
+# Linux Installations 
 
-Requirements
-------------
+## Ubuntu Installation
+
+### Requirements
 
 * Ubuntu 16 or newer
 * C++14 compiler
@@ -13,8 +13,7 @@ Requirements
 * ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
 * MPI-2 implementation (if MPI support is needed)
 
-Setup
------
+### Setup
 
 *Note*: Keep in mind that your CMake version should be newer than the boost version. If you have an older CMake, you may want an older boost version. Alternatively, you can choose to upgrade your version of CMake.
 
@@ -55,8 +54,7 @@ make
 make install
 ```
 
-Testing
--------
+### Testing
 
 A quick test is to double check the versions of the HELICS player and recorder:
 
@@ -70,8 +68,7 @@ $ helics_recorder --version
 x.x.x (20XX-XX-XX)
 ```
 
-Building HELICS with python support
------------------------------------
+### Building HELICS with python support
 
 Run the following:
 
@@ -89,8 +86,7 @@ export PYTHONPATH=~/.local/helics-X.X.X/python:$PYTHONPATH
 export PATH=~/.local/bin:$PATH
 ```
 
-Testing HELICS with python support
-----------------------------------
+### Testing HELICS with python support
 
 If you open a interactive Python session and import HELICS, you should be able to get the version of `helics` and an output that is similar to the following.
 
@@ -106,3 +102,9 @@ In [2]: helics.helicsGetVersion()
 Out[2]: 'x.x.x (20XX-XX-XX)'
 
 ```
+
+## A few Specialized Platforms 
+The HELICS build supports a few specialized platforms, more will be added as needed.  Generally the build requirements are automatically detected but that is not always possible.  So a system configuration can be specified in the HELICS_BUILD_CONFIGURATION variable of CMake.
+
+### Raspbery PI
+To build on Raspberry PI system using Raspbian use `HELICS_BUILD_CONFIGURATION=PI`  This will add a few required libraries to the build so it works without other configuration.  Otherwise it is also possible to build using `-DCMAKE_CXX_FLAGS=-latomic`
