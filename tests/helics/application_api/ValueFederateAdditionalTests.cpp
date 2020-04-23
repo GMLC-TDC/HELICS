@@ -800,7 +800,7 @@ TEST(valuefederate, from_file_bad)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     std::string fstr2 = "non_existing.toml";
-    EXPECT_THROW(std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
+    EXPECT_THROW(auto fed = std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
 }
 
 TEST(valuefederate, from_file_bad2)
@@ -808,7 +808,7 @@ TEST(valuefederate, from_file_bad2)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     auto fstr2 = "non_existing.toml";
-    EXPECT_THROW(std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
+    EXPECT_THROW(auto fed = std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
 }
 
 TEST(valuefederate, from_file_bad3)

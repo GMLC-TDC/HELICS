@@ -41,7 +41,7 @@ TEST(federateInfo, constructor2)
     EXPECT_EQ(f1.coreType, helics::core_type::INPROC);
     EXPECT_EQ(f1.defName, "f2");
     EXPECT_TRUE(f1.autobroker);
-    EXPECT_EQ(f1.flagProps.size(), 2);
+    EXPECT_EQ(f1.flagProps.size(), 2U);
 }
 
 TEST(federateInfo, constructor_error)

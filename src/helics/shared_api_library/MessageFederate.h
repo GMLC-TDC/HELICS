@@ -492,7 +492,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message_object message);
  * @endforcpponly
  *
  * @beginPythonOnly
- * @returns Raw string data.
+ * @return Raw string data.
  * @endPythonOnly
  */
 HELICS_EXPORT void
