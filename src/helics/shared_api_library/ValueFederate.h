@@ -602,7 +602,7 @@ HELICS_EXPORT void helicsInputGetComplex(helics_input ipt, double* real, double*
 /**
  * Get the size of a value for subscription assuming return as an array of doubles.
  *
- * @return The number of double in a returned vector.
+ * @return The number of doubles in a returned vector.
  */
 HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
 
