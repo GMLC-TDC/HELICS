@@ -462,7 +462,7 @@ HELICS_EXPORT void helicsInputAddTarget(helics_input ipt, const char* target, he
 /**
  * Get the size of the raw value for subscription.
  *
- * @return the size of the raw data/string in bytes
+ * @return The size of the raw data/string in bytes.
  */
 HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
 
@@ -478,7 +478,7 @@ HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
  * @endforcpponly
  *
  * @beginPythonOnly
- * @return raw string data
+ * @return Raw string data.
  * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxDatalen, int* actualSize, helics_error* err);
