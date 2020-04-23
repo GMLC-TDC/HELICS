@@ -207,7 +207,7 @@ TEST(federateInfo, loadinfoPropsJson)
     EXPECT_EQ(f1.intProps.size(), 1U);
     EXPECT_EQ(f1.intProps[0].second, 5);
 
-    f1 = helics::loadFederateInfo("{\"loglevel\":\"summary\"}");
+    f1 = helics::loadFederateInfo(R"({"loglevel":"summary"})");
     EXPECT_EQ(f1.intProps.size(), 1U);
     EXPECT_EQ(f1.intProps[0].second, 2);
     EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"unknown\"}"), helics::InvalidIdentifier);
