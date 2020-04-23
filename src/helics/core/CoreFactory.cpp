@@ -249,7 +249,7 @@ without issue*/
     static gmlc::concurrency::DelayedDestructor<Core>
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<Core>
+    static gmlc::concurrency::SearchableObjectHolder<Core,core_type>
         searchableCores; //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
@@ -260,44 +260,37 @@ without issue*/
         return searchableCores.findObject(name);
     }
 
-    static bool isJoinableCoreOfType(core_type type, const std::shared_ptr<Core>& ptr)
-    {
-        if (!ptr->isOpenToNewFederates()) {
-            return false;
-        }
-        try {
-            return MasterCoreBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
-        }
-        catch (const helics::HelicsException&) {
-            // the error will throw if the MasterCoreBuilder can't find the core type, in which case it is open yet so return true
-            return true;
-        }
-    }
-
-    static bool isJoinableCoreForType(core_type type, const std::shared_ptr<Core>& ptr)
-    {
-        if (type == core_type::INPROC || type == core_type::TEST) {
-            return isJoinableCoreOfType(core_type::INPROC, ptr) ||
-                isJoinableCoreOfType(core_type::TEST, ptr);
-        }
-        return isJoinableCoreOfType(type, ptr);
-    }
-
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
         return searchableCores.findObject(
-            [type](auto& ptr) { return isJoinableCoreForType(type, ptr); });
+            [type](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
     }
 
-    bool registerCore(const std::shared_ptr<Core>& core)
+    bool registerCore(const std::shared_ptr<Core>& core, core_type type)
     {
         bool res = false;
         if (core) {
-            res = searchableCores.addObject(core->getIdentifier(), core);
+            res = searchableCores.addObject(core->getIdentifier(), core,type);
         }
         cleanUpCores();
         if (res) {
             delayedDestroyer.addObjectsToBeDestroyed(core);
+            switch (type) {
+                case core_type::INPROC:
+                    searchableCores.addType(core->getIdentifier(), core_type::TEST);
+                    break;
+                case core_type::TEST:
+                    searchableCores.addType(core->getIdentifier(), core_type::INPROC);
+                    break;
+                case core_type::IPC:
+                    searchableCores.addType(core->getIdentifier(), core_type::INTERPROCESS);
+                    break;
+                case core_type::INTERPROCESS:
+                    searchableCores.addType(core->getIdentifier(), core_type::IPC);
+                    break;
+                default:
+                    break;
+            }
         }
         return res;
     }
@@ -329,6 +322,11 @@ without issue*/
             searchableCores.removeObject(
                 [&name](auto& obj) { return (obj->getIdentifier() == name); });
         }
+    }
+
+    void addAssociatedCoreType(const std::string& name, core_type type)
+    {
+        searchableCores.addType(name, type);
     }
 
     static const std::string helpStr{"--help"};

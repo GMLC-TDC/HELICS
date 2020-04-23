@@ -246,7 +246,7 @@ need be without issue*/
         }
     }
 
-    void addBrokerType(const std::string& name, core_type type)
+    void addAssociatedBrokerType(const std::string& name, core_type type)
     {
         searchableBrokers.addType(name, type);
     }

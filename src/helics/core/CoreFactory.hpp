@@ -27,10 +27,6 @@ namespace CoreFactory {
     class CoreBuilder {
       public:
         virtual std::shared_ptr<Core> build(const std::string& name) = 0;
-        /** check if a Core is of the correct type
-        return true if the type is compatible
-        */
-        virtual bool checkType(Core* cr) const { return (cr != nullptr); }
     };
 
     /** template for making a Core builder*/
@@ -45,10 +41,6 @@ namespace CoreFactory {
         virtual std::shared_ptr<Core> build(const std::string& name) override
         {
             return std::make_shared<CoreTYPE>(name);
-        }
-        virtual bool checkType(Core* cr) const override
-        {
-            return dynamic_cast<CoreTYPE*>(cr) != nullptr;
         }
     };
 
@@ -166,6 +158,10 @@ calling cleanUpBrokers earlier if desired
 @param name the name of the Core to unregister
 */
     void unregisterCore(const std::string& name);
+
+    /** add a type associated with a core*/
+    void addAssociatedCoreType(const std::string& name, core_type type);
+
     /** clean up unused cores
 @details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is
 registered or when the clean up function is called this prevents some odd threading issues
