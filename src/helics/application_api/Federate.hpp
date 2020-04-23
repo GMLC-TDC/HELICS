@@ -175,7 +175,8 @@ class HELICS_CXX_EXPORT Federate {
     @param message a string describing the error to display in a log
     @deprecated please use localError instead
      */
-    [[deprecated("please use localError method")]] void error(int errorcode, const std::string& message);
+    [[deprecated("please use localError method")]] void
+        error(int errorcode, const std::string& message);
 
     /** specify the simulator had a local error with error code and message
     @param errorcode an integral code for the error
