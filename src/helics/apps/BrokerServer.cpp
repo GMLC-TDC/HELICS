@@ -95,7 +95,7 @@ namespace apps {
         }
     }
 
-    bool BrokerServer::hasActiveBrokers() const { return BrokerFactory::brokersActive(); }
+    bool BrokerServer::hasActiveBrokers() { return BrokerFactory::brokersActive(); }
     /** force terminate all running brokers*/
     void BrokerServer::forceTerminate()
     {

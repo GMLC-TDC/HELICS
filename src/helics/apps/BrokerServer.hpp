@@ -44,15 +44,15 @@ communication methods*/
     */
         explicit BrokerServer(std::vector<std::string> args);
         /** construct from command line arguments parsed as a single string
-    @param argString a merged string with all the arguments
+    @param configFile a configuration file for the broker Server
     */
-        explicit BrokerServer(const std::string& argString);
+        explicit BrokerServer(const std::string& configFile);
         /** destructor*/
         ~BrokerServer();
         /** start the broker servers*/
         void startServers();
         /** check if there are any active Brokers running*/
-        bool hasActiveBrokers() const;
+        static bool hasActiveBrokers();
         /** force terminate all running brokers*/
         void forceTerminate();
         /** close the broker server from creating new brokers*/
