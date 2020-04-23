@@ -138,7 +138,7 @@ namespace apps {
         app->add_flag("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
 #endif
 #ifdef ENABLE_MPI_CORE
-        app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
+        //app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
 #endif
 #ifdef HELICS_ENABLE_WEBSERVER
         app->add_flag(
