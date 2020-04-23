@@ -103,7 +103,8 @@ TEST(federate_tests, bad_broker_error_zmq_ci_skip)
     helics::FederateInfo fi(helics::core_type::ZMQ);
     fi.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(
+        auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
 }
 
 TEST(federate_tests, timeout_error_zmq_ci_skip)
@@ -111,7 +112,8 @@ TEST(federate_tests, timeout_error_zmq_ci_skip)
     helics::FederateInfo fi(helics::core_type::ZMQ);
     fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(
+        auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
 }
 
 #endif
