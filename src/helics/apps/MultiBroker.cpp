@@ -30,6 +30,11 @@ namespace helics {
 static auto mfact =
     BrokerFactory::addBrokerType<MultiBroker>("multi", static_cast<int>(core_type::MULTI));
 
+bool allowMultiBroker()
+{
+    return true;
+}
+
 static void loadTypeSpecificArgs(
     helics::core_type ctype,
     CommsInterface* comm,
@@ -107,7 +112,16 @@ MultiBroker::~MultiBroker()
 
 bool MultiBroker::brokerConnect()
 {
+    if ((netInfo.brokerName.empty()) && (netInfo.brokerAddress.empty())) {
+        CoreBroker::setAsRoot();
+    }
     masterComm = CommFactory::create(type);
+    masterComm->setCallback(
+        [this](ActionMessage&& M)
+        {
+            BrokerBase::addActionMessage(std::move(M));
+        });
+    masterComm->setLoggingCallback(BrokerBase::getLoggingCallback());
     masterComm->setName(getIdentifier());
     masterComm->loadNetworkInfo(netInfo);
     masterComm->setTimeout(networkTimeout.to_ms());

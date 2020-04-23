@@ -20,9 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/apps/MultiBroker.hpp"
 
 #include <cstdio>
 #include <future>
+
+static const bool amb = helics::allowMultiBroker();
 
 TEST(MultiBroker, constructor1)
 {
@@ -34,4 +37,22 @@ TEST(MultiBroker, constructor1)
     EXPECT_EQ(App.getIdentifier(), "brk1");
     App.forceTerminate();
     EXPECT_FALSE(App.isConnected());
+}
+
+TEST(MultiBroker, connect1)
+{
+    helics::BrokerApp b(helics::core_type::MULTI, "brk2", "--type test");
+    EXPECT_TRUE(b.connect());
+    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt2 --name=core1b");
+    EXPECT_TRUE(c1.connect());
+
+    helics::Federate fedb("fedb", c1);
+    fedb.enterExecutingMode();
+
+    fedb.finalize();
+    c1->disconnect();
+    b.forceTerminate();
+    EXPECT_TRUE(b.waitForDisconnect(std::chrono::milliseconds(500)));
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 }

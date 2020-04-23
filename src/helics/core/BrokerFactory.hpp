@@ -101,12 +101,17 @@ namespace BrokerFactory {
 @details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling
 cleanUpBrokers earlier if desired
 @param broker a pointer to a Broker object that should be able to be found globally
+@param type the core type associated with a broker
 @return true if the registration was successful false otherwise*/
-    bool registerBroker(const std::shared_ptr<Broker>& broker);
+    bool registerBroker(const std::shared_ptr<Broker>& broker, core_type type);
     /** remove a broker from the registry
 @param name the name of the broker to unregister
 */
     void unregisterBroker(const std::string& name);
+
+    /** add a type associated with a broker*/
+    void addBrokerType(const std::string& name, core_type type);
+
     /** clean up unused brokers
 @details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is
 registered or when the clean up function is called this prevents some odd threading issues

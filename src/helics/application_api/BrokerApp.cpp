@@ -47,6 +47,9 @@ BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, int argc, c
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
     if (app->helics_parse(argc, argv) == helicsCLI11App::parse_output::ok) {
+        if (ctype == core_type::MULTI) {
+            app->setDefaultCoreType(ctype);
+        }
         processArgs(app);
     }
 }
@@ -67,6 +70,10 @@ BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, const std::
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
     if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
+        if (ctype == core_type::MULTI)
+        {
+            app->setDefaultCoreType(ctype);
+        }
         processArgs(app);
     }
 }
