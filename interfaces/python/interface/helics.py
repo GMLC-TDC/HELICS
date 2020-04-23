@@ -2141,6 +2141,18 @@ def helicsFederatePublishJSON(fed: "helics_federate", json: "char const *") -> "
     r"""Publish data contained in a json file or string."""
     return _helics.helicsFederatePublishJSON(fed, json)
 
+def helicsPublicationIsValid(pub: "helics_publication") -> "helics_bool":
+    r"""
+    Check if a publication is valid.
+
+    :type pub: void
+    :param pub: The publication to check.
+
+    :rtype: int
+    :return: helics_true if the publication is a valid publication.
+    """
+    return _helics.helicsPublicationIsValid(pub)
+
 def helicsPublicationPublishRaw(pub: "helics_publication", data: "void const *") -> "int":
     r"""
     Publish raw data from a char * and length.
@@ -2267,6 +2279,18 @@ def helicsPublicationAddTarget(pub: "helics_publication", target: "char const *"
     :param target: The name of an input that the data should be sent to.
     """
     return _helics.helicsPublicationAddTarget(pub, target)
+
+def helicsInputIsValid(ipt: "helics_input") -> "helics_bool":
+    r"""
+    Check if an input is valid.
+
+    :type ipt: void
+    :param ipt: The input to check.
+
+    :rtype: int
+    :return: helics_true if the Input object represents a valid input.
+    """
+    return _helics.helicsInputIsValid(ipt)
 
 def helicsInputAddTarget(ipt: "helics_input", target: "char const *") -> "void":
     r"""
@@ -2918,6 +2942,18 @@ def helicsFederateGetEndpointByIndex(fed: "helics_federate", index: "int") -> "h
     :return: A helics_endpoint.
     """
     return _helics.helicsFederateGetEndpointByIndex(fed, index)
+
+def helicsEndpointIsValid(endpoint: "helics_endpoint") -> "helics_bool":
+    r"""
+    Check if an endpoint is valid.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object to check.
+
+    :rtype: int
+    :return: helics_true if the Endpoint object represents a valid endpoint.
+    """
+    return _helics.helicsEndpointIsValid(endpoint)
 
 def helicsEndpointSetDefaultDestination(endpoint: "helics_endpoint", dest: "char const *") -> "void":
     r"""
@@ -3680,6 +3716,18 @@ def helicsFederateGetFilterByIndex(fed: "helics_federate", index: "int") -> "hel
     :return: A helics_filter, which will be NULL if an invalid index is given.
     """
     return _helics.helicsFederateGetFilterByIndex(fed, index)
+
+def helicsFilterIsValid(filt: "helics_filter") -> "helics_bool":
+    r"""
+    Check if a filter is valid.
+
+    :type filt: void
+    :param filt: The filter object to check.
+
+    :rtype: int
+    :return: helics_true if the Filter object represents a valid filter.
+    """
+    return _helics.helicsFilterIsValid(filt)
 
 def helicsFilterGetName(filt: "helics_filter") -> "char const *":
     r"""

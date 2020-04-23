@@ -1722,6 +1722,17 @@ public class helics {
   }
 
   /**
+   * Check if a publication is valid.<br>
+   * <br>
+   * @param pub The publication to check.<br>
+   * <br>
+   * @return helics_true if the publication is a valid publication.
+   */
+  public static int helicsPublicationIsValid(SWIGTYPE_p_void pub) {
+    return helicsJNI.helicsPublicationIsValid(SWIGTYPE_p_void.getCPtr(pub));
+  }
+
+  /**
    * Publish raw data from a char * and length.<br>
    * <br>
    * @param pub The publication to publish for.<br>
@@ -1832,6 +1843,17 @@ public class helics {
    */
   public static void helicsPublicationAddTarget(SWIGTYPE_p_void pub, String target) {
     helicsJNI.helicsPublicationAddTarget(SWIGTYPE_p_void.getCPtr(pub), target);
+  }
+
+  /**
+   * Check if an input is valid.<br>
+   * <br>
+   * @param ipt The input to check.<br>
+   * <br>
+   * @return helics_true if the Input object represents a valid input.
+   */
+  public static int helicsInputIsValid(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputIsValid(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
   /**
@@ -2439,6 +2461,17 @@ public class helics {
   public static SWIGTYPE_p_void helicsFederateGetEndpointByIndex(SWIGTYPE_p_void fed, int index) {
     long cPtr = helicsJNI.helicsFederateGetEndpointByIndex(SWIGTYPE_p_void.getCPtr(fed), index);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   * Check if an endpoint is valid.<br>
+   * <br>
+   * @param endpoint The endpoint object to check.<br>
+   * <br>
+   * @return helics_true if the Endpoint object represents a valid endpoint.
+   */
+  public static int helicsEndpointIsValid(SWIGTYPE_p_void endpoint) {
+    return helicsJNI.helicsEndpointIsValid(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
   /**
@@ -3144,6 +3177,17 @@ public class helics {
   public static SWIGTYPE_p_void helicsFederateGetFilterByIndex(SWIGTYPE_p_void fed, int index) {
     long cPtr = helicsJNI.helicsFederateGetFilterByIndex(SWIGTYPE_p_void.getCPtr(fed), index);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   * Check if a filter is valid.<br>
+   * <br>
+   * @param filt The filter object to check.<br>
+   * <br>
+   * @return helics_true if the Filter object represents a valid filter.
+   */
+  public static int helicsFilterIsValid(SWIGTYPE_p_void filt) {
+    return helicsJNI.helicsFilterIsValid(SWIGTYPE_p_void.getCPtr(filt));
   }
 
   /**
