@@ -437,6 +437,17 @@ option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE)
 
 # -------------------------------------------------------------
+# Some specialized configurations
+# -------------------------------------------------------------
+
+show_variable(HELICS_BUILD_CONFIGURATION STRING "specify a build configuration to use for some specialized systems that are not otherwise detectable" "")
+mark_as_advanced(HELICS_BUILD_CONFIGURATION)
+
+if (HELICS_BUILD_CONFIGURATION STREQUAL "PI")
+	target_link_libraries(helics_base INTERFACE atomic)
+endif()
+
+# -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
 
