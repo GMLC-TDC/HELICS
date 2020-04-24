@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     bool websocket_server{false};
 
     helics::helicsCLI11App cmdLine("helics broker command line");
-    auto term =
+    auto* term =
         cmdLine
             .add_subcommand(
                 "term",
@@ -144,7 +144,7 @@ void terminalFunction(std::vector<std::string> args)
         }
     };
 
-    auto restartBroker = [&broker, &args](std::vector<std::string> broker_args, bool force) {
+    auto restartBroker = [&broker, &args](const std::vector<std::string>& broker_args, bool force) {
         if (!broker_args.empty()) {
             args = broker_args;
         }
@@ -206,14 +206,14 @@ void terminalFunction(std::vector<std::string> args)
             closeBroker();
         });
 
-    auto restart =
+    auto* restart =
         termProg.add_subcommand("restart", "restart the broker if it is not currently executing")
             ->allow_extras();
     restart->callback([restartBroker, &restart]() {
         restartBroker(restart->remaining_for_passthrough(), false);
     });
 
-    auto frestart =
+    auto* frestart =
         termProg.add_subcommand("restart!", "forceably terminate the broker and restart it")
             ->allow_extras();
     frestart->callback(
@@ -246,12 +246,12 @@ void terminalFunction(std::vector<std::string> args)
             std::cout << vres << '\n';
         }
     };
-    auto querySub = termProg.add_subcommand(
+    auto* querySub = termProg.add_subcommand(
         "query",
         "make a query of some target >>query <target> <query> or query <query> to query the broker");
-    auto qgroup1 = querySub->add_option_group("targetGroup")->enabled_by_default();
+    auto* qgroup1 = querySub->add_option_group("targetGroup")->enabled_by_default();
     qgroup1->add_option("target", target, "the name of object to target");
-    auto qgroup2 = querySub->add_option_group("queryGroup");
+    auto* qgroup2 = querySub->add_option_group("queryGroup");
     qgroup2->add_option("query", query, "the query to make")->required();
     querySub->preparse_callback([qgroup1, &target](size_t argcount) {
         if (argcount < 2) {

@@ -50,7 +50,7 @@ namespace CoreFactory {
         }
         static const std::shared_ptr<CoreBuilder>& getIndexedBuilder(std::size_t index)
         {
-            auto& blder = instance();
+            const auto& blder = instance();
             if (blder->builders.size() <= index) {
                 throw(HelicsException("core type index is not available"));
             }
@@ -101,9 +101,9 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, const std::string& configureString)
+        create(core_type type, const std::string& coreName, const std::string& configureString)
     {
-        auto core = makeCore(type, core_name);
+        auto core = makeCore(type, coreName);
         if (!core) {
             throw(helics::RegistrationFailure("unable to create core"));
         }
@@ -130,9 +130,9 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, std::vector<std::string> args)
+        create(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
-        auto core = makeCore(type, core_name);
+        auto core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
         registerCore(core,type);
 
@@ -156,9 +156,9 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, int argc, char* argv[])
+        create(core_type type, const std::string& coreName, int argc, char* argv[])
     {
-        auto core = makeCore(type, core_name);
+        auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
         registerCore(core,type);
 
@@ -166,18 +166,18 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& core_name, std::vector<std::string> args)
+        FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
-        std::shared_ptr<Core> core = findCore(core_name);
+        std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
             return core;
         }
-        core = makeCore(type, core_name);
+        core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
 
         bool success = registerCore(core,type);
         if (!success) {
-            core = findCore(core_name);
+            core = findCore(coreName);
             if (core) {
                 return core;
             }
@@ -188,19 +188,19 @@ namespace CoreFactory {
 
     std::shared_ptr<Core> FindOrCreate(
         core_type type,
-        const std::string& core_name,
+        const std::string& coreName,
         const std::string& configureString)
     {
-        std::shared_ptr<Core> core = findCore(core_name);
+        std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
             return core;
         }
-        core = makeCore(type, core_name);
+        core = makeCore(type, coreName);
         core->configure(configureString);
 
         bool success = registerCore(core,type);
         if (!success) {
-            core = findCore(core_name);
+            core = findCore(coreName);
             if (core) {
                 return core;
             }
@@ -210,18 +210,18 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& core_name, int argc, char* argv[])
+        FindOrCreate(core_type type, const std::string& coreName, int argc, char* argv[])
     {
-        std::shared_ptr<Core> core = findCore(core_name);
+        std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
             return core;
         }
-        core = makeCore(type, core_name);
+        core = makeCore(type, coreName);
 
         core->configureFromArgs(argc, argv);
         bool success = registerCore(core,type);
         if (!success) {
-            core = findCore(core_name);
+            core = findCore(coreName);
             if (core) {
                 return core;
             }
@@ -233,7 +233,7 @@ namespace CoreFactory {
     /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
     static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
-        auto ccore = dynamic_cast<CommonCore*>(core.get());
+        auto* ccore = dynamic_cast<CommonCore*>(core.get());
         if (ccore != nullptr) {
             ccore->processDisconnect(true);
             ccore->joinAllThreads();

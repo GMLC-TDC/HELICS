@@ -24,7 +24,7 @@ namespace tcp {
       public:
         /** default constructor*/
         TcpCoreSS() noexcept;
-        TcpCoreSS(const std::string& core_name);
+        TcpCoreSS(const std::string& coreName);
 
       protected:
         virtual std::shared_ptr<helicsCLI11App> generateCLI() override;

@@ -62,19 +62,19 @@ namespace CoreFactory {
 
     /** create a core from a type, name, and initializationString
 @param type the type of core to create
-@param core_name the name for the core
-@param initializationString a string containing arguments for the core
+@param coreName the name for the core
+@param configureString a string containing arguments for configuration of the core
 */
     std::shared_ptr<Core> create(
         core_type type,
-        const std::string& core_name,
-        const std::string& initializationString);
+        const std::string& coreName,
+        const std::string& configureString);
     /**
  * Creates a Core API object of the specified type.
  *
  * Invokes initialize() on the instantiated Core object.
  */
-    std::shared_ptr<Core> create(core_type type, const std::string& initializationString);
+    std::shared_ptr<Core> create(core_type type, const std::string& configureString);
 
     /** create a core from a type and command line arguments
 @param type the type of core to create
@@ -106,22 +106,22 @@ namespace CoreFactory {
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param argc the number of arguments
 @param argv the actual argument parameters
 @return a pointer to the created core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, int argc, char* argv[]);
+        create(core_type type, const std::string& coreName, int argc, char* argv[]);
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, std::vector<std::string> args);
+        create(core_type type, const std::string& coreName, std::vector<std::string> args);
 
     /** tries to find a named core if it fails it creates a new one
  */

@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "MultiBroker.hpp"
 
-#include "../core/helicsCLI11JsonConfig.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "../core/helicsCLI11JsonConfig.hpp"
 #include "../network/CommsInterface.hpp"
 #include "../network/NetworkBrokerData.hpp"
 
@@ -35,6 +35,7 @@ bool allowMultiBroker()
     return true;
 }
 
+/*
 static void loadTypeSpecificArgs(
     helics::core_type ctype,
     CommsInterface* comm,
@@ -48,7 +49,7 @@ static void loadTypeSpecificArgs(
         case core_type::TCP_SS:
 #ifdef ENABLE_TCP_CORE
         {
-            auto cm = dynamic_cast<tcp::TcpCommsSS*>(comm);
+            auto* cm = dynamic_cast<tcp::TcpCommsSS*>(comm);
             helicsCLI11App tsparse;
             tsparse.add_option_function<std::vector<std::string>>(
                 "--connections",
@@ -60,13 +61,11 @@ static void loadTypeSpecificArgs(
 #endif
         break;
         case core_type::MPI:
-            break;
         default:
             break;
     }
 }
-
-
+*/
 MultiBroker::MultiBroker(const std::string& brokerName): CoreBroker(brokerName) {}
 
 MultiBroker::MultiBroker() noexcept {}
@@ -94,10 +93,7 @@ bool MultiBroker::brokerConnect()
     }
     masterComm = CommFactory::create(type);
     masterComm->setCallback(
-        [this](ActionMessage&& M)
-        {
-            BrokerBase::addActionMessage(std::move(M));
-        });
+        [this](ActionMessage&& M) { BrokerBase::addActionMessage(std::move(M)); });
     masterComm->setLoggingCallback(BrokerBase::getLoggingCallback());
     masterComm->setName(getIdentifier());
     masterComm->loadNetworkInfo(netInfo);
@@ -108,7 +104,8 @@ bool MultiBroker::brokerConnect()
     return res;
 }
 
-void MultiBroker::brokerDisconnect() {
+void MultiBroker::brokerDisconnect()
+{
     int exp = 0;
     if (disconnectionStage.compare_exchange_strong(exp, 1)) {
         if (masterComm) {
@@ -143,8 +140,7 @@ std::shared_ptr<helicsCLI11App> MultiBroker::generateCLI()
 
 std::string MultiBroker::generateLocalAddressString() const
 {
-    switch (type)
-    {
+    switch (type) {
         case core_type::INPROC:
         case core_type::IPC:
         case core_type::INTERPROCESS:
@@ -154,7 +150,7 @@ std::string MultiBroker::generateLocalAddressString() const
             break;
     }
     auto netcomm = dynamic_cast<NetworkCommsInterface*>(masterComm.get());
-    if (netcomm) {
+    if (netcomm != nullptr) {
         return netcomm->getAddress();
     }
     return getIdentifier();
@@ -162,33 +158,18 @@ std::string MultiBroker::generateLocalAddressString() const
 
 void MultiBroker::transmit(route_id rid, const ActionMessage& cmd)
 {
-    if (rid == parent_route_id) {
-        if (masterComm) {
-            masterComm->transmit(rid, cmd);
-            return;
-            }
-    }
-    else if (comms.empty())
-    {
+    if (rid == parent_route_id|| comms.empty()) {
         if (masterComm) {
             masterComm->transmit(rid, cmd);
             return;
         }
-    }
-    else
-    {
-
+    } else {
     }
 }
 
 void MultiBroker::transmit(route_id rid, ActionMessage&& cmd)
 {
-    if (rid == parent_route_id) {
-        if (masterComm) {
-            masterComm->transmit(rid, cmd);
-            return;
-        }
-    } else if (comms.empty()) {
+    if (rid == parent_route_id || comms.empty()) {
         if (masterComm) {
             masterComm->transmit(rid, cmd);
             return;

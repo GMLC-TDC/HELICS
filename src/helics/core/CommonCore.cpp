@@ -62,8 +62,8 @@ CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
 CommonCore::CommonCore(bool /*arg*/) noexcept: timeoutMon(new TimeoutMonitor) {}
 
-CommonCore::CommonCore(const std::string& core_name):
-    BrokerBase(core_name), timeoutMon(new TimeoutMonitor)
+CommonCore::CommonCore(const std::string& coreName):
+    BrokerBase(coreName), timeoutMon(new TimeoutMonitor)
 {
 }
 

@@ -29,15 +29,15 @@ namespace helics {
 namespace CoreFactory {
     /** create a core from a type, name, and initializationString
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param initializationString a string containing arguments for the core
 */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> create(
         core_type type,
-        const std::string& core_name,
+        const std::string& coreName,
         const std::string& initializationString)
     {
-        CoreApp cr(type, core_name, initializationString);
+        CoreApp cr(type, coreName, initializationString);
         return cr.getCopyofCorePointer();
     }
     /**
@@ -100,7 +100,7 @@ namespace CoreFactory {
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param argc the number of arguments
 @param argv the actual argument parameters
 @return a pointer to the created core

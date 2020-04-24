@@ -19,7 +19,7 @@ template class NetworkCore<tcp::TcpComms, interface_type::tcp>;
 namespace tcp {
     TcpCoreSS::TcpCoreSS() noexcept {}
 
-    TcpCoreSS::TcpCoreSS(const std::string& core_name): NetworkCore(core_name) {}
+    TcpCoreSS::TcpCoreSS(const std::string& coreName): NetworkCore(coreName) {}
 
     std::shared_ptr<helicsCLI11App> TcpCoreSS::generateCLI()
     {
