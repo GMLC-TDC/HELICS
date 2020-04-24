@@ -40,7 +40,7 @@ class MultiBroker: public CoreBroker {
     /** construct from command line arguments
     @param brokerName the name of the broker
     */
-    MultiBroker(const std::string& brokerName);
+    explicit MultiBroker(const std::string& brokerName);
 
     /** destructor*/
     ~MultiBroker();
@@ -49,7 +49,6 @@ class MultiBroker: public CoreBroker {
     virtual bool brokerConnect() override;
     virtual void brokerDisconnect() override;
     virtual bool tryReconnect() override;
-    void loadComms();
     /** generate a CLI11 Application for subprocesses for processing of command line arguments*/
     virtual std::shared_ptr<helicsCLI11App> generateCLI();
 

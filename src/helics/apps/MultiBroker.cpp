@@ -66,33 +66,10 @@ static void loadTypeSpecificArgs(
     }
 }
 
-static std::unique_ptr<CommsInterface>
-    generateComms(const std::string& type, const std::string& initString = std::string{})
-{
-    auto ctype = coreTypeFromString(type);
-
-    NetworkBrokerData nbdata;
-    auto parser = nbdata.commandLineParser("127.0.0.1");
-    parser->helics_parse(initString);
-
-    std::unique_ptr<CommsInterface> comm;
-
-    if (comm) {
-        comm->loadNetworkInfo(nbdata);
-    }
-    return comm;
-}
 
 MultiBroker::MultiBroker(const std::string& brokerName): CoreBroker(brokerName) {}
 
 MultiBroker::MultiBroker() noexcept {}
-
-void MultiBroker::loadComms()
-{
-    masterComm = generateComms("def");
-    masterComm->setCallback(
-        [this](ActionMessage&& M) { BrokerBase::addActionMessage(std::move(M)); });
-}
 
 MultiBroker::~MultiBroker()
 {
