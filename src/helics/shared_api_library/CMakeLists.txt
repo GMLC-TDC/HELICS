@@ -49,7 +49,7 @@ target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
    target_compile_options(
        helicsSharedLib
-       PRIVATE -Wno-documentation
+       PUBLIC -Wno-documentation
    )
 endif()
 
