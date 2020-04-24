@@ -15,7 +15,7 @@ TEST(CoreConfig, test1)
     configString.append(TEST_DIR);
     configString.append("core_config/core_config1.json");
     auto cr = helics::CoreFactory::create(helics::core_type::TEST, configString);
-    EXPECT_EQ(cr->getIdentifier(), "coreName1");
+    EXPECT_EQ(cr->getIdentifier(), "core_name1");
     cr->disconnect();
 }
 
@@ -25,7 +25,7 @@ TEST(CoreConfig, test2)
     configString.append(TEST_DIR);
     configString.append("core_config/core_config2.json");
     auto cr = helics::CoreFactory::create(helics::core_type::TEST, configString);
-    EXPECT_EQ(cr->getIdentifier(), "coreName2");
+    EXPECT_EQ(cr->getIdentifier(), "core_name2");
     cr->disconnect();
 }
 
@@ -35,6 +35,6 @@ TEST(CoreConfig, test3)
     configString.append(TEST_DIR);
     configString.append("core_config/core_config3.json");
     auto cr = helics::CoreFactory::create(helics::core_type::TEST, configString);
-    EXPECT_EQ(cr->getIdentifier(), "coreName10");
+    EXPECT_EQ(cr->getIdentifier(), "core_name10");
     cr->disconnect();
 }
