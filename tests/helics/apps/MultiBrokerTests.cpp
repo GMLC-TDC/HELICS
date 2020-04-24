@@ -56,3 +56,25 @@ TEST(MultiBroker, connect1)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 }
+
+TEST(MultiBroker, file1)
+{
+    using helics::core_type;
+    const std::string config = "--config="+std::string(TEST_DIR) + "multiBroker1.json";
+    helics::BrokerApp App(core_type::MULTI, "brkf1",config);
+
+    // Brokers connect automatically
+    EXPECT_TRUE(App.isConnected());
+    EXPECT_TRUE(App.isOpenToNewFederates());
+    EXPECT_EQ(App.getIdentifier(), "brkf1");
+
+    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+    EXPECT_TRUE(brk1);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::ZMQ);
+    EXPECT_TRUE(brk1);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TCP);
+    EXPECT_TRUE(brk1);
+
+    App.forceTerminate();
+    EXPECT_FALSE(App.isConnected());
+}

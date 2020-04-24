@@ -33,6 +33,7 @@ class MultiBroker: public CoreBroker {
     std::string configFile; //!< the name of the config file in use
     std::atomic<bool> brokerInitialized{false}; //!< atomic protecting local initialization
     core_type type{core_type::ZMQ}; //!< the core type of the master controller
+    std::vector<std::pair<route_id, int>> routingTable; // index of the routes
   public:
     /** default constructor*/
     MultiBroker() noexcept;
