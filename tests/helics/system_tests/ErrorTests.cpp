@@ -24,7 +24,8 @@ TEST_F(error_tests, duplicate_federate_names)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    EXPECT_THROW(std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(
+        auto fed2 = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
     Fed->finalize();
 }
 

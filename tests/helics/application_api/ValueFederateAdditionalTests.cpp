@@ -109,11 +109,11 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto sv = pubid.getKey();
-    auto sv2 = pubid2.getKey();
+    const auto& sv = pubid.getKey();
+    const auto& sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0-pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");
@@ -379,8 +379,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, vector_callback_lists)
     helics::data_block db(547, ';');
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
-    vFed1->setInputNotificationCallback(sub1, [&](helics::Input&, helics::Time) { ++ccnt; });
-    vFed1->setInputNotificationCallback(sub2, [&](helics::Input&, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback(
+        sub1, [&](helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
+    vFed1->setInputNotificationCallback(
+        sub2, [&](helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
     vFed1->enterExecutingMode();
     vFed1->publishRaw(pubid3, db);
     vFed1->requestTime(1.0);
@@ -567,7 +569,7 @@ TEST_F(valuefed_add_tests_ci_skip, test_move_calls)
     helics::ValueFederate vFedMoved(std::move(vFed));
     EXPECT_EQ(vFedMoved.getName(), "test1");
     // verify that this was moved so this does produce a warning on some systems about use after move
-    EXPECT_NE(vFed.getName(), "test1");
+    EXPECT_NE(vFed.getName(), "test1"); //NOLINT
 }
 
 static constexpr const char* config_files[] = {"example_value_fed.json", "example_value_fed.toml"};
@@ -800,7 +802,8 @@ TEST(valuefederate, from_file_bad)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     std::string fstr2 = "non_existing.toml";
-    EXPECT_THROW(std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
+    EXPECT_THROW(
+        auto fed = std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
 }
 
 TEST(valuefederate, from_file_bad2)
@@ -808,7 +811,8 @@ TEST(valuefederate, from_file_bad2)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     auto fstr2 = "non_existing.toml";
-    EXPECT_THROW(std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
+    EXPECT_THROW(
+        auto fed = std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
 }
 
 TEST(valuefederate, from_file_bad3)

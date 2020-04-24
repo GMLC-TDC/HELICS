@@ -462,7 +462,7 @@ HELICS_EXPORT void helicsInputAddTarget(helics_input ipt, const char* target, he
 /**
  * Get the size of the raw value for subscription.
  *
- * @returns the size of the raw data/string in bytes
+ * @return The size of the raw data/string in bytes.
  */
 HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
 
@@ -478,7 +478,7 @@ HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
  * @endforcpponly
  *
  * @beginPythonOnly
- * @returns raw string data
+ * @return Raw string data.
  * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxDatalen, int* actualSize, helics_error* err);
@@ -486,7 +486,7 @@ HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxD
 /**
  * Get the size of a value for subscription assuming return as a string.
  *
- * @returns The size of the string.
+ * @return The size of the string.
  */
 HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
 
@@ -502,7 +502,7 @@ HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
  * @endforcpponly
  *
  * @beginPythonOnly
- * @returns A string data
+ * @return A string data
  * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetString(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, helics_error* err);
@@ -602,7 +602,7 @@ HELICS_EXPORT void helicsInputGetComplex(helics_input ipt, double* real, double*
 /**
  * Get the size of a value for subscription assuming return as an array of doubles.
  *
- * @returns The number of double in a returned vector.
+ * @return The number of doubles in a returned vector.
  */
 HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
 
