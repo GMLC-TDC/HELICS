@@ -1,0 +1,12 @@
+{
+	"master": {
+		"type": "test"
+	},
+	"comms": [{
+		"type": "zmq",
+        "port":23410
+	}, {
+		"type": "zmq",
+        "port":23700
+	}]
+}

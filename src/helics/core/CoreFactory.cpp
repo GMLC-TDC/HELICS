@@ -263,7 +263,7 @@ without issue*/
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
         return searchableCores.findObject(
-            [type](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
     }
 
     bool registerCore(const std::shared_ptr<Core>& core, core_type type)

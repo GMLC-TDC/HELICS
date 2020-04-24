@@ -50,7 +50,7 @@ class MultiBroker: public CoreBroker {
     virtual void brokerDisconnect() override;
     virtual bool tryReconnect() override;
     /** generate a CLI11 Application for subprocesses for processing of command line arguments*/
-    virtual std::shared_ptr<helicsCLI11App> generateCLI();
+    virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
   protected:
     /** generate the local address information*/

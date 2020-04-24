@@ -175,7 +175,7 @@ need be without issue*/
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
     {
         return searchableBrokers.findObject(
-            [type](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
     }
 
     std::vector<std::shared_ptr<Broker>> getAllBrokers() { return searchableBrokers.getObjects(); }
