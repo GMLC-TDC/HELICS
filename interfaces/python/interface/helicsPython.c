@@ -17393,7 +17393,7 @@ static PyMethodDef SwigMethods[] = {
 		"Get the size of the raw value for subscription.\n"
 		"\n"
 		":rtype: int\n"
-		":return: the size of the raw data/string in bytes\n"
+		":return: The size of the raw data/string in bytes.\n"
 		""},
 	 { "helicsInputGetRawValue", _wrap_helicsInputGetRawValue, METH_O, "\n"
 		"Get the raw data for the latest value of a subscription.\n"
@@ -17404,7 +17404,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		":rtype: void\n"
-		":return: raw string data\n"
+		":return: Raw string data.\n"
 		""},
 	 { "helicsInputGetStringSize", _wrap_helicsInputGetStringSize, METH_O, "\n"
 		"Get the size of a value for subscription assuming return as a string.\n"
@@ -17498,7 +17498,7 @@ static PyMethodDef SwigMethods[] = {
 		"Get the size of a value for subscription assuming return as an array of doubles.\n"
 		"\n"
 		":rtype: int\n"
-		":return: The number of double in a returned vector.\n"
+		":return: The number of doubles in a returned vector.\n"
 		""},
 	 { "helicsInputGetVector", _wrap_helicsInputGetVector, METH_O, "\n"
 		"Get a vector from a subscription.\n"
