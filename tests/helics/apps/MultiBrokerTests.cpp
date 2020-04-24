@@ -43,7 +43,7 @@ TEST(MultiBroker, connect1)
 {
     helics::BrokerApp b(helics::core_type::MULTI, "brk2", "--type test");
     EXPECT_TRUE(b.connect());
-    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt2 --name=core1b");
+    helics::CoreApp c1(helics::core_type::TEST, "--brokername=brk2 --name=core1b");
     EXPECT_TRUE(c1.connect());
 
     helics::Federate fedb("fedb", c1);

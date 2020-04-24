@@ -148,11 +148,11 @@ namespace CoreFactory {
     std::shared_ptr<Core> findCore(const std::string& name);
 
     /** register a testCore so it can be found by others
-@details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by
-calling cleanUpBrokers earlier if desired
+@details also cleans up any leftover Cores that were previously unregistered this can be controlled by
+calling cleanUpCores earlier if desired
 @param core a pointer to a testCore object that should be found globally
 @return true if the registration was successful false otherwise*/
-    bool registerCore(const std::shared_ptr<Core>& core);
+    bool registerCore(const std::shared_ptr<Core>& core, core_type type);
 
     /** remove a Core from the registry
 @param name the name of the Core to unregister

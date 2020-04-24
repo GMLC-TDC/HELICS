@@ -127,6 +127,7 @@ bool MultiBroker::brokerConnect()
     masterComm->setTimeout(networkTimeout.to_ms());
 
     auto res = masterComm->connect();
+    BrokerFactory::addAssociatedBrokerType(getIdentifier(), type);
     return res;
 }
 
@@ -165,6 +166,16 @@ std::shared_ptr<helicsCLI11App> MultiBroker::generateCLI()
 
 std::string MultiBroker::generateLocalAddressString() const
 {
+    switch (type)
+    {
+        case core_type::INPROC:
+        case core_type::IPC:
+        case core_type::INTERPROCESS:
+        case core_type::TEST:
+            return getIdentifier();
+        default:
+            break;
+    }
     auto netcomm = dynamic_cast<NetworkCommsInterface*>(masterComm.get());
     if (netcomm) {
         return netcomm->getAddress();
@@ -178,14 +189,35 @@ void MultiBroker::transmit(route_id rid, const ActionMessage& cmd)
         if (masterComm) {
             masterComm->transmit(rid, cmd);
             return;
-        } else {
+            }
+    }
+    else if (comms.empty())
+    {
+        if (masterComm) {
+            masterComm->transmit(rid, cmd);
+            return;
         }
+    }
+    else
+    {
+
     }
 }
 
 void MultiBroker::transmit(route_id rid, ActionMessage&& cmd)
 {
-    masterComm->transmit(rid, std::move(cmd));
+    if (rid == parent_route_id) {
+        if (masterComm) {
+            masterComm->transmit(rid, cmd);
+            return;
+        }
+    } else if (comms.empty()) {
+        if (masterComm) {
+            masterComm->transmit(rid, cmd);
+            return;
+        }
+    } else {
+    }
 }
 
 void MultiBroker::addRoute(route_id rid, const std::string& routeInfo)

@@ -108,7 +108,7 @@ namespace CoreFactory {
             throw(helics::RegistrationFailure("unable to create core"));
         }
         core->configure(configureString);
-        registerCore(core);
+        registerCore(core,type);
 
         return core;
     }
@@ -134,7 +134,7 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, core_name);
         core->configureFromVector(std::move(args));
-        registerCore(core);
+        registerCore(core,type);
 
         return core;
     }
@@ -160,7 +160,7 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, core_name);
         core->configureFromArgs(argc, argv);
-        registerCore(core);
+        registerCore(core,type);
 
         return core;
     }
@@ -175,7 +175,7 @@ namespace CoreFactory {
         core = makeCore(type, core_name);
         core->configureFromVector(std::move(args));
 
-        bool success = registerCore(core);
+        bool success = registerCore(core,type);
         if (!success) {
             core = findCore(core_name);
             if (core) {
@@ -198,7 +198,7 @@ namespace CoreFactory {
         core = makeCore(type, core_name);
         core->configure(configureString);
 
-        bool success = registerCore(core);
+        bool success = registerCore(core,type);
         if (!success) {
             core = findCore(core_name);
             if (core) {
@@ -219,7 +219,7 @@ namespace CoreFactory {
         core = makeCore(type, core_name);
 
         core->configureFromArgs(argc, argv);
-        bool success = registerCore(core);
+        bool success = registerCore(core,type);
         if (!success) {
             core = findCore(core_name);
             if (core) {
