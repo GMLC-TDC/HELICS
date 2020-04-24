@@ -73,7 +73,7 @@ class CommonCore: public Core, public BrokerBase {
     /**function mainly to match some other object constructors does the same thing as the default constructor*/
     explicit CommonCore(bool arg) noexcept;
     /** construct from a core name*/
-    explicit CommonCore(const std::string& core_name);
+    explicit CommonCore(const std::string& coreName);
     /** virtual destructor*/
     virtual ~CommonCore() override;
     virtual void configure(const std::string& configureString) override final;

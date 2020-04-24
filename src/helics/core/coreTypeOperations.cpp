@@ -105,7 +105,8 @@ namespace core {
         {"http", core_type::HTTP},
         {"HTTP", core_type::HTTP},
         {"web", core_type::HTTP},
-        {"test1", core_type::TEST}};
+        {"test1", core_type::TEST},
+        {"multi", core_type::MULTI}};
 
     core_type coreTypeFromString(std::string type) noexcept
     {

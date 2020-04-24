@@ -18,8 +18,8 @@ namespace zeromq {
       public:
         /** default constructor*/
         explicit ZmqBroker(bool rootbroker = false) noexcept;
-        /** construct from with a core name*/
-        explicit ZmqBroker(const std::string& broker_name);
+        /** construct using a particular name*/
+        explicit ZmqBroker(const std::string& brokerName);
 
       private:
         virtual bool brokerConnect() override;

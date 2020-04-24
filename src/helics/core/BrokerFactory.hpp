@@ -25,10 +25,6 @@ namespace BrokerFactory {
       public:
         /** build a new broker of the builder type*/
         virtual std::shared_ptr<Broker> build(const std::string& name) = 0;
-        /** check if a broker is of the correct type
-        return true if the type is compatible
-        */
-        virtual bool checkType(Broker* brk) const { return (brk != nullptr); }
     };
 
     /** template for making a Broker builder*/
@@ -43,10 +39,6 @@ namespace BrokerFactory {
         virtual std::shared_ptr<Broker> build(const std::string& name) override
         {
             return std::make_shared<BrokerTYPE>(name);
-        }
-        virtual bool checkType(Broker* brk) const override
-        {
-            return dynamic_cast<BrokerTYPE*>(brk) != nullptr;
         }
     };
 
@@ -101,12 +93,17 @@ namespace BrokerFactory {
 @details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling
 cleanUpBrokers earlier if desired
 @param broker a pointer to a Broker object that should be able to be found globally
+@param type the core type associated with a broker
 @return true if the registration was successful false otherwise*/
-    bool registerBroker(const std::shared_ptr<Broker>& broker);
+    bool registerBroker(const std::shared_ptr<Broker>& broker, core_type type);
     /** remove a broker from the registry
 @param name the name of the broker to unregister
 */
     void unregisterBroker(const std::string& name);
+
+    /** add a type associated with a broker*/
+    void addAssociatedBrokerType(const std::string& name, core_type type);
+
     /** clean up unused brokers
 @details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is
 registered or when the clean up function is called this prevents some odd threading issues

@@ -28,9 +28,10 @@ int main(int argc, char* argv[])
     bool runterminal{false};
     bool autorestart{false};
     bool http_webserver{false};
+    bool websocket_server{false};
 
     helics::helicsCLI11App cmdLine("helics broker command line");
-    auto term =
+    auto* term =
         cmdLine
             .add_subcommand(
                 "term",
@@ -47,6 +48,10 @@ int main(int argc, char* argv[])
         "--http",
         http_webserver,
         "start an http webserver that can respond to queries on the broker");
+    cmdLine.add_flag(
+        "--web",
+        websocket_server,
+        "start an websocket webserver that can respond to queries on the broker");
     cmdLine
         .footer(
             "helics_broker <broker args ..> starts a broker with the given args and waits for it to "
@@ -70,16 +75,16 @@ int main(int argc, char* argv[])
     }
 #ifdef HELICS_ENABLE_WEBSERVER
     std::unique_ptr<helics::apps::WebServer> webserver;
-    if (http_webserver) {
+    if (http_webserver || websocket_server) {
         webserver = std::make_unique<helics::apps::WebServer>();
-        webserver->enableHttpServer(true);
+        webserver->enableHttpServer(http_webserver);
+        webserver->enableWebSocketServer(websocket_server);
         webserver->startServer(nullptr);
     }
 #else
-    {
-        if (http_webserver) {
-            std::cout << "the http webserver is not available in this build" << std::endl;
-        }
+    if (http_webserver || websocket_server) {
+        std::cout << "the http webserver and websocket server are not available in this build"
+                  << std::endl;
     }
 #endif
     try {
@@ -140,7 +145,7 @@ void terminalFunction(std::vector<std::string> args)
         }
     };
 
-    auto restartBroker = [&broker, &args](std::vector<std::string> broker_args, bool force) {
+    auto restartBroker = [&broker, &args](const std::vector<std::string>& broker_args, bool force) {
         if (!broker_args.empty()) {
             args = broker_args;
         }
@@ -202,14 +207,14 @@ void terminalFunction(std::vector<std::string> args)
             closeBroker();
         });
 
-    auto restart =
+    auto* restart =
         termProg.add_subcommand("restart", "restart the broker if it is not currently executing")
             ->allow_extras();
     restart->callback([restartBroker, &restart]() {
         restartBroker(restart->remaining_for_passthrough(), false);
     });
 
-    auto frestart =
+    auto* frestart =
         termProg.add_subcommand("restart!", "forceably terminate the broker and restart it")
             ->allow_extras();
     frestart->callback(
@@ -242,12 +247,12 @@ void terminalFunction(std::vector<std::string> args)
             std::cout << vres << '\n';
         }
     };
-    auto querySub = termProg.add_subcommand(
+    auto* querySub = termProg.add_subcommand(
         "query",
         "make a query of some target >>query <target> <query> or query <query> to query the broker");
-    auto qgroup1 = querySub->add_option_group("targetGroup")->enabled_by_default();
+    auto* qgroup1 = querySub->add_option_group("targetGroup")->enabled_by_default();
     qgroup1->add_option("target", target, "the name of object to target");
-    auto qgroup2 = querySub->add_option_group("queryGroup");
+    auto* qgroup2 = querySub->add_option_group("queryGroup");
     qgroup2->add_option("query", query, "the query to make")->required();
     querySub->preparse_callback([qgroup1, &target](size_t argcount) {
         if (argcount < 2) {
