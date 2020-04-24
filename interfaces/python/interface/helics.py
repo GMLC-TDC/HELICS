@@ -2308,7 +2308,7 @@ def helicsInputGetRawValueSize(ipt: "helics_input") -> "int":
     Get the size of the raw value for subscription.
 
     :rtype: int
-    :return: the size of the raw data/string in bytes
+    :return: The size of the raw data/string in bytes.
     """
     return _helics.helicsInputGetRawValueSize(ipt)
 
@@ -2322,7 +2322,7 @@ def helicsInputGetRawValue(ipt: "helics_input") -> "int *":
 
 
     :rtype: void
-    :return: raw string data
+    :return: Raw string data.
     """
     return _helics.helicsInputGetRawValue(ipt)
 
@@ -2446,7 +2446,7 @@ def helicsInputGetVectorSize(ipt: "helics_input") -> "int":
     Get the size of a value for subscription assuming return as an array of doubles.
 
     :rtype: int
-    :return: The number of double in a returned vector.
+    :return: The number of doubles in a returned vector.
     """
     return _helics.helicsInputGetVectorSize(ipt)
 

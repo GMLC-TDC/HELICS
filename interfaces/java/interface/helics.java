@@ -1870,7 +1870,7 @@ public class helics {
    * <br>
    * Get the size of the raw value for subscription.<br>
    * <br>
-   * @return the size of the raw data/string in bytes
+   * @return The size of the raw data/string in bytes.
    */
   public static int helicsInputGetRawValueSize(SWIGTYPE_p_void ipt) {
     return helicsJNI.helicsInputGetRawValueSize(SWIGTYPE_p_void.getCPtr(ipt));
@@ -1883,7 +1883,7 @@ public class helics {
    * <br>
    * <br>
    * <br>
-   * @return raw string data
+   * @return Raw string data.
    */
   public static void helicsInputGetRawValue(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int maxDatalen, int[] actualSize) {
     helicsJNI.helicsInputGetRawValue(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), maxDatalen, actualSize);
@@ -1999,7 +1999,7 @@ public class helics {
   /**
    * Get the size of a value for subscription assuming return as an array of doubles.<br>
    * <br>
-   * @return The number of double in a returned vector.
+   * @return The number of doubles in a returned vector.
    */
   public static int helicsInputGetVectorSize(SWIGTYPE_p_void ipt) {
     return helicsJNI.helicsInputGetVectorSize(SWIGTYPE_p_void.getCPtr(ipt));
