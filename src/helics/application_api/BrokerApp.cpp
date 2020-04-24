@@ -106,14 +106,13 @@ bool BrokerApp::waitForDisconnect(std::chrono::milliseconds waitTime)
     return true;
 }
 
-std::unique_ptr<helicsCLI11App> BrokerApp::generateParser( bool noTypeOption)
+std::unique_ptr<helicsCLI11App> BrokerApp::generateParser(bool noTypeOption)
 {
     auto app = std::make_unique<helicsCLI11App>("Broker application");
-    if (!noTypeOption)
-    {
+    if (!noTypeOption) {
         app->addTypeOption();
     }
-    
+
     if (name.empty()) {
         app->add_option("--name,-n", name, "name of the broker");
     }

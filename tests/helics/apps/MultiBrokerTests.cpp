@@ -17,10 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
+#include "helics/apps/MultiBroker.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "helics/apps/MultiBroker.hpp"
 
 #include <cstdio>
 #include <future>

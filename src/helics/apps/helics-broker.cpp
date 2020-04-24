@@ -82,9 +82,10 @@ int main(int argc, char* argv[])
         webserver->startServer(nullptr);
     }
 #else
-        if (http_webserver || websocket_server) {
-            std::cout << "the http webserver and websocket server are not available in this build" << std::endl;
-        }
+    if (http_webserver || websocket_server) {
+        std::cout << "the http webserver and websocket server are not available in this build"
+                  << std::endl;
+    }
 #endif
     try {
         if (runterminal) {

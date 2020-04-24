@@ -158,7 +158,7 @@ std::string MultiBroker::generateLocalAddressString() const
 
 void MultiBroker::transmit(route_id rid, const ActionMessage& cmd)
 {
-    if (rid == parent_route_id|| comms.empty()) {
+    if (rid == parent_route_id || comms.empty()) {
         if (masterComm) {
             masterComm->transmit(rid, cmd);
             return;

@@ -96,7 +96,7 @@ namespace BrokerFactory {
             throw(helics::RegistrationFailure("unable to create broker"));
         }
         broker->configure(configureString);
-        bool reg = registerBroker(broker,type);
+        bool reg = registerBroker(broker, type);
         if (!reg) {
             throw(helics::RegistrationFailure("unable to register broker"));
         }
@@ -115,7 +115,7 @@ namespace BrokerFactory {
     {
         auto broker = makeBroker(type, brokerName);
         broker->configureFromArgs(argc, argv);
-        bool reg = registerBroker(broker,type);
+        bool reg = registerBroker(broker, type);
         if (!reg) {
             throw(helics::RegistrationFailure("unable to register broker"));
         }
@@ -134,7 +134,7 @@ namespace BrokerFactory {
     {
         auto broker = makeBroker(type, brokerName);
         broker->configureFromVector(std::move(args));
-        bool reg = registerBroker(broker,type);
+        bool reg = registerBroker(broker, type);
         if (!reg) {
             throw(helics::RegistrationFailure("unable to register broker"));
         }
@@ -161,7 +161,7 @@ need be without issue*/
     static gmlc::concurrency::DelayedDestructor<Broker>
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<Broker,core_type>
+    static gmlc::concurrency::SearchableObjectHolder<Broker, core_type>
         searchableBrokers; //!< the object managing the searchable objects
 
     // this will trip the line when it is destroyed at global destruction time
@@ -175,7 +175,7 @@ need be without issue*/
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
     {
         return searchableBrokers.findObject(
-            [type](auto& ptr) { return ptr->isOpenToNewFederates(); },type);
+            [type](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
     }
 
     std::vector<std::shared_ptr<Broker>> getAllBrokers() { return searchableBrokers.getObjects(); }
@@ -186,17 +186,16 @@ need be without issue*/
     {
         bool registered = false;
         if (broker) {
-            registered = searchableBrokers.addObject(broker->getIdentifier(), broker,type);
+            registered = searchableBrokers.addObject(broker->getIdentifier(), broker, type);
         }
         cleanUpBrokers();
         if ((!registered) && (broker)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            registered = searchableBrokers.addObject(broker->getIdentifier(), broker,type);
+            registered = searchableBrokers.addObject(broker->getIdentifier(), broker, type);
         }
         if (registered) {
             delayedDestroyer.addObjectsToBeDestroyed(broker);
-            switch (type)
-            {
+            switch (type) {
                 case core_type::INPROC:
                     searchableBrokers.addType(broker->getIdentifier(), core_type::TEST);
                     break;
@@ -237,7 +236,6 @@ need be without issue*/
         return searchableBrokers.copyObject(copyFromName, copyToName);
     }
 
-    
     void unregisterBroker(const std::string& name)
     {
         if (!searchableBrokers.removeObject(name)) {

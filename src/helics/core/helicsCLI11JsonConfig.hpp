@@ -24,9 +24,10 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     void skipJson(bool skj = true) { skip_json_ = skj; }
     /// if the specified section isn't available use the root section
     void fallbackToDefault(bool ftd = true) { fallback_to_default_ = ftd; }
+
   private:
     bool skip_json_{false};
-    bool fallback_to_default_{ false };
+    bool fallback_to_default_{false};
     /// Internal parser for the configuration
     std::vector<CLI::ConfigItem> fromConfigInternal(
         Json::Value j,

@@ -20,7 +20,7 @@ class CommsInterface;
 // small function to call to force symbol linkages
 bool allowMultiBroker();
 
-    /** helper class defining some common functionality for brokers and cores that use different
+/** helper class defining some common functionality for brokers and cores that use different
 communication methods*/
 class MultiBroker: public CoreBroker {
   protected:
