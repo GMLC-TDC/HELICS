@@ -32,10 +32,8 @@ namespace CoreFactory {
 @param coreName the name for the core
 @param initializationString a string containing arguments for the core
 */
-    HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> create(
-        core_type type,
-        const std::string& coreName,
-        const std::string& initializationString)
+    HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
+        create(core_type type, const std::string& coreName, const std::string& initializationString)
     {
         CoreApp cr(type, coreName, initializationString);
         return cr.getCopyofCorePointer();

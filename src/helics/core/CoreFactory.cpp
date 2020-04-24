@@ -108,7 +108,7 @@ namespace CoreFactory {
             throw(helics::RegistrationFailure("unable to create core"));
         }
         core->configure(configureString);
-        registerCore(core,type);
+        registerCore(core, type);
 
         return core;
     }
@@ -134,7 +134,7 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
-        registerCore(core,type);
+        registerCore(core, type);
 
         return core;
     }
@@ -160,7 +160,7 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
-        registerCore(core,type);
+        registerCore(core, type);
 
         return core;
     }
@@ -175,7 +175,7 @@ namespace CoreFactory {
         core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
 
-        bool success = registerCore(core,type);
+        bool success = registerCore(core, type);
         if (!success) {
             core = findCore(coreName);
             if (core) {
@@ -198,7 +198,7 @@ namespace CoreFactory {
         core = makeCore(type, coreName);
         core->configure(configureString);
 
-        bool success = registerCore(core,type);
+        bool success = registerCore(core, type);
         if (!success) {
             core = findCore(coreName);
             if (core) {
@@ -219,7 +219,7 @@ namespace CoreFactory {
         core = makeCore(type, coreName);
 
         core->configureFromArgs(argc, argv);
-        bool success = registerCore(core,type);
+        bool success = registerCore(core, type);
         if (!success) {
             core = findCore(coreName);
             if (core) {
@@ -249,7 +249,7 @@ without issue*/
     static gmlc::concurrency::DelayedDestructor<Core>
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<Core,core_type>
+    static gmlc::concurrency::SearchableObjectHolder<Core, core_type>
         searchableCores; //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
@@ -270,7 +270,7 @@ without issue*/
     {
         bool res = false;
         if (core) {
-            res = searchableCores.addObject(core->getIdentifier(), core,type);
+            res = searchableCores.addObject(core->getIdentifier(), core, type);
         }
         cleanUpCores();
         if (res) {

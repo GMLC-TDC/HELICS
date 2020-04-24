@@ -65,10 +65,8 @@ namespace CoreFactory {
 @param coreName the name for the core
 @param configureString a string containing arguments for configuration of the core
 */
-    std::shared_ptr<Core> create(
-        core_type type,
-        const std::string& coreName,
-        const std::string& configureString);
+    std::shared_ptr<Core>
+        create(core_type type, const std::string& coreName, const std::string& configureString);
     /**
  * Creates a Core API object of the specified type.
  *
