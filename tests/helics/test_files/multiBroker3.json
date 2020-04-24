@@ -1,6 +1,6 @@
 {
 	"comms": [{
-		"type": "zmq",
+		"type": "zmq"
 	}, {
 		"type": "ipc"
 	}, {
