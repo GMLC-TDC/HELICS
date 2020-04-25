@@ -4127,11 +4127,11 @@ class Option : public OptionBase<Option> {
         return (cnt>0)?cnt:(force_callback_?1U:0U);
     }
 
-    /// True if the option was not passed and arguments
+    /// True if not arguments were passed for the option
     bool empty() const { return results_.empty(); }
 
-    /// This class is true if option is passed.
-    explicit operator bool() const { return !empty(); }
+    /// This bool operator returns true if any arguments were passed or the option callback is forced
+    explicit operator bool() const { return !empty()||force_callback_; }
 
     /// Clear the parsed results (mostly for testing)
     void clear() {
