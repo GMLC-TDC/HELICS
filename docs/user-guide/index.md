@@ -28,7 +28,7 @@ There are a number of classes of HELICS users:
 *   [**Integrating a New Simulator**](./simulator_integration.md) - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
 *   **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
 *   [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
-*   [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type communication isn't sufficient.
+*   [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type of communication isn't sufficient.
 *   **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
 
 ## Additional Resources ##

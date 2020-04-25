@@ -24,7 +24,7 @@ Some library reorganization, additional static analysis(CppLint and clang-tidy),
 -   `helicsEndpointSendMessageObjectZeroCopy` to allow transferring messages with minimal copying.
 -   `helics<Interface>IsValid` functions to the C API
 -   `helicscpp::cleanHelicsLibrary` to the C++98 API.
--   a Comm factory to the Core to enable constructing Comm interfaces directly from the type.
+-   A Comm factory to the Core to enable constructing Comm interfaces directly from the type.
 -   The REST API in the webserver was updated to include ability to create and destroy brokers.
 -   A websocket server similar to the REST API but will respond to JSON queries.
 -   A test suite for the HTTP and websocket servers.
