@@ -233,7 +233,7 @@ class CoreBroker: public Broker, public BrokerBase {
     @details add a route to a table, the connection information is contained in the string with the described
     identifier
     @param rid the identification of the route
-    @param interfaceId an interface id code that can be used to identify the interface route should be added to in most cases this should be zero since there is only one interface
+    @param interfaceId an interface id code that can be used to identify the interface route should be added to, in most cases this should be zero since there is only one interface
     @param routeInfo a string containing the information necessary to connect
     */
     virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;

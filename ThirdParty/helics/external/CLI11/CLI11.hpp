@@ -4127,7 +4127,7 @@ class Option : public OptionBase<Option> {
         return (cnt>0)?cnt:(force_callback_?1U:0U);
     }
 
-    /// True if not arguments were passed for the option
+    /// True if no arguments were passed for the option
     bool empty() const { return results_.empty(); }
 
     /// This bool operator returns true if any arguments were passed or the option callback is forced
@@ -8914,4 +8914,3 @@ inline std::string Formatter::make_option_usage(const Option *opt) const {
 }
 
 }  // namespace CLI
-
