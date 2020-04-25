@@ -11,20 +11,20 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
-set(helicsJar ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar)
+set(helicsJar ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar)
 
 add_custom_target(
     Java_hello_world
     ALL
     ${Java_JAVAC_EXECUTABLE}
     -classpath
-    ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
+    ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
     -d
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
     DEPENDS
         helics::java
-        ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
+        ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building HelloWorld.java"
     VERBATIM
 )
@@ -34,13 +34,13 @@ add_custom_target(
     ALL
     ${Java_JAVAC_EXECUTABLE}
     -classpath
-    ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
+    ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
     -d
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/JavaHelicsApiTests.java
     DEPENDS
         helics::java
-        ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
+        ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building JavaHelicsApiTests.java"
     VERBATIM
 )
