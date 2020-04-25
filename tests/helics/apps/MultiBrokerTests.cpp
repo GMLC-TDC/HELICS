@@ -60,8 +60,8 @@ TEST(MultiBroker, connect1)
 TEST(MultiBroker, file1)
 {
     using helics::core_type;
-    const std::string config = "--config="+std::string(TEST_DIR) + "multiBroker1.json";
-    helics::BrokerApp App(core_type::MULTI, "brkf1",config);
+    const std::string config = "--config=" + std::string(TEST_DIR) + "multiBroker1.json";
+    helics::BrokerApp App(core_type::MULTI, "brkf1", config);
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
@@ -102,7 +102,6 @@ TEST(MultiBroker, file2)
     App.reset();
     helics::cleanupHelicsLibrary();
 }
-
 
 TEST(MultiBroker, file3)
 {
@@ -152,8 +151,6 @@ TEST(MultiBroker, file4)
     helics::cleanupHelicsLibrary();
 }
 
-
-
 TEST(MultiBroker, link2)
 {
     using helics::core_type;
@@ -186,7 +183,7 @@ TEST(MultiBroker, link2)
 
     EXPECT_DOUBLE_EQ(fedB.getDouble(sub), 27.045);
     fedB.finalize();
-    
+
     App.waitForDisconnect(std::chrono::milliseconds(300));
     EXPECT_FALSE(App.isConnected());
     App.reset();

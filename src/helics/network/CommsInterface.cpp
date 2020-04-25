@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommsInterface.hpp"
 
 #include "../core/core-exceptions.hpp"
-#include "gmlc/utilities/stringOps.h"
 #include "NetworkBrokerData.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 #include <iostream>
 #include <memory>
@@ -277,8 +277,7 @@ bool CommsInterface::connect()
     if (localTargetAddress.empty()) {
         localTargetAddress = name;
     }
-    if (randomID.empty())
-    {
+    if (randomID.empty()) {
         randomID = gmlc::utilities::randomString(10);
     }
     if (!singleThread) {

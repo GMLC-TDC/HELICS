@@ -171,6 +171,7 @@ class CommsInterface {
     void join_tx_rx_thread();
     /** get the generated randomID for this comm interface*/
     const std::string& getRandomID() const { return randomID; }
+
   private:
     gmlc::concurrency::TripWireDetector
         tripDetector; //!< try to detect if everything is shutting down

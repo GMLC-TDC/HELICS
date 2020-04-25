@@ -182,8 +182,7 @@ need be without issue*/
 
     bool brokersActive() { return !searchableBrokers.empty(); }
 
-    static void
-        addExtraTypes(const std::string &name, core_type type)
+    static void addExtraTypes(const std::string& name, core_type type)
     {
         switch (type) {
             case core_type::INPROC:

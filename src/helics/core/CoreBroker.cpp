@@ -336,7 +336,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 if (brk != _brokers.end()) {
                     // we would get this if the ack didn't go through for some reason
                     brk->route = route_id{routeCount++};
-                    addRoute(brk->route,command.getExtraData(), command.getString(targetStringLoc));
+                    addRoute(
+                        brk->route, command.getExtraData(), command.getString(targetStringLoc));
                     routing_table[brk->global_id] = brk->route;
 
                     // sending the response message
