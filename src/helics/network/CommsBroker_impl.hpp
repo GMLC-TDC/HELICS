@@ -112,7 +112,10 @@ void CommsBroker<COMMS, BrokerT>::transmit(route_id rid, ActionMessage&& cmd)
 }
 
 template<class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::addRoute(route_id rid, int /*interfaceId*/, const std::string& routeInfo)
+void CommsBroker<COMMS, BrokerT>::addRoute(
+    route_id rid,
+    int /*interfaceId*/,
+    const std::string& routeInfo)
 {
     comms->addRoute(rid, routeInfo);
 }

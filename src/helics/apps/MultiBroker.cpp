@@ -140,8 +140,7 @@ bool MultiBroker::brokerConnect()
 
                 bool res = comm->connect();
                 comms.push_back(std::move(comm));
-                if (!res)
-                {
+                if (!res) {
                     brokerDisconnect();
                     return false;
                 }
