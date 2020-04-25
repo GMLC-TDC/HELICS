@@ -265,8 +265,10 @@ class CommonCore: public Core, public BrokerBase {
     virtual void transmit(route_id rid, ActionMessage&& cmd) = 0;
     /** add a route to whatever internal structure manages the routes
     @param rid the identification of the route
-    @param routeInfo a string containing the information necessary to connect*/
-    virtual void addRoute(route_id rid, const std::string& routeInfo) = 0;
+    @param interfaceId an interface id code that can be used to identify the interface route should be added to, in most cases this should be zero since there is only one interface
+    @param routeInfo a string containing the information necessary to connect
+    */
+    virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;
     /** remove or disconnect a route from use
     @param rid the identification of the route
     */

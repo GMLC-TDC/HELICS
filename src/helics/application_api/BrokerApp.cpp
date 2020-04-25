@@ -26,6 +26,7 @@ BrokerApp::BrokerApp(
 {
     auto app = generateParser(ctype == core_type::MULTI);
     app->setDefaultCoreType(ctype);
+    app->passConfig = true;
     if (app->helics_parse(std::move(args)) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
@@ -46,6 +47,7 @@ BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, int argc, c
 {
     auto app = generateParser(ctype == core_type::MULTI);
     app->setDefaultCoreType(ctype);
+    app->passConfig = true;
     if (app->helics_parse(argc, argv) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
@@ -66,6 +68,7 @@ BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, const std::
 {
     auto app = generateParser(ctype == core_type::MULTI);
     app->setDefaultCoreType(ctype);
+    app->passConfig = true;
     if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
@@ -128,7 +131,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser(bool noTypeOption)
 
 void BrokerApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
 {
-    auto remArgs = app->remaining_for_passthrough();
+    auto& remArgs = app->remainArgs();
     try {
         broker = BrokerFactory::create(app->getCoreType(), name, remArgs);
     }

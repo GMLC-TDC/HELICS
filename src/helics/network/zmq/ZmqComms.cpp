@@ -111,7 +111,8 @@ namespace zeromq {
         zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
         pullSocket.setsockopt(ZMQ_LINGER, 200);
         zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
-        std::string controlsockString = std::string("inproc://") + name + "_control";
+        std::string controlsockString =
+            std::string("inproc://") + name + '_' + getRandomID() + "_control";
         try {
             controlSocket.bind(controlsockString.c_str());
         }
@@ -406,7 +407,8 @@ namespace zeromq {
         // Setup the control socket for comms with the receiver
         zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
         controlSocket.setsockopt(ZMQ_LINGER, 200);
-        std::string controlsockString = std::string("inproc://") + name + "_control";
+        std::string controlsockString =
+            std::string("inproc://") + name + '_' + getRandomID() + "_control";
         controlSocket.connect(controlsockString);
         try {
             auto res = initializeBrokerConnections(controlSocket);
