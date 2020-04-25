@@ -300,7 +300,6 @@ TEST_F(httpTest, core)
 
 TEST_F(httpTest, coreBody)
 {
-
     auto result = sendGet("brk2/cr1");
 
     auto result2 = sendCommand(http::verb::search, "brk2/cr1", "query=current_state");
