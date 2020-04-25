@@ -84,15 +84,16 @@ MultiBroker::~MultiBroker()
 
 bool MultiBroker::brokerConnect()
 {
+    std::shared_ptr<helicsCLI11App> app;
+    std::string configString = "--config='" + configFile + '\'';
+    if (!configFile.empty()) {
+        app = netInfo.commandLineParser("");
+        app->addTypeOption();
+        app->allow_config_extras(CLI::config_extras_mode::error);
+    } else if (type == core_type::MULTI) {
+        type = core_type::DEFAULT;
+    }
     try {
-        std::shared_ptr<helicsCLI11App> app;
-        std::string configString = "--config='" + configFile + '\'';
-        if (!configFile.empty()) {
-            app = netInfo.commandLineParser("");
-            app->addTypeOption();
-        } else if (type == core_type::MULTI) {
-            type = core_type::DEFAULT;
-        }
         if (type == core_type::MULTI) {
             app->get_config_formatter_base()->section("master");
             app->setDefaultCoreType(type);
@@ -118,6 +119,14 @@ bool MultiBroker::brokerConnect()
             BrokerFactory::addAssociatedBrokerType(getIdentifier(), type);
         }
         bool moreComms = (!configFile.empty());
+        if (moreComms) {
+            // remove options that are used to specify a broker
+            app->remove_option(app->get_option("--broker"));
+            app->remove_option(app->get_option("--brokerport"));
+            app->remove_option(app->get_option("--brokername"));
+            app->remove_option(app->get_option("--brokeraddress"));
+            app->remove_option(app->get_option("--autobroker"));
+        }
         uint16_t index = 0;
         while (moreComms) {
             netInfo = NetworkBrokerData(); //to reset the networkBrokerData
@@ -150,6 +159,13 @@ bool MultiBroker::brokerConnect()
             }
             ++index;
         }
+    }
+    catch (const CLI::Error& e) {
+        std::ostringstream ss;
+        app->exit(e, ss, ss);
+        CoreBroker::loggerFunction(helics_log_level_error, getIdentifier(), ss.str());
+        brokerDisconnect();
+        return false;
     }
     catch (...) {
         brokerDisconnect();
