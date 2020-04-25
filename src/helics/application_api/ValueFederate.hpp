@@ -40,14 +40,17 @@ class HELICS_CXX_EXPORT ValueFederate:
     ValueFederate(
         const std::string& fedName,
         const std::shared_ptr<Core>& core,
-        const FederateInfo& fi);
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedName the name of the federate can be empty to use a name from the federateInfo
     @param core a CoreApp with the core to connect to.
     @param fi  a federate information structure
     */
-    ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
+    ValueFederate(
+        const std::string& fedName,
+        CoreApp& core,
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a string with the required information
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON

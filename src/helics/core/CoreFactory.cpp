@@ -266,31 +266,37 @@ without issue*/
             [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
     }
 
+    static void addExtraTypes(const std::string& name, core_type type)
+    {
+        switch (type) {
+            case core_type::INPROC:
+                searchableCores.addType(name, core_type::TEST);
+                break;
+            case core_type::TEST:
+                searchableCores.addType(name, core_type::INPROC);
+                break;
+            case core_type::IPC:
+                searchableCores.addType(name, core_type::INTERPROCESS);
+                break;
+            case core_type::INTERPROCESS:
+                searchableCores.addType(name, core_type::IPC);
+                break;
+            default:
+                break;
+        }
+    }
+
     bool registerCore(const std::shared_ptr<Core>& core, core_type type)
     {
         bool res = false;
+        const std::string& cname = (core) ? core->getIdentifier() : std::string{};
         if (core) {
-            res = searchableCores.addObject(core->getIdentifier(), core, type);
+            res = searchableCores.addObject(cname, core, type);
         }
         cleanUpCores();
         if (res) {
             delayedDestroyer.addObjectsToBeDestroyed(core);
-            switch (type) {
-                case core_type::INPROC:
-                    searchableCores.addType(core->getIdentifier(), core_type::TEST);
-                    break;
-                case core_type::TEST:
-                    searchableCores.addType(core->getIdentifier(), core_type::INPROC);
-                    break;
-                case core_type::IPC:
-                    searchableCores.addType(core->getIdentifier(), core_type::INTERPROCESS);
-                    break;
-                case core_type::INTERPROCESS:
-                    searchableCores.addType(core->getIdentifier(), core_type::IPC);
-                    break;
-                default:
-                    break;
-            }
+            addExtraTypes(cname, type);
         }
         return res;
     }
@@ -327,6 +333,7 @@ without issue*/
     void addAssociatedCoreType(const std::string& name, core_type type)
     {
         searchableCores.addType(name, type);
+        addExtraTypes(name, type);
     }
 
     static const std::string helpStr{"--help"};

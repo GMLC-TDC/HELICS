@@ -182,35 +182,41 @@ need be without issue*/
 
     bool brokersActive() { return !searchableBrokers.empty(); }
 
+    static void
+        addExtraTypes(const std::string &name, core_type type)
+    {
+        switch (type) {
+            case core_type::INPROC:
+                searchableBrokers.addType(name, core_type::TEST);
+                break;
+            case core_type::TEST:
+                searchableBrokers.addType(name, core_type::INPROC);
+                break;
+            case core_type::IPC:
+                searchableBrokers.addType(name, core_type::INTERPROCESS);
+                break;
+            case core_type::INTERPROCESS:
+                searchableBrokers.addType(name, core_type::IPC);
+                break;
+            default:
+                break;
+        }
+    }
     bool registerBroker(const std::shared_ptr<Broker>& broker, core_type type)
     {
         bool registered = false;
+        const std::string& bname = (broker) ? broker->getIdentifier() : std::string{};
         if (broker) {
-            registered = searchableBrokers.addObject(broker->getIdentifier(), broker, type);
+            registered = searchableBrokers.addObject(bname, broker, type);
         }
         cleanUpBrokers();
         if ((!registered) && (broker)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            registered = searchableBrokers.addObject(broker->getIdentifier(), broker, type);
+            registered = searchableBrokers.addObject(bname, broker, type);
         }
         if (registered) {
             delayedDestroyer.addObjectsToBeDestroyed(broker);
-            switch (type) {
-                case core_type::INPROC:
-                    searchableBrokers.addType(broker->getIdentifier(), core_type::TEST);
-                    break;
-                case core_type::TEST:
-                    searchableBrokers.addType(broker->getIdentifier(), core_type::INPROC);
-                    break;
-                case core_type::IPC:
-                    searchableBrokers.addType(broker->getIdentifier(), core_type::INTERPROCESS);
-                    break;
-                case core_type::INTERPROCESS:
-                    searchableBrokers.addType(broker->getIdentifier(), core_type::IPC);
-                    break;
-                default:
-                    break;
-            }
+            addExtraTypes(bname, type);
         }
 
         return registered;
@@ -247,6 +253,7 @@ need be without issue*/
     void addAssociatedBrokerType(const std::string& name, core_type type)
     {
         searchableBrokers.addType(name, type);
+        addExtraTypes(name, type);
     }
 
     static const std::string helpStr{"--help"};

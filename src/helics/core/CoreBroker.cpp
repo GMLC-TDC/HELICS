@@ -336,7 +336,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 if (brk != _brokers.end()) {
                     // we would get this if the ack didn't go through for some reason
                     brk->route = route_id{routeCount++};
-                    addRoute(brk->route, command.getString(targetStringLoc));
+                    addRoute(brk->route,command.getExtraData(), command.getString(targetStringLoc));
                     routing_table[brk->global_id] = brk->route;
 
                     // sending the response message
@@ -364,7 +364,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                     newroute = route_id(routeCount++);
-                    addRoute(newroute, command.getString(targetStringLoc));
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
                     newroute = getRoute(command.source_id);
@@ -386,7 +386,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                     newroute = route_id{routeCount++};
-                    addRoute(newroute, command.getString(targetStringLoc));
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
                     newroute = getRoute(command.source_id);
@@ -409,7 +409,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                     newroute = route_id{routeCount++};
-                    addRoute(newroute, command.getString(targetStringLoc));
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
                     newroute = getRoute(command.source_id);
@@ -428,7 +428,10 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                 // TODO(PT): this will need to be updated when we enable mesh routing
                 _brokers.back().route = route_id{routeCount++};
-                addRoute(_brokers.back().route, command.getString(targetStringLoc));
+                addRoute(
+                    _brokers.back().route,
+                    command.getExtraData(),
+                    command.getString(targetStringLoc));
                 _brokers.back().parent = global_broker_id_local;
                 _brokers.back()._nonLocal = false;
                 _brokers.back()._route_key = true;

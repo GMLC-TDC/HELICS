@@ -34,14 +34,17 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     CombinationFederate(
         const std::string& fedName,
         const std::shared_ptr<Core>& core,
-        const FederateInfo& fi);
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a federate information structure and using the given CoreApp
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param core a CoreApp object representing the core to connect to
     @param fi  a federate information structure
     */
-    CombinationFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
+    CombinationFederate(
+        const std::string& fedName,
+        CoreApp& core,
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a federate name and a file with the required information
 	@param fedName the name of the federate, can be empty to use the name from the configString

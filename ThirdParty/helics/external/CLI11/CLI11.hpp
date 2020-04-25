@@ -4122,9 +4122,12 @@ class Option : public OptionBase<Option> {
     Option &operator=(const Option &) = delete;
 
     /// Count the total number of times an option was passed
-    std::size_t count() const { return results_.size(); }
+    std::size_t count() const {
+        auto cnt = results_.size();
+        return (cnt>0)?cnt:(force_callback_?1U:0U);
+    }
 
-    /// True if the option was not passed
+    /// True if the option was not passed and arguments
     bool empty() const { return results_.empty(); }
 
     /// This class is true if option is passed.
