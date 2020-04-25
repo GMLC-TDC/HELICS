@@ -185,6 +185,9 @@ else()
 
     add_library(helicsJava SHARED interface/helicsJava.c)
     target_link_libraries(helicsJava HELICS::helicsSharedLib ${JAVA_LIBRARIES})
+    target_include_directories(helicsJava PRIVATE ${JAVA_INCLUDE_PATH})
+    target_include_directories(helicsJava PRIVATE ${JAVA_INCLUDE_PATH2})
+    target_include_directories(helicsJava PRIVATE ${JNI_INCLUDE_DIRS})
 
     if(MSVC)
         target_compile_options(helicsJava PRIVATE "/wd4100")
