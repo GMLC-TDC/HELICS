@@ -15,7 +15,8 @@ Some library reorganization, additional static analysis(CppLint and clang-tidy),
 -   Update FMT library to version 6.2.0
 -   The core and broker Factories use a map instead of a fixed list which is a step toward allowing user defined cores
 -   Updated CLI11 included code to customized version to allow configuration of cores and brokers through Json files
--   The ordering of the helics_error_types enum is in ascending order.  
+-   The ordering of the helics_error_types enum is in ascending order
+-   Refactored the Matlab and Java swig interface builds to enable standalone builds
 
 ### Fixed
 -   Added CPPlint and fixed a number of issues that check identified.
