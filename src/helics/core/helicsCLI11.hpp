@@ -71,7 +71,7 @@ class helicsCLI11App: public CLI::App {
             remArgs = remaining_for_passthrough();
             if (passConfig) {
                 auto* opt = get_option_no_throw("--config");
-                if (opt!=nullptr && opt->count() > 0) {
+                if (opt != nullptr && opt->count() > 0) {
                     remArgs.push_back(opt->as<std::string>());
                     remArgs.emplace_back("--config");
                 }

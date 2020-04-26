@@ -25,7 +25,7 @@ void terminalFunction(std::vector<std::string> args);
 
 static const bool amb = helics::allowMultiBroker();
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) //NOLINT
 {
     int ret{0};
     bool runterminal{false};
