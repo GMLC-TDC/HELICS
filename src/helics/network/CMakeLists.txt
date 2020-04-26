@@ -165,7 +165,7 @@ endif(ENABLE_MPI_CORE)
 if(ENABLE_ZMQ_CORE)
     target_link_libraries(
         helics_network PRIVATE
-        ${ZeroMQ_DEPENDENCY}
+        helics::zmq
     )
     source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(ENABLE_ZMQ_CORE)

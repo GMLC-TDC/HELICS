@@ -9,11 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 /** @file
 @details function in this file are common function used between the different TCP comms */
 
-#include "cppzmq/zmq.hpp"
-
 #include <chrono>
 #include <string>
 class AsioContextManager;
+
+namespace zmq {
+class socket_t;
+}
 
 namespace helics {
 namespace hzmq {

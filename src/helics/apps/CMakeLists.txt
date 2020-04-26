@@ -72,7 +72,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                                    ${helics_apps_private_headers} ${helics_apps_broker_files})
 
     target_link_libraries(helics_apps PUBLIC helics_application_api)
-    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
+    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt helics::zmq)
     
     if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)

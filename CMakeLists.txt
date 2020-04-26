@@ -516,13 +516,12 @@ if(ENABLE_ZMQ_CORE)
     endif()
 
     if(HELICS_USE_ZMQ_STATIC_LIBRARY)
-        set(ZeroMQ_DEPENDENCY libzmq-static)
+		add_library(helics::zmq ALIAS libzmq-static)
         target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
     else()
-        set(ZeroMQ_DEPENDENCY libzmq)
+		add_library(helics::zmq ALIAS libzmq)
     endif()
     # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-    target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
 endif()
 
 # -----------------------------------------------------------------------------
