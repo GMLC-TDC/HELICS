@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/Broker.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "MultiBroker.hpp"
 #include "gmlc/utilities/stringOps.h"
 
 #ifdef HELICS_ENABLE_WEBSERVER
@@ -21,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** function to run the online terminal program*/
 void terminalFunction(std::vector<std::string> args);
+
+static const bool amb = helics::allowMultiBroker();
 
 int main(int argc, char* argv[])
 {
@@ -62,6 +65,7 @@ int main(int argc, char* argv[])
             return std::string{};
         });
     cmdLine.allow_extras();
+    cmdLine.set_config();
     auto res = cmdLine.helics_parse(argc, argv);
     if (res != helics::helicsCLI11App::parse_output::ok) {
         switch (res) {
