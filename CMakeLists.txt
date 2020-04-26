@@ -12,10 +12,10 @@ cmake_minimum_required(VERSION 3.4)
 # of CMake. For most of the policies, the new version is better (hence the change).
 # We don't use the 3.0...3.16 syntax because of a bug in MSVC 15.7
 # built-in and modified CMake 3.11
-if(CMAKE_VERSION VERSION_LESS 3.16)
+if(CMAKE_VERSION VERSION_LESS 3.17)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 else()
-    cmake_policy(VERSION 3.16)
+    cmake_policy(VERSION 3.17)
 endif()
 
 project(HELICS VERSION 2.5.0)
@@ -92,7 +92,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
                 CACHE PATH "default install path" FORCE
             )
         elseif(MSYS)
-            # use CMAKE_OBJCOPY here since it is somewhat less likely to be overwridden
+            # use CMAKE_OBJCOPY here since it is somewhat less likely to be overridden
             # by users rather than the compiler
             get_filename_component(path_bin ${CMAKE_OBJCOPY} DIRECTORY)
             get_filename_component(path_install ${path_bin} DIRECTORY)
@@ -399,7 +399,7 @@ if(NOT HELICS_DISABLE_BOOST)
 endif()
 
 # -------------------------------------------------------------
-# TOML11  add the toml interpreter
+# TOML11  add the TOML interpreter
 # -------------------------------------------------------------
 
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
