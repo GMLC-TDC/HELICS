@@ -11,12 +11,15 @@
 
 file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
+  get_filename_component(helics.i_INCLUDE_DIR "${HELICS_SWIG_helics.i_FILE}" DIRECTORY)
+
   # custom command for building the wrap file
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     COMMAND
       "${SWIG_EXECUTABLE}" "-matlab" "-c++" -o "helicsMEX.cpp"
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
+      "-I${helics.i_INCLUDE_DIR}"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsMatlab.i
     DEPENDS
       ../helics.i
