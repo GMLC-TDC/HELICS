@@ -25,6 +25,9 @@ The following list of tools is a list of tools that have worked with HELICS at s
     -   DC and AC (Newton’s method & Fast Decoupled) power flow and
     -   DC and AC optimal power flow (OPF)
 
+### Real time simulators
+-   [OpalRT](https://www.opal-rt.com/hardware-in-the-loop/) A few projects are using HELICS to allow connections between Opal RT and other simulations
+-   [RTDS](https://www.rtds.com/) Some planning or testing for RTDS linkages to HELICS is underway and will be required for some known projects
 
 ### Electric Power Market simulation
 -   [FESTIV](https://github.com/NREL/FESTIV_MODEL), the Flexible Energy Scheduling Tool for Integrating Variable Generation, provides multi-timescale steady-state power system operations simulations that aims to replicate the full time spectrum of scheduling and reserve processes (multi-step commitment and dispatch plus simplified AGC) to meet energy and reliability needs of the bulk power system.

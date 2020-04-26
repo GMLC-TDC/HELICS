@@ -45,7 +45,7 @@ class helicsCLI11App: public CLI::App {
     {
         set_help_flag("-h,-?,--help", "Print this help message and exit");
         set_config(
-            "--config-file,--config", "helics_config.ini", "specify base configuration file");
+            "--config-file,--config", "helics_config.toml", "specify base configuration file");
         version(helics::versionString);
         add_option_group("quiet")->immediate_callback()->add_flag(
             "--quiet", quiet, "silence most print output");

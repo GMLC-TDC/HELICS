@@ -50,7 +50,7 @@ namespace CoreFactory {
         }
         static const std::shared_ptr<CoreBuilder>& getIndexedBuilder(std::size_t index)
         {
-            auto& blder = instance();
+            const auto& blder = instance();
             if (blder->builders.size() <= index) {
                 throw(HelicsException("core type index is not available"));
             }
@@ -101,14 +101,14 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, const std::string& configureString)
+        create(core_type type, const std::string& coreName, const std::string& configureString)
     {
-        auto core = makeCore(type, core_name);
+        auto core = makeCore(type, coreName);
         if (!core) {
             throw(helics::RegistrationFailure("unable to create core"));
         }
         core->configure(configureString);
-        registerCore(core);
+        registerCore(core, type);
 
         return core;
     }
@@ -130,11 +130,11 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, std::vector<std::string> args)
+        create(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
-        auto core = makeCore(type, core_name);
+        auto core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
-        registerCore(core);
+        registerCore(core, type);
 
         return core;
     }
@@ -156,28 +156,28 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, int argc, char* argv[])
+        create(core_type type, const std::string& coreName, int argc, char* argv[])
     {
-        auto core = makeCore(type, core_name);
+        auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
-        registerCore(core);
+        registerCore(core, type);
 
         return core;
     }
 
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& core_name, std::vector<std::string> args)
+        FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
-        std::shared_ptr<Core> core = findCore(core_name);
+        std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
             return core;
         }
-        core = makeCore(type, core_name);
+        core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
 
-        bool success = registerCore(core);
+        bool success = registerCore(core, type);
         if (!success) {
-            core = findCore(core_name);
+            core = findCore(coreName);
             if (core) {
                 return core;
             }
@@ -188,19 +188,19 @@ namespace CoreFactory {
 
     std::shared_ptr<Core> FindOrCreate(
         core_type type,
-        const std::string& core_name,
+        const std::string& coreName,
         const std::string& configureString)
     {
-        std::shared_ptr<Core> core = findCore(core_name);
+        std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
             return core;
         }
-        core = makeCore(type, core_name);
+        core = makeCore(type, coreName);
         core->configure(configureString);
 
-        bool success = registerCore(core);
+        bool success = registerCore(core, type);
         if (!success) {
-            core = findCore(core_name);
+            core = findCore(coreName);
             if (core) {
                 return core;
             }
@@ -210,18 +210,18 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& core_name, int argc, char* argv[])
+        FindOrCreate(core_type type, const std::string& coreName, int argc, char* argv[])
     {
-        std::shared_ptr<Core> core = findCore(core_name);
+        std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
             return core;
         }
-        core = makeCore(type, core_name);
+        core = makeCore(type, coreName);
 
         core->configureFromArgs(argc, argv);
-        bool success = registerCore(core);
+        bool success = registerCore(core, type);
         if (!success) {
-            core = findCore(core_name);
+            core = findCore(coreName);
             if (core) {
                 return core;
             }
@@ -233,7 +233,7 @@ namespace CoreFactory {
     /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
     static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
-        auto ccore = dynamic_cast<CommonCore*>(core.get());
+        auto* ccore = dynamic_cast<CommonCore*>(core.get());
         if (ccore != nullptr) {
             ccore->processDisconnect(true);
             ccore->joinAllThreads();
@@ -249,7 +249,7 @@ without issue*/
     static gmlc::concurrency::DelayedDestructor<Core>
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<Core>
+    static gmlc::concurrency::SearchableObjectHolder<Core, core_type>
         searchableCores; //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
@@ -260,44 +260,43 @@ without issue*/
         return searchableCores.findObject(name);
     }
 
-    static bool isJoinableCoreOfType(core_type type, const std::shared_ptr<Core>& ptr)
-    {
-        if (!ptr->isOpenToNewFederates()) {
-            return false;
-        }
-        try {
-            return MasterCoreBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
-        }
-        catch (const helics::HelicsException&) {
-            // the error will throw if the MasterCoreBuilder can't find the core type, in which case it is open yet so return true
-            return true;
-        }
-    }
-
-    static bool isJoinableCoreForType(core_type type, const std::shared_ptr<Core>& ptr)
-    {
-        if (type == core_type::INPROC || type == core_type::TEST) {
-            return isJoinableCoreOfType(core_type::INPROC, ptr) ||
-                isJoinableCoreOfType(core_type::TEST, ptr);
-        }
-        return isJoinableCoreOfType(type, ptr);
-    }
-
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
         return searchableCores.findObject(
-            [type](auto& ptr) { return isJoinableCoreForType(type, ptr); });
+            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
     }
 
-    bool registerCore(const std::shared_ptr<Core>& core)
+    static void addExtraTypes(const std::string& name, core_type type)
+    {
+        switch (type) {
+            case core_type::INPROC:
+                searchableCores.addType(name, core_type::TEST);
+                break;
+            case core_type::TEST:
+                searchableCores.addType(name, core_type::INPROC);
+                break;
+            case core_type::IPC:
+                searchableCores.addType(name, core_type::INTERPROCESS);
+                break;
+            case core_type::INTERPROCESS:
+                searchableCores.addType(name, core_type::IPC);
+                break;
+            default:
+                break;
+        }
+    }
+
+    bool registerCore(const std::shared_ptr<Core>& core, core_type type)
     {
         bool res = false;
+        const std::string& cname = (core) ? core->getIdentifier() : std::string{};
         if (core) {
-            res = searchableCores.addObject(core->getIdentifier(), core);
+            res = searchableCores.addObject(cname, core, type);
         }
         cleanUpCores();
         if (res) {
             delayedDestroyer.addObjectsToBeDestroyed(core);
+            addExtraTypes(cname, type);
         }
         return res;
     }
@@ -329,6 +328,12 @@ without issue*/
             searchableCores.removeObject(
                 [&name](auto& obj) { return (obj->getIdentifier() == name); });
         }
+    }
+
+    void addAssociatedCoreType(const std::string& name, core_type type)
+    {
+        searchableCores.addType(name, type);
+        addExtraTypes(name, type);
     }
 
     static const std::string helpStr{"--help"};

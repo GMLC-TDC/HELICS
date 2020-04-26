@@ -51,6 +51,7 @@ enum class core_type : int {
     INPROC = helics_core_type_inproc, //!< core/broker using a stripped down in process core type
     NULLCORE = helics_core_type_null, //!< explicit core type that doesn't exist
     UNRECOGNIZED = 22, //!< unknown
+    MULTI = 45 //!< use the multi-broker
 
 };
 

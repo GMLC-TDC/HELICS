@@ -62,8 +62,8 @@ CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
 CommonCore::CommonCore(bool /*arg*/) noexcept: timeoutMon(new TimeoutMonitor) {}
 
-CommonCore::CommonCore(const std::string& core_name):
-    BrokerBase(core_name), timeoutMon(new TimeoutMonitor)
+CommonCore::CommonCore(const std::string& coreName):
+    BrokerBase(coreName), timeoutMon(new TimeoutMonitor)
 {
 }
 
@@ -2480,7 +2480,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         } break;
         case CMD_REG_ROUTE:
             // TODO(PT): double check this
-            addRoute(route_id(command.getExtraData()), command.payload);
+            addRoute(route_id(command.getExtraData()), 0, command.payload);
             break;
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();

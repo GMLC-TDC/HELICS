@@ -121,6 +121,7 @@ class CommsInterface {
     std::string
         brokerInitString; //!< the initialization string for any automatically generated broker
   private:
+    std::string randomID; //!< randomized id for preventing crosstalk in some situations
     std::atomic<connection_status> tx_status{
         connection_status::startup}; //!< the status of the transmitter thread
     gmlc::concurrency::TriggerVariable txTrigger;
@@ -168,6 +169,8 @@ class CommsInterface {
     void propertyUnLock();
     /** function to join the processing threads*/
     void join_tx_rx_thread();
+    /** get the generated randomID for this comm interface*/
+    const std::string& getRandomID() const { return randomID; }
 
   private:
     gmlc::concurrency::TripWireDetector

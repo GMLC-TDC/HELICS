@@ -46,8 +46,8 @@ add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtur
 add_executable(shared-library-tests-cpp ${cpp_shared_library_test_sources}
                                         cpptestFixtures.hpp ../coreTypeLists.hpp)
 
-target_link_libraries(shared-library-tests helicsSharedLib helics_test_base)
-target_link_libraries(shared-library-tests-cpp helicsSharedLib helics_test_base)
+target_link_libraries(shared-library-tests helics_test_base helicsSharedLib)
+target_link_libraries(shared-library-tests-cpp helics_test_base helicsSharedLib)
 
 target_include_directories(shared-library-tests PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes)
 target_include_directories(shared-library-tests-cpp PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes)

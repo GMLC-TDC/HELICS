@@ -27,10 +27,6 @@ namespace CoreFactory {
     class CoreBuilder {
       public:
         virtual std::shared_ptr<Core> build(const std::string& name) = 0;
-        /** check if a Core is of the correct type
-        return true if the type is compatible
-        */
-        virtual bool checkType(Core* cr) const { return (cr != nullptr); }
     };
 
     /** template for making a Core builder*/
@@ -45,10 +41,6 @@ namespace CoreFactory {
         virtual std::shared_ptr<Core> build(const std::string& name) override
         {
             return std::make_shared<CoreTYPE>(name);
-        }
-        virtual bool checkType(Core* cr) const override
-        {
-            return dynamic_cast<CoreTYPE*>(cr) != nullptr;
         }
     };
 
@@ -70,19 +62,17 @@ namespace CoreFactory {
 
     /** create a core from a type, name, and initializationString
 @param type the type of core to create
-@param core_name the name for the core
-@param initializationString a string containing arguments for the core
+@param coreName the name for the core
+@param configureString a string containing arguments for configuration of the core
 */
-    std::shared_ptr<Core> create(
-        core_type type,
-        const std::string& core_name,
-        const std::string& initializationString);
+    std::shared_ptr<Core>
+        create(core_type type, const std::string& coreName, const std::string& configureString);
     /**
  * Creates a Core API object of the specified type.
  *
  * Invokes initialize() on the instantiated Core object.
  */
-    std::shared_ptr<Core> create(core_type type, const std::string& initializationString);
+    std::shared_ptr<Core> create(core_type type, const std::string& configureString);
 
     /** create a core from a type and command line arguments
 @param type the type of core to create
@@ -114,22 +104,22 @@ namespace CoreFactory {
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param argc the number of arguments
 @param argv the actual argument parameters
 @return a pointer to the created core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, int argc, char* argv[]);
+        create(core_type type, const std::string& coreName, int argc, char* argv[]);
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, std::vector<std::string> args);
+        create(core_type type, const std::string& coreName, std::vector<std::string> args);
 
     /** tries to find a named core if it fails it creates a new one
  */
@@ -156,16 +146,20 @@ namespace CoreFactory {
     std::shared_ptr<Core> findCore(const std::string& name);
 
     /** register a testCore so it can be found by others
-@details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by
-calling cleanUpBrokers earlier if desired
+@details also cleans up any leftover Cores that were previously unregistered this can be controlled by
+calling cleanUpCores earlier if desired
 @param core a pointer to a testCore object that should be found globally
 @return true if the registration was successful false otherwise*/
-    bool registerCore(const std::shared_ptr<Core>& core);
+    bool registerCore(const std::shared_ptr<Core>& core, core_type type);
 
     /** remove a Core from the registry
 @param name the name of the Core to unregister
 */
     void unregisterCore(const std::string& name);
+
+    /** add a type associated with a core*/
+    void addAssociatedCoreType(const std::string& name, core_type type);
+
     /** clean up unused cores
 @details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is
 registered or when the clean up function is called this prevents some odd threading issues

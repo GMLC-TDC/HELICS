@@ -50,3 +50,8 @@ To enable or disable options, use `+`, `-`, and `~`. For example, to build with 
 spack install helics +mpi
 ```
 
+## Troubleshooting shared library errors on Windows
+If you encounter an error along the lines of `DLL load failed: The specified module could not be found` when attempting to use the C shared library installed by a package manager, it is likely a required system dependency is missing. You can determine which DLL it is unable to find using a tool like https://github.com/lucasg/Dependencies to see what dependency is missing for the helics C shared library DLL. It is fine if it shows it can't find `WS2_32.dll`, but all other DLLs should be found.
+The most likely to be missing is `vcruntime140_1.dll`, which can be fixed by downloading the latest Visual C++ Redistributable from https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads and installing it.
+
+
