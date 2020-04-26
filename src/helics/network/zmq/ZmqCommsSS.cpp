@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ZmqCommsSS.h"
 
-#include "../../common/zmqContextManager.h"
-#include "../../common/zmqHelper.h"
-#include "../../common/zmqSocketDescriptor.h"
+#include "zmqContextManager.h"
+#include "zmqHelper.h"
+#include "zmqSocketDescriptor.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"

@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 #ifdef ENABLE_ZMQ_CORE
-#    include "../common/zmqContextManager.h"
+#    include "../network/zmq/zmqContextManager.h"
 #    include "../network/zmq/ZmqCommsCommon.h"
 #endif
 

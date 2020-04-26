@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ZmqCore.h"
 
-#include "../../common/zmqContextManager.h"
+#include "zmqContextManager.h"
 #include "../NetworkCore_impl.hpp"
 #include "ZmqComms.h"
 #include "ZmqCommsSS.h"
