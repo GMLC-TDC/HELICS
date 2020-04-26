@@ -70,8 +70,8 @@ class helicsCLI11App: public CLI::App {
             last_output = parse_output::ok;
             remArgs = remaining_for_passthrough();
             if (passConfig) {
-                auto* opt = get_option("--config");
-                if (opt->count() > 0) {
+                auto* opt = get_option_no_throw("--config");
+                if (opt != nullptr && opt->count() > 0) {
                     remArgs.push_back(opt->as<std::string>());
                     remArgs.emplace_back("--config");
                 }
