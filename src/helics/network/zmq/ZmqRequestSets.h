@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "zmqContextManager.h"
+#include "ZmqContextManager.h"
 #include "../../core/ActionMessage.hpp"
 #include "cppzmq/zmq.hpp"
 #include "gmlc/containers/extra/optional.hpp"
