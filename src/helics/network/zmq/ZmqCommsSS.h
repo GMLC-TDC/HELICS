@@ -45,7 +45,7 @@ namespace zeromq {
         /** process Tx control cmd message
         return code for required action TRUE=close connection, FALSE=continue*/
         bool processTxControlCmd(
-            ActionMessage cmd,
+            const ActionMessage &cmd,
             std::map<route_id, std::string>& routes,
             std::map<std::string, std::string>& connection_info);
 

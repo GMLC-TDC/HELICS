@@ -17,8 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 #ifdef ENABLE_ZMQ_CORE
-#    include "../network/zmq/ZmqContextManager.h"
 #    include "../network/zmq/ZmqCommsCommon.h"
+#    include "../network/zmq/ZmqContextManager.h"
 #    include "cppzmq/zmq.hpp"
 #endif
 
@@ -89,62 +89,61 @@ namespace apps {
 
 #ifdef ENABLE_ZMQ_CORE
 
-    std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket(zmq::context_t& ctx)
+    std::pair<std::unique_ptr<zmq::socket_t>, int>
+        zmqBrokerServer::loadZMQsocket(zmq::context_t& ctx)
     {
+        std::pair<std::unique_ptr<zmq::socket_t>, int> retval{nullptr,
+                                                              DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1};
         std::string ext_interface = "tcp://*";
-        int zmqport = DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1;
         std::chrono::milliseconds timeout(20000);
         if (config_->isMember("zmq")) {
             auto V = (*config_)["zmq"];
             replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", zmqport);
+            replaceIfMember(V, "port", retval.second);
         }
-        auto repSocket = std::make_unique<zmq::socket_t>(ctx, ZMQ_REP);
-        repSocket->setsockopt(ZMQ_LINGER, 500);
-        auto bindsuccess = hzmq::bindzmqSocket(*repSocket, ext_interface, zmqport, timeout);
+        retval.first = std::make_unique<zmq::socket_t>(ctx, ZMQ_REP);
+        retval.first->setsockopt(ZMQ_LINGER, 500);
+        auto bindsuccess =
+            hzmq::bindzmqSocket(*retval.first, ext_interface, retval.second, timeout);
         if (!bindsuccess) {
-            repSocket->close();
+            retval.first->close();
+            retval.first.reset();
+            retval.second = 0;
             logMessage("ZMQ server failed to start");
-            return nullptr;
         }
-        return repSocket;
+        return retval;
     }
 
-    std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQSSsocket(zmq::context_t& ctx)
+    std::pair<std::unique_ptr<zmq::socket_t>, int>
+        zmqBrokerServer::loadZMQSSsocket(zmq::context_t& ctx)
     {
+        std::pair<std::unique_ptr<zmq::socket_t>, int> retval{nullptr,
+                                                              DEFAULT_ZMQSS_BROKER_PORT_NUMBER};
         std::string ext_interface = "tcp://*";
-        int zmqport = DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
         std::chrono::milliseconds timeout(20000);
         if (config_->isMember("zmqss")) {
             auto V = (*config_)["zmqss"];
             replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", zmqport);
+            replaceIfMember(V, "port", retval.second);
         }
-        auto repSocket = std::make_unique<zmq::socket_t>(ctx, ZMQ_ROUTER);
-        repSocket->setsockopt(ZMQ_LINGER, 500);
-        auto bindsuccess = hzmq::bindzmqSocket(*repSocket, ext_interface, zmqport, timeout);
+        retval.first = std::make_unique<zmq::socket_t>(ctx, ZMQ_ROUTER);
+        retval.first->setsockopt(ZMQ_LINGER, 500);
+        auto bindsuccess =
+            hzmq::bindzmqSocket(*retval.first, ext_interface, retval.second, timeout);
         if (!bindsuccess) {
-            repSocket->close();
+            retval.first->close();
+            retval.first.reset();
+            retval.second = 0;
             logMessage("ZMQSS server failed to start");
-            return nullptr;
         }
-        return repSocket;
+        return retval;
     }
 
-    zmqBrokerServer::zmqServerData zmqBrokerServer::generateZMQServerData()
+    zmqBrokerServer::zmqServerData zmqBrokerServer::generateServerData(int portNumber, int skip)
     {
         zmqServerData pdata;
         for (int ii = 0; ii < 20; ++ii) {
-            pdata.ports.emplace_back(DEFAULT_ZMQ_BROKER_PORT_NUMBER + 4 + ii * 2, false, nullptr);
-        }
-        return pdata;
-    }
-
-    zmqBrokerServer::zmqServerData zmqBrokerServer::generateZMQSSServerData()
-    {
-        zmqServerData pdata;
-        for (int ii = 0; ii < 20; ++ii) {
-            pdata.ports.emplace_back(DEFAULT_ZMQSS_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
+            pdata.ports.emplace_back(portNumber + ii * skip, false, nullptr);
         }
         return pdata;
     }
@@ -184,8 +183,9 @@ namespace apps {
         auto ctx = ZmqContextManager::getContextPointer();
 
         if (zmq_enabled_) {
-            sockets.push_back(loadZMQsocket(ctx->getContext()));
-            data.push_back(generateZMQServerData());
+            auto sdata = loadZMQsocket(ctx->getContext());
+            sockets.push_back(std::move(sdata.first));
+            data.push_back(generateServerData(sdata.second + 3, 2));
             handleMessage.push_back([this](zmq::socket_t* skt, portData& pdata) {
                 zmq::message_t msg;
                 skt->recv(msg);
@@ -195,9 +195,10 @@ namespace apps {
         }
 
         if (zmqss_enabled_) {
-            sockets.push_back(loadZMQSSsocket(ctx->getContext()));
-            data.push_back(generateZMQSSServerData());
-            handleMessage.push_back([this](zmq::socket_t* skt, portData& pdata) {
+            auto sdata = loadZMQSSsocket(ctx->getContext());
+            sockets.push_back(std::move(sdata.first));
+            data.push_back(generateServerData(sdata.second + 4, 1));
+            handleMessage.emplace_back([this](zmq::socket_t* skt, portData& pdata) {
                 zmq::message_t msg1;
                 zmq::message_t msg2;
                 skt->recv(msg1); //should be null
@@ -210,9 +211,9 @@ namespace apps {
         }
 
         std::vector<zmq::pollitem_t> poller;
-        for (std::size_t ii = 0; ii < sockets.size(); ++ii) {
+        for (auto& socket : sockets) {
             poller.emplace_back();
-            poller.back().socket = static_cast<void*>(*sockets[ii]);
+            poller.back().socket = static_cast<void*>(*socket);
             poller.back().events = ZMQ_POLLIN;
         }
 

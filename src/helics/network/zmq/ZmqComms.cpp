@@ -7,14 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ZmqComms.h"
 
-#include "ZmqContextManager.h"
-#include "ZmqHelper.h"
-#include "zmqSocketDescriptor.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
+#include "ZmqContextManager.h"
+#include "ZmqHelper.h"
 #include "ZmqRequestSets.h"
+#include "zmqSocketDescriptor.h"
 
 #include <csignal>
 #include <map>
@@ -283,7 +283,8 @@ namespace zeromq {
                             logError("ZMQ broker connection error (2)");
                             setTxStatus(connection_status::error);
                             break;
-                        } else if (rc == 0) {
+                        }
+                        if (rc == 0) {
                             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                                 return (-3);
                             }
@@ -435,7 +436,8 @@ namespace zeromq {
         }
         setTxStatus(connection_status::connected);
         zmq::message_t msg;
-        while (true) {
+        bool continueProcessing{true};
+        while (continueProcessing) {
             route_id rid;
             ActionMessage cmd;
 
@@ -479,7 +481,9 @@ namespace zeromq {
                             processed = true;
                             break;
                         case DISCONNECT:
-                            goto CLOSE_TX_LOOP; // break out of loop
+                            continueProcessing = false;
+                            processed = true;
+                            break;
                     }
                 }
             }
@@ -502,10 +506,9 @@ namespace zeromq {
                 catch (const zmq::error_t& e) {
                     if ((getRxStatus() == connection_status::terminated) ||
                         (getRxStatus() == connection_status::error)) {
-                        goto CLOSE_TX_LOOP; // break out of loop
-                    } else {
-                        logError(e.what());
+                        break;
                     }
+                    logError(e.what());
                 }
                 continue;
             } else {
@@ -525,7 +528,6 @@ namespace zeromq {
                 }
             }
         }
-    CLOSE_TX_LOOP:
         brokerPushSocket.close();
 
         routes.clear();
