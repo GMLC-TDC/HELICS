@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #include <algorithm>
-
-using namespace helics;
+#include <string>
+using helics::data_type;
 
 data_type getType(const std::string& typeString)
 {
@@ -49,7 +49,7 @@ data_type getType(const std::string& typeString)
 
     gmlc::utilities::makeLowerCase(tstr);
 
-    return getTypeFromString(tstr);
+    return helics::getTypeFromString(tstr);
 }
 
 char typeCharacter(data_type type)

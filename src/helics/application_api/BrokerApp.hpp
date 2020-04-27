@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {
@@ -134,7 +135,7 @@ class HELICS_CXX_EXPORT BrokerApp {
 
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
-    std::unique_ptr<helicsCLI11App> generateParser();
+    std::unique_ptr<helicsCLI11App> generateParser(bool noTypeOption = false);
     std::shared_ptr<Broker> broker; //!< the actual endpoint objects
     std::string name; //!< the name of the broker
 };

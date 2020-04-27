@@ -73,7 +73,7 @@ if __name__ == "__main__":
 #################################  Registering  federate from json  ########################################
 
     fed = h.helicsCreateValueFederateFromConfig('Transmission_json.json')
-    status = h.helicsFederateRegisterInterfaces(fed, 'Transmission_json.json')
+    h.helicsFederateRegisterInterfaces(fed, 'Transmission_json.json')
     federate_name = h.helicsFederateGetName(fed)[-1]
     print(" Federate {} has been registered".format(federate_name))
     pubkeys_count = h.helicsFederateGetPublicationCount(fed)
@@ -88,12 +88,12 @@ if __name__ == "__main__":
         print(pubtype)
     for i in range(0,subkeys_count):
         subid["m{}".format(i)] = h.helicsFederateGetInputByIndex(fed, i)
-        status = h.helicsInputSetDefaultComplex(subid["m{}".format(i)], 0, 0)
+        h.helicsInputSetDefaultComplex(subid["m{}".format(i)], 0, 0)
         sub_key = h.helicsSubscriptionGetKey(subid["m{}".format(i)])
         print( 'Registered Subscription ---> {}'.format(sub_key))
 
 ######################   Entereing Execution Mode  ##########################################################
-    status = h.helicsFederateEnterInitializingMode(fed)
+    h.helicsFederateEnterInitializingMode(fed)
     status = h.helicsFederateEnterExecutingMode(fed)
 
     #Pypower Processing (inputs)

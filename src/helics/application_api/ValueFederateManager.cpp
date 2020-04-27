@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+
+#include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id):
     coreObject(coreOb), fed(vfed), fedID(id)
@@ -132,7 +134,7 @@ void ValueFederateManager::addTarget(const Input& inp, const std::string& target
 
 void ValueFederateManager::removeTarget(const Publication& pub, const std::string& target)
 {
-    // TODO:: erase from targetID's
+    // TODO(PT): erase from targetID's
     coreObject->removeTarget(pub.handle, target);
 }
 
@@ -147,7 +149,7 @@ void ValueFederateManager::removeTarget(const Input& inp, const std::string& tar
             break;
         }
     }
-    // TODO:: erase from targetID's
+    // TODO(PT): erase from targetID's
 }
 
 void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& block)

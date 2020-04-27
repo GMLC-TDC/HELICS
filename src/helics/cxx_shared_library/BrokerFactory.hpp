@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/BrokerApp.hpp"
 #include "Broker.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace helics {
 /**
  * Factory for building Core API instances.
@@ -113,7 +117,7 @@ registered or when the clean up function is called this prevents some odd thread
 @param delay the number of milliseconds to wait to ensure stuff is cleaned up
 @return the number of brokers still operating
 */
-    HELICS_SHARED_DEPRECATED size_t cleanUpBrokers(std::chrono::milliseconds delay) { return 0; };
+    HELICS_SHARED_DEPRECATED size_t cleanUpBrokers(std::chrono::milliseconds delay) { return 0; }
 
     /** make a copy of the broker pointer to allow access to the new name
 @return true if successful
@@ -125,6 +129,6 @@ registered or when the clean up function is called this prevents some odd thread
     }
 
     /** display the help listing for a particular core_type*/
-    HELICS_SHARED_DEPRECATED void displayHelp(core_type type = core_type::UNRECOGNIZED){};
+    HELICS_SHARED_DEPRECATED void displayHelp(core_type type = core_type::UNRECOGNIZED) {}
 } // namespace BrokerFactory
 } // namespace helics

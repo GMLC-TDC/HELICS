@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_core_types.hpp"
 #include "flagOperations.hpp"
 
+#include <string>
+
 namespace helics {
 /** define the type of the handle*/
 enum class handle_type : char {
@@ -34,7 +36,7 @@ enum handle_flag_definitions {
 class BasicHandleInfo {
   public:
     /** default constructor*/
-    BasicHandleInfo() noexcept: type_in(type), type_out(units){};
+    BasicHandleInfo() noexcept: type_in(type), type_out(units) {}
     /** construct from the data*/
     BasicHandleInfo(
         global_federate_id federate_id,

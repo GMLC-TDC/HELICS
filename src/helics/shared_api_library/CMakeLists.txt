@@ -46,6 +46,13 @@ set_target_properties(
 target_link_libraries(helicsSharedLib PRIVATE helics_application_api)
 target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
+   target_compile_options(
+       helicsSharedLib
+       PUBLIC -Wno-documentation
+   )
+endif()
+
 if(UNIX OR MINGW)
     if(NOT APPLE)
         target_link_libraries(

@@ -34,12 +34,12 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     std::string key; //!< key for the broker
     std::string
         localport; //!< string for defining the local port to use usually a number but other strings are possible
-
+    std::string fileInUse; //!< string containing a configuration file that was used
     /** default constructor*/
     FederateInfo() = default;
     /** construct from a type
     @param cType the type of core to use for the federate*/
-    explicit FederateInfo(core_type cType): coreType(cType){};
+    explicit FederateInfo(core_type cType): coreType(cType) {}
     /** load a federateInfo object from command line arguments in a string
     @details calls /ref loadInfoFromArgs in the constructor
     @param args a string containing the command line arguments
@@ -81,11 +81,23 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     */
     void loadInfoFromArgsIgnoreOutput(int argc, char* argv[]);
 
+    /** load a federateInfo object from a toml string either a file or toml string
+    @param toml a string containing the name of the toml file or toml contents
+    */
+    void loadInfoFromToml(const std::string& toml, bool runArgParser = true);
+
+    /** load a federateInfo object from a JSON string either a file or JSON string
+  @param json a string containing the name of the JSON file or JSON contents
+  */
+    void loadInfoFromJson(const std::string& json, bool runArgParser = true);
+
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
+    /** do some additional configuration from config files */
+    void config_additional(helicsCLI11App* app);
 };
 
-/** generate a FederateInfo object from a config file (JSON, TOML)
+/** generate a FederateInfo object from a config file or string (JSON, TOML)
  */
 HELICS_CXX_EXPORT FederateInfo loadFederateInfo(const std::string& configString);
 

@@ -13,8 +13,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <set>
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace apps {

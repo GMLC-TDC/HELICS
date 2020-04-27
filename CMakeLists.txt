@@ -18,14 +18,14 @@ else()
     cmake_policy(VERSION 3.16)
 endif()
 
-project(HELICS VERSION 2.4.2)
+project(HELICS VERSION 2.5.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-03-27")
+set(HELICS_DATE "2020-04-26")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -437,6 +437,17 @@ option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE)
 
 # -------------------------------------------------------------
+# Some specialized configurations
+# -------------------------------------------------------------
+
+show_variable(HELICS_BUILD_CONFIGURATION STRING "specify a build configuration to use for some specialized systems that are not otherwise detectable" "")
+mark_as_advanced(HELICS_BUILD_CONFIGURATION)
+
+if (HELICS_BUILD_CONFIGURATION STREQUAL "PI")
+	target_link_libraries(helics_base INTERFACE atomic)
+endif()
+
+# -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
 
@@ -621,7 +632,7 @@ if(NOT WIN32)
         get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
         # message(STATUS "zmqdir path =${zmqdir}")
         if(APPLE)
-            # TODO: Make sure it works for building ZMQ from source automatically using
+            # TODO(@nightlark): Make sure it works for building ZMQ from source automatically using
             # CMake
             list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
             list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)

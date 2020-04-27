@@ -15,6 +15,7 @@ file defines some common filter operations
 #include "gmlc/libguarded/cow_guarded.hpp"
 
 #include <atomic>
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>

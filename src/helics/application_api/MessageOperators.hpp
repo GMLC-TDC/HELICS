@@ -12,6 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 /** @file
 @brief define helper classes to scope filter operations
 */

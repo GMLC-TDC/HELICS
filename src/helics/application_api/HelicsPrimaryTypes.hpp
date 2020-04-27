@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
@@ -181,18 +182,18 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
             break;
         case vector_loc: // vector
         {
-            auto& vec = mpark::get<std::vector<double>>(dv);
+            const auto& vec = mpark::get<std::vector<double>>(dv);
             val = static_cast<X>(vectorNorm(vec));
             break;
         }
         case complex_vector_loc: // complex vector
         {
-            auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            const auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
             val = static_cast<X>(vectorNorm(vec));
             break;
         }
         case named_point_loc: {
-            auto& np = mpark::get<NamedPoint>(dv);
+            const auto& np = mpark::get<NamedPoint>(dv);
             if (std::isnan(np.value)) {
                 val = static_cast<X>(getDoubleFromString(np.name));
             } else {

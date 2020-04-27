@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TypedBrokerServer.hpp"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #if defined(ENABLE_TCP_CORE) || defined(ENABLE_UDP_CORE)
 
 #    include "helics/common/AsioContextManager.h"
@@ -41,7 +45,7 @@ namespace apps {
         /** stop the server*/
         virtual void stopServer() override;
         void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
-        void enableUdpServer(bool enabled) { udp_enabled_ = enabled; };
+        void enableUdpServer(bool enabled) { udp_enabled_ = enabled; }
 
       private:
         void mainLoop();

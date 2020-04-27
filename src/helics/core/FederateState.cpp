@@ -20,8 +20,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <chrono>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "MessageTimer.hpp"
@@ -90,7 +93,7 @@ static const std::string emptyStr;
 #    define LOG_TRACE(message) ((void)0)
 #endif // LOGGING_DISABLED
 
-using namespace std::chrono_literals;
+using namespace std::chrono_literals; //NOLINT
 
 namespace helics {
 FederateState::FederateState(const std::string& name_, const CoreFederateInfo& info_):
@@ -148,7 +151,7 @@ void FederateState::reset()
     state = HELICS_CREATED;
     queue.clear();
     delayQueues.clear();
-    // TODO:: this probably needs to do a lot more
+    // TODO(PT): this probably needs to do a lot more
 }
 /** reset the federate to the initializing state*/
 void FederateState::reInit()
@@ -156,7 +159,7 @@ void FederateState::reInit()
     state = HELICS_INITIALIZING;
     queue.clear();
     delayQueues.clear();
-    // TODO:: this needs to reset a bunch of stuff as well as check a few things
+    // TODO(PT): this needs to reset a bunch of stuff as well as check a few things
 }
 federate_state FederateState::getState() const
 {
@@ -1656,6 +1659,18 @@ std::string FederateState::processQueryActual(const std::string& query) const
     }
     if (query == "current_time") {
         return timeCoord->printTimeStatus();
+    }
+    if (query == "current_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["state"] = static_cast<int>(state.load());
+        base["publications"] = publicationCount();
+        base["input"] = inputCount();
+        base["endpoints"] = endpointCount();
+        base["granted_time"] = static_cast<double>(grantedTime());
+        return generateJsonString(base);
     }
     if (query == "timeconfig") {
         Json::Value base;

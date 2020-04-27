@@ -22,8 +22,8 @@ if(HELICS_BUILD_APP_LIBRARY)
         Tracer.hpp
         helicsApp.hpp
         Clone.hpp
-		CoreApp.hpp
-		BrokerApp.hpp
+        CoreApp.hpp
+        BrokerApp.hpp
     )
 
 	set(helics_apps_broker_headers 
@@ -76,6 +76,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     
     if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
+        target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
     endif()
     # add and alias library to match the find_package
     add_library(HELICS::apps ALIAS helics_apps)

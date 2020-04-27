@@ -56,7 +56,7 @@ this is a json file.  The sections in the json file include the server type For 
 }
 ```
 
-There is also a [webserver](./running_interaction.md) that can be run with the other broker servers.  
+There is also a [webserver](./webserver.md) that can be run with the other broker servers.  
 
 ## Use of keys
 If there are multiple users and you want to verify that a specific broker can only be used with federates you control.  It is possible to add a key to the broker that is required to be supplied with the federates to connect to the broker.  **NOTE:** *this is not a cryptographic key, it is just a string that is not programmatically accessible to others.*  

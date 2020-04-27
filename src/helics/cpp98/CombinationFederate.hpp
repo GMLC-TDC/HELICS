@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "MessageFederate.hpp"
 #include "ValueFederate.hpp"
 
+#include <string>
+
 namespace helicscpp {
 /** combination federate object in the C++98 API
 @details a combination federate merges a \ref ValueFederate and a \ref MessageFederate*/

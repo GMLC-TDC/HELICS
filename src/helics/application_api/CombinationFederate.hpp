@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
 
+#include <memory>
+#include <string>
+
 namespace helics {
 /** class defining a federate that can use both the value and message interfaces */
 class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public MessageFederate {
@@ -31,21 +34,24 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     CombinationFederate(
         const std::string& fedName,
         const std::shared_ptr<Core>& core,
-        const FederateInfo& fi);
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a federate information structure and using the given CoreApp
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param core a CoreApp object representing the core to connect to
     @param fi  a federate information structure
     */
-    CombinationFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
+    CombinationFederate(
+        const std::string& fedName,
+        CoreApp& core,
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a federate name and a file with the required information
 	@param fedName the name of the federate, can be empty to use the name from the configString
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code or a string with command line arguments
 	*/
-    CombinationFederate(const std::string& name, const std::string& configString);
+    CombinationFederate(const std::string& fedName, const std::string& configString);
 
     /**constructor taking a file with the required information
      @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON

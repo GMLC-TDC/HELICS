@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 /** @file
@@ -37,27 +38,27 @@ class data_block {
     /**default destructor*/
     ~data_block() = default;
     /** size allocation constructor */
-    explicit data_block(size_t blockSize) { m_data.resize(blockSize); };
+    explicit data_block(size_t blockSize) { m_data.resize(blockSize); }
     /** size and data */
-    data_block(size_t blockSize, char init): m_data(blockSize, init){};
+    data_block(size_t blockSize, char init): m_data(blockSize, init) {}
     /** copy constructor */
     data_block(const data_block& db) = default;
     /** move constructor */
     data_block(data_block&& db) = default;
     /** construct from char * */
     // NOLINTNEXTLINE
-    /* implicit */ data_block(const char* s): m_data(s){};
+    /* implicit */ data_block(const char* s): m_data(s) {}
     /** construct from string */
     // NOLINTNEXTLINE
-    /* implicit */ data_block(const std::string& str): m_data(str){};
+    /* implicit */ data_block(const std::string& str): m_data(str) {}
     /** move from string */
     // NOLINTNEXTLINE
-    /* implicit */ data_block(std::string&& str) noexcept: m_data(std::move(str)){};
+    /* implicit */ data_block(std::string&& str) noexcept: m_data(std::move(str)) {}
     /** char * and length */
-    data_block(const char* s, size_t len): m_data(s, len){};
+    data_block(const char* s, size_t len): m_data(s, len) {}
     /** construct from a vector object */
     // NOLINTNEXTLINE
-    /* implicit */ data_block(const std::vector<char>& vdata): m_data(vdata.data(), vdata.size()){};
+    /* implicit */ data_block(const std::vector<char>& vdata): m_data(vdata.data(), vdata.size()) {}
     /** construct from an arbitrary vector*/
     template<class X>
     // NOLINTNEXTLINE
@@ -146,13 +147,15 @@ class Message {
     Time time = timeZero; //!< the event time the message is sent
     std::uint16_t flags{0}; //!< message flags
     std::uint16_t messageValidation{0U}; //!< extra field for user object usage, not used by HELICS
-    int32_t messageID{0}; //!< the messageID for a message
+    std::int32_t messageID{0}; //!< the messageID for a message
     data_block data; //!< the data packet for the message
     std::string dest; //!< the destination of the message
     std::string source; //!< the most recent source of the message
     std::string original_source; //!< the original source of the message
     std::string original_dest; //!< the original destination of a message
-  public:
+    std::int32_t counter{0}; //!< indexing counter not used directly by helics
+    void* backReference{nullptr}; //!< back referencing pointer not used by helics
+
     /** default constructor*/
     Message() = default;
     /** swap operation for the Message*/

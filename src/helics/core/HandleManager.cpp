@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "HandleManager.hpp"
 
 #include "ActionMessage.hpp"
-// TODO PT move the flags out of actionMessage
+// TODO(PT): move the flags out of actionMessage
 
 namespace helics {
 BasicHandleInfo& HandleManager::addHandle(

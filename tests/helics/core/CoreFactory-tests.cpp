@@ -8,8 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/coreTypeOperations.hpp"
 #include "helics/helics-config.h"
+#include "helics/network/loadCores.hpp"
 
 #include "gtest/gtest.h"
+
+static const bool ld = helics::loadCores();
 
 #ifdef ENABLE_ZMQ_CORE
 TEST(CoreFactory_tests, ZmqCore_test)
@@ -90,14 +93,6 @@ TEST(CoreFactory_tests, tcpCore_test)
     core->disconnect();
     core = nullptr;
 }
-#else
-TEST(CoreFactory_tests, tcpCore_test)
-{
-    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP), false);
-}
-#endif
-
-#ifdef ENABLE_TCP_CORE
 TEST(CoreFactory_tests, tcpSSCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP_SS), true);
@@ -108,6 +103,10 @@ TEST(CoreFactory_tests, tcpSSCore_test)
     core = nullptr;
 }
 #else
+TEST(CoreFactory_tests, tcpCore_test)
+{
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP), false);
+}
 TEST(CoreFactory_tests, tcpSSCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP_SS), false);

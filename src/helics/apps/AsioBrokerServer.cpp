@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/AsioContextManager.h"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../core/NetworkBrokerData.hpp"
-#include "../core/networkDefaults.hpp"
+#include "../network/NetworkBrokerData.hpp"
+#include "../network/networkDefaults.hpp"
 #ifdef ENABLE_TCP_CORE
-#    include "../core/tcp/TcpHelperClasses.h"
+#    include "../network/tcp/TcpHelperClasses.h"
 #endif
 #ifdef ENABLE_UDP_CORE
 #    include <asio/ip/udp.hpp>
@@ -20,6 +20,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <array>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace helics {
 
@@ -27,12 +30,12 @@ namespace helics {
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
-        UdpServer(asio::io_context& io_context, std::string& interface, unsigned short portNum):
+        UdpServer(asio::io_context& io_context, std::string& interface, std::uint16_t portNum):
             socket_(io_context)
         {
             socket_.open(asio::ip::udp::v4());
-            socket_.bind(asio::ip::udp::endpoint(
-                asio::ip::address::from_string(interface), static_cast<uint16_t>(portNum)));
+            socket_.bind(
+                asio::ip::udp::endpoint(asio::ip::address::from_string(interface), portNum));
         }
 
         ~UdpServer()

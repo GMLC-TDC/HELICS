@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#pragma once
 
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Endpoints.hpp"
@@ -12,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <random>
+#include <string>
 
-using namespace helics;
 /** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate: public BenchmarkFederate {
   public:
@@ -43,20 +44,20 @@ class PholdFederate: public BenchmarkFederate {
     std::uniform_int_distribution<unsigned int> rand_uniform_int;
 
   public:
-    // TODO: output cluster name in a summary file, along with node count and feds per node
+    // TODO(@nightlark): output cluster name in a summary file, along with node count and feds per node
     PholdFederate(): BenchmarkFederate("PHOLD") {}
 
     // functions for setting parameters
-    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; };
-    void setRandomSeed(unsigned int s) { seed = s; };
-    void setRandomTimeMean(double mean) { randTimeMean_ = mean; };
-    void setInitialEventCount(unsigned int count) { initEvCount_ = count; };
-    void setLocalProbability(double p) { localProbability_ = p; };
-    void setLookahead(double v) { lookahead_ = v; };
+    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; }
+    void setRandomSeed(unsigned int s) { seed = s; }
+    void setRandomTimeMean(double mean) { randTimeMean_ = mean; }
+    void setInitialEventCount(unsigned int count) { initEvCount_ = count; }
+    void setLocalProbability(double p) { localProbability_ = p; }
+    void setLookahead(double v) { lookahead_ = v; }
 
     // functions for setting callbacks
-    void setBeforeFinalizeCallback(std::function<void()> cb = nullptr) { callBeforeFinalize = cb; };
-    void setAfterFinalizeCallback(std::function<void()> cb = nullptr) { callAfterFinalize = cb; };
+    void setBeforeFinalizeCallback(std::function<void()> cb = nullptr) { callBeforeFinalize = cb; }
+    void setAfterFinalizeCallback(std::function<void()> cb = nullptr) { callAfterFinalize = cb; }
 
     std::string getName() override { return "phold_" + std::to_string(index); }
 

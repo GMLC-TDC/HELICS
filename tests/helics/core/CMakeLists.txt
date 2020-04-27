@@ -20,43 +20,22 @@ set(
     data-block-tests.cpp
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
-    networkInfoTests.cpp
-	InprocCore-Tests.cpp
+    CoreConfigureTests.cpp
 )
-
-if(ENABLE_TEST_CORE)
-    list(APPEND core_test_sources TestCore-tests.cpp)
-endif()
-
-if(ENABLE_ZMQ_CORE)
-    list(APPEND core_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
-endif()
-
-if(ENABLE_TCP_CORE)
-    list(APPEND core_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
-endif()
-
-if(ENABLE_UDP_CORE)
-    list(APPEND core_test_sources UdpCore-tests.cpp)
-endif()
-
-if(ENABLE_IPC_CORE)
-    list(APPEND core_test_sources IPCcore_tests.cpp)
-endif()
-
-if(ENABLE_MPI_CORE)
-    list(APPEND core_test_sources MpiCore-tests.cpp)
-endif()
 
 if (NOT HELICS_DISABLE_ASIO)
     list(APPEND core_test_sources MessageTimerTests.cpp)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics_core helics_test_base)
+target_link_libraries(core-tests helics_network helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(core-tests PRIVATE BOOST_DATE_TIME_NO_LIB)
+
+target_compile_definitions(core-tests PRIVATE
+                           "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
+
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests)

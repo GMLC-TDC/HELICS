@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace units {
 class precise_unit;
@@ -266,7 +269,7 @@ class HELICS_CXX_EXPORT Input {
             "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
             "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move(callback);
-        fed->setInputNotificationCallback(*this, [this](Input&, Time time) {
+        fed->setInputNotificationCallback(*this, [this](Input& /*unused*/, Time time) {
             handleCallback(time);
         });
     }
@@ -446,7 +449,6 @@ HELICS_CXX_EXPORT void integerExtractAndConvert(
 @tparam X the class of the value associated with a input*/
 template<class X>
 class InputT: public Input {
-  public:
   private:
     std::function<void(X, Time)> value_callback; //!< callback function for the federate
     std::function<double(const X& v1, const X& v2)>
@@ -482,7 +484,6 @@ class InputT: public Input {
     {
     }
 
-  public:
     /** get the most recent value
     @return the value*/
     X getValue() { return Input::getValue<X>(); }
@@ -499,7 +500,9 @@ class InputT: public Input {
     void setInputNotificationCallback(std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->setInputNotificationCallback(*this, [=](Input&, Time time) { handleCallback(time); });
+        fed->setInputNotificationCallback(*this, [=](Input& /*unused*/, Time time) {
+            handleCallback(time);
+        });
     }
     /** set a default value
     @param val the value to set as the default
@@ -598,7 +601,7 @@ const X& Input::getValueRef()
             valueExtract(dv, type, lastValue);
         }
     } else {
-        // TODO:: PT make some logic that it can get the raw data from the core again if it was converted already
+        // TODO(PT): make some logic that it can get the raw data from the core again if it was converted already
     }
 
     return getValueRefImpl<remove_cv_ref<X>>(lastValue);

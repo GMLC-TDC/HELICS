@@ -20,7 +20,7 @@ class Filter {
     /** construct from C level helics_filter object*/
     explicit Filter(helics_filter hfilt) HELICS_NOTHROW: filt(hfilt) {}
     /** default constructor*/
-    Filter() HELICS_NOTHROW: filt(HELICS_NULL_POINTER){};
+    Filter() HELICS_NOTHROW: filt(HELICS_NULL_POINTER) {}
     /** copy constructor*/
     Filter(const Filter& filter): filt(filter.filt) {}
     /** copy assignment*/
@@ -34,6 +34,8 @@ class Filter {
     operator helics_filter() const { return filt; }
     /** get the underlying helics_filter object*/
     helics_filter baseObject() const { return filt; }
+    /** check if the filter is valid */
+    bool isValid() const { return (helicsFilterIsValid(filt) == helics_true); }
     /** get the name for the filter*/
     const char* getName() const { return helicsFilterGetName(filt); }
     /** set a property on a filter

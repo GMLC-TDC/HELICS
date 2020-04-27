@@ -9,7 +9,7 @@
 package com.java.helics;
 
 /**
- *  enumeration of possible federate states
+ * enumeration of possible federate states
  */
 public final class helics_federate_state {
   /**

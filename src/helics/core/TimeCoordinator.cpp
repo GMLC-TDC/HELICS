@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "json/json.h"
 #include <algorithm>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 static auto nullMessageFunction = [](const ActionMessage&) {};
@@ -837,7 +840,7 @@ int TimeCoordinator::getIntegerProperty(int intProperty) const
         case defs::properties::max_iterations:
             return info.maxIterations;
         default:
-            // TODO: make this something consistent
+            // TODO(PT): make this something consistent
             return -972;
     }
 }

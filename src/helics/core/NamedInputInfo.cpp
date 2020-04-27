@@ -9,7 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units/units.hpp"
 
 #include <algorithm>
+#include <memory>
 #include <set>
+#include <string>
+#include <utility>
 
 namespace helics {
 std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData()

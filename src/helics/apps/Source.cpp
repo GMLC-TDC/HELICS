@@ -21,14 +21,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <set>
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 namespace apps {
     void SignalGenerator::set(const std::string& /*parameter*/, double /*val*/) {}
     /** set a string parameter*/
     void SignalGenerator::setString(const std::string& /*parameter*/, const std::string& /*val*/) {}
-
-    using namespace std::string_literals;
 
     Source::Source(int argc, char* argv[]): App("source", argc, argv) { processArgs(); }
 

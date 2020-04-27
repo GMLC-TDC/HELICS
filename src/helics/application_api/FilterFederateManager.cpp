@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "helics/core/core-exceptions.hpp"
 
+#include <utility>
+
 namespace helics {
 FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, local_federate_id id):
     coreObject(coreObj), fed(ffed), fedID(id)

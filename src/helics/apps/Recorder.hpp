@@ -13,6 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 class CloningFilter;
@@ -118,28 +121,30 @@ namespace apps {
         class ValueCapture {
           public:
             helics::Time time;
-            int index = -1;
-            int16_t iteration = 0;
-            bool first = false;
+            int index{-1};
+            int16_t iteration{0};
+            bool first{false};
             std::string value;
             ValueCapture() = default;
             ValueCapture(helics::Time t1, int id1, const std::string& val):
-                time(t1), index(id1), value(val){};
+                time(t1), index(id1), value(val)
+            {
+            }
         };
 
         /** helper class for displaying statistics*/
         class ValueStats {
           public:
-            helics::Time time = helics::Time::minVal();
+            helics::Time time{helics::Time::minVal()};
             std::string lastVal;
             std::string key;
-            int cnt = 0;
+            int cnt{0};
         };
 
-        bool allow_iteration = false; //!< trigger to allow Iteration
-        bool verbose = false; //!< print all captured values to the screen
-        Time nextPrintTimeStep =
-            helics::timeZero; //!< the time advancement period for printing markers
+        bool allow_iteration{false}; //!< trigger to allow Iteration
+        bool verbose{false}; //!< print all captured values to the screen
+        Time nextPrintTimeStep{
+            helics::timeZero}; //!< the time advancement period for printing markers
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points; //!< lists of points that were captured
         std::vector<Input> subscriptions; //!< the actual subscription objects

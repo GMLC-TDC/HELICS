@@ -15,15 +15,18 @@ if(SWIG_VERSION VERSION_GREATER "4.0.0")
   set(SWIG_DOXYGEN_FLAG "-doxygen")
 endif()
 
+  get_filename_component(helics.i_INCLUDE_DIR "${HELICS_SWIG_helics.i_FILE}" DIRECTORY)
+
   # custom command for building the wrap file
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsJava.c
     COMMAND
       "${SWIG_EXECUTABLE}" "-java" "-package" "com.java.helics" -o "helicsJava.c" "${SWIG_DOXYGEN_FLAG}"
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
+      "-I${helics.i_INCLUDE_DIR}"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsJava.i
     DEPENDS
-      ../helics.i
+      ${HELICS_SWIG_helics.i_FILE}
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsJava.i
       ${SHARED_LIB_HEADERS}
       ${CMAKE_CURRENT_SOURCE_DIR}/java_maps.i

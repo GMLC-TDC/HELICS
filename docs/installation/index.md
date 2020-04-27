@@ -37,11 +37,12 @@ Use Spack (requires Spack develop branch or versions released after v0.14.1) on 
 spack install helics
 ```
 
-For more information on supported options (e.g. using a custom HELICS build with MPI support), see the [package managers](https://helics.readthedocs.io/en/latest/installation/package_manager.html) page for more details, or the documentation for your package manager.
+For more information on supported options (e.g. using a custom HELICS build with MPI support) and troubleshooting tips, see the [package managers](https://helics.readthedocs.io/en/latest/installation/package_manager.html) page for more details, or the documentation for your package manager.
 
 ### Using an installer for your operating system
 
 Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS/releases/latest) and add them to your path.
+Windows users should install the latest version of the [Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
 The installers come with bindings for Python (3.6), MATLAB, and Java extensions precompiled as part of the installation.
 All you need to do is add the relevant folders to your User's PATH variables.
 

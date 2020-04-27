@@ -37,6 +37,8 @@ jobs:
   # -----------------------
   # Configure HELICS
   # -----------------------
+  - bash: |
+      echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT_1_72_0"
   - task: CMake@1
     inputs:
       cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
@@ -49,11 +51,11 @@ jobs:
 #    displayName: 'Configure Python interface'
 #    condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
     
-  - task: CMake@1
-    inputs:
-      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
-    displayName: 'Configure Java interface'
-    condition: eq( variables['langArch'], 'x64' )
+#  - task: CMake@1
+#    inputs:
+#      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
+#    displayName: 'Configure Java interface'
+#    condition: eq( variables['langArch'], 'x64' )
 
   # -----------------------
   # Build HELICS

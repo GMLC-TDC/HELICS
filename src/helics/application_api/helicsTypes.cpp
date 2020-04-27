@@ -12,26 +12,27 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringConversion.h"
 
 #include <algorithm>
+#include <functional>
 #include <numeric>
 #include <regex>
 #include <unordered_map>
 
-using namespace gmlc::utilities;
+using namespace gmlc::utilities; //NOLINT
 
 namespace helics {
-static const std::string doubleString("double");
-static const std::string intString("int64");
-static const std::string stringString("string");
-static const std::string complexString("complex");
-static const std::string boolString("bool");
-static const std::string doubleVecString("double_vector");
-static const std::string complexVecString("complex_vector");
-static const std::string namedPointString("named_point");
-static const std::string timeString("time");
-static const std::string nullString;
 
 const std::string& typeNameStringRef(data_type type)
 {
+    static const std::string doubleString("double");
+    static const std::string intString("int64");
+    static const std::string stringString("string");
+    static const std::string complexString("complex");
+    static const std::string boolString("bool");
+    static const std::string doubleVecString("double_vector");
+    static const std::string complexVecString("complex_vector");
+    static const std::string namedPointString("named_point");
+    static const std::string timeString("time");
+    static const std::string nullString;
     switch (type) {
         case data_type::helics_double:
             return doubleString;
@@ -106,14 +107,14 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(float).name(), data_type::helics_double},
     {typeid(char).name(), data_type::helics_string},
     {typeid(unsigned char).name(), data_type::helics_int},
-    {typeid(short).name(), data_type::helics_int},
-    {typeid(unsigned short).name(), data_type::helics_int},
+    {typeid(short).name(), data_type::helics_int}, // NOLINT
+    {typeid(unsigned short).name(), data_type::helics_int}, // NOLINT
     {typeid(int).name(), data_type::helics_int},
     {typeid(unsigned int).name(), data_type::helics_int},
-    {typeid(long).name(), data_type::helics_int},
-    {typeid(unsigned long).name(), data_type::helics_int},
-    {typeid(long long).name(), data_type::helics_int},
-    {typeid(unsigned long long).name(), data_type::helics_int},
+    {typeid(long).name(), data_type::helics_int}, // NOLINT
+    {typeid(unsigned long).name(), data_type::helics_int}, // NOLINT
+    {typeid(long long).name(), data_type::helics_int}, // NOLINT
+    {typeid(unsigned long long).name(), data_type::helics_int}, // NOLINT
     {typeid(int64_t).name(), data_type::helics_int},
     {typeid(uint64_t).name(), data_type::helics_int},
     {typeid(int32_t).name(), data_type::helics_int},
@@ -631,7 +632,7 @@ data_block typeConvert(data_type type, int64_t val)
             return std::to_string(val);
         case data_type::helics_named_point:
             if (static_cast<uint64_t>(std::abs(val)) >
-                (2ull << 51u)) // this checks whether the actual value will fit in a double
+                (2ULL << 51U)) // this checks whether the actual value will fit in a double
             {
                 return ValueConverter<NamedPoint>::convert(
                     NamedPoint{std::to_string(val), std::nan("0")});
@@ -820,7 +821,7 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
         case data_type::helics_vector: {
             std::vector<double> DV;
             DV.reserve(val.size() * 2);
-            for (auto& vali : val) {
+            for (const auto& vali : val) {
                 DV.push_back(vali.real());
                 DV.push_back(vali.imag());
             }

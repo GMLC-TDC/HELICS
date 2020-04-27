@@ -21,9 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <random>
 #include <thread>
 
-using helics::operator"" _t;
-// static constexpr helics::Time tend = 3600.0_t;  // simulation end time
-using namespace helics;
 /** class implementing the hub for an echo test*/
 class messageGenerator {
   public:
@@ -106,6 +103,7 @@ class messageGenerator {
     }
 };
 
+using helics::core_type;
 static void BMmgen_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -125,7 +123,7 @@ static void BMmgen_singleCore(benchmark::State& state)
         mgen.run();
         state.PauseTiming();
         wcore.reset();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }
@@ -152,7 +150,7 @@ static void BMmgen_multiCore(benchmark::State& state, core_type cType)
         broker->setLoggingLevel(helics_log_level_no_print);
 
         std::vector<messageGenerator> gens(feds);
-        std::vector<std::shared_ptr<Core>> cores(feds);
+        std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
                 cType,
@@ -185,7 +183,7 @@ static void BMmgen_multiCore(benchmark::State& state, core_type cType)
         broker->disconnect();
         broker.reset();
         cores.clear();
-        cleanupHelicsLibrary();
+        helics::cleanupHelicsLibrary();
         state.ResumeTiming();
     }
 }

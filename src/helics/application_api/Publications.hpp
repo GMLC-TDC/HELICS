@@ -10,6 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "HelicsPrimaryTypes.hpp"
 #include "ValueFederate.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace units {
 class precise_unit;
 } // namespace units
@@ -435,7 +439,7 @@ class PublicationT: public Publication {
     */
     void publish(const X& val, const std::string& units)
     {
-        // TODO:: figure out units
+        // TODO(PT): figure out units
         (void)(units);
         Publication::publish(val);
     }

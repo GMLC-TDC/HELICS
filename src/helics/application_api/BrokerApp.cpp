@@ -14,9 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <fstream>
 #include <iostream>
+#include <utility>
 
 namespace helics {
-const std::string estring;
 
 BrokerApp::BrokerApp(
     core_type ctype,
@@ -24,8 +24,9 @@ BrokerApp::BrokerApp(
     std::vector<std::string> args):
     name(broker_name)
 {
-    auto app = generateParser();
+    auto app = generateParser(ctype == core_type::MULTI);
     app->setDefaultCoreType(ctype);
+    app->passConfig = true;
     if (app->helics_parse(std::move(args)) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
@@ -41,11 +42,12 @@ BrokerApp::BrokerApp(std::vector<std::string> args):
 {
 }
 
-BrokerApp::BrokerApp(core_type ctype, const std::string& broker_name, int argc, char* argv[]):
-    name(broker_name)
+BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, int argc, char* argv[]):
+    name(brokerName)
 {
-    auto app = generateParser();
+    auto app = generateParser(ctype == core_type::MULTI);
     app->setDefaultCoreType(ctype);
+    app->passConfig = true;
     if (app->helics_parse(argc, argv) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
@@ -61,11 +63,12 @@ BrokerApp::BrokerApp(int argc, char* argv[]):
 {
 }
 
-BrokerApp::BrokerApp(core_type ctype, const std::string& broker_name, const std::string& argString):
-    name(broker_name)
+BrokerApp::BrokerApp(core_type ctype, const std::string& brokerName, const std::string& argString):
+    name(brokerName)
 {
-    auto app = generateParser();
+    auto app = generateParser(ctype == core_type::MULTI);
     app->setDefaultCoreType(ctype);
+    app->passConfig = true;
     if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
@@ -106,15 +109,18 @@ bool BrokerApp::waitForDisconnect(std::chrono::milliseconds waitTime)
     return true;
 }
 
-std::unique_ptr<helicsCLI11App> BrokerApp::generateParser()
+std::unique_ptr<helicsCLI11App> BrokerApp::generateParser(bool noTypeOption)
 {
     auto app = std::make_unique<helicsCLI11App>("Broker application");
-    app->addTypeOption();
+    if (!noTypeOption) {
+        app->addTypeOption();
+    }
+
     if (name.empty()) {
         app->add_option("--name,-n", name, "name of the broker");
     }
     app->allow_extras();
-    auto app_p = app.get();
+    auto* app_p = app.get();
     app->footer([app_p]() {
         auto coreType = coreTypeFromString((*app_p)["--core"]->as<std::string>());
         BrokerFactory::displayHelp(coreType);
@@ -125,7 +131,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser()
 
 void BrokerApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
 {
-    auto remArgs = app->remaining_for_passthrough();
+    auto& remArgs = app->remainArgs();
     try {
         broker = BrokerFactory::create(app->getCoreType(), name, remArgs);
     }
@@ -200,11 +206,13 @@ void BrokerApp::makeConnections(const std::string& file)
 /** get the identifier of the broker*/
 const std::string& BrokerApp::getIdentifier() const
 {
+    static const std::string estring;
     return (broker) ? broker->getIdentifier() : estring;
 }
 /** get the network address of the broker*/
 const std::string& BrokerApp::getAddress() const
 {
+    static const std::string estring;
     return (broker) ? broker->getAddress() : estring;
 }
 /** make a query at the broker*/

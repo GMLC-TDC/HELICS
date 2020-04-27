@@ -20,9 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "cppzmq/zmq.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <map>
-using namespace zmq;
+using zmq::socket_type;
 /*
 req = ZMQ_REQ,
 rep = ZMQ_REP,
@@ -42,22 +43,22 @@ pull = ZMQ_PULL,
     */
 
 /* *INDENT-OFF* */
-static const std::map<std::string, zmq::socket_type> socketMap{{"req", socket_type::req},
-                                                               {"request", socket_type::req},
-                                                               {"rep", socket_type::rep},
-                                                               {"reply", socket_type::rep},
-                                                               {"dealer", socket_type::dealer},
-                                                               {"router", socket_type::router},
-                                                               {"pub", socket_type::pub},
-                                                               {"publish", socket_type::pub},
-                                                               {"sub", socket_type::sub},
-                                                               {"subscribe", socket_type::sub},
-                                                               {"xpub", socket_type::xpub},
-                                                               {"xsub", socket_type::xsub},
-                                                               {"push", socket_type::push},
-                                                               {"pull", socket_type::pull},
-                                                               {"pair", socket_type::pair},
-                                                               {"stream", socket_type::stream}};
+static const std::map<std::string, socket_type> socketMap{{"req", socket_type::req},
+                                                          {"request", socket_type::req},
+                                                          {"rep", socket_type::rep},
+                                                          {"reply", socket_type::rep},
+                                                          {"dealer", socket_type::dealer},
+                                                          {"router", socket_type::router},
+                                                          {"pub", socket_type::pub},
+                                                          {"publish", socket_type::pub},
+                                                          {"sub", socket_type::sub},
+                                                          {"subscribe", socket_type::sub},
+                                                          {"xpub", socket_type::xpub},
+                                                          {"xsub", socket_type::xsub},
+                                                          {"push", socket_type::push},
+                                                          {"pull", socket_type::pull},
+                                                          {"pair", socket_type::pair},
+                                                          {"stream", socket_type::stream}};
 /* *INDENT-ON* */
 
 socket_type socketTypeFromString(const std::string& socketType)

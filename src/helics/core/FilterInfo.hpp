@@ -9,7 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_core_types.hpp"
 
 #include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace helics {
 /** data class defining the information about a filter*/

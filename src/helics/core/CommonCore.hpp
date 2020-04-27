@@ -26,7 +26,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "json/forwards.h"
 #include <array>
 #include <atomic>
+#include <map>
+#include <memory>
 #include <set>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
 
 namespace helics {
 class TestHandle;
@@ -50,7 +56,7 @@ class FedInfo {
     operation_state state{operation_state::operating};
 
     constexpr FedInfo() = default;
-    constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed){};
+    constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed) {}
     FederateState* operator->() noexcept { return fed; }
     const FederateState* operator->() const noexcept { return fed; }
     operator bool() const noexcept { return (fed != nullptr); }
@@ -67,7 +73,7 @@ class CommonCore: public Core, public BrokerBase {
     /**function mainly to match some other object constructors does the same thing as the default constructor*/
     explicit CommonCore(bool arg) noexcept;
     /** construct from a core name*/
-    explicit CommonCore(const std::string& core_name);
+    explicit CommonCore(const std::string& coreName);
     /** virtual destructor*/
     virtual ~CommonCore() override;
     virtual void configure(const std::string& configureString) override final;
@@ -229,7 +235,7 @@ class CommonCore: public Core, public BrokerBase {
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override final;
     /** unregister the core from any process find functions*/
     void unregister();
-    /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
+    /**TODO(PT): figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
      * class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
@@ -259,8 +265,10 @@ class CommonCore: public Core, public BrokerBase {
     virtual void transmit(route_id rid, ActionMessage&& cmd) = 0;
     /** add a route to whatever internal structure manages the routes
     @param rid the identification of the route
-    @param routeInfo a string containing the information necessary to connect*/
-    virtual void addRoute(route_id rid, const std::string& routeInfo) = 0;
+    @param interfaceId an interface id code that can be used to identify the interface route should be added to, in most cases this should be zero since there is only one interface
+    @param routeInfo a string containing the information necessary to connect
+    */
+    virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;
     /** remove or disconnect a route from use
     @param rid the identification of the route
     */

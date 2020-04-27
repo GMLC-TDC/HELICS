@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <complex>
 #include <cstring>
+#include <utility>
+#include <vector>
 
 namespace helics {
 ActionMessage::ActionMessage(action_message_def::action_t startingAction):

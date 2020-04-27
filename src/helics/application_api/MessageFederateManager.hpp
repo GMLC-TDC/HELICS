@@ -19,9 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 namespace helics {
 class Core;
 class MessageFederate;
@@ -57,12 +59,12 @@ class MessageFederateManager {
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
     /* check if a given endpoint has any unread messages*/
-    bool hasMessage(const Endpoint& ept) const;
+    static bool hasMessage(const Endpoint& ept);
 
     /**
      * Returns the number of pending receives for the specified destination endpoint.
      */
-    uint64_t pendingMessages(const Endpoint& ept) const;
+    static uint64_t pendingMessages(const Endpoint& ept);
     /**
      * Returns the number of pending receives for the specified destination endpoint.
      */
@@ -70,7 +72,7 @@ class MessageFederateManager {
     /** receive a packet from a particular endpoint
     @param ept the identifier for the endpoint
     @return a message object*/
-    std::unique_ptr<Message> getMessage(const Endpoint& ept);
+    static std::unique_ptr<Message> getMessage(const Endpoint& ept);
     /* receive a communication message for any endpoint in the federate*/
     std::unique_ptr<Message> getMessage();
 
@@ -96,10 +98,6 @@ class MessageFederateManager {
     void initializeToExecuteStateTransition();
     /** generate results for a local query */
     std::string localQuery(const std::string& queryStr) const;
-    /** get the name of an endpoint from its id
-    @param ept the endpoint to query
-    @return empty string if an invalid id is passed*/
-    const std::string& getEndpointName(const Endpoint& ept) const;
 
     /** get the id of a registered publication from its id
     @param name the publication id
@@ -119,7 +117,7 @@ class MessageFederateManager {
     @param ept  the endpoint id to register the callback for
     @param callback the function to call
     */
-    void setEndpointNotificationCallback(
+    static void setEndpointNotificationCallback(
         const Endpoint& ept,
         const std::function<void(Endpoint&, Time)>& callback);
 

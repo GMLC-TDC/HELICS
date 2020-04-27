@@ -12,6 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <functional>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 /** class managing the coordination of time in HELICS for forwarding object (cores, brokers)
@@ -120,6 +123,6 @@ class ForwardingTimeCoordinator {
     /** check if there are any active Time dependencies*/
     bool hasActiveTimeDependencies() const;
     /** get the current next time*/
-    Time getNextTime() const { return time_next; };
+    Time getNextTime() const { return time_next; }
 };
 } // namespace helics

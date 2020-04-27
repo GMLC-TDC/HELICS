@@ -845,162 +845,6 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1log_1level_1trace
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1ok_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_ok;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1registration_1failure_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_registration_failure;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1connection_1failure_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_connection_failure;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1object_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_invalid_object;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1argument_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_invalid_argument;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1discard_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_discard;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1system_1failure_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_system_failure;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1warning_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_warning;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1state_1transition_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_invalid_state_transition;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1function_1call_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_invalid_function_call;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1execution_1failure_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_execution_failure;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1insufficient_1space_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_insufficient_space;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1other_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_error_types result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_error_types)helics_error_other;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1fatal_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_error_types result;
@@ -1020,6 +864,162 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1external_1
   (void)jenv;
   (void)jcls;
   result = (helics_error_types)helics_error_external_type;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1other_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_other;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1insufficient_1space_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_insufficient_space;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1execution_1failure_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_execution_failure;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1function_1call_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_invalid_function_call;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1state_1transition_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_invalid_state_transition;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1warning_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_warning;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1system_1failure_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_system_failure;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1discard_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_discard;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1argument_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_invalid_argument;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1invalid_1object_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_invalid_object;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1connection_1failure_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_connection_failure;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1registration_1failure_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_registration_failure;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1ok_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_ok;
   jresult = (jint)result; 
   return jresult;
 }
@@ -5720,6 +5720,20 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederatePublishJSON
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_publication arg1 = (helics_publication) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_publication *)&jarg1; 
+  result = (helics_bool)helicsPublicationIsValid(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   helics_publication arg1 = (helics_publication) 0 ;
   void *arg2 = (void *) 0 ;
@@ -6032,6 +6046,20 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationAddTarge
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_input arg1 = (helics_input) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_input *)&jarg1; 
+  result = (helics_bool)helicsInputIsValid(arg1);
+  jresult = (jint)result; 
+  return jresult;
 }
 
 
@@ -7408,6 +7436,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetEndpoin
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_endpoint *)&jarg1; 
+  result = (helics_bool)helicsEndpointIsValid(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetDefaultDestination(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
@@ -7563,6 +7605,31 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendMessage
   arg1 = *(helics_endpoint *)&jarg1; 
   arg2 = *(helics_message_object *)&jarg2; 
   helicsEndpointSendMessageObject(arg1,arg2,arg3);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendMessageObjectZeroCopy(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_message_object arg2 = (helics_message_object) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_endpoint *)&jarg1; 
+  arg2 = *(helics_message_object *)&jarg2; 
+  helicsEndpointSendMessageObjectZeroCopy(arg1,arg2,arg3);
   {
     if (arg3->error_code!=helics_ok)
     {
@@ -8717,6 +8784,20 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetFilterB
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFilterIsValid(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_filter arg1 = (helics_filter) 0 ;
+  helics_bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_filter *)&jarg1; 
+  result = (helics_bool)helicsFilterIsValid(arg1);
+  jresult = (jint)result; 
   return jresult;
 }
 

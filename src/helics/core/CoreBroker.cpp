@@ -21,9 +21,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryHelpers.hpp"
 
 #include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
-using namespace std::string_literals;
 
 constexpr char universalKey[] = "**";
 
@@ -264,8 +266,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     noInit.source_id = global_broker_id_local;
                     transmit(parent_route_id, noInit);
                 }
-            } else // we are initialized already
-            {
+            } else {
+                // we are initialized already
                 ActionMessage badInit(CMD_FED_ACK);
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;
@@ -334,7 +336,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 if (brk != _brokers.end()) {
                     // we would get this if the ack didn't go through for some reason
                     brk->route = route_id{routeCount++};
-                    addRoute(brk->route, command.getString(targetStringLoc));
+                    addRoute(
+                        brk->route, command.getExtraData(), command.getString(targetStringLoc));
                     routing_table[brk->global_id] = brk->route;
 
                     // sending the response message
@@ -356,13 +359,13 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     noInit.source_id = global_broker_id_local;
                     transmit(parent_route_id, noInit);
                 }
-            } else // we are initialized already
-            {
+            } else {
+                // we are initialized already
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                     newroute = route_id(routeCount++);
-                    addRoute(newroute, command.getString(targetStringLoc));
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
                     newroute = getRoute(command.source_id);
@@ -384,7 +387,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                     newroute = route_id{routeCount++};
-                    addRoute(newroute, command.getString(targetStringLoc));
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
                     newroute = getRoute(command.source_id);
@@ -407,7 +410,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                     newroute = route_id{routeCount++};
-                    addRoute(newroute, command.getString(targetStringLoc));
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
                     newroute = getRoute(command.source_id);
@@ -424,9 +427,12 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 return;
             }
             if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                // TODO PT:: this will need to be updated when we enable mesh routing
+                // TODO(PT): this will need to be updated when we enable mesh routing
                 _brokers.back().route = route_id{routeCount++};
-                addRoute(_brokers.back().route, command.getString(targetStringLoc));
+                addRoute(
+                    _brokers.back().route,
+                    command.getExtraData(),
+                    command.getString(targetStringLoc));
                 _brokers.back().parent = global_broker_id_local;
                 _brokers.back()._nonLocal = false;
                 _brokers.back()._route_key = true;
@@ -789,8 +795,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         elink.messageID = defs::errors::connection_failure;
                         broadcast(elink);
                         brokerState = broker_state_t::errored;
-                        addActionMessage(
-                            CMD_USER_DISCONNECT); // TODO::PT this needs something better but this does
+                        addActionMessage(CMD_USER_DISCONNECT);
+                        // TODO(PT): this needs something better but this does
                         // what is needed for now
                     } else {
                         // pass it up the chain let the root deal with it
@@ -2412,16 +2418,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return getAddress();
     }
     if (request == "counts") {
-        std::string cnts = "{\"brokers\":";
-        cnts += std::to_string(_brokers.size());
-        cnts += ",\n";
-        cnts += "\"federates\":";
-        cnts += std::to_string(_federates.size());
-        cnts += ",\n";
-        cnts += "\"handles\":";
-        cnts += std::to_string(handles.size());
-        cnts += '}';
-        return cnts;
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        if (!isRootc) {
+            base["parent"] = higher_broker_id.baseValue();
+        }
+        base["brokers"] = static_cast<int>(_brokers.size());
+        base["federates"] = static_cast<int>(_federates.size());
+        base["handles"] = static_cast<int>(handles.size());
+        return generateJsonString(base);
     }
     if (request == "summary") {
         return generateFederationSummary();
@@ -2436,6 +2442,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_broker_id_local.baseValue();
+        if (!isRootc) {
+            base["parent"] = higher_broker_id.baseValue();
+        }
         base["state"] = brokerStateName(brokerState.load());
         base["federates"] = Json::arrayValue;
         for (auto& fed : _federates) {
@@ -2698,6 +2707,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
+                m.dest_id = broker->global_id;
             }
         }
         if ((route == parent_route_id) && (isRootc)) {

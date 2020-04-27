@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 /** check if a type_name has an index code*/
 bool hasIndexCode(const std::string& type_name);

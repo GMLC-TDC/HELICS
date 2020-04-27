@@ -27,8 +27,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 #include <thread>
+#include <tuple>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace helics {
 
@@ -50,7 +54,7 @@ class BasicFedInfo {
     route_id route; //!< the routing information for data to be sent to the federate
     global_broker_id parent; //!< the id of the parent broker/core
     connection_state state{connection_state::connected};
-    explicit BasicFedInfo(const std::string& fedname): name(fedname){};
+    explicit BasicFedInfo(const std::string& fedname): name(fedname) {}
 };
 
 /** class defining the common information about a broker federate*/
@@ -74,7 +78,7 @@ class BasicBrokerInfo {
     bool _disable_ping{false}; //!< indicator that the broker doesn't respond to pings
     // 1 byte gap
     std::string routeInfo; //!< string describing the connection information for the route
-    explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName){};
+    explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName) {}
 };
 
 class TimeCoordinator;
@@ -228,10 +232,11 @@ class CoreBroker: public Broker, public BrokerBase {
     /** add a route to the type specific routing information and establish the connection
     @details add a route to a table, the connection information is contained in the string with the described
     identifier
-    @param rid  the identifier for the route
-    @param routeInfo  a string describing the connection info
+    @param rid the identification of the route
+    @param interfaceId an interface id code that can be used to identify the interface route should be added to, in most cases this should be zero since there is only one interface
+    @param routeInfo a string containing the information necessary to connect
     */
-    virtual void addRoute(route_id rid, const std::string& routeInfo) = 0;
+    virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;
     /** remove or disconnect a route from use
     @param rid the identification of the route
     */

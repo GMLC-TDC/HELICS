@@ -5,16 +5,11 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "helics/application_api.hpp"
 #include "helics/core/core-exceptions.hpp"
 
 #include "gtest/gtest.h"
 #include <complex>
-
-/** these test cases test out the value converters
- */
-#include "../application_api/testFixtures.hpp"
-#include "helics/application_api.hpp"
-
 #include <future>
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
@@ -29,7 +24,8 @@ TEST_F(error_tests, duplicate_federate_names)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    EXPECT_THROW(std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(
+        auto fed2 = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
     Fed->finalize();
 }
 

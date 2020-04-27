@@ -1,0 +1,10 @@
+{
+	"master": {
+		"type": "test"
+	},
+	"comms": [{
+		"type": "zmq"
+	}, {
+		"type": "tcp"
+	}]
+}

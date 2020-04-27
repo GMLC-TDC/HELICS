@@ -54,7 +54,8 @@ Options effect the connection of libraries used in HELICS and how they are linke
 -   `HELICS_ENABLE_SWIG`:    \[Default=OFF\] Conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used.  This enables swig usage in cases where it would not otherwise be necessary.
 -   `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] If python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12,  This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
 -   `HELICS_ENABLE_GIT_HOOKS`:  install a git hook to check clang format before a push
--   `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake.  So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.  
+-   `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake.  So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.
+-   `HELICS_BUILD_CONFIGURATION`: A string containing a specialized build configuration if any.  The only platform this is currently used on is for building on a Raspberry PI system, in which case this should be set to "PI". 
 
 #### ZeroMQ related Options
 -   `HELICS_USE_SYSTEM_ZEROMQ_ONLY`:  \[Default=OFF\] Only find Zeromq through the system libraries, never attempt a local build.

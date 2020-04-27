@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <thread>
+#include <utility>
 
 namespace helics {
 std::vector<std::string> vectorizeQueryResult(std::string&& queryres)

@@ -9,6 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CLI11_EXPERIMENTAL_OPTIONAL 0
 #include "helics/external/CLI11/CLI11.hpp"
+
+#include <string>
+#include <utility>
+#include <vector>
 #undef CLI11_EXPERIMENTAL_OPTIONAL
 #include "core-types.hpp"
 #include "helics-time.hpp"
@@ -40,8 +44,9 @@ class helicsCLI11App: public CLI::App {
         CLI::App(std::move(app_description), app_name, nullptr)
     {
         set_help_flag("-h,-?,--help", "Print this help message and exit");
-        set_config("--config-file", "helics_config.ini", "specify base configuration file");
-        add_flag_callback("--version,-v", []() { throw(CLI::Success{}); });
+        set_config(
+            "--config-file,--config", "helics_config.toml", "specify base configuration file");
+        version(helics::versionString);
         add_option_group("quiet")->immediate_callback()->add_flag(
             "--quiet", quiet, "silence most print output");
     }
@@ -54,6 +59,7 @@ class helicsCLI11App: public CLI::App {
         parse_error = -4,
     };
     bool quiet{false};
+    bool passConfig{true};
     parse_output last_output{parse_output::ok};
 
     template<typename... Args>
@@ -63,6 +69,14 @@ class helicsCLI11App: public CLI::App {
             parse(std::forward<Args>(args)...);
             last_output = parse_output::ok;
             remArgs = remaining_for_passthrough();
+            if (passConfig) {
+                auto* opt = get_option_no_throw("--config");
+                if (opt != nullptr && opt->count() > 0) {
+                    remArgs.push_back(opt->as<std::string>());
+                    remArgs.emplace_back("--config");
+                }
+            }
+
             return parse_output::ok;
         }
         catch (const CLI::CallForHelp& ch) {
@@ -79,9 +93,9 @@ class helicsCLI11App: public CLI::App {
             last_output = parse_output::help_all_call;
             return parse_output::help_all_call;
         }
-        catch (const CLI::Success&) {
+        catch (const CLI::CallForVersion& cv) {
             if (!quiet) {
-                std::cout << helics::versionString << '\n';
+                exit(cv);
             }
             last_output = parse_output::version_call;
             return parse_output::version_call;
@@ -124,13 +138,14 @@ class helicsCLI11App: public CLI::App {
 
     void addTypeOption()
     {
-        auto og = add_option_group("network type")->immediate_callback();
+        auto* og = add_option_group("network type")->immediate_callback();
         og->add_option_function<std::string>(
               "--coretype,-t,--type,--core",
               [this](const std::string& val) {
                   coreType = coreTypeFromString(val);
-                  if (coreType == core_type::UNRECOGNIZED)
+                  if (coreType == core_type::UNRECOGNIZED) {
                       throw CLI::ValidationError(val + " is NOT a recognized core type");
+                  }
               },
               "type of the core to connect to")
             ->default_str("(" + to_string(coreType) + ")");

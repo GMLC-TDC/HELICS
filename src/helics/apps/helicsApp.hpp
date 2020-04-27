@@ -8,6 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/CombinationFederate.hpp"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace CLI {
 class App;
 } // namespace CLI

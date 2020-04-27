@@ -97,13 +97,14 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
 }
 
 #ifdef ENABLE_ZMQ_CORE
-// TODO PT:: make this work for all test types
+// TODO(PT): make this work for all test types
 TEST(federate_tests, bad_broker_error_zmq_ci_skip)
 {
     helics::FederateInfo fi(helics::core_type::ZMQ);
     fi.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(
+        auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
 }
 
 TEST(federate_tests, timeout_error_zmq_ci_skip)
@@ -111,7 +112,8 @@ TEST(federate_tests, timeout_error_zmq_ci_skip)
     helics::FederateInfo fi(helics::core_type::ZMQ);
     fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(
+        auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
 }
 
 #endif
@@ -387,7 +389,7 @@ TEST(federate_tests, from_file5)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     auto fstr2 = "non_existing.toml";
-    EXPECT_THROW(std::make_shared<helics::Federate>(fstr2), helics::InvalidParameter);
+    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>(fstr2), helics::InvalidParameter);
 }
 
 TEST(federate_tests, from_file6)
@@ -758,7 +760,7 @@ TEST(federate_tests, forceErrorExec)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterExecutingMode();
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
@@ -775,7 +777,7 @@ TEST(federate_tests, forceErrorExecAsync)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterExecutingModeAsync(helics::iteration_request::force_iteration);
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
@@ -792,7 +794,7 @@ TEST(federate_tests, forceErrorInitAsync)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterInitializingModeAsync();
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
@@ -810,7 +812,7 @@ TEST(federate_tests, forceErrorPendingTimeAsync)
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
-    Fed1->error(9827);
+    Fed1->globalError(9827);
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::InvalidFunctionCall);
 
@@ -921,7 +923,7 @@ TEST(federate_tests, forceErrorPendingTimeIterativeAsync)
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(2.0, helics::iteration_request::no_iterations);
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::InvalidFunctionCall);
 
@@ -938,7 +940,7 @@ TEST(federate_tests, forceErrorFinalizeAsync)
 
     Fed1->enterExecutingMode();
     Fed1->finalizeAsync();
-    Fed1->error(9827);
+    Fed1->localError(9827);
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::InvalidFunctionCall);
 
@@ -978,7 +980,8 @@ TEST(federate_tests, error_after_disconnect)
         helics::InvalidFunctionCall);
     EXPECT_THROW(
         Fed1->setInfo(helics::interface_handle{0}, "information"), helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->error(99), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->localError(99), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->globalError(99), helics::InvalidFunctionCall);
 }
 
 static constexpr const char* simple_global_files[] = {"example_globals1.json",

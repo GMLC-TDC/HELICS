@@ -10,7 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "federate_id.hpp"
 
 #include <functional>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 /** @file
  * The HELICS core interface.  Abstract class that is

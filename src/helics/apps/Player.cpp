@@ -22,6 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <set>
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper(const std::string& str);
@@ -184,7 +187,7 @@ namespace apps {
     void Player::loadTextFile(const std::string& filename)
     {
         App::loadTextFile(filename);
-        using namespace gmlc::utilities::stringOps;
+        using namespace gmlc::utilities::stringOps; //NOLINT
         std::ifstream infile(filename);
         std::string str;
 

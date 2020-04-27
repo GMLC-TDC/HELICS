@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics-time.hpp"
 
+#include <utility>
 #include <vector>
 
 namespace helics {
@@ -18,7 +19,6 @@ class CoreFederateInfo {
     std::vector<std::pair<int, int>> intProps; //!< container for the integer properties
     std::vector<std::pair<int, bool>> flagProps; //!< container for the binary flag options
 
-  public:
     /** double overload for timeprops needs to be there since a literal double will convert to int more easily than
     to Time*/
     void setProperty(int propId, double propVal) { timeProps.emplace_back(propId, propVal); }

@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helics_definitions.hpp"
+#include "../network/loadCores.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "CoreApp.hpp"
 #include "FilterFederateManager.hpp"
@@ -22,9 +23,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>
 #include <iostream>
+#include <string>
+#include <utility>
 
 namespace helics {
-using namespace std::literals::chrono_literals;
+//a key link that does very little yet, but forces linking to a particular file
+static const auto ldcores = loadCores();
+
+using namespace std::chrono_literals; //NOLINT
 void cleanupHelicsLibrary()
 {
     BrokerFactory::cleanUpBrokers(100ms);
@@ -205,8 +211,8 @@ void Federate::enterInitializingModeAsync()
         }
     } else if (cm == modes::pending_init) {
         return;
-    } else if (cm != modes::initializing) // if we are already in initialization do nothing
-    {
+    } else if (cm != modes::initializing) {
+        // if we are already in initialization do nothing
         throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
     }
 }
@@ -340,7 +346,6 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
             asyncInfo->execFuture = std::async(std::launch::async, eExecFunc);
         } break;
         case modes::pending_exec:
-            break;
         case modes::executing:
         case modes::pending_time:
         case modes::pending_iterative_time:
@@ -524,12 +529,6 @@ void Federate::disconnect()
     coreObject = nullptr;
 }
 
-void Federate::error(int errorcode)
-{
-    std::string errorString = "error " + std::to_string(errorcode) + " in federate " + name;
-    error(errorcode, errorString);
-}
-
 void Federate::completeOperation()
 {
     switch (currentMode.load()) {
@@ -553,16 +552,26 @@ void Federate::completeOperation()
     }
 }
 
+void Federate::error(int errorcode)
+{
+    localError(errorcode);
+}
+
 void Federate::error(int errorcode, const std::string& message)
 {
-    if (!coreObject) {
-        throw(
-            InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
-    }
-    // deal with pending operations first
-    completeOperation();
-    currentMode = modes::error;
-    coreObject->logMessage(fedID, errorcode, message);
+    localError(errorcode, message);
+}
+
+void Federate::localError(int errorcode)
+{
+    std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + name;
+    localError(errorcode, errorString);
+}
+
+void Federate::globalError(int errorcode)
+{
+    std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + name;
+    globalError(errorcode, errorString);
 }
 
 void Federate::localError(int errorcode, const std::string& message)

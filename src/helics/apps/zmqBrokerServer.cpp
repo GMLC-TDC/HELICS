@@ -8,14 +8,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "zmqBrokerServer.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../core/NetworkBrokerData.hpp"
-#include "../core/networkDefaults.hpp"
+#include "../network/NetworkBrokerData.hpp"
+#include "../network/networkDefaults.hpp"
 
 #include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #ifdef ENABLE_ZMQ_CORE
 #    include "../common/zmqContextManager.h"
-#    include "../core/zmq/ZmqCommsCommon.h"
+#    include "../network/zmq/ZmqCommsCommon.h"
 #endif
 
 static const Json::Value null;

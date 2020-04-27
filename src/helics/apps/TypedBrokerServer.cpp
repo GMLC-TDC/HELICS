@@ -10,7 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/loggerCore.hpp"
 #include "../core/ActionMessage.hpp"
 #include "../core/BrokerFactory.hpp"
-#include "../core/NetworkBrokerData.hpp"
+#include "../network/NetworkBrokerData.hpp"
+
+#include <utility>
 
 namespace helics {
 namespace apps {

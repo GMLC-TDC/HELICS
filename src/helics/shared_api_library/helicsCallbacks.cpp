@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <vector>
 
 void helicsBrokerSetLoggingCallback(

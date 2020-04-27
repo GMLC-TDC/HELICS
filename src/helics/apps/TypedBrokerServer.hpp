@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <json/forwards.h>
 #include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
 
 namespace helics {
 class Broker;

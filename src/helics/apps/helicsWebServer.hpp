@@ -9,11 +9,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TypedBrokerServer.hpp"
 
+#include <atomic>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <utility>
 
 namespace helics {
 namespace apps {
+
+    class IocWrapper;
 
     /** a virtual class to use as a base for broker servers of various types*/
     class WebServer: public TypedBrokerServer {
@@ -24,15 +30,20 @@ namespace apps {
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
+        /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
-        void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; };
+        /** enable the websocket server*/
+        void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; }
 
       private:
         void mainLoop();
 
+        std::atomic<bool> running{false};
+        std::shared_ptr<IocWrapper> context;
         std::thread mainLoopThread;
         std::mutex threadGuard;
-        const Json::Value* config_{nullptr};
+
+        const Json::Value* config{nullptr};
         const std::string name_;
         std::string httpAddress_{"127.0.0.1"};
         int httpPort_{80};
@@ -40,6 +51,7 @@ namespace apps {
         int websocketPort_{80};
         bool http_enabled_{false};
         bool websocket_enabled_{false};
+        std::atomic<bool> executing{false};
     };
 } // namespace apps
 } // namespace helics

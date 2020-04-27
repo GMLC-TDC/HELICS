@@ -4,13 +4,15 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#pragma once
 
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 
-using helics::operator"" _t;
+#include <string>
+
 /* class implementing a leaf for the echo message benchmark*/
 class EchoLeaf: public BenchmarkFederate {
   private:

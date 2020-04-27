@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <cstring>
+#include <memory>
+#include <utility>
 
 namespace helics {
 std::unique_ptr<Message> EndpointInfo::getMessage(Time maxTime)

@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../shared_api_library/ValueFederate.h"
 #include "helicsExceptions.hpp"
 
+#include <string>
+#include <vector>
+
 namespace helicscpp {
 /** C++98 interface for a publication object*/
 class Publication {
@@ -18,7 +21,7 @@ class Publication {
     /** construct from a helics_publication*/
     explicit Publication(helics_publication hpub) HELICS_NOTHROW: pub(hpub) {}
     /** default constructor*/
-    Publication() HELICS_NOTHROW: pub(HELICS_NULL_POINTER){};
+    Publication() HELICS_NOTHROW: pub(HELICS_NULL_POINTER) {}
     /** copy constructor*/
     Publication(const Publication& publication): pub(publication.pub) {}
     /** copy assignment*/
@@ -32,6 +35,10 @@ class Publication {
     operator helics_publication() const { return pub; }
     /** return the underlying helics_publication object*/
     helics_publication baseObject() const { return pub; }
+
+    /** check if the publication is valid */
+    bool isValid() const { return (helicsPublicationIsValid(pub) == helics_true); }
+
     /** Methods to publish values **/
 
     /** publish raw data from a pointer and length*/

@@ -34,6 +34,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 
@@ -57,8 +62,8 @@ CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
 CommonCore::CommonCore(bool /*arg*/) noexcept: timeoutMon(new TimeoutMonitor) {}
 
-CommonCore::CommonCore(const std::string& core_name):
-    BrokerBase(core_name), timeoutMon(new TimeoutMonitor)
+CommonCore::CommonCore(const std::string& coreName):
+    BrokerBase(coreName), timeoutMon(new TimeoutMonitor)
 {
 }
 
@@ -533,7 +538,7 @@ iteration_result
     // do an exec check on the fed to process previously received messages so it can't get in a deadlocked state
     ActionMessage exec(CMD_EXEC_CHECK);
     fed->addAction(exec);
-    // TODO:: check for error conditions?
+    // TODO(PT): check for error conditions?
     return fed->enterExecutingMode(iterate);
 }
 
@@ -758,7 +763,7 @@ Time CommonCore::getTimeProperty(local_federate_id federateID, int32_t property)
 int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t property) const
 {
     if (federateID == local_core_id) {
-        //TODO: PT add some code to actually get the properties from the core if appropriate
+        // TODO(PT): add some code to actually get the properties from the core if appropriate
         return 0;
     }
     auto fed = getFederateAt(federateID);
@@ -1281,7 +1286,7 @@ std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    // TODO::PT this is a long chain should be refactored
+    // TODO(PT): this is a long chain should be refactored
     return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getData();
 }
 
@@ -1295,7 +1300,7 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interfac
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    // todo:: this is a long chain should be refactored
+    // TODO(PT): this is a long chain should be refactored
     return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getAllData();
 }
 
@@ -2474,8 +2479,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             }
         } break;
         case CMD_REG_ROUTE:
-            // TODO:: double check this
-            addRoute(route_id(command.getExtraData()), command.payload);
+            // TODO(PT): double check this
+            addRoute(route_id(command.getExtraData()), 0, command.payload);
             break;
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();
@@ -3193,7 +3198,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             auto pub = loopHandles.getPublication(command.name);
             if (pub != nullptr) {
                 if (checkActionFlag(*pub, disconnected_flag)) {
-                    // TODO:: this might generate an error if the required flag was set
+                    // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
                 command.setAction(CMD_ADD_SUBSCRIBER);
@@ -3216,7 +3221,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             auto inp = loopHandles.getInput(inputName);
             if (inp != nullptr) {
                 if (checkActionFlag(*inp, disconnected_flag)) {
-                    // TODO:: this might generate an error if the required flag was set
+                    // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
                 command.setAction(CMD_ADD_PUBLISHER);
@@ -3242,7 +3247,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             auto filt = loopHandles.getFilter(command.name);
             if (filt != nullptr) {
                 if (checkActionFlag(*filt, disconnected_flag)) {
-                    // TODO:: this might generate an error if the required flag was set
+                    // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
                 command.setAction(CMD_ADD_ENDPOINT);
@@ -3263,7 +3268,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             auto ept = loopHandles.getEndpoint(command.name);
             if (ept != nullptr) {
                 if (checkActionFlag(*ept, disconnected_flag)) {
-                    // TODO:: this might generate an error if the required flag was set
+                    // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
                 command.setAction(CMD_ADD_FILTER);
@@ -3404,9 +3409,8 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
                 }
             }
         }
-    }
-    // just forward these to the appropriate federate
-    else if (command.dest_id == global_broker_id_local) {
+    } else if (command.dest_id == global_broker_id_local) {
+        // just forward these to the appropriate federate
         if (command.action() == CMD_ADD_ENDPOINT) {
             auto filtI = filters.find(global_handle(global_broker_id_local, command.dest_handle));
             if (filtI != nullptr) {
@@ -3723,7 +3727,7 @@ void CommonCore::organizeFilterOperations()
                             someUnused = true;
                         }
                     } else {
-                        // TODO:: this will need some work to finish sorting out but should work for initial tests
+                        // TODO(PT): this will need some work to finish sorting out but should work for initial tests
                         if (core::matchingTypes(fi->allSourceFilters[ii]->inputType, currentType)) {
                             used[ii] = true;
                             usedMore = true;
@@ -4308,8 +4312,8 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
                         deliverMessage(cmd);
                     }
                 }
-            } else // the filter didn't have a function or was deactivated but still was requested to process
-            {
+            } else {
+                // the filter didn't have a function or was deactivated but still was requested to process
                 bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                 bool returnToSender =
                     ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);

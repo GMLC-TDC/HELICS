@@ -17,11 +17,16 @@ target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(helics_test_base INTERFACE compile_flags_target)
 
 add_subdirectory(core)
+add_subdirectory(network)
 add_subdirectory(common)
 add_subdirectory(system_tests)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)
+    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
+        add_subdirectory(webserver)
+    endif()
+        
 endif()
 
 add_subdirectory(application_api)

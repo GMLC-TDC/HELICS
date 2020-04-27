@@ -22,6 +22,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 /** enumeration of possible operations on a socket*/
@@ -45,9 +46,11 @@ class ZmqSocketDescriptor {
     std::vector<socketOperation> ops; //!< a list of connections of make through bind
     std::function<void(const zmq::multipart_t& res)> callback; //!< the message handler
     ZmqSocketDescriptor(std::string socketName = ""):
-        name(std::move(socketName)){}; // purposefully implicit
+        name(std::move(socketName)) {} // purposefully implicit
     ZmqSocketDescriptor(std::string socketName, zmq::socket_type stype):
-        name(std::move(socketName)), type(stype){};
+        name(std::move(socketName)), type(stype)
+    {
+    }
     inline void addOperation(socket_ops op, const std::string& desc) { ops.emplace_back(op, desc); }
     zmq::socket_t makeSocket(zmq::context_t& ctx) const;
     std::unique_ptr<zmq::socket_t> makeSocketPtr(zmq::context_t& ctx) const;

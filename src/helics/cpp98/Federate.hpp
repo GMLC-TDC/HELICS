@@ -160,7 +160,7 @@ typedef struct {
 class Federate {
   public:
     /// Default constructor
-    Federate() HELICS_NOTHROW: fed(NULL), exec_async_iterate(false){};
+    Federate() HELICS_NOTHROW: fed(NULL), exec_async_iterate(false) {}
     /// Copy constructor
     Federate(const Federate& fedObj): exec_async_iterate(fedObj.exec_async_iterate)
     {
@@ -504,7 +504,7 @@ class Federate {
 
     /** add a dependency for this federate
      @details adds an additional internal time dependency for the federate
-     @param federateName the name of the federate to add a dependency on
+     @param fedName the name of the federate to add a dependency on
      */
     void addDependency(const std::string& fedName)
     {

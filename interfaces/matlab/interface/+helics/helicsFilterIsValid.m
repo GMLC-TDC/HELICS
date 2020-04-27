@@ -1,0 +1,3 @@
+function varargout = helicsFilterIsValid(varargin)
+  [varargout{1:nargout}] = helicsMEX(295, varargin{:});
+end

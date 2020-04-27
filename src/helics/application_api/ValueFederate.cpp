@@ -17,7 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 
 #include <deque>
+#include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace helics {
 /**constructor taking a core engine and federate info structure

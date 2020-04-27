@@ -17,8 +17,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <chrono>
+#include <deque>
 #include <map>
+#include <memory>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace helics {
@@ -158,7 +162,7 @@ class FederateState {
     @param[out] id the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny(interface_handle& id);
     /** set the CommonCore object that is managing this Federate*/
-    void setParent(CommonCore* coreObject) { parent_ = coreObject; };
+    void setParent(CommonCore* coreObject) { parent_ = coreObject; }
     /** update the info structure
    @details public call so it also calls the federate lock before calling private update function
    the action Message should be CMD_FED_CONFIGURE

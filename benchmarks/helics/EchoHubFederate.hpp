@@ -4,13 +4,16 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#pragma once
 
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 
-using helics::operator"" _t;
+#include <string>
+#include <vector>
+
 /** class implementing the hub for an echo test*/
 class EchoHub: public BenchmarkFederate {
   private:
@@ -44,7 +47,7 @@ class EchoHub: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        auto cTime = 0.0_t;
+        helics::Time cTime{0.0};
         while (cTime <= finalTime) {
             for (int ii = 0; ii < num_leafs; ++ii) {
                 if (fed->isUpdated(subs[ii])) {

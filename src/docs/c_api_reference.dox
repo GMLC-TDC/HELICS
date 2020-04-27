@@ -166,6 +166,7 @@ functions applying to federates created as a value or combination federate \ref 
 
  \section pub Publication interface Functions 
 functions applying to a \ref helics_publication object
+ - \ref helicsPublicationIsValid
  - \ref helicsPublicationPublishRaw
  - \ref helicsPublicationPublishString
  - \ref helicsPublicationPublishInteger
@@ -188,6 +189,7 @@ functions applying to a \ref helics_publication object
 
  \section input Input interface Functions 
 functions applying to a \ref helics_input object
+ - \ref helicsInputIsValid
  - \ref helicsInputAddTarget
  - \ref helicsInputGetRawValueSize
  - \ref helicsInputGetRawValue
@@ -237,7 +239,6 @@ Functions applying to federates created as a value or combination federate \ref 
  - \ref helicsFederateGetEndpointByIndex
  - \ref helicsFederateHasMessage
  - \ref helicsFederatePendingMessages
- - \ref helicsFederateGetMessage
  - \ref helicsFederateGetMessageObject
  - \ref helicsFederateCreateMessageObject
  - \ref helicsFederateClearMessages
@@ -269,21 +270,21 @@ functions applying to a \ref helics_message_object
  - \ref helicsMessageSetString
  - \ref helicsMessageSetData
  - \ref helicsMessageAppendData
+ - \ref helicsMessageCopy
 
  \section endpoint Endpoint interface Functions 
 functions applying to a \ref helics_endpoint object
+ - \ref helicsEndpointIsValid
  - \ref helicsEndpointSetDefaultDestination
  - \ref helicsEndpointGetDefaultDestination
  - \ref helicsEndpointSendMessageRaw
  - \ref helicsEndpointSendEventRaw
- - \ref helicsEndpointSendMessage
  - \ref helicsEndpointSendMessageObject
+ - \ref helicsEndpointSendMessageObjectZeroCopy
  - \ref helicsEndpointSubscribe
  - \ref helicsEndpointHasMessage
  - \ref helicsEndpointPendingMessages
- - \ref helicsEndpointGetMessage
  - \ref helicsEndpointGetMessageObject
- - \ref helicsEndpointClearMessages
  - \ref helicsEndpointGetType
  - \ref helicsEndpointGetName
  - \ref helicsEndpointGetInfo
@@ -303,6 +304,8 @@ Functions applying to all federates but related to \ref helics_filter
 
  \section filter Filter interface Functions 
 Functions applying to a \ref helics_filter object
+ - \ref helicsFilterSetCustomCallback
+ - \ref helicsFilterIsValid
  - \ref helicsFilterGetName
  - \ref helicsFilterSet
  - \ref helicsFilterSetString

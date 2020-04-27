@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../shared_api_library/ValueFederate.h"
 #include "helicsExceptions.hpp"
 
+#include <string>
+#include <vector>
+
 namespace helicscpp {
 /** C++98 interface for a helics Input*/
 class Input {
@@ -18,7 +21,7 @@ class Input {
     /** construct from a helics_input object*/
     explicit Input(helics_input hsub) HELICS_NOTHROW: inp(hsub) {}
     /** default constructor*/
-    Input() HELICS_NOTHROW: inp(HELICS_NULL_POINTER){};
+    Input() HELICS_NOTHROW: inp(HELICS_NULL_POINTER) {}
     /** copy constructor*/
     Input(const Input& inputs) HELICS_NOTHROW: inp(inputs.inp) {}
     /** copy assign*/
@@ -31,6 +34,8 @@ class Input {
     operator helics_input() const { return inp; }
     /** extract the base object*/
     helics_input baseObject() const { return inp; }
+    /** check if the input is valid */
+    bool isValid() const { return (helicsInputIsValid(inp) == helics_true); }
     /** Methods to set default values for inputs **/
     /** set the default value as a raw data with length*/
     void setDefault(const char* data, int len) { helicsInputSetDefaultRaw(inp, data, len, NULL); }
@@ -150,6 +155,13 @@ class Input {
     const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
     const char* getTarget() const { return helicsSubscriptionGetKey(inp); }
+    /** get the interface information field of the filter*/
+    const char* getInfo() const { return helicsInputGetInfo(inp); }
+    /** set the interface information field of the publication*/
+    void setInfo(const std::string& info)
+    {
+        helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
+    }
 
   private:
     helics_input inp; //!< the reference to the underlying publication
