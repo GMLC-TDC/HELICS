@@ -84,11 +84,10 @@ namespace apps {
                             }
                             return generatePortRequestReply(rxcmd, nbrk.first);
                         }
-                            ActionMessage rep(CMD_PROTOCOL);
-                            rep.messageID = DELAY_CONNECTION;
-                            return rep;
-                    }
-                    break;
+                        ActionMessage rep(CMD_PROTOCOL);
+                        rep.messageID = DELAY_CONNECTION;
+                        return rep;
+                    } break;
                 }
                 break;
             default:
