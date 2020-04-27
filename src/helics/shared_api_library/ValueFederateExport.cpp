@@ -73,7 +73,6 @@ static inline helics_input addInput(helics_federate fed, std::unique_ptr<helics:
     helics_input hinp = inp.get();
     fedObj->inputs.push_back(std::move(inp));
     return hinp;
-    
 }
 
 static inline helics_publication addPublication(helics_federate fed, std::unique_ptr<helics::PublicationObject> pub)
