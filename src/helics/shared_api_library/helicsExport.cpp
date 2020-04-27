@@ -21,8 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <vector>
 #ifdef ENABLE_ZMQ_CORE
-#    include "../common/zmqContextManager.h"
-#    include "cppzmq/zmq.hpp"
+#    include "../network/zmq/ZmqContextManager.h"
 #endif
 
 const char* helicsGetVersion(void)
@@ -1001,7 +1000,7 @@ MasterObjectHolder::~MasterObjectHolder()
 {
 #ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete()) {
-        ZmqContextManager::getContext().close(); // LCOV_EXCL_LINE
+        ZmqContextManager::closeContext(); // LCOV_EXCL_LINE
     }
 #endif
     helics::LoggingCore::setFastShutdown();

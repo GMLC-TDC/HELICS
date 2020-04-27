@@ -6,14 +6,14 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ZmqCommsSS.h"
 
-#include "../../common/zmqContextManager.h"
-#include "../../common/zmqHelper.h"
-#include "../../common/zmqSocketDescriptor.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
+#include "ZmqContextManager.h"
+#include "ZmqHelper.h"
 #include "ZmqRequestSets.h"
+#include "zmqSocketDescriptor.h"
 
 #include <iostream>
 #include <map>
@@ -213,8 +213,8 @@ namespace zeromq {
     {
         if (serverMode) {
             brokerSocket.setsockopt(ZMQ_LINGER, 500);
-            auto bindsuccess = hzmq::bindzmqSocket(
-                brokerSocket, localTargetAddress, PortNumber, connectionTimeout);
+            auto bindsuccess =
+                bindzmqSocket(brokerSocket, localTargetAddress, PortNumber, connectionTimeout);
             if (!bindsuccess) {
                 brokerSocket.close();
                 disconnecting = true;
@@ -235,11 +235,11 @@ namespace zeromq {
     }
 
     bool ZmqCommsSS::processTxControlCmd(
-        ActionMessage cmd,
+        const ActionMessage& cmd,
         std::map<route_id, std::string>& routes,
         std::map<std::string, std::string>& connection_info)
     {
-        bool close_tx = false;
+        bool close_tx{false};
 
         switch (cmd.messageID) {
             case RECONNECT_TRANSMITTER:
@@ -351,25 +351,25 @@ namespace zeromq {
 
         setRxStatus(connection_status::connected);
 
-        int status = 0;
+        int status{0};
 
         bool haltLoop{false};
         //  std::vector<ActionMessage> txlist;
         while (!haltLoop) {
             route_id rid;
             ActionMessage cmd;
-            int count = 0;
+            int count{0};
 
             // Handle Tx messages first
             auto tx_msg = txQueue.try_pop();
-            int rc = zmq::poll(poller, 0l);
+            int rc = zmq::poll(poller, 0L);
             if (!tx_msg || (rc <= 0)) {
                 std::this_thread::yield();
             }
-            int tx_count = 0;
+            int tx_count{0};
             // Balance between tx and rx processing since both running on single thread
             while (tx_msg && (tx_count < TX_RX_MSG_COUNT)) {
-                bool processed = false;
+                bool processed{false};
                 cmd = std::move(tx_msg->second);
                 rid = tx_msg->first;
                 if (isProtocolCommand(cmd)) {
@@ -439,14 +439,14 @@ namespace zeromq {
             count = 0;
             rc = 1;
             while ((rc > 0) && (count < 5)) {
-                rc = zmq::poll(poller, 0l);
+                rc = zmq::poll(poller, 0L);
 
                 if (rc > 0) {
-                    if ((poller[0].revents & ZMQ_POLLIN) != 0) {
+                    if (zmq::has_message(poller[0])) {
                         status = processRxMessage(*sockets[0], connection_info);
                     }
                     if (serverMode && hasBroker) {
-                        if ((poller[1].revents & ZMQ_POLLIN) != 0) {
+                        if (zmq::has_message(poller[1])) {
                             status = processRxMessage(*sockets[1], connection_info);
                         }
                     }

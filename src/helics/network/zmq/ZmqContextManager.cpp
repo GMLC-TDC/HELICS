@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
-#include "zmqContextManager.h"
+#include "ZmqContextManager.h"
 
 #include "cppzmq/zmq.hpp"
 
@@ -98,8 +98,12 @@ ZmqContextManager::~ZmqContextManager()
     // std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
 
     if (leakOnDelete) {
-        // yes I am purposefully leaking this PHILIP TOP
-        auto val = zcontext.release();
+        // yes I am purposefully leaking this( PHILIP TOP)
+        // do the vagaries of library closeout this may end up being destroyed too soon and can cause
+        // some extraneous errors to show up when closing programs, so this just lets the OS process cleanup
+        // since the only issues occur on program termination, in other situations closing does present an issue
+        // and since this particular object is mostly only closed on termination this is the default.
+        auto* val = zcontext.release();
         (void)(val);
     }
 }

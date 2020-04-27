@@ -7,8 +7,22 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.5.0][] - 2020-04-25
-Some library reorganization, additional static analysis(CppLint and clang-tidy), multiBroker
+## [2.5.1][] ~ 2020-05-25
+
+### Changed
+-   All ZeroMQ related files are now located in the network library and under a single namespace
+
+### Fixed
+
+### Added
+-   A helics::zmq target was added for linking with zeromq if using HELICS as a subproject
+
+### Deprecated
+
+### Removed
+
+## [2.5.0][] - 2020-04-26
+Some library reorganization, additional static analysis(CppLint and clang-tidy), multiBroker, Webserver updates including a websocket interface and the ability to create and destroy brokers from the HTTP and websocket interfaces.
 
 ### Changed
 -   Split the HELICS core library into a separate core and network library
@@ -599,3 +613,4 @@ This is a major revision so this changelog will not capture all the changes that
 [2.4.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.1
 [2.4.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.2
 [2.5.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.0
+[2.5.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.1

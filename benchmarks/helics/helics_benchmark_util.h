@@ -102,7 +102,7 @@ inline void printHELICSsystemInfo()
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: "
               << HELICS_VERSION_STRING << '\n';
 #if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
-    std::cout << "ZMQ VERSION: " << helics::hzmq::getZMQVersion() << '\n';
+    std::cout << "ZMQ VERSION: " << helics::zeromq::getZMQVersion() << '\n';
 #endif
     std::cout << "COMPILER INFO: " << HELICS_COMPILER_VERSION << '\n';
     std::cout << "BUILD FLAGS: " << HELICS_BUILD_FLAGS << '\n';

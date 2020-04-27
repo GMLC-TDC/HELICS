@@ -48,11 +48,10 @@ namespace apps {
 
         void mainLoop();
 #ifdef ENABLE_ZMQ_CORE
-        std::unique_ptr<zmq::socket_t> loadZMQsocket(zmq::context_t& ctx);
-        std::unique_ptr<zmq::socket_t> loadZMQSSsocket(zmq::context_t& ctx);
+        std::pair<std::unique_ptr<zmq::socket_t>, int> loadZMQsocket(zmq::context_t& ctx);
+        std::pair<std::unique_ptr<zmq::socket_t>, int> loadZMQSSsocket(zmq::context_t& ctx);
 
-        zmqServerData generateZMQServerData();
-        zmqServerData generateZMQSSServerData();
+        static zmqServerData generateServerData(int portNumber, int skip);
 
         std::string
             generateResponseToMessage(zmq::message_t& msg, portData& pdata, core_type ctype);

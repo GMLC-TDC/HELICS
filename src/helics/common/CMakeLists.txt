@@ -31,27 +31,10 @@ set(
     configFileHelpers.cpp
 )
 
-set(zmq_headers zmqContextManager.h zmqHelper.h
-                ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
-                ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp)
-
-set(
-    zmq_sources
-    # zmqReactor.cpp
-    zmqContextManager.cpp
-    # zmqSocketDescriptor.cpp
-    zmqHelper.cpp
-    # zmqProxyHub.cpp
-)
-
 # headers that are part of the public interface
 set(helics_public_common JsonProcessingFunctions.hpp AsioContextManager.h logger.h
                          GuardedTypes.hpp)
 
-if(ENABLE_ZMQ_CORE)
-    list(APPEND common_headers ${zmq_headers})
-    list(APPEND common_sources ${zmq_sources})
-endif(ENABLE_ZMQ_CORE)
 
 if (NOT HELICS_DISABLE_ASIO)
     list(APPEND common_headers AsioContextManager.h)
@@ -67,10 +50,6 @@ target_link_libraries(helics_common PUBLIC HELICS::jsoncpp_lib HELICS::utilities
 if(TARGET Boost::boost AND NOT HELICS_DISABLE_BOOST)
    target_link_libraries(helics_common PRIVATE Boost::boost)
 endif()
-
-if(ENABLE_ZMQ_CORE)
-   target_link_libraries(helics_common PRIVATE ${ZeroMQ_DEPENDENCY})
-endif(ENABLE_ZMQ_CORE)
 
 if(APPLE)
     target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")

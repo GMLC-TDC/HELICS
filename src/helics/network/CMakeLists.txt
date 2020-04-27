@@ -40,6 +40,9 @@ set(
     zmq/ZmqCommsSS.cpp
     zmq/ZmqRequestSets.cpp
     zmq/ZmqCommsCommon.cpp
+    zmq/ZmqContextManager.cpp
+    #zmq/zmqSocketDescriptor.cpp
+    zmq/ZmqHelper.cpp
 )
 
 set(UDP_SOURCE_FILES udp/UdpCore.cpp udp/UdpBroker.cpp udp/UdpComms.cpp)
@@ -90,6 +93,11 @@ set(
     zmq/ZmqCommsSS.h
     zmq/ZmqRequestSets.h
     zmq/ZmqCommsCommon.h
+    zmq/ZmqContextManager.h
+    #zmq/zmqSocketDescriptor.h
+    zmq/ZmqHelper.h
+    ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
+    ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
 set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService.h)
@@ -157,7 +165,7 @@ endif(ENABLE_MPI_CORE)
 if(ENABLE_ZMQ_CORE)
     target_link_libraries(
         helics_network PRIVATE
-        ${ZeroMQ_DEPENDENCY}
+        helics::zmq
     )
     source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(ENABLE_ZMQ_CORE)
