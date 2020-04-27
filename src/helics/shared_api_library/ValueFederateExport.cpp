@@ -66,18 +66,23 @@ static helics::PublicationObject* verifyPublication(helics_publication pub, heli
     return pubObj;
 }
 
-static inline void addInput(helics_federate fed, std::unique_ptr<helics::InputObject> inp)
+static inline helics_input addInput(helics_federate fed, std::unique_ptr<helics::InputObject> inp)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     inp->valid = InputValidationIdentifier;
+    helics_input hinp = inp.get();
     fedObj->inputs.push_back(std::move(inp));
+    return hinp;
+    
 }
 
-static inline void addPublication(helics_federate fed, std::unique_ptr<helics::PublicationObject> pub)
+static inline helics_publication addPublication(helics_federate fed, std::unique_ptr<helics::PublicationObject> pub)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     pub->valid = PublicationValidationIdentifier;
+    helics_publication hpub = pub.get();
     fedObj->pubs.push_back(std::move(pub));
+    return hpub;
 }
 
 /* input/pub registration */
@@ -91,9 +96,7 @@ helics_input helicsFederateRegisterSubscription(helics_federate fed, const char*
         auto sub = std::make_unique<helics::InputObject>();
         sub->inputPtr = &fedObj->registerSubscription(AS_STRING(key), AS_STRING(units));
         sub->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(sub.get());
-        addInput(fed, std::move(sub));
-        return ret;
+        return addInput(fed, std::move(sub));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -115,9 +118,7 @@ helics_publication
         auto pub = std::make_unique<helics::PublicationObject>();
         pub->pubPtr = &fedObj->registerPublication(AS_STRING(key), AS_STRING(type), AS_STRING(units));
         pub->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_publication>(pub.get());
-        addPublication(fed, std::move(pub));
-        return ret;
+        return addPublication(fed, std::move(pub));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -147,9 +148,7 @@ helics_publication
         pub->pubPtr = &(
             fedObj->registerPublication(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
         pub->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_publication>(pub.get());
-        addPublication(fed, std::move(pub));
-        return ret;
+        return addPublication(fed, std::move(pub));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -173,9 +172,7 @@ helics_publication helicsFederateRegisterGlobalTypePublication(
         auto pub = std::make_unique<helics::PublicationObject>();
         pub->pubPtr = &fedObj->registerGlobalPublication(AS_STRING(key), AS_STRING(type), AS_STRING(units));
         pub->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_publication>(pub.get());
-        addPublication(fed, std::move(pub));
-        return ret;
+        return addPublication(fed, std::move(pub));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -210,9 +207,7 @@ helics_publication helicsFederateRegisterGlobalPublication(
         pub->pubPtr = &(fedObj->registerGlobalPublication(
             AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
         pub->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_publication>(pub.get());
-        addPublication(fed, std::move(pub));
-        return ret;
+        return addPublication(fed, std::move(pub));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -231,9 +226,7 @@ helics_input helicsFederateRegisterTypeInput(helics_federate fed, const char* ke
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr = &(fedObj->registerInput(AS_STRING(key), AS_STRING(type), AS_STRING(units)));
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -265,9 +258,7 @@ helics_input helicsFederateRegisterInput(helics_federate fed, const char* key, h
         inp->inputPtr =
             &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -287,9 +278,7 @@ helics_input
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr = &(fedObj->registerGlobalInput(AS_STRING(key), AS_STRING(type), AS_STRING(units)));
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -322,9 +311,7 @@ helics_input
         inp->inputPtr =
             &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -387,9 +374,7 @@ helics_publication helicsFederateGetPublication(helics_federate fed, const char*
         auto pubObj = std::make_unique<helics::PublicationObject>();
         pubObj->pubPtr = &pub;
         pubObj->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_publication>(pubObj.get());
-        addPublication(fed, std::move(pubObj));
-        return ret;
+        return addPublication(fed, std::move(pubObj));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -418,9 +403,7 @@ helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int 
         pub->pubPtr = &id;
 
         pub->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_publication>(pub.get());
-        addPublication(fed, std::move(pub));
-        return ret;
+        return addPublication(fed, std::move(pub));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -452,9 +435,7 @@ helics_input helicsFederateGetInput(helics_federate fed, const char* key, helics
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr = &id;
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -482,9 +463,7 @@ helics_input helicsFederateGetInputByIndex(helics_federate fed, int index, helic
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr = &id;
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -513,9 +492,7 @@ helics_input helicsFederateGetSubscription(helics_federate fed, const char* key,
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr = &id;
         inp->fedptr = std::move(fedObj);
-        auto* ret = reinterpret_cast<helics_input>(inp.get());
-        addInput(fed, std::move(inp));
-        return ret;
+        return addInput(fed, std::move(inp));
     }
     // LCOV_EXCL_START
     catch (...) {
