@@ -439,7 +439,7 @@ namespace zeromq {
             count = 0;
             rc = 1;
             while ((rc > 0) && (count < 5)) {
-                rc = zmq::poll(poller, 0l);
+                rc = zmq::poll(poller, 0L);
 
                 if (rc > 0) {
                     if (zmq::has_message(poller[0])) {

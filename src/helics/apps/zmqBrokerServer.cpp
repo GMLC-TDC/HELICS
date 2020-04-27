@@ -233,7 +233,7 @@ namespace apps {
             if (rc > 0) {
                 zmq::message_t msg;
                 for (std::size_t ii = 0; ii < poller.size(); ++ii) {
-                    if ((poller[ii].revents & ZMQ_POLLIN) != 0) {
+                    if (zmq::has_message(poller[ii])) {
                         handleMessage[ii](sockets[ii].get(), data[ii].ports);
                     }
                 }

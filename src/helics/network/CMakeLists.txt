@@ -41,7 +41,7 @@ set(
     zmq/ZmqRequestSets.cpp
     zmq/ZmqCommsCommon.cpp
     zmq/ZmqContextManager.cpp
-    #zmq/ZmqSocketDescriptor.cpp
+    #zmq/zmqSocketDescriptor.cpp
     zmq/ZmqHelper.cpp
 )
 
@@ -94,7 +94,7 @@ set(
     zmq/ZmqRequestSets.h
     zmq/ZmqCommsCommon.h
     zmq/ZmqContextManager.h
-    #zmq/ZmqSocketDescriptor.h
+    #zmq/zmqSocketDescriptor.h
     zmq/ZmqHelper.h
     ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
     ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
