@@ -49,7 +49,7 @@ namespace apps {
         void mainLoop();
 #ifdef ENABLE_ZMQ_CORE
         std::pair<std::unique_ptr<zmq::socket_t>, int> loadZMQsocket(zmq::context_t& ctx);
-        std::pair < std::unique_ptr<zmq::socket_t>, int> loadZMQSSsocket(zmq::context_t& ctx);
+        std::pair<std::unique_ptr<zmq::socket_t>, int> loadZMQSSsocket(zmq::context_t& ctx);
 
         static zmqServerData generateServerData(int portNumber, int skip);
 

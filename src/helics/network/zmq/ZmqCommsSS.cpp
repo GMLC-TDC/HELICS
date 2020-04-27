@@ -213,8 +213,8 @@ namespace zeromq {
     {
         if (serverMode) {
             brokerSocket.setsockopt(ZMQ_LINGER, 500);
-            auto bindsuccess = bindzmqSocket(
-                brokerSocket, localTargetAddress, PortNumber, connectionTimeout);
+            auto bindsuccess =
+                bindzmqSocket(brokerSocket, localTargetAddress, PortNumber, connectionTimeout);
             if (!bindsuccess) {
                 brokerSocket.close();
                 disconnecting = true;
@@ -235,7 +235,7 @@ namespace zeromq {
     }
 
     bool ZmqCommsSS::processTxControlCmd(
-        const ActionMessage &cmd,
+        const ActionMessage& cmd,
         std::map<route_id, std::string>& routes,
         std::map<std::string, std::string>& connection_info)
     {

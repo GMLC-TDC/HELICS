@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../NetworkBrokerData.hpp"
 #include "cppzmq/zmq.hpp"
+
 #include <string>
 #include <thread>
 

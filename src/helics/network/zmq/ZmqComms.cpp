@@ -158,8 +158,8 @@ namespace zeromq {
             }
         }
         if (serverMode) {
-            auto bindsuccess = bindzmqSocket(
-                repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
+            auto bindsuccess =
+                bindzmqSocket(repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
             if (!bindsuccess) {
                 pullSocket.close();
                 repSocket.close();
