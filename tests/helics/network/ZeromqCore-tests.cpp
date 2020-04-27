@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "cppzmq/zmq.hpp"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/network/zmq/ZmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -15,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-types.hpp"
 #include "helics/network/zmq/ZmqBroker.h"
 #include "helics/network/zmq/ZmqComms.h"
+#include "helics/network/zmq/ZmqContextManager.h"
 #include "helics/network/zmq/ZmqCore.h"
 #include "helics/network/zmq/ZmqRequestSets.h"
 
