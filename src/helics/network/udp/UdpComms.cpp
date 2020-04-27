@@ -136,7 +136,7 @@ namespace udp {
             if (len == 5) {
                 std::string str(data.data(), len);
                 if (str == "close") {
-                    goto CLOSE_RX_LOOP;
+                    break;
                 }
             }
             ActionMessage M(data.data(), len);
@@ -146,21 +146,19 @@ namespace udp {
             }
             if (isProtocolCommand(M)) {
                 if (M.messageID == CLOSE_RECEIVER) {
-                    goto CLOSE_RX_LOOP;
-                } else {
-                    auto reply = generateReplyToIncomingMessage(M);
-                    if (reply.messageID == DISCONNECT) {
-                        goto CLOSE_RX_LOOP;
-                    } else if (reply.action() != CMD_IGNORE) {
-                        socket.send_to(
-                            asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
-                    }
+                    break;
+                }
+                auto reply = generateReplyToIncomingMessage(M);
+                if (reply.messageID == DISCONNECT) {
+                    break;
+                }
+                if (reply.action() != CMD_IGNORE) {
+                    socket.send_to(asio::buffer(reply.to_string()), remote_endp, 0, ignored_error);
                 }
             } else {
                 ActionCallback(std::move(M));
             }
         }
-    CLOSE_RX_LOOP:
         disconnecting = true;
         setRxStatus(connection_status::terminated);
     }
@@ -237,9 +235,8 @@ namespace udp {
                             }
                             setTxStatus(connection_status::error);
                             return;
-                        } else {
-                            continue;
                         }
+                        continue;
                     }
                     auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
                     if (error) {
@@ -323,8 +320,8 @@ namespace udp {
         }
 
         setTxStatus(connection_status::connected);
-
-        while (true) {
+        bool continueProcessing{true};
+        while (continueProcessing) {
             route_id rid;
             ActionMessage cmd;
 
@@ -366,7 +363,9 @@ namespace udp {
                             processed = true;
                             break;
                         case DISCONNECT:
-                            goto CLOSE_TX_LOOP; // break out of loop
+                            continueProcessing = false;
+                            processed = true;
+                            break;
                     }
                 }
             }
@@ -423,8 +422,6 @@ namespace udp {
                 }
             }
         }
-    CLOSE_TX_LOOP:
-
         routes.clear();
         if (getRxStatus() == connection_status::connected) {
             if (closingRx) {

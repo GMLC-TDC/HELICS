@@ -35,7 +35,7 @@ namespace apps {
         std::string brkname;
         std::string brkinit;
         bool newbrk{false};
-        auto& strs = rx.getStringData();
+        const auto& strs = rx.getStringData();
         if (!strs.empty()) {
             brkname = strs[0];
         }
@@ -83,12 +83,12 @@ namespace apps {
                                 assignPort(pdata, pt, nbrk.first);
                             }
                             return generatePortRequestReply(rxcmd, nbrk.first);
-                        } else {
+                        }
                             ActionMessage rep(CMD_PROTOCOL);
                             rep.messageID = DELAY_CONNECTION;
                             return rep;
-                        }
-                    } break;
+                    }
+                    break;
                 }
                 break;
             default:
