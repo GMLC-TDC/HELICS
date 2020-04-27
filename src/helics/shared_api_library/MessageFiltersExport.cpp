@@ -41,20 +41,22 @@ static helics::FilterObject* getFilterObj(helics_filter filt, helics_error* err)
     return fObj;
 }
 
+// fed is assumed to be valid here
 static inline helics_filter federateAddFilter(helics_federate fed, std::unique_ptr<helics::FilterObject> filt)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     filt->valid = filterValidationIdentifier;
-    helics_filter ret = reinterpret_cast<helics_filter>(filt.get());
+    helics_filter ret = filt.get();
     fedObj->filters.push_back(std::move(filt));
     return ret;
 }
 
+// core is assumed to be valid here
 static inline helics_filter coreAddFilter(helics_core core, std::unique_ptr<helics::FilterObject> filt)
 {
     auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
     filt->valid = filterValidationIdentifier;
-    helics_filter ret = reinterpret_cast<helics_filter>(filt.get());
+    helics_filter ret = filt.get();
     coreObj->filters.push_back(std::move(filt));
     return ret;
 }
