@@ -85,7 +85,7 @@ namespace apps {
                             return generatePortRequestReply(rxcmd, nbrk.first);
                         } else {
                             ActionMessage rep(CMD_PROTOCOL);
-                            rep.messageID = DELAY;
+                            rep.messageID = DELAY_CONNECTION;
                             return rep;
                         }
                     } break;

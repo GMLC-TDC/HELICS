@@ -277,7 +277,7 @@ namespace udp {
                             // Setup the control socket for comms with the receiver
                             broker_endpoint = *resolver.resolve(query);
                             continue;
-                        } else if (m.messageID == DELAY) {
+                        } else if (m.messageID == DELAY_CONNECTION) {
                             std::this_thread::sleep_for(std::chrono::seconds(2));
                         } else if (m.messageID == DISCONNECT) {
                             if (PortNumber <= 0) {

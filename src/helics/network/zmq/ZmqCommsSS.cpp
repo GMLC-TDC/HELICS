@@ -141,7 +141,7 @@ namespace zeromq {
                     }
                     status = 5;
                 } break;
-                case DELAY:
+                case DELAY_CONNECTION:
                     std::this_thread::sleep_for(std::chrono::seconds(2));
                     status = 5; //need to reconnect after this
                     break;
