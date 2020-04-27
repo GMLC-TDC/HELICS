@@ -213,7 +213,7 @@ namespace zeromq {
     {
         if (serverMode) {
             brokerSocket.setsockopt(ZMQ_LINGER, 500);
-            auto bindsuccess = hzmq::bindzmqSocket(
+            auto bindsuccess = bindzmqSocket(
                 brokerSocket, localTargetAddress, PortNumber, connectionTimeout);
             if (!bindsuccess) {
                 brokerSocket.close();
@@ -442,11 +442,11 @@ namespace zeromq {
                 rc = zmq::poll(poller, 0l);
 
                 if (rc > 0) {
-                    if ((poller[0].revents & ZMQ_POLLIN) != 0) {
+                    if (zmq::has_message(poller[0])) {
                         status = processRxMessage(*sockets[0], connection_info);
                     }
                     if (serverMode && hasBroker) {
-                        if ((poller[1].revents & ZMQ_POLLIN) != 0) {
+                        if (zmq::has_message(poller[1])) {
                             status = processRxMessage(*sockets[1], connection_info);
                         }
                     }

@@ -104,7 +104,7 @@ namespace apps {
         retval.first = std::make_unique<zmq::socket_t>(ctx, ZMQ_REP);
         retval.first->setsockopt(ZMQ_LINGER, 500);
         auto bindsuccess =
-            hzmq::bindzmqSocket(*retval.first, ext_interface, retval.second, timeout);
+            zeromq::bindzmqSocket(*retval.first, ext_interface, retval.second, timeout);
         if (!bindsuccess) {
             retval.first->close();
             retval.first.reset();
@@ -129,7 +129,7 @@ namespace apps {
         retval.first = std::make_unique<zmq::socket_t>(ctx, ZMQ_ROUTER);
         retval.first->setsockopt(ZMQ_LINGER, 500);
         auto bindsuccess =
-            hzmq::bindzmqSocket(*retval.first, ext_interface, retval.second, timeout);
+            zeromq::bindzmqSocket(*retval.first, ext_interface, retval.second, timeout);
         if (!bindsuccess) {
             retval.first->close();
             retval.first.reset();
@@ -186,7 +186,7 @@ namespace apps {
             auto sdata = loadZMQsocket(ctx->getContext());
             sockets.push_back(std::move(sdata.first));
             data.push_back(generateServerData(sdata.second + 3, 2));
-            handleMessage.push_back([this](zmq::socket_t* skt, portData& pdata) {
+            handleMessage.emplace_back([this](zmq::socket_t* skt, portData& pdata) {
                 zmq::message_t msg;
                 skt->recv(msg);
                 std::string response = generateResponseToMessage(msg, pdata, core_type::ZMQ);

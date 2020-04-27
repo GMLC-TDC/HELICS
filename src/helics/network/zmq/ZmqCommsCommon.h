@@ -18,7 +18,7 @@ class socket_t;
 }
 
 namespace helics {
-namespace hzmq {
+namespace zeromq {
     static const std::chrono::milliseconds defaultPeriod(200);
 
     /** bind a zmq socket, with a timeout and timeout period*/
@@ -30,5 +30,6 @@ namespace hzmq {
         std::chrono::milliseconds period = defaultPeriod);
     /** get the ZeroMQ version currently in use*/
     std::string getZMQVersion();
-} // namespace hzmq
+} // namespace zeromq
+
 } // namespace helics

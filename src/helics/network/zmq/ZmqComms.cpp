@@ -158,7 +158,7 @@ namespace zeromq {
             }
         }
         if (serverMode) {
-            auto bindsuccess = hzmq::bindzmqSocket(
+            auto bindsuccess = bindzmqSocket(
                 repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
             if (!bindsuccess) {
                 pullSocket.close();
@@ -173,7 +173,7 @@ namespace zeromq {
         }
 
         auto bindsuccess =
-            hzmq::bindzmqSocket(pullSocket, localTargetAddress, PortNumber, connectionTimeout);
+            bindzmqSocket(pullSocket, localTargetAddress, PortNumber, connectionTimeout);
 
         if (!bindsuccess) {
             pullSocket.close();
@@ -202,7 +202,7 @@ namespace zeromq {
             auto rc = zmq::poll(poller, std::chrono::milliseconds(1000));
             if (rc > 0) {
                 zmq::message_t msg;
-                if ((poller[0].revents & ZMQ_POLLIN) != 0) {
+                if (zmq::has_message(poller[0])) {
                     controlSocket.recv(msg);
 
                     auto status = processIncomingMessage(msg);
@@ -210,7 +210,7 @@ namespace zeromq {
                         break;
                     }
                 }
-                if ((poller[1].revents & ZMQ_POLLIN) != 0) {
+                if (zmq::has_message(poller[1])) {
                     pullSocket.recv(msg);
                     auto status = processIncomingMessage(msg);
                     if (status < 0) {
@@ -218,7 +218,7 @@ namespace zeromq {
                     }
                 }
                 if (serverMode) {
-                    if ((poller[2].revents & ZMQ_POLLIN) != 0) {
+                    if (zmq::has_message(poller[2])) {
                         repSocket.recv(msg);
                         auto status = replyToIncomingMessage(msg, repSocket);
                         if (status < 0) {

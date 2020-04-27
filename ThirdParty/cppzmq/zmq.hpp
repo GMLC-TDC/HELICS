@@ -297,6 +297,11 @@ inline int poll(std::vector<zmq_pollitem_t> &items, long timeout_ = -1)
 }
 #endif
 
+inline bool has_message(const zmq_pollitem_t &item)
+{
+    return ((static_cast<uint32_t>(item.revents) & ZMQ_POLLIN)!=0U);
+}
+
 
 inline void version(int *major_, int *minor_, int *patch_)
 {
