@@ -87,7 +87,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     EXPECT_TRUE(m.getStringData() == fr.getStringData());
 }
 
-TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
+TEST(ActionMessage_tests, action_test_to_string_time_request)
 {
     helics::ActionMessage m(CMD_TIME_REQUEST);
     /*
@@ -100,16 +100,14 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
     *>(&m)));
     }
     */
-    m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
+    m.actionTime = 47.2342;
     m.source_handle = interface_handle{4};
     m.source_id = global_federate_id{232324};
     m.dest_id = global_federate_id{22552215};
     m.dest_handle = interface_handle{2322342};
-
     m.setString(sourceStringLoc, "this is a long source string to test");
-    m.setString(origSourceStringLoc, "this is a longer alternate source string to test");
-    m.setString(targetStringLoc, "this is a target");
+    // this is a time request and the payload and strings don't get copied
     m.Tdemin = 2342532.2342;
     m.Tso = 54.7814;
     m.Te = Time::epsilon();
@@ -120,14 +118,14 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
     ActionMessage fr;
     fr.from_string(data);
     EXPECT_TRUE(m.action() == fr.action());
-    EXPECT_EQ(m.payload, fr.payload);
+    EXPECT_TRUE(fr.payload.empty());
     EXPECT_EQ(m.source_handle, fr.source_handle);
     EXPECT_EQ(m.source_id, fr.source_id);
     EXPECT_EQ(m.dest_handle, fr.dest_handle);
     EXPECT_EQ(m.dest_id, fr.dest_id);
     EXPECT_TRUE(m.actionTime == fr.actionTime);
 
-    EXPECT_TRUE(m.getStringData() == fr.getStringData());
+    EXPECT_TRUE(fr.getStringData().empty());
     EXPECT_TRUE(m.Tso == fr.Tso);
     EXPECT_TRUE(m.Te == fr.Te);
     EXPECT_TRUE(m.Tdemin == fr.Tdemin);

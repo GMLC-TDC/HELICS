@@ -141,14 +141,15 @@ const std::string& ActionMessage::getString(int index) const
 
 void ActionMessage::setString(int index, const std::string& str)
 {
-    if ((index >= 0) && (index < 256)) {
-        if (index >= static_cast<int>(stringData.size())) {
-            stringData.resize(static_cast<size_t>(index) + 1);
-        }
-        stringData[index] = str;
-    } else {
+    if (index >= 256 || index < 0)
+    {
         throw(std::invalid_argument("index out of specified range (0-255)"));
     }
+    if (index >= static_cast<int>(stringData.size())) {
+       stringData.resize(static_cast<size_t>(index) + 1);
+    }
+    stringData[index] = str;
+   
 }
 
 /** check for little endian*/
@@ -158,19 +159,26 @@ static inline std::uint8_t isLittleEndian()
     return (*reinterpret_cast<std::int8_t*>(&test) == 1) ? std::uint8_t(1) : 0;
 }
 
+// action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload
+// size(4 bytes)+1 byte for number of strings=45
+static constexpr int action_message_base_size = static_cast<int>(
+    7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1);
+
+
 int ActionMessage::toByteArray(char* data, int buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
-
-    if ((data == nullptr) || (buffer_size == 0)) {
-        return -1;
-    }
-    if (static_cast<int>(buffer_size) < serializedByteCount()) {
-        return -1;
-    }
-    char* dataStart = data;
     // put the main string size in the first 4 bytes;
-    auto ssize = static_cast<uint32_t>(payload.size()) & 0x00FFFFFFu;
+    std::uint32_t ssize =
+        (messageAction != CMD_TIME_REQUEST) ? static_cast<uint32_t>(payload.size() & 0x00FFFFFFUL) : 0UL;
+
+    if ((data == nullptr) || (buffer_size == 0) ||
+        buffer_size < static_cast<int>(action_message_base_size+ssize)) {
+        return -1;
+    }
+
+    char* dataStart = data;
+    
     *data = littleEndian;
     data[1] = static_cast<uint8_t>(ssize >> 16U);
     data[2] = static_cast<uint8_t>((ssize >> 8U) & 0xFFU);
@@ -208,50 +216,55 @@ int ActionMessage::toByteArray(char* data, int buffer_size) const
         bt = Tso.getBaseTimeCode();
         std::memcpy(data, &(bt), sizeof(Time::baseType));
         data += sizeof(Time::baseType);
+        *data = 0;
+        ++data;
+        return static_cast<int>(data - dataStart);
     }
+
     if (ssize > 0) {
         std::memcpy(data, payload.data(), ssize);
         data += ssize;
     }
 
-    if (stringData.empty()) {
-        *data = 0;
-        ++data;
-    } else {
+  //  if (stringData.empty()) {
+  //      *data = 0;
+   //     ++data;
+   // } else {
         *data = static_cast<uint8_t>(stringData.size());
         ++data;
-        for (auto& str : stringData) {
+        ssize += action_message_base_size;
+        for (const auto& str : stringData) {
             auto strsize = static_cast<uint32_t>(str.size());
+            if (buffer_size < static_cast<int>(ssize)) {
+                return -1;}
+
             std::memcpy(data, &strsize, sizeof(uint32_t));
             data += sizeof(uint32_t);
             std::memcpy(data, str.data(), str.size());
             data += str.size();
         }
-    }
+ //   }
     auto actSize = static_cast<int>(data - dataStart);
     return actSize;
 }
 
-// action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload
-// size(4 bytes)+1 byte for number of strings=45
-static constexpr int action_message_base_size = static_cast<int>(
-    7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1);
-
 int ActionMessage::serializedByteCount() const
 {
     int size{action_message_base_size};
-    size += static_cast<int>(payload.size());
+    
     // for time request add an additional 3*8 bytes
     if (messageAction == CMD_TIME_REQUEST) {
         size += static_cast<int>(3 * sizeof(Time::baseType));
+        return size;
     }
+    size += static_cast<int>(payload.size());
     // add additional string data
-    if (!stringData.empty()) {
-        for (auto& str : stringData) {
+ //   if (!stringData.empty()) {
+        for (const auto& str : stringData) {
             // 4(to store the length)+length of the string
             size += static_cast<int>(sizeof(uint32_t) + str.size());
         }
-    }
+   // }
     return size;
 }
 
