@@ -141,15 +141,13 @@ const std::string& ActionMessage::getString(int index) const
 
 void ActionMessage::setString(int index, const std::string& str)
 {
-    if (index >= 256 || index < 0)
-    {
+    if (index >= 256 || index < 0) {
         throw(std::invalid_argument("index out of specified range (0-255)"));
     }
     if (index >= static_cast<int>(stringData.size())) {
-       stringData.resize(static_cast<size_t>(index) + 1);
+        stringData.resize(static_cast<size_t>(index) + 1);
     }
     stringData[index] = str;
-   
 }
 
 /** check for little endian*/
@@ -164,21 +162,21 @@ static inline std::uint8_t isLittleEndian()
 static constexpr int action_message_base_size = static_cast<int>(
     7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1);
 
-
 int ActionMessage::toByteArray(char* data, int buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
     // put the main string size in the first 4 bytes;
-    std::uint32_t ssize =
-        (messageAction != CMD_TIME_REQUEST) ? static_cast<uint32_t>(payload.size() & 0x00FFFFFFUL) : 0UL;
+    std::uint32_t ssize = (messageAction != CMD_TIME_REQUEST) ?
+        static_cast<uint32_t>(payload.size() & 0x00FFFFFFUL) :
+        0UL;
 
     if ((data == nullptr) || (buffer_size == 0) ||
-        buffer_size < static_cast<int>(action_message_base_size+ssize)) {
+        buffer_size < static_cast<int>(action_message_base_size + ssize)) {
         return -1;
     }
 
     char* dataStart = data;
-    
+
     *data = littleEndian;
     data[1] = static_cast<uint8_t>(ssize >> 16U);
     data[2] = static_cast<uint8_t>((ssize >> 8U) & 0xFFU);
@@ -226,24 +224,25 @@ int ActionMessage::toByteArray(char* data, int buffer_size) const
         data += ssize;
     }
 
-  //  if (stringData.empty()) {
-  //      *data = 0;
-   //     ++data;
-   // } else {
-        *data = static_cast<uint8_t>(stringData.size());
-        ++data;
-        ssize += action_message_base_size;
-        for (const auto& str : stringData) {
-            auto strsize = static_cast<uint32_t>(str.size());
-            if (buffer_size < static_cast<int>(ssize)) {
-                return -1;}
-
-            std::memcpy(data, &strsize, sizeof(uint32_t));
-            data += sizeof(uint32_t);
-            std::memcpy(data, str.data(), str.size());
-            data += str.size();
+    //  if (stringData.empty()) {
+    //      *data = 0;
+    //     ++data;
+    // } else {
+    *data = static_cast<uint8_t>(stringData.size());
+    ++data;
+    ssize += action_message_base_size;
+    for (const auto& str : stringData) {
+        auto strsize = static_cast<uint32_t>(str.size());
+        if (buffer_size < static_cast<int>(ssize)) {
+            return -1;
         }
- //   }
+
+        std::memcpy(data, &strsize, sizeof(uint32_t));
+        data += sizeof(uint32_t);
+        std::memcpy(data, str.data(), str.size());
+        data += str.size();
+    }
+    //   }
     auto actSize = static_cast<int>(data - dataStart);
     return actSize;
 }
@@ -251,7 +250,7 @@ int ActionMessage::toByteArray(char* data, int buffer_size) const
 int ActionMessage::serializedByteCount() const
 {
     int size{action_message_base_size};
-    
+
     // for time request add an additional 3*8 bytes
     if (messageAction == CMD_TIME_REQUEST) {
         size += static_cast<int>(3 * sizeof(Time::baseType));
@@ -259,12 +258,12 @@ int ActionMessage::serializedByteCount() const
     }
     size += static_cast<int>(payload.size());
     // add additional string data
- //   if (!stringData.empty()) {
-        for (const auto& str : stringData) {
-            // 4(to store the length)+length of the string
-            size += static_cast<int>(sizeof(uint32_t) + str.size());
-        }
-   // }
+    //   if (!stringData.empty()) {
+    for (const auto& str : stringData) {
+        // 4(to store the length)+length of the string
+        size += static_cast<int>(sizeof(uint32_t) + str.size());
+    }
+    // }
     return size;
 }
 
@@ -689,7 +688,7 @@ static constexpr size_t actEnd = sizeof(actionStrings) / sizeof(actionPair);
 const char* actionMessageType(action_message_def::action_t action)
 {
     const auto* pptr = static_cast<const actionPair*>(actionStrings);
-    const auto *res = std::find_if(pptr, pptr + actEnd, [action](const auto& pt) {
+    const auto* res = std::find_if(pptr, pptr + actEnd, [action](const auto& pt) {
         return (pt.first == action);
     });
     if (res != pptr + actEnd) {
@@ -714,8 +713,8 @@ static constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
 // can (in actuality-there was a case that did this) be used as the program is shutting down
 const char* commandErrorString(int errorcode)
 {
-    const auto *pptr = static_cast<const errorPair*>(errorStrings);
-    const auto *res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
+    const auto* pptr = static_cast<const errorPair*>(errorStrings);
+    const auto* res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
         return (pt.first == errorcode);
     });
     if (res != pptr + errEnd) {
