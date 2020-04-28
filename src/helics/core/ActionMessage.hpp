@@ -15,15 +15,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-constexpr int targetStringLoc = 0;
-constexpr int sourceStringLoc = 1;
-constexpr int unitStringLoc = 1;
-constexpr int origSourceStringLoc = 2;
-constexpr int origDestStringLoc = 3;
-constexpr int typeStringLoc = 0;
-constexpr int typeOutStringLoc = 1;
+constexpr int targetStringLoc{0};
+constexpr int sourceStringLoc{1};
+constexpr int unitStringLoc{1};
+constexpr int origSourceStringLoc{2};
+constexpr int origDestStringLoc{3};
+constexpr int typeStringLoc{0};
+constexpr int typeOutStringLoc{1};
 
-constexpr int32_t cmd_info_basis = 65536;
+constexpr int32_t cmd_info_basis{65536};
 
 /** class defining the primary message object used in HELICS */
 class ActionMessage {
