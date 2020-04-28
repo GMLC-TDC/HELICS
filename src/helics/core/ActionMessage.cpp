@@ -75,7 +75,7 @@ ActionMessage::ActionMessage(const char* data, size_t size): ActionMessage()
 
 ActionMessage::~ActionMessage() = default;
 
-ActionMessage& ActionMessage::operator=(const ActionMessage& act)
+ActionMessage& ActionMessage::operator=(const ActionMessage& act) //NOLINT
 {
     messageAction = act.messageAction;
     messageID = act.messageID;
@@ -299,7 +299,7 @@ void ActionMessage::packetize(std::string& data) const
     auto dsz = static_cast<uint32_t>(data.size());
     data[1] = static_cast<char>(((dsz >> 16U) & 0xFFU));
     data[2] = static_cast<char>(((dsz >> 8U) & 0xFFU));
-    data[3] = static_cast<char>(dsz & 0xFFu);
+    data[3] = static_cast<char>(dsz & 0xFFU);
     data.push_back(TAIL_CHAR1);
     data.push_back(TAIL_CHAR2);
 }
@@ -418,7 +418,7 @@ int ActionMessage::fromByteArray(const char* data, int buffer_size)
         payload.assign(data, sz);
         data += sz;
     }
-    int stringCount = *data;
+    auto stringCount = static_cast<int>(*data);
     ++data;
     if (stringCount != 0) {
         stringData.resize(stringCount);
@@ -482,9 +482,9 @@ int ActionMessage::depacketize(const char* data, int buffer_size)
         return 0;
     }
     unsigned int message_size = static_cast<unsigned char>(data[1]);
-    message_size <<= 8u;
+    message_size <<= 8U;
     message_size += static_cast<unsigned char>(data[2]);
-    message_size <<= 8u;
+    message_size <<= 8U;
     message_size += static_cast<unsigned char>(data[3]);
     if (buffer_size < static_cast<int>(message_size + 2)) {
         return 0;
@@ -688,8 +688,8 @@ static constexpr size_t actEnd = sizeof(actionStrings) / sizeof(actionPair);
 // can (in actuality) be used as the program is shutting down
 const char* actionMessageType(action_message_def::action_t action)
 {
-    auto pptr = static_cast<const actionPair*>(actionStrings);
-    auto res = std::find_if(pptr, pptr + actEnd, [action](const auto& pt) {
+    const auto* pptr = static_cast<const actionPair*>(actionStrings);
+    const auto *res = std::find_if(pptr, pptr + actEnd, [action](const auto& pt) {
         return (pt.first == action);
     });
     if (res != pptr + actEnd) {
@@ -714,8 +714,8 @@ static constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
 // can (in actuality-there was a case that did this) be used as the program is shutting down
 const char* commandErrorString(int errorcode)
 {
-    auto pptr = static_cast<const errorPair*>(errorStrings);
-    auto res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
+    const auto *pptr = static_cast<const errorPair*>(errorStrings);
+    const auto *res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
         return (pt.first == errorcode);
     });
     if (res != pptr + errEnd) {
@@ -727,7 +727,7 @@ const char* commandErrorString(int errorcode)
 std::string errorMessageString(const ActionMessage& command)
 {
     if (checkActionFlag(command, error_flag)) {
-        auto& estring = command.getString(0);
+        const auto& estring = command.getString(0);
         if (estring.empty()) {
             return commandErrorString(command.messageID);
         }

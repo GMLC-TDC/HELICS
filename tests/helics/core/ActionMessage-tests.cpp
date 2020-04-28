@@ -362,14 +362,14 @@ TEST(ActionMessage_tests, check_conversions)
     EXPECT_EQ(cmdStr, std::string(cmdVec.data(), cmdVec.size()));
 
     auto testBuffer1 = std::make_unique<char[]>(cmdStr.size() + 20);
-    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2u); // make a too small buffer
+    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2U); // make a too small buffer
 
     auto res = cmd.toByteArray(testBuffer1.get(), static_cast<int>(cmdStr.size() + 20));
     EXPECT_EQ(res, static_cast<int>(cmdStr.size()));
     // just check to make sure the same string was written
     EXPECT_EQ(cmdStr, std::string(testBuffer1.get(), res));
     // this should return -1
-    res = cmd.toByteArray(testBuffer2.get(), static_cast<int>(cmdStr.size() >> 2u));
+    res = cmd.toByteArray(testBuffer2.get(), static_cast<int>(cmdStr.size() >> 2U));
     EXPECT_EQ(res, -1);
 }
 
