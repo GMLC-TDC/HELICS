@@ -418,17 +418,17 @@ int ActionMessage::fromByteArray(const char* data, int buffer_size)
         payload.assign(data, sz);
         data += sz;
     }
-    auto stringCount = static_cast<int>(*data);
+    auto stringCount = static_cast<uint32_t>(*data);
     ++data;
     if (stringCount != 0) {
         stringData.resize(stringCount);
-        tsize += 4 * stringCount;
+        tsize += static_cast<int>(4 * stringCount);
         if (buffer_size < tsize) {
             messageAction = CMD_INVALID;
             return (0);
         }
 
-        for (int ii = 0; ii < stringCount; ++ii) {
+        for (uint32_t ii = 0; ii < stringCount; ++ii) {
             uint32_t ssize;
             memcpy(&ssize, data, sizeof(uint32_t));
             data += sizeof(uint32_t);
