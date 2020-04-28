@@ -151,7 +151,7 @@ endif(ENABLE_MPI_CORE)
 
 add_library(helics_network STATIC ${NETWORK_SRC_FILES} ${NETWORK_INCLUDE_FILES})
 
-target_link_libraries(helics_network PUBLIC helics_core PRIVATE fmt::fmt compile_flags_target)
+target_link_libraries(helics_network PUBLIC helics_core PRIVATE fmt::fmt compile_flags_target helics::zmq)
 
 if(TARGET Boost::boost AND NOT HELICS_DISABLE_BOOST)
     target_compile_definitions(helics_network PRIVATE BOOST_DATE_TIME_NO_LIB)
@@ -163,10 +163,6 @@ if(ENABLE_MPI_CORE)
 endif(ENABLE_MPI_CORE)
 
 if(ENABLE_ZMQ_CORE)
-    target_link_libraries(
-        helics_network PRIVATE
-        helics::zmq
-    )
     source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(ENABLE_ZMQ_CORE)
 

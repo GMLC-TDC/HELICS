@@ -507,24 +507,22 @@ endif()
 # -------------------------------------------------------------
 
 # If ZeroMQ library is enabled try to locate it and link against it
-
+add_library(zmq INTERFACE)
 if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
     if(NOT ZeroMQ_FOUND)
         message(FATAL_ERROR "ZeroMQ not found, needed to enable the ZMQ Core")
     endif()
-	add_library(zmq INTERFACE)
     if(HELICS_USE_ZMQ_STATIC_LIBRARY)
         target_link_libraries(zmq INTERFACE libzmq-static)
         target_compile_definitions(zmq INTERFACE -DZMQ_STATIC)
     else()
         target_link_libraries(zmq INTERFACE libzmq)
     endif()
-    # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-	add_library(helics::zmq ALIAS zmq)
 endif()
-
+add_library(helics::zmq ALIAS zmq)
+    
 # -----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 # -----------------------------------------------------------------------------
