@@ -154,7 +154,7 @@ void ActionMessage::setString(int index, const std::string& str)
 /** check for little endian*/
 static inline std::uint8_t isLittleEndian()
 {
-    static std::int32_t test = 1;
+    static std::int32_t test{1};
     return (*reinterpret_cast<std::int8_t*>(&test) == 1) ? std::uint8_t(1) : 0;
 }
 
@@ -638,6 +638,8 @@ static constexpr std::pair<action_message_def::action_t, const char*> actionStri
     {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
     {action_message_def::action_t::cmd_add_filter, "add_filter"},
     {action_message_def::action_t::cmd_remove_filter, "remove filter"},
+    {action_message_def::action_t::cmd_filter_link, "link filter"},
+    {action_message_def::action_t::cmd_data_link, "data link"},
     {action_message_def::action_t::cmd_reg_input, "reg_input"},
     {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
     {action_message_def::action_t::cmd_remove_subscriber, "remove subscriber"},
@@ -650,11 +652,18 @@ static constexpr std::pair<action_message_def::action_t, const char*> actionStri
     {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
     {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
     {action_message_def::action_t::cmd_remove_named_endpoint, "remove_named_endpoint"},
+    {action_message_def::action_t::cmd_disconnect_fed, "disconnect_fed"},
+    {action_message_def::action_t::cmd_disconnect_broker, "disconnect_broker"},
+    {action_message_def::action_t::cmd_disconnect_core, "disconnect_core"},
     {action_message_def::action_t::cmd_remove_named_input, "remove_named_input"},
     {action_message_def::action_t::cmd_remove_named_publication, "remove_named_publication"},
     {action_message_def::action_t::cmd_remove_named_filter, "remove_named_filter"},
     {action_message_def::action_t::cmd_close_interface, "close_interface"},
     {action_message_def::action_t::cmd_multi_message, "multi message"},
+    {action_message_def::action_t::cmd_broker_configure, "broker_configure"},
+    {action_message_def::action_t::cmd_time_barrier_request, "request time barrier"},
+    {action_message_def::action_t::cmd_time_barrier, "time barrier"},
+    {action_message_def::action_t::cmd_time_barrier_clear, "clear time barrier"},
     // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
     {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
     {action_message_def::action_t::cmd_protocol, "protocol"},
