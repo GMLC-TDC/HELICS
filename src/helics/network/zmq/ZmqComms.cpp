@@ -372,7 +372,7 @@ namespace zeromq {
                                     controlSocket.send(M.to_string());
                                     return (-1);
                                 }
-                            } else if (rxcmd.messageID == DELAY) {
+                            } else if (rxcmd.messageID == DELAY_CONNECTION) {
                                 std::this_thread::sleep_for(std::chrono::seconds(2));
                             }
                         }

@@ -310,7 +310,7 @@ namespace tcp {
                                 connectionTimeout);
                             continue;
                         }
-                        if (mess->second.messageID == DELAY) {
+                        if (mess->second.messageID == DELAY_CONNECTION) {
                             std::this_thread::sleep_for(std::chrono::seconds(2));
                             continue;
                         }
