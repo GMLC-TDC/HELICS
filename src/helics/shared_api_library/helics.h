@@ -33,6 +33,16 @@ extern "C" {
 HELICS_EXPORT const char* helicsGetVersion(void);
 
 /**
+ * Get the build flags used to compile HELICS.
+ */
+HELICS_EXPORT const char* helicsGetBuildFlags(void);
+
+/**
+ * Get the compiler version used to compile HELICS.
+ */
+HELICS_EXPORT const char* helicsGetCompilerVersion(void);
+
+/**
  * Return an initialized error object.
  */
 HELICS_EXPORT helics_error helicsErrorInitialize(void);

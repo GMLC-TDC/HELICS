@@ -86,7 +86,7 @@ class PholdFederate: public BenchmarkFederate {
             std::mt19937 random_engine(0x600d5eed);
             std::uniform_int_distribution<unsigned int> rand_seed_uniform;
             for (int i = 0; i < index; i++) {
-                rand_seed_uniform(random_engine);
+                (void) rand_seed_uniform(random_engine);
             }
             setRandomSeed(rand_seed_uniform(random_engine));
         }

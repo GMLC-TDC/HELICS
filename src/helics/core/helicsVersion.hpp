@@ -23,5 +23,8 @@ constexpr int versionMinor = HELICS_VERSION_MINOR;
 constexpr int versionPatch = HELICS_VERSION_PATCH;
 /** the build string if any*/
 constexpr auto versionBuild = HELICS_VERSION_BUILD;
-
+/** build flags used to compile helics*/
+constexpr auto buildFlags = HELICS_BUILD_FLAGS;
+/** compiler used to build helics*/
+constexpr auto compiler = HELICS_COMPILER_VERSION;
 } // namespace helics
