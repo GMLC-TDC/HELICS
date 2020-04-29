@@ -58,9 +58,9 @@ jobs:
 
   helicsTSan:
     docker:
-      - image: helics/buildenv:sanitizers
+      - image: helics/buildenv:clang10-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON -DUSE_LIBCXX=ON'
       TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4'
 
     steps:
@@ -146,7 +146,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc10-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS="-Wmismatched-tags -Wredundant-tags"'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wmismatched-tags'
     steps:
       - checkout
       - run: *setup_helics
