@@ -1901,6 +1901,30 @@ SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetVersion(JNIEn
 }
 
 
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetBuildFlags(JNIEnv *jenv, jclass jcls) {
+  jstring jresult = 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char *)helicsGetBuildFlags();
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetCompilerVersion(JNIEnv *jenv, jclass jcls) {
+  jstring jresult = 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char *)helicsGetCompilerVersion();
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsIsCoreTypeAvailable(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
