@@ -34,7 +34,6 @@ const char* helicsGetBuildFlags(void)
     return helics::buildFlags;
 }
 
-
 const char* helicsGetCompilerVersion(void)
 {
     return helics::compiler;
