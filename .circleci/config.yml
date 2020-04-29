@@ -146,7 +146,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc10-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wmismatched-tags'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags'
     steps:
       - checkout
       - run: *setup_helics
