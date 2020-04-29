@@ -39,7 +39,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 foreach(T ${HELICS_BENCHMARKS})
 
-    add_executable(${T} ${T}.cpp)
+    add_executable(${T} ${T}.cpp helics_benchmark_main.h helics_benchmark_util.h)
     target_link_libraries(${T} PUBLIC helics_application_api)
     add_benchmark(${T})
     set_target_properties(${T} PROPERTIES FOLDER benchmarks)

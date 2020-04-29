@@ -29,6 +29,16 @@ const char* helicsGetVersion(void)
     return helics::versionString;
 }
 
+const char* helicsGetBuildFlags(void)
+{
+    return helics::buildFlags;
+}
+
+const char* helicsGetCompilerVersion(void)
+{
+    return helics::compiler;
+}
+
 static constexpr const char* nullstrPtr = "";
 
 const std::string emptyStr;

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helics/helics-config.h"
+#include "helics/core/helicsVersion.hpp"
 
 #include <iostream>
 #include <string>
@@ -104,8 +104,8 @@ inline void printHELICSsystemInfo()
 #if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
     std::cout << "ZMQ VERSION: " << helics::zeromq::getZMQVersion() << '\n';
 #endif
-    std::cout << "COMPILER INFO: " << HELICS_COMPILER_VERSION << '\n';
-    std::cout << "BUILD FLAGS: " << HELICS_BUILD_FLAGS << '\n';
+    std::cout << "COMPILER INFO: " << helics::compiler << '\n';
+    std::cout << "BUILD FLAGS: " << helics::buildFlags << '\n';
     std::cout << "------------PROCESSOR INFO ----------------\n";
     std::cout << "HOST PROCESSOR TYPE: " << HELICS_BUILD_PROCESSOR << '\n';
     auto cpumodel = getCPUModel();
