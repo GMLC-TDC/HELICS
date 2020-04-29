@@ -139,6 +139,8 @@ public class helicsJNI {
   public final static native long new_helics_message();
   public final static native void delete_helics_message(long jarg1);
   public final static native String helicsGetVersion();
+  public final static native String helicsGetBuildFlags();
+  public final static native String helicsGetCompilerVersion();
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
   public final static native long helicsCreateCore(String jarg1, String jarg2, String jarg3);
   public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, String[] jarg3);

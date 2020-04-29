@@ -374,6 +374,14 @@ def helicsGetVersion() -> "char const *":
     r"""Get a version string for HELICS."""
     return _helics.helicsGetVersion()
 
+def helicsGetBuildFlags() -> "char const *":
+    r"""Get the build flags used to compile HELICS."""
+    return _helics.helicsGetBuildFlags()
+
+def helicsGetCompilerVersion() -> "char const *":
+    r"""Get the compiler version used to compile HELICS."""
+    return _helics.helicsGetCompilerVersion()
+
 def helicsIsCoreTypeAvailable(type: "char const *") -> "helics_bool":
     r"""
     Returns true if core/broker type specified is available in current compilation.

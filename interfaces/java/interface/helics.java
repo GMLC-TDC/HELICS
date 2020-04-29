@@ -60,6 +60,20 @@ public class helics {
   }
 
   /**
+   * Get the build flags used to compile HELICS.
+   */
+  public static String helicsGetBuildFlags() {
+    return helicsJNI.helicsGetBuildFlags();
+  }
+
+  /**
+   * Get the compiler version used to compile HELICS.
+   */
+  public static String helicsGetCompilerVersion() {
+    return helicsJNI.helicsGetCompilerVersion();
+  }
+
+  /**
    * Returns true if core/broker type specified is available in current compilation.<br>
    * <br>
    * @param type A string representing a core type.<br>

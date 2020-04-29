@@ -4003,6 +4003,32 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsGetBuildFlags(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "helicsGetBuildFlags", 0, 0, 0)) SWIG_fail;
+  result = (char *)helicsGetBuildFlags();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsGetCompilerVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "helicsGetCompilerVersion", 0, 0, 0)) SWIG_fail;
+  result = (char *)helicsGetCompilerVersion();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsIsCoreTypeAvailable(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -15913,6 +15939,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "helics_message_swigregister", helics_message_swigregister, METH_O, NULL},
 	 { "helics_message_swiginit", helics_message_swiginit, METH_VARARGS, NULL},
 	 { "helicsGetVersion", _wrap_helicsGetVersion, METH_NOARGS, "Get a version string for HELICS."},
+	 { "helicsGetBuildFlags", _wrap_helicsGetBuildFlags, METH_NOARGS, "Get the build flags used to compile HELICS."},
+	 { "helicsGetCompilerVersion", _wrap_helicsGetCompilerVersion, METH_NOARGS, "Get the compiler version used to compile HELICS."},
 	 { "helicsIsCoreTypeAvailable", _wrap_helicsIsCoreTypeAvailable, METH_O, "\n"
 		"Returns true if core/broker type specified is available in current compilation.\n"
 		"\n"
