@@ -28,6 +28,18 @@ std::string version()
     return std::string(helicsGetVersion());
 }
 
+/** get a string with the helics version info*/
+std::string buildFlags()
+{
+    return std::string(helicsGetBuildFlags());
+}
+
+/** get a string with the compiler used to compile the library*/
+std::string compilerVersion()
+{
+    return std::string(helicsGetCompilerVersion());
+}
+
 /** do a cleanup of the brokers and cores currently in the library*/
 void cleanupHelicsLibrary()
 {
