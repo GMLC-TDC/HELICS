@@ -65,13 +65,13 @@ target_compile_options(
 target_compile_options(
     compile_flags_target
     INTERFACE
-       "${${PROJECT_NAME}_EXTRA_COMPILE_FLAGS}"
+       ${${PROJECT_NAME}_EXTRA_COMPILE_FLAGS}
 )
 
 target_compile_options(
     build_flags_target
     INTERFACE
-       "${${PROJECT_NAME}_EXTRA_BUILD_FLAGS}"
+       ${${PROJECT_NAME}_EXTRA_BUILD_FLAGS}
 )
 
 if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
