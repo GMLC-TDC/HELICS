@@ -270,7 +270,15 @@ TEST_F(httpTest, core)
     auto result = sendGet("brk2");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_EQ(val["cores"].size(), 1U);
+    if (val["cores"].empty()) {
+        // on occasion the core might not be registered with the broker in low CPU count systems
+        // so we need to wait.
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        result = sendGet("brk2");
+        EXPECT_FALSE(result.empty());
+        val = loadJson(result);
+    }
+    ASSERT_EQ(val["cores"].size(), 1U);
     EXPECT_STREQ(val["cores"][0]["name"].asCString(), "cr1");
 
     auto result2 = sendCommand(http::verb::search, "/search/brk2", "query=current_state");
