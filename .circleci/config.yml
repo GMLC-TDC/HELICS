@@ -135,7 +135,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc10-builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS=-fanalyzer -Wmismatched-tags -wredundant-tags'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fanalyzer -Wmismatched-tags -wredundant-tags"'
     steps:
       - checkout
       - run: *setup_helics
