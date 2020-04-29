@@ -61,6 +61,7 @@ jobs:
       - image: helics/buildenv:builder
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4'
 
     steps:
       - checkout
@@ -161,7 +162,7 @@ workflows:
       - helicsInstall1
       - helicsInstall2
       - helicsgccTSan
-      - gcc10
+
   nightly:
     triggers:
       - schedule:
@@ -174,9 +175,10 @@ workflows:
       - helicsoctave
       - helicsMSan
       - helicsASan
-      - helicsTSan
       - helicsTumbleweed
       - helicsNoZmq
+      - helicsgccTSan
+      - gcc10
   benchmark:
     triggers:
       - schedule:
