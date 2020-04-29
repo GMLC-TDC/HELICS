@@ -163,6 +163,7 @@ workflows:
       - helicsTSan
       - helicsInstall1
       - helicsInstall2
+      - gcc10
   nightly:
     triggers:
       - schedule:
