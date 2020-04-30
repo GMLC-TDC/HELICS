@@ -56,7 +56,7 @@ class webTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);
+        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc); //NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26247");
@@ -87,7 +87,7 @@ class webTest: public ::testing::Test {
         stream.reset();
     }
 
-    std::string sendText(const std::string& message)
+    static std::string sendText(const std::string& message)
     {
         // Send the message
         stream->write(net::buffer(message));
@@ -132,7 +132,7 @@ class webTest: public ::testing::Test {
         helics::BrokerFactory::cleanUpBrokers();
     }
     // You can define per-test tear-down logic as usual.
-    virtual void TearDown() {}
+    virtual void TearDown() override {}
 
   private:
     // Some expensive resource shared by all tests.
