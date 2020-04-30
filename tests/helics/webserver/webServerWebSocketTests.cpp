@@ -132,7 +132,7 @@ class webTest: public ::testing::Test {
         helics::BrokerFactory::cleanUpBrokers();
     }
     // You can define per-test tear-down logic as usual.
-    virtual void TearDown() override {}
+    void TearDown() final {}
 
   private:
     // Some expensive resource shared by all tests.
