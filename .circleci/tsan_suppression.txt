@@ -2,3 +2,4 @@
 
 # potential race condition from 
 race:cxa_at_exit_wrapper
+race:zmq::session_base_t
