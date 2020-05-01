@@ -57,7 +57,7 @@ static void BMecho_singleCore(benchmark::State& state)
 // Register the function as a benchmark
 BENCHMARK(BMecho_singleCore)
     ->RangeMultiplier(2)
-    ->Range(1, 1 << 8)
+    ->Range(1, 1U << 8)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
@@ -110,7 +110,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
     }
 }
 
-static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
+static constexpr int64_t maxscale{1U << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)
