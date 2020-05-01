@@ -37,7 +37,7 @@ set(HELICS_MULTINODE_BENCHMARKS
 if (NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
     include(ProcessorCount)
     ProcessorCount(N)
-    if (N LE 4)
+    if (N LESS 5)
        set (HELICS_BENCHMARK_SHIFT_FACTOR -1)
     else()
        set (HELICS_BENCHMARK_SHIFT_FACTOR 0)
