@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <random>
 #include <string>
+#include <utility>
 
 /** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate: public BenchmarkFederate {
