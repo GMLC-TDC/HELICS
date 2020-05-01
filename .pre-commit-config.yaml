@@ -1,0 +1,17 @@
+
+repos:
+- repo: https://github.com/psf/black
+  rev: 19.3b0
+  hooks:
+  - id: black
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v2.5.0
+  hooks:
+  - id: check-added-large-files
+  - id: mixed-line-ending
+  - id: trailing-whitespace
+    exclude: ^(ThirdParty/|test/files/)
+  - id: check-merge-conflict
+  - id: check-case-conflict
+  - id: check-symlinks
+  - id: check-yaml
