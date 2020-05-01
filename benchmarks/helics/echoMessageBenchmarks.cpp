@@ -175,7 +175,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, tcpssCore, core_type::TCP_SS)
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, udpCore, core_type::UDP)
     ->RangeMultiplier(2)
-    ->Range(1, maxscale/2)
+    ->Range(1, maxscale / 2)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();
