@@ -13,9 +13,11 @@ A note on future revisions.
 -   All ZeroMQ related files are now located in the network library and under a single namespace
 
 ### Fixed
+-   Sporadic failures in the Webserver and websocket tests
 
 ### Added
 -   A helics::zmq target was added for linking with zeromq if using HELICS as a subproject
+-   A `HELICS_BENCHMARK_SHIFT_FACTOR` CMake was added to allow the benchmarks to scale depending on computational resources  
 
 ### Deprecated
 

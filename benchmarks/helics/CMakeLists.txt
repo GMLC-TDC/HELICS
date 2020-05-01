@@ -34,7 +34,19 @@ set(HELICS_MULTINODE_BENCHMARKS
     TimingLeafFederate
 )
 
-set (HELICS_BENCHMARK_SHIFT_FACTOR 0)
+if (NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if (N LE 4)
+       set (HELICS_BENCHMARK_SHIFT_FACTOR -1)
+    else()
+       set (HELICS_BENCHMARK_SHIFT_FACTOR 0)
+    endif()
+endif()
+
+if (NOT HELICS_BENCHMARK_SHIFT_FACTOR GREATER -4)
+    message(FATAL_ERROR "defined shift factor must be a number and greater than -4")
+endif()
 
 # Only affects current directory, so safe
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
