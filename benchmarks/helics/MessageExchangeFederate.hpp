@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 
-using helics::operator"" _t;
 /** class implementing a federate that sends messages to another (and vice versa)*/
 class MessageExchangeFederate: public BenchmarkFederate {
   private:
@@ -54,7 +53,7 @@ class MessageExchangeFederate: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        auto cTime = 0.0_t;
+        auto cTime = helics::timeZero;
         while (cTime < finalTime) {
             while (ept.hasMessage()) {
                 ept.getMessage();
