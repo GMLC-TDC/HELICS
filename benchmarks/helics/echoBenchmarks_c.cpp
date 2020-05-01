@@ -33,7 +33,7 @@ class EchoHub_c {
   public:
     EchoHub_c() = default;
     ~EchoHub_c() { helicsFederateFree(vFed); }
-    void run(const std::function<void()> &callOnReady = {})
+    void run(const std::function<void()>& callOnReady = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -80,7 +80,7 @@ class EchoHub_c {
         auto cTime = helics_time_zero;
         while (cTime <= finalTime) {
             for (int ii = 0; ii < cnt_; ++ii) {
-                if (helicsInputIsUpdated(subs[ii])==helics_true) {
+                if (helicsInputIsUpdated(subs[ii]) == helics_true) {
                     int actLen{0};
                     helicsInputGetString(subs[ii], buffer, 256, &actLen, nullptr);
                     helicsPublicationPublishRaw(pubs[ii], buffer, actLen, nullptr);
@@ -105,7 +105,7 @@ class EchoLeaf_c {
   public:
     EchoLeaf_c() = default;
     ~EchoLeaf_c() { helicsFederateFree(vFed); }
-    void run(const std::function<void()> &callOnReady = {})
+    void run(const std::function<void()>& callOnReady = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -156,7 +156,7 @@ class EchoLeaf_c {
             if (cnt <= iter) {
                 helicsPublicationPublishString(pub, txstring.c_str(), nullptr);
             }
-            if (helicsInputIsUpdated(sub)!=helics_false) {
+            if (helicsInputIsUpdated(sub) != helics_false) {
                 int actLen{0};
                 helicsInputGetString(sub, tbuffer, 256, &actLen, nullptr);
                 if (std::string(tbuffer) != txstring) {
@@ -272,7 +272,7 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
     }
 }
 
-static constexpr int64_t maxscale{1U<<(3 + HELICS_BENCHMARK_SHIFT_FACTOR)};
+static constexpr int64_t maxscale{1U << (3 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, "inproc")
     ->RangeMultiplier(2)
