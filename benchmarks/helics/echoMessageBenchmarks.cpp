@@ -21,6 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 
+using helics::core_type;
+
 static void BMecho_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {

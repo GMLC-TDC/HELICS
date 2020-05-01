@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
+using helics::core_type;
+
 static void BMecho_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {

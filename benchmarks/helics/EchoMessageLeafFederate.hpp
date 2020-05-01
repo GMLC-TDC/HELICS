@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 
-using helics::operator"" _t;
 /* class implementing a leaf for the echo message benchmark*/
 class EchoMessageLeaf: public BenchmarkFederate {
   private:

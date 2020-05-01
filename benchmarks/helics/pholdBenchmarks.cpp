@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
+using helics::core_type;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 static void BMphold_singleCore(benchmark::State& state)
 {

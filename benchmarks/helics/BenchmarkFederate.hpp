@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-using helics::core_type;
+
 /** class implementing common functionality for benchmarks */
 class BenchmarkFederate {
   public:
