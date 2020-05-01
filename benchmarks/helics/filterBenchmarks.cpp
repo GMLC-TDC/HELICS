@@ -135,7 +135,7 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
     }
 }
 
-static constexpr int64_t maxscale{1 << 5};
+static constexpr int64_t maxscale{1 << (5 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMfilter_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)

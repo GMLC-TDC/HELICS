@@ -272,7 +272,7 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
     }
 }
 
-static constexpr int64_t maxscale{1 << 3};
+static constexpr int64_t maxscale{(3 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, "inproc")
     ->RangeMultiplier(2)
