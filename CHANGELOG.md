@@ -17,7 +17,7 @@ A note on future revisions.
 
 ### Added
 -   A helics::zmq target was added for linking with zeromq if using HELICS as a subproject
--   A `HELICS_BENCHMARK_SHIFT_FACTOR` CMake was added to allow the benchmarks to scale depending on computational resources  
+-   A `HELICS_BENCHMARK_SHIFT_FACTOR` CMake option was added to allow the benchmarks to scale depending on computational resources  
 
 ### Deprecated
 
