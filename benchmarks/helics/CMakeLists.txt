@@ -60,7 +60,7 @@ foreach(T ${HELICS_BENCHMARKS})
     target_compile_definitions(${T} PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})")
 endforeach()
 
-add_executable(helics_benchmarks BenchmarkMain.cpp)
+add_executable(helics_benchmarks BenchmarkMain.cpp BenchmarkFederate.hpp)
 target_link_libraries(helics_benchmarks PUBLIC helics_application_api)
 set_target_properties(helics_benchmarks PROPERTIES FOLDER benchmarks_multimachine)
 foreach(T ${HELICS_MULTINODE_BENCHMARKS})

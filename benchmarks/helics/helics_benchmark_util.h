@@ -52,11 +52,11 @@ inline std::string getCPUModel()
     if (fp == nullptr) {
         return std::string{};
     }
-    size_t n = 0;
-    char* line = NULL;
+    size_t n{0};
+    char* line{nullptr};
     std::string info;
     while (getline(&line, &n, fp) > 0) {
-        if (strstr(line, "model name")) {
+        if (strstr(line, "model name")!=nullptr) {
             info.append(line);
             break;
         }

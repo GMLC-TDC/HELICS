@@ -156,8 +156,8 @@ class EchoLeaf_c {
             if (cnt <= iter) {
                 helicsPublicationPublishString(pub, txstring.c_str(), nullptr);
             }
-            if (helicsInputIsUpdated(sub)) {
-                int actLen = 0;
+            if (helicsInputIsUpdated(sub)!=helics_false) {
+                int actLen{0};
                 helicsInputGetString(sub, tbuffer, 256, &actLen, nullptr);
                 if (std::string(tbuffer) != txstring) {
                     std::cout << "incorrect string\n";
