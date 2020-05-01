@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-
 /** class implementing common functionality for benchmarks */
 class BenchmarkFederate {
   public:
@@ -46,7 +45,7 @@ class BenchmarkFederate {
      */
     void setIndex(int i) { index = i; }
     /** gets the index parameter*/
-    int getIndex()const { return index; }
+    int getIndex() const { return index; }
     /** sets the max index parameter
      * @param i the max index
      */
@@ -173,7 +172,9 @@ class BenchmarkFederate {
      * @param callOnReady a no argument, void return type function called after doMakeReady is run
      * @param callOnEnd a no argument, void return type function called after helics finalize()
      */
-    void run(const std::function<void()> & callOnReady = {}, const std::function<void()> & callOnEnd = {})
+    void
+        run(const std::function<void()>& callOnReady = {},
+            const std::function<void()>& callOnEnd = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -207,7 +208,7 @@ class BenchmarkFederate {
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>
-    int initialize(const helics::FederateInfo & fi, Args... args)
+    int initialize(const helics::FederateInfo& fi, Args... args)
     {
         setupArgumentParsing();
         return internalInitialize(fi, parseArgs(args...));
@@ -228,7 +229,7 @@ class BenchmarkFederate {
     void printResults()
     {
         doAddBenchmarkResults();
-        for (const auto &r : results) {
+        for (const auto& r : results) {
             if (result_format == OutputFormat::PLAIN_TEXT) {
                 std::cout << r.name << ": " << r.value << std::endl;
             }
