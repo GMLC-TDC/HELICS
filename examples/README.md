@@ -1,14 +1,14 @@
-# HELICS examples
+# HELICS Examples
 
 ## More Examples
 
 Please see the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples) for many more examples than are available in the HELICS repository
 This includes examples in many of the interface languages.
 
-Good places to start includes
+Good places to start include:
 
 [C Example](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/c)
-[Python Examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/python/pi-exchange)
+[Python Example](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/python/pi-exchange)
 [C++ Example](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/cpp/valueFederate1/valueFed.cpp)
 [Matlab Example](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/matlab/pi-exchange)
 

@@ -46,7 +46,7 @@
 -   [Introduction](#introduction)
 -   [Getting Started](#getting-started)
 -   [Documentation](#documentation)
-    -   [Changelog](#changlog)
+    -   [Changelog](#changelog)
     -   [RoadMap](#roadmap)
 -   [Installers](#installers)
 -   [Building HELICS](#build-from-source-instructions)
@@ -89,9 +89,9 @@ A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepare
 Our [ReadTheDocs](https://helics.readthedocs.io/en/latest/index.html) site provides a set of documentation including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete Doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS/wiki).
 
 ### Documentation downloads
--   [PDF Version](https://docs.helics.org/_/downloads/en/latest/pdf/)
--   [EPUB docs](https://docs.helics.org/_/downloads/en/latest/epub/)
+-   [PDF](https://docs.helics.org/_/downloads/en/latest/pdf/)
 -   [HTML Zip file](https://docs.helics.org/_/downloads/en/latest/htmlzip/)
+-   [EPUB](https://docs.helics.org/_/downloads/en/latest/epub/)
 
 Additionally, our initial design requirements document can be found [here](docs/introduction/original_specification.md), which describes a number of our early design considerations and some directions that might be possible in the future.
 
