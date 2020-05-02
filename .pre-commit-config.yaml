@@ -19,4 +19,6 @@ repos:
   - id: check-toml
   - id: check-json
   - id: end-of-file-fixer
+    exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/)
   - id: pretty-format-json
+    args: --no-sort-keys
