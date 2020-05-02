@@ -4,6 +4,7 @@ repos:
   rev: 19.3b0
   hooks:
   - id: black
+    exclude: ^(ThirdParty/|interfaces/python/interface/)
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v2.5.0
   hooks:
@@ -15,3 +16,7 @@ repos:
   - id: check-case-conflict
   - id: check-symlinks
   - id: check-yaml
+  - id: check-toml
+  - id: check-json
+  - id: end-of-file-fixer
+  - id: pretty-format-json
