@@ -16,6 +16,8 @@ repos:
   - id: check-case-conflict
   - id: check-symlinks
   - id: check-yaml
+    args: --allow-multiple-documents
+    exclude: ^(ThirdParty/)
   - id: check-toml
   - id: check-json
   - id: end-of-file-fixer
