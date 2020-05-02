@@ -10,7 +10,7 @@ repos:
   - id: check-added-large-files
   - id: mixed-line-ending
   - id: trailing-whitespace
-    exclude: ^(ThirdParty/|interfaces/*/interface/)
+    exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/)
   - id: check-merge-conflict
   - id: check-case-conflict
   - id: check-symlinks
