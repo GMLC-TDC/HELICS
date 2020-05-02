@@ -10,7 +10,7 @@ repos:
   - id: check-added-large-files
   - id: mixed-line-ending
   - id: trailing-whitespace
-    exclude: ^(ThirdParty/|test/files/)
+    exclude: ^(ThirdParty/|interface/*/interface/)
   - id: check-merge-conflict
   - id: check-case-conflict
   - id: check-symlinks
