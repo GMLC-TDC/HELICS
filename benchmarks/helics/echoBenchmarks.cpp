@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
+using helics::core_type;
+
 static void BMecho_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -57,7 +59,7 @@ static void BMecho_singleCore(benchmark::State& state)
 // Register the function as a benchmark
 BENCHMARK(BMecho_singleCore)
     ->RangeMultiplier(2)
-    ->Range(1, 1 << 8)
+    ->Range(1, 1U << 8)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
@@ -110,7 +112,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
     }
 }
 
-static constexpr int64_t maxscale{1 << 4};
+static constexpr int64_t maxscale{1U << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)
@@ -171,7 +173,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, tcpssCore, core_type::TCP_SS)
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, udpCore, core_type::UDP)
     ->RangeMultiplier(2)
-    ->Range(1, 1 << 4)
+    ->Range(1, maxscale)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();

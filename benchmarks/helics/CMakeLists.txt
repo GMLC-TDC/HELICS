@@ -34,6 +34,20 @@ set(HELICS_MULTINODE_BENCHMARKS
     TimingLeafFederate
 )
 
+if (NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if (N LESS 5)
+       set (HELICS_BENCHMARK_SHIFT_FACTOR -1)
+    else()
+       set (HELICS_BENCHMARK_SHIFT_FACTOR 0)
+    endif()
+endif()
+
+if (NOT HELICS_BENCHMARK_SHIFT_FACTOR GREATER -4)
+    message(FATAL_ERROR "defined shift factor must be a number and greater than -4")
+endif()
+
 # Only affects current directory, so safe
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -43,10 +57,10 @@ foreach(T ${HELICS_BENCHMARKS})
     target_link_libraries(${T} PUBLIC helics_application_api)
     add_benchmark(${T})
     set_target_properties(${T} PROPERTIES FOLDER benchmarks)
-
+    target_compile_definitions(${T} PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})")
 endforeach()
 
-add_executable(helics_benchmarks BenchmarkMain.cpp)
+add_executable(helics_benchmarks BenchmarkMain.cpp BenchmarkFederate.hpp)
 target_link_libraries(helics_benchmarks PUBLIC helics_application_api)
 set_target_properties(helics_benchmarks PROPERTIES FOLDER benchmarks_multimachine)
 foreach(T ${HELICS_MULTINODE_BENCHMARKS})
@@ -58,6 +72,7 @@ if (NOT HELICS_DISABLE_C_SHARED_LIB)
    target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
    add_benchmark(echoBenchmarks_c)
    set_target_properties(echoBenchmarks_c PROPERTIES FOLDER benchmarks)
+    target_compile_definitions(echoBenchmarks_c PRIVATE  "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})")
    target_include_directories(
       echoBenchmarks_c
       PUBLIC ${HELICS_BINARY_DIR}/helics_generated_includes/

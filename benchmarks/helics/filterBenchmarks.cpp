@@ -22,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 
+using helics::core_type;
+
 static void BMfilter_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -135,7 +137,7 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
     }
 }
 
-static constexpr int64_t maxscale{1 << 5};
+static constexpr int64_t maxscale{1 << (5 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMfilter_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)

@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 
-using helics::operator"" _t;
 /** class implementing the hub for an echo test*/
 class EchoMessageHub: public BenchmarkFederate {
   private:
@@ -34,7 +33,7 @@ class EchoMessageHub: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        auto cTime = 0.0_t;
+        auto cTime = helics::timeZero;
         while (cTime <= finalTime) {
             while (ept.hasMessage()) {
                 auto m = ept.getMessage();

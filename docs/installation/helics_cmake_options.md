@@ -71,7 +71,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 
 
 ## Hidden Options
-There are a few options in the CMake system that are not visible in the GUI they mainly deal with particular situations related to release, testing, and code generation and should not be normally used. They are all default off.
+There are a few options in the CMake system that are not visible in the GUI they mainly deal with particular situations related to release, testing, benchmarks, and code generation and should not be normally used. They are all default off unless otherwise noted.
 
 -   `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` : Use swig to generate the interface files for the different languages but don't compile them.  
 -   `HELICS_OVERWRITE_INTERFACE_FILES` : Instruct CMake to take the generated files, and overwrite the existing interface files for the given language, only applies to python, Matlab, and Java.  This is used in the generation of the interface files for releases and the git repo.  It is only active is `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` is enabled.  
@@ -80,3 +80,4 @@ There are a few options in the CMake system that are not visible in the GUI they
 -   `HELICS_INSTALL_PACKAGE_TESTS` : Set the find_package tests to only look for HELICS in the system install paths, and enable the package-config-tests
 -   `HELICS_DISABLE_GIT_OPERATIONS` : will turn off any of the helper tools that require git, this is useful in a couple cases for building packages and other situations where updates shouldn't be checked and no modifications should be made.  
 -   `HELICS_SKIP_ZMQ_INSTALL`:  This is only relevant if ZMQ is built as part of the compilation process, but it skips the installation of zmq as part of HELICS install in that case.  
+-   `HELICS_BENCHMARK_SHIFT_FACTOR`: For running the benchmarks this shift factor can be used to scale the number of federates used for the benchmark tests.  If used it is required to be a number and is power of 2 shift from nominal values.  For example for a small system a shift factor of -1 or -2 might be appropriate for the benchmarks not to take too long.  The default for systems with 4 or fewer cores is `-1` and 0 for larger compute systems.  For small 2 core systems a value of -2 might be appropriate. For some very large systems a bigger value might be able to be used.   
