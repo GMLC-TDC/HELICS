@@ -11,15 +11,14 @@ repos:
   - id: check-added-large-files
   - id: mixed-line-ending
   - id: trailing-whitespace
-    exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/)
+    exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
   - id: check-merge-conflict
   - id: check-case-conflict
-  - id: check-symlinks
   - id: check-yaml
     args: ['--allow-multiple-documents']
-    exclude: ^(ThirdParty/)
+    exclude: ^(ThirdParty/|.github/workflows/)
   - id: check-toml
   - id: end-of-file-fixer
-    exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/)
+    exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
   - id: pretty-format-json
     args: ['--no-sort-keys']
