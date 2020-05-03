@@ -9,6 +9,7 @@ on:
 
 jobs:
   pre-commit:
+    if: github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
     name: Formatting
     runs-on: ubuntu-latest
     steps:
@@ -45,3 +46,18 @@ jobs:
         BRANCH_PREFIX: "pre-commit/"
         NO_HASH: "true"
         REPLACE_BRANCH: "true"
+  pre-commit-draft:
+    if: github.event.pull_request.draft == true || github.event.pull_request.head.repo.full_name != github.repository
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+    - name: set PY
+      run: echo "::set-env name=PY::$(python --version --version | sha256sum | cut -d' ' -f1)"
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+    - uses: pre-commit/action@v1.0.0
+
