@@ -21,6 +21,16 @@ jobs:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - uses: pre-commit/action@v1.0.0
+    - name: Stage changed doc/script files
+      if: ${{ failure() }}
+      shell: bash --noprofile --norc {0}
+      run: |
+        git diff --name-only
+        if [[ "$?" == "0" ]];
+        then
+          git add --all
+        fi
+        exit 0
     - name: Create/update a file update PR with no hash
       if: ${{ failure() }}
       uses: ./.github/actions/create-file-update-pr
