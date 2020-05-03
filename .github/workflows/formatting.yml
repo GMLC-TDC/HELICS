@@ -21,6 +21,17 @@ jobs:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - uses: pre-commit/action@v1.0.0
-    - name: Run git status
-      if: ${{ always() }}
-      run: git status
+    - name: Create/update a file update PR with no hash
+      if: ${{ failure() }}
+      uses: ./.github/actions/create-file-update-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated formatting of doc/script files"
+        PR_TITLE: "Automated formatting of doc/script files"
+        PR_BODY: "Automated formatting of doc/script files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "pre-commit/"
+        NO_HASH: "true"
+        REPLACE_BRANCH: "true"
