@@ -22,7 +22,7 @@ jobs:
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - uses: pre-commit/action@v1.0.0
     - name: Stage changed doc/script files
-      if: ${{ failure() }} && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
+      if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
       shell: bash --noprofile --norc {0}
       run: |
         git diff --name-only
@@ -32,7 +32,7 @@ jobs:
         fi
         exit 0
     - name: Create/update a file update PR with no hash
-      if: ${{ failure() }} && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
+      if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
       uses: ./.github/actions/create-file-update-pr
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
