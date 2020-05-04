@@ -9,8 +9,7 @@ on:
 
 jobs:
   pre-commit:
-    if: github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
-    name: Formatting-check-PR-Generate
+    name: Formatting-check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,7 +22,7 @@ jobs:
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - uses: pre-commit/action@v1.0.0
     - name: Stage changed doc/script files
-      if: ${{ failure() }}
+      if: ${{ failure() }} && (github.event.pull_request.draft == true || github.event.pull_request.head.repo.full_name != github.repository)
       shell: bash --noprofile --norc {0}
       run: |
         git diff --name-only
@@ -33,7 +32,7 @@ jobs:
         fi
         exit 0
     - name: Create/update a file update PR with no hash
-      if: ${{ failure() }}
+      if: ${{ failure() }} && (github.event.pull_request.draft == true || github.event.pull_request.head.repo.full_name != github.repository)
       uses: ./.github/actions/create-file-update-pr
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,14 +45,4 @@ jobs:
         BRANCH_PREFIX: "pre-commit/"
         NO_HASH: "true"
         REPLACE_BRANCH: "true"
-  pre-commit-draft:
-    if: github.event.pull_request.draft == true || github.event.pull_request.head.repo.full_name != github.repository
-    name: Formatting-check
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-    - name: set PY
-      run: echo "::set-env name=PY::$(python --version --version | sha256sum | cut -d' ' -f1)"
-    - uses: pre-commit/action@v1.0.0
 
