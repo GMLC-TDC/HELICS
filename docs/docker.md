@@ -22,7 +22,7 @@ docker search helics
 |helics/buildenv:sanitizers|container for running clang sanitizers|
 |helics/helics|container with installed HELICS executables|
 
-the `helics/helics` repository contains a number of tags corresponding to different versions of helics with the all the apps and executables present for each different version.  
+the `helics/helics` repository contains a number of tags corresponding to different versions of helics with the all the apps and executables present for each different version.
 ```bash
 docker pull helics/helics:develop
 ```
@@ -105,8 +105,8 @@ docker ps
 Working with docker container
 -----------------------------
 
-When you run a image, docker creates a container, as soon as you exit, the container is destroyed.   
-You can detached from container (like the application screen) and reattach later.  
+When you run a image, docker creates a container, as soon as you exit, the container is destroyed.
+You can detached from container (like the application screen) and reattach later.
 
 - to detached:    `CTRL-P CTRL-D`
 

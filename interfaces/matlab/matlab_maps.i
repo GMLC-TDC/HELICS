@@ -75,7 +75,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
-	
+
   if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3-1);
 }
 
@@ -100,10 +100,10 @@ static void throwHelicsMatlabError(helics_error *err) {
 {
 	if(mxIsComplex($input))
 	{
-		
+
 		$1=mxGetPr($input)[0];
 		$2=mxGetPi($input)[0];
-	}  
+	}
     else if (mxIsDouble($input))
 	{
 		$2=0.0;
@@ -134,8 +134,8 @@ static void throwHelicsMatlabError(helics_error *err) {
 		}
 		$2[ii+1]=buffer_cell;
 	}
-    
-  } 
+
+  }
   else if (mxIsChar($input))
   {
   int retval=0;
@@ -228,7 +228,7 @@ static void throwHelicsMatlabError(helics_error *err) {
     $1=PyBytes_AsString($input);
 	$2=PyBytes_Size($input);
   }
-  else 
+  else
   {
 	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
    return NULL;

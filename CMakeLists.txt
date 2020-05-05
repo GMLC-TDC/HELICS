@@ -522,7 +522,7 @@ if(ENABLE_ZMQ_CORE)
     endif()
 endif()
 add_library(helics::zmq ALIAS zmq)
-    
+
 # -----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 # -----------------------------------------------------------------------------

@@ -317,10 +317,10 @@ HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
 /**
  * Clear all message from an endpoint.
  *
- * @deprecated This function does nothing and will be removed. 
+ * @deprecated This function does nothing and will be removed.
  *             Use helicsFederateClearMessages to free all messages,
  *             or helicsMessageFree to clear an individual message.
- * 
+ *
  * @param endpoint The endpoint object to operate on.
  */
 HELICS_DEPRECATED_EXPORT void helicsEndpointClearMessages(helics_endpoint endpoint);

@@ -201,5 +201,3 @@ export PYTHON_EXECUTABLE=$(command -v python3)
 if [[ "$TRAVIS" != "true" && "$os_name" == Darwin ]]; then
     echo "To install additional dependencies on macOS, please use Homebrew to install the packages in .ci/Brewfile.travis"
 fi
-
-

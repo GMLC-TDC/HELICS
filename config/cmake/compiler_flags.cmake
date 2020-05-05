@@ -27,14 +27,14 @@ if (WIN32)
         endif(CMAKE_SYSTEM_VERSION)
     endmacro(get_WIN32_WINNT)
 endif()
-    
-	
+
+
 cmake_dependent_option(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS
        "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
 
 cmake_dependent_option(${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS
        "generate a compiler error for any warning encountered" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
-	   
+
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     mark_as_advanced(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     mark_as_advanced(${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS)
@@ -102,7 +102,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
 
-   
+
     # this option produces a number of warnings in third party libraries
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:GNU>:-Wold-style-cast>>) this
@@ -138,7 +138,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
                 compile_flags_target
                 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wclass-memaccess>
             )
-			
+
         endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

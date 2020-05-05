@@ -10,4 +10,3 @@
 import atexit
 atexit.register(helicsCloseLibrary)
 %}
-

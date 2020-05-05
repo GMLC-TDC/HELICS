@@ -1,6 +1,6 @@
 # Tools with HELICS Support
 
-The following list of tools is a list of tools that have worked with HELICS at some level either on current projects or in the past, or in some cases funded projects that will be working with certain tools.  
+The following list of tools is a list of tools that have worked with HELICS at some level either on current projects or in the past, or in some cases funded projects that will be working with certain tools.
 
 ## Power Systems Tools
 
@@ -10,7 +10,7 @@ The following list of tools is a list of tools that have worked with HELICS at s
 -   [OpenDSS](https://smartgrid.epri.com/SimulationTool.aspx), an open-source tool for distribution powerflow, DER models, harmonics, and other capabilities traditionally found in commercial distribution analysis tools. There are two primary interfaces with HELICS support:
     -   [OpenDSSDirect.py](https://github.com/dss-extensions/OpenDSSDirect.py) which provides a "direct" interface to interact with the OpenDSS engine enabling support for non-Windows (Linux, OSX) systems.
     -   [PyDSS](https://github.com/NREL/PyDSS) which builds on OpenDSSDirect to provide enhanced advanced inverter models and significantly more robust convergence with high-penetration DER controls along with flexible support for user-defined controls and visualization.
--   [CYME](http://www.cyme.com/software/cymdist/) has been used in connection with a python wrapper interface and through FMI wrapper.  
+-   [CYME](http://www.cyme.com/software/cymdist/) has been used in connection with a python wrapper interface and through FMI wrapper.
 
 
 ### Electric Transmission System Simulation
@@ -33,7 +33,7 @@ The following list of tools is a list of tools that have worked with HELICS at s
 -   [FESTIV](https://github.com/NREL/FESTIV_MODEL), the Flexible Energy Scheduling Tool for Integrating Variable Generation, provides multi-timescale steady-state power system operations simulations that aims to replicate the full time spectrum of scheduling and reserve processes (multi-step commitment and dispatch plus simplified AGC) to meet energy and reliability needs of the bulk power system.
 -   [PLEXOS](https://energyexemplar.com/solutions/plexos/), a commercial production cost simulator. Support via OpenPLEXOS is under development.
 -   [MATPOWER](http://www.pserc.cornell.edu/matpower/) (described above) also includes basic optimal powerflow support.
--   [PyPower](https://pypi.org/project/PYPOWER/)  (described above) also includes basic AC and DC optimal powerflow solvers.  
+-   [PyPower](https://pypi.org/project/PYPOWER/)  (described above) also includes basic AC and DC optimal powerflow solvers.
 
 ### Contingency Analysis tools
 -   [CAPE](https://new.siemens.com/global/en/products/energy/services/transmission-distribution-smart-grid/consulting-and-planning/pss-software/psscape.html) protection system modeling (IN development)

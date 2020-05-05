@@ -5,7 +5,7 @@ Broker Server
 The broker server is an executable that can be used to automatically generate brokers on an as needed basis
 and coordinate their control and management.  It is considered experimental as version 2.2 only works with the ZMQ core type.  Future versions will expand this significantly.
 
-Future plans include expanding to all networking core types (ZMQ, ZMQSS, TCP, TCPSS, UDP, and MPI), expanding the abilities of a terminal program and making a Restful interface to the server and underlying brokers.  
+Future plans include expanding to all networking core types (ZMQ, ZMQSS, TCP, TCPSS, UDP, and MPI), expanding the abilities of a terminal program and making a Restful interface to the server and underlying brokers.
 
 
 Command line arguments

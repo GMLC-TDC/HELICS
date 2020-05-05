@@ -1,7 +1,7 @@
-
 import time
 import pytest as pt
 import helics as h
+
 
 def AddBroker(core_type="zmq", number_of_federates=1):
 
@@ -19,6 +19,7 @@ def AddBroker(core_type="zmq", number_of_federates=1):
         pass
 
     return broker
+
 
 def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed"):
 
@@ -49,10 +50,11 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
 
     return mFed, fedinfo
 
+
 def FreeFederate(fed, fedinfo):
     h.helicsFederateFinalize(fed)
     state = h.helicsFederateGetState(fed)
-    assert state == 3 # TODO: should this be 3?
+    assert state == 3  # TODO: should this be 3?
 
     h.helicsFederateInfoFree(fedinfo)
     h.helicsFederateFree(fed)
@@ -65,6 +67,7 @@ def broker():
     h.helicsBrokerDisconnect(broker)
     h.helicsCloseLibrary()
 
+
 def test_broker_functions(broker):
 
     initstring = "--broker="
@@ -74,6 +77,7 @@ def test_broker_functions(broker):
     address = h.helicsBrokerGetAddress(broker)
     initstring = initstring + address
 
+
 def test_message_filter_registration(broker):
 
     fFed, ffedinfo = AddFederate(broker, "zmq", 1, 1, "filter")
@@ -82,10 +86,10 @@ def test_message_filter_registration(broker):
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", None)
 
-    f1 = h.helicsFederateRegisterFilter (fFed, h.helics_filter_type_custom, "filter1")
-    f2 = h.helicsFederateRegisterFilter (fFed, h.helics_filter_type_custom, "filter2")
-    h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    h.helicsFederateRegisterFilter (fFed, h.helics_filter_type_custom,  "filter0/fout")
+    f1 = h.helicsFederateRegisterFilter(fFed, h.helics_filter_type_custom, "filter1")
+    f2 = h.helicsFederateRegisterFilter(fFed, h.helics_filter_type_custom, "filter2")
+    h.helicsFederateRegisterEndpoint(fFed, "fout", "")
+    h.helicsFederateRegisterFilter(fFed, h.helics_filter_type_custom, "filter0/fout")
     h.helicsFederateEnterExecutingModeAsync(fFed)
     h.helicsFederateEnterExecutingMode(mFed)
     h.helicsFederateEnterExecutingModeComplete(fFed)
@@ -106,6 +110,7 @@ def test_message_filter_registration(broker):
     FreeFederate(mFed, mfedinfo)
     time.sleep(1.0)
 
+
 def test_message_filter_function(broker):
 
     fFed, ffedinfo = AddFederate(broker, "zmq", 1, 1, "filter")
@@ -118,9 +123,9 @@ def test_message_filter_function(broker):
     h.helicsFilterAddSourceTarget(f1, "port1")
     f2 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filter_type_delay, "filter2")
     h.helicsFilterAddSourceTarget(f2, "port1")
-    h.helicsFederateRegisterEndpoint(fFed,'fout','');
-    f3 = h.helicsFederateRegisterFilter(fFed, h.helics_filter_type_random_delay, 'filter3');
-    h.helicsFilterAddSourceTarget(f3,'filter/fout');
+    h.helicsFederateRegisterEndpoint(fFed, "fout", "")
+    f3 = h.helicsFederateRegisterFilter(fFed, h.helics_filter_type_random_delay, "filter3")
+    h.helicsFilterAddSourceTarget(f3, "filter/fout")
 
     h.helicsFilterSet(f2, "delay", 2.5)
     h.helicsFederateEnterExecutingModeAsync(fFed)
@@ -130,11 +135,11 @@ def test_message_filter_function(broker):
     assert state == 2
     data = "hello world"
 
-    filt_key = h.helicsFilterGetName(f1);
-    assert filt_key == 'filter1';
+    filt_key = h.helicsFilterGetName(f1)
+    assert filt_key == "filter1"
 
-    filt_key = h.helicsFilterGetName(f2);
-    assert filt_key == 'filter2';
+    filt_key = h.helicsFilterGetName(f2)
+    assert filt_key == "filter2"
 
     h.helicsEndpointSendMessageRaw(p1, "port2", data)
     h.helicsFederateRequestTimeAsync(mFed, 1.0)
@@ -143,17 +148,17 @@ def test_message_filter_function(broker):
     grantedtime = h.helicsFederateRequestTimeComplete(mFed)
     assert grantedtime == 1.0
     res = h.helicsFederateHasMessage(mFed)
-    assert res==0
+    assert res == 0
     res = h.helicsEndpointHasMessage(p2)
-    assert res==0
-    #grantedtime = h.helicsFederateRequestTime(fFed, 3.0)
-    #assert res==h.helics_true
+    assert res == 0
+    # grantedtime = h.helicsFederateRequestTime(fFed, 3.0)
+    # assert res==h.helics_true
 
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
-    #f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
-    #ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    #f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+    # f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
+    # ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
+    # f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
 
     FreeFederate(fFed, ffedinfo)
     FreeFederate(mFed, mfedinfo)

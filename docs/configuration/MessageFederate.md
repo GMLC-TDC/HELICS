@@ -59,4 +59,3 @@ File based configuration looks primarily at an "endpoints" JSON array
 
 See the comments in the file for more information.
 Endpoints can subscribe to publications in which case a message is delivered for every value published.
-

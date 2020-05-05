@@ -36,7 +36,7 @@ aliases:
        make install
        ctest -V -R find-package-tests
        ctest -V -R package-config-tests
-       
+
   - &run_benchmarks
     name: run_benchmarks
     command: |
@@ -55,7 +55,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_octave_tests
-      
+
   helicsgccTSan:
     docker:
       - image: helics/buildenv:builder
@@ -101,7 +101,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_installer_tests
-      
+
   helicsNoZmq:
     docker:
       - image: helics/buildenv:gcc8-builder
@@ -111,7 +111,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
-      
+
   helicsTumbleweed:
     docker:
       - image: helics/buildenv:tumbleweed-builder
@@ -189,4 +189,3 @@ workflows:
                 - develop
     jobs:
       - benchmarkjob
-
