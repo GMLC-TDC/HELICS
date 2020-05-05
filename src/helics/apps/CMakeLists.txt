@@ -26,14 +26,14 @@ if(HELICS_BUILD_APP_LIBRARY)
         BrokerApp.hpp
     )
 
-	set(helics_apps_broker_headers 
+	set(helics_apps_broker_headers
 		 MultiBroker.hpp
 		 BrokerServer.hpp
          zmqBrokerServer.hpp
          AsioBrokerServer.hpp
          TypedBrokerServer.hpp
 		 )
-     
+
     set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
 
     set(
@@ -55,7 +55,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         zmqBrokerServer.cpp
         TypedBrokerServer.cpp
 	)
-    
+
     if (NOT HELICS_DISABLE_ASIO)
         list(APPEND helics_apps_broker_files  AsioBrokerServer.cpp)
     endif()
@@ -73,7 +73,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     target_link_libraries(helics_apps PUBLIC helics_application_api)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt helics::zmq)
-    
+
     if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
         target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
@@ -182,7 +182,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     target_link_libraries(helics-apps-shared PUBLIC HELICS::helics-shared)
     target_link_libraries(helics-apps-shared PRIVATE helics_common fmt::fmt HELICS::utilities)
-    
+
     # add and alias library to match the find_package
     add_library(HELICS::helics-apps-shared ALIAS helics-apps-shared)
 
@@ -244,7 +244,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
 	endif()
 	endif()
-    
+
 endif(HELICS_BUILD_APP_LIBRARY)
 
 # configure executable app

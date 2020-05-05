@@ -71,7 +71,7 @@ class MessageFederate: public virtual Federate {
         return Endpoint(ep);
     }
 
-    /** get an Endpoint from its name 
+    /** get an Endpoint from its name
     @param name the name of the endpoint to retrieve
     @return an Endpoint*/
     Endpoint getEndpoint(const std::string& name)

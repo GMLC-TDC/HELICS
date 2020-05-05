@@ -33,7 +33,7 @@ Naming Conventions
     ``` cpp
     Publication &registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
     ```
-    
+
     Exceptions:  functions that match standard library functions e.g. to_string()
 
 4) All fundamental types and enumerations should be underscore

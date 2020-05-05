@@ -23,7 +23,7 @@
                "unit" : "V",
                "info" : "{
                     \"object\" : \"network_node\",
-                    \"property\" : \"positive_sequence_voltage\" 
+                    \"property\" : \"positive_sequence_voltage\"
 					}"
           }
      ]

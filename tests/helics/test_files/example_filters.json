@@ -74,7 +74,7 @@
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	},
 	{
-	
+
 		"name":"source",  //source adds a cloning filter for all messages send from a particular endpoint
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	}
@@ -83,4 +83,3 @@
 ]
 
 }
-

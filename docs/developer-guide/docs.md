@@ -30,4 +30,3 @@ If you are unable to install `pandoc`, you may be able to generate some of the d
 ```
 pip install recommonmark
 ```
-

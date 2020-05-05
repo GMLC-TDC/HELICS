@@ -7921,4 +7921,3 @@ object triplex_load {
 	current_fraction_12 0.000000;
 	impedance_fraction_12 0.990000;
 };
-

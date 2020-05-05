@@ -19,4 +19,3 @@ for test in "${tests[@]}"; do
 done
 # Return 0 or a positive integer for failure
 exit ${SUMRESULT}
-

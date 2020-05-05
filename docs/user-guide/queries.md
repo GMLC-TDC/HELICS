@@ -229,6 +229,6 @@ Queries in the C api work similarly but the mechanics are different.
 The basic operation is to create a query using [`helicsQueryCreate(target,query)`](../doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
 
 This function returns a query object that can be used in one of the execute functions to generate results.
-It can be called asynchronously on a federate.  The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.  
+It can be called asynchronously on a federate.  The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use.
 The interface api's (python, matlab, octave, Java, etc) will work similarly.

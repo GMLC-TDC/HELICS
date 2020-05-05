@@ -119,7 +119,7 @@ class ValueFederate: public virtual Federate {
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param name the name of the publication
-	@param type the type of publication to register 
+	@param type the type of publication to register
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */

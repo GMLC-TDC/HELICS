@@ -91,7 +91,7 @@ end
 %!     forceCloseStruct(feds);
 %!     assert(false);
 %! end_try_catch
-% 
+%
 % testEndpointRegistration
 %!test
 %! helics
@@ -99,20 +99,20 @@ end
 %! assert(success)
 %! try
 %! epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
-%! 
+%!
 %! epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
-%! 
+%!
 %! helicsFederateEnterExecutingMode(feds.mFed);
-%! 
+%!
 %! ept_key = helicsEndpointGetName(epid1);
 %! assert(ept_key,'fed1/ep1');
-%! 
+%!
 %! ept_key = helicsEndpointGetName(epid2);
 %! assert(ept_key,'ep2');
-%! 
+%!
 %! ept_type = helicsEndpointGetType(epid1);
 %! assert(isempty(ept_type));
-%! 
+%!
 %! ept_type = helicsEndpointGetType(epid2);
 %! assert(ept_type,'random');
 %! success=closeStruct(feds);
@@ -131,25 +131,25 @@ end
 %! assert(success)
 %! try
 %! epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
-%! 
+%!
 %! epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
-%! 
+%!
 %! helicsFederateSetTimeProperty(feds.mFed,int32(137),1.0);
 %! helicsFederateEnterExecutingMode(feds.mFed);
 %! data = 'this is a random string message';
-%! 
+%!
 %! helicsEndpointSendEventRaw(epid1,'ep2',data,1.0);
-%! 
+%!
 %! granted_time=helicsFederateRequestTime(feds.mFed,2.0);
 %! assert(granted_time,1.0);
-%! 
+%!
 %! res=helicsFederateHasMessage(feds.mFed);
 %! assert(res,1);
 %! res=helicsEndpointHasMessage(epid1);
 %! assert(res,0);
 %! res=helicsEndpointHasMessage(epid2);
 %! assert(res,1);
-%! 
+%!
 %! message = helicsEndpointGetMessage(epid2);
 %! assert(message.data,data);
 %! assert(double(message.length),length(data));
@@ -157,11 +157,10 @@ end
 %! assert(message.time,1.0);
 %! success=closeStruct(feds);
 %! assert(success);
-%! 
+%!
 %! catch e
 %!    disp(e.message)
 %!     disp(e.stack(1))
 %!     forceCloseStruct(feds);
 %!     assert(false);
 %! end_try_catch
-

@@ -28,7 +28,7 @@ To set up your environment:
    environment variable to the install location. The CMake will only automatically find
     boost 1.58 or newer.
    Building with Visual Studio 2017 will require boost 1.65.1 or newer and CMake 3.9
-    or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.  Visual studio 2019 will require CMake 3.14 or later.  
+    or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.  Visual studio 2019 will require CMake 3.14 or later.
     Boost 1.70 with CMake 3.14+ is the current recommended configuration.
 3.  *Optional* Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
    We **highly recommend skipping** this step and running CMake with the
@@ -44,7 +44,7 @@ To set up your environment:
 ```shell
      choco install swig
 ```
-   from windows power shell.  
+   from windows power shell.
 6.  Open a Visual Studio Command Prompt, and go to your working
     directory.
 7.  Make sure *CMake* and *git* are available in the Command Prompt.
@@ -113,9 +113,9 @@ recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 x.x.x 20XX-XX-XX
 
 > helics_recorder.exe --version
-x.x.x 20XX-XX-XX  
+x.x.x 20XX-XX-XX
 ```
-there may be additional build information if a non tagged version is built.  
+there may be additional build information if a non tagged version is built.
 
 ## Building HELICS with python support ##
 
@@ -194,7 +194,7 @@ Total Installed Size:  65.78 MiB
 :: Proceed with installation? [Y/n] y
 
 ```
-you will be asked to proceed with installation, answering `y` will install HELICS and the required dependencies.  
+you will be asked to proceed with installation, answering `y` will install HELICS and the required dependencies.
 
 ```bash
 $ helics_broker --version
@@ -215,9 +215,9 @@ $ pacboy -Sy helics
 if the python interface is needed on MSYS2 it can be installed through pip but requires some setup first.
 ```bash
 $export CMAKE_GENERATOR="MSYS Makefiles"
-$pip install helics  
+$pip install helics
 ```
-This will install the HELICS python extension in the correct location.  The pacman package should be installed first  
+This will install the HELICS python extension in the correct location.  The pacman package should be installed first
 
 ### Building HELICS From Source on Windows with MSYS2 ###
 
@@ -278,10 +278,10 @@ where x is the number of threads you can give the make process to speed up the b
 $ make install
 ```
 unless you changed the value of CMake_INSTALL_PREFIX everything the default install location /usr/local/helics_2_1_0. This install path will be referred to as HELICS_INSTALL for the sections related to GridLab-D.
-If you want to build Gridlab-d on Windows with HELICS see [Building with HELICS](http://gridlab-d.shoutwiki.com/wiki/Building_GridLAB-D_on_Windows_with_MSYS2#Building_with_the_HELICS_Library).  Please use branch feature/1179 to build with HELICS 2.1 or later instead of the branch listed.  
+If you want to build Gridlab-d on Windows with HELICS see [Building with HELICS](http://gridlab-d.shoutwiki.com/wiki/Building_GridLAB-D_on_Windows_with_MSYS2#Building_with_the_HELICS_Library).  Please use branch feature/1179 to build with HELICS 2.1 or later instead of the branch listed.
 
 #### Compiling with clang ####
-Clang does not work to compile on MSYS2 at this time.  It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes. It is getting closer as of (1/30/2020) Mostly it compiles when linked with Libc++ and libc++abi, but there seems to be some missing functions as of yet, so cannot be used other than for some warning checks.    
+Clang does not work to compile on MSYS2 at this time.  It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes. It is getting closer as of (1/30/2020) Mostly it compiles when linked with Libc++ and libc++abi, but there seems to be some missing functions as of yet, so cannot be used other than for some warning checks.
 
 ## Building with mingw ##
 HELICS can also be built with the standalone MinGW
@@ -295,7 +295,7 @@ HELICS can also be built with the standalone MinGW
 
 Cygwin is another UNIX like environment on Windows.  It has some peculiarities.
 HELICS will only build on the 32 bit version due to incompatibilities with ASIO and the 64 bit build.  But it does build on the 32 bit versions completely and on the 64 bit version if `HELICS_DISABLE_ASIO=ON` is set
-Also the helics-config utility does not get built due to an incompatibility with the filesystem header.  
+Also the helics-config utility does not get built due to an incompatibility with the filesystem header.
 
 -   required packages include CMake, libboost-devel, make, gcc, g++, libzmq(if using zmq)
 -   use the unix makefiles generator
