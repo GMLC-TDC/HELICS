@@ -103,5 +103,3 @@ To ensure that the Python extension works correctly, you may add the following t
 ```bash
 export PYTHONPATH="~/local/helics_install/python"
 ```
-
-

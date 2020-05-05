@@ -46,10 +46,10 @@ message(STATUS "SYSTEM INFO -> ${HELICS_COMPILER_VERSION}")
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/" "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/")
 else()
     set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
-    set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH})
+    set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake/" "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/" ${CMAKE_MODULE_PATH})
     get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
 endif()
 
@@ -522,7 +522,7 @@ if(ENABLE_ZMQ_CORE)
     endif()
 endif()
 add_library(helics::zmq ALIAS zmq)
-    
+
 # -----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 # -----------------------------------------------------------------------------

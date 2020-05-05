@@ -81,5 +81,3 @@ helics.helicsFederateFree(vfed);
 helics.helicsCloseLibrary();
 
 display('PI SENDER: Broker disconnected');
-
-

@@ -180,7 +180,7 @@ jobs:
         - export SHELL=cmd
         - source scripts/setup-helics-ci-options.sh
         - choco install boost-msvc-12
-    
+
     - os: windows
       name: "MSYS"
       if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(msys)/) OR (commit_message =~ /(msys)/)
@@ -236,14 +236,14 @@ jobs:
       name: "GCC 6 Code Coverage"
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true 
+        - USE_SWIG=true
         - TEST_TYPE=Coverage
         - BUILD_TYPE=Coverage
         - DISABLE_INTERFACES="Python,Java"
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-      
+
     - stage: trigger dependent repositories
       if: branch IN (master, develop)
       before_install: true
@@ -262,7 +262,7 @@ install:
   - source scripts/install-ci-dependencies.sh
   - source scripts/setup-helics-ci-options.sh
   - export CMAKE_COMPILER_LAUNCHER="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
-  
+
 script:
   - mkdir -p build && cd build
   - $SHELL_CMD ../scripts/ci-build.sh

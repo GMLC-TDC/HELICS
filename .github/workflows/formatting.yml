@@ -1,0 +1,48 @@
+name: Formatting
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  pre-commit:
+    name: Formatting-check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+    - name: set PY
+      run: echo "::set-env name=PY::$(python --version --version | sha256sum | cut -d' ' -f1)"
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+    - uses: pre-commit/action@v1.0.0
+    - name: Stage changed doc/script files
+      if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
+      shell: bash --noprofile --norc {0}
+      run: |
+        git diff --name-only
+        if [[ "$?" == "0" ]];
+        then
+          git add --all
+        fi
+        exit 0
+    - name: Create/update a file update PR with no hash
+      if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
+      uses: ./.github/actions/create-file-update-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated formatting of doc/script files"
+        PR_TITLE: "Automated formatting of doc/script files"
+        PR_BODY: "Automated formatting of doc/script files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "pre-commit/"
+        NO_HASH: "true"
+        REPLACE_BRANCH: "true"
+

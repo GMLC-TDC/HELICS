@@ -170,7 +170,7 @@
 //    $1=PyBytes_AsString($input);
 //	$2=PyBytes_Size($input);
 //  }
-//  else 
+//  else
 //  {
 //	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
 //    return NULL;

@@ -1,4 +1,4 @@
-# Linux Installations 
+# Linux Installations
 
 ## Ubuntu Installation
 
@@ -103,7 +103,7 @@ Out[2]: 'x.x.x (20XX-XX-XX)'
 
 ```
 
-## A few Specialized Platforms 
+## A few Specialized Platforms
 The HELICS build supports a few specialized platforms, more will be added as needed.  Generally the build requirements are automatically detected but that is not always possible.  So a system configuration can be specified in the HELICS_BUILD_CONFIGURATION variable of CMake.
 
 ### Raspbery PI

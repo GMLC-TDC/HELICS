@@ -83,60 +83,60 @@
                "unit" : "V",
                "info" : "{
                     \"object\" : \"network_node\",
-                    \"property\" : \"positive_sequence_voltage\" 
+                    \"property\" : \"positive_sequence_voltage\"
 					}"
           }
      ],
 	 "endpoints" : [
 		{
-			"global" : true,  
-			"name" : "IEEE_123_feeder_0/EV6", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV6",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV6\",
 				\"property\" : \"constant_power_A\"
 			}"
 		},
 		{
-			"global" : true, 
-			"name" : "IEEE_123_feeder_0/EV5", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV5",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV5\",
 				\"property\" : \"constant_power_B\"
 			}"
-		},		
+		},
 		{
-			"global" : true, 
-			"name" : "IEEE_123_feeder_0/EV4", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV4",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV4\",
 				\"property\" : \"constant_power_C\"
 			}"
 		},
 		{
-			"global" : true, 
-			"name" : "IEEE_123_feeder_0/EV3", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV3",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV3\",
 				\"property\" : \"constant_power_A\"
 			}"
 		},
 		{
-			"global" : true, 
-			"name" : "IEEE_123_feeder_0/EV2", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV2",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV2\",
 				\"property\" : \"constant_power_B\"
 			}"
 		},
 		{
-			"global" : true,  
-			"name" : "IEEE_123_feeder_0/EV1", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV1",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV1\",
 				\"property\" : \"constant_power_C\"

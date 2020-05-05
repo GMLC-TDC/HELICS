@@ -1,6 +1,6 @@
 # Logging
 
-Logging in HELICS is normally handled through an independent thread.  The thread prints message to the console and or to a file.  
+Logging in HELICS is normally handled through an independent thread.  The thread prints message to the console and or to a file.
 
 ## Federate Logging
 Most of the time the log for a federate is the same as for its core.  This is managed through a few properties in the FederateInfo structure which can also be directly specified through the property functions.
@@ -149,4 +149,4 @@ void logInfoMessage (const std::string &message) const;
 void logDebugMessage (const std::string &message) const;
 ```
 
-These will log a message at the appropriate level or at a user specified level.  
+These will log a message at the appropriate level or at a user specified level.

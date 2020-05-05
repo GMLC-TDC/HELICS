@@ -3,14 +3,14 @@ A few simple exercises about co-simulation timing
 
 ## Key Parameters
 
--   **Period**: The minimum time resolution a federate will allow.  
+-   **Period**: The minimum time resolution a federate will allow.
 -   **Offset**: a shift in the period.  Allowed times for federate grants after time 0 are `offset+N*period`, where `N` is a non-negative integer.
--   **Time_delta**: the minimum time between grants, i.e. if a federate is granted time T, the next possible time is `T+Time_delta`.  
+-   **Time_delta**: the minimum time between grants, i.e. if a federate is granted time T, the next possible time is `T+Time_delta`.
 
 ## Modifier Flags
 
 -   **Uninteruptible**: a federate can only be granted requested times
--   **wait_for_current_time_update**:  specify that a federate should wait until all federates executing at the current time have finished.  
+-   **wait_for_current_time_update**:  specify that a federate should wait until all federates executing at the current time have finished.
 
 ![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 

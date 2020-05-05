@@ -6,7 +6,7 @@ Unlike HELICS values which are persistent (meaning they are continuously availab
 
 
 ## Message Federate Endpoints ##
-As previously discussed, message federates interact with the federation by defining an "endpoint" that acts as their address to send and receive messages. Message federates are typically sending and receiving measurements, control signals, commands, and other signal data with HELICS acting as a perfect communication system (infinite bandwidth, virtually no latency, guaranteed delivery). 
+As previously discussed, message federates interact with the federation by defining an "endpoint" that acts as their address to send and receive messages. Message federates are typically sending and receiving measurements, control signals, commands, and other signal data with HELICS acting as a perfect communication system (infinite bandwidth, virtually no latency, guaranteed delivery).
 
 In fact, as you'll see in [a later section](./filters.md), it is possible to create more realistic communication-system effects natively in HELICS (as well as use a full-blown communication simulator like [ns-3](https://www.nsnam.org) to do the same). This is relevant now, though, because it influences how the endpoints are created and, as a consequence, how the simulator handles messages. You could, for example, have a system with three federates communicating with each other: a remote voltage sensor, a voltage controller, and a voltage regulation actuator (we'll pretend for the case of this example that the last two are physically separated though they often aren't). In this case, you could imagine that the voltage sensor only sends messages to the voltage controller and the voltage controller only sends messages to the voltage regulation actuator. That is, those two paths between the three entities are distinct, have no interaction, and have unique properties (though they may not be modeled). Given this, referring to the figure below, the voltage sensor could have one endpoint ("Endpoint 1") to send the voltage signal, the voltage regulator could receive the measurement at one endpoint ("Endpoint 2") and send the control signal on another ("Endpoint 3"), and the voltage regulation actuator would receive the control signal on its own endpoint ("Endpoint 4").
 
@@ -32,25 +32,25 @@ Once the message topology considering endpoints has been determined, the definit
 	 ...
 	 "endpoints" : [
 		{
-			"name" : "voltage_sensor", 
-			"global" : true, 
-			"destination" : "voltage_controller", 
+			"name" : "voltage_sensor",
+			"global" : true,
+			"destination" : "voltage_controller",
 			"info" : ""
 		},
 		{
-			"name" : "voltage_controller_1", 
-			"global" : true, 
+			"name" : "voltage_controller_1",
+			"global" : true,
 			"info" : ""
 		},
 		{
-			"name" : "voltage_controller_2", 
-			"global" : true, 
-			"destination" : "voltage_actuator", 
+			"name" : "voltage_controller_2",
+			"global" : true,
+			"destination" : "voltage_actuator",
 			"info" : ""
 		},
 		{
-			"name" : "voltage_actuator", 
-			"global" : true, 
+			"name" : "voltage_actuator",
+			"global" : true,
 			"info" : ""
 		}
 	 ...
@@ -60,7 +60,7 @@ Once the message topology considering endpoints has been determined, the definit
 * **`name`** - Analogous to `key` in value federates, this is the unique identifier of the endpoint in the federation and has the same interaction with `global` as the value federates do.
 * **`global`** - Just as in value federates, `global` allows for the identifier of the endpoint to be declared unique for the entire federation.
 * **`destination`** - For endpoints that send all outgoing messages to only a single endpoint, `destination` allows the endpoint to be specified in the JSON configuration. This allows for a more modular implementation of the federate since this parameter is externally defined rather than being hardcoded in the federate itself.
-* **`info`** - Just as in the value federate, the string in this field is ignored by HELICS and can be used by the federate for internal configuration purposes. 
+* **`info`** - Just as in the value federate, the string in this field is ignored by HELICS and can be used by the federate for internal configuration purposes.
 
 There are a few other configuration parameters that are applicable if the endpoint is interacting with a HELICS value message.
 
@@ -75,12 +75,12 @@ Keeping in mind that this a model for demonstration purposes (which is to say, d
 
   * All EVs are very large (200kW; level 2 charging is rated up to 20kW)
   * All EVs have infinite battery capacity
-  * All EVs will be at home all day, desiring to charge all day if they can. 
+  * All EVs will be at home all day, desiring to charge all day if they can.
   * All EVs charge at the same power level.
   * The EV charge controller has direct control over the charging of all EVs in the distribution system. It can tell them when to turn off and on at will.
   * The EV charge controller has the responsibility to limit the total load of the distribution system to a specified level to prevent overloading on the substation transformer.
   * The EV will turn off some EV charging when the total distribution load exceeds the transformer limit by a certain percentage and will turn some EVs back on when below the limit by a certain percentage.
-  * Nothing is fair about how the charge controller chooses which EVs to charge and which to disconnect.  
+  * Nothing is fair about how the charge controller chooses which EVs to charge and which to disconnect.
 
 The message topology (including the endpoints) and the not very interesting broker topology are shown below.
 
@@ -106,33 +106,33 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 		"destination": "IEEE_123_feeder_0/EV6",
 		"type": "genmessage",
 		"global": true
-		
-	},  
-	{ 
+
+	},
+	{
 		"name": "EV_Controller/EV5",
 		"destination": "IEEE_123_feeder_0/EV5",
 		"type": "genmessage",
 		"global": true
-	},  
+	},
    ...
-	],	
+	],
 	"subscriptions":[
 	{
 		"key": "IEEE_123_feeder_0/totalLoad",
 		"type": "complex",
 		"required": true
-	}, 
-	{ 
+	},
+	{
 		"key": "IEEE_123_feeder_0/charge_EV6",
 		"type": "complex",
 		"required": true
 	},
-	{ 
+	{
 		"key": "IEEE_123_feeder_0/charge_EV5",
 		"type": "complex",
 		"required": true
 	},
-	...	
+	...
 	]
 }
 ```
@@ -181,18 +181,18 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
           ],
 	 "endpoints" : [
 		{
-			"global" : true, 
-			"name" : "IEEE_123_feeder_0/EV6", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV6",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV6\",
 				\"property\" : \"constant_power_A\"
 			}"
 		},
 		{
-			"global" : true, 
-			"name" : "IEEE_123_feeder_0/EV5", 
-			"type" : "complex", 
+			"global" : true,
+			"name" : "IEEE_123_feeder_0/EV5",
+			"type" : "complex",
 			"info" : "{
 				\"object\" : \"EV5\",
 				\"property\" : \"constant_power_B\"
@@ -215,4 +215,3 @@ Running [the example](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e3681
 Given the relatively dramatic changes in load, you might expect the voltage on the transmission system to be impacted. You would be right:
 
 ![Ex. 1b EV charge pattern](../img/Ex1b_Bus_voltage_118.png)
-

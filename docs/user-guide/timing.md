@@ -17,8 +17,8 @@ HELICS co-simulations end under one of two conditions: when all federates have b
 The same JSON configuration file used to set the publications, subscriptions, and endpoints as discussed in the [section on federates](./federates.md) also has a number of parameters that can be set to influence how the federate manages its timing with the co-simulation.
 
 ```
-{ 
-  "name":"generic_federate", 
+{
+  "name":"generic_federate",
   ...
   "uninterruptible":false,
   "period":  1.0,
@@ -31,7 +31,7 @@ The same JSON configuration file used to set the publications, subscriptions, an
 * **period** - Many time-based simulators have a minimum time-resolution or a user-configurable step size. The `period` parameter can be used to effectively synchronize the times that are granted with the defined simulation period. The default units for `period` are in seconds but the string for this parameter can include its own units (e.g. "2 ms" or "1 hour"). Setting `period`  will force all time grants to occur at times of `n*period` even if subscriptions are updated, messages arrive, or the federate requests a time between periods. This value effectively makes the federates `uninterruptible` during the times between periods. Relatedly...
 
 * **offset [0]** - There may be cases where it is preferable to have a simulator receive time grants that are offset slightly in time to one or more other federates. Defining an `offset` value allows this to take place; units are handled the same as in `period`. Setting both `period` and `offset`, will result in the all times granted to the federate in question being constrained to `n*period + offset`.
-  
+
 * **timeDelta [0]** - timeDelta has some similarities to `period`; where `period` constrained the granted time to regular intervals, `timeDelta` constrains the grant time to a minimum amount from the last granted time. Units are handled the same as in `period`.
 
 More than likely you're going to want to set at least one of these based on how the federate in question handles time (assuming that whoever integrated the federate didn't set any of them programmatically). For example, if the federate has a minimum time-step, setting `period` to that time-step value will guarantee that grants will only happen on that time-step. That is, if the federate has no concept of time shorter than one second, setting `period` to 1 second will guarantee that the federate is never granted a time of, say, 3.3 seconds even if new publication values arrive at that time. If those new values show up at 3.3 seconds and `period` is set to 1 second, the federate will see them when it is woken up at 4 seconds. HELICS will also delay any requests of invalid times to the next allowed time.  For example if a period of 1.0 was set and request was made at 3.3 seconds the grant would occur at 4.0 seconds.
@@ -44,9 +44,9 @@ Its important to note that these settings specifically impact the granted time a
 Just for the purposes of illustration, let's suppose that a co-simulation federation with the following timing parameters has been assembled:
 
 * **Logger** - This federate is a results logger and simply writes out to files the current values of various publications made by the other federates in the co-simulation. This logging simulator will record values every 1 ms and as such, the JSON config sets `period` to this value and sets the `uninterruptible` flag.
-* **Generator** - This is a generator simulator that specializes in comprehensive modeling of the machine dynamics. The Generator will have an endpoint used to receive commands from the Generator Controller subscriptions to the Power System to provide the inputs necessary to replicate the physics of its system. 
+* **Generator** - This is a generator simulator that specializes in comprehensive modeling of the machine dynamics. The Generator will have an endpoint used to receive commands from the Generator Controller subscriptions to the Power System to provide the inputs necessary to replicate the physics of its system.
 
-  The models of the generator are valid at a time-step of 0.1 ms and thus the simulator integrator requires that the `period` of the HELICS interface be set to some multiple of 0.1. In this case we'll use 1 ms and to ease integration with the Power System federate, it will also have an `offset` of 0.5 ms. 
+  The models of the generator are valid at a time-step of 0.1 ms and thus the simulator integrator requires that the `period` of the HELICS interface be set to some multiple of 0.1. In this case we'll use 1 ms and to ease integration with the Power System federate, it will also have an `offset` of 0.5 ms.
 * **Generator Controller** - This is an event-based simulator, updating the control commands to the Generator federate whenever new inputs are received from the Power System federate (subscriptions to the physical values it calculates). As such, it will always request `maxTime`, expecting to be granted times whenever the state of the Power System federate changes. The `timeDelta` will be set to 0.010 ms to replicate the time it takes to calculate and communicate the command signals to the Generator.
 * **Power System** - This federate is a classic power system dynamics simulator with a fixed time-step of 1 ms. The integrator of this simulator choose to realize this by setting the `uninterruptible` flag and hard-coding the time requests to advance at 1 ms intervals.
 
@@ -56,8 +56,8 @@ Below is a timing diagram showing how these federates interact during a co-simul
 
 Items of notes:
 
-* Generator Controller gets granted a time of 1 ms (at the first grant time) even though is requested `maxTime` because a message was created by the Power System federate at that time stamp. As Generator Controller depends on nothing else, HELICS was able to grant it the same time as Power System even though it is clearly performing its calculations after Power System has performed its. 
-* Relatedly, Generator Controller requests a time of `maxTime` once it has calculated the new control signals for Generator. Due to the value set by `timeDelta`, the soonest time it can be granted would be 0.01 ms after its most recent granted time (1.01  in the case of the first operational period, 2.01 in the case of the second period.) 
+* Generator Controller gets granted a time of 1 ms (at the first grant time) even though is requested `maxTime` because a message was created by the Power System federate at that time stamp. As Generator Controller depends on nothing else, HELICS was able to grant it the same time as Power System even though it is clearly performing its calculations after Power System has performed its.
+* Relatedly, Generator Controller requests a time of `maxTime` once it has calculated the new control signals for Generator. Due to the value set by `timeDelta`, the soonest time it can be granted would be 0.01 ms after its most recent granted time (1.01  in the case of the first operational period, 2.01 in the case of the second period.)
 * When Logger is granted a time of 1 ms, the values it will record are those previously published by other federates. Specifically, the new values that Power System is calculating are not available for Logger to record.
 
 ## Exercises
