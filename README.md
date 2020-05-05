@@ -5,61 +5,56 @@
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
-[![](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&utm_medium=referral&utm_content=GMLC-TDC/HELICS&utm_campaign=Badge_Grade;branch=develop)
-[![](https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true)](https://ci.appveyor.com/project/HELICS/helics/history)
-[![Cirrus Status](https://api.cirrus-ci.com/github/GMLC-TDC/HELICS.svg)](https://cirrus-ci.com/github/GMLC-TDC/HELICS)
-[![Drone IO Status](https://cloud.drone.io/api/badges/GMLC-TDC/HELICS/status.svg?ref=refs/heads/develop)](https://cloud.drone.io/GMLC-TDC/HELICS)
-[![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop)
+[![](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=develop)
+[![CircleCI](https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg)](https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop)
+[![Documentation Status](https://readthedocs.org/projects/helics/badge/?version=latest)](https://helics.readthedocs.io/en/latest/?badge=latest)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 
 ## Build Status
-
 <table>
   <tr>
     <td><b>Service</b></td>
     <td><b>Master</b></td>
     <td><b>Develop</b></td>
-    <td><b>helics3</b></td>
   </tr>
   <tr>
   <td>Travis CI</td>
   <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=master" alt="Build Status" /></a></td>
   <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=helics3" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Azure</td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=master"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=master" alt="Build Status" /></a></td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
-  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=helics3"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=helics3" alt="Build Status" /></a></td>
   </tr>
   <tr>
-  <td>Circle-CI</td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master.svg?style=svg" alt="Build Status" /></a></td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg" alt="Build Status" /></a></td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3.svg?style=svg" alt="Build Status" /></a></td>
+  <td>Appveyor</td>
+  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/master?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true" alt="Build Status" /></a></td>
   </tr>
-  <td>Docs</td>
-  <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
+  <tr>
+  <td>Coverage</td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/master/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
   </tr>
 </table>
 
+
 ## Table of contents
 
-- [Introduction](#introduction)
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-  - [Changelog](#changelog)
-  - [RoadMap](#roadmap)
-- [Installers](#installers)
-- [Building HELICS](#build-from-source-instructions)
-- [Docker](#docker)
-- [Tools with HELICS support](#tools-with-helics-support)
-- [Contributing](#contributing)
-- [Release](#release)
+-   [Introduction](#introduction)
+-   [Getting Started](#getting-started)
+-   [Documentation](#documentation)
+    -   [Changelog](#changelog)
+    -   [RoadMap](#roadmap)
+-   [Installers](#installers)
+-   [Building HELICS](#build-from-source-instructions)
+-   [Docker](#docker)
+-   [Tools with HELICS support](#tools-with-helics-support)
+-   [Contributing](#contributing)
+-   [Release](#release)
+
 
 ## Introduction
 
@@ -67,11 +62,11 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools. However, it is possible to use HELICS for co-simulation in any domain. Previous and existing HELICS efforts have stretched across a wide range of scales in time and space: From transient dynamics (e.g. power system frequency response or electromechanical transient simulation) through steady-state power flow and markets to long-term planning studies. And from individual appliance behaviors, through distribution & bulk systems, and to nation-wide simulations.
 
-HELICS is also highly scalable, enabling everything from simple connections between 2 software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including [Python](#pip), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
+HELICS is also highly scalable, enabling everything from simple connections between 2 software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these.  Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including Python, C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab.  [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
 
 **Brief History:** HELICS began as the core software development of the Grid Modernization Laboratory Consortium ([GMLC](https://gridmod.labworks.org/)) project on integrated Transmission-Distribution-Communication simulation (TDC, GMLC project 1.4.15) supported by the U.S. Department of Energy's Offices of Electricity Delivery and Energy Reliability ([OE](https://www.energy.gov/oe/office-electricity-delivery-and-energy-reliability)) and Energy Efficiency and Renewable Energy ([EERE](https://www.energy.gov/eere/office-energy-efficiency-renewable-energy)). As such, its first use cases were around modern electric power systems, though today it is used for a much larger range of applications. HELICS's layered, high-performance, co-simulation framework builds on the collective experience of multiple national labs.
 
-**Motivation:** Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations.
+**Motivation:** Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations.  
 
 ## Getting Started
 
@@ -79,7 +74,7 @@ We've created a series of roughly 10-minute mini-tutorial videos that discuss va
 
 The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
-Several examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples). This repo provides a number of examples using the different libraries and interfaces.
+Several examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples).  This repo provides a number of examples using the different libraries and interfaces.
 
 The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) provides a series of tutorials using HELICS to build a co-simulation using domain-specific external modeling tools that is built around an electric power system use case with integrated transmission-distribution-market-communication quasi-steady-state-timeseries (QSTS) simulation.
 
@@ -87,26 +82,22 @@ The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) 
 
 A [Users guide](https://helics.readthedocs.io/en/latest/user-guide/index.html) for getting started
 
-A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepared for the IEEE PES General meeting in Atlanta. The example materials are available on Binder.
+A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepared for the IEEE PES General meeting in Atlanta.  The example materials are available on Binder.
 
 ## Documentation
 
-Our [ReadTheDocs](https://helics.readthedocs.io/en/latest/index.html) site provides a set of documentation including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete Doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more. A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS/wiki).
+Our [ReadTheDocs](https://helics.readthedocs.io/en/latest/index.html) site provides a set of documentation including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete Doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS/wiki).
 
 ### Documentation downloads
-
-- [PDF](https://docs.helics.org/_/downloads/en/latest/pdf/)
-- [HTML Zip file](https://docs.helics.org/_/downloads/en/latest/htmlzip/)
-- [EPUB](https://docs.helics.org/_/downloads/en/latest/epub/)
+-   [PDF](https://docs.helics.org/_/downloads/en/latest/pdf/)
+-   [HTML Zip file](https://docs.helics.org/_/downloads/en/latest/htmlzip/)
+-   [EPUB](https://docs.helics.org/_/downloads/en/latest/epub/)
 
 Additionally, our initial design requirements document can be found [here](docs/introduction/original_specification.md), which describes a number of our early design considerations and some directions that might be possible in the future.
 
 ### [CHANGELOG](CHANGELOG.md)
-
 For a history of changes to HELICS
-
 ### [ROADMAP](docs/ROADMAP.md)
-
 For a snapshot of some current plans for what is to come
 
 ## Installers
@@ -118,7 +109,7 @@ Make sure the latest [Visual C++ Redistributable](https://support.microsoft.com/
 
 ### Conda
 
-Some support to Conda is provided see [conda install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-conda-windows-macos-linux) for the instructions. It is supported through a separate [repo](https://github.com/GMLC-TDC/helics-conda).
+Some support to Conda is provided see [conda install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-conda-windows-macos-linux) for the instructions.  It is  supported through a separate [repo](https://github.com/GMLC-TDC/helics-conda).
 
 ### pip
 
@@ -138,7 +129,7 @@ HELICS can be installed on Linux (and macOS) using Spack, a package manager aime
 
 ## Docker
 
-Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/helics/repository/docker/helics/helics). This image does not include any libraries for linking just the executables. `helics_broker`, `helics_app`, `helics_recorder`, `helics_player`, and `helics_broker_server`. Other images are expected to be available in the future. See [Docker](https://github.com/GMLC-TDC/HELICS/blob/master/docs/docker.md) for a few more details.
+Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/helics/repository/docker/helics/helics).  This image does not include any libraries for linking just the executables.  `helics_broker`, `helics_app`, `helics_recorder`, `helics_player`, and `helics_broker_server`.  Other images are expected to be available in the future.  See [Docker](https://github.com/GMLC-TDC/HELICS/blob/master/docs/docker.md) for a few more details.
 
 ## Tools with HELICS support
 
@@ -152,46 +143,42 @@ We are always looking for help adding support for more tools, so please contact 
 
 ### HELICS helper Apps
 
-- [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
-- [Player](https://helics.readthedocs.io/en/latest/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
-- [Recorder](https://helics.readthedocs.io/en/latest/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
-- [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html), which is a command line tool for running a Broker. There is also a [Broker Server](https://helics.readthedocs.io/en/latest/user-guide/simultaneous_cosimulation) which can generate brokers as needed, and can include a REST API.
-- [App](https://helics.readthedocs.io/en/latest/apps/App.htm) is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).
+-   [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
+-   [Player](https://helics.readthedocs.io/en/latest/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
+-   [Recorder](https://helics.readthedocs.io/en/latest/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
+-   [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  which is a command line tool for running a Broker.  There is also a [Broker Server](https://helics.readthedocs.io/en/latest/user-guide/simultaneous_cosimulation) which can generate brokers as needed, and can include a REST API.
+-   [App](https://helics.readthedocs.io/en/latest/apps/App.htm) is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).
 
 ## Contributing
-
-Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing. And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations. All prior contributors can be found [here](CONTRIBUTORS.md)
+Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations.  All prior contributors can be found [here](CONTRIBUTORS.md)
 
 ### Optional components
-
 A list of optional component that are not included in HELICS but are optionally used by the library
 
 #### [zmq](http://www.zeromq.org)
+  ZeroMQ message passing is used in the ZMQ core networking.  The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source.  HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  Currently the Windows installers and shared library builds static link ZeroMQ.  When building from source it is an optional component and can be excluded by setting  `ENABLE_ZMQ_CORE` to `OFF`
 
-ZeroMQ message passing is used in the ZMQ core networking. The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `ENABLE_ZMQ_CORE` to `OFF`
+### [Google Test](https://github.com/google/googletest)  
+  HELICS tests are written to use the Google Test and mock frameworks. Google Test is included in the source tarball but is downloaded as an optional component. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
 
-### [Google Test](https://github.com/google/googletest)
+### [Google Benchmark](https://github.com/google/benchmark)  
+ Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
 
-HELICS tests are written to use the Google Test and mock frameworks. Google Test is included in the source tarball but is downloaded as an optional component. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
-
-### [Google Benchmark](https://github.com/google/benchmark)
-
-Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
 
 ## Publications
 
-\[1\] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in _Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems_, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) | [published](https://ieeexplore.ieee.org/document/8064542/)
+\[1\] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in *Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems*, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) | [published](https://ieeexplore.ieee.org/document/8064542/)
 
 ## In the News
 
 HELICS was selected as an [R&D 100 Award Finalist](https://www.rdworldonline.com/finalists-announced-for-2019-rd-100-awards/).
+
 
 ## Source Repo
 
 The HELICS source code is hosted on GitHub: [https://github.com/GMLC-TDC/HELICS](https://github.com/GMLC-TDC/HELICS)
 
 ## Release
-
 HELICS is distributed under the terms of the BSD-3 clause license. All new
 contributions must be made under this license. [LICENSE](LICENSE)
 
