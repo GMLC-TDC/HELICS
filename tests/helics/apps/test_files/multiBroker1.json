@@ -1,10 +1,13 @@
 {
-	"master": {
-		"type": "test"
-	},
-	"comms": [{
-		"type": "zmq"
-	}, {
-		"type": "tcp"
-	}]
+  "master": {
+    "type": "test"
+  },
+  "comms": [
+    {
+      "type": "zmq"
+    },
+    {
+      "type": "tcp"
+    }
+  ]
 }

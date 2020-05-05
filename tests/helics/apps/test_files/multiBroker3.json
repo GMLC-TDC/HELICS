@@ -1,9 +1,13 @@
 {
-	"comms": [{
-		"type": "zmq"
-	}, {
-		"type": "ipc"
-	}, {
-		"type": "tcp"
-	}]
+  "comms": [
+    {
+      "type": "zmq"
+    },
+    {
+      "type": "ipc"
+    },
+    {
+      "type": "tcp"
+    }
+  ]
 }
