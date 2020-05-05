@@ -37,10 +37,10 @@ if(hasParent)
 
 else()
     cmake_minimum_required(VERSION 3.4)
-    if(CMAKE_VERSION VERSION_LESS 3.16)
+    if(CMAKE_VERSION VERSION_LESS 3.17)
        cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
     else()
-       cmake_policy(VERSION 3.16)
+       cmake_policy(VERSION 3.17)
     endif()
     set(HELICS_BUILD_TESTS
         ON

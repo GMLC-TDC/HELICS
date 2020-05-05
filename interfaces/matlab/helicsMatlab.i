@@ -4,4 +4,3 @@
 %ignore helics_complex;
 
 %include "../helics.i"
-

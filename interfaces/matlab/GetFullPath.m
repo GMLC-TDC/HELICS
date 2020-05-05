@@ -125,7 +125,7 @@ if isempty(hasDataRead)
    %      ['GetFullPath: Using slow Matlab-version instead of fast Mex.', ...
    %       char(10), 'Compile: InstallMex GetFullPath.c']);
    %end
-   
+
    % DATAREAD is deprecated in 2011b, but still available. In Matlab 6.5, REGEXP
    % does not know the 'split' command, therefore DATAREAD is preferred:
    hasDataRead = ~isempty(which('dataread'));
@@ -149,7 +149,7 @@ end
 if isWIN  % Windows: --------------------------------------------------------
    FSep = '\';
    File = strrep(File, '/', FSep);
-   
+
    % Remove the magic key on demand, it is appended finally again:
    if strncmp(File, '\\?\', 4)
       if strncmpi(File, '\\?\UNC\', 8)
@@ -158,7 +158,7 @@ if isWIN  % Windows: --------------------------------------------------------
          File = File(5:length(File));
       end
    end
-   
+
    isUNC   = strncmp(File, '\\', 2);
    FileLen = length(File);
    if isUNC == 0                        % File is not a UNC path
@@ -172,7 +172,7 @@ if isWIN  % Windows: --------------------------------------------------------
             ThePath = ThePath(1:3);     % Drive letter only
          end
       end
-      
+
       if FileLen < 2 || File(2) ~= ':'  % Does not start with drive letter
          if ThePath(length(ThePath)) ~= FSep
             if File(1) ~= FSep
@@ -188,7 +188,7 @@ if isWIN  % Windows: --------------------------------------------------------
                File = [ThePath, File];
             end
          end
-         
+
       elseif FileLen == 2 && File(2) == ':'   % "C:" current directory on C!
          % "C:" is the current directory on the C-disk, even if the current
          % directory is on another disk! This was ignored in Matlab 6.5, but
@@ -208,18 +208,18 @@ if isWIN  % Windows: --------------------------------------------------------
          end
       end
    end
-   
+
 else         % Linux, MacOS: ---------------------------------------------------
    FSep = '/';
    File = strrep(File, '\', FSep);
-   
+
    if strcmp(File, '~') || strncmp(File, '~/', 2)  % Home directory:
       HomeDir = getenv('HOME');
       if ~isempty(HomeDir)
          File(1) = [];
          File    = [HomeDir, File];
       end
-      
+
    elseif strncmpi(File, FSep, 1) == 0
       % Append relative path to current folder:
       ThePath = cd;
@@ -251,12 +251,12 @@ if ~isempty(strfind(File, [FSep, '.']))
       Drive   = FSep;
       File(1) = [];
    end
-   
+
    hasTrailFSep = (File(length(File)) == FSep);
    if hasTrailFSep
       File(length(File)) = [];
    end
-   
+
    if hasDataRead
       if isWIN  % Need "\\" as separator:
          C = dataread('string', File, '%s', 'delimiter', '\\');  %#ok<REMFF1>
@@ -266,10 +266,10 @@ if ~isempty(strfind(File, [FSep, '.']))
    else  % Use the slower REGEXP, when DATAREAD is not available anymore:
       C = regexp(File, FSep, 'split');
    end
-   
+
    % Remove '\.\' directly without side effects:
    C(strcmp(C, '.')) = [];
-   
+
    % Remove '\..' with the parent recursively:
    R = 1:length(C);
    for dd = reshape(find(strcmp(C, '..')), 1, [])
@@ -279,13 +279,13 @@ if ~isempty(strfind(File, [FSep, '.']))
          R(index - 1) = [];
       end
    end
-   
+
    if isempty(R)
       File = Drive;
       if isUNC && ~hasTrailFSep
          File(length(File)) = [];
       end
-      
+
    elseif isWIN
       % If you have CStr2String, use the faster:
       %   File = CStr2String(C(R), FSep, hasTrailFSep);
@@ -295,7 +295,7 @@ if ~isempty(strfind(File, [FSep, '.']))
       else
          File = [Drive, File(1:length(File) - 1)];
       end
-      
+
    else  % Unix:
       File = [Drive, sprintf('%s/', C{R})];
       if ~hasTrailFSep
@@ -310,7 +310,7 @@ if isWIN
       error(['JSimon:', mfilename, ':BadTypeInput2'], ...
          ['*** ', mfilename, ': Input must be a string or cell string']);
    end
-   
+
    if (strncmpi(Style, 'a', 1) && length(File) >= MAX_PATH) || ...
          strncmpi(Style, 'f', 1)
       % Do not use [isUNC] here, because this concerns the input, which can

@@ -58,4 +58,3 @@
 #cmakedefine HAVE_SHARED_MUTEX
 
 #endif // COMPILER_CONFIG_H
-

@@ -23,7 +23,7 @@ string(REPLACE "return \(long\) this"
 string(REPLACE "\(long\) types[0].second.ptr"
        "\(long long\) types[0].second.ptr" HELICS_OCT_SOURCE
        "${HELICS_OCT_SOURCE}")
-   
+
 			file(WRITE helicsOCTAVE_wrap.cpp "${HELICS_OCT_SOURCE}")
 			set(FILE_WRITTEN TRUE)
 		endif()

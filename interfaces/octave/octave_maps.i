@@ -99,7 +99,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 		Complex arg=$input.complex_value();
 		$1=arg.real();
 		$2=arg.imag();
-	}  
+	}
     else if ($input.is_float_type())
 	{
 		$2=0.0;
@@ -123,8 +123,8 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
         int alloc;
 		SWIG_AsCharPtrAndSize(arg, &$2[ii+1], NULL, &alloc);
 	}
-    
-  } 
+
+  }
   else if ($input.is_string())
   {
   int retval=0;
@@ -192,7 +192,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 	{
         dat[ii]=$1[ii];
 	}
-	
+
   _outp = SWIG_Octave_AppendOutput(_outp, a);
 }
 

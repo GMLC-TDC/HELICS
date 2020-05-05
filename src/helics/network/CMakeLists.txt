@@ -202,4 +202,3 @@ target_compile_options(
         PRIVATE
             $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
     )
-

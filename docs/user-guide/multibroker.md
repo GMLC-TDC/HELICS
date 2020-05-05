@@ -38,9 +38,9 @@ The primary communication pathway can be specified in a master object or on the 
 
 Master comm information can also be given through the command line.  The master comm is the only on in which higher level broker information may be specified.  Any broker related specification in the comms sections will result in an error.   If the MultiBroker is intended to be a root broker then no master section is required.  Multiple network communication pathways of the same type are allowed assuming they use different ports.
 
-Programmatically multibrokers can also be started using the BrokerApp and giving it the type `helics::core_type::MULTI` for arguments to the multibroker the type of the master comm can be specified on the command line arguments as well.  
+Programmatically multibrokers can also be started using the BrokerApp and giving it the type `helics::core_type::MULTI` for arguments to the multibroker the type of the master comm can be specified on the command line arguments as well.
 
 ## Limitations
--   Using TCPSS comms in the multibroker does not currently support outgoing connections like a full TCPSS broker would.  This will likely be fixed in upcoming releases.  
+-   Using TCPSS comms in the multibroker does not currently support outgoing connections like a full TCPSS broker would.  This will likely be fixed in upcoming releases.
 -   Configuration files must currently be in JSON, in a few limited cases TOML files may work, but configuration of multiple comms in a toml file will not work. This will also likely be fixed in upcoming releases.
 -   General support for multibrokers is not provided in the webServer due to limitations on the configuration files.  Some mechanism for this will be allowed in a future release.

@@ -15,10 +15,10 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(NOT hasParent)
     message(STATUS "Standalone MATLAB interface build")
 
-    if(CMAKE_VERSION VERSION_LESS 3.16)
+    if(CMAKE_VERSION VERSION_LESS 3.17)
         cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
     else()
-        cmake_policy(VERSION 3.16)
+        cmake_policy(VERSION 3.17)
     endif()
 
     # Setup options
@@ -374,4 +374,3 @@ file(GLOB EXTRA_MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/extra/*.m)
 
 message(STATUS "Extra ${EXTRA_MATLAB_FILES}")
 install(FILES ${EXTRA_MATLAB_FILES} DESTINATION matlab/+helics COMPONENT matlab)
-

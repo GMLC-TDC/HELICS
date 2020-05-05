@@ -44,7 +44,7 @@ The [Broker](Broker.html) executes a broker like the stand alone Broker app, it 
 
 #### Clone
 
-The [Clone](Clone.html) has the ability to copy another federate and record it to a file that can be used by a Player.  It will duplicate all publications and subscriptions of a federate.  
+The [Clone](Clone.html) has the ability to copy another federate and record it to a file that can be used by a Player.  It will duplicate all publications and subscriptions of a federate.
 
 #### MultiBroker
 
