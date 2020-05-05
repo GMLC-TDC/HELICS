@@ -46,7 +46,3 @@ matlab -nodesktop -nosplash
 cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab/pi-exchange
 pireceiver
 ```
-
-
-
-

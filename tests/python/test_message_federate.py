@@ -2,6 +2,7 @@ import time
 import pytest as pt
 import helics as h
 
+
 @pt.fixture
 def mFed():
     initstring = "-f 1 --name=mainbroker"
@@ -40,7 +41,6 @@ def mFed():
 
     h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 1)
 
-
     mFed = h.helicsCreateMessageFederate("TestA Federate", fedinfo)
 
     yield mFed
@@ -48,7 +48,7 @@ def mFed():
     h.helicsFederateFinalize(mFed)
     state = h.helicsFederateGetState(mFed)
     assert state == 3
-    while (h.helicsBrokerIsConnected(broker)):
+    while h.helicsBrokerIsConnected(broker):
         time.sleep(1)
 
     h.helicsFederateInfoFree(fedinfo)
@@ -63,6 +63,7 @@ def test_message_federate_initialize(mFed):
 
     state = h.helicsFederateGetState(mFed)
     assert state == 2
+
 
 def test_message_federate_endpoint_registration(mFed):
     epid1 = h.helicsFederateRegisterEndpoint(mFed, "ep1", None)
@@ -108,9 +109,9 @@ def test_message_federate_send(mFed):
 
     message = h.helicsEndpointGetMessage(epid2)
 
-    assert message.data == 'random-data'
+    assert message.data == "random-data"
     assert message.length == 11
-    assert message.original_dest == ''
-    assert message.original_source == 'TestA Federate/ep1'
-    assert message.source == 'TestA Federate/ep1'
+    assert message.original_dest == ""
+    assert message.original_source == "TestA Federate/ep1"
+    assert message.source == "TestA Federate/ep1"
     assert message.time == 1.0

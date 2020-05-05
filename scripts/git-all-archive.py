@@ -31,6 +31,7 @@ def runcmd(cmd):
     stdoutdata, stderrdata = p.communicate()
     return stdoutdata, stderrdata
 
+
 ###
 # Send file to github.com
 ###
@@ -39,21 +40,20 @@ def runcmd(cmd):
 def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
     REPO = urlparse(CLONE).path
     REPO = REPO.split(".")[0]
-    if (REPO[0] == '/'):
+    if REPO[0] == "/":
         REPO = REPO[1:]
     REPOSITORY = REPO
 
     if not os.path.exists(FILENAME):
-        print("File \"" + FILENAME + "\" cannot be found in current directory.")
+        print('File "' + FILENAME + '" cannot be found in current directory.')
         sys.exit(1)
     else:
         print("> sending " + FILENAME + "....")
 
     # Open Github organization/user
-    gh = github.Github(api_preview=True,
-                       login_or_token=TOKEN,
-                       client_id=CLIENTID,
-                       client_secret=CLIENTSECRET)
+    gh = github.Github(
+        api_preview=True, login_or_token=TOKEN, client_id=CLIENTID, client_secret=CLIENTSECRET
+    )
 
     # find Repository
     try:
@@ -90,7 +90,7 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
         if e.status == 404:
             print("!!  ERROR: check authentication asset not found!")
             sys.exit(1)
-        if e.data['errors'][0]['code'] == "already_exists":
+        if e.data["errors"][0]["code"] == "already_exists":
             print(">     already exist... patching file...")
 
         assets = release.get_assets()
@@ -124,16 +124,40 @@ def main():
 
     """
     parser = ArgumentParser(description=DESCRIPTION, formatter_class=RawTextHelpFormatter)
-    parser.add_argument('--clone', action='store', dest="CLONE",
-                        help="clone a github repository [https://github.com/GMLC-TDC/HELICS.git]")
-    parser.add_argument("--to_path", action='store', dest="TOPATH", help="clone into a directory [helics_tar_generate")
-    parser.add_argument('--releasename', action='store', dest="RELEASE",
-                        help="github release/tag to upload if different than version")
-    parser.add_argument('--prefix', action='store', dest="PREFIX", help="filename prefix [HELICS]")
-    parser.add_argument('--tag', action='store', dest="HELICSTAG", help="github release/tag [v2.1.1]")
-    parser.add_argument('--token', action='store', dest="TOKEN", help="github Personal Access Token")
-    parser.add_argument('--client_id', action='store', dest="CLIENTID", help="github Client ID Oauth Apps")
-    parser.add_argument('--client_secret', action='store', dest="CLIENTSECRET", help="github Client Secret Oauth Apps")
+    parser.add_argument(
+        "--clone",
+        action="store",
+        dest="CLONE",
+        help="clone a github repository [https://github.com/GMLC-TDC/HELICS.git]",
+    )
+    parser.add_argument(
+        "--to_path",
+        action="store",
+        dest="TOPATH",
+        help="clone into a directory [helics_tar_generate",
+    )
+    parser.add_argument(
+        "--releasename",
+        action="store",
+        dest="RELEASE",
+        help="github release/tag to upload if different than version",
+    )
+    parser.add_argument("--prefix", action="store", dest="PREFIX", help="filename prefix [HELICS]")
+    parser.add_argument(
+        "--tag", action="store", dest="HELICSTAG", help="github release/tag [v2.1.1]"
+    )
+    parser.add_argument(
+        "--token", action="store", dest="TOKEN", help="github Personal Access Token"
+    )
+    parser.add_argument(
+        "--client_id", action="store", dest="CLIENTID", help="github Client ID Oauth Apps"
+    )
+    parser.add_argument(
+        "--client_secret",
+        action="store",
+        dest="CLIENTSECRET",
+        help="github Client Secret Oauth Apps",
+    )
 
     args = parser.parse_args()
 
@@ -157,15 +181,15 @@ def main():
         Repo.clone_from(CLONE, TOPATH)
         repo = Repo(TOPATH)
     else:
-        if(os.path.exists("./.git")):
+        if os.path.exists("./.git"):
             repo = Repo(".")
             TOPATH = "."
-        elif (os.path.exists("../.git")):
+        elif os.path.exists("../.git"):
             repo = Repo("..")
             TOPATH = ".."
         else:
-            print("> Current directory does not contain \".git\"")
-            print("> Are you in \"git\" repository?")
+            print('> Current directory does not contain ".git"')
+            print('> Are you in "git" repository?')
             print("")
             parser.print_help(sys.stderr)
             sys.exit(1)
@@ -194,7 +218,10 @@ def main():
     if RELEASE is None:
         RELEASE = HELICSTAG.name
 
-    if not (isinstance(HELICSTAG, git.refs.tag.TagReference) or isinstance(HELICSTAG, git.refs.head.Head)):
+    if not (
+        isinstance(HELICSTAG, git.refs.tag.TagReference)
+        or isinstance(HELICSTAG, git.refs.head.Head)
+    ):
         print("Could not find tag " + HELICSTAG + " in repository")
         sys.exit(1)
 
@@ -222,7 +249,7 @@ def main():
     NAME = PREFIX + "-" + HELICSTAG.name
     FILENAME = NAME + ".tar.gz"
     tar = tarfile.open(name=FILENAME, mode="w:gz")
-    tar.add(TMPDIR+"/repo", arcname=NAME)
+    tar.add(TMPDIR + "/repo", arcname=NAME)
     tar.close()
 
     # If a github token has been passed try to upload on github.
@@ -237,7 +264,7 @@ def main():
         shutil.move(FILENAME, "..")
 
     print(TMPDIR)
-    fileList = glob.glob('*.tar')
+    fileList = glob.glob("*.tar")
     # Iterate over the list of filepaths & remove each file.
     for filePath in fileList:
         try:

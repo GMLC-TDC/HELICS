@@ -40,7 +40,7 @@ namespace HelicsValueFederate
             var pub = gmlc.helics.helicsFederateRegisterGlobalPublication(vFed, "pub1", gmlc.helics_data_type.helics_data_type_double, "");
             var sub = gmlc.helics.helicsFederateRegisterSubscription(vFed, "pub1", "");
             gmlc.helics.helicsInputSetDefaultDouble(sub, 1.0);
-            
+
             gmlc.helics.helicsFederateEnterExecutingMode(vFed);
 
             state = gmlc.helics.helicsFederateGetState(vFed);

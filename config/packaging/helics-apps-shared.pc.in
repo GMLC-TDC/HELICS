@@ -11,4 +11,4 @@ Libs: -L${libdir} -lhelics-apps-shared
 Libs.private:
 Requires: helics-shared
 Requires.private:
-Cflags: 
+Cflags:

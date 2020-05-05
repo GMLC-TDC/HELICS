@@ -2,6 +2,7 @@ import os
 
 dirname = os.path.realpath(os.path.dirname(__file__))
 
+
 def get_version():
 
     with open(os.path.join(dirname, "../CMakeLists.txt")) as f:
@@ -12,6 +13,7 @@ def get_version():
             helics_version = l.split()[-1].strip(")")
 
     return helics_version
+
 
 def main():
 

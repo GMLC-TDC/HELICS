@@ -9,25 +9,25 @@
 
 set(
     c_shared_library_test_sources
-    ctestFixtures.cpp 
+    ctestFixtures.cpp
     shared-library-tests.cpp
-    test-value-federate1.cpp 
+    test-value-federate1.cpp
     test-value-federate2.cpp
-    FilterTests.cpp 
+    FilterTests.cpp
     test-message-federate.cpp
     SystemTests.cpp
     TimingTests.cpp
     evilInputTests.cpp
     iterationTests.cpp
-    QueryTests.cpp 
-    badInputTests.cpp 
-    comboConfigTests.cpp 
+    QueryTests.cpp
+    badInputTests.cpp
+    comboConfigTests.cpp
     loggingTests.cpp
 )
 
 set(
     cpp_shared_library_test_sources
-    cpptestFixtures.cpp 
+    cpptestFixtures.cpp
     cppshared-library-tests.cpp
     # test-value-federate1_cpp.cpp
     test-value-federate2_cpp.cpp

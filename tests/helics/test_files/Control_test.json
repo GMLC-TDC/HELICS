@@ -9,29 +9,29 @@
 		"name": "EV_Controller/EV6",
 		"type": "genmessage",
 		"global": true
-		
-	},  
-	{ 
+
+	},
+	{
 		"name": "EV_Controller/EV5",
 		"type": "genmessage",
 		"global": true
-	},  
-	{ 
+	},
+	{
 		"name": "EV_Controller/EV4",
 		"type": "genmessage",
 		"global": true
-	},  
-	{ 
+	},
+	{
 		"name": "EV_Controller/EV3",
 		"type": "genmessage",
 		"global": true
-	},  
-	{ 
+	},
+	{
 		"name": "EV_Controller/EV2",
 		"type": "genmessage",
 		"global": true
-	},	
-	{ 
+	},
+	{
 		"name": "EV_Controller/EV1",
 		"type": "genmessage",
 		"global": true
@@ -123,27 +123,27 @@
 		"key": "IEEE_123_feeder_0/totalLoad",
 		"type": "complex",
 		"required": true
-	},  { 
+	},  {
 		"key": "IEEE_123_feeder_0/charge_EV6",
 		"type": "complex",
 		"required": true
-	},	{ 
+	},	{
 		"key": "IEEE_123_feeder_0/charge_EV5",
 		"type": "complex",
 		"required": true
-	},	{ 
+	},	{
 		"key": "IEEE_123_feeder_0/charge_EV4",
 		"type": "complex",
 		"required": true
-	},  { 
+	},  {
 		"key": "IEEE_123_feeder_0/charge_EV3",
 		"type": "complex",
 		"required": true
-	},  { 
+	},  {
 		"key": "IEEE_123_feeder_0/charge_EV2",
 		"type": "complex",
 		"required": true
-	},  { 
+	},  {
 		"key": "IEEE_123_feeder_0/charge_EV1",
 		"type": "complex",
 		"required": true

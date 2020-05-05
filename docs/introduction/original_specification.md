@@ -170,7 +170,7 @@ __*Open question*: How far do we define this (e.g., all the way down to the prog
 
 ### Testing Specification
 
-## Simulators 
+## Simulators
 
 While the co-simulation environment will support any simulation element that meets the minimum requirements, it is envisioned many TDC applications will rely heavily on a common style of simulators. As a result we will define two classes of simulator interfaces:
 
@@ -632,7 +632,7 @@ The Question of using Boost is still up for debate.
 
 *Open Issue* : Steve's comments on Boost - Steve has used Boost virtually all C++ projects lately. There is a lot provided that is still missing in STL. The team might want to restrict to a specific set of packages in boost.
 
-*Open Issue* : I/O libraries 
+*Open Issue* : I/O libraries
 
 ### Configuration, Build, and Test
 
@@ -658,7 +658,3 @@ community. A continuous intergratiion server like TravisCI will be implemented f
 ### API
 
 ### Testing Specification
-
-
-
-

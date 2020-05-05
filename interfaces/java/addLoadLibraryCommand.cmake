@@ -22,6 +22,6 @@ if (${ALREADY_LOADED} LESS 0)
 string(REPLACE "public class helicsJNI {"
        "public class helicsJNI {\n  static {\n    System.loadLibrary\(\"${LIBRARY_FILE}\"\);\n  }" HELICS_JNI_SOURCE
        "${HELICS_JNI_SOURCE}")
-   
+
 file(WRITE helicsJNI.java "${HELICS_JNI_SOURCE}")
 endif()

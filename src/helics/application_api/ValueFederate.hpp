@@ -72,7 +72,7 @@ class HELICS_CXX_EXPORT ValueFederate:
      */
     explicit ValueFederate(bool res);
 
-    /** this is an overload for the string operation top deconflict with the bool version 
+    /** this is an overload for the string operation top deconflict with the bool version
      */
     explicit ValueFederate(const char* configString);
 

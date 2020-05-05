@@ -20,7 +20,7 @@ class Broker {
   public:
     /** Default constructor */
     Broker() HELICS_NOTHROW: broker(HELICS_NULL_POINTER) {}
-    /** construct broker 
+    /** construct broker
 	@param type string with the type of the broker to create
 	@param name the name of the broker
 	@param initString command line argument for starting the broker
