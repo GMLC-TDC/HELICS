@@ -17,5 +17,3 @@ repos:
     args: ['--allow-multiple-documents']
   - id: check-toml
   - id: end-of-file-fixer
-  - id: pretty-format-json
-    args: ['--no-sort-keys', '--autofix']
