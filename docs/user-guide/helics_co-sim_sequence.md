@@ -29,7 +29,7 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
 		
 	Below is an example of how a very generic configuration for the transmission federate could look followed by one for the distribution federate.
 		
-	```JSON
+	```json
 	{ 
 		"name":"transmission_federate",
 		"coreType":"ZMQ"
@@ -48,7 +48,7 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
 	}
 	```
 		
-	```JSON
+	```json
 	{ 
 		"name":"distribution_federate",
 		"coreType":"ZMQ"
