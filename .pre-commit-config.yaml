@@ -1,4 +1,4 @@
-exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/|/config/cmake_thirdparty/)
+exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
 repos:
 - repo: https://github.com/psf/black
   rev: 19.10b0
