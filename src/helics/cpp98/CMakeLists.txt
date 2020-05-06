@@ -62,4 +62,3 @@ endif(MSVC)
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/cpp98
         COMPONENT headers
     )
-

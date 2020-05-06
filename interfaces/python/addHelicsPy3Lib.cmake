@@ -10,10 +10,10 @@
 # This is a compatibility file for pre-CMake 3.12 versions using the old python find method
 function(helics_python3_add_library HELICS_LIBNAME)
     add_library(${HELICS_LIBNAME} MODULE ${ARGN})
-    
+
     # Add path to Python include directory
     target_include_directories(${HELICS_LIBNAME} PUBLIC ${HELICS_Python_INCLUDE_DIRS})
-    
+
     # Get list of libraries to link with for Python module
     if(NOT MSVC)
         execute_process(
@@ -22,7 +22,7 @@ function(helics_python3_add_library HELICS_LIBNAME)
                 "from distutils import sysconfig; print(sysconfig.get_config_var('BLDSHARED').split(' ', 1)[1])"
             OUTPUT_VARIABLE pymodule_libs
         )
-    
+
         # Clean-up leading and trailing whitespace
         string(STRIP ${pymodule_libs} pymodule_libs)
     else()
@@ -51,7 +51,7 @@ function(helics_python3_add_library HELICS_LIBNAME)
                 "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS').split(' ', 1)[1])"
             OUTPUT_VARIABLE pymodule_includes
         )
-                
+
         # Clean-up leading and trailing whitespace, convert into a CMake
         # ;-separated list
         string(STRIP ${pymodule_includes} pymodule_includes)

@@ -33,7 +33,7 @@ end
 if isempty(libraryName)
     %if we are empty try for a debug version
     listing = dir(fullfile(directory, '*helicsSharedLibd.*'));
-    
+
     for i=1:numel(listing)
         [~, ~, ext]=fileparts(listing(i).name);
         if isequal(ext, '.h')
@@ -47,7 +47,7 @@ if isempty(libraryName)
         end
         libraryName = listing(i).name;
     end
-    
+
 end
 
 if (~isempty(libraryName))

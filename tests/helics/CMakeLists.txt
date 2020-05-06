@@ -26,7 +26,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         add_subdirectory(webserver)
     endif()
-        
+
 endif()
 
 add_subdirectory(application_api)

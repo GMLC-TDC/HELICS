@@ -204,7 +204,7 @@ class BenchmarkFederate {
 
     /** initialize function parses options and sets up parameters
      * @param fi a helics::FederateInfo object
-     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings) 
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings)
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>

@@ -123,4 +123,3 @@ done
 # gzip the tar
 echo "> gzipping final tar"
 gzip --force --verbose "${OUTPUT_BASENAME}.tar"
-

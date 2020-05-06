@@ -57,4 +57,3 @@ if [[ "$1" ]]; then
 else
     echo "Usage: $0 setup-counters|gather-coverage-info"
 fi
-

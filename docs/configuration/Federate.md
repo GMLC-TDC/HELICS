@@ -10,7 +10,7 @@ This name is prepended for any local interfaces.
 
 ## Core information
 
-Certain information is used by the federate to establish linkages to a core object this. 
+Certain information is used by the federate to establish linkages to a core object this.
 ### Core name
 
  the corename identifies a potentially preexisting core in the same process that can be used

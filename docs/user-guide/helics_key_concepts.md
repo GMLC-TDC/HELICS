@@ -31,6 +31,3 @@ For co-simulations on limited hardware where a federate requires significant com
 ### Multi-Broker ###
 Alternatively, it would be possible to locate a broker on each computer and create a root broker on a third node. This kind of architecture could help if higher performance is needed and the federates on each computer primarily interact with each other and very little with the federates on the other computer. As compared to the previous architecture, adding the extra layer of brokers would keep local messages on the same compute node and reduce congestion on the root broker.
 ![HELICS Architecture 4](../img/helics_architecture_4.png)
-
-
-

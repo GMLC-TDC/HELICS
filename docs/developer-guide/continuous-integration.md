@@ -29,7 +29,7 @@ On the develop branch a few additional tests are run on a daily basis.  These wi
   - Xcode 9.4 which is the oldest fully supported Xcode version (not for PRs to develop)
 
 ## Appveyor tests
-  - MSVC 2015 CMake 3.13,  python and JAVA builds 
+  - MSVC 2015 CMake 3.13,  python and JAVA builds
 
 ## Azure tests
 PRs and commits to the master and develop branches that pass the tests on Travis will trigger builds on Azure for several other HELICS related repositories (such as HELICS-Examples). The result of the builds for those repositories will be reported as a comment on the PR (if any) that triggered the build.
@@ -38,10 +38,10 @@ On the Primary HELICS repository there are 4 Azure builds:
 -    MSVC2015 64bit Build and test, chocolatey swig/boost
 -    MSVC2017 32bit Build and test
 -    MSVC2017 64bit Build and test with Java
--    MSVC2019 64bit Build and test with Java 
+-    MSVC2019 64bit Build and test with Java
 
 ## Circle CI
-All PR's and branches trigger a set of builds using Docker images on Circle-CI.  
+All PR's and branches trigger a set of builds using Docker images on Circle-CI.
 -   Octave tests - tests the Octave interface and runs some tests
 -   Clang-MSAN - runs the clang memory sanitizer
 -   Clang-ASAN - runs the clang address sanitizer and undefined behavior sanitizer
@@ -50,7 +50,7 @@ All PR's and branches trigger a set of builds using Docker images on Circle-CI.
 -   install2  - build and install and link with the C shared library, and C\++98 library only and run some tests linking with the installed library
 
 ### Benchmark tests
-   Circle ci also runs a benchmark test that runs every couple days.  Eventually this will form the basis of benchmark regression test.  
+   Circle ci also runs a benchmark test that runs every couple days.  Eventually this will form the basis of benchmark regression test.
 
 ## Drone
 -  64 bit and 32 bit builds on ARM processors
@@ -62,4 +62,4 @@ All PR's and branches trigger a set of builds using Docker images on Circle-CI.
 -  Build the docs for the website and test on every commit
 
 ## Codacy
-There are some static analysis checks run with Codacy.  While it is watched it is not always required to pass.  
+There are some static analysis checks run with Codacy.  While it is watched it is not always required to pass.

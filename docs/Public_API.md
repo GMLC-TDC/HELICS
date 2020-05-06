@@ -26,7 +26,7 @@ The public API includes the following
     *   CoreApp.hpp (New in 2.3)-  Operations and some capabilities may be added or tweaked in the next revision
     *   timeOperations.hpp (New in 2.3)-  previously functions were in helics-time.hpp
     *   typeOperations.hpp (New in 2.3)-  previously functions were in core-types.hpp
-    *   Exceptions:  Any function or method dealing with Inputs with data from multiple sources is subject to change,  the vector subscriptions, and vector inputs are subject to change.  The functionality related to PublishJSON is considered experimental and may change in the future.  The queries to retrieve JSON may update the format of the returned JSON in the future.  A general note on queries.  The data returned via queries is subject to change,  in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers.    
+    *   Exceptions:  Any function or method dealing with Inputs with data from multiple sources is subject to change,  the vector subscriptions, and vector inputs are subject to change.  The functionality related to PublishJSON is considered experimental and may change in the future.  The queries to retrieve JSON may update the format of the returned JSON in the future.  A general note on queries.  The data returned via queries is subject to change,  in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers.
 
 *   Core library headers
     *   Core.hpp
@@ -64,7 +64,7 @@ The public API includes the following
     *   CoreApp.hpp  (aliased to application_api version)
     *   BrokerServer.hpp (removed in 2.3 as not useful for library operations, though still available in the static library)
 
-*   Exceptions:  Any function dealing with Inputs concerning data from multiple sources is subject to change,  the vector subscription Objects, and vector Input objects are subject to change. Also some changes may occur in regard to units on the Application API.  
+*   Exceptions:  Any function dealing with Inputs concerning data from multiple sources is subject to change,  the vector subscription Objects, and vector Input objects are subject to change. Also some changes may occur in regard to units on the Application API.
 
 
 *   C++98 Library *All headers are mostly stable.  Though we reserve the ability to make changes to make them better match the main C\+\+ API.*

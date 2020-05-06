@@ -1,7 +1,7 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+All rights reserved.
 
 SPDX-License-Identifier: BSD-3-Clause
 
@@ -38,4 +38,3 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_COMPILER_VERSION "${HELICS_COMPILER_VERSION}"
 #define HELICS_BUILD_FLAGS "${HELICS_BUILD_FLAGS_OUTPUT}"
 #define HELICS_BUILD_PROCESSOR "${CMAKE_SYSTEM_PROCESSOR}"
-

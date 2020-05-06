@@ -152,7 +152,7 @@ end
 %! p1=helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 %!
 %! p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
-%! 
+%!
 %! f1=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_delay,'filter1');
 %! helicsFilterAddSourceTarget(f1,'port1');
 %! helicsFilterSet(f1,'delay',2.5);

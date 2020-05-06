@@ -78,7 +78,7 @@ There are a number of different options and approaches at this point depending o
 
 <div class="admonition note">
 
-Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`. There are also many other options, and you can check them out by running `ccmake .` in the `build` folder. 
+Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`. There are also many other options, and you can check them out by running `ccmake .` in the `build` folder.
 
 Keep in mind running HELICS commands like `helics_app` will not work from just any old random folder with a custom install folder.
 You will either need to run them from inside the `bin` subfolder of your custom install, or provide a more complete path to the command.
