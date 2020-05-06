@@ -21,4 +21,5 @@ repos:
   rev: v0.6.9
   hooks:
   - id: cmake-format
+    exclude: *.in$
 
