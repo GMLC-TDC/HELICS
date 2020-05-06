@@ -83,7 +83,7 @@ if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
     endif()
 endif()
 
-# CMake UseSWIG doesn't properly propagate include dirs when using target_link_libraries This is
+# CMake UseSWIG doesn't properly propagate include dirs when using target_link_libraries. This is
 # also the only way that works with CMake < 3.12
 include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 

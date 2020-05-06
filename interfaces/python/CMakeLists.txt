@@ -102,7 +102,7 @@ if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
     endif()
 endif()
 
-# CMake UseSWIG doesn't properly propagate include dirs when using target_link_libraries This is
+# CMake UseSWIG doesn't properly propagate include dirs when using target_link_libraries. This is
 # also the only way that works with CMake < 3.12
 include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 
@@ -272,7 +272,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT
 # Install steps
 # ##################################################################################################
 # Copy/install commands for shared libraries are only needed on Windows, which doesn't support
-# rpaths Standalone interface builds for wheels will need the files to be copied to a different
+# rpaths. Standalone interface builds for wheels will need the files to be copied to a different
 # location anyway, so not copying the files for now isn't a big loss
 if(WIN32)
     # Realistically for bundling into a Python wheel, the dll should be given a unique name to avoid
