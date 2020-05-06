@@ -11,18 +11,14 @@ if(SWIG_EXECUTABLE)
     # Enable generation using swig
 
     set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME helics)
-    # set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS
-    # "-outfile;helics.cs")
+    # set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
     set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc")
 
     swig_add_library(
         CShelics
-        TYPE
-        MODULE
-        LANGUAGE
-        csharp
-        SOURCES
-        helicsCsharp.i
+        TYPE MODULE
+        LANGUAGE csharp
+        SOURCES helicsCsharp.i
     )
 
     swig_link_libraries(CShelics helicsSharedLib)
@@ -41,12 +37,5 @@ copy_shared_target(${SWIG_MODULE_CShelics_REAL_NAME} helicsSharedLib)
 
 install_key_files_with_comp(csharp)
 
-install(
-    TARGETS
-        ${SWIG_MODULE_CShelics_REAL_NAME}
-        DESTINATION
-        csharp
-        COMPONENT
-        csharp
-)
+install(TARGETS ${SWIG_MODULE_CShelics_REAL_NAME} DESTINATION csharp COMPONENT csharp)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.cs DESTINATION csharp COMPONENT csharp)

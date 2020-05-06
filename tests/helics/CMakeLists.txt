@@ -23,7 +23,9 @@ add_subdirectory(system_tests)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)
-    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
+    if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
+                                               OR HELICS_DISABLE_ASIO)
+    )
         add_subdirectory(webserver)
     endif()
 
@@ -43,8 +45,8 @@ endif()
 
 if(NOT MSVC)
     set(package_test_command --test-command "${CMAKE_CTEST_COMMAND}")
-else() # don't try to run the tests on MSVC since that would require copying the dll's
-       # and doing some other setup that isn't that important to run on all OS
+else() # don't try to run the tests on MSVC since that would require copying the dll's and doing
+       # some other setup that isn't that important to run on all OS
     set(package_test_command)
 endif()
 

@@ -14,33 +14,23 @@ include(UseJava)
 set(helicsJar ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar)
 
 add_custom_target(
-    Java_hello_world
-    ALL
-    ${Java_JAVAC_EXECUTABLE}
-    -classpath
-    ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
-    -d
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
-    DEPENDS
-        helics::java
-        ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
+    Java_hello_world ALL
+    ${Java_JAVAC_EXECUTABLE} -classpath
+    ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar -d
+    ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
+    DEPENDS helics::java
+            ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building HelloWorld.java"
     VERBATIM
 )
 
 add_custom_target(
-    Java_Helics_Api
-    ALL
-    ${Java_JAVAC_EXECUTABLE}
-    -classpath
-    ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
-    -d
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/JavaHelicsApiTests.java
-    DEPENDS
-        helics::java
-        ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
+    Java_Helics_Api ALL
+    ${Java_JAVAC_EXECUTABLE} -classpath
+    ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar -d
+    ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/JavaHelicsApiTests.java
+    DEPENDS helics::java
+            ${CMAKE_BINARY_DIR}/interfaces/java/jarproject/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building JavaHelicsApiTests.java"
     VERBATIM
 )
@@ -51,37 +41,21 @@ if(CMAKE_HOST_WIN32 AND NOT CYGWIN AND CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
 else()
     set(CMAKE_JAVA_INCLUDE_FLAG_SEP ":")
 endif()
-set(
-    java_test_classpath
-    "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}${CMAKE_CURRENT_BINARY_DIR}"
+set(java_test_classpath "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}${CMAKE_CURRENT_BINARY_DIR}")
+
+add_test(NAME Java_hello_world_test
+         COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:helics::java>
+                 -classpath "${java_test_classpath}" HelloWorld
 )
 
-add_test(
-    NAME Java_hello_world_test
-    COMMAND
-        ${Java_JAVA_EXECUTABLE}
-        -Djava.library.path=$<TARGET_FILE_DIR:helics::java>
-        -classpath
-        "${java_test_classpath}"
-        HelloWorld
-)
-
-add_test(
-    NAME Java_Helics_Api_tests
-    COMMAND
-        ${Java_JAVA_EXECUTABLE}
-        -Djava.library.path=$<TARGET_FILE_DIR:helics::java>
-        -classpath
-        "${java_test_classpath}"
-        JavaHelicsApiTests
+add_test(NAME Java_Helics_Api_tests
+         COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:helics::java>
+                 -classpath "${java_test_classpath}" JavaHelicsApiTests
 )
 
 set_target_properties(Java_hello_world Java_Helics_Api PROPERTIES FOLDER tests)
 
-set_property(
-    TEST Java_hello_world_test Java_Helics_Api_tests
-    PROPERTY LABELS Java Continuous Daily
-)
+set_property(TEST Java_hello_world_test Java_Helics_Api_tests PROPERTY LABELS Java Continuous Daily)
 
 copy_key_files_to_target_located_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR})
 copy_shared_target_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR} helicsSharedLib)
