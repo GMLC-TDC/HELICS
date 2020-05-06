@@ -2355,7 +2355,7 @@ int _wrap_helicsCreateCoreFromArgs(int resc, mxArray *resv[], int argc, mxArray 
         arg4[ii+1]=buffer_cell;
       }
       
-    } 
+    }
     else if (mxIsChar(argv[2]))
     {
       int retval=0;
@@ -2587,7 +2587,7 @@ int _wrap_helicsCreateBrokerFromArgs(int resc, mxArray *resv[], int argc, mxArra
         arg4[ii+1]=buffer_cell;
       }
       
-    } 
+    }
     else if (mxIsChar(argv[2]))
     {
       int retval=0;
@@ -4125,7 +4125,7 @@ int _wrap_helicsFederateInfoLoadFromArgs(int resc, mxArray *resv[], int argc, mx
         arg3[ii+1]=buffer_cell;
       }
       
-    } 
+    }
     else if (mxIsChar(argv[1]))
     {
       int retval=0;
@@ -8861,7 +8861,7 @@ int _wrap_helicsPublicationPublishComplex(int resc, mxArray *resv[], int argc, m
     {
       arg2=mxGetPr(argv[1])[0];
       arg3=mxGetPi(argv[1])[0];
-    }  
+    }
     else if (mxIsDouble(argv[1]))
     {
       arg3=0.0;
@@ -10056,7 +10056,7 @@ int _wrap_helicsInputSetDefaultComplex(int resc, mxArray *resv[], int argc, mxAr
     {
       arg2=mxGetPr(argv[1])[0];
       arg3=mxGetPi(argv[1])[0];
-    }  
+    }
     else if (mxIsDouble(argv[1]))
     {
       arg3=0.0;

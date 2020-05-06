@@ -2704,7 +2704,7 @@ public class helics {
   /**
    * Clear all message from an endpoint.<br>
    * <br>
-   * @deprecated This function does nothing and will be removed. <br>
+   * @deprecated This function does nothing and will be removed.<br>
    *             Use helicsFederateClearMessages to free all messages,<br>
    *             or helicsMessageFree to clear an individual message.<br>
    * <br>
