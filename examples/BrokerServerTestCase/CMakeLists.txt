@@ -13,11 +13,4 @@ target_link_libraries(brokerServerTestCase PUBLIC HELICS::apps)
 
 set_target_properties(brokerServerTestCase PROPERTIES FOLDER examples)
 
-if(HELICS_BUILD_TESTS AND NOT MSVC)
-    # add_test(
-    # NAME brokerServerTestCase COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10
-    # $<TARGET_FILE:nonlings_fed1_cpp> $<TARGET_FILE:nonlings_fed2_cpp> ) set_property(TEST
-    # nonlings_example PROPERTY LABELS Continuous)
-endif()
-
 copy_key_files_to_target_location(brokerServerTestCase)

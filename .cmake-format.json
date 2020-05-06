@@ -8,7 +8,7 @@
   "max_lines_hwrap": 3,
   "tab_size": 4,
   "max_subgroups_hwrap": 3,
-  "max_pargs_hwrap": 6,
+  "max_pargs_hwrap": 5,
   "keyword_case": "upper",
   "enum_char": ".",
   "bullet_char": "*",
