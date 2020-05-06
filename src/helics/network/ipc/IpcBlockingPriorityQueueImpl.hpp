@@ -57,20 +57,20 @@ operations require a swap, however in high usage the two locks will reduce conte
         class IpcBlockingPriorityQueueImpl {
           private:
             mutable boost::interprocess::interprocess_mutex
-                m_pushLock; //!< lock for operations on the pushElements vector
+                m_pushLock;  //!< lock for operations on the pushElements vector
             dataBlock pushData;
             mutable boost::interprocess::interprocess_mutex
-                m_pullLock; //!< lock for elements on the pullLock vector
+                m_pullLock;  //!< lock for elements on the pullLock vector
             dataBlock pullData;
             mutable boost::interprocess::interprocess_mutex
-                m_conditionLock; //!< lock for the empty and full Flag
-            bool queueEmptyFlag{true}; //!< flag indicating the queue is empty
+                m_conditionLock;  //!< lock for the empty and full Flag
+            bool queueEmptyFlag{true};  //!< flag indicating the queue is empty
             bool queueFullFlag{false};
             // the condition variable should be keyed of the conditionLock
             boost::interprocess::interprocess_condition
-                condition_empty; //!< condition variable for notification of new data
+                condition_empty;  //!< condition variable for notification of new data
             boost::interprocess::interprocess_condition
-                condition_full; //!< condition variable for notification of available space
+                condition_full;  //!< condition variable for notification of available space
             unsigned char* data1 = nullptr;
             unsigned char* data2 = nullptr;
             size_t data1Size = 0;
@@ -131,6 +131,6 @@ depending on the number of consumers
             bool empty() const;
         };
 
-    } // namespace detail
-} // namespace ipc
-} // namespace helics
+    }  // namespace detail
+}  // namespace ipc
+}  // namespace helics

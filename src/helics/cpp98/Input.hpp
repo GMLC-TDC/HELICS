@@ -58,8 +58,10 @@ class Input {
     /** set the default vector data value*/
     void setDefault(const std::vector<double>& data)
     {
-        helicsInputSetDefaultVector(
-            inp, data.data(), static_cast<int>(data.size() * sizeof(double)), NULL);
+        helicsInputSetDefaultVector(inp,
+                                    data.data(),
+                                    static_cast<int>(data.size() * sizeof(double)),
+                                    NULL);
     }
 
     /** Methods to get subscription values **/
@@ -164,8 +166,8 @@ class Input {
     }
 
   private:
-    helics_input inp; //!< the reference to the underlying publication
+    helics_input inp;  //!< the reference to the underlying publication
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

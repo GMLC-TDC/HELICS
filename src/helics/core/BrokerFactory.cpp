@@ -63,7 +63,7 @@ namespace BrokerFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterBrokerBuilder() = default;
-        std::vector<BuildT> builders; //!< container for the builders
+        std::vector<BuildT> builders;  //!< container for the builders
     };
 
     void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
@@ -148,7 +148,7 @@ namespace BrokerFactory {
         auto tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
         if (tbroker) {
             tbroker->processDisconnect(
-                true); // use true here as it is possible the searchableObjectHolder is deleted already
+                true);  // use true here as it is possible the searchableObjectHolder is deleted already
             tbroker->joinAllThreads();
         }
     };
@@ -159,10 +159,10 @@ what we do is delay the destruction until it is called in a different thread whi
 need be without issue*/
 
     static gmlc::concurrency::DelayedDestructor<Broker>
-        delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
+        delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<Broker, core_type>
-        searchableBrokers; //!< the object managing the searchable objects
+        searchableBrokers;  //!< the object managing the searchable objects
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
@@ -174,8 +174,8 @@ need be without issue*/
 
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
     {
-        return searchableBrokers.findObject(
-            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+        return searchableBrokers.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); },
+                                            type);
     }
 
     std::vector<std::shared_ptr<Broker>> getAllBrokers() { return searchableBrokers.getObjects(); }
@@ -273,5 +273,5 @@ need be without issue*/
         }
     }
 
-} // namespace BrokerFactory
-} // namespace helics
+}  // namespace BrokerFactory
+}  // namespace helics

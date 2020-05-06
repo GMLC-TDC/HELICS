@@ -38,20 +38,17 @@ class InterfaceInfo {
     EndpointInfo* getEndpoint(const std::string& endpointName);
     EndpointInfo* getEndpoint(interface_handle handle);
 
-    void createPublication(
-        interface_handle handle,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
-    void createInput(
-        interface_handle handle,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
-    void createEndpoint(
-        interface_handle handle,
-        const std::string& endpointName,
-        const std::string& type);
+    void createPublication(interface_handle handle,
+                           const std::string& key,
+                           const std::string& type,
+                           const std::string& units);
+    void createInput(interface_handle handle,
+                     const std::string& key,
+                     const std::string& type,
+                     const std::string& units);
+    void createEndpoint(interface_handle handle,
+                        const std::string& endpointName,
+                        const std::string& type);
 
     auto getEndpoints() { return endpoints.lock(); }
     auto getPublications() { return publications.lock(); }
@@ -87,15 +84,15 @@ class InterfaceInfo {
   private:
     std::atomic<global_federate_id> global_id;
     bool only_update_on_change{
-        false}; //!< flag indicating that subscriptions values should only be updated on change
+        false};  //!< flag indicating that subscriptions values should only be updated on change
     shared_guarded<
         gmlc::containers::DualMappedPointerVector<PublicationInfo, std::string, interface_handle>>
-        publications; //!< storage for all the publications
+        publications;  //!< storage for all the publications
     shared_guarded<
         gmlc::containers::DualMappedPointerVector<EndpointInfo, std::string, interface_handle>>
-        endpoints; //!< storage for all the endpoints
+        endpoints;  //!< storage for all the endpoints
     shared_guarded<
         gmlc::containers::DualMappedPointerVector<NamedInputInfo, std::string, interface_handle>>
-        inputs; //!< storage for all the endpoints
+        inputs;  //!< storage for all the endpoints
 };
-} // namespace helics
+}  // namespace helics

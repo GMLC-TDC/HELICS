@@ -263,4 +263,4 @@ void TimeDependencies::resetDependentEvents(helics::Time grantTime)
     }
 }
 
-} // namespace helics
+}  // namespace helics

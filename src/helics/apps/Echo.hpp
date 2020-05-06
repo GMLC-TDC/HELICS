@@ -94,10 +94,10 @@ protected.
       private:
         /** process remaining command line arguments*/
         void processArgs();
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        Time delayTime = timeZero; //!< respond to each message with the specified delay
-        size_t echoCounter = 0; //!< the current message index
-        std::mutex delayTimeLock; // mutex protecting delayTime
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        Time delayTime = timeZero;  //!< respond to each message with the specified delay
+        size_t echoCounter = 0;  //!< the current message index
+        std::mutex delayTimeLock;  // mutex protecting delayTime
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

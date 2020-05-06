@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cpp98/Broker.hpp>
 #include <cpp98/ValueFederate.hpp>
-#include <cpp98/helics.hpp> // helicsVersionString
+#include <cpp98/helics.hpp>  // helicsVersionString
 #include <math.h>
 #include <stdio.h>
 #ifdef _MSC_VER
@@ -61,7 +61,7 @@ int main(int /*argc*/, char** /*argv*/)
     /* Register the subscription */
 
     /* Enter initialization state */
-    vfed->enterInitializingMode(); // can throw helicscpp::InvalidStateTransition exception
+    vfed->enterInitializingMode();  // can throw helicscpp::InvalidStateTransition exception
     printf(" Entered initialization state\n");
 
     double x = 0.0, /*yprv = 100,*/ xprv = 100;
@@ -73,7 +73,7 @@ int main(int /*argc*/, char** /*argv*/)
 
     pub.publish(x);
     /* Enter execution state */
-    vfed->enterExecutingMode(); // can throw helicscpp::InvalidStateTransition exception
+    vfed->enterExecutingMode();  // can throw helicscpp::InvalidStateTransition exception
     printf(" Entered execution state\n");
 
     fflush(NULL);

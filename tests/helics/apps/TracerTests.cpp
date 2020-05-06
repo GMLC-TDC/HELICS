@@ -77,12 +77,12 @@ TEST(tracer_tests, tracer_test_message)
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
 
-    auto cb =
-        [&mguard,
-         &lastTime](helics::Time tm, const std::string&, std::unique_ptr<helics::Message> mess) {
-            mguard = std::move(mess);
-            lastTime = static_cast<double>(tm);
-        };
+    auto cb = [&mguard, &lastTime](helics::Time tm,
+                                   const std::string&,
+                                   std::unique_ptr<helics::Message> mess) {
+        mguard = std::move(mess);
+        lastTime = static_cast<double>(tm);
+    };
 
     helics::MessageFederate mfed("block1", fi);
     helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
@@ -312,10 +312,9 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
 }
 #endif
 
-INSTANTIATE_TEST_SUITE_P(
-    tracer_tests,
-    tracer_message_file_tests,
-    ::testing::ValuesIn(simple_message_files));
+INSTANTIATE_TEST_SUITE_P(tracer_tests,
+                         tracer_message_file_tests,
+                         ::testing::ValuesIn(simple_message_files));
 
 TEST(tracer_tests, tracer_test_destendpoint_clone)
 {
@@ -619,10 +618,9 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    tracer_tests,
-    tracer_clone_file_tests,
-    ::testing::ValuesIn(simple_clone_test_files));
+INSTANTIATE_TEST_SUITE_P(tracer_tests,
+                         tracer_clone_file_tests,
+                         ::testing::ValuesIn(simple_clone_test_files));
 
 #ifdef ENABLE_ZMQ_CORE
 #    ifndef DISABLE_SYSTEM_CALL_TESTS

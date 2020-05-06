@@ -19,8 +19,8 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
 
 void PublicationInfo::removeSubscriber(global_handle subscriberToRemove)
 {
-    subscribers.erase(
-        std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove), subscribers.end());
+    subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove),
+                      subscribers.end());
 }
 
-} // namespace helics
+}  // namespace helics

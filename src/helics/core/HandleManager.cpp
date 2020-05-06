@@ -10,12 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 // TODO(PT): move the flags out of actionMessage
 
 namespace helics {
-BasicHandleInfo& HandleManager::addHandle(
-    global_federate_id fed_id,
-    handle_type what,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+BasicHandleInfo& HandleManager::addHandle(global_federate_id fed_id,
+                                          handle_type what,
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units)
 {
     interface_handle local_id(static_cast<interface_handle::base_type>(handles.size()));
     std::string actKey = (!key.empty()) ? key : generateName(what);
@@ -24,13 +23,12 @@ BasicHandleInfo& HandleManager::addHandle(
     return handles.back();
 }
 
-BasicHandleInfo& HandleManager::addHandle(
-    global_federate_id fed_id,
-    interface_handle local_id,
-    handle_type what,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+BasicHandleInfo& HandleManager::addHandle(global_federate_id fed_id,
+                                          interface_handle local_id,
+                                          handle_type what,
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units)
 {
     auto index = static_cast<int32_t>(handles.size());
     std::string actKey = (!key.empty()) ? key : generateName(what);
@@ -366,4 +364,4 @@ std::string HandleManager::generateName(handle_type what) const
             return std::string("_handle_") + std::to_string(handles.size());
     }
 }
-} // namespace helics
+}  // namespace helics

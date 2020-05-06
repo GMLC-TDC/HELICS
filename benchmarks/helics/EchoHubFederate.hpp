@@ -29,8 +29,10 @@ class EchoHub: public BenchmarkFederate {
         // default final time for this benchmark
         finalTime = helics::Time(100, time_units::ms);
 
-        app->add_option(
-            "--num_leafs", num_leafs, "the number of echoleaf federates to expect", true);
+        app->add_option("--num_leafs",
+                        num_leafs,
+                        "the number of echoleaf federates to expect",
+                        true);
     }
 
     std::string getName() override { return "echohub"; }

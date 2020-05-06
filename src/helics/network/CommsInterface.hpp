@@ -27,8 +27,8 @@ class CommsInterface {
   public:
     /** enumeration of whether the threading system should generate a single thread or multiple threads*/
     enum class thread_generation {
-        single, // indicate that a single thread is used for transmitting and receiving
-        dual // indicate that separate threads are used 1 for transmission and one for reception
+        single,  // indicate that a single thread is used for transmitting and receiving
+        dual  // indicate that separate threads are used 1 for transmission and one for reception
     };
     /** default constructor*/
     CommsInterface() = default;
@@ -38,10 +38,9 @@ class CommsInterface {
 
     /** load network information into the comms object*/
     virtual void loadNetworkInfo(const NetworkBrokerData& netInfo);
-    void loadTargetInfo(
-        const std::string& localTarget,
-        const std::string& brokerTarget,
-        interface_networks targetNetwork = interface_networks::local);
+    void loadTargetInfo(const std::string& localTarget,
+                        const std::string& brokerTarget,
+                        interface_networks targetNetwork = interface_networks::local);
     /** transmit a message along a particular route
      */
     void transmit(route_id rid, const ActionMessage& cmd);
@@ -101,63 +100,63 @@ class CommsInterface {
     /// enumeration of the connection status flags for more immediate feedback from the processing threads
     enum class connection_status : int {
 
-        startup = -1, //!< the connection is in startup mode
-        connected = 0, //!< we are connected
-        reconnecting = 1, //!< we are trying reconnect
-        terminated = 2, //!< the connection has been terminated
-        error = 4 //!< some error occurred on the connection
+        startup = -1,  //!< the connection is in startup mode
+        connected = 0,  //!< we are connected
+        reconnecting = 1,  //!< we are trying reconnect
+        terminated = 2,  //!< the connection has been terminated
+        error = 4  //!< some error occurred on the connection
     };
 
   private:
     std::atomic<connection_status> rx_status{
-        connection_status::startup}; //!< the status of the receiver thread
+        connection_status::startup};  //!< the status of the receiver thread
   protected:
     gmlc::concurrency::TriggerVariable rxTrigger;
 
-    std::string name; //!< the name of the object
-    std::string localTargetAddress; //!< the base for the receive address
-    std::string brokerTargetAddress; //!< the base for the broker address
-    std::string brokerName; //!< the identifier for the broker
+    std::string name;  //!< the name of the object
+    std::string localTargetAddress;  //!< the base for the receive address
+    std::string brokerTargetAddress;  //!< the base for the broker address
+    std::string brokerName;  //!< the identifier for the broker
     std::string
-        brokerInitString; //!< the initialization string for any automatically generated broker
+        brokerInitString;  //!< the initialization string for any automatically generated broker
   private:
-    std::string randomID; //!< randomized id for preventing crosstalk in some situations
+    std::string randomID;  //!< randomized id for preventing crosstalk in some situations
     std::atomic<connection_status> tx_status{
-        connection_status::startup}; //!< the status of the transmitter thread
+        connection_status::startup};  //!< the status of the transmitter thread
     gmlc::concurrency::TriggerVariable txTrigger;
-    std::atomic<bool> operating{false}; //!< the comms interface is in startup mode
-    const bool singleThread{false}; //!< specify that the interface should operate a single thread
+    std::atomic<bool> operating{false};  //!< the comms interface is in startup mode
+    const bool singleThread{false};  //!< specify that the interface should operate a single thread
 
   protected:
-    bool serverMode = true; //!< some comms have a server mode and non-server mode
-    bool autoBroker = false; //!< the broker should be automatically generated if needed
+    bool serverMode = true;  //!< some comms have a server mode and non-server mode
+    bool autoBroker = false;  //!< the broker should be automatically generated if needed
     std::chrono::milliseconds connectionTimeout{
-        4000}; // timeout for the initial connection to a broker or to bind a broker port(in ms)
-    int maxMessageSize = 16 * 1024; //!< the maximum message size for the queues (if needed)
-    int maxMessageCount = 512; //!< the maximum number of message to buffer (if needed)
-    std::atomic<bool> requestDisconnect{false}; //!< flag gets set when disconnect is called
+        4000};  // timeout for the initial connection to a broker or to bind a broker port(in ms)
+    int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
+    int maxMessageCount = 512;  //!< the maximum number of message to buffer (if needed)
+    std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
     std::function<void(ActionMessage&&)>
-        ActionCallback; //!< the callback for what to do with a received message
+        ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string& name, const std::string& message)>
-        loggingCallback; //!< callback for logging
+        loggingCallback;  //!< callback for logging
     gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
-        txQueue; //!< set of messages waiting to be transmitted
+        txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
-        false}; //!< flag indicating that the comm system is in the process of disconnecting
+        false};  //!< flag indicating that the comm system is in the process of disconnecting
     interface_networks interfaceNetwork = interface_networks::local;
 
   private:
-    std::thread queue_transmitter; //!< single thread for sending data
-    std::thread queue_watcher; //!< thread monitoring the receive queue
-    std::mutex threadSyncLock; //!< lock to handle thread operations
-    virtual void queue_rx_function() = 0; //!< the functional loop for the receive queue
-    virtual void queue_tx_function() = 0; //!< the loop for transmitting data
-    virtual void closeTransmitter(); //!< function to instruct the transmitter loop to close
-    virtual void closeReceiver(); //!< function to instruct the receiver loop to close
-    virtual void reconnectTransmitter(); //!< function to reconnect the transmitter
-    virtual void reconnectReceiver(); //!< function to reconnect the receiver
+    std::thread queue_transmitter;  //!< single thread for sending data
+    std::thread queue_watcher;  //!< thread monitoring the receive queue
+    std::mutex threadSyncLock;  //!< lock to handle thread operations
+    virtual void queue_rx_function() = 0;  //!< the functional loop for the receive queue
+    virtual void queue_tx_function() = 0;  //!< the loop for transmitting data
+    virtual void closeTransmitter();  //!< function to instruct the transmitter loop to close
+    virtual void closeReceiver();  //!< function to instruct the receiver loop to close
+    virtual void reconnectTransmitter();  //!< function to reconnect the transmitter
+    virtual void reconnectReceiver();  //!< function to reconnect the receiver
   protected:
     void setTxStatus(connection_status txStatus);
     void setRxStatus(connection_status rxStatus);
@@ -174,7 +173,7 @@ class CommsInterface {
 
   private:
     gmlc::concurrency::TripWireDetector
-        tripDetector; //!< try to detect if everything is shutting down
+        tripDetector;  //!< try to detect if everything is shutting down
 };
 
 namespace CommFactory {
@@ -188,9 +187,8 @@ namespace CommFactory {
     template<class CommTYPE>
     class CommTypeBuilder final: public CommBuilder {
       public:
-        static_assert(
-            std::is_base_of<CommsInterface, CommTYPE>::value,
-            "Type does not inherit from helics::CommsInterface");
+        static_assert(std::is_base_of<CommsInterface, CommTYPE>::value,
+                      "Type does not inherit from helics::CommsInterface");
 
         using comm_build_type = CommTYPE;
         virtual std::unique_ptr<CommsInterface> build() override
@@ -200,10 +198,9 @@ namespace CommFactory {
     };
 
     /** define a new Comm Builder from the builder give a name and build code*/
-    void defineCommBuilder(
-        std::shared_ptr<CommBuilder> cb,
-        const std::string& commTypeName,
-        int code);
+    void defineCommBuilder(std::shared_ptr<CommBuilder> cb,
+                           const std::string& commTypeName,
+                           int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CommTYPE>
@@ -218,7 +215,7 @@ namespace CommFactory {
     std::unique_ptr<CommsInterface> create(core_type type);
     std::unique_ptr<CommsInterface> create(const std::string& type);
 
-} // namespace CommFactory
+}  // namespace CommFactory
 
 template<class X>
 class ConditionalChangeOnDestroy {
@@ -235,4 +232,4 @@ class ConditionalChangeOnDestroy {
     ~ConditionalChangeOnDestroy() { aref.compare_exchange_strong(expectedValue, fval); }
 };
 
-} // namespace helics
+}  // namespace helics

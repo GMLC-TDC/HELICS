@@ -199,7 +199,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     });
 
     fs->global_id =
-        global_federate_id(0); // if it doesn't match the id in the command, this will hang
+        global_federate_id(0);  // if it doesn't match the id in the command, this will hang
     fs_process2.wait();
     fs->global_id = helics::global_federate_id();
     auto state = fs_process2.get();
@@ -242,8 +242,8 @@ TEST_F(federateStateTests, basic_processmessage_test)
         return fs->enterExecutingMode(iteration_request::no_iterations);
     });
     auto st = fs->getState();
-    EXPECT_TRUE(
-        (st == federate_state::HELICS_INITIALIZING) || (st == federate_state::HELICS_EXECUTING));
+    EXPECT_TRUE((st == federate_state::HELICS_INITIALIZING) ||
+                (st == federate_state::HELICS_EXECUTING));
     fs->addAction(cmd);
     auto res = fs_process2.get();
     if (res != iteration_result::error) {

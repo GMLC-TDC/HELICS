@@ -136,8 +136,8 @@ class HELICS_CXX_EXPORT BrokerApp {
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser(bool noTypeOption = false);
-    std::shared_ptr<Broker> broker; //!< the actual endpoint objects
-    std::string name; //!< the name of the broker
+    std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
+    std::string name;  //!< the name of the broker
 };
 
 /** class that waits for a broker to terminate before finishing the destructor*/
@@ -167,4 +167,4 @@ class BrokerKeeper {
     BrokerApp brk;
 };
 
-} //namespace helics
+}  //namespace helics

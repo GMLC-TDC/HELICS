@@ -25,8 +25,8 @@ static void BMring2_singleCore(benchmark::State& state)
         state.PauseTiming();
         int feds = 2;
         gmlc::concurrency::Barrier brr(feds);
-        auto wcore = helics::CoreFactory::create(
-            core_type::INPROC, std::string("--autobroker --federates=2"));
+        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+                                                 std::string("--autobroker --federates=2"));
 
         std::vector<RingTransmit> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
@@ -35,8 +35,8 @@ static void BMring2_singleCore(benchmark::State& state)
             links[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
-        std::thread rthread(
-            [&](RingTransmit& link) { link.run([&brr]() { brr.wait(); }); }, std::ref(links[1]));
+        std::thread rthread([&](RingTransmit& link) { link.run([&brr]() { brr.wait(); }); },
+                            std::ref(links[1]));
 
         links[0].makeReady();
         brr.wait();
@@ -67,17 +67,19 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
         state.PauseTiming();
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(feds);
-        auto broker = helics::BrokerFactory::create(
-            cType, std::string("--federates=") + std::to_string(feds));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          std::string("--federates=") + std::to_string(feds));
         broker->setLoggingLevel(helics_log_level_no_print);
 
         std::vector<RingTransmit> links(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            cores[ii] = helics::CoreFactory::create(
-                cType,
-                std::string(
-                    "--log_level=no_print --federates=1 --broker=" + broker->getIdentifier()));
+            cores[ii] =
+                helics::CoreFactory::create(cType,
+                                            std::string(
+                                                "--log_level=no_print --federates=1 --broker=" +
+                                                broker->getIdentifier()));
             cores[ii]->connect();
             std::string bmInit =
                 "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
@@ -85,9 +87,9 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](RingTransmit& link) { link.run([&brr]() { brr.wait(); }); },
-                std::ref(links[ii + 1]));
+            threadlist[ii] =
+                std::thread([&](RingTransmit& link) { link.run([&brr]() { brr.wait(); }); },
+                            std::ref(links[ii + 1]));
         }
 
         links[0].makeReady();

@@ -25,16 +25,16 @@ bool allowMultiBroker();
 communication methods*/
 class MultiBroker: public CoreBroker {
   protected:
-    std::atomic<int> disconnectionStage{0}; //!< the stage of disconnection
-    std::vector<std::unique_ptr<CommsInterface>> comms; //!< the actual comms objects
+    std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
+    std::vector<std::unique_ptr<CommsInterface>> comms;  //!< the actual comms objects
     std::unique_ptr<CommsInterface>
-        masterComm; //!< the primary comms object or the one that links with the master
+        masterComm;  //!< the primary comms object or the one that links with the master
     NetworkBrokerData netInfo{
-        interface_type::tcp}; //!< structure containing the networking information
-    std::string configFile; //!< the name of the config file in use
-    std::atomic<bool> brokerInitialized{false}; //!< atomic protecting local initialization
-    core_type type{core_type::MULTI}; //!< the core type of the master controller
-    std::vector<std::pair<route_id, int>> routingTable; // index of the routes
+        interface_type::tcp};  //!< structure containing the networking information
+    std::string configFile;  //!< the name of the config file in use
+    std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
+    core_type type{core_type::MULTI};  //!< the core type of the master controller
+    std::vector<std::pair<route_id, int>> routingTable;  // index of the routes
   public:
     /** default constructor*/
     MultiBroker() noexcept;
@@ -66,4 +66,4 @@ class MultiBroker: public CoreBroker {
 
     virtual void removeRoute(route_id rid) override;
 };
-} // namespace helics
+}  // namespace helics

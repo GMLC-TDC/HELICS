@@ -73,13 +73,13 @@ namespace udp {
             }
             catch (const std::system_error& error) {
                 if ((autoPortNumber) &&
-                    (hasBroker)) { // If we failed and we are on an automatically assigned port number,  just try a different port
+                    (hasBroker)) {  // If we failed and we are on an automatically assigned port number,  just try a different port
                     int tries = 0;
                     while (!bindsuccess) {
                         ++PortNumber;
                         try {
-                            socket.bind(udp::endpoint(
-                                udpnet(interfaceNetwork), static_cast<uint16_t>(PortNumber)));
+                            socket.bind(udp::endpoint(udpnet(interfaceNetwork),
+                                                      static_cast<uint16_t>(PortNumber)));
                             bindsuccess = true;
                         }
                         catch (const std::system_error&) {
@@ -91,10 +91,9 @@ namespace udp {
                     }
                     if (!bindsuccess) {
                         disconnecting = true;
-                        logError(fmt::format(
-                            "unable to bind socket {} :{}",
-                            makePortAddress(localTargetAddress, PortNumber),
-                            error.what()));
+                        logError(fmt::format("unable to bind socket {} :{}",
+                                             makePortAddress(localTargetAddress, PortNumber),
+                                             error.what()));
                         socket.close();
                         setRxStatus(connection_status::error);
                         return;
@@ -102,19 +101,17 @@ namespace udp {
                     continue;
                 }
                 if (t_cnt == std::chrono::milliseconds(0)) {
-                    logWarning(fmt::format(
-                        "bind error on UDP socket {} :{}",
-                        makePortAddress(localTargetAddress, PortNumber),
-                        error.what()));
+                    logWarning(fmt::format("bind error on UDP socket {} :{}",
+                                           makePortAddress(localTargetAddress, PortNumber),
+                                           error.what()));
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 t_cnt += std::chrono::milliseconds(200);
                 if (t_cnt > connectionTimeout) {
                     disconnecting = true;
-                    logError(fmt::format(
-                        "unable to bind socket {} :{}",
-                        makePortAddress(localTargetAddress, PortNumber),
-                        error.what()));
+                    logError(fmt::format("unable to bind socket {} :{}",
+                                         makePortAddress(localTargetAddress, PortNumber),
+                                         error.what()));
                     socket.close();
                     setRxStatus(connection_status::error);
                     return;
@@ -176,7 +173,7 @@ namespace udp {
         }
 
         std::error_code error;
-        std::map<route_id, udp::endpoint> routes; // for all the other possible routes
+        std::map<route_id, udp::endpoint> routes;  // for all the other possible routes
         udp::endpoint broker_endpoint;
 
         if (!brokerTargetAddress.empty()) {
@@ -187,8 +184,9 @@ namespace udp {
                 brokerPort = DEFAULT_UDP_BROKER_PORT_NUMBER;
             }
             try {
-                udp::resolver::query query(
-                    udpnet(interfaceNetwork), brokerTargetAddress, std::to_string(brokerPort));
+                udp::resolver::query query(udpnet(interfaceNetwork),
+                                           brokerTargetAddress,
+                                           std::to_string(brokerPort));
                 // Setup the control socket for comms with the receiver
                 broker_endpoint = *resolver.resolve(query);
                 int retries{0};
@@ -267,10 +265,9 @@ namespace udp {
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
                             }
-                            query = udp::resolver::query(
-                                udpnet(interfaceNetwork),
-                                brokerTargetAddress,
-                                std::to_string(brokerPort));
+                            query = udp::resolver::query(udpnet(interfaceNetwork),
+                                                         brokerTargetAddress,
+                                                         std::to_string(brokerPort));
                             // Setup the control socket for comms with the receiver
                             broker_endpoint = *resolver.resolve(query);
                             continue;
@@ -303,13 +300,15 @@ namespace udp {
         udp::endpoint rxEndpoint;
         if (localTargetAddress.empty() || localTargetAddress == "*" ||
             localTargetAddress == "udp://*") {
-            udp::resolver::query queryLocal(
-                udpnet(interfaceNetwork), "127.0.0.1", std::to_string(PortNumber));
+            udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                            "127.0.0.1",
+                                            std::to_string(PortNumber));
             auto result = resolver.resolve(queryLocal);
             rxEndpoint = *result;
         } else {
-            udp::resolver::query queryLocal(
-                udpnet(interfaceNetwork), localTargetAddress, std::to_string(PortNumber));
+            udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                            localTargetAddress,
+                                            std::to_string(PortNumber));
             auto result = resolver.resolve(queryLocal, error);
             if (error) {
                 logError(std::string("Unable to resolve:") + localTargetAddress);
@@ -336,11 +335,12 @@ namespace udp {
                                 std::string interface;
                                 std::string port;
                                 std::tie(interface, port) = extractInterfaceandPortString(newroute);
-                                udp::resolver::query queryNew(
-                                    udpnet(interfaceNetwork), interface, port);
+                                udp::resolver::query queryNew(udpnet(interfaceNetwork),
+                                                              interface,
+                                                              port);
 
-                                routes.emplace(
-                                    route_id{cmd.getExtraData()}, *resolver.resolve(queryNew));
+                                routes.emplace(route_id{cmd.getExtraData()},
+                                               *resolver.resolve(queryNew));
                             }
                             catch (std::exception&) {
                                 // TODO(someone): do something???
@@ -352,8 +352,10 @@ namespace udp {
                             processed = true;
                             break;
                         case CLOSE_RECEIVER:
-                            transmitSocket.send_to(
-                                asio::buffer(cmd.to_string()), rxEndpoint, 0, error);
+                            transmitSocket.send_to(asio::buffer(cmd.to_string()),
+                                                   rxEndpoint,
+                                                   0,
+                                                   error);
                             if (error) {
                                 logError(fmt::format(
                                     "transmit failure on sending 'close' to receiver  {}",
@@ -375,8 +377,10 @@ namespace udp {
 
             if (rid == parent_route_id) {
                 if (hasBroker) {
-                    transmitSocket.send_to(
-                        asio::buffer(cmd.to_string()), broker_endpoint, 0, error);
+                    transmitSocket.send_to(asio::buffer(cmd.to_string()),
+                                           broker_endpoint,
+                                           0,
+                                           error);
                     if (error) {
                         logWarning(
                             fmt::format("transmit failure sending to broker  {}", error.message()));
@@ -386,37 +390,39 @@ namespace udp {
                         "message directed to broker of comm system with no broker, message dropped {}",
                         prettyPrintString(cmd)));
                 }
-            } else if (rid == control_route) { // send to rx thread loop
+            } else if (rid == control_route) {  // send to rx thread loop
                 transmitSocket.send_to(asio::buffer(cmd.to_string()), rxEndpoint, 0, error);
                 if (error) {
-                    logWarning(fmt::format(
-                        "transmit failure sending control message to receiver  {}",
-                        error.message()));
+                    logWarning(
+                        fmt::format("transmit failure sending control message to receiver  {}",
+                                    error.message()));
                 }
             } else {
                 auto rt_find = routes.find(rid);
                 if (rt_find != routes.end()) {
-                    transmitSocket.send_to(
-                        asio::buffer(cmd.to_string()), rt_find->second, 0, error);
+                    transmitSocket.send_to(asio::buffer(cmd.to_string()),
+                                           rt_find->second,
+                                           0,
+                                           error);
                     if (error) {
-                        logWarning(fmt::format(
-                            "transmit failure sending to route {}:{}",
-                            rid.baseValue(),
-                            error.message()));
+                        logWarning(fmt::format("transmit failure sending to route {}:{}",
+                                               rid.baseValue(),
+                                               error.message()));
                     }
                 } else {
                     if (hasBroker) {
-                        transmitSocket.send_to(
-                            asio::buffer(cmd.to_string()), broker_endpoint, 0, error);
+                        transmitSocket.send_to(asio::buffer(cmd.to_string()),
+                                               broker_endpoint,
+                                               0,
+                                               error);
                         if (error) {
-                            logWarning(fmt::format(
-                                "transmit failure sending to broker  {}", error.message()));
+                            logWarning(fmt::format("transmit failure sending to broker  {}",
+                                                   error.message()));
                         }
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(
-                                std::string("(udp) unknown route, message dropped ") +
-                                prettyPrintString(cmd));
+                            logWarning(std::string("(udp) unknown route, message dropped ") +
+                                       prettyPrintString(cmd));
                         }
                     }
                 }
@@ -429,8 +435,8 @@ namespace udp {
                     std::string cls("close");
                     transmitSocket.send_to(asio::buffer(cls), rxEndpoint, 0, error);
                     if (error) {
-                        logWarning(fmt::format(
-                            "transmit failure sending close to receiver III:{}", error.message()));
+                        logWarning(fmt::format("transmit failure sending close to receiver III:{}",
+                                               error.message()));
                     } else {
                         if (!(rxTrigger.wait_for(std::chrono::milliseconds(2000)))) {
                             logWarning("udp rx not responding to close signal");
@@ -441,8 +447,8 @@ namespace udp {
                 std::string cls("close");
                 transmitSocket.send_to(asio::buffer(cls), rxEndpoint, 0, error);
                 if (error) {
-                    logWarning(fmt::format(
-                        "transmit failure sending close to receiver II:{}", error.message()));
+                    logWarning(fmt::format("transmit failure sending close to receiver II:{}",
+                                           error.message()));
                 }
             }
         }
@@ -466,21 +472,21 @@ namespace udp {
                         localTargetAddress == "udp://*") {
                         // try connecting with the receiver socket
                         udp::resolver resolver(serv->getBaseContext());
-                        udp::resolver::query queryLocal(
-                            udpnet(interfaceNetwork), "127.0.0.1", std::to_string(PortNumber));
+                        udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                                        "127.0.0.1",
+                                                        std::to_string(PortNumber));
                         rxEndpoint = *resolver.resolve(queryLocal);
                     } else {
                         // try connecting with the receiver socket
                         udp::resolver resolver(serv->getBaseContext());
-                        udp::resolver::query queryLocal(
-                            udpnet(interfaceNetwork),
-                            localTargetAddress,
-                            std::to_string(PortNumber));
+                        udp::resolver::query queryLocal(udpnet(interfaceNetwork),
+                                                        localTargetAddress,
+                                                        std::to_string(PortNumber));
                         rxEndpoint = *resolver.resolve(queryLocal);
                     }
 
-                    udp::socket transmitter(
-                        serv->getBaseContext(), udp::endpoint(udpnet(interfaceNetwork), 0));
+                    udp::socket transmitter(serv->getBaseContext(),
+                                            udp::endpoint(udpnet(interfaceNetwork), 0));
                     std::string cls("close");
                     std::error_code error;
                     transmitter.send_to(asio::buffer(cls), rxEndpoint, 0, error);
@@ -495,6 +501,6 @@ namespace udp {
             }
         }
     }
-} // namespace udp
+}  // namespace udp
 
-} // namespace helics
+}  // namespace helics

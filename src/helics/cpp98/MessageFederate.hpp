@@ -62,8 +62,8 @@ class MessageFederate: public virtual Federate {
     @param type the defined type of the interface for endpoint checking if requested
      @return an Endpoint Object
 	*/
-    Endpoint
-        registerGlobalEndpoint(const std::string& name, const std::string& type = std::string())
+    Endpoint registerGlobalEndpoint(const std::string& name,
+                                    const std::string& type = std::string())
     {
         helics_endpoint ep =
             helicsFederateRegisterGlobalEndpoint(fed, name.c_str(), type.c_str(), hThrowOnError());
@@ -105,5 +105,5 @@ class MessageFederate: public virtual Federate {
   private:
     std::vector<helics_endpoint> local_endpoints;
 };
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

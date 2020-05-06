@@ -59,10 +59,9 @@ namespace apps {
         }
     }
 
-    Recorder::Recorder(
-        const std::string& appName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi):
+    Recorder::Recorder(const std::string& appName,
+                       const std::shared_ptr<Core>& core,
+                       const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(helics_flag_observer);
@@ -97,10 +96,10 @@ namespace apps {
         auto subCount = fed->getInputCount();
         for (int ii = 0; ii < subCount; ++ii) {
             subscriptions.emplace_back(fed->getInput(ii));
-            subids.emplace(
-                subscriptions.back().getHandle(), static_cast<int>(subscriptions.size()) - 1);
-            subkeys.emplace(
-                subscriptions.back().getTarget(), static_cast<int>(subscriptions.size()) - 1);
+            subids.emplace(subscriptions.back().getHandle(),
+                           static_cast<int>(subscriptions.size()) - 1);
+            subkeys.emplace(subscriptions.back().getTarget(),
+                            static_cast<int>(subscriptions.size()) - 1);
         }
         auto eptCount = fed->getEndpointCount();
         for (int ii = 0; ii < eptCount; ++ii) {
@@ -157,7 +156,7 @@ namespace apps {
 
     void Recorder::loadTextFile(const std::string& textFile)
     {
-        using namespace gmlc::utilities::stringOps; //NOLINT
+        using namespace gmlc::utilities::stringOps;  //NOLINT
 
         std::ifstream infile(textFile);
         std::string str;
@@ -183,12 +182,11 @@ namespace apps {
                         addSubscription(removeQuotes(blk[1]));
                     } else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e")) {
                         addEndpoint(removeQuotes(blk[1]));
-                    } else if (
-                        (blk[0] == "sourceclone") || (blk[0] == "source") || (blk[0] == "src")) {
+                    } else if ((blk[0] == "sourceclone") || (blk[0] == "source") ||
+                               (blk[0] == "src")) {
                         addSourceEndpointClone(removeQuotes(blk[1]));
-                    } else if (
-                        (blk[0] == "destclone") || (blk[0] == "dest") ||
-                        (blk[0] == "destination")) {
+                    } else if ((blk[0] == "destclone") || (blk[0] == "dest") ||
+                               (blk[0] == "destination")) {
                         addDestEndpointClone(removeQuotes(blk[1]));
                     } else if (blk[0] == "capture") {
                         addCapture(removeQuotes(blk[1]));
@@ -375,15 +373,16 @@ namespace apps {
                         }
                     } else {
                         if (iteration > 0) {
-                            valstr = fmt::format(
-                                "[{}:{}]value {}=block[{}]",
-                                currentTime,
-                                iteration,
-                                sub.getTarget(),
-                                val.size());
+                            valstr = fmt::format("[{}:{}]value {}=block[{}]",
+                                                 currentTime,
+                                                 iteration,
+                                                 sub.getTarget(),
+                                                 val.size());
                         } else {
-                            valstr = fmt::format(
-                                "[{}]value {}=block[{}]", currentTime, sub.getTarget(), val.size());
+                            valstr = fmt::format("[{}]value {}=block[{}]",
+                                                 currentTime,
+                                                 sub.getTarget(),
+                                                 val.size());
                         }
                     }
                     logger->addMessage(std::move(valstr));
@@ -403,19 +402,17 @@ namespace apps {
                 if (verbose) {
                     std::string messstr;
                     if (mess->data.size() < 50) {
-                        messstr = fmt::format(
-                            "[{}]message from {} to {}::{}",
-                            currentTime,
-                            mess->source,
-                            mess->dest,
-                            mess->data.to_string());
+                        messstr = fmt::format("[{}]message from {} to {}::{}",
+                                              currentTime,
+                                              mess->source,
+                                              mess->dest,
+                                              mess->data.to_string());
                     } else {
-                        messstr = fmt::format(
-                            "[{}]message from {} to {}:: size {}",
-                            currentTime,
-                            mess->source,
-                            mess->dest,
-                            mess->data.size());
+                        messstr = fmt::format("[{}]message from {} to {}:: size {}",
+                                              currentTime,
+                                              mess->source,
+                                              mess->dest,
+                                              mess->data.size());
                     }
                     logger->addMessage(std::move(messstr));
                 }
@@ -433,9 +430,9 @@ namespace apps {
     std::string Recorder::encode(const std::string& str2encode)
     {
         return std::string("b64[") +
-            gmlc::utilities::base64_encode(
-                   reinterpret_cast<const unsigned char*>(str2encode.c_str()),
-                   static_cast<int>(str2encode.size())) +
+            gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(
+                                               str2encode.c_str()),
+                                           static_cast<int>(str2encode.size())) +
             ']';
     }
 
@@ -449,13 +446,12 @@ namespace apps {
                 //    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' <<
                 //    stat.lastVal
                 //        << '\n';
-                fmt::print(
-                    out,
-                    "{}\t{}\t{}\t{}\n",
-                    stat.key,
-                    stat.cnt,
-                    static_cast<double>(stat.time),
-                    stat.lastVal);
+                fmt::print(out,
+                           "{}\t{}\t{}\t{}\n",
+                           stat.key,
+                           stat.cnt,
+                           static_cast<double>(stat.time),
+                           stat.lastVal);
             }
             out.flush();
         }
@@ -480,13 +476,12 @@ namespace apps {
                 if (!mapfile.empty()) {
                     std::ofstream out(mapfile);
                     for (auto& stat : vStat) {
-                        fmt::print(
-                            out,
-                            "{}\t{}\t{}\t{}\n",
-                            stat.key,
-                            stat.cnt,
-                            static_cast<double>(stat.time),
-                            stat.lastVal);
+                        fmt::print(out,
+                                   "{}\t{}\t{}\t{}\n",
+                                   stat.key,
+                                   stat.cnt,
+                                   static_cast<double>(stat.time),
+                                   stat.lastVal);
                     }
                     out.flush();
                 }
@@ -510,8 +505,8 @@ namespace apps {
             subscriptions.emplace_back(fed->registerSubscription(key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
             auto id = subscriptions.back().getHandle();
-            subids[id] = index; // this is a new element
-            subkeys[key] = index; // this is a potential replacement
+            subids[id] = index;  // this is a new element
+            subkeys[key] = index;  // this is a potential replacement
         }
     }
     /** add an endpoint*/
@@ -522,8 +517,8 @@ namespace apps {
             endpoints.emplace_back(GLOBAL, fed.get(), endpoint);
             auto index = static_cast<int>(endpoints.size()) - 1;
             auto id = endpoints.back().getHandle();
-            eptids.emplace(id, index); // this is a new element
-            eptNames[endpoint] = index; // this is a potential replacement
+            eptids.emplace(id, index);  // this is a new element
+            eptNames[endpoint] = index;  // this is a potential replacement
         }
     }
 
@@ -593,10 +588,9 @@ namespace apps {
             nextPrintTimeStep,
             "print a statement indicating time advancement every <arg> period during the simulation");
         app->add_flag("--verbose", verbose, "print all value results to the screen");
-        app->add_option(
-            "--mapfile",
-            mapfile,
-            "write progress to a map file for concurrent progress monitoring");
+        app->add_option("--mapfile",
+                        mapfile,
+                        "write progress to a map file for concurrent progress monitoring");
 
         app->add_option("--output,-o", outFileName, "the output file for recording the data", true);
 
@@ -644,8 +638,8 @@ namespace apps {
             ->type_size(-1);
 
         capture_group
-            ->add_option(
-                "--endpoints", "endpoints to capture, this argument may be specified multiple time")
+            ->add_option("--endpoints",
+                         "endpoints to capture, this argument may be specified multiple time")
             ->each([this](const std::string& ept) {
                 auto eptlist = splitlineQuotes(ept);
                 for (const auto& eptname : eptlist) {
@@ -671,5 +665,5 @@ namespace apps {
         return app;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

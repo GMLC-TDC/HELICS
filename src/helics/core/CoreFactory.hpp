@@ -33,9 +33,8 @@ namespace CoreFactory {
     template<class CoreTYPE>
     class CoreTypeBuilder final: public CoreBuilder {
       public:
-        static_assert(
-            std::is_base_of<Core, CoreTYPE>::value,
-            "Type does not inherit from helics::Core");
+        static_assert(std::is_base_of<Core, CoreTYPE>::value,
+                      "Type does not inherit from helics::Core");
 
         using core_build_type = CoreTYPE;
         virtual std::shared_ptr<Core> build(const std::string& name) override
@@ -45,10 +44,9 @@ namespace CoreFactory {
     };
 
     //** define a new Core Builder from the builder give a name and build code*/
-    void defineCoreBuilder(
-        std::shared_ptr<CoreBuilder> cb,
-        const std::string& coreTypeName,
-        int code);
+    void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb,
+                           const std::string& coreTypeName,
+                           int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CoreTYPE>
@@ -123,10 +121,9 @@ namespace CoreFactory {
 
     /** tries to find a named core if it fails it creates a new one
  */
-    std::shared_ptr<Core> FindOrCreate(
-        core_type type,
-        const std::string& coreName,
-        const std::string& initializationString);
+    std::shared_ptr<Core> FindOrCreate(core_type type,
+                                       const std::string& coreName,
+                                       const std::string& initializationString);
 
     /** tries to find a named core if it fails it creates a new one
  */
@@ -184,6 +181,6 @@ registered or when the clean up function is called this prevents some odd thread
 
     /** terminate All existing cores */
     void terminateAllCores();
-} // namespace CoreFactory
+}  // namespace CoreFactory
 
-} // namespace helics
+}  // namespace helics

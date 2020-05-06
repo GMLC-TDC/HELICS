@@ -93,7 +93,7 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
     helics::Time reqTime = 0.5;
     for (int ii = 0; ii < 8; ++ii) {
         if (ii <
-            5) { // this is designed to go faster than real time for a little while, then the dependency will halt and
+            5) {  // this is designed to go faster than real time for a little while, then the dependency will halt and
             // should trigger the force grant
             pubid.publish(static_cast<double>(reqTime));
             fed2->requestTimeAsync(reqTime);
@@ -140,7 +140,7 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
     int outofTimeBounds = 0;
     for (int ii = 0; ii < 8; ++ii) {
         if (ii <
-            5) { // this is designed to go faster than real time for a little while, then the dependency will halt and
+            5) {  // this is designed to go faster than real time for a little while, then the dependency will halt and
             // should trigger the force grant
             pubid.publish(static_cast<double>(reqTime));
             fed2->requestTimeAsync(reqTime);

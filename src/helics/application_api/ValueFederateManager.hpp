@@ -26,17 +26,16 @@ class ValueFederate;
 
 /** structure used to contain information about a publication*/
 struct publication_info {
-    std::string name; //!< publication name
-    std::string type; //!< publication type
-    std::string units; //!< publication units
-    interface_handle coreID; //!< Handle from the core
-    publication_id_t id; //!< the id used as the identifier
-    int size{-1}; //!< required size of a publication
+    std::string name;  //!< publication name
+    std::string type;  //!< publication type
+    std::string units;  //!< publication units
+    interface_handle coreID;  //!< Handle from the core
+    publication_id_t id;  //!< the id used as the identifier
+    int size{-1};  //!< required size of a publication
     bool forward{true};
-    publication_info(
-        const std::string& n_name,
-        const std::string& n_type,
-        const std::string& n_units):
+    publication_info(const std::string& n_name,
+                     const std::string& n_type,
+                     const std::string& n_units):
         name(n_name),
         type(n_type), units(n_units)
     {
@@ -44,18 +43,18 @@ struct publication_info {
 };
 /** structure used to contain information about a subscription*/
 struct input_info {
-    data_view lastData; //!< the last published data from a target
-    Time lastUpdate{0.0}; //!< the time the subscription was last updated
-    Time lastQuery{0.0}; //!< the time the query was made
-    std::string name; //!< subscription name
-    std::string type; //!< subscription type
-    std::string units; //!< subscription units
-    std::string pubtype; //!< the listed type of the corresponding publication
-    interface_handle coreID; //!< Handle from the core
-    input_id_t id; //!< the id used as the identifier
+    data_view lastData;  //!< the last published data from a target
+    Time lastUpdate{0.0};  //!< the time the subscription was last updated
+    Time lastQuery{0.0};  //!< the time the query was made
+    std::string name;  //!< subscription name
+    std::string type;  //!< subscription type
+    std::string units;  //!< subscription units
+    std::string pubtype;  //!< the listed type of the corresponding publication
+    interface_handle coreID;  //!< Handle from the core
+    input_id_t id;  //!< the id used as the identifier
 
-    std::function<void(Input&, Time)> callback; //!< callback to trigger on update
-    bool hasUpdate = false; //!< indicator that there was an update
+    std::function<void(Input&, Time)> callback;  //!< callback to trigger on update
+    bool hasUpdate = false;  //!< indicator that there was an update
     input_info(const std::string& n_name, const std::string& n_type, const std::string& n_units):
         name(n_name), type(n_type), units(n_units)
     {
@@ -68,10 +67,9 @@ class ValueFederateManager {
     ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id);
     ~ValueFederateManager();
 
-    Publication& registerPublication(
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
+    Publication& registerPublication(const std::string& key,
+                                     const std::string& type,
+                                     const std::string& units);
     /** register a subscription
     @details call is only valid in startup mode
     */
@@ -208,26 +206,26 @@ class ValueFederateManager {
         gmlc::containers::
             DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>>
         inputs;
-    shared_guarded_m<gmlc::containers::DualMappedVector<
-        Publication,
-        std::string,
-        interface_handle,
-        reference_stability::stable>>
+    shared_guarded_m<gmlc::containers::DualMappedVector<Publication,
+                                                        std::string,
+                                                        interface_handle,
+                                                        reference_stability::stable>>
         publications;
-    Time CurrentTime = Time(-1.0); //!< the current simulation time
-    Core* coreObject; //!< the pointer to the actual core
+    Time CurrentTime = Time(-1.0);  //!< the current simulation time
+    Core* coreObject;  //!< the pointer to the actual core
     ValueFederate*
-        fed; //!< pointer back to the value Federate for creation of the Publication/Inputs
-    local_federate_id fedID; //!< the federation ID from the core API
-    atomic_guarded<std::function<void(Input&, Time)>> allCallback; //!< the global callback function
+        fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
+    local_federate_id fedID;  //!< the federation ID from the core API
+    atomic_guarded<std::function<void(Input&, Time)>>
+        allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
-        inputData; //!< the storage for the message queues and other unique Endpoint information
+        inputData;  //!< the storage for the message queues and other unique Endpoint information
     shared_guarded<std::multimap<std::string, interface_handle>>
-        targetIDs; //!< container for the target identifications
+        targetIDs;  //!< container for the target identifications
     shared_guarded<std::multimap<interface_handle, std::string>>
-        inputTargets; //!< container for the specified input targets
+        inputTargets;  //!< container for the specified input targets
   private:
     void getUpdateFromCore(interface_handle handle);
 };
 
-} // namespace helics
+}  // namespace helics

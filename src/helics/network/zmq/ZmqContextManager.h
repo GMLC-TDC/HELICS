@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 namespace zmq {
 class context_t;
-} // namespace zmq
+}  // namespace zmq
 
 /** class defining a global context manager for all zmq usage
 @details the zmq::context_t is stored in global structure so more than one can exist, but most use cases it is just
@@ -32,11 +32,11 @@ the equivalent of a singleton*/
 class ZmqContextManager {
   private:
     static std::map<std::string, std::shared_ptr<ZmqContextManager>>
-        contexts; //!< container for pointers to all the available contexts
-    std::string name; //!< context name
-    std::unique_ptr<zmq::context_t> zcontext; //!< pointer to the actual context
+        contexts;  //!< container for pointers to all the available contexts
+    std::string name;  //!< context name
+    std::unique_ptr<zmq::context_t> zcontext;  //!< pointer to the actual context
     std::atomic<bool> leakOnDelete{
-        true}; //!< this is done to prevent some errors if zmq is not built properly or the OS shuts it down early
+        true};  //!< this is done to prevent some errors if zmq is not built properly or the OS shuts it down early
 
     /** the constructor is private to make sure it is created through the static functions*/
     explicit ZmqContextManager(const std::string& contextName);

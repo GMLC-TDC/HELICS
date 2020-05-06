@@ -26,8 +26,8 @@ namespace BrokerFactory {
  *
  * Invokes initialize() on the instantiated Core object.
  */
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker>
-        create(core_type type, const std::string& initializationString)
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
+                                                            const std::string& initializationString)
     {
         BrokerApp brk(type, initializationString);
         return brk.getCopyofBrokerPointer();
@@ -40,17 +40,16 @@ namespace BrokerFactory {
     }
 
     /** Create a broker from command line arguments in a vector*/
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker>
-        create(core_type type, std::vector<std::string> args)
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
+                                                            std::vector<std::string> args)
     {
         BrokerApp brk(type, args);
         return brk.getCopyofBrokerPointer();
     }
 
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(
-        core_type type,
-        const std::string& broker_name,
-        const std::string& initializationString)
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
+                                                            const std::string& broker_name,
+                                                            const std::string& initializationString)
     {
         BrokerApp brk(type, broker_name, initializationString);
         return brk.getCopyofBrokerPointer();
@@ -122,13 +121,13 @@ registered or when the clean up function is called this prevents some odd thread
     /** make a copy of the broker pointer to allow access to the new name
 @return true if successful
  */
-    HELICS_SHARED_DEPRECATED bool
-        copyBrokerIdentifier(const std::string& copyFromName, const std::string& copyToName)
+    HELICS_SHARED_DEPRECATED bool copyBrokerIdentifier(const std::string& copyFromName,
+                                                       const std::string& copyToName)
     {
         return false;
     }
 
     /** display the help listing for a particular core_type*/
     HELICS_SHARED_DEPRECATED void displayHelp(core_type type = core_type::UNRECOGNIZED) {}
-} // namespace BrokerFactory
-} // namespace helics
+}  // namespace BrokerFactory
+}  // namespace helics

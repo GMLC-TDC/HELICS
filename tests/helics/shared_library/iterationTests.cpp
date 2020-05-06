@@ -30,14 +30,17 @@ TEST_F(iteration_tests, execution_iteration_test)
     helicsFederateEnterInitializingMode(vFed1, nullptr);
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
 
-    auto comp = helicsFederateEnterExecutingModeIterative(
-        vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+    auto comp =
+        helicsFederateEnterExecutingModeIterative(vFed1,
+                                                  helics_iteration_request_iterate_if_needed,
+                                                  nullptr);
     EXPECT_TRUE(comp == helics_iteration_result_iterating);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
 
-    comp = helicsFederateEnterExecutingModeIterative(
-        vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+    comp = helicsFederateEnterExecutingModeIterative(vFed1,
+                                                     helics_iteration_request_iterate_if_needed,
+                                                     nullptr);
 
     EXPECT_TRUE(comp == helics_iteration_result_next_step);
 
@@ -70,8 +73,10 @@ std::pair<double, int> runInitIterations(helics_federate vfed, int index, int to
     int itcount = 0;
     while (itres == helics_iteration_result_iterating) {
         helicsPublicationPublishDouble(pub, cval, nullptr);
-        itres = helicsFederateEnterExecutingModeIterative(
-            vfed, helics_iteration_request_iterate_if_needed, nullptr);
+        itres =
+            helicsFederateEnterExecutingModeIterative(vfed,
+                                                      helics_iteration_request_iterate_if_needed,
+                                                      nullptr);
         auto val1 = helicsInputGetDouble(sub_high, nullptr);
         auto val2 = helicsInputGetDouble(sub_low, nullptr);
         cval = (val1 + val2) / 2.0;
@@ -89,9 +94,8 @@ std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<helics
     std::vector<std::future<std::pair<double, int>>> futures;
     for (decltype(N) ii = 0; ii < N; ++ii) {
         auto vFed = fedVec[ii];
-        futures.push_back(std::async(std::launch::async, [vFed, ii, N]() {
-            return runInitIterations(vFed, ii, N);
-        }));
+        futures.push_back(std::async(std::launch::async,
+                                     [vFed, ii, N]() { return runInitIterations(vFed, ii, N); }));
     }
     std::vector<std::pair<double, int>> results(N);
     for (decltype(N) ii = 0; ii < N; ++ii) {
@@ -160,15 +164,18 @@ TEST_F(iteration_tests, execution_iteration_test_2fed)
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
 
     helicsFederateEnterExecutingModeAsync(vFed1, nullptr);
-    auto comp = helicsFederateEnterExecutingModeIterative(
-        vFed2, helics_iteration_request_iterate_if_needed, nullptr);
+    auto comp =
+        helicsFederateEnterExecutingModeIterative(vFed2,
+                                                  helics_iteration_request_iterate_if_needed,
+                                                  nullptr);
 
     EXPECT_TRUE(comp == helics_iteration_result_iterating);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
 
-    comp = helicsFederateEnterExecutingModeIterative(
-        vFed2, helics_iteration_request_iterate_if_needed, nullptr);
+    comp = helicsFederateEnterExecutingModeIterative(vFed2,
+                                                     helics_iteration_request_iterate_if_needed,
+                                                     nullptr);
 
     EXPECT_TRUE(comp == helics_iteration_result_next_step);
 
@@ -295,8 +302,10 @@ TEST_F(iteration_tests, test_iteration_counter)
             helicsPublicationPublishInteger(pub2, c2, nullptr);
         }
 
-        helicsFederateRequestTimeIterativeAsync(
-            vFed1, 1.0, helics_iteration_request_iterate_if_needed, nullptr);
+        helicsFederateRequestTimeIterativeAsync(vFed1,
+                                                1.0,
+                                                helics_iteration_request_iterate_if_needed,
+                                                nullptr);
         helics_iteration_result state;
 
         auto grantedTime = helicsFederateRequestTimeIterative(

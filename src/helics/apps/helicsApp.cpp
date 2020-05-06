@@ -110,11 +110,10 @@ namespace apps {
         auto app =
             std::make_unique<helicsCLI11App>("common options for all Helics Apps", "[HELICS_APP]");
 
-        app->add_flag(
-            "--local",
-            useLocal,
-            "specify otherwise unspecified endpoints and publications as local( "
-            "i.e.the keys will be prepended with the player name)");
+        app->add_flag("--local",
+                      useLocal,
+                      "specify otherwise unspecified endpoints and publications as local( "
+                      "i.e.the keys will be prepended with the player name)");
         app->add_option("--stop", stopTime, "The time to stop the app");
         app->add_option("--input,input", masterFileName, "The primary input file")
             ->check(CLI::ExistingFile);
@@ -212,5 +211,5 @@ namespace apps {
         fed->disconnect();
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

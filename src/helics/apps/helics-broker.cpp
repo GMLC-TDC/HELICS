@@ -25,7 +25,7 @@ void terminalFunction(std::vector<std::string> args);
 
 static const bool amb = helics::allowMultiBroker();
 
-int main(int argc, char* argv[]) //NOLINT
+int main(int argc, char* argv[])  //NOLINT
 {
     int ret{0};
     bool runterminal{false};
@@ -47,14 +47,12 @@ int main(int argc, char* argv[]) //NOLINT
         autorestart,
         "helics_broker --autorestart <broker args ...> will start a continually regenerating broker "
         "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
-    cmdLine.add_flag(
-        "--http",
-        http_webserver,
-        "start an http webserver that can respond to queries on the broker");
-    cmdLine.add_flag(
-        "--web",
-        websocket_server,
-        "start an websocket webserver that can respond to queries on the broker");
+    cmdLine.add_flag("--http",
+                     http_webserver,
+                     "start an http webserver that can respond to queries on the broker");
+    cmdLine.add_flag("--web",
+                     websocket_server,
+                     "start an websocket webserver that can respond to queries on the broker");
     cmdLine
         .footer(
             "helics_broker <broker args ..> starts a broker with the given args and waits for it to "
@@ -197,10 +195,9 @@ void terminalFunction(std::vector<std::string> args)
     bool cmdcont = true;
     helics::helicsCLI11App termProg("helics broker command line terminal");
     termProg.ignore_case();
-    termProg.add_flag(
-        "-q{false},--quit{false},--exit{false}",
-        cmdcont,
-        "close the terminal and wait for the broker to exit");
+    termProg.add_flag("-q{false},--quit{false},--exit{false}",
+                      cmdcont,
+                      "close the terminal and wait for the broker to exit");
     termProg.add_subcommand("quit", "close the terminal and  wait for the broker to exit")
         ->callback([&cmdcont]() { cmdcont = false; });
     termProg.add_subcommand("terminate", "terminate the broker")->callback(closeBroker);
@@ -271,7 +268,7 @@ void terminalFunction(std::vector<std::string> args)
         std::getline(std::cin, cmdin);
         if (cmdin == "exit" ||
             cmdin ==
-                "q") { // provide a fast path to exit without going through the terminal command line processor
+                "q") {  // provide a fast path to exit without going through the terminal command line processor
             cmdcont = false;
             continue;
         }

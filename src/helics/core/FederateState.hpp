@@ -51,72 +51,72 @@ class FederateState {
     ~FederateState();
 
   private:
-    const std::string name; //!< the name of the federate
+    const std::string name;  //!< the name of the federate
     std::unique_ptr<TimeCoordinator>
-        timeCoord; //!< object that manages the time to determine granting
+        timeCoord;  //!< object that manages the time to determine granting
   public:
-    local_federate_id local_id; //!< id code for the local federate descriptor
-    std::atomic<global_federate_id> global_id; //!< global id code, default to invalid
+    local_federate_id local_id;  //!< id code for the local federate descriptor
+    std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<federate_state> state{HELICS_CREATED}; //!< the current state of the federate
+    std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{
-        false}; //!< flag indicating that values should only be transmitted if different than previous values
-    bool realtime{false}; //!< flag indicating that the federate runs in real time
-    bool observer{false}; //!< flag indicating the federate is an observer only
-    bool source_only{false}; //!< flag indicating the federate is a source_only
+        false};  //!< flag indicating that values should only be transmitted if different than previous values
+    bool realtime{false};  //!< flag indicating that the federate runs in real time
+    bool observer{false};  //!< flag indicating the federate is an observer only
+    bool source_only{false};  //!< flag indicating the federate is a source_only
     bool ignore_time_mismatch_warnings{
-        false}; //!< flag indicating that time mismatches should be ignored
+        false};  //!< flag indicating that time mismatches should be ignored
     bool strict_input_type_checking{
-        false}; //!< flag indicating that inputs should have strict type checking
-    bool ignore_unit_mismatch{false}; //!< flag to ignore mismatching units
+        false};  //!< flag indicating that inputs should have strict type checking
+    bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     bool slow_responding{
-        false}; //!< flag indicating that a federate is likely to be slow in responding
-    InterfaceInfo interfaceInformation; //!< the container for the interface information objects
+        false};  //!< flag indicating that a federate is likely to be slow in responding
+    InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
-    std::atomic<bool> init_transmitted{false}; //!< the initialization request has been transmitted
+    std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
-    int errorCode{0}; //!< storage for an error code
-    CommonCore* parent_{nullptr}; //!< pointer to the higher level;
-    std::string errorString; //!< storage for an error string populated on an error
+    int errorCode{0};  //!< storage for an error code
+    CommonCore* parent_{nullptr};  //!< pointer to the higher level;
+    std::string errorString;  //!< storage for an error string populated on an error
     decltype(std::chrono::steady_clock::now())
-        start_clock_time; //!< time the initialization mode started for real time capture
-    Time rt_lag{timeZero}; //!< max lag for the rt control
-    Time rt_lead{timeZero}; //!< min lag for the realtime control
-    int32_t realTimeTimerIndex{-1}; //!< the timer index for the real time timer;
+        start_clock_time;  //!< time the initialization mode started for real time capture
+    Time rt_lag{timeZero};  //!< max lag for the rt control
+    Time rt_lead{timeZero};  //!< min lag for the realtime control
+    int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{
-        false}; //!< this federate has requested entry to initialization
+        false};  //!< this federate has requested entry to initialization
   private:
-    bool iterating{false}; //!< the federate is iterating at a time step
+    bool iterating{false};  //!< the federate is iterating at a time step
     bool timeGranted_mode{
-        false}; //!< indicator if the federate is in a granted state or a requested state waiting to grant
+        false};  //!< indicator if the federate is in a granted state or a requested state waiting to grant
     bool terminate_on_error{
-        false}; //!< indicator that if the federate encounters a configuration error it should cause a co-simulation abort
-    int logLevel{1}; //!< the level of logging used in the federate
+        false};  //!< indicator that if the federate encounters a configuration error it should cause a co-simulation abort
+    int logLevel{1};  //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;
   private:
     std::shared_ptr<MessageTimer>
-        mTimer; //!< message timer object for real time operations and timeouts
+        mTimer;  //!< message timer object for real time operations and timeouts
     gmlc::containers::BlockingQueue<ActionMessage>
-        queue; //!< processing queue for messages incoming to a federate
+        queue;  //!< processing queue for messages incoming to a federate
     std::atomic<uint16_t> interfaceFlags{
-        0}; //!< current defaults for operational flags of interfaces for this federate
+        0};  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id, std::deque<ActionMessage>>
-        delayQueues; //!< queue for delaying processing of messages for a time
-    std::vector<interface_handle> events; //!< list of value events to process
-    std::vector<global_federate_id> delayedFederates; //!< list of federates to delay messages from
-    Time time_granted{startupTime}; //!< the most recent granted time;
-    Time allowed_send_time{startupTime}; //!< the next time a message can be sent;
-    mutable std::atomic_flag processing = ATOMIC_FLAG_INIT; //!< the federate is processing
+        delayQueues;  //!< queue for delaying processing of messages for a time
+    std::vector<interface_handle> events;  //!< list of value events to process
+    std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
+    Time time_granted{startupTime};  //!< the most recent granted time;
+    Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
+    mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string&, const std::string&)>
-        loggerFunction; //!< callback for logging functions
+        loggerFunction;  //!< callback for logging functions
     std::function<std::string(const std::string&)>
-        queryCallback; //!< a callback for additional queries
+        queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/
@@ -196,7 +196,7 @@ class FederateState {
     void spinlock() const
     {
         while (processing.test_and_set()) {
-            ; // spin
+            ;  // spin
         }
     }
     /** locks the processing with a sleep loop*/
@@ -327,8 +327,9 @@ class FederateState {
     @param logMessageSource the name of the object that sent the message
     @param message the message to log
     */
-    void logMessage(int level, const std::string& logMessageSource, const std::string& message)
-        const;
+    void logMessage(int level,
+                    const std::string& logMessageSource,
+                    const std::string& message) const;
 
     /** set the logging function
     @details function must have signature void(int level, const std::string &sourceName, const std::string
@@ -361,13 +362,12 @@ class FederateState {
     /** route a message either forward to parent or add to queue*/
     void routeMessage(const ActionMessage& msg);
     /** create an interface*/
-    void createInterface(
-        handle_type htype,
-        interface_handle handle,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
+    void createInterface(handle_type htype,
+                         interface_handle handle,
+                         const std::string& key,
+                         const std::string& type,
+                         const std::string& units);
     /** close an interface*/
     void closeInterface(interface_handle handle, handle_type type);
 };
-} // namespace helics
+}  // namespace helics

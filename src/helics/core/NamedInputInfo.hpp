@@ -20,19 +20,18 @@ class NamedInputInfo {
   public:
     /** data structure containing a helics data value recorded from a publication*/
     struct dataRecord {
-        Time time = Time::minVal(); //!< the time of the data value
-        unsigned int iteration = 0; //!< the iteration number of the data value
-        std::shared_ptr<const data_block> data; //!< the data value
+        Time time = Time::minVal();  //!< the time of the data value
+        unsigned int iteration = 0;  //!< the iteration number of the data value
+        std::shared_ptr<const data_block> data;  //!< the data value
         /** default constructor*/
         dataRecord() = default;
         dataRecord(Time recordTime, std::shared_ptr<const data_block> recordData):
             time(recordTime), data(std::move(recordData))
         {
         }
-        dataRecord(
-            Time recordTime,
-            unsigned int recordIteration,
-            std::shared_ptr<const data_block> recordData):
+        dataRecord(Time recordTime,
+                   unsigned int recordIteration,
+                   std::shared_ptr<const data_block> recordData):
             time(recordTime),
             iteration(recordIteration), data(std::move(recordData))
         {
@@ -40,41 +39,40 @@ class NamedInputInfo {
     };
 
     /** constructor with all the information*/
-    NamedInputInfo(
-        global_handle handle,
-        const std::string& key_,
-        const std::string& type_,
-        const std::string& units_):
+    NamedInputInfo(global_handle handle,
+                   const std::string& key_,
+                   const std::string& type_,
+                   const std::string& units_):
         id(handle),
         key(key_), type(type_), units(units_)
     {
     }
 
-    const global_handle id; //!< identifier for the handle
-    const std::string key; //!< the identifier for the input
-    const std::string type; //! the nominal type of data for the input
-    std::string inputType; //!< the type of data that its first matching input uses
-    std::string inputUnits; //!< the units of the data that its first matching input uses
-    const std::string units; //!< the units of the controlInput
+    const global_handle id;  //!< identifier for the handle
+    const std::string key;  //!< the identifier for the input
+    const std::string type;  //! the nominal type of data for the input
+    std::string inputType;  //!< the type of data that its first matching input uses
+    std::string inputUnits;  //!< the units of the data that its first matching input uses
+    const std::string units;  //!< the units of the controlInput
     bool required =
-        false; //!< flag indicating that the subscription requires a matching publication
-    bool optional = false; //!< flag indicating that any targets are optional
-    bool has_target = false; //!< flag indicating that the input has a source
+        false;  //!< flag indicating that the subscription requires a matching publication
+    bool optional = false;  //!< flag indicating that any targets are optional
+    bool has_target = false;  //!< flag indicating that the input has a source
     bool only_update_on_change =
-        false; //!< flag indicating that the data should only be updated on change
+        false;  //!< flag indicating that the data should only be updated on change
     bool not_interruptible =
-        false; //!< indicator that this handle should not be used for interrupting
+        false;  //!< indicator that this handle should not be used for interrupting
     bool strict_type_matching =
-        false; //!< indicator that the handle need to have strict type matching
-    bool single_source = false; //!< allow only a single source to connect
-    bool ignore_unit_mismatch = false; //!< ignore unit mismatches
-    std::vector<dataRecord> current_data; //!< the most recent published data
-    std::vector<global_handle> input_sources; //!< the sources of the input signals
+        false;  //!< indicator that the handle need to have strict type matching
+    bool single_source = false;  //!< allow only a single source to connect
+    bool ignore_unit_mismatch = false;  //!< ignore unit mismatches
+    std::vector<dataRecord> current_data;  //!< the most recent published data
+    std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;
     std::vector<std::tuple<std::string, std::string, std::string>>
-        source_info; //!< the name,type,units of the sources
+        source_info;  //!< the name,type,units of the sources
   private:
-    std::vector<std::vector<dataRecord>> data_queues; //!< queue of the data
+    std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
   public:
     /** get all the current data*/
@@ -84,11 +82,10 @@ class NamedInputInfo {
     /** get a the most recent data point*/
     std::shared_ptr<const data_block> getData();
     /** add a data block into the queue*/
-    void addData(
-        global_handle source_id,
-        Time valueTime,
-        unsigned int iteration,
-        std::shared_ptr<const data_block> data);
+    void addData(global_handle source_id,
+                 Time valueTime,
+                 unsigned int iteration,
+                 std::shared_ptr<const data_block> data);
 
     /** update current data not including data at the specified time
     @param newTime the time to move the subscription to
@@ -109,11 +106,10 @@ class NamedInputInfo {
     /** get the event based on the event queue*/
     Time nextValueTime() const;
     /** add a new source target to the input*/
-    void addSource(
-        global_handle newSource,
-        const std::string& sourceName,
-        const std::string& stype,
-        const std::string& sunits);
+    void addSource(global_handle newSource,
+                   const std::string& sourceName,
+                   const std::string& stype,
+                   const std::string& sunits);
     /** remove a source */
     void removeSource(global_handle sourceToRemove, Time minTime);
     /** remove a source */
@@ -128,4 +124,4 @@ class NamedInputInfo {
 bool checkTypeMatch(const std::string& type1, const std::string& type2, bool strict_match);
 
 bool checkUnitMatch(const std::string& unit1, const std::string& unit2, bool strict_match);
-} // namespace helics
+}  // namespace helics

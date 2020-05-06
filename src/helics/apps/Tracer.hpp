@@ -123,17 +123,18 @@ namespace apps {
 
       protected:
         bool printMessage = false;
-        bool allow_iteration = false; //!< flag to allow iteration of the federate for time requests
-        bool skiplog = false; //!< skip the log function and print directly to cout
-        std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
+        bool allow_iteration =
+            false;  //!< flag to allow iteration of the federate for time requests
+        bool skiplog = false;  //!< skip the log function and print directly to cout
+        std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
-        std::vector<Input> subscriptions; //!< the actual subscription objects
-        std::map<std::string, int> subkeys; //!< translate subscription names to an index
+        std::vector<Input> subscriptions;  //!< the actual subscription objects
+        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
 
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        std::map<std::string, int> eptNames; //!< translate endpoint name to index
-        std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
-        std::vector<std::string> captureInterfaces; //!< storage for the interfaces to capture
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
+        std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
         std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
         std::function<void(Time, const std::string&, std::unique_ptr<Message>)>
@@ -141,5 +142,5 @@ namespace apps {
         std::function<void(Time, const std::string&, const std::string&)> valueCallback;
     };
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

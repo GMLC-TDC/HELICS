@@ -58,11 +58,10 @@ static auto recordComparison = [](const NamedInputInfo::dataRecord& rec1,
         ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
-void NamedInputInfo::addData(
-    global_handle source_id,
-    Time valueTime,
-    unsigned int iteration,
-    std::shared_ptr<const data_block> data)
+void NamedInputInfo::addData(global_handle source_id,
+                             Time valueTime,
+                             unsigned int iteration,
+                             std::shared_ptr<const data_block> data)
 {
     int index;
     bool found = false;
@@ -82,17 +81,18 @@ void NamedInputInfo::addData(
         data_queues[index].emplace_back(valueTime, iteration, std::move(data));
     } else {
         dataRecord newRecord(valueTime, iteration, std::move(data));
-        auto m = std::upper_bound(
-            data_queues[index].begin(), data_queues[index].end(), newRecord, recordComparison);
+        auto m = std::upper_bound(data_queues[index].begin(),
+                                  data_queues[index].end(),
+                                  newRecord,
+                                  recordComparison);
         data_queues[index].insert(m, std::move(newRecord));
     }
 }
 
-void NamedInputInfo::addSource(
-    global_handle newSource,
-    const std::string& sourceName,
-    const std::string& stype,
-    const std::string& sunits)
+void NamedInputInfo::addSource(global_handle newSource,
+                               const std::string& sourceName,
+                               const std::string& stype,
+                               const std::string& sunits)
 {
     if (input_sources.empty()) {
         inputType = stype;
@@ -256,7 +256,7 @@ bool NamedInputInfo::updateData(dataRecord&& update, int index)
         return true;
     }
     if (current_data[index].time ==
-        update.time) { // this is for bookkeeping purposes should still return false
+        update.time) {  // this is for bookkeeping purposes should still return false
         current_data[index].iteration = update.iteration;
     }
     return false;
@@ -337,4 +337,4 @@ bool checkUnitMatch(const std::string& unit1, const std::string& unit2, bool str
     return (!std::isnan(conv));
 }
 
-} // namespace helics
+}  // namespace helics

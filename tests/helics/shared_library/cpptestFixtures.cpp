@@ -18,7 +18,7 @@ Livermore National Security, LLC.
 static bool hasIndexCode(const std::string& type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
-        if (*(type_name.end() - 2) == '_') { // this setup ignores the setup mode
+        if (*(type_name.end() - 2) == '_') {  // this setup ignores the setup mode
             return true;
         }
     }
@@ -38,14 +38,15 @@ static auto StartBrokerImp(const std::string& core_type_name, std::string initia
         std::string new_type(core_type_name.begin(), core_type_name.end() - 2);
         return std::make_shared<helicscpp::Broker>(new_type, std::string(), initialization_string);
     }
-    return std::make_shared<helicscpp::Broker>(
-        core_type_name, std::string(), initialization_string);
+    return std::make_shared<helicscpp::Broker>(core_type_name,
+                                               std::string(),
+                                               initialization_string);
 }
 
 bool FederateTestFixture_cpp::hasIndexCode(const std::string& type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
-        if (*(type_name.end() - 2) == '_') { // this setup ignores the setup mode
+        if (*(type_name.end() - 2) == '_') {  // this setup ignores the setup mode
             return true;
         }
     }
@@ -84,9 +85,9 @@ std::shared_ptr<helicscpp::Broker>
     return AddBroker(core_type_name, std::string("-f") + std::to_string(count));
 }
 
-std::shared_ptr<helicscpp::Broker> FederateTestFixture_cpp::AddBroker(
-    const std::string& core_type_name,
-    const std::string& initialization_string)
+std::shared_ptr<helicscpp::Broker>
+    FederateTestFixture_cpp::AddBroker(const std::string& core_type_name,
+                                       const std::string& initialization_string)
 {
     std::shared_ptr<helicscpp::Broker> broker;
     if (extraBrokerArgs.empty()) {

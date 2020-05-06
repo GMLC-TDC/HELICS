@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace Json {
 class Value;
-} // namespace Json
+}  // namespace Json
 
 namespace helics {
 /** class handling the construction in pieces of a JSON map*/
@@ -65,4 +65,4 @@ class JsonBuilder {
     /** reset the builder*/
     void reset();
 };
-} // namespace helics
+}  // namespace helics

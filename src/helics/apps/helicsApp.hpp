@@ -14,10 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace CLI {
 class App;
-} // namespace CLI
+}  // namespace CLI
 namespace Json {
 class Value;
-} // namespace Json
+}  // namespace Json
 
 namespace helics {
 namespace apps {
@@ -120,9 +120,9 @@ external protection, that will result in undefined behavior
         void processArgs(std::unique_ptr<helicsCLI11App>& app, const std::string& defaultAppName);
 
       protected:
-        std::shared_ptr<CombinationFederate> fed; //!< the federate created for the Player
-        Time stopTime = Time::maxVal(); //!< the time the Player should stop
-        std::string masterFileName; //!< the name of the master file used to do the construction
+        std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player
+        Time stopTime = Time::maxVal();  //!< the time the Player should stop
+        std::string masterFileName;  //!< the name of the master file used to do the construction
         bool useLocal{false};
         bool fileLoaded{false};
         bool deactivated{false};
@@ -130,5 +130,5 @@ external protection, that will result in undefined behavior
         bool helpMode{false};
         std::vector<std::string> remArgs;
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

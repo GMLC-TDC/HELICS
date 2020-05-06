@@ -39,10 +39,9 @@ exeTestRunner::exeTestRunner(const std::string& baseLocation, const std::string&
     active = findFileLocation(baseLocation, target);
 }
 
-exeTestRunner::exeTestRunner(
-    const std::string& baseLocation,
-    const std::string& baseLocation2,
-    const std::string& target)
+exeTestRunner::exeTestRunner(const std::string& baseLocation,
+                             const std::string& baseLocation2,
+                             const std::string& target)
 {
     ++counter;
     outFile = "exeText_" + std::to_string(counter) + ".out";

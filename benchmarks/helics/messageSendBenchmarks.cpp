@@ -29,8 +29,10 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
         int fed_count = 2;
         gmlc::concurrency::Barrier brr(static_cast<size_t>(fed_count + 1));
 
-        auto broker = helics::BrokerFactory::create(
-            cType, "brokerb", std::string("--federates=") + std::to_string(fed_count));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          "brokerb",
+                                          std::string("--federates=") + std::to_string(fed_count));
         broker->setLoggingLevel(helics_log_level_no_print);
 
         int wcore_fed_count = 1;
@@ -45,9 +47,9 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
         int msg_size = state.range(0);
         int msg_count = state.range(1);
         if (singleCore) {
-            wcore = helics::CoreFactory::create(
-                cType,
-                std::string("--log_level=no_print --federates=") + std::to_string(wcore_fed_count));
+            wcore = helics::CoreFactory::create(cType,
+                                                std::string("--log_level=no_print --federates=") +
+                                                    std::to_string(wcore_fed_count));
         }
         for (int ii = 0; ii < fed_count; ++ii) {
             std::string bmInit = "--index=" + std::to_string(ii) +
@@ -112,7 +114,7 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
 // Register the single core benchmark
 BENCHMARK_CAPTURE(BMsendMessage, singleCore, core_type::INPROC, true)
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 20}, {1, 1}}) // 1GB takes about 6 seconds
+    ->Ranges({{1, 1 << 20}, {1, 1}})  // 1GB takes about 6 seconds
     ->Ranges({{1, 1}, {1, 1 << 9}})
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -124,7 +126,7 @@ BENCHMARK_CAPTURE(BMsendMessage, singleCore, core_type::INPROC, true)
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/inprocCore, core_type::INPROC)
     // clang-format on
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 20}, {1, 1}}) // 1GB takes about 6 seconds
+    ->Ranges({{1, 1 << 20}, {1, 1}})  // 1GB takes about 6 seconds
     ->Ranges({{1, 1}, {1, 1 << 9}})
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -136,7 +138,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/inprocCore, core_type::INPROC)
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqCore, core_type::ZMQ)
     // clang-format on
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 20}, {1, 1}}) // 1GB takes about 30 seconds
+    ->Ranges({{1, 1 << 20}, {1, 1}})  // 1GB takes about 30 seconds
     ->Ranges({{1, 1}, {1, 1 << 9}})
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -161,9 +163,10 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqssCore, core_type::ZMQ_SS)
 BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
     // clang-format on
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes Boost transmit error
+    ->Ranges({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes Boost transmit error
     ->Ranges({{1, 1},
-              {1, 1 << 9}}) // msg count has a much bigger effect on time taken (increasing size had
+              {1,
+               1 << 9}})  // msg count has a much bigger effect on time taken (increasing size had
     // no noticeable effect on times)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -177,11 +180,11 @@ BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpCore, core_type::TCP)
     // clang-format on
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes error/terminate
+    ->Ranges({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes error/terminate
     ->Ranges(
         {{1, 1},
          {1,
-          1 << 9}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
+          1 << 9}})  // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();
@@ -191,11 +194,11 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpCore, core_type::TCP)
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpssCore, core_type::TCP_SS)
     // clang-format on
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes error/terminate
+    ->Ranges({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes error/terminate
     ->Ranges(
         {{1, 1},
          {1,
-          1 << 9}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
+          1 << 9}})  // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();
@@ -209,12 +212,12 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/udpCore, core_type::UDP)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 15},
-              {1, 1}}) // msg size of 65536 bytes causes error/terminate, though somewhere about 8K
+              {1, 1}})  // msg size of 65536 bytes causes error/terminate, though somewhere about 8K
     // the benchmark time drops from several ms to <1ms
     ->Ranges(
         {{1, 1},
          {1,
-          1 << 6}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times);
+          1 << 6}})  // msg count has a bigger effect on time taken (increasing size had minimal effect on times);
     // larger sizes/counts did seem to result in hanging, maybe an important packet was lost
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)

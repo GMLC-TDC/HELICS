@@ -37,9 +37,8 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
             links[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
-        std::thread rthread(
-            [&](RingTransmitMessage& link) { link.run([&brr]() { brr.wait(); }); },
-            std::ref(links[1]));
+        std::thread rthread([&](RingTransmitMessage& link) { link.run([&brr]() { brr.wait(); }); },
+                            std::ref(links[1]));
 
         links[0].makeReady();
         brr.wait();
@@ -70,8 +69,10 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
         state.PauseTiming();
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(feds);
-        auto broker = helics::BrokerFactory::create(
-            cType, std::string("--restrictive_time_policy --federates=") + std::to_string(feds));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          std::string("--restrictive_time_policy --federates=") +
+                                              std::to_string(feds));
         broker->setLoggingLevel(0);
 
         std::vector<RingTransmitMessage> links(feds);
@@ -79,8 +80,8 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
                 cType,
-                std::string(
-                    "--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
+                std::string("--restrictive_time_policy --federates=1 --broker=" +
+                            broker->getIdentifier()));
             cores[ii]->connect();
             std::string bmInit =
                 "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
@@ -88,9 +89,9 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](RingTransmitMessage& link) { link.run([&brr]() { brr.wait(); }); },
-                std::ref(links[ii + 1]));
+            threadlist[ii] =
+                std::thread([&](RingTransmitMessage& link) { link.run([&brr]() { brr.wait(); }); },
+                            std::ref(links[ii + 1]));
         }
 
         links[0].makeReady();

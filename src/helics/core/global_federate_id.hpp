@@ -46,8 +46,8 @@ class global_broker_id {
     base_type localIndex() const { return gid - global_broker_id_shift; }
 
   private:
-    base_type gid = invalid_global_broker_id; //!< the underlying index value
-    friend class global_federate_id; // for allowing comparison operators to work well
+    base_type gid = invalid_global_broker_id;  //!< the underlying index value
+    friend class global_federate_id;  // for allowing comparison operators to work well
     static constexpr base_type invalid_global_broker_id{-2'010'000'000};
 };
 
@@ -68,9 +68,12 @@ class global_federate_id {
 
     constexpr explicit global_federate_id(base_type val) noexcept: gid(val) {}
     /** implicit conversion from global_id*/
-    constexpr global_federate_id(global_broker_id id) noexcept: gid(id.gid) {} // NOLINT
+    constexpr global_federate_id(global_broker_id id) noexcept: gid(id.gid) {}  // NOLINT
 
-    constexpr operator global_broker_id() const noexcept { return global_broker_id{gid}; } // NOLINT
+    constexpr operator global_broker_id() const noexcept
+    {
+        return global_broker_id{gid};
+    }  // NOLINT
     /** conversion to the base_type*/
     constexpr base_type baseValue() const { return gid; }
     /** equality operator*/
@@ -104,7 +107,7 @@ class global_federate_id {
 
   private:
     static constexpr base_type invalid_global_fed_id{-2'010'000'000};
-    base_type gid{invalid_global_fed_id}; //!< the underlying index value
+    base_type gid{invalid_global_fed_id};  //!< the underlying index value
 };
 /** identifier to target the local core even if the global id hasn't been assigned yet*/
 constexpr global_federate_id direct_core_id{-235262};
@@ -116,8 +119,8 @@ std::ostream& operator<<(std::ostream& os, global_federate_id id);
 /** class merging a global id and handle together */
 class global_handle {
   public:
-    global_federate_id fed_id = global_federate_id{}; //!< the federate id component
-    interface_handle handle = interface_handle{}; //!< the interface handle component
+    global_federate_id fed_id = global_federate_id{};  //!< the federate id component
+    interface_handle handle = interface_handle{};  //!< the interface handle component
     /** default constructor*/
     constexpr global_handle() = default;
     /** construct directly from a federate_id and interface_handle*/
@@ -177,7 +180,7 @@ class route_id {
 
   private:
     static constexpr base_type invalid_route_id{-1'295'148'000};
-    base_type rid{invalid_route_id}; //!< the underlying index value
+    base_type rid{invalid_route_id};  //!< the underlying index value
 };
 
 constexpr route_id parent_route_id{0};
@@ -187,14 +190,14 @@ constexpr route_id control_route{-1};
  */
 std::ostream& operator<<(std::ostream& os, route_id id);
 
-} // namespace helics
+}  // namespace helics
 
 namespace std {
 /** define a template specialization for hash function for global_federate_id so it can be used in unordered_map*/
 template<>
 struct hash<helics::global_federate_id> {
-    using argument_type = helics::global_federate_id; //!< typedef for input type of hash
-    using result_type = std::size_t; //!< typedef for output result
+    using argument_type = helics::global_federate_id;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
     /** hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
@@ -205,8 +208,8 @@ struct hash<helics::global_federate_id> {
 /** define a template specialization for hash function for global_broker_id so it can be used in unordered_map*/
 template<>
 struct hash<helics::global_broker_id> {
-    using argument_type = helics::global_broker_id; //!< typedef for input type of hash
-    using result_type = std::size_t; //!< typedef for output result
+    using argument_type = helics::global_broker_id;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
     /** hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
@@ -217,8 +220,8 @@ struct hash<helics::global_broker_id> {
 /** define a template specialization for hash function for route_id so it can be used in unordered_map*/
 template<>
 struct hash<helics::route_id> {
-    using argument_type = helics::route_id; //!< typedef for input type of hash
-    using result_type = std::size_t; //!< typedef for output result
+    using argument_type = helics::route_id;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
     /** hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
@@ -230,8 +233,8 @@ struct hash<helics::route_id> {
 @details based on hash of std::uint64_t*/
 template<>
 struct hash<helics::global_handle> {
-    using argument_type = helics::global_handle; //!< typedef for input type of hash
-    using result_type = std::size_t; //!< typedef for output result
+    using argument_type = helics::global_handle;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
     /** hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
@@ -239,4 +242,4 @@ struct hash<helics::global_handle> {
     }
 };
 
-} // namespace std
+}  // namespace std

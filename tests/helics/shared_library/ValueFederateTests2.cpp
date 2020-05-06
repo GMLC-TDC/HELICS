@@ -99,7 +99,7 @@ BOOST_DATA_TEST_CASE(test_all_callback, bdata::make(core_types_single), core_typ
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     BOOST_CHECK_EQUAL(ccnt, 2);
-    ccnt = 0; // reset the counter
+    ccnt = 0;  // reset the counter
     vFed1->publish(pubid3, db);
     vFed1->publish(pubid2, 4);
     vFed1->publish(pubid1, "test string2");
@@ -131,8 +131,10 @@ BOOST_DATA_TEST_CASE(test_vector_callback_lists, bdata::make(core_types_single),
     helics::subscription_id_t lastId;
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
-    vFed1->registerSubscriptionNotificationCallback(
-        {sub1, sub2}, [&](helics::subscription_id_t, helics::Time) { ++ccnt; });
+    vFed1->registerSubscriptionNotificationCallback({sub1, sub2},
+                                                    [&](helics::subscription_id_t, helics::Time) {
+                                                        ++ccnt;
+                                                    });
     vFed1->enterExecutionState();
     vFed1->publish(pubid3, db);
     vFed1->requestTime(1.0);
@@ -143,7 +145,7 @@ BOOST_DATA_TEST_CASE(test_vector_callback_lists, bdata::make(core_types_single),
     vFed1->requestTime(3.0);
     BOOST_CHECK_EQUAL(ccnt, 1);
 
-    ccnt = 0; // reset the counter
+    ccnt = 0;  // reset the counter
     vFed1->publish(pubid3, db);
     vFed1->publish(pubid2, 4);
     vFed1->publish(pubid1, "test string2");

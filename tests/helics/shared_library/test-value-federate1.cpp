@@ -406,11 +406,10 @@ TEST_P(vfed_type_tests, single_transfer)
 }
 
 // template <class X>
-void runFederateTestDouble(
-    const char* core,
-    double defaultValue,
-    double testValue1,
-    double testValue2)
+void runFederateTestDouble(const char* core,
+                           double defaultValue,
+                           double testValue1,
+                           double testValue2)
 {
     helics_time gtime;
     double val1 = 0;
@@ -458,14 +457,13 @@ void runFederateTestDouble(
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestComplex(
-    const char* core,
-    double defaultValue_r,
-    double defaultValue_i,
-    double testValue1_r,
-    double testValue1_i,
-    double testValue2_r,
-    double testValue2_i)
+void runFederateTestComplex(const char* core,
+                            double defaultValue_r,
+                            double defaultValue_i,
+                            double testValue1_r,
+                            double testValue1_i,
+                            double testValue2_r,
+                            double testValue2_i)
 {
     helics_time gtime;
     double val1_r = 0.0;
@@ -518,11 +516,10 @@ void runFederateTestComplex(
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestInteger(
-    const char* core,
-    int64_t defaultValue,
-    int64_t testValue1,
-    int64_t testValue2)
+void runFederateTestInteger(const char* core,
+                            int64_t defaultValue,
+                            int64_t testValue1,
+                            int64_t testValue2)
 {
     helics_time gtime;
     int64_t val1 = 0;
@@ -618,11 +615,10 @@ void runFederateTestBool(const char* core, bool defaultValue, bool testValue1, b
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestString(
-    const char* core,
-    const char* defaultValue,
-    const char* testValue1,
-    const char* testValue2)
+void runFederateTestString(const char* core,
+                           const char* defaultValue,
+                           const char* testValue1,
+                           const char* testValue2)
 {
     helics_time gtime;
 #define STRINGSIZE 100
@@ -674,14 +670,13 @@ void runFederateTestString(
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestVectorD(
-    const char* core,
-    const double defaultValue[],
-    const double testValue1[],
-    const double testValue2[],
-    int len,
-    int len1,
-    int len2)
+void runFederateTestVectorD(const char* core,
+                            const double defaultValue[],
+                            const double testValue1[],
+                            const double testValue2[],
+                            int len,
+                            int len1,
+                            int len2)
 {
     helics_time gtime;
     int maxlen = (len1 > len2) ? len1 : len2;
@@ -762,14 +757,13 @@ void runFederateTestVectorD(
     delete[] val;
 }
 
-void runFederateTestNamedPoint(
-    const char* core,
-    const char* defaultValue,
-    double defVal,
-    const char* testValue1,
-    double testVal1,
-    const char* testValue2,
-    double testVal2)
+void runFederateTestNamedPoint(const char* core,
+                               const char* defaultValue,
+                               double defVal,
+                               const char* testValue1,
+                               double testVal1,
+                               const char* testValue2,
+                               double testVal2)
 {
     helics_time gtime;
 #define STRINGSIZE 100
@@ -853,20 +847,21 @@ TEST_P(vfed_type_tests, single_transfer_complex)
 
 TEST_P(vfed_type_tests, single_transfer_string)
 {
-    runFederateTestString(
-        GetParam(), "start", "inside of the functional relationship of helics", "I am a string");
+    runFederateTestString(GetParam(),
+                          "start",
+                          "inside of the functional relationship of helics",
+                          "I am a string");
 }
 
 TEST_P(vfed_type_tests, single_transfer_named_point)
 {
-    runFederateTestNamedPoint(
-        GetParam(),
-        "start",
-        5.3,
-        "inside of the functional relationship of helics",
-        45.7823,
-        "I am a string",
-        0.0);
+    runFederateTestNamedPoint(GetParam(),
+                              "start",
+                              5.3,
+                              "inside of the functional relationship of helics",
+                              45.7823,
+                              "I am a string",
+                              0.0);
 }
 
 TEST_P(vfed_type_tests, single_transfer_boolean)
@@ -1022,8 +1017,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_EQ(wait, helics_true);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    vfed_tests,
-    vfed_simple_type_tests,
-    ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests,
+                         vfed_simple_type_tests,
+                         ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(core_types));

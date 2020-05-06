@@ -118,8 +118,8 @@ class Core {
     }
 
   protected:
-    helics_core core; //!< reference to the underlying core object
+    helics_core core;  //!< reference to the underlying core object
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

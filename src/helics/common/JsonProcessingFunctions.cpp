@@ -94,7 +94,7 @@ std::string generateJsonString(const Json::Value& block)
 {
     Json::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
-    builder["indentation"] = "   "; // or whatever you like
+    builder["indentation"] = "   ";  // or whatever you like
     auto writer = std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
     std::stringstream sstr;
     writer->write(block, &sstr);

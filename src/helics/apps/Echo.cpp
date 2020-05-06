@@ -135,5 +135,5 @@ namespace apps {
         }
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

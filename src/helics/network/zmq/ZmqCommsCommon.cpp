@@ -16,12 +16,11 @@ namespace helics {
 namespace zeromq {
     using std::chrono::milliseconds;
     /** bind a zmq socket, with a timeout and timeout period*/
-    bool bindzmqSocket(
-        zmq::socket_t& socket,
-        const std::string& address,
-        int port,
-        milliseconds timeout,
-        milliseconds period)
+    bool bindzmqSocket(zmq::socket_t& socket,
+                       const std::string& address,
+                       int port,
+                       milliseconds timeout,
+                       milliseconds period)
     {
         bool bindsuccess = false;
         milliseconds tcount{0};
@@ -51,5 +50,5 @@ namespace zeromq {
             std::to_string(std::get<1>(vers)) + '.' + std::to_string(std::get<2>(vers));
     }
 
-} // namespace zeromq
-} // namespace helics
+}  // namespace zeromq
+}  // namespace helics

@@ -90,9 +90,8 @@ std::vector<std::pair<double, int>>
     std::vector<std::future<std::pair<double, int>>> futures;
     for (decltype(N) ii = 0; ii < N; ++ii) {
         auto vFed = fedVec[ii].get();
-        futures.push_back(std::async(std::launch::async, [vFed, ii, N]() {
-            return runInitIterations(vFed, ii, N);
-        }));
+        futures.push_back(std::async(std::launch::async,
+                                     [vFed, ii, N]() { return runInitIterations(vFed, ii, N); }));
     }
     std::vector<std::pair<double, int>> results(N);
     for (decltype(N) ii = 0; ii < N; ++ii) {
@@ -125,10 +124,9 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     EXPECT_NEAR(res1.first, 2.5, 0.1);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    iteration_tests,
-    iteration_tests_type,
-    ::testing::ValuesIn(core_types_all));
+INSTANTIATE_TEST_SUITE_P(iteration_tests,
+                         iteration_tests_type,
+                         ::testing::ValuesIn(core_types_all));
 
 TEST_F(iteration_tests, execution_iteration_loop3)
 {

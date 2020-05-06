@@ -17,8 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace apps {
 
-    static ActionMessage
-        generatePortRequestReply(const ActionMessage& /*cmd*/, std::shared_ptr<Broker>& brk)
+    static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
+                                                  std::shared_ptr<Broker>& brk)
     {
         ActionMessage rep(CMD_PROTOCOL);
         rep.messageID = NEW_BROKER_INFORMATION;
@@ -63,10 +63,9 @@ namespace apps {
         return {brk, newbrk};
     }
 
-    ActionMessage TypedBrokerServer::generateMessageResponse(
-        const ActionMessage& rxcmd,
-        portData& pdata,
-        core_type ctype)
+    ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rxcmd,
+                                                             portData& pdata,
+                                                             core_type ctype)
     {
         //   std::cout << "received data length " << msg.size () << std::endl;
         switch (rxcmd.action()) {
@@ -130,5 +129,5 @@ namespace apps {
     {
         LoggerManager::logMessage(std::move(message));
     }
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

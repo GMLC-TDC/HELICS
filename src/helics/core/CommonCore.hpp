@@ -81,57 +81,56 @@ class CommonCore: public Core, public BrokerBase {
     virtual void configureFromVector(std::vector<std::string> args) override final;
     virtual bool isConfigured() const override final;
     virtual bool isOpenToNewFederates() const override final;
-    virtual void
-        globalError(local_federate_id federateID, int errorCode, const std::string& error_string)
-            override final;
-    virtual void
-        localError(local_federate_id federateID, int errorCode, const std::string& error_string)
-            override final;
+    virtual void globalError(local_federate_id federateID,
+                             int errorCode,
+                             const std::string& error_string) override final;
+    virtual void localError(local_federate_id federateID,
+                            int errorCode,
+                            const std::string& error_string) override final;
     virtual void finalize(local_federate_id federateID) override final;
     virtual void enterInitializingMode(local_federate_id federateID) override final;
     virtual void setCoreReadyToInit() override final;
-    virtual iteration_result enterExecutingMode(
-        local_federate_id federateID,
-        iteration_request iterate = NO_ITERATION) override final;
-    virtual local_federate_id
-        registerFederate(const std::string& name, const CoreFederateInfo& info) override final;
+    virtual iteration_result
+        enterExecutingMode(local_federate_id federateID,
+                           iteration_request iterate = NO_ITERATION) override final;
+    virtual local_federate_id registerFederate(const std::string& name,
+                                               const CoreFederateInfo& info) override final;
     virtual const std::string& getFederateName(local_federate_id federateID) const override final;
     virtual local_federate_id getFederateId(const std::string& name) const override final;
     virtual int32_t getFederationSize() override final;
     virtual Time timeRequest(local_federate_id federateID, Time next) override final;
-    virtual iteration_time
-        requestTimeIterative(local_federate_id federateID, Time next, iteration_request iterate)
-            override final;
+    virtual iteration_time requestTimeIterative(local_federate_id federateID,
+                                                Time next,
+                                                iteration_request iterate) override final;
     virtual Time getCurrentTime(local_federate_id federateID) const override final;
     virtual uint64_t getCurrentReiteration(local_federate_id federateID) const override final;
     virtual void
         setTimeProperty(local_federate_id federateID, int32_t property, Time time) override final;
-    virtual void
-        setIntegerProperty(local_federate_id federateID, int32_t property, int16_t propertyValue)
-            override final;
-    virtual Time
-        getTimeProperty(local_federate_id federateID, int32_t property) const override final;
-    virtual int16_t
-        getIntegerProperty(local_federate_id federateID, int32_t property) const override final;
-    virtual void setFlagOption(local_federate_id federateID, int32_t flag, bool flagValue = true)
-        override final;
+    virtual void setIntegerProperty(local_federate_id federateID,
+                                    int32_t property,
+                                    int16_t propertyValue) override final;
+    virtual Time getTimeProperty(local_federate_id federateID,
+                                 int32_t property) const override final;
+    virtual int16_t getIntegerProperty(local_federate_id federateID,
+                                       int32_t property) const override final;
+    virtual void setFlagOption(local_federate_id federateID,
+                               int32_t flag,
+                               bool flagValue = true) override final;
     virtual bool getFlagOption(local_federate_id federateID, int32_t flag) const override final;
 
-    virtual interface_handle registerPublication(
-        local_federate_id federateID,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units) override final;
-    virtual interface_handle
-        getPublication(local_federate_id federateID, const std::string& key) const override final;
-    virtual interface_handle registerInput(
-        local_federate_id federateID,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units) override final;
+    virtual interface_handle registerPublication(local_federate_id federateID,
+                                                 const std::string& key,
+                                                 const std::string& type,
+                                                 const std::string& units) override final;
+    virtual interface_handle getPublication(local_federate_id federateID,
+                                            const std::string& key) const override final;
+    virtual interface_handle registerInput(local_federate_id federateID,
+                                           const std::string& key,
+                                           const std::string& type,
+                                           const std::string& units) override final;
 
-    virtual interface_handle
-        getInput(local_federate_id federateID, const std::string& key) const override final;
+    virtual interface_handle getInput(local_federate_id federateID,
+                                      const std::string& key) const override final;
 
     virtual const std::string& getHandleName(interface_handle handle) const override final;
 
@@ -140,10 +139,10 @@ class CommonCore: public Core, public BrokerBase {
 
     virtual bool getHandleOption(interface_handle handle, int32_t option) const override final;
     virtual void closeHandle(interface_handle handle) override final;
-    virtual void
-        removeTarget(interface_handle handle, const std::string& targetToRemove) override final;
-    virtual void
-        addDestinationTarget(interface_handle handle, const std::string& dest) override final;
+    virtual void removeTarget(interface_handle handle,
+                              const std::string& targetToRemove) override final;
+    virtual void addDestinationTarget(interface_handle handle,
+                                      const std::string& dest) override final;
     virtual void addSourceTarget(interface_handle handle, const std::string& name) override final;
     virtual const std::string& getInjectionUnits(interface_handle handle) const override final;
     virtual const std::string& getExtractionUnits(interface_handle handle) const override final;
@@ -155,57 +154,49 @@ class CommonCore: public Core, public BrokerBase {
         getAllValues(interface_handle handle) override final;
     virtual const std::vector<interface_handle>&
         getValueUpdates(local_federate_id federateID) override final;
-    virtual interface_handle registerEndpoint(
-        local_federate_id federateID,
-        const std::string& name,
-        const std::string& type) override final;
-    virtual interface_handle
-        getEndpoint(local_federate_id federateID, const std::string& name) const override final;
-    virtual interface_handle registerFilter(
-        const std::string& filterName,
-        const std::string& type_in,
-        const std::string& type_out) override final;
-    virtual interface_handle registerCloningFilter(
-        const std::string& filterName,
-        const std::string& type_in,
-        const std::string& type_out) override final;
+    virtual interface_handle registerEndpoint(local_federate_id federateID,
+                                              const std::string& name,
+                                              const std::string& type) override final;
+    virtual interface_handle getEndpoint(local_federate_id federateID,
+                                         const std::string& name) const override final;
+    virtual interface_handle registerFilter(const std::string& filterName,
+                                            const std::string& type_in,
+                                            const std::string& type_out) override final;
+    virtual interface_handle registerCloningFilter(const std::string& filterName,
+                                                   const std::string& type_in,
+                                                   const std::string& type_out) override final;
     virtual interface_handle getFilter(const std::string& name) const override final;
-    virtual void
-        addDependency(local_federate_id federateID, const std::string& federateName) override final;
-    virtual void registerFrequentCommunicationsPair(
-        const std::string& source,
-        const std::string& dest) override final;
+    virtual void addDependency(local_federate_id federateID,
+                               const std::string& federateName) override final;
+    virtual void registerFrequentCommunicationsPair(const std::string& source,
+                                                    const std::string& dest) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& source, const std::string& target) override final;
-    virtual void addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint)
-        override final;
-    virtual void addDestinationFilterToEndpoint(
-        const std::string& filter,
-        const std::string& endpoint) override final;
-    virtual void send(
-        interface_handle sourceHandle,
-        const std::string& destination,
-        const char* data,
-        uint64_t length) override final;
-    virtual void sendEvent(
-        Time time,
-        interface_handle sourceHandle,
-        const std::string& destination,
-        const char* data,
-        uint64_t length) override final;
-    virtual void
-        sendMessage(interface_handle sourceHandle, std::unique_ptr<Message> message) override final;
+    virtual void addSourceFilterToEndpoint(const std::string& filter,
+                                           const std::string& endpoint) override final;
+    virtual void addDestinationFilterToEndpoint(const std::string& filter,
+                                                const std::string& endpoint) override final;
+    virtual void send(interface_handle sourceHandle,
+                      const std::string& destination,
+                      const char* data,
+                      uint64_t length) override final;
+    virtual void sendEvent(Time time,
+                           interface_handle sourceHandle,
+                           const std::string& destination,
+                           const char* data,
+                           uint64_t length) override final;
+    virtual void sendMessage(interface_handle sourceHandle,
+                             std::unique_ptr<Message> message) override final;
     virtual uint64_t receiveCount(interface_handle destination) override final;
     virtual std::unique_ptr<Message> receive(interface_handle destination) override final;
-    virtual std::unique_ptr<Message>
-        receiveAny(local_federate_id federateID, interface_handle& endpoint_id) override final;
+    virtual std::unique_ptr<Message> receiveAny(local_federate_id federateID,
+                                                interface_handle& endpoint_id) override final;
     virtual uint64_t receiveCountAny(local_federate_id federateID) override final;
-    virtual void
-        logMessage(local_federate_id federateID, int logLevel, const std::string& messageToLog)
-            override final;
-    virtual void setFilterOperator(
-        interface_handle filter,
-        std::shared_ptr<FilterOperator> callback) override final;
+    virtual void logMessage(local_federate_id federateID,
+                            int logLevel,
+                            const std::string& messageToLog) override final;
+    virtual void setFilterOperator(interface_handle filter,
+                                   std::shared_ptr<FilterOperator> callback) override final;
 
     /** set the local identification for the core*/
     void setIdentifier(const std::string& name);
@@ -216,17 +207,16 @@ class CommonCore: public Core, public BrokerBase {
 
     /** set the core logging level*/
     virtual void setLoggingLevel(int logLevel) override;
-    virtual void setLoggingCallback(
-        local_federate_id federateID,
-        std::function<void(int, const std::string&, const std::string&)> logFunction)
-        override final;
+    virtual void setLoggingCallback(local_federate_id federateID,
+                                    std::function<void(int, const std::string&, const std::string&)>
+                                        logFunction) override final;
 
     virtual void setLogFile(const std::string& lfile) override final;
 
     virtual std::string query(const std::string& target, const std::string& queryStr) override;
-    virtual void setQueryCallback(
-        local_federate_id federateID,
-        std::function<std::string(const std::string&)> queryFunction) override;
+    virtual void
+        setQueryCallback(local_federate_id federateID,
+                         std::function<std::string(const std::string&)> queryFunction) override;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override;
     virtual bool connect() override final;
     virtual bool isConnected() const override final;
@@ -304,16 +294,16 @@ class CommonCore: public Core, public BrokerBase {
     FederateState* getHandleFederateCore(interface_handle handle);
 
   private:
-    std::string prevIdentifier; //!< storage for the case of requiring a renaming
+    std::string prevIdentifier;  //!< storage for the case of requiring a renaming
     std::map<global_federate_id, route_id>
-        routing_table; //!< map for external routes  <global federate id, route id>
+        routing_table;  //!< map for external routes  <global federate id, route id>
     gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
+        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
     std::unordered_map<std::string, route_id>
-        knownExternalEndpoints; //!< external map for all known external endpoints with names and route
+        knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
 
     std::unique_ptr<TimeoutMonitor>
-        timeoutMon; //!< class to handle timeouts and disconnection notices
+        timeoutMon;  //!< class to handle timeouts and disconnection notices
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages();
     /** respond to delayed message with an error*/
@@ -340,13 +330,12 @@ class CommonCore: public Core, public BrokerBase {
     /** process a destination filter message return*/
     void processDestFilterReturn(ActionMessage& cmd);
     /** create a source filter */
-    FilterInfo* createFilter(
-        global_broker_id dest,
-        interface_handle handle,
-        const std::string& key,
-        const std::string& type_in,
-        const std::string& type_out,
-        bool cloning);
+    FilterInfo* createFilter(global_broker_id dest,
+                             interface_handle handle,
+                             const std::string& key,
+                             const std::string& type_in,
+                             const std::string& type_out,
+                             bool cloning);
 
     /** check if we can remove some dependencies*/
     void checkDependencies();
@@ -378,46 +367,45 @@ class CommonCore: public Core, public BrokerBase {
     std::string filteredEndpointQuery(const FederateState* fed) const;
 
   private:
-    int32_t _global_federation_size = 0; //!< total size of the federation
+    int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
-        0}; //!< counter for the number of times the entry to initialization Mode was explicitly delayed
+        0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
-        federates; //!< threadsafe local federate information list for external functions
+        federates;  //!< threadsafe local federate information list for external functions
     gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
-        loopFederates; // federate pointers stored for the core loop
+        loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{
-        54}; //!< counter for the number of messages that have been sent, nothing
+        54};  //!< counter for the number of messages that have been sent, nothing
     //!< magical about 54 just a number bigger than 1 to prevent
     //!< confusion
 
-    ordered_guarded<HandleManager> handles; //!< local handle information;
+    ordered_guarded<HandleManager> handles;  //!< local handle information;
     HandleManager
-        loopHandles; //!< copy of handles to use in the primary processing loop without thread protection
+        loopHandles;  //!< copy of handles to use in the primary processing loop without thread protection
     std::map<int32_t, std::set<int32_t>>
-        ongoingFilterProcesses; //!< sets of ongoing filtered messages
+        ongoingFilterProcesses;  //!< sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>>
-        ongoingDestFilterProcesses; //!< sets of ongoing destination filter processing
+        ongoingDestFilterProcesses;  //!< sets of ongoing destination filter processing
 
     std::map<int32_t, std::vector<ActionMessage>>
-        delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
+        delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{
-        1}; //!< counter for queries start at 1 so the default value isn't used
-    gmlc::concurrency::DelayedObjects<std::string> activeQueries; //!< holder for active queries
+        1};  //!< counter for queries start at 1 so the default value isn't used
+    gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
         /// holder for the query map builder information
     mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>>
-        filterCoord; //!< map of all local filters
+        filterCoord;  //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint
-    gmlc::containers::DualMappedPointerVector<
-        FilterInfo,
-        std::string,
-        global_handle>
-        filters; //!< storage for all the filters
+    gmlc::containers::DualMappedPointerVector<FilterInfo,
+                                              std::string,
+                                              global_handle>
+        filters;  //!< storage for all the filters
 
-    std::atomic<uint16_t> nextAirLock{0}; //!< the index of the next airlock to use
+    std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<stx::any>, 4>
-        dataAirlocks; //!< airlocks for updating filter operators and other functions
-    gmlc::concurrency::TriggerVariable disconnection; //!< controller for the disconnection process
+        dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration();
@@ -428,14 +416,13 @@ class CommonCore: public Core, public BrokerBase {
     /** add a new handle to the generic structure
     and return a reference to the basicHandle
     */
-    const BasicHandleInfo& createBasicHandle(
-        global_federate_id global_federateId,
-        local_federate_id local_federateId,
-        handle_type HandleType,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units,
-        uint16_t flags = 0);
+    const BasicHandleInfo& createBasicHandle(global_federate_id global_federateId,
+                                             local_federate_id local_federateId,
+                                             handle_type HandleType,
+                                             const std::string& key,
+                                             const std::string& type,
+                                             const std::string& units,
+                                             uint16_t flags = 0);
 
     /** check if a global id represents a local federate
     @param global_fedid the identifier for the federate
@@ -487,4 +474,4 @@ class CommonCore: public Core, public BrokerBase {
     friend class TimeoutMonitor;
 };
 
-} // namespace helics
+}  // namespace helics

@@ -34,11 +34,11 @@ namespace tcp {
 
       private:
         virtual bool brokerConnect() override;
-        bool no_outgoing_connections = false; //!< disable outgoing connections if true;
+        bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
         std::vector<std::string>
-            connections; //!< defined connections These are connections that the comm section
+            connections;  //!< defined connections These are connections that the comm section
         //!< reaches out to regardless of whether it is a broker/core/ or server
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

@@ -13,5 +13,5 @@ namespace udp {
     class UdpComms;
     using UdpCore = NetworkCore<UdpComms, interface_type::udp>;
 
-} // namespace udp
-} // namespace helics
+}  // namespace udp
+}  // namespace helics

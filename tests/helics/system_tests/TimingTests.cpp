@@ -40,7 +40,7 @@ TEST_F(timing_tests, simple_timing_test)
     EXPECT_EQ(res, 2.0);
 
     res = vFed2->requestTime(2.0);
-    EXPECT_EQ(res, 0.5); // the result should show up at the next available time point
+    EXPECT_EQ(res, 0.5);  // the result should show up at the next available time point
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
@@ -71,7 +71,7 @@ TEST_F(timing_tests, simple_timing_test2)
     res = vFed1->requestTime(1.85);
     EXPECT_EQ(res, 2.0);
     res = vFed2->requestTime(1.79);
-    EXPECT_EQ(res, 0.5); // the result should show up at the next available time point
+    EXPECT_EQ(res, 0.5);  // the result should show up at the next available time point
     res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
@@ -101,16 +101,16 @@ TEST_F(timing_tests, simple_timing_test_message)
     ept1.send("e2", "test1");
     vFed1->requestTimeAsync(1.85);
     res = vFed2->requestTimeComplete();
-    EXPECT_EQ(res, 0.9); // the message should show up at the next available time point
+    EXPECT_EQ(res, 0.9);  // the message should show up at the next available time point
     vFed2->requestTimeAsync(2.0);
     res = vFed2->requestTimeComplete();
-    EXPECT_EQ(res, 2.25); // the message should show up at the next available time point
+    EXPECT_EQ(res, 2.25);  // the message should show up at the next available time point
     vFed2->requestTimeAsync(3.0);
     res = vFed1->requestTimeComplete();
     EXPECT_EQ(res, 2.4);
     vFed1->finalize();
     vFed2
-        ->finalize(); // this will also test finalizing while a time request is ongoing otherwise it will time out.
+        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag)
@@ -155,7 +155,7 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     EXPECT_EQ(rvec.back(), 100.0);
     vFed1->finalize();
     vFed2
-        ->finalize(); // this will also test finalizing while a time request is ongoing otherwise it will time out.
+        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag_option)
@@ -200,7 +200,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     EXPECT_EQ(rvec.back(), 100.0);
     vFed1->finalize();
     vFed2
-        ->finalize(); // this will also test finalizing while a time request is ongoing otherwise it will time out.
+        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
@@ -250,7 +250,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     EXPECT_EQ(rvec.back(), 100.0);
     vFed1->finalize();
     vFed2
-        ->finalize(); // this will also test finalizing while a time request is ongoing otherwise it will time out.
+        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
 TEST_F(timing_tests, timing_with_input_delay)
@@ -277,7 +277,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     res = vFed2->requestTimeComplete();
     EXPECT_EQ(
         res,
-        1.1); // the message should show up at the next available time point after the impact window
+        1.1);  // the message should show up at the next available time point after the impact window
     vFed2->requestTimeAsync(2.0);
     res = vFed1->requestTimeComplete();
     EXPECT_EQ(res, 1.9);
@@ -285,7 +285,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     EXPECT_EQ(res, 2.0);
     vFed1->finalize();
     vFed2
-        ->finalize(); // this will also test finalizing while a time request is ongoing otherwise it will time out.
+        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
 TEST_F(timing_tests, timing_with_minDelta_change)
@@ -338,8 +338,10 @@ TEST_F(timing_tests, sender_finalize_timing_result)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::Publication sender(
-        helics::interface_visibility::global, vFed1, "pub", helics::data_type::helics_double);
+    helics::Publication sender(helics::interface_visibility::global,
+                               vFed1,
+                               "pub",
+                               helics::data_type::helics_double);
     auto& receiver = vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -351,7 +353,7 @@ TEST_F(timing_tests, sender_finalize_timing_result)
     granted1 = vFed1->requestTime(2.0);
     EXPECT_EQ(granted1, 2.0);
     // now check that the receiver got the data at time 1.0
-    auto granted2 = vFed2->requestTime(400.0); // request a big time
+    auto granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 1.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 1.0);
@@ -367,7 +369,7 @@ TEST_F(timing_tests, sender_finalize_timing_result)
     sender.publish(4.0);
 
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 2.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 2.0);
@@ -378,17 +380,17 @@ TEST_F(timing_tests, sender_finalize_timing_result)
 
     vFed1->finalize();
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 3.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 3.0);
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 4.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 4.0);
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 6.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 6.0);
@@ -401,8 +403,10 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::Publication sender(
-        helics::interface_visibility::global, vFed1, "pub", helics::data_type::helics_double);
+    helics::Publication sender(helics::interface_visibility::global,
+                               vFed1,
+                               "pub",
+                               helics::data_type::helics_double);
     auto& receiver = vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -414,7 +418,7 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
     granted1 = vFed1->requestTime(2.0);
     EXPECT_EQ(granted1, 2.0);
     // now check that the receiver got the data at time 1.0
-    auto granted2 = vFed2->requestTime(400.0); // request a big time
+    auto granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 1.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 1.0);
@@ -430,7 +434,7 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
     sender.publish(4.0);
 
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 2.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 2.0);
@@ -441,22 +445,22 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
 
     vFed1->finalize();
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 3.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 3.0);
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 4.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 4.0);
     // check the grant at time 2.0
-    granted2 = vFed2->requestTime(5.0); // request time of 5
+    granted2 = vFed2->requestTime(5.0);  // request time of 5
     EXPECT_EQ(granted2, 5.0);
-    EXPECT_TRUE(!receiver.isUpdated()); // should not have an update
-    EXPECT_EQ(receiver.getValue<double>(), 4.0); // the get value should be the previous value
+    EXPECT_TRUE(!receiver.isUpdated());  // should not have an update
+    EXPECT_EQ(receiver.getValue<double>(), 4.0);  // the get value should be the previous value
 
-    granted2 = vFed2->requestTime(400.0); // request a big time
+    granted2 = vFed2->requestTime(400.0);  // request a big time
     EXPECT_EQ(granted2, 6.0);
     EXPECT_TRUE(receiver.isUpdated());
     EXPECT_EQ(receiver.getValue<double>(), 6.0);
@@ -464,14 +468,16 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
 }
 
 #ifdef ENABLE_ZMQ_CORE
-TEST_F(timing_tests, fast_sender_tests_ci_skip) // ci_skip
+TEST_F(timing_tests, fast_sender_tests_ci_skip)  // ci_skip
 {
     SetupTest<helics::ValueFederate>("zmq_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::Publication sender(
-        helics::interface_visibility::global, vFed1, "pub", helics::data_type::helics_double);
+    helics::Publication sender(helics::interface_visibility::global,
+                               vFed1,
+                               "pub",
+                               helics::data_type::helics_double);
     auto& receiver = vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -495,17 +501,21 @@ TEST_F(timing_tests, fast_sender_tests_ci_skip) // ci_skip
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, dual_fast_sender_tests_ci_skip) // ci_skip
+TEST_F(timing_tests, dual_fast_sender_tests_ci_skip)  // ci_skip
 {
     SetupTest<helics::ValueFederate>("zmq_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-    helics::Publication sender1(
-        helics::interface_visibility::global, vFed1, "pub1", helics::data_type::helics_double);
+    helics::Publication sender1(helics::interface_visibility::global,
+                                vFed1,
+                                "pub1",
+                                helics::data_type::helics_double);
     auto& receiver1 = vFed2->registerSubscription("pub1");
-    helics::Publication sender2(
-        helics::interface_visibility::global, vFed3, "pub2", helics::data_type::helics_double);
+    helics::Publication sender2(helics::interface_visibility::global,
+                                vFed3,
+                                "pub2",
+                                helics::data_type::helics_double);
     auto& receiver2 = vFed2->registerSubscription("pub2");
     vFed1->enterExecutingModeAsync();
     vFed3->enterExecutingModeAsync();

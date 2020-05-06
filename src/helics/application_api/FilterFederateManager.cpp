@@ -19,10 +19,9 @@ FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, loca
 }
 FilterFederateManager::~FilterFederateManager() = default;
 
-Filter& FilterFederateManager::registerFilter(
-    const std::string& name,
-    const std::string& type_in,
-    const std::string& type_out)
+Filter& FilterFederateManager::registerFilter(const std::string& name,
+                                              const std::string& type_in,
+                                              const std::string& type_out)
 {
     auto handle = coreObject->registerFilter(name, type_in, type_out);
     if (handle.isValid()) {
@@ -39,10 +38,9 @@ Filter& FilterFederateManager::registerFilter(
     throw(RegistrationFailure("Unable to register Filter"));
 }
 
-CloningFilter& FilterFederateManager::registerCloningFilter(
-    const std::string& name,
-    const std::string& type_in,
-    const std::string& type_out)
+CloningFilter& FilterFederateManager::registerCloningFilter(const std::string& name,
+                                                            const std::string& type_in,
+                                                            const std::string& type_out)
 {
     auto handle = coreObject->registerCloningFilter(name, type_in, type_out);
     if (handle.isValid()) {
@@ -64,8 +62,8 @@ Filter& FilterFederateManager::registerFilter(filter_types type, const std::stri
     return make_filter(type, fed, name);
 }
 
-CloningFilter&
-    FilterFederateManager::registerCloningFilter(filter_types type, const std::string& name)
+CloningFilter& FilterFederateManager::registerCloningFilter(filter_types type,
+                                                            const std::string& name)
 {
     return make_cloning_filter(type, fed, std::string(), name);
 }
@@ -118,4 +116,4 @@ void FilterFederateManager::closeAllFilters()
         }
     }
 }
-} // namespace helics
+}  // namespace helics

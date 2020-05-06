@@ -46,5 +46,5 @@ void cleanupHelicsLibrary()
     helicsCleanupLibrary();
 }
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

@@ -30,7 +30,7 @@ class HelicsException: public std::runtime_error {
     int errorCode() const { return eCode; }
 
   private:
-    int eCode; //!< containing the error code value
+    int eCode;  //!< containing the error code value
 };
 
 /** helper class that will throw an error if the helics error object has a actual error in it
@@ -51,8 +51,8 @@ class hThrowOnError {
     operator helics_error*() { return &eObj; }
 
   private:
-    helics_error eObj; //!< holder for a helics error object which is used in the C interface
+    helics_error eObj;  //!< holder for a helics error object which is used in the C interface
 };
-} // namespace helicscpp
+}  // namespace helicscpp
 
 #endif /*_HELICS_CPP98_EXCEPTIONS_*/

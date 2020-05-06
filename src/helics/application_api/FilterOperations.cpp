@@ -172,11 +172,11 @@ double randDouble(random_dists_t dist, double p1, double p2)
             std::student_t_distribution<double> distribution(p1);
             return distribution(generator);
         }
-        case random_dists_t::geometric: { // integer multiples of some period
+        case random_dists_t::geometric: {  // integer multiples of some period
             std::geometric_distribution<int> distribution(p1);
             return distribution(generator) * p2;
         }
-        case random_dists_t::poisson: { // integer multiples of some period
+        case random_dists_t::poisson: {  // integer multiples of some period
             std::poisson_distribution<int> distribution(p1);
             return distribution(generator) * p2;
         }
@@ -200,9 +200,9 @@ double randDouble(random_dists_t dist, double p1, double p2)
 /** class wrapping the distribution generation functions and parameters*/
 class randomDelayGenerator {
   public:
-    std::atomic<random_dists_t> dist{random_dists_t::uniform}; //!< the distribution
-    std::atomic<double> param1{0.0}; //!< parameter 1 typically mean or min
-    std::atomic<double> param2{0.0}; //!< parameter 2 typically stddev or max
+    std::atomic<random_dists_t> dist{random_dists_t::uniform};  //!< the distribution
+    std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
+    std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
 
     double generate() { return randDouble(dist.load(), param1.load(), param2.load()); }
 };
@@ -220,9 +220,8 @@ void RandomDelayFilterOperation::set(const std::string& property, double val)
     if ((property == "param1") || (property == "mean") || (property == "min") ||
         (property == "alpha")) {
         rdelayGen->param1.store(val);
-    } else if (
-        (property == "param2") || (property == "stddev") || (property == "max") ||
-        (property == "beta")) {
+    } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
+               (property == "beta")) {
         rdelayGen->param2.store(val);
     }
 }
@@ -233,14 +232,12 @@ void RandomDelayFilterOperation::setString(const std::string& property, const st
         if (res != distMap.end()) {
             rdelayGen->dist.store(res->second);
         }
-    } else if (
-        (property == "param1") || (property == "mean") || (property == "min") ||
-        (property == "alpha")) {
+    } else if ((property == "param1") || (property == "mean") || (property == "min") ||
+               (property == "alpha")) {
         auto tm = gmlc::utilities::loadTimeFromString<Time>(val);
         rdelayGen->param1.store(static_cast<double>(tm));
-    } else if (
-        (property == "param2") || (property == "stddev") || (property == "max") ||
-        (property == "beta")) {
+    } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
+               (property == "beta")) {
         auto tm = gmlc::utilities::loadTimeFromString<Time>(val);
         rdelayGen->param2.store(static_cast<double>(tm));
     }
@@ -265,9 +262,8 @@ void RandomDropFilterOperation::set(const std::string& property, double val)
         dropProb = val;
     }
 }
-void RandomDropFilterOperation::setString(
-    const std::string& /*property*/,
-    const std::string& /*val*/)
+void RandomDropFilterOperation::setString(const std::string& /*property*/,
+                                          const std::string& /*val*/)
 {
 }
 
@@ -327,8 +323,8 @@ std::string
     return newDest;
 }
 
-std::string
-    RerouteFilterOperation::rerouteOperation(const std::string& src, const std::string& dest) const
+std::string RerouteFilterOperation::rerouteOperation(const std::string& src,
+                                                     const std::string& dest) const
 {
     auto cond = conditions.lock_shared();
     if (cond->empty()) {
@@ -424,4 +420,4 @@ std::vector<std::unique_ptr<Message>> CloneFilterOperation::sendMessage(const Me
     }
     return messages;
 }
-} // namespace helics
+}  // namespace helics

@@ -94,7 +94,7 @@ namespace mpi {
 
         auto& mpi_service = MpiService::getInstance();
 
-        std::map<route_id, std::pair<int, int>> routes; // for all the other possible routes
+        std::map<route_id, std::pair<int, int>> routes;  // for all the other possible routes
 
         std::pair<int, int> brokerLocation;
         if (!brokerTargetAddress.empty()) {
@@ -131,7 +131,7 @@ namespace mpi {
                             break;
                         case DISCONNECT:
                             rxMessageQueue.push(cmd);
-                            goto CLOSE_TX_LOOP; // break out of loop
+                            goto CLOSE_TX_LOOP;  // break out of loop
                     }
                 }
             }
@@ -145,7 +145,7 @@ namespace mpi {
                     // std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
                     mpi_service.sendMessage(brokerLocation, cmd.to_vector());
                 }
-            } else if (rid == control_route) { // send to rx thread loop
+            } else if (rid == control_route) {  // send to rx thread loop
                 // Send to ourself -- may need command line option to enable for openmpi
                 // std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
                 rxMessageQueue.push(cmd);
@@ -162,9 +162,9 @@ namespace mpi {
                         mpi_service.sendMessage(brokerLocation, cmd.to_vector());
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(fmt::format(
-                                "unknown route and no broker, dropping message {}",
-                                prettyPrintString(cmd)));
+                            logWarning(
+                                fmt::format("unknown route and no broker, dropping message {}",
+                                            prettyPrintString(cmd)));
                         }
                     }
                 }
@@ -187,5 +187,5 @@ namespace mpi {
         cmd.messageID = CLOSE_RECEIVER;
         rxMessageQueue.push(cmd);
     }
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

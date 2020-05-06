@@ -114,13 +114,13 @@ namespace ipc {
     /** class implementing interactions with a queue to transmit data*/
     class SendToQueue {
       private:
-        std::unique_ptr<ipc_queue> txqueue; //!< the actual interprocess queue
-        std::string connectionNameOrig; //!< the connection name as specified
+        std::unique_ptr<ipc_queue> txqueue;  //!< the actual interprocess queue
+        std::string connectionNameOrig;  //!< the connection name as specified
         std::string
-            connectionName; //!< translation of the connection name using only valid characters
-        std::string errorString; //!< buffer for any error code
-        std::vector<char> buffer; //!< storage for serialized data of the message
-        bool connected = false; //!< flag indicating connectivity
+            connectionName;  //!< translation of the connection name using only valid characters
+        std::string errorString;  //!< buffer for any error code
+        std::vector<char> buffer;  //!< storage for serialized data of the message
+        bool connected = false;  //!< flag indicating connectivity
 
       public:
         SendToQueue() = default;
@@ -131,5 +131,5 @@ namespace ipc {
 
         const std::string& getError() const { return errorString; }
     };
-} // namespace ipc
-} // namespace helics
+}  // namespace ipc
+}  // namespace helics

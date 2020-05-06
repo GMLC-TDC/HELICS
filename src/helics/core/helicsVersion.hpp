@@ -27,4 +27,4 @@ constexpr auto versionBuild = HELICS_VERSION_BUILD;
 constexpr auto buildFlags = HELICS_BUILD_FLAGS;
 /** compiler used to build helics*/
 constexpr auto compiler = HELICS_COMPILER_VERSION;
-} // namespace helics
+}  // namespace helics

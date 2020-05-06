@@ -174,4 +174,4 @@ bool LoggerNoThread::isRunning() const
     return true;
 }
 
-} // namespace helics
+}  // namespace helics

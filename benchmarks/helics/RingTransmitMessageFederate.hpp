@@ -44,8 +44,8 @@ class RingTransmitMessage: public BenchmarkFederate {
     void doFedInit() override
     {
         ept = &fed->registerIndexedEndpoint("ept", index);
-        ept->setDefaultDestination(
-            "ept_" + std::to_string((index == maxIndex - 1) ? 0 : (index + 1)));
+        ept->setDefaultDestination("ept_" +
+                                   std::to_string((index == maxIndex - 1) ? 0 : (index + 1)));
     }
 
     void doMainLoop() override

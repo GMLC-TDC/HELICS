@@ -33,10 +33,9 @@ class FilterFederateManager {
     @param type_in the type the filter is expecting as an input
     @param type_out the type the filter generates
     */
-    Filter& registerFilter(
-        const std::string& name,
-        const std::string& type_in,
-        const std::string& type_out);
+    Filter& registerFilter(const std::string& name,
+                           const std::string& type_in,
+                           const std::string& type_out);
 
     /** register a cloningFilter
     @details call is only valid in startup mode
@@ -44,10 +43,9 @@ class FilterFederateManager {
     @param type_in the type the filter is expecting as an input
     @param type_out the type the filter generates
     */
-    CloningFilter& registerCloningFilter(
-        const std::string& name,
-        const std::string& type_in,
-        const std::string& type_out);
+    CloningFilter& registerCloningFilter(const std::string& name,
+                                         const std::string& type_in,
+                                         const std::string& type_out);
 
     /** register a Filter
     @details call is only valid in startup mode
@@ -79,7 +77,7 @@ class FilterFederateManager {
   private:
     Core* coreObject = nullptr;
     shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
-    Federate* fed = nullptr; //!< pointer back to the message Federate
-    const local_federate_id fedID; //!< storage for the federate ID
+    Federate* fed = nullptr;  //!< pointer back to the message Federate
+    const local_federate_id fedID;  //!< storage for the federate ID
 };
-} // namespace helics
+}  // namespace helics

@@ -30,10 +30,10 @@ namespace tcp {
         virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
       private:
-        std::vector<std::string> connections; //!< defined connections
-        bool no_outgoing_connections = false; //!< disable outgoing connections if true;
+        std::vector<std::string> connections;  //!< defined connections
+        bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
         virtual bool brokerConnect() override;
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

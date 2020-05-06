@@ -12,4 +12,4 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 template class NetworkCore<udp::UdpComms, interface_type::udp>;
-} // namespace helics
+}  // namespace helics

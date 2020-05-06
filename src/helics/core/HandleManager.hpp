@@ -27,31 +27,29 @@ class HandleManager {
     need two classes that do basically
     the same thing just with different container types so using deque reduce the amount of the code to maintain as
     well*/
-    std::deque<BasicHandleInfo> handles; //!< local handle information
+    std::deque<BasicHandleInfo> handles;  //!< local handle information
     std::unordered_map<std::string, interface_handle>
-        publications; //!< map of all local publications
-    std::unordered_map<std::string, interface_handle> endpoints; //!< map of all local endpoints
-    std::unordered_map<std::string, interface_handle> inputs; //!< map of all local endpoints
-    std::unordered_map<std::string, interface_handle> filters; //!< map of all local endpoints
-    std::unordered_map<std::uint64_t, int32_t> unique_ids; //!< map of identifiers
+        publications;  //!< map of all local publications
+    std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
+    std::unordered_map<std::string, interface_handle> inputs;  //!< map of all local endpoints
+    std::unordered_map<std::string, interface_handle> filters;  //!< map of all local endpoints
+    std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
     HandleManager() = default;
     /** add a handle to manage*/
-    BasicHandleInfo& addHandle(
-        global_federate_id fed_id,
-        handle_type what,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
+    BasicHandleInfo& addHandle(global_federate_id fed_id,
+                               handle_type what,
+                               const std::string& key,
+                               const std::string& type,
+                               const std::string& units);
     /** add a handle to manage*/
-    BasicHandleInfo& addHandle(
-        global_federate_id fed_id,
-        interface_handle local_id,
-        handle_type what,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
+    BasicHandleInfo& addHandle(global_federate_id fed_id,
+                               interface_handle local_id,
+                               handle_type what,
+                               const std::string& key,
+                               const std::string& type,
+                               const std::string& units);
 
     void addHandle(const BasicHandleInfo& otherHandle);
     /** add a handle at the specified index*/
@@ -113,4 +111,4 @@ class HandleManager {
     std::string generateName(handle_type what) const;
 };
 
-} // namespace helics
+}  // namespace helics

@@ -36,10 +36,9 @@ std::shared_ptr<helicsCLI11App>
     nbparser->option_defaults()->ignore_underscore();
 
     nbparser
-        ->add_flag(
-            "--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
-            interfaceNetwork,
-            "specify external interface to use, default is --local")
+        ->add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
+                   interfaceNetwork,
+                   "specify external interface to use, default is --local")
         ->disable_flag_override();
     nbparser->add_option_function<std::string>(
         "--brokeraddress",
@@ -50,10 +49,9 @@ std::shared_ptr<helicsCLI11App>
             checkAndUpdateBrokerAddress(localAddress);
         },
         "location of the broker i.e network address");
-    nbparser->add_flag(
-        "--reuse_address",
-        reuse_address,
-        "allow the server to reuse a bound address, mostly useful for tcp cores");
+    nbparser->add_flag("--reuse_address",
+                       reuse_address,
+                       "allow the server to reuse a bound address, mostly useful for tcp cores");
     nbparser
         ->add_flag(
             "--noack,--noack_connect",
@@ -83,22 +81,22 @@ std::shared_ptr<helicsCLI11App>
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
     nbparser
-        ->add_option(
-            "--maxcount", maxMessageCount, "The maximum number of message to have in a queue")
+        ->add_option("--maxcount",
+                     maxMessageCount,
+                     "The maximum number of message to have in a queue")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
     nbparser->add_option("--networkretries", maxRetries, "the maximum number of network retries")
         ->capture_default_str();
-    nbparser->add_flag(
-        "--osport,--use_os_port",
-        use_os_port,
-        "specify that the ports should be allocated by the host operating system");
-    nbparser->add_flag(
-        "--autobroker",
-        autobroker,
-        "allow a broker to be automatically created if one is not available");
-    nbparser->add_option(
-        "--brokerinit", brokerInitString, "the initialization string for the broker");
+    nbparser->add_flag("--osport,--use_os_port",
+                       use_os_port,
+                       "specify that the ports should be allocated by the host operating system");
+    nbparser->add_flag("--autobroker",
+                       autobroker,
+                       "allow a broker to be automatically created if one is not available");
+    nbparser->add_option("--brokerinit",
+                         brokerInitString,
+                         "the initialization string for the broker");
     nbparser
         ->add_flag_function(
             "--client{0},--server{1}",
@@ -127,8 +125,9 @@ std::shared_ptr<helicsCLI11App>
         "the local interface to use for the receive ports");
     nbparser->add_option("--port,-p", portNumber, "port number to use")
         ->transform(CLI::Transformer({{"auto", "-1"}}, CLI::ignore_case));
-    nbparser->add_option(
-        "--brokerport", brokerPort, "The port number to use to connect with the broker");
+    nbparser->add_option("--brokerport",
+                         brokerPort,
+                         "The port number to use to connect with the broker");
     nbparser
         ->add_option_function<int>(
             "--localport,--interfaceport",
@@ -159,27 +158,26 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
     switch (allowedType) {
         case interface_type::tcp:
             if ((brokerAddress == "tcp://*") || (brokerAddress == "*") ||
-                (brokerAddress == "tcp")) { // the broker address can't use a wild card
+                (brokerAddress == "tcp")) {  // the broker address can't use a wild card
                 brokerAddress = localAddress;
             }
             break;
         case interface_type::udp:
             if ((brokerAddress == "udp://*") || (brokerAddress == "*") ||
-                (brokerAddress == "udp")) { // the broker address can't use a wild card
+                (brokerAddress == "udp")) {  // the broker address can't use a wild card
                 brokerAddress = localAddress;
             }
             break;
         case interface_type::ip:
             if ((brokerAddress == "udp://*") ||
-                (brokerAddress == "udp")) { // the broker address can't use a wild card
+                (brokerAddress == "udp")) {  // the broker address can't use a wild card
                 if (localAddress.compare(3, 3, "://") == 0) {
                     brokerAddress = std::string("udp://") + localAddress.substr(6);
                 } else {
                     brokerAddress = std::string("udp://") + localAddress;
                 }
-            } else if (
-                (brokerAddress == "tcp://*") ||
-                (brokerAddress == "tcp")) { // the broker address can't use a wild card
+            } else if ((brokerAddress == "tcp://*") ||
+                       (brokerAddress == "tcp")) {  // the broker address can't use a wild card
                 if (localAddress.compare(3, 3, "://") == 0) {
                     brokerAddress = std::string("tcp://") + localAddress.substr(6);
                 } else {
@@ -310,8 +308,8 @@ bool isipv6(const std::string& address)
     return false;
 }
 
-std::vector<std::string>
-    prioritizeExternalAddresses(std::vector<std::string> high, std::vector<std::string> low)
+std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> high,
+                                                     std::vector<std::string> low)
 {
     std::vector<std::string> result;
 
@@ -597,4 +595,4 @@ std::string generateMatchingInterfaceAddress(const std::string& server, interfac
     return newInterface;
 }
 
-} // namespace helics
+}  // namespace helics

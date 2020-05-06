@@ -14,5 +14,5 @@ namespace inproc {
     /** implementation for the core that can only communicate in process*/
     using InprocCore = NetworkCore<InprocComms, interface_type::inproc>;
 
-} // namespace inproc
-} // namespace helics
+}  // namespace inproc
+}  // namespace helics

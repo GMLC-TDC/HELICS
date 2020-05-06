@@ -27,9 +27,9 @@ static void BMphold_singleCore(benchmark::State& state)
 
         int fed_count = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(fed_count));
-        auto wcore = helics::CoreFactory::create(
-            core_type::INPROC,
-            std::string("--autobroker --federates=") + std::to_string(fed_count));
+        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+                                                 std::string("--autobroker --federates=") +
+                                                     std::to_string(fed_count));
         std::vector<PholdFederate> feds(fed_count);
         for (int ii = 0; ii < fed_count; ++ii) {
             // phold federate default seed values are deterministic, based on index
@@ -41,8 +41,8 @@ static void BMphold_singleCore(benchmark::State& state)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(fed_count - 1));
         for (int ii = 0; ii < fed_count - 1; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](PholdFederate& f) { f.run([&brr]() { brr.wait(); }); }, std::ref(feds[ii + 1]));
+            threadlist[ii] = std::thread([&](PholdFederate& f) { f.run([&brr]() { brr.wait(); }); },
+                                         std::ref(feds[ii + 1]));
         }
         feds[0].makeReady();
         brr.wait();
@@ -80,8 +80,10 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
         int fed_count = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(fed_count));
 
-        auto broker = helics::BrokerFactory::create(
-            cType, "brokerb", std::string("--federates=") + std::to_string(fed_count));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          "brokerb",
+                                          std::string("--federates=") + std::to_string(fed_count));
         broker->setLoggingLevel(helics_log_level_no_print);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--log_level=no_print --federates=1"));
@@ -101,8 +103,8 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(fed_count - 1));
         for (int ii = 0; ii < fed_count - 1; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](PholdFederate& f) { f.run([&brr]() { brr.wait(); }); }, std::ref(feds[ii + 1]));
+            threadlist[ii] = std::thread([&](PholdFederate& f) { f.run([&brr]() { brr.wait(); }); },
+                                         std::ref(feds[ii + 1]));
         }
         feds[0].makeReady();
         brr.wait();
@@ -179,7 +181,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, tcpCore, core_type::TCP)
 // Register the TCP SS benchmarks
 BENCHMARK_CAPTURE(BMphold_multiCore, tcpssCore, core_type::TCP_SS)
     ->RangeMultiplier(2)
-    ->Range(1, 1) // This is set to 1; any higher seems to result in deadlock (OS buffer limit?)
+    ->Range(1, 1)  // This is set to 1; any higher seems to result in deadlock (OS buffer limit?)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();

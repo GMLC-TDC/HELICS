@@ -29,9 +29,9 @@ common use case, and many other objects are small, so the small string optimizat
 */
 class data_block {
   private:
-    std::string m_data; //!< using a string to represent the data
-    friend class data_view; //!< let data view access the string directly
-    friend class ActionMessage; //!< let action Message access the string directly
+    std::string m_data;  //!< using a string to represent the data
+    friend class data_view;  //!< let data view access the string directly
+    friend class ActionMessage;  //!< let action Message access the string directly
   public:
     /** default constructor */
     data_block() = default;
@@ -144,17 +144,17 @@ inline bool operator!=(const data_block& db1, const data_block& db2)
 /** class containing a message structure*/
 class Message {
   public:
-    Time time = timeZero; //!< the event time the message is sent
-    std::uint16_t flags{0}; //!< message flags
-    std::uint16_t messageValidation{0U}; //!< extra field for user object usage, not used by HELICS
-    std::int32_t messageID{0}; //!< the messageID for a message
-    data_block data; //!< the data packet for the message
-    std::string dest; //!< the destination of the message
-    std::string source; //!< the most recent source of the message
-    std::string original_source; //!< the original source of the message
-    std::string original_dest; //!< the original destination of a message
-    std::int32_t counter{0}; //!< indexing counter not used directly by helics
-    void* backReference{nullptr}; //!< back referencing pointer not used by helics
+    Time time = timeZero;  //!< the event time the message is sent
+    std::uint16_t flags{0};  //!< message flags
+    std::uint16_t messageValidation{0U};  //!< extra field for user object usage, not used by HELICS
+    std::int32_t messageID{0};  //!< the messageID for a message
+    data_block data;  //!< the data packet for the message
+    std::string dest;  //!< the destination of the message
+    std::string source;  //!< the most recent source of the message
+    std::string original_source;  //!< the original source of the message
+    std::string original_dest;  //!< the original destination of a message
+    std::int32_t counter{0};  //!< indexing counter not used directly by helics
+    void* backReference{nullptr};  //!< back referencing pointer not used by helics
 
     /** default constructor*/
     Message() = default;
@@ -234,4 +234,4 @@ inline bool isValidIndex(sizeType testSize, const SizedDataType& vec)
     return ((testSize >= sizeType(0)) && (testSize < static_cast<sizeType>(vec.size())));
 }
 
-} // namespace helics
+}  // namespace helics

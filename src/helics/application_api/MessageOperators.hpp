@@ -31,7 +31,7 @@ class HELICS_CXX_EXPORT MessageTimeOperator: public FilterOperator {
     void setTimeFunction(std::function<Time(Time)> userTimeFunction);
 
   private:
-    std::function<Time(Time)> TimeFunction; //!< the function that actually does the processing
+    std::function<Time(Time)> TimeFunction;  //!< the function that actually does the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -49,7 +49,7 @@ class HELICS_CXX_EXPORT MessageDestOperator: public FilterOperator {
 
   private:
     std::function<std::string(const std::string&, const std::string&)>
-        DestUpdateFunction; //!< the function that actually does the processing
+        DestUpdateFunction;  //!< the function that actually does the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -65,7 +65,7 @@ class HELICS_CXX_EXPORT MessageDataOperator: public FilterOperator {
 
   private:
     std::function<data_view(data_view)>
-        dataFunction; //!< the function actually doing the processing
+        dataFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -85,7 +85,7 @@ class HELICS_CXX_EXPORT MessageConditionalOperator: public FilterOperator {
 
   private:
     std::function<bool(const Message*)>
-        evalFunction; //!< the function actually doing the processing
+        evalFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -106,7 +106,7 @@ class HELICS_CXX_EXPORT CloneOperator: public FilterOperator {
 
   private:
     std::function<std::vector<std::unique_ptr<Message>>(const Message*)>
-        evalFunction; //!< the function actually doing the processing
+        evalFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
     virtual std::vector<std::unique_ptr<Message>>
         processVector(std::unique_ptr<Message> message) override;
@@ -138,9 +138,9 @@ class HELICS_CXX_EXPORT FirewallOperator: public FilterOperator {
 
   private:
     std::function<bool(const Message*)>
-        checkFunction; //!< the function actually doing the processing
+        checkFunction;  //!< the function actually doing the processing
     std::atomic<operations> operation{
-        operations::drop}; //!< the operation to perform if the firewall triggers
+        operations::drop};  //!< the operation to perform if the firewall triggers
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -158,7 +158,7 @@ class HELICS_CXX_EXPORT CustomMessageOperator: public FilterOperator {
 
   private:
     std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)>
-        messageFunction; //!< the function actually doing the processing
+        messageFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
-} // namespace helics
+}  // namespace helics

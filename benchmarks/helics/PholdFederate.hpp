@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate: public BenchmarkFederate {
   public:
-    int evCount{0}; // number of events handled by this federate
+    int evCount{0};  // number of events handled by this federate
 
   private:
     helics::Endpoint* ept{nullptr};
@@ -29,10 +29,10 @@ class PholdFederate: public BenchmarkFederate {
     // 10% remote communications (also ran with 25%, 50%, and 100% remote communications)
     // mean exponential distribution of 0.90
     // optional lookahead of .1 (to prevent arbitrarily small increases in time with conservative simulators)
-    unsigned int initEvCount_{16}; // starting number of events
-    double localProbability_{.9}; // probability of local events
-    double randTimeMean_{deltaTime *
-                         .9}; // mean for the exponential distribution used when picking event times
+    unsigned int initEvCount_{16};  // starting number of events
+    double localProbability_{.9};  // probability of local events
+    double randTimeMean_{
+        deltaTime * .9};  // mean for the exponential distribution used when picking event times
     double lookahead_{deltaTime * .1};
 
     // classes related to the exponential and uniform distribution random number generator
@@ -71,12 +71,12 @@ class PholdFederate: public BenchmarkFederate {
     void setupArgumentParsing() override
     {
         app->add_option("--init_ev_count", initEvCount_, "the starting number of events");
-        app->add_option(
-            "--local_probability", localProbability_, "the probability of local events");
-        app->add_option(
-            "--rand_time_mean",
-            randTimeMean_,
-            "mean for the exponential distribution used when picking event times");
+        app->add_option("--local_probability",
+                        localProbability_,
+                        "the probability of local events");
+        app->add_option("--rand_time_mean",
+                        randTimeMean_,
+                        "mean for the exponential distribution used when picking event times");
         app->add_flag("--gen_rand_seed", generateRandomSeed, "enable generating a random seed");
         app->add_option("--set_rand_seed", seed, "set the random seed");
         app->add_option("--set_phold_lookahead", lookahead_, "set the lookahead used by phold");
@@ -90,7 +90,7 @@ class PholdFederate: public BenchmarkFederate {
     void doParamInit(helics::FederateInfo& /*fi*/) override
     {
         if (app->get_option("--set_rand_seed")->count() == 0) {
-            std::mt19937 random_engine(0x600d5eed); // NOLINT
+            std::mt19937 random_engine(0x600d5eed);  // NOLINT
             std::uniform_int_distribution<unsigned int> rand_seed_uniform;
             for (int i = 0; i < index; i++) {
                 (void)rand_seed_uniform(random_engine);

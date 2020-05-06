@@ -59,7 +59,7 @@ namespace mpi {
         static MPI_Comm mpiCommunicator;
         static bool startServiceThread;
 
-        std::mutex mpiDataLock; //!< lock for the comms and send_requests
+        std::mutex mpiDataLock;  //!< lock for the comms and send_requests
         std::vector<MpiComms*> comms;
         gmlc::containers::BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>>
             txMessageQueue;
@@ -76,5 +76,5 @@ namespace mpi {
         bool initMPI();
     };
 
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

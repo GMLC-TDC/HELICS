@@ -22,19 +22,19 @@ class UnknownHandleManager {
 
   private:
     std::unordered_multimap<std::string, targetInfo>
-        unknown_publications; //!< map of all unknown publications
+        unknown_publications;  //!< map of all unknown publications
     std::unordered_multimap<std::string, targetInfo>
-        unknown_endpoints; //!< map of all unknown endpoints
+        unknown_endpoints;  //!< map of all unknown endpoints
     std::unordered_multimap<std::string, targetInfo>
-        unknown_inputs; //!< map of all unknown endpoints
+        unknown_inputs;  //!< map of all unknown endpoints
     std::unordered_multimap<std::string, targetInfo>
-        unknown_filters; //!< map of all unknown filters
+        unknown_filters;  //!< map of all unknown filters
     std::unordered_multimap<std::string, std::string>
-        unknown_links; //!< map where links on either side is not known
+        unknown_links;  //!< map where links on either side is not known
     std::unordered_multimap<std::string, std::string>
-        unknown_src_filters; //!< map connecting source filters to endpoints
+        unknown_src_filters;  //!< map connecting source filters to endpoints
     std::unordered_multimap<std::string, std::string>
-        unknown_dest_filters; //!< map connecting destination filters to endpoints
+        unknown_dest_filters;  //!< map connecting destination filters to endpoints
   public:
     /** default constructor*/
     UnknownHandleManager() = default;
@@ -100,4 +100,4 @@ class UnknownHandleManager {
         std::function<void(const std::string& name, char type, global_handle)> cfunc) const;
 };
 
-} // namespace helics
+}  // namespace helics

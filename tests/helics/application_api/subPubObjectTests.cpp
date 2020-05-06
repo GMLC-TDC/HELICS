@@ -140,9 +140,9 @@ void runPubSubThroughTypeTests(const TX& valtx, const RX& valrx)
     auto s = subObj.getValue<RX>();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the object is what we expect
-    BOOST_CHECK_MESSAGE(
-        s == valrx,
-        std::string(typeid(TX).name()) + " -> " + typeid(IX).name() + " -> " + typeid(RX).name());
+    BOOST_CHECK_MESSAGE(s == valrx,
+                        std::string(typeid(TX).name()) + " -> " + typeid(IX).name() + " -> " +
+                            typeid(RX).name());
     vFed->finalize();
 }
 
@@ -278,8 +278,9 @@ TEST(subscriptionObject, complex_vector_tests)
     runPubSubTypeTests<vc, std::string>(eVec, helics::helicsComplexVectorString(eVec));
     runPubSubTypeTests<std::string, vc>(helics::helicsComplexVectorString(eVec), eVec);
 
-    runPubSubTypeTests<vc, helics::NamedPoint>(
-        tcvec2, {helics::helicsComplexVectorString(tcvec2), std::nan("0")});
+    runPubSubTypeTests<vc, helics::NamedPoint>(tcvec2,
+                                               {helics::helicsComplexVectorString(tcvec2),
+                                                std::nan("0")});
 }
 
 TEST(subscriptionObject, complex_vector_tests_ci_skip)
@@ -396,8 +397,9 @@ TEST(subscriptionObject, VectorSize_tests)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::make_publication<std::vector<double>>(
-        helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto pubObj = helics::make_publication<std::vector<double>>(helics::GLOBAL,
+                                                                vFed.get(),
+                                                                std::string("pub1"));
 
     auto& subObj = vFed->registerSubscription("pub1");
 

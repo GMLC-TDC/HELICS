@@ -53,5 +53,5 @@ namespace apps {
         bool websocket_enabled_{false};
         std::atomic<bool> executing{false};
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

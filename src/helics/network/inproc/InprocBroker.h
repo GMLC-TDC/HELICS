@@ -17,5 +17,5 @@ namespace inproc {
     using InprocBroker =
         NetworkBroker<InprocComms, interface_type::inproc, static_cast<int>(core_type::INPROC)>;
 
-} // namespace inproc
-} // namespace helics
+}  // namespace inproc
+}  // namespace helics

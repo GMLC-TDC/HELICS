@@ -42,17 +42,17 @@ class AsioContextManager: public std::enable_shared_from_this<AsioContextManager
   private:
     enum class loop_mode : int { stopped = 0, starting = 1, running = 2 };
     static std::map<std::string, std::shared_ptr<AsioContextManager>>
-        contexts; //!< container for pointers to all the available contexts
+        contexts;  //!< container for pointers to all the available contexts
     std::atomic<int> runCounter{
-        0}; //!< counter for the number of times the runContextLoop has been called
-    std::string name; //!< context name
-    std::unique_ptr<asio::io_context> ictx; //!< pointer to the actual context
+        0};  //!< counter for the number of times the runContextLoop has been called
+    std::string name;  //!< context name
+    std::unique_ptr<asio::io_context> ictx;  //!< pointer to the actual context
     std::unique_ptr<asio::io_context::work>
-        nullwork; //!< pointer to an object used to keep a context running
-    bool leakOnDelete = false; //!< this is done to prevent some warning messages for use in DLL's
-    std::atomic<loop_mode> running{loop_mode::stopped}; //!< flag indicating the loop is running
-    std::mutex runningLoopLock; //!< lock protecting the nullwork object and the return future
-    std::atomic<bool> terminateLoop{false}; //!< flag indicating that the loop should terminate
+        nullwork;  //!< pointer to an object used to keep a context running
+    bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
+    std::atomic<loop_mode> running{loop_mode::stopped};  //!< flag indicating the loop is running
+    std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
+    std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
     /** constructor*/
     explicit AsioContextManager(const std::string& contextName);
@@ -80,7 +80,7 @@ class AsioContextManager: public std::enable_shared_from_this<AsioContextManager
         Servicer(Servicer&& sv) = default;
 
       private:
-        std::shared_ptr<AsioContextManager> contextManager; //!< a pointer to the context manager
+        std::shared_ptr<AsioContextManager> contextManager;  //!< a pointer to the context manager
     };
 
   public:

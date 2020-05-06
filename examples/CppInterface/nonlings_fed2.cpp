@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include <cpp98/ValueFederate.hpp>
-#include <cpp98/helics.hpp> // helicsVersionString
+#include <cpp98/helics.hpp>  // helicsVersionString
 #include <math.h>
 #include <stdio.h>
 
@@ -46,14 +46,14 @@ int main(int /*argc*/, char** /*argv*/)
     printf(" Publication registered\n");
 
     /* Enter initialization state */
-    vfed->enterInitializingMode(); // can throw helicscpp::InvalidStateTransition exception
+    vfed->enterInitializingMode();  // can throw helicscpp::InvalidStateTransition exception
     printf(" Entered initialization state\n");
     double y = 1.0, /*xprv = 100,*/ yprv = 100;
 
     pub.publish(y);
     fflush(NULL);
     /* Enter execution state */
-    vfed->enterExecutingMode(); // can throw helicscpp::InvalidStateTransition exception
+    vfed->enterExecutingMode();  // can throw helicscpp::InvalidStateTransition exception
     printf(" Entered execution state\n");
 
     fflush(NULL);

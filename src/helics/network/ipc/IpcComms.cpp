@@ -72,13 +72,13 @@ namespace ipc {
                 err.messageID = defs::errors::connection_failure;
                 err.payload = rxQueue.getError();
                 ActionCallback(std::move(err));
-                setRxStatus(connection_status::error); // the connection has failed
+                setRxStatus(connection_status::error);  // the connection has failed
                 rxQueue.changeState(queue_state_t::closing);
                 return;
             }
         }
         setRxStatus(
-            connection_status::connected); // this is a atomic indicator that the rx queue is ready
+            connection_status::connected);  // this is a atomic indicator that the rx queue is ready
         bool IPCoperating = false;
         while (true) {
             auto bc = ipcbackchannel.load();
@@ -96,7 +96,7 @@ namespace ipc {
                         err.messageID = defs::errors::connection_failure;
                         err.payload = rxQueue.getError();
                         ActionCallback(std::move(err));
-                        setRxStatus(connection_status::error); // the connection has failed
+                        setRxStatus(connection_status::error);  // the connection has failed
                         rxQueue.changeState(queue_state_t::closing);
                         ipcbackchannel = 0;
                         return;
@@ -143,9 +143,9 @@ namespace ipc {
 
     void IpcComms::queue_tx_function()
     {
-        SendToQueue brokerQueue; //!< the queue of the broker
+        SendToQueue brokerQueue;  //!< the queue of the broker
         SendToQueue rxQueue;
-        std::map<route_id, SendToQueue> routes; //!< table of the routes to other brokers
+        std::map<route_id, SendToQueue> routes;  //!< table of the routes to other brokers
         bool hasBroker = false;
 
         if (!brokerTargetAddress.empty()) {
@@ -155,8 +155,8 @@ namespace ipc {
                 conn = brokerQueue.connect(brokerTargetAddress, true, 20);
                 if (!conn) {
                     ActionMessage err(CMD_ERROR);
-                    err.payload = fmt::format(
-                        "Unable to open broker connection -> {}", brokerQueue.getError());
+                    err.payload = fmt::format("Unable to open broker connection -> {}",
+                                              brokerQueue.getError());
                     err.messageID = defs::errors::connection_failure;
                     ActionCallback(std::move(err));
                     setTxStatus(connection_status::error);
@@ -287,5 +287,5 @@ namespace ipc {
 
     std::string IpcComms::getAddress() const { return localTargetAddress; }
 
-} // namespace ipc
-} // namespace helics
+}  // namespace ipc
+}  // namespace helics

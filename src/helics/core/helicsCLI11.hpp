@@ -44,11 +44,13 @@ class helicsCLI11App: public CLI::App {
         CLI::App(std::move(app_description), app_name, nullptr)
     {
         set_help_flag("-h,-?,--help", "Print this help message and exit");
-        set_config(
-            "--config-file,--config", "helics_config.toml", "specify base configuration file");
+        set_config("--config-file,--config",
+                   "helics_config.toml",
+                   "specify base configuration file");
         version(helics::versionString);
-        add_option_group("quiet")->immediate_callback()->add_flag(
-            "--quiet", quiet, "silence most print output");
+        add_option_group("quiet")->immediate_callback()->add_flag("--quiet",
+                                                                  quiet,
+                                                                  "silence most print output");
     }
 
     enum class parse_output : int {
@@ -159,7 +161,7 @@ class helicsCLI11App: public CLI::App {
     std::vector<std::string> remArgs;
     core_type coreType{core_type::DEFAULT};
 };
-} // namespace helics
+}  // namespace helics
 
 // use the CLI lexical cast function overload to convert a string into a time
 namespace CLI {
@@ -181,5 +183,5 @@ namespace detail {
     {
         return "TIME";
     }
-} // namespace detail
-} // namespace CLI
+}  // namespace detail
+}  // namespace CLI

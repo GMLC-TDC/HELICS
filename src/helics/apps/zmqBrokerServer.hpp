@@ -21,7 +21,7 @@ namespace zmq {
 class socket_t;
 class message_t;
 class context_t;
-} // namespace zmq
+}  // namespace zmq
 
 #endif
 
@@ -64,5 +64,5 @@ namespace apps {
         bool zmqss_enabled_{false};
         std::atomic_bool exitAll{false};
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

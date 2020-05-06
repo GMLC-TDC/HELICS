@@ -38,4 +38,4 @@ HELICS_CXX_EXPORT Time loadTimeFromString(std::string timeString, time_units def
 */
 HELICS_CXX_EXPORT time_units timeUnitsFromString(const std::string& unitString);
 
-} // namespace helics
+}  // namespace helics

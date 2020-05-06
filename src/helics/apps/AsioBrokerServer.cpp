@@ -46,12 +46,11 @@ namespace udp {
 
         void start_receive()
         {
-            socket_.async_receive_from(
-                asio::buffer(recv_buffer_),
-                remote_endpoint_,
-                [this](const asio::error_code& error, std::size_t bytes) {
-                    handle_receive(error, bytes);
-                });
+            socket_.async_receive_from(asio::buffer(recv_buffer_),
+                                       remote_endpoint_,
+                                       [this](const asio::error_code& error, std::size_t bytes) {
+                                           handle_receive(error, bytes);
+                                       });
         }
         void stop_receive() { socket_.cancel(); }
         /** set the callback for the data object*/
@@ -88,15 +87,14 @@ namespace udp {
         std::array<char, 1024> recv_buffer_;
         std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataCall;
     };
-} // namespace udp
+}  // namespace udp
 #endif
 
 namespace apps {
 #ifdef ENABLE_TCP_CORE
-    std::size_t AsioBrokerServer::tcpDataReceive(
-        std::shared_ptr<tcp::TcpConnection> connection,
-        const char* data,
-        std::size_t bytes_received)
+    std::size_t AsioBrokerServer::tcpDataReceive(std::shared_ptr<tcp::TcpConnection> connection,
+                                                 const char* data,
+                                                 std::size_t bytes_received)
     {
         std::size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -146,13 +144,12 @@ namespace apps {
             pdata.emplace_back(DEFAULT_TCP_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
         }
     }
-#endif // ENABLE_TCP_CORE
+#endif  // ENABLE_TCP_CORE
 
 #ifdef ENABLE_UDP_CORE
-    bool AsioBrokerServer::udpDataReceive(
-        std::shared_ptr<udp::UdpServer> server,
-        const char* data,
-        size_t bytes_received)
+    bool AsioBrokerServer::udpDataReceive(std::shared_ptr<udp::UdpServer> server,
+                                          const char* data,
+                                          size_t bytes_received)
     {
         ActionMessage m(data, static_cast<int>(bytes_received));
         if (isProtocolCommand(m)) {
@@ -197,7 +194,7 @@ namespace apps {
         }
     }
 
-#endif // ENABLE_UDP_CORE
+#endif  // ENABLE_UDP_CORE
 
     static const Json::Value null;
 
@@ -261,5 +258,5 @@ namespace apps {
         }
 #endif
     }
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

@@ -48,9 +48,8 @@ class MessageFederateManager {
     @param localEndpoint the local endpoint of a known communication pair
     @param remoteEndpoint of a communication pair
     */
-    void registerKnownCommunicationPath(
-        const Endpoint& localEndpoint,
-        const std::string& remoteEndpoint);
+    void registerKnownCommunicationPath(const Endpoint& localEndpoint,
+                                        const std::string& remoteEndpoint);
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
     @param ept the specified endpoint to deliver the values
     @param pubName the name of the publication to subscribe
@@ -79,11 +78,10 @@ class MessageFederateManager {
     /**/
     void sendMessage(const Endpoint& source, const std::string& dest, const data_view& message);
     /**/
-    void sendMessage(
-        const Endpoint& source,
-        const std::string& dest,
-        const data_view& message,
-        Time sendTime);
+    void sendMessage(const Endpoint& source,
+                     const std::string& dest,
+                     const data_view& message,
+                     Time sendTime);
     /**/
     void sendMessage(const Endpoint& source, std::unique_ptr<Message> message);
 
@@ -117,9 +115,9 @@ class MessageFederateManager {
     @param ept  the endpoint id to register the callback for
     @param callback the function to call
     */
-    static void setEndpointNotificationCallback(
-        const Endpoint& ept,
-        const std::function<void(Endpoint&, Time)>& callback);
+    static void
+        setEndpointNotificationCallback(const Endpoint& ept,
+                                        const std::function<void(Endpoint&, Time)>& callback);
 
     /**disconnect from the coreObject*/
     void disconnect();
@@ -140,16 +138,17 @@ class MessageFederateManager {
     shared_guarded<
         gmlc::containers::
             DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
-        local_endpoints; //!< storage for the local endpoint information
+        local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint&, Time)>> allCallback;
-    Time CurrentTime = Time::minVal(); //!< the current simulation time
-    Core* coreObject; //!< the pointer to the actual core
-    MessageFederate* mFed; //!< pointer back to the message Federate
-    const local_federate_id fedID; //!< storage for the federate ID
+    Time CurrentTime = Time::minVal();  //!< the current simulation time
+    Core* coreObject;  //!< the pointer to the actual core
+    MessageFederate* mFed;  //!< pointer back to the message Federate
+    const local_federate_id fedID;  //!< storage for the federate ID
     shared_guarded<std::vector<std::unique_ptr<EndpointData>>>
-        eptData; //!< the storage for the message queues and other unique Endpoint information
-    guarded<std::vector<unsigned int>> messageOrder; //!< maintaining a list of the ordered messages
-  private: // private functions
+        eptData;  //!< the storage for the message queues and other unique Endpoint information
+    guarded<std::vector<unsigned int>>
+        messageOrder;  //!< maintaining a list of the ordered messages
+  private:  // private functions
     void removeOrderedMessage(unsigned int index);
 };
-} // namespace helics
+}  // namespace helics
