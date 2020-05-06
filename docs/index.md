@@ -28,6 +28,7 @@ Motivation: Energy systems and their associated information and communication te
    installation/index
    introduction/index
    user-guide/index
+   Tools_using_HELICS
 ```
 
 ```eval_rst
