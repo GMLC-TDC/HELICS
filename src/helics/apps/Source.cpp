@@ -55,10 +55,9 @@ namespace apps {
         fed->setFlagOption(helics_flag_source_only);
     }
 
-    Source::Source(
-        const std::string& appName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi):
+    Source::Source(const std::string& appName,
+                   const std::shared_ptr<Core>& core,
+                   const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(helics_flag_source_only);
@@ -164,10 +163,9 @@ namespace apps {
                     if (el == "properties") {
                         for (auto& prop : genElement["properties"]) {
                             if ((prop.isMember("name")) && (prop.isMember("value"))) {
-                                setGeneratorProperty(
-                                    generators[index].get(),
-                                    prop["name"].asString(),
-                                    prop["value"]);
+                                setGeneratorProperty(generators[index].get(),
+                                                     prop["name"].asString(),
+                                                     prop["value"]);
                             }
                         }
                     } else {
@@ -254,26 +252,24 @@ namespace apps {
         }
     }
 
-    void Source::addPublication(
-        const std::string& key,
-        const std::string& generator,
-        data_type type,
-        Time period,
-        const std::string& units)
+    void Source::addPublication(const std::string& key,
+                                const std::string& generator,
+                                data_type type,
+                                Time period,
+                                const std::string& units)
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
             std::cerr << "publication already exists\n";
             return;
         }
-        SourceObject newObj(
-            Publication(
-                useLocal ? interface_visibility::local : interface_visibility::global,
-                fed,
-                key,
-                typeNameStringRef(type),
-                units),
-            period);
+        SourceObject newObj(Publication(useLocal ? interface_visibility::local :
+                                                   interface_visibility::global,
+                                        fed,
+                                        key,
+                                        typeNameStringRef(type),
+                                        units),
+                            period);
 
         if (!generator.empty()) {
             auto res = generatorLookup.find(generator);
@@ -391,5 +387,5 @@ namespace apps {
         return minTime;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

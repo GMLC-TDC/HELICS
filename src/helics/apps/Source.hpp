@@ -116,12 +116,11 @@ protection, that will result in undefined behavior
     @param period the period of the publication
     @param units the units associated with the publication
     */
-        void addPublication(
-            const std::string& key,
-            const std::string& generator,
-            data_type type,
-            Time period,
-            const std::string& units = std::string());
+        void addPublication(const std::string& key,
+                            const std::string& generator,
+                            data_type type,
+                            Time period,
+                            const std::string& units = std::string());
 
         /** add a publication to a source
     @param key the key of the publication to add
@@ -129,11 +128,10 @@ protection, that will result in undefined behavior
     @param period the period of the publication
     @param units the units associated with the publication
     */
-        void addPublication(
-            const std::string& key,
-            data_type type,
-            Time period,
-            const std::string& units = std::string())
+        void addPublication(const std::string& key,
+                            data_type type,
+                            Time period,
+                            const std::string& units = std::string())
         {
             addPublication(key, std::string(), type, period, units);
         }
@@ -165,12 +163,12 @@ protection, that will result in undefined behavior
         Time runSourceLoop(Time currentTime);
 
       private:
-        std::vector<SourceObject> sources; //!< the actual publication objects
-        std::vector<std::shared_ptr<SignalGenerator>> generators; //!< the signal generators
-        std::map<std::string, int> generatorLookup; //!< map of generator names to indices
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        std::map<std::string, int> pubids; //!< publication id map
-        Time defaultPeriod = 1.0; //!< the default period of publication
+        std::vector<SourceObject> sources;  //!< the actual publication objects
+        std::vector<std::shared_ptr<SignalGenerator>> generators;  //!< the signal generators
+        std::map<std::string, int> generatorLookup;  //!< map of generator names to indices
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::map<std::string, int> pubids;  //!< publication id map
+        Time defaultPeriod = 1.0;  //!< the default period of publication
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

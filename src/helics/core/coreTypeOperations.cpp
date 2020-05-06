@@ -232,7 +232,7 @@ namespace core {
             case core_type::TCP_SS:
                 available = tcp_availability;
                 break;
-            case core_type::DEFAULT: // default should always be available
+            case core_type::DEFAULT:  // default should always be available
                 available = true;
                 break;
             case core_type::INPROC:
@@ -275,5 +275,5 @@ namespace core {
         return (res != global_match_strings.end());
     }
 
-} // namespace core
-} // namespace helics
+}  // namespace core
+}  // namespace helics

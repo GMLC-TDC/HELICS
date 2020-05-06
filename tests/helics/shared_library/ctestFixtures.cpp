@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 static bool hasIndexCode(const std::string& type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
-        if (*(type_name.end() - 2) == '_') { // this setup ignores the setup mode
+        if (*(type_name.end() - 2) == '_') {  // this setup ignores the setup mode
             return true;
         }
     }
@@ -36,7 +36,7 @@ static auto StartBrokerImp(const std::string& core_type_name, std::string initia
 bool FederateTestFixture::hasIndexCode(const std::string& type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
-        if (*(type_name.end() - 2) == '_') { // this setup ignores the setup mode
+        if (*(type_name.end() - 2) == '_') {  // this setup ignores the setup mode
             return true;
         }
     }
@@ -97,9 +97,8 @@ helics_broker FederateTestFixture::AddBroker(const std::string& core_type_name, 
     return AddBroker(core_type_name, std::string("-f") + std::to_string(count));
 }
 
-helics_broker FederateTestFixture::AddBroker(
-    const std::string& core_type_name,
-    const std::string& initialization_string)
+helics_broker FederateTestFixture::AddBroker(const std::string& core_type_name,
+                                             const std::string& initialization_string)
 {
     helics_broker broker;
     if (extraBrokerArgs.empty()) {
@@ -112,12 +111,11 @@ helics_broker FederateTestFixture::AddBroker(
     return broker;
 }
 
-void FederateTestFixture::SetupTest(
-    FedCreator ctor,
-    const std::string& core_type_name,
-    int count,
-    helics_time time_delta,
-    const std::string& name_prefix)
+void FederateTestFixture::SetupTest(FedCreator ctor,
+                                    const std::string& core_type_name,
+                                    int count,
+                                    helics_time time_delta,
+                                    const std::string& name_prefix)
 {
     ctype = core_type_name;
     helics_broker broker = AddBroker(core_type_name, count);
@@ -125,13 +123,12 @@ void FederateTestFixture::SetupTest(
     AddFederates(ctor, core_type_name, count, broker, time_delta, name_prefix);
 }
 
-void FederateTestFixture::AddFederates(
-    FedCreator ctor,
-    std::string core_type_name,
-    int count,
-    helics_broker broker,
-    helics_time time_delta,
-    const std::string& name_prefix)
+void FederateTestFixture::AddFederates(FedCreator ctor,
+                                       std::string core_type_name,
+                                       int count,
+                                       helics_broker broker,
+                                       helics_time time_delta,
+                                       const std::string& name_prefix)
 {
     bool hasIndex = hasIndexCode(core_type_name);
     int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
@@ -172,7 +169,7 @@ void FederateTestFixture::AddFederates(
             }
             helicsCoreFree(core);
         } break;
-        case 2: { // each federate has its own core
+        case 2: {  // each federate has its own core
             size_t offset = federates.size();
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii) {

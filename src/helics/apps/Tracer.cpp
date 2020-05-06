@@ -55,10 +55,9 @@ namespace apps {
             std::cout << app->help();
         }
     }
-    Tracer::Tracer(
-        const std::string& appName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi):
+    Tracer::Tracer(const std::string& appName,
+                   const std::shared_ptr<Core>& core,
+                   const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(helics_flag_observer);
@@ -85,8 +84,8 @@ namespace apps {
         auto subCount = fed->getInputCount();
         for (int ii = 0; ii < subCount; ++ii) {
             subscriptions.emplace_back(fed->getInput(ii));
-            subkeys.emplace(
-                subscriptions.back().getName(), static_cast<int>(subscriptions.size()) - 1);
+            subkeys.emplace(subscriptions.back().getName(),
+                            static_cast<int>(subscriptions.size()) - 1);
         }
         auto eptCount = fed->getEndpointCount();
         for (int ii = 0; ii < eptCount; ++ii) {
@@ -142,7 +141,7 @@ namespace apps {
 
     void Tracer::loadTextFile(const std::string& textFile)
     {
-        using namespace gmlc::utilities::stringOps; //NOLINT
+        using namespace gmlc::utilities::stringOps;  //NOLINT
         App::loadTextFile(textFile);
         std::ifstream infile(textFile);
         std::string str;
@@ -168,12 +167,11 @@ namespace apps {
                         addSubscription(removeQuotes(blk[1]));
                     } else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e")) {
                         addEndpoint(removeQuotes(blk[1]));
-                    } else if (
-                        (blk[0] == "sourceclone") || (blk[0] == "source") || (blk[0] == "src")) {
+                    } else if ((blk[0] == "sourceclone") || (blk[0] == "source") ||
+                               (blk[0] == "src")) {
                         addSourceEndpointClone(removeQuotes(blk[1]));
-                    } else if (
-                        (blk[0] == "destclone") || (blk[0] == "dest") ||
-                        (blk[0] == "destination")) {
+                    } else if ((blk[0] == "destclone") || (blk[0] == "dest") ||
+                               (blk[0] == "destination")) {
                         addDestEndpointClone(removeQuotes(blk[1]));
                     } else if (blk[0] == "capture") {
                         addCapture(removeQuotes(blk[1]));
@@ -258,15 +256,16 @@ namespace apps {
                         }
                     } else {
                         if (iteration > 0) {
-                            valstr = fmt::format(
-                                "[{}:{}]value {}=block[{}]",
-                                currentTime,
-                                iteration,
-                                sub.getTarget(),
-                                val.size());
+                            valstr = fmt::format("[{}:{}]value {}=block[{}]",
+                                                 currentTime,
+                                                 iteration,
+                                                 sub.getTarget(),
+                                                 val.size());
                         } else {
-                            valstr = fmt::format(
-                                "[{}]value {}=block[{}]", currentTime, sub.getTarget(), val.size());
+                            valstr = fmt::format("[{}]value {}=block[{}]",
+                                                 currentTime,
+                                                 sub.getTarget(),
+                                                 val.size());
                         }
                     }
                     if (skiplog) {
@@ -287,19 +286,17 @@ namespace apps {
                 if (printMessage) {
                     std::string messstr;
                     if (mess->data.size() < 50) {
-                        messstr = fmt::format(
-                            "[{}]message from {} to {}::{}",
-                            currentTime,
-                            mess->source,
-                            mess->dest,
-                            mess->data.to_string());
+                        messstr = fmt::format("[{}]message from {} to {}::{}",
+                                              currentTime,
+                                              mess->source,
+                                              mess->dest,
+                                              mess->data.to_string());
                     } else {
-                        messstr = fmt::format(
-                            "[{}]message from {} to {}:: size {}",
-                            currentTime,
-                            mess->source,
-                            mess->dest,
-                            mess->data.size());
+                        messstr = fmt::format("[{}]message from {} to {}:: size {}",
+                                              currentTime,
+                                              mess->source,
+                                              mess->dest,
+                                              mess->data.size());
                     }
                     if (skiplog) {
                         std::cout << messstr << '\n';
@@ -320,19 +317,17 @@ namespace apps {
                 if (printMessage) {
                     std::string messstr;
                     if (mess->data.size() < 50) {
-                        messstr = fmt::format(
-                            "[{}]message from {} to {}::{}",
-                            currentTime,
-                            mess->source,
-                            mess->original_dest,
-                            mess->data.to_string());
+                        messstr = fmt::format("[{}]message from {} to {}::{}",
+                                              currentTime,
+                                              mess->source,
+                                              mess->original_dest,
+                                              mess->data.to_string());
                     } else {
-                        messstr = fmt::format(
-                            "[{}]message from %s to %s:: size %d",
-                            currentTime,
-                            mess->source,
-                            mess->original_dest,
-                            mess->data.size());
+                        messstr = fmt::format("[{}]message from %s to %s:: size %d",
+                                              currentTime,
+                                              mess->source,
+                                              mess->original_dest,
+                                              mess->data.size());
                     }
                     if (skiplog) {
                         std::cout << messstr << '\n';
@@ -399,7 +394,7 @@ namespace apps {
         if ((res == subkeys.end()) || (res->second == -1)) {
             subscriptions.push_back(helics::make_subscription(*fed, key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
-            subkeys[key] = index; // this is a potential replacement
+            subkeys[key] = index;  // this is a potential replacement
         }
     }
 
@@ -410,7 +405,7 @@ namespace apps {
         if ((res == eptNames.end()) || (res->second == -1)) {
             endpoints.emplace_back(GLOBAL, fed, endpoint);
             auto index = static_cast<int>(endpoints.size()) - 1;
-            eptNames[endpoint] = index; // this is a potential replacement
+            eptNames[endpoint] = index;  // this is a potential replacement
         }
     }
     void Tracer::addSourceEndpointClone(const std::string& sourceEndpoint)
@@ -492,8 +487,8 @@ namespace apps {
             ->type_size(-1);
 
         capture_group
-            ->add_option(
-                "--endpoints", "endpoints to capture, this argument may be specified multiple time")
+            ->add_option("--endpoints",
+                         "endpoints to capture, this argument may be specified multiple time")
             ->each([this](const std::string& ept) {
                 auto eptlist = splitlineQuotes(ept);
                 for (const auto& eptname : eptlist) {
@@ -519,5 +514,5 @@ namespace apps {
         return app;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

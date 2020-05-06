@@ -72,7 +72,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define INPROCTEST2 "inproc_2",
 #    define INPROCTEST3 "inproc_3",
 #    define INPROCTEST4 "inproc_4",
-#else //if the INPROC core is turned off then just use the test core since it is required to be available for tests
+#else  //if the INPROC core is turned off then just use the test core since it is required to be available for tests
 #    define INPROCTEST "test"
 #    define INPROCTEST2 "test_2"
 #    define INPROCTEST3 "test_3"

@@ -55,7 +55,7 @@ namespace mpi {
     bool MpiCore::brokerConnect()
     {
         std::lock_guard<std::mutex> lock(
-            dataMutex); // mutex protecting the other information in the ipcBroker
+            dataMutex);  // mutex protecting the other information in the ipcBroker
 
         if (brokerAddress.empty()) {
             brokerAddress = "0:0";
@@ -69,5 +69,5 @@ namespace mpi {
 
     std::string MpiCore::generateLocalAddressString() const { return comms->getAddress(); }
 
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

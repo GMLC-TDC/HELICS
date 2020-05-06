@@ -57,7 +57,7 @@ class ValueConverter<std::string> {
     static void interpret(const data_view& block, std::string& val) { val = interpret(block); }
     static std::string type() { return "string"; }
 };
-} // namespace helics
+}  // namespace helics
 
 // This should be at the end since it depends on the definitions in here
 #ifndef HELICS_CXX_STATIC_DEFINE

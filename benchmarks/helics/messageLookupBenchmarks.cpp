@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** class implementing the hub for an echo test*/
 class messageGenerator {
   public:
-    helics::Time finalTime = helics::Time(100, time_units::ms); // final time
+    helics::Time finalTime = helics::Time(100, time_units::ms);  // final time
   private:
     std::unique_ptr<helics::MessageFederate> mFed;
     std::vector<helics::Endpoint> epts;
@@ -79,11 +79,13 @@ class messageGenerator {
 
     void mainLoop()
     {
-        std::random_device rd; // obtain a random number from hardware
-        std::mt19937 eng(rd()); // seed the generator
-        std::uniform_int_distribution<> messageDest(
-            0, cnt_total_ - 1); // define possible destinations
-        std::uniform_int_distribution<> messageSource(0, cnt_local_ - 1); // define possible sources
+        std::random_device rd;  // obtain a random number from hardware
+        std::mt19937 eng(rd());  // seed the generator
+        std::uniform_int_distribution<> messageDest(0,
+                                                    cnt_total_ -
+                                                        1);  // define possible destinations
+        std::uniform_int_distribution<> messageSource(0,
+                                                      cnt_local_ - 1);  // define possible sources
         const std::string message = "hello";
         const std::string destName = "ept_";
         for (int jj = 0; jj < 100; ++jj) {
@@ -111,12 +113,11 @@ static void BMmgen_singleCore(benchmark::State& state)
 
         auto wcore = helics::CoreFactory::create(core_type::INPROC, std::string("--autobroker "));
         messageGenerator mgen;
-        mgen.initialize(
-            wcore->getIdentifier(),
-            static_cast<int>(state.range(0)),
-            static_cast<int>(state.range(0)),
-            100,
-            0);
+        mgen.initialize(wcore->getIdentifier(),
+                        static_cast<int>(state.range(0)),
+                        static_cast<int>(state.range(0)),
+                        100,
+                        0);
 
         mgen.makeReady();
         state.ResumeTiming();
@@ -145,30 +146,31 @@ static void BMmgen_multiCore(benchmark::State& state, core_type cType)
         state.PauseTiming();
         int feds = static_cast<int>(state.range(1));
         gmlc::concurrency::Barrier brr(feds);
-        auto broker = helics::BrokerFactory::create(
-            cType, std::string("--federates=") + std::to_string(feds));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          std::string("--federates=") + std::to_string(feds));
         broker->setLoggingLevel(helics_log_level_no_print);
 
         std::vector<messageGenerator> gens(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            cores[ii] = helics::CoreFactory::create(
-                cType,
-                std::string(
-                    " --federates=1 --log_level=no_print --broker=" + broker->getIdentifier()));
+            cores[ii] =
+                helics::CoreFactory::create(cType,
+                                            std::string(
+                                                " --federates=1 --log_level=no_print --broker=" +
+                                                broker->getIdentifier()));
             cores[ii]->connect();
-            gens[ii].initialize(
-                cores[ii]->getIdentifier(),
-                static_cast<int>(state.range(0) / state.range(1)),
-                static_cast<int>(state.range(0)),
-                100,
-                ii);
+            gens[ii].initialize(cores[ii]->getIdentifier(),
+                                static_cast<int>(state.range(0) / state.range(1)),
+                                static_cast<int>(state.range(0)),
+                                100,
+                                ii);
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](messageGenerator& gen) { gen.run([&brr]() { brr.wait(); }); },
-                std::ref(gens[ii + 1]));
+            threadlist[ii] =
+                std::thread([&](messageGenerator& gen) { gen.run([&brr]() { brr.wait(); }); },
+                            std::ref(gens[ii + 1]));
         }
 
         gens[0].makeReady();

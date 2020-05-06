@@ -35,10 +35,10 @@ namespace mpi {
 
       private:
         virtual bool brokerConnect() override;
-        mutable std::mutex dataMutex; //!< mutex protecting the configuration information
-        std::string brokerAddress; //!< the mpi rank:tag of the parent broker
+        mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+        std::string brokerAddress;  //!< the mpi rank:tag of the parent broker
         int brokerRank{0};
         int brokerTag{0};
     };
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

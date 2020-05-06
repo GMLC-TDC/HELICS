@@ -214,14 +214,13 @@ namespace inproc {
                         tbroker->addActionMessage(std::move(cmd));
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(
-                                std::string("unknown route, message dropped ") +
-                                prettyPrintString(cmd));
+                            logWarning(std::string("unknown route, message dropped ") +
+                                       prettyPrintString(cmd));
                         }
                     }
                 }
             }
-        } // while (!haltLoop)
+        }  // while (!haltLoop)
 
         routes.clear();
         tbroker = nullptr;
@@ -231,6 +230,6 @@ namespace inproc {
 
     std::string InprocComms::getAddress() const { return localTargetAddress; }
 
-} // namespace inproc
+}  // namespace inproc
 
-} // namespace helics
+}  // namespace helics

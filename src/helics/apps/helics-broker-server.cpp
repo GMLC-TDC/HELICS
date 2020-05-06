@@ -25,13 +25,13 @@ int main(int argc, char* argv[])
     bool runterminal = false;
 
     helics::helicsCLI11App cmdLine("helics broker server command line");
-    auto term = cmdLine
-                    .add_subcommand(
-                        "term",
-                        "helics_broker_server term will start a broker server "
-                        "and open a terminal control window "
-                        "for the broker server, run help in a terminal for more commands\n")
-                    ->prefix_command();
+    auto term =
+        cmdLine
+            .add_subcommand("term",
+                            "helics_broker_server term will start a broker server "
+                            "and open a terminal control window "
+                            "for the broker server, run help in a terminal for more commands\n")
+            ->prefix_command();
     term->callback([&runterminal]() { runterminal = true; });
     helics::Time opTime(30, time_units::minutes);
     cmdLine
@@ -205,8 +205,8 @@ void terminalFunction(std::vector<std::string> args)
         ->callback(newBroker);
 
     termProg
-        .add_subcommand(
-            "terminate!", "forcibly terminate the broker servers, shutdown all brokers and exit")
+        .add_subcommand("terminate!",
+                        "forcibly terminate the broker servers, shutdown all brokers and exit")
         ->callback([closeBrokerServer, &cmdcont]() {
             cmdcont = false;
             closeBrokerServer();
@@ -279,7 +279,7 @@ void terminalFunction(std::vector<std::string> args)
         std::getline(std::cin, cmdin);
         if (cmdin == "exit" ||
             cmdin ==
-                "q") { // provide a fast path to exit without going through the terminal command line processor
+                "q") {  // provide a fast path to exit without going through the terminal command line processor
             cmdcont = false;
             continue;
         }

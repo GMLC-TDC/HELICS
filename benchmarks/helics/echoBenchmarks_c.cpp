@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** class implementing the hub for an echo test*/
 class EchoHub_c {
   public:
-    helics_time finalTime{0.1}; // final time
+    helics_time finalTime{0.1};  // final time
   private:
     helics_federate vFed{nullptr};
     std::vector<helics_publication> pubs;
@@ -190,8 +190,8 @@ static void BMecho_singleCore(benchmark::State& state)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+            threadlist[ii] = std::thread([&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); },
+                                         std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -230,24 +230,28 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
         auto broker =
             helicsCreateBroker(cTypeString.c_str(), "brokerb", initString.c_str(), nullptr);
 
-        auto wcore = helicsCreateCore(
-            cTypeString.c_str(), "", "--federates=1 --log_level=no_print", nullptr);
+        auto wcore = helicsCreateCore(cTypeString.c_str(),
+                                      "",
+                                      "--federates=1 --log_level=no_print",
+                                      nullptr);
         // this is to delay until the threads are ready
         EchoHub_c hub;
         hub.initialize(helicsCoreGetIdentifier(wcore), feds);
         std::vector<EchoLeaf_c> leafs(feds);
         std::vector<helics_core> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            cores[ii] = helicsCreateCore(
-                cTypeString.c_str(), nullptr, "-f 1 --log_level=no_print", nullptr);
+            cores[ii] = helicsCreateCore(cTypeString.c_str(),
+                                         nullptr,
+                                         "-f 1 --log_level=no_print",
+                                         nullptr);
             helicsCoreConnect(cores[ii], nullptr);
             leafs[ii].initialize(helicsCoreGetIdentifier(cores[ii]), ii);
         }
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+            threadlist[ii] = std::thread([&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); },
+                                         std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();

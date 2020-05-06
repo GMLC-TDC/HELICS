@@ -52,8 +52,8 @@ class Broker {
     }
     /** initialize from command line arguments
      */
-    [[deprecated("please use configureFromArgs instead")]] void
-        initializeFromArgs(int argc, char* argv[])
+    [[deprecated("please use configureFromArgs instead")]] void initializeFromArgs(int argc,
+                                                                                   char* argv[])
     {
         configureFromArgs(argc, argv);
     }
@@ -114,12 +114,12 @@ class Broker {
     endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void
-        addSourceFilterToEndpoint(const std::string& filter, const std::string& target) = 0;
+    virtual void addSourceFilterToEndpoint(const std::string& filter,
+                                           const std::string& target) = 0;
     /** create a filter connection between a named filter and a named endpoint for destination processing
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void
-        addDestinationFilterToEndpoint(const std::string& filter, const std::string& target) = 0;
+    virtual void addDestinationFilterToEndpoint(const std::string& filter,
+                                                const std::string& target) = 0;
 };
-} // namespace helics
+}  // namespace helics

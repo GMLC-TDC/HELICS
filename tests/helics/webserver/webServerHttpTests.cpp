@@ -32,10 +32,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
-namespace beast = boost::beast; // from <boost/beast.hpp>
-namespace http = beast::http; // from <boost/beast/http.hpp>
-namespace net = boost::asio; // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast;  // from <boost/beast.hpp>
+namespace http = beast::http;  // from <boost/beast/http.hpp>
+namespace net = boost::asio;  // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 const constexpr char localhost[] = "localhost";
 
@@ -56,7 +56,7 @@ class httpTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<beast::tcp_stream>(ioc); //NOLINT
+        stream = std::make_unique<beast::tcp_stream>(ioc);  //NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26242");
@@ -135,8 +135,8 @@ class httpTest: public ::testing::Test {
         return res.body();
     }
 
-    static std::shared_ptr<helics::Broker>
-        addBroker(helics::core_type ctype, const std::string& init)
+    static std::shared_ptr<helics::Broker> addBroker(helics::core_type ctype,
+                                                     const std::string& init)
     {
         auto brk = helics::BrokerFactory::create(ctype, init);
         if (brk) {

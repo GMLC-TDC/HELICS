@@ -40,5 +40,5 @@ namespace apps {
         /* log a message to the console */
         static void logMessage(std::string message);
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

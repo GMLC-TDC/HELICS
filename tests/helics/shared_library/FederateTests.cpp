@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(federate_initialize_tests, *utf::label("ci"))
     BOOST_CHECK(Fed->getCurrentState() == helics::Federate::op_states::initialization);
     Fed->enterExecutionState();
     BOOST_CHECK(Fed->getCurrentState() == helics::Federate::op_states::execution);
-    Fed = nullptr; // force the destructor
+    Fed = nullptr;  // force the destructor
 }
 
 BOOST_AUTO_TEST_CASE(federate_time_step_tests, *utf::label("ci"))

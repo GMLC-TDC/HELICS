@@ -190,4 +190,4 @@ std::unique_ptr<Message> CustomMessageOperator::process(std::unique_ptr<Message>
     return message;
 }
 
-} // namespace helics
+}  // namespace helics

@@ -391,14 +391,13 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
     EXPECT_TRUE(!mCore->isConnected());
 }
 
-static bool two_stage_filter_test(
-    std::shared_ptr<helics::MessageFederate>& mFed,
-    std::shared_ptr<helics::MessageFederate>& fFed1,
-    std::shared_ptr<helics::MessageFederate>& fFed2,
-    helics::Endpoint& p1,
-    helics::Endpoint& p2,
-    helics::Filter& f1,
-    helics::Filter& f2)
+static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed,
+                                  std::shared_ptr<helics::MessageFederate>& fFed1,
+                                  std::shared_ptr<helics::MessageFederate>& fFed2,
+                                  helics::Endpoint& p1,
+                                  helics::Endpoint& p2,
+                                  helics::Filter& f1,
+                                  helics::Filter& f2)
 {
     bool correct = true;
 
@@ -1188,8 +1187,7 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    filter_tests,
-    filter_single_type_test,
-    ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(filter_tests,
+                         filter_single_type_test,
+                         ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(core_types_all));

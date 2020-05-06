@@ -162,7 +162,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     cmd.source_handle = interface_handle{2};
     cmd.dest_id = global_federate_id{3};
     cmd.dest_handle = interface_handle{4};
-    cmd.flags = 0x1a2F; // this has no significance
+    cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal();
     cmd.payload = "hello world";
 
@@ -180,7 +180,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     EXPECT_EQ(cmd_copy.flags, 0x1a2F);
     EXPECT_EQ(cmd_copy.actionTime, helics::Time::maxVal());
     EXPECT_EQ(cmd_copy.payload, "hello world");
-    EXPECT_EQ(cmd_copy.name, "hello world"); // aliased to payload
+    EXPECT_EQ(cmd_copy.name, "hello world");  // aliased to payload
 
     EXPECT_EQ(cmd_copy.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_copy.Tdemin, helics::Time::minVal());
@@ -218,7 +218,7 @@ TEST(ActionMessage_tests, assignment_test)
     EXPECT_TRUE(checkActionFlag(cmd_assign, error_flag));
     EXPECT_EQ(cmd_assign.actionTime, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.payload, "hello world");
-    EXPECT_EQ(cmd_assign.name, "hello world"); // aliased to payload
+    EXPECT_EQ(cmd_assign.name, "hello world");  // aliased to payload
 
     EXPECT_EQ(cmd_assign.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.Tdemin, helics::Time::minVal());
@@ -362,7 +362,7 @@ TEST(ActionMessage_tests, check_conversions)
     EXPECT_EQ(cmdStr, std::string(cmdVec.data(), cmdVec.size()));
 
     auto testBuffer1 = std::make_unique<char[]>(cmdStr.size() + 20);
-    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2U); // make a too small buffer
+    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2U);  // make a too small buffer
 
     auto res = cmd.toByteArray(testBuffer1.get(), static_cast<int>(cmdStr.size() + 20));
     EXPECT_EQ(res, static_cast<int>(cmdStr.size()));

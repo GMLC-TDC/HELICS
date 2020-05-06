@@ -99,9 +99,8 @@ TEST(federateInfo, loadArgs_error)
     helics::FederateInfo f1;
     EXPECT_NO_THROW(f1.loadInfoFromArgs("--name f3 --type ipc --flags unrecognized --port=5000"));
 
-    EXPECT_THROW(
-        f1.loadInfoFromArgs("--name f3 --type ipc --brokerport=hippity_hopity"),
-        helics::InvalidParameter);
+    EXPECT_THROW(f1.loadInfoFromArgs("--name f3 --type ipc --brokerport=hippity_hopity"),
+                 helics::InvalidParameter);
 }
 
 TEST(federateInfo, loadArgs_error2)
@@ -164,17 +163,17 @@ TEST(federateInfo, property_index)
 TEST(federateInfo, option_index)
 {
     EXPECT_EQ(helics::getOptionIndex("unexpected"), -1);
-    EXPECT_EQ(
-        helics::getOptionIndex("single_connection"), helics_handle_option_single_connection_only);
-    EXPECT_EQ(
-        helics::getOptionIndex("StrictTypeChecking"), helics_handle_option_strict_type_checking);
+    EXPECT_EQ(helics::getOptionIndex("single_connection"),
+              helics_handle_option_single_connection_only);
+    EXPECT_EQ(helics::getOptionIndex("StrictTypeChecking"),
+              helics_handle_option_strict_type_checking);
     EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
 }
 
 TEST(federateInfo, loadinfoError)
 {
-    EXPECT_THROW(
-        helics::loadFederateInfo("{\"log_level\":\"whatever\"}"), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("{\"log_level\":\"whatever\"}"),
+                 helics::InvalidIdentifier);
 }
 
 TEST(federateInfo, loadinfoPropsJson)

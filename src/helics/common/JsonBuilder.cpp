@@ -132,4 +132,4 @@ void JsonBuilder::reset()
 {
     jMap = nullptr;
 }
-} // namespace helics
+}  // namespace helics

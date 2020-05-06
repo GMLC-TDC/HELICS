@@ -11,4 +11,4 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 template class NetworkCore<testcore::TestComms, interface_type::inproc>;
-} // namespace helics
+}  // namespace helics

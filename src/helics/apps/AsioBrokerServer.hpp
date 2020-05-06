@@ -25,7 +25,7 @@ namespace helics {
 namespace tcp {
     class TcpServer;
     class TcpConnection;
-} // namespace tcp
+}  // namespace tcp
 #    endif
 #    ifdef ENABLE_UDP_CORE
 namespace udp {
@@ -52,10 +52,9 @@ namespace apps {
 #    ifdef ENABLE_TCP_CORE
         std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
         void loadTCPServerData(portData& pdata);
-        std::size_t tcpDataReceive(
-            std::shared_ptr<tcp::TcpConnection> connection,
-            const char* data,
-            size_t bytes_received);
+        std::size_t tcpDataReceive(std::shared_ptr<tcp::TcpConnection> connection,
+                                   const char* data,
+                                   size_t bytes_received);
         std::shared_ptr<tcp::TcpServer> tcpserver;
         portData tcpPortData;
 #    endif
@@ -63,10 +62,9 @@ namespace apps {
         std::shared_ptr<udp::UdpServer> loadUDPserver(asio::io_context& ioctx);
         void loadUDPServerData(portData& pdata);
 
-        bool udpDataReceive(
-            std::shared_ptr<udp::UdpServer> server,
-            const char* data,
-            size_t bytes_received);
+        bool udpDataReceive(std::shared_ptr<udp::UdpServer> server,
+                            const char* data,
+                            size_t bytes_received);
         std::shared_ptr<udp::UdpServer> udpserver;
         portData udpPortData;
 #    endif
@@ -79,8 +77,8 @@ namespace apps {
         bool tcp_enabled_{false};
         bool udp_enabled_{false};
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics
 
 #else
 /** a virtual class to use as a base for broker servers of various types*/

@@ -27,8 +27,9 @@ namespace tcp {
         auto hApp = NetworkBroker::generateCLI();
         hApp->description("TCP Single Socket Broker arguments");
         hApp->add_option("--connections", connections, "target link connections");
-        hApp->add_flag(
-                "--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
+        hApp->add_flag("--no_outgoing_connection",
+                       no_outgoing_connections,
+                       "disable outgoing connections")
             ->ignore_underscore();
         return hApp;
     }
@@ -46,5 +47,5 @@ namespace tcp {
         return NetworkBroker::brokerConnect();
     }
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

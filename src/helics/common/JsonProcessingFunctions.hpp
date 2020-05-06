@@ -29,8 +29,8 @@ Json::Value loadJson(const std::string& jsonString);
 Json::Value loadJsonStr(const std::string& jsonString);
 
 /** read a time from a JSON value element*/
-helics::Time
-    loadJsonTime(const Json::Value& timeElement, time_units defaultUnits = time_units::sec);
+helics::Time loadJsonTime(const Json::Value& timeElement,
+                          time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
 std::string getKey(const Json::Value& element);
@@ -61,10 +61,9 @@ inline int64_t getOrDefault(const Json::Value& element, const std::string& key, 
     return (element.isMember(key)) ? element[key].asInt64() : defVal;
 }
 
-inline bool callIfMember(
-    const Json::Value& element,
-    const std::string& key,
-    const std::function<void(const std::string&, helics::Time)>& call)
+inline bool callIfMember(const Json::Value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&, helics::Time)>& call)
 {
     if (element.isMember(key)) {
         call(key, loadJsonTime(element[key]));
@@ -73,10 +72,9 @@ inline bool callIfMember(
     return false;
 }
 
-inline bool callIfMember(
-    const Json::Value& element,
-    const std::string& key,
-    const std::function<void(const std::string&, bool)>& call)
+inline bool callIfMember(const Json::Value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&, bool)>& call)
 {
     if (element.isMember(key)) {
         call(key, element[key].asBool());
@@ -85,10 +83,9 @@ inline bool callIfMember(
     return false;
 }
 
-inline bool callIfMember(
-    const Json::Value& element,
-    const std::string& key,
-    const std::function<void(const std::string&, int)>& call)
+inline bool callIfMember(const Json::Value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&, int)>& call)
 {
     if (element.isMember(key)) {
         call(key, element[key].asInt());
@@ -97,10 +94,9 @@ inline bool callIfMember(
     return false;
 }
 
-inline bool callIfMember(
-    const Json::Value& element,
-    const std::string& key,
-    const std::function<void(const std::string&)>& call)
+inline bool callIfMember(const Json::Value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&)>& call)
 {
     if (element.isMember(key)) {
         call(element[key].asString());

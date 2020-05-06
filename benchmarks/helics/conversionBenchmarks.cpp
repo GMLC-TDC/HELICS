@@ -34,10 +34,10 @@ BENCHMARK_CAPTURE(BMconversion, string_conv, std::string{"test 1"});
 
 BENCHMARK_CAPTURE(BMconversion, string_conv_med, std::string{"test a longer string"});
 
-BENCHMARK_CAPTURE(
-    BMconversion,
-    string_conv_long,
-    std::string{"test a longer string with quite a bit longer length than the previous one"});
+BENCHMARK_CAPTURE(BMconversion,
+                  string_conv_long,
+                  std::string{
+                      "test a longer string with quite a bit longer length than the previous one"});
 
 BENCHMARK_CAPTURE(BMconversion, vector_conv, std::vector<double>{26.5, 18.6, -48.5, -5.4e-12});
 
@@ -67,10 +67,10 @@ BENCHMARK_CAPTURE(BMinterpret, string_interp, std::string{"test 1"});
 
 BENCHMARK_CAPTURE(BMinterpret, string_interp_med, std::string{"test a longer string"});
 
-BENCHMARK_CAPTURE(
-    BMinterpret,
-    string_interp_long,
-    std::string{"test a longer string with quite a bit longer length than the previous one"});
+BENCHMARK_CAPTURE(BMinterpret,
+                  string_interp_long,
+                  std::string{
+                      "test a longer string with quite a bit longer length than the previous one"});
 
 BENCHMARK_CAPTURE(BMinterpret, vector_interp, std::vector<double>{26.5, 18.6, -48.5, -5.4e-12});
 

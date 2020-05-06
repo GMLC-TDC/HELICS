@@ -60,17 +60,18 @@ TEST_P(valuefed_single_transfer, types7)
 
 TEST_P(valuefed_single_transfer, types8)
 {
-    runFederateTest<std::string>(
-        GetParam(),
-        "start",
-        "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runFederateTest<std::string>(GetParam(),
+                                 "start",
+                                 "inside of the functional relationship of helics",
+                                 std::string("I am a string"));
 }
 
 TEST_P(valuefed_single_transfer, types9)
 {
-    runFederateTestv2<std::vector<double>>(
-        GetParam(), {34.3, 24.2}, {12.4, 14.7, 16.34, 18.17}, {9.9999, 8.8888, 7.7777});
+    runFederateTestv2<std::vector<double>>(GetParam(),
+                                           {34.3, 24.2},
+                                           {12.4, 14.7, 16.34, 18.17},
+                                           {9.9999, 8.8888, 7.7777});
 }
 
 TEST_P(valuefed_single_transfer, types10)
@@ -133,11 +134,10 @@ TEST_P(valuefed_single_transfer, publishers7)
 
 TEST_P(valuefed_single_transfer, types_publishers8)
 {
-    runFederateTestObj<std::string>(
-        GetParam(),
-        "start",
-        "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runFederateTestObj<std::string>(GetParam(),
+                                    "start",
+                                    "inside of the functional relationship of helics",
+                                    std::string("I am a string"));
 }
 
 TEST_P(valuefed_single_transfer, types_publishers9)
@@ -147,7 +147,6 @@ TEST_P(valuefed_single_transfer, types_publishers9)
     std::complex<double> v2 = {-3e45, 1e-23};
     runFederateTestObj<std::complex<double>>(GetParam(), def, v1, v2);
 }
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_single_transfer_ci_skip,
-    valuefed_single_transfer,
-    ::testing::ValuesIn(core_types_single));
+INSTANTIATE_TEST_SUITE_P(valuefed_single_transfer_ci_skip,
+                         valuefed_single_transfer,
+                         ::testing::ValuesIn(core_types_single));

@@ -81,4 +81,4 @@ template class CommsBroker<inproc::InprocComms, CoreBroker>;
 template class CommsBroker<mpi::MpiComms, CoreBroker>;
 template class CommsBroker<mpi::MpiComms, CommonCore>;
 #endif
-} // namespace helics
+}  // namespace helics

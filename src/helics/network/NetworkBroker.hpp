@@ -27,8 +27,8 @@ class NetworkBroker: public CommsBroker<COMMS, CoreBroker> {
   protected:
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
     virtual bool brokerConnect() override;
-    mutable std::mutex dataMutex; //!< mutex protecting the configuration information
-    NetworkBrokerData netInfo{baseline}; //!< structure containing the networking information
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+    NetworkBrokerData netInfo{baseline};  //!< structure containing the networking information
 };
 
-} // namespace helics
+}  // namespace helics

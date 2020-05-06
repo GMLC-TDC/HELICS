@@ -19,29 +19,26 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** generate a subscription object from a value federate*/
-inline Input& make_subscription(
-    ValueFederate* valueFed,
-    const std::string& key,
-    const std::string& units = std::string())
+inline Input& make_subscription(ValueFederate* valueFed,
+                                const std::string& key,
+                                const std::string& units = std::string())
 {
     return valueFed->registerSubscription(key, units);
 }
 
 /** generate a subscription object from a value federate*/
-inline Input& make_subscription(
-    ValueFederate& valueFed,
-    const std::string& key,
-    const std::string& units = std::string())
+inline Input& make_subscription(ValueFederate& valueFed,
+                                const std::string& key,
+                                const std::string& units = std::string())
 {
     return valueFed.registerSubscription(key, units);
 }
 
 /** generate a typed subscription object from a value federate*/
 template<class X>
-inline InputT<X> make_subscription(
-    ValueFederate* valueFed,
-    const std::string& key,
-    const std::string& units = std::string())
+inline InputT<X> make_subscription(ValueFederate* valueFed,
+                                   const std::string& key,
+                                   const std::string& units = std::string())
 {
     InputT<X> ipt(valueFed, typeNameString<X>(), units);
     ipt.addTarget(key);
@@ -50,10 +47,9 @@ inline InputT<X> make_subscription(
 
 /** generate a typed subscription object from a value federate*/
 template<class X>
-inline InputT<X> make_subscription(
-    ValueFederate& valueFed,
-    const std::string& key,
-    const std::string& units = std::string())
+inline InputT<X> make_subscription(ValueFederate& valueFed,
+                                   const std::string& key,
+                                   const std::string& units = std::string())
 {
     InputT<X> ipt(&valueFed, typeNameString<X>(), units);
     ipt.addTarget(key);
@@ -93,13 +89,13 @@ void getValue(ValueFederate& fed, const std::string& key, X& obj)
 template<class X>
 class VectorSubscription {
   private:
-    ValueFederate* fed = nullptr; //!< reference to the value federate
-    std::string m_key; //!< the key for the subscription
-    std::string m_units; //!< the defined units of the federate
-    std::vector<Input> ids; //!< the id of the federate
+    ValueFederate* fed = nullptr;  //!< reference to the value federate
+    std::string m_key;  //!< the key for the subscription
+    std::string m_units;  //!< the defined units of the federate
+    std::vector<Input> ids;  //!< the id of the federate
     std::function<void(int, Time)>
-        update_callback; //!< callback function for when a value is updated
-    std::vector<X> vals; //!< storage for the values
+        update_callback;  //!< callback function for when a value is updated
+    std::vector<X> vals;  //!< storage for the values
   public:
     VectorSubscription() noexcept {};
     /**constructor to build a subscription object
@@ -110,13 +106,12 @@ class VectorSubscription {
    @param defValue the default value
    @param units the units associated with the Subscription
    */
-    VectorSubscription(
-        ValueFederate* valueFed,
-        const std::string& key,
-        int startIndex,
-        int count,
-        const X& defValue,
-        const std::string& units = std::string()):
+    VectorSubscription(ValueFederate* valueFed,
+                       const std::string& key,
+                       int startIndex,
+                       int count,
+                       const X& defValue,
+                       const std::string& units = std::string()):
         fed(valueFed),
         m_key(key), m_units(units)
     {
@@ -143,13 +138,12 @@ class VectorSubscription {
     @param units the units associated with the Subscription
     */
     template<class FedPtr>
-    VectorSubscription(
-        FedPtr valueFed,
-        const std::string& key,
-        int startIndex,
-        int count,
-        const X& defValue,
-        const std::string& units = std::string()):
+    VectorSubscription(FedPtr valueFed,
+                       const std::string& key,
+                       int startIndex,
+                       int count,
+                       const X& defValue,
+                       const std::string& units = std::string()):
         VectorSubscription(std::addressof(*valueFed), key, startIndex, count, defValue, units)
     {
         static_assert(
@@ -220,14 +214,14 @@ class VectorSubscription {
 template<class X>
 class VectorSubscription2d {
   private:
-    ValueFederate* fed = nullptr; //!< reference to the value federate
-    std::string m_key; //!< the name of the subscription
-    std::string m_units; //!< the defined units of the federate
-    std::vector<Input> ids; //!< the id of the federate
+    ValueFederate* fed = nullptr;  //!< reference to the value federate
+    std::string m_key;  //!< the name of the subscription
+    std::string m_units;  //!< the defined units of the federate
+    std::vector<Input> ids;  //!< the id of the federate
     std::function<void(int, Time)>
-        update_callback; //!< callback function for when a value is updated
-    std::vector<X> vals; //!< storage for the values
-    std::array<int, 4> indices{{0, 0, 0, 0}}; //!< storage for the indices and start values
+        update_callback;  //!< callback function for when a value is updated
+    std::vector<X> vals;  //!< storage for the values
+    std::array<int, 4> indices{{0, 0, 0, 0}};  //!< storage for the indices and start values
   public:
     VectorSubscription2d() noexcept {};
 
@@ -242,15 +236,14 @@ class VectorSubscription2d {
     @param units the units associated with the Subscription
     */
     template<class FedPtr>
-    VectorSubscription2d(
-        FedPtr valueFed,
-        const std::string& key,
-        int startIndex_x,
-        int count_x,
-        int startIndex_y,
-        int count_y,
-        const X& defValue,
-        const std::string& units = std::string()):
+    VectorSubscription2d(FedPtr valueFed,
+                         const std::string& key,
+                         int startIndex_x,
+                         int count_x,
+                         int startIndex_y,
+                         int count_y,
+                         const X& defValue,
+                         const std::string& units = std::string()):
         fed(std::addressof(*valueFed)),
         m_key(key), m_units(units)
     {
@@ -332,4 +325,4 @@ class VectorSubscription2d {
     }
 };
 
-} // namespace helics
+}  // namespace helics

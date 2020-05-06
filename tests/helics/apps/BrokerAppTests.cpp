@@ -168,14 +168,15 @@ TEST(BrokerAppTests, constructor11)
 
 TEST(BrokerAppTests, constructor12)
 {
-    EXPECT_THROW(
-        helics::BrokerApp(helics::core_type::NULLCORE, "brk12", std::vector<std::string>{}),
-        helics::HelicsException);
+    EXPECT_THROW(helics::BrokerApp(helics::core_type::NULLCORE,
+                                   "brk12",
+                                   std::vector<std::string>{}),
+                 helics::HelicsException);
 #ifdef ENABLE_ZMQ_CORE
-    EXPECT_THROW(
-        helics::BrokerApp(
-            helics::core_type::ZMQ, "brk12", std::vector<std::string>{"10.7.5.5", "--interface"}),
-        helics::ConnectionFailure);
+    EXPECT_THROW(helics::BrokerApp(helics::core_type::ZMQ,
+                                   "brk12",
+                                   std::vector<std::string>{"10.7.5.5", "--interface"}),
+                 helics::ConnectionFailure);
 #endif
 }
 

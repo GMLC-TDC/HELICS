@@ -37,7 +37,7 @@ std::shared_ptr<ZmqContextManager>
     ZmqContextManager::getContextPointer(const std::string& contextName)
 {
     std::lock_guard<std::mutex> conlock(
-        contextLock); // just to ensure that nothing funny happens if you try to
+        contextLock);  // just to ensure that nothing funny happens if you try to
     // get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {

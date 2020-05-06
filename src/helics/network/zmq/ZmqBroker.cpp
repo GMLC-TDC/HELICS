@@ -48,5 +48,5 @@ namespace zeromq {
         return NetworkBroker::brokerConnect();
     }
 
-} // namespace zeromq
-} // namespace helics
+}  // namespace zeromq
+}  // namespace helics

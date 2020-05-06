@@ -24,8 +24,8 @@ namespace gmlc {
 namespace libguarded {
     template<class T, class M>
     class shared_guarded;
-} // namespace libguarded
-} // namespace gmlc
+}  // namespace libguarded
+}  // namespace gmlc
 
 /**
  * HELICS Application API
@@ -45,34 +45,34 @@ class HELICS_CXX_EXPORT Federate {
   public:
     /** the allowable operation modes of the federate*/
     enum class modes : char {
-        startup = 0, //!< when created the federate is in startup state
-        initializing = 1, //!< entered after the enterInitializingMode call has returned
-        executing = 2, //!< entered after the enterExectuationState call has returned
+        startup = 0,  //!< when created the federate is in startup state
+        initializing = 1,  //!< entered after the enterInitializingMode call has returned
+        executing = 2,  //!< entered after the enterExectuationState call has returned
         finalize =
-            3, //!< the federate has finished executing normally final values may be retrieved
-        error = 4, //!< error state no core communication is possible but values can be retrieved
+            3,  //!< the federate has finished executing normally final values may be retrieved
+        error = 4,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
-        pending_init = 5, //!< indicator that the federate is pending entry to initialization state
-        pending_exec = 6, //!< state pending EnterExecution State
-        pending_time = 7, //!< state that the federate is pending a timeRequest
+        pending_init = 5,  //!< indicator that the federate is pending entry to initialization state
+        pending_exec = 6,  //!< state pending EnterExecution State
+        pending_time = 7,  //!< state that the federate is pending a timeRequest
         pending_iterative_time =
-            8, //!< state that the federate is pending an iterative time request
-        pending_finalize = 9 //!< state that the federate is pending a finalize call
+            8,  //!< state that the federate is pending an iterative time request
+        pending_finalize = 9  //!< state that the federate is pending a finalize call
     };
 
   protected:
-    std::atomic<modes> currentMode{modes::startup}; //!< the current state of the simulation
-    char nameSegmentSeparator = '/'; //!< the separator between automatically prependend names
+    std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
+    char nameSegmentSeparator = '/';  //!< the separator between automatically prependend names
   private:
-    local_federate_id fedID; //!< the federate ID of the object for use in the core
+    local_federate_id fedID;  //!< the federate ID of the object for use in the core
   protected:
-    std::shared_ptr<Core> coreObject; //!< reference to the core simulation API
-    Time currentTime = Time::minVal(); //!< the current simulation time
+    std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
+    Time currentTime = Time::minVal();  //!< the current simulation time
   private:
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
-        asyncCallInfo; //!< pointer to a class defining the async call information
-    std::unique_ptr<FilterFederateManager> fManager; //!< class for managing filter operations
-    std::string name; //!< the name of the federate
+        asyncCallInfo;  //!< pointer to a class defining the async call information
+    std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
+    std::string name;  //!< the name of the federate
 
   public:
     /**constructor taking a federate information structure
@@ -85,10 +85,9 @@ class HELICS_CXX_EXPORT Federate {
     @param core a shared pointer to a core object, the pointer will be copied
     @param fi  a federate information structure
     */
-    Federate(
-        const std::string& fedname,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi = FederateInfo{});
+    Federate(const std::string& fedname,
+             const std::shared_ptr<Core>& core,
+             const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -175,8 +174,8 @@ class HELICS_CXX_EXPORT Federate {
     @param message a string describing the error to display in a log
     @deprecated please use localError instead
      */
-    [[deprecated("please use localError method")]] void
-        error(int errorcode, const std::string& message);
+    [[deprecated("please use localError method")]] void error(int errorcode,
+                                                              const std::string& message);
 
     /** specify the simulator had a local error with error code and message
     @param errorcode an integral code for the error
@@ -371,10 +370,9 @@ class HELICS_CXX_EXPORT Federate {
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    Filter& registerGlobalFilter(
-        const std::string& filterName,
-        const std::string& inputType = std::string(),
-        const std::string& outputType = std::string());
+    Filter& registerGlobalFilter(const std::string& filterName,
+                                 const std::string& inputType = std::string(),
+                                 const std::string& outputType = std::string());
 
     /** define a cloning filter interface on a source
     @details a cloning filter will modify copy of messages coming from or going to target endpoints
@@ -382,10 +380,9 @@ class HELICS_CXX_EXPORT Federate {
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    CloningFilter& registerGlobalCloningFilter(
-        const std::string& filterName,
-        const std::string& inputType = std::string(),
-        const std::string& outputType = std::string());
+    CloningFilter& registerGlobalCloningFilter(const std::string& filterName,
+                                               const std::string& inputType = std::string(),
+                                               const std::string& outputType = std::string());
 
     /** define a filter interface
     @details a filter will modify messages coming from or going to target endpoints
@@ -393,10 +390,9 @@ class HELICS_CXX_EXPORT Federate {
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    Filter& registerFilter(
-        const std::string& filterName,
-        const std::string& inputType = std::string(),
-        const std::string& outputType = std::string());
+    Filter& registerFilter(const std::string& filterName,
+                           const std::string& inputType = std::string(),
+                           const std::string& outputType = std::string());
 
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
@@ -405,10 +401,9 @@ class HELICS_CXX_EXPORT Federate {
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    CloningFilter& registerCloningFilter(
-        const std::string& filterName,
-        const std::string& inputType = std::string(),
-        const std::string& outputType = std::string());
+    CloningFilter& registerCloningFilter(const std::string& filterName,
+                                         const std::string& inputType = std::string(),
+                                         const std::string& outputType = std::string());
 
     /** define a nameless filter interface
      */
@@ -618,4 +613,4 @@ class HELICS_CXX_EXPORT Federate {
 @details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
 yet*/
 HELICS_CXX_EXPORT void cleanupHelicsLibrary();
-} // namespace helics
+}  // namespace helics

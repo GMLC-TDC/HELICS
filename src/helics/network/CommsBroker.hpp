@@ -20,9 +20,9 @@ communication methods*/
 template<class COMMS, class BrokerT>
 class CommsBroker: public BrokerT {
   protected:
-    std::atomic<int> disconnectionStage{0}; //!< the stage of disconnection
-    std::unique_ptr<COMMS> comms; //!< the actual comms object
-    std::atomic<bool> brokerInitialized{false}; //!< atomic protecting local initialization
+    std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
+    std::unique_ptr<COMMS> comms;  //!< the actual comms object
+    std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
   public:
     /** default constructor*/
     CommsBroker() noexcept;
@@ -51,4 +51,4 @@ class CommsBroker: public BrokerT {
     /** get a pointer to the comms object*/
     COMMS* getCommsObjectPointer();
 };
-} // namespace helics
+}  // namespace helics

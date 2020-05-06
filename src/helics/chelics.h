@@ -14,4 +14,4 @@ Header file for inclusion of the entire C shared library
 #include "shared_api_library/MessageFilters.h"
 #include "shared_api_library/ValueFederate.h"
 
-#endif // SRC_HELICS_CHELICS_H_
+#endif  // SRC_HELICS_CHELICS_H_

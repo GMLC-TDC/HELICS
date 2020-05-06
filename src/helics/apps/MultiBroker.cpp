@@ -78,7 +78,7 @@ MultiBroker::~MultiBroker()
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
-    masterComm.reset(); // need to ensure the comms are deleted before the callbacks become invalid
+    masterComm.reset();  // need to ensure the comms are deleted before the callbacks become invalid
     BrokerBase::joinAllThreads();
 }
 
@@ -129,7 +129,7 @@ bool MultiBroker::brokerConnect()
         }
         uint16_t index = 0;
         while (moreComms) {
-            netInfo = NetworkBrokerData(); //to reset the networkBrokerData
+            netInfo = NetworkBrokerData();  //to reset the networkBrokerData
             app->get_config_formatter_base()->section("comms")->index(index);
             app->setDefaultCoreType(core_type::MULTI);
             app->parse(configString);
@@ -298,4 +298,4 @@ void MultiBroker::removeRoute(route_id rid)
     }
 }
 
-} // namespace helics
+}  // namespace helics

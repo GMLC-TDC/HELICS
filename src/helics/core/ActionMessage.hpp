@@ -29,25 +29,25 @@ constexpr int32_t cmd_info_basis{65536};
 class ActionMessage {
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
   private:
-    action_message_def::action_t messageAction{CMD_IGNORE}; // 4 -- command
+    action_message_def::action_t messageAction{CMD_IGNORE};  // 4 -- command
   public:
-    int32_t messageID{0}; //!< 8 -- message ID for a variety of purposes
-    global_federate_id source_id{parent_broker_id}; //!< 12 -- for federate_id or route_id
-    interface_handle source_handle{}; //!< 16 -- for local handle or local code
-    global_federate_id dest_id{parent_broker_id}; //!< 20 fed_id for a targeted message
-    interface_handle dest_handle{}; //!< 24 local handle for a targeted message
-    uint16_t counter{0}; //!< 26 counter for filter tracking or message counter
-    uint16_t flags{0}; //!<  28 set of messageFlags
-    uint32_t sequenceID{0}; //!< a sequence number for ordering
-    Time actionTime{timeZero}; //!< 40 the time an action took place or will take place	//32
+    int32_t messageID{0};  //!< 8 -- message ID for a variety of purposes
+    global_federate_id source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
+    interface_handle source_handle{};  //!< 16 -- for local handle or local code
+    global_federate_id dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
+    interface_handle dest_handle{};  //!< 24 local handle for a targeted message
+    uint16_t counter{0};  //!< 26 counter for filter tracking or message counter
+    uint16_t flags{0};  //!<  28 set of messageFlags
+    uint32_t sequenceID{0};  //!< a sequence number for ordering
+    Time actionTime{timeZero};  //!< 40 the time an action took place or will take place	//32
     std::string
-        payload; //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
-    std::string& name; //!< alias payload to a name reference for registration functions
-    Time Te{timeZero}; //!< 48 event time
-    Time Tdemin{timeZero}; //!< 56 min dependent event time
-    Time Tso{timeZero}; //!< 64 the second order dependent time
+        payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
+    std::string& name;  //!< alias payload to a name reference for registration functions
+    Time Te{timeZero};  //!< 48 event time
+    Time Tdemin{timeZero};  //!< 56 min dependent event time
+    Time Tso{timeZero};  //!< 64 the second order dependent time
   private:
-    std::vector<std::string> stringData; //!< container for extra string data
+    std::vector<std::string> stringData;  //!< container for extra string data
   public:
     /** default constructor*/
     ActionMessage() noexcept: name(payload) {}
@@ -55,13 +55,12 @@ class ActionMessage {
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
     */
-    /* implicit */ ActionMessage(action_message_def::action_t startingAction); // NOLINT
+    /* implicit */ ActionMessage(action_message_def::action_t startingAction);  // NOLINT
     /** construct from action, source and destination id's
      */
-    ActionMessage(
-        action_message_def::action_t startingAction,
-        global_federate_id sourceId,
-        global_federate_id destId);
+    ActionMessage(action_message_def::action_t startingAction,
+                  global_federate_id sourceId,
+                  global_federate_id destId);
     /** move constructor*/
     ActionMessage(ActionMessage&& act) noexcept;
     /** build an action message from a message*/
@@ -118,21 +117,19 @@ class ActionMessage {
         stringData[0] = string1;
         stringData[1] = string2;
     }
-    void setStringData(
-        const std::string& string1,
-        const std::string& string2,
-        const std::string& string3)
+    void setStringData(const std::string& string1,
+                       const std::string& string2,
+                       const std::string& string3)
     {
         stringData.resize(3);
         stringData[0] = string1;
         stringData[1] = string2;
         stringData[2] = string3;
     }
-    void setStringData(
-        const std::string& string1,
-        const std::string& string2,
-        const std::string& string3,
-        const std::string& string4)
+    void setStringData(const std::string& string1,
+                       const std::string& string2,
+                       const std::string& string3,
+                       const std::string& string4)
     {
         stringData.resize(4);
         stringData[0] = string1;
@@ -213,9 +210,8 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd);
 /** check if a command is a protocol command*/
 inline bool isProtocolCommand(const ActionMessage& command) noexcept
 {
-    return (
-        (command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) ||
-        (command.action() == CMD_PROTOCOL_BIG));
+    return ((command.action() == CMD_PROTOCOL) || (command.action() == CMD_PROTOCOL_PRIORITY) ||
+            (command.action() == CMD_PROTOCOL_BIG));
 }
 /** check if a command is a priority command*/
 inline bool isPriorityCommand(const ActionMessage& command) noexcept
@@ -332,4 +328,4 @@ std::string errorMessageString(const ActionMessage& command);
 /** set the flags for an iteration request*/
 void setIterationFlags(ActionMessage& command, iteration_request iterate);
 
-} // namespace helics
+}  // namespace helics

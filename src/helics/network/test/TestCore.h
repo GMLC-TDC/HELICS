@@ -14,5 +14,5 @@ namespace testcore {
     /** implementation for the core that can only communicate in process*/
     using TestCore = NetworkCore<TestComms, interface_type::inproc>;
 
-} // namespace testcore
-} // namespace helics
+}  // namespace testcore
+}  // namespace helics

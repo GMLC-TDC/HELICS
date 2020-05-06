@@ -22,14 +22,13 @@ namespace zeromq {
     static const std::chrono::milliseconds defaultPeriod(200);
 
     /** bind a zmq socket, with a timeout and timeout period*/
-    bool bindzmqSocket(
-        zmq::socket_t& socket,
-        const std::string& address,
-        int port,
-        std::chrono::milliseconds timeout,
-        std::chrono::milliseconds period = defaultPeriod);
+    bool bindzmqSocket(zmq::socket_t& socket,
+                       const std::string& address,
+                       int port,
+                       std::chrono::milliseconds timeout,
+                       std::chrono::milliseconds period = defaultPeriod);
     /** get the ZeroMQ version currently in use*/
     std::string getZMQVersion();
-} // namespace zeromq
+}  // namespace zeromq
 
-} // namespace helics
+}  // namespace helics

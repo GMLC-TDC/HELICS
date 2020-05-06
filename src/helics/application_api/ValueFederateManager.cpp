@@ -51,10 +51,9 @@ int getTypeSize(const std::string& type)
     return (ret == typeSizes.end()) ? (-1) : ret->second;
 }
 
-Publication& ValueFederateManager::registerPublication(
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Publication& ValueFederateManager::registerPublication(const std::string& key,
+                                                       const std::string& type,
+                                                       const std::string& units)
 {
     auto coreID = coreObject->registerPublication(fedID, key, type, units);
 
@@ -72,10 +71,9 @@ Publication& ValueFederateManager::registerPublication(
     throw(RegistrationFailure("Unable to register Publication"));
 }
 
-Input& ValueFederateManager::registerInput(
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Input& ValueFederateManager::registerInput(const std::string& key,
+                                           const std::string& type,
+                                           const std::string& units)
 {
     auto coreID = coreObject->registerInput(fedID, key, type, units);
     auto inpHandle = inputs.lock();
@@ -172,7 +170,7 @@ void ValueFederateManager::getUpdateFromCore(interface_handle updatedHandle)
     auto inpHandle = inputs.lock();
     /** find the id*/
     auto fid = inpHandle->find(updatedHandle);
-    if (fid != inpHandle->end()) { // assign the data
+    if (fid != inpHandle->end()) {  // assign the data
 
         auto info = reinterpret_cast<input_info*>(fid->dataReference);
         info->lastData = data_view(std::move(data));
@@ -233,7 +231,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
     for (auto handle : handles) {
         /** find the id*/
         auto fid = inpHandle->find(handle);
-        if (fid != inpHandle->end()) { // assign the data
+        if (fid != inpHandle->end()) {  // assign the data
             auto data = coreObject->getValue(handle);
             auto iData = reinterpret_cast<input_info*>(fid->dataReference);
             iData->lastData = std::move(data);
@@ -244,14 +242,14 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
                 if (iData->callback) {
                     Input& inp = *fid;
 
-                    inpHandle.unlock(); // need to free the lock
+                    inpHandle.unlock();  // need to free the lock
 
                     // callbacks can do all sorts of things, best not to have it locked during the callback
                     iData->callback(inp, CurrentTime);
                     inpHandle = inputs.lock();
                 } else if (allCall) {
                     Input& inp = *fid;
-                    inpHandle.unlock(); // need to free the lock
+                    inpHandle.unlock();  // need to free the lock
                     // callbacks can do all sorts of strange things, best not to have it locked during the callback
                     allCall(inp, CurrentTime);
                     inpHandle = inputs.lock();
@@ -287,9 +285,8 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
             [](const auto& info) { return info.getName(); },
             [](const auto& info) { return (!info.getName().empty()); });
     } else if (queryStr == "subscriptions") {
-        ret = generateStringVector(targetIDs.lock_shared(), [](const auto& target) {
-            return target.first;
-        });
+        ret = generateStringVector(targetIDs.lock_shared(),
+                                   [](const auto& target) { return target.first; });
     } else if (queryStr == "updated_input_indices") {
         ret = "[";
         auto hand = inputs.lock();
@@ -505,9 +502,8 @@ void ValueFederateManager::setInputNotificationCallback(std::function<void(Input
     allCallback.store(std::move(callback));
 }
 
-void ValueFederateManager::setInputNotificationCallback(
-    const Input& inp,
-    std::function<void(Input&, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback(const Input& inp,
+                                                        std::function<void(Input&, Time)> callback)
 {
     auto data = reinterpret_cast<input_info*>(inp.dataReference);
     if (data != nullptr) {
@@ -517,4 +513,4 @@ void ValueFederateManager::setInputNotificationCallback(
     }
 }
 
-} // namespace helics
+}  // namespace helics

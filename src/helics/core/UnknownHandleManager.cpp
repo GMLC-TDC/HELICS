@@ -10,35 +10,31 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** add a missingPublication*/
-void UnknownHandleManager::addUnknownPublication(
-    const std::string& key,
-    global_handle target,
-    uint16_t flags)
+void UnknownHandleManager::addUnknownPublication(const std::string& key,
+                                                 global_handle target,
+                                                 uint16_t flags)
 {
     unknown_publications.emplace(key, std::make_pair(target, flags));
 }
 /** add a missingPublication*/
-void UnknownHandleManager::addUnknownInput(
-    const std::string& key,
-    global_handle target,
-    uint16_t flags)
+void UnknownHandleManager::addUnknownInput(const std::string& key,
+                                           global_handle target,
+                                           uint16_t flags)
 {
     unknown_inputs.emplace(key, std::make_pair(target, flags));
 }
 
 /** add a missing destination endpoint*/
-void UnknownHandleManager::addUnknownEndpoint(
-    const std::string& key,
-    global_handle target,
-    uint16_t flags)
+void UnknownHandleManager::addUnknownEndpoint(const std::string& key,
+                                              global_handle target,
+                                              uint16_t flags)
 {
     unknown_endpoints.emplace(key, std::make_pair(target, flags));
 }
 /** add a missing filter*/
-void UnknownHandleManager::addUnknownFilter(
-    const std::string& key,
-    global_handle target,
-    uint16_t flags)
+void UnknownHandleManager::addUnknownFilter(const std::string& key,
+                                            global_handle target,
+                                            uint16_t flags)
 {
     unknown_filters.emplace(key, std::make_pair(target, flags));
 }
@@ -48,23 +44,21 @@ void UnknownHandleManager::addDataLink(const std::string& source, const std::str
     unknown_links.emplace(source, target);
 }
 
-void UnknownHandleManager::addSourceFilterLink(
-    const std::string& filter,
-    const std::string& endpoint)
+void UnknownHandleManager::addSourceFilterLink(const std::string& filter,
+                                               const std::string& endpoint)
 {
     unknown_src_filters.emplace(filter, endpoint);
 }
 
-void UnknownHandleManager::addDestinationFilterLink(
-    const std::string& filter,
-    const std::string& endpoint)
+void UnknownHandleManager::addDestinationFilterLink(const std::string& filter,
+                                                    const std::string& endpoint)
 {
     unknown_dest_filters.emplace(filter, endpoint);
 }
 
-static auto getTargets(
-    const std::unordered_multimap<std::string, UnknownHandleManager::targetInfo>& tmap,
-    const std::string& target)
+static auto
+    getTargets(const std::unordered_multimap<std::string, UnknownHandleManager::targetInfo>& tmap,
+               const std::string& target)
 {
     std::vector<UnknownHandleManager::targetInfo> targets;
     auto rp = tmap.equal_range(target);
@@ -78,9 +72,8 @@ static auto getTargets(
     return targets;
 }
 
-static auto getTargets(
-    const std::unordered_multimap<std::string, std::string>& tmap,
-    const std::string& target)
+static auto getTargets(const std::unordered_multimap<std::string, std::string>& tmap,
+                       const std::string& target)
 {
     std::vector<std::string> targets;
     auto rp = tmap.equal_range(target);
@@ -140,10 +133,9 @@ std::vector<std::string>
 
 bool UnknownHandleManager::hasUnknowns() const
 {
-    return (
-        !(unknown_publications.empty() && unknown_endpoints.empty() && unknown_inputs.empty() &&
-          unknown_filters.empty() && unknown_links.empty() && unknown_dest_filters.empty() &&
-          unknown_src_filters.empty()));
+    return (!(unknown_publications.empty() && unknown_endpoints.empty() && unknown_inputs.empty() &&
+              unknown_filters.empty() && unknown_links.empty() && unknown_dest_filters.empty() &&
+              unknown_src_filters.empty()));
 }
 
 bool UnknownHandleManager::hasNonOptionalUnknowns() const
@@ -292,7 +284,7 @@ void UnknownHandleManager::clearFederateUnknowns(global_federate_id id)
     for (auto it = std::begin(unknown_publications); it != std::end(unknown_publications);) {
         if (it->second.first.fed_id == id) {
             it = unknown_publications.erase(
-                it); // previously this was something like m_map.erase(it++);
+                it);  // previously this was something like m_map.erase(it++);
         } else {
             ++it;
         }
@@ -300,25 +292,26 @@ void UnknownHandleManager::clearFederateUnknowns(global_federate_id id)
     for (auto it = std::begin(unknown_endpoints); it != std::end(unknown_endpoints);) {
         if (it->second.first.fed_id == id) {
             it = unknown_endpoints.erase(
-                it); // previously this was something like m_map.erase(it++);
+                it);  // previously this was something like m_map.erase(it++);
         } else {
             ++it;
         }
     }
     for (auto it = std::begin(unknown_filters); it != std::end(unknown_filters);) {
         if (it->second.first.fed_id == id) {
-            it = unknown_filters.erase(it); // previously this was something like m_map.erase(it++);
+            it =
+                unknown_filters.erase(it);  // previously this was something like m_map.erase(it++);
         } else {
             ++it;
         }
     }
     for (auto it = std::begin(unknown_inputs); it != std::end(unknown_inputs);) {
         if (it->second.first.fed_id == id) {
-            it = unknown_inputs.erase(it); // previously this was something like m_map.erase(it++);
+            it = unknown_inputs.erase(it);  // previously this was something like m_map.erase(it++);
         } else {
             ++it;
         }
     }
 }
 
-} // namespace helics
+}  // namespace helics

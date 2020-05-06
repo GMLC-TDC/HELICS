@@ -62,7 +62,7 @@ TEST(ZMQSSCore, transmit)
     bool connected2 = comm2.connect();
     ASSERT_TRUE(connected2);
     bool connected1 = connected_fut.get();
-    if (!connected1) { // lets just try again if it is not connected
+    if (!connected1) {  // lets just try again if it is not connected
         connected1 = comm.connect();
     }
     ASSERT_TRUE(connected1);
@@ -131,12 +131,12 @@ TEST(ZMQSSCore, addroute)
     bool connected1 = comm3.connect();
     ASSERT_TRUE(connected1);
     bool connected2 = connected_fut.get();
-    if (!connected2) { // lets just try again if it is not connected
+    if (!connected2) {  // lets just try again if it is not connected
         connected2 = comm.connect();
     }
     ASSERT_TRUE(connected2);
     connected2 = connected_fut2.get();
-    if (!connected2) { // lets just try again if it is not connected
+    if (!connected2) {  // lets just try again if it is not connected
         connected2 = comm2.connect();
     }
     ASSERT_TRUE(connected2);

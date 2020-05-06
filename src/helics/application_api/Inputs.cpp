@@ -15,11 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-Input::Input(
-    ValueFederate* valueFed,
-    interface_handle id,
-    const std::string& actName,
-    const std::string& unitsOut):
+Input::Input(ValueFederate* valueFed,
+             interface_handle id,
+             const std::string& actName,
+             const std::string& unitsOut):
     fed(valueFed),
     handle(id), actualName(actName)
 {
@@ -31,11 +30,10 @@ Input::Input(
     }
 }
 
-Input::Input(
-    ValueFederate* valueFed,
-    const std::string& key,
-    const std::string& defaultType,
-    const std::string& units)
+Input::Input(ValueFederate* valueFed,
+             const std::string& key,
+             const std::string& defaultType,
+             const std::string& units)
 {
     auto& inp = valueFed->getInput(key);
     if (inp.isValid()) {
@@ -45,12 +43,11 @@ Input::Input(
     }
 }
 
-Input::Input(
-    interface_visibility locality,
-    ValueFederate* valueFed,
-    const std::string& key,
-    const std::string& defaultType,
-    const std::string& units)
+Input::Input(interface_visibility locality,
+             ValueFederate* valueFed,
+             const std::string& key,
+             const std::string& defaultType,
+             const std::string& units)
 {
     try {
         if (locality == interface_visibility::global) {
@@ -93,8 +90,8 @@ void Input::handleCallback(Time time)
         } break;
         case vector_loc: {
             auto val = getValue<std::vector<double>>();
-            mpark::get<std::function<void(const std::vector<double>&, Time)>>(
-                value_callback)(val, time);
+            mpark::get<std::function<void(const std::vector<double>&, Time)>>(value_callback)(val,
+                                                                                              time);
         } break;
         case complex_vector_loc: {
             auto val = getValue<std::vector<std::complex<double>>>();
@@ -105,12 +102,12 @@ void Input::handleCallback(Time time)
             auto val = getValue<NamedPoint>();
             mpark::get<std::function<void(const NamedPoint&, Time)>>(value_callback)(val, time);
         } break;
-        case 7: // bool loc
+        case 7:  // bool loc
         {
             auto val = getValue<bool>();
             mpark::get<std::function<void(const bool&, Time)>>(value_callback)(val, time);
         } break;
-        case 8: // Time loc
+        case 8:  // Time loc
         {
             auto val = getValue<Time>();
             mpark::get<std::function<void(const Time&, Time)>>(value_callback)(val, time);
@@ -128,7 +125,7 @@ bool Input::checkUpdate(bool assumeUpdate)
             }
             auto visitor = [&, this](auto&& arg) {
                 std::remove_reference_t<decltype(arg)> newVal;
-                (void)arg; // suppress VS2015 warning
+                (void)arg;  // suppress VS2015 warning
                 if (type == helics::data_type::helics_double) {
                     defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
@@ -199,7 +196,7 @@ size_t Input::getStringSize()
         if (lastValue.index() == named_point_loc) {
             auto& np = getValueRef<NamedPoint>();
             if (np.name.empty()) {
-                return 30; //"#invalid" string +20
+                return 30;  //"#invalid" string +20
             }
             //+20 is just in case the converted string is actually being requested in which case the +20 is for
             // the string representation of a double
@@ -216,7 +213,7 @@ size_t Input::getStringSize()
         const auto& np = mpark::get<NamedPoint>(lastValue);
 
         if (np.name.empty()) {
-            return 30; //"~length of #invalid" string +20
+            return 30;  //"~length of #invalid" string +20
         }
         //+20 is just in case the converted string is actually being requested in which case it the 20 accounts
         // for the string representation of a double
@@ -262,10 +259,9 @@ void Input::loadSourceInformation()
     }
 }
 
-double doubleExtractAndConvert(
-    const data_view& dv,
-    const std::shared_ptr<units::precise_unit>& inputUnits,
-    const std::shared_ptr<units::precise_unit>& outputUnits)
+double doubleExtractAndConvert(const data_view& dv,
+                               const std::shared_ptr<units::precise_unit>& inputUnits,
+                               const std::shared_ptr<units::precise_unit>& outputUnits)
 {
     auto V = ValueConverter<double>::interpret(dv);
     if ((inputUnits) && (outputUnits)) {
@@ -274,11 +270,10 @@ double doubleExtractAndConvert(
     return V;
 }
 
-void integerExtractAndConvert(
-    defV& store,
-    const data_view& dv,
-    const std::shared_ptr<units::precise_unit>& inputUnits,
-    const std::shared_ptr<units::precise_unit>& outputUnits)
+void integerExtractAndConvert(defV& store,
+                              const data_view& dv,
+                              const std::shared_ptr<units::precise_unit>& inputUnits,
+                              const std::shared_ptr<units::precise_unit>& outputUnits)
 {
     auto V = ValueConverter<int64_t>::interpret(dv);
     if ((inputUnits) && (outputUnits)) {
@@ -360,4 +355,4 @@ int Input::getValue(char* str, int maxsize)
     return length;
 }
 
-} // namespace helics
+}  // namespace helics

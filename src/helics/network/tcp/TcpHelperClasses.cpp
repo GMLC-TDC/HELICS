@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace tcp {
     using asio::ip::tcp;
-    using namespace std::chrono_literals; //NOLINT
+    using namespace std::chrono_literals;  //NOLINT
 
     std::atomic<int> TcpConnection::idcounter{10};
 
@@ -36,11 +36,12 @@ namespace tcp {
                 receivingHalt.activate();
             }
             if (!triggerhalt) {
-                socket_.async_receive(
-                    asio::buffer(data.data() + residBufferSize, data.size() - residBufferSize),
-                    [ptr = shared_from_this()](const std::error_code& err, size_t bytes) {
-                        ptr->handle_read(err, bytes);
-                    });
+                socket_.async_receive(asio::buffer(data.data() + residBufferSize,
+                                                   data.size() - residBufferSize),
+                                      [ptr = shared_from_this()](const std::error_code& err,
+                                                                 size_t bytes) {
+                                          ptr->handle_read(err, bytes);
+                                      });
                 if (triggerhalt) {
                     // cancel previous operation if triggerhalt is now active
                     socket_.cancel();
@@ -97,10 +98,9 @@ namespace tcp {
                 dataCall(shared_from_this(), data.data(), bytes_transferred + residBufferSize);
             if (used < (bytes_transferred + residBufferSize)) {
                 if (used > 0) {
-                    std::copy(
-                        data.data() + used,
-                        data.data() + bytes_transferred + residBufferSize,
-                        data.data());
+                    std::copy(data.data() + used,
+                              data.data() + bytes_transferred + residBufferSize,
+                              data.data());
                 }
                 residBufferSize = bytes_transferred + residBufferSize - used;
             } else {
@@ -120,10 +120,9 @@ namespace tcp {
                     dataCall(shared_from_this(), data.data(), bytes_transferred + residBufferSize);
                 if (used < (bytes_transferred + residBufferSize)) {
                     if (used > 0) {
-                        std::copy(
-                            data.data() + used,
-                            data.data() + bytes_transferred + residBufferSize,
-                            data.data());
+                        std::copy(data.data() + used,
+                                  data.data() + bytes_transferred + residBufferSize,
+                                  data.data());
                     }
                     residBufferSize = bytes_transferred + residBufferSize - used;
                 } else {
@@ -213,29 +212,26 @@ namespace tcp {
         state.store(connection_state_t::closed);
     }
 
-    TcpConnection::pointer TcpConnection::create(
-        asio::io_context& io_context,
-        const std::string& connection,
-        const std::string& port,
-        size_t bufferSize)
+    TcpConnection::pointer TcpConnection::create(asio::io_context& io_context,
+                                                 const std::string& connection,
+                                                 const std::string& port,
+                                                 size_t bufferSize)
     {
         return pointer(new TcpConnection(io_context, connection, port, bufferSize));
     }
 
-    TcpConnection::TcpConnection(
-        asio::io_context& io_context,
-        const std::string& connection,
-        const std::string& port,
-        size_t bufferSize):
+    TcpConnection::TcpConnection(asio::io_context& io_context,
+                                 const std::string& connection,
+                                 const std::string& port,
+                                 size_t bufferSize):
         socket_(io_context),
         context_(io_context), data(bufferSize), connecting(true), idcode(idcounter++)
     {
         tcp::resolver resolver(io_context);
         tcp::resolver::query query(tcp::v4(), connection, port);
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-        socket_.async_connect(*endpoint_iterator, [this](const std::error_code& error) {
-            connect_handler(error);
-        });
+        socket_.async_connect(*endpoint_iterator,
+                              [this](const std::error_code& error) { connect_handler(error); });
     }
 
     void TcpConnection::connect_handler(const std::error_code& error)
@@ -379,10 +375,11 @@ namespace tcp {
             auto& socket = conn->socket();
             acceptor_.listen();
             auto ptr = shared_from_this();
-            acceptor_.async_accept(
-                socket,
-                [this, apointer = std::move(ptr), connection = std::move(conn)](
-                    const std::error_code& error) { handle_accept(apointer, connection, error); });
+            acceptor_.async_accept(socket,
+                                   [this, apointer = std::move(ptr), connection = std::move(conn)](
+                                       const std::error_code& error) {
+                                       handle_accept(apointer, connection, error);
+                                   });
             return true;
         }
 
@@ -406,10 +403,9 @@ namespace tcp {
         str += std::to_string(endpoint_.port());
         return str;
     }
-    void TcpAcceptor::handle_accept(
-        TcpAcceptor::pointer ptr,
-        TcpConnection::pointer new_connection,
-        const std::error_code& error)
+    void TcpAcceptor::handle_accept(TcpAcceptor::pointer ptr,
+                                    TcpConnection::pointer new_connection,
+                                    const std::error_code& error)
     {
         if (state.load() != accepting_state_t::connected) {
             asio::socket_base::linger optionLinger(true, 0);
@@ -456,12 +452,11 @@ namespace tcp {
         }
     }
 
-    TcpServer::TcpServer(
-        asio::io_context& io_context,
-        const std::string& address,
-        uint16_t portNum,
-        bool port_reuse,
-        int nominalBufferSize):
+    TcpServer::TcpServer(asio::io_context& io_context,
+                         const std::string& address,
+                         uint16_t portNum,
+                         bool port_reuse,
+                         int nominalBufferSize):
         ioctx(io_context),
         bufferSize(nominalBufferSize), reuse_address(port_reuse)
     {
@@ -472,8 +467,10 @@ namespace tcp {
             endpoints.emplace_back(asio::ip::tcp::v4(), portNum);
         } else {
             tcp::resolver resolver(io_context);
-            tcp::resolver::query query(
-                tcp::v4(), address, std::to_string(portNum), tcp::resolver::query::canonical_name);
+            tcp::resolver::query query(tcp::v4(),
+                                       address,
+                                       std::to_string(portNum),
+                                       tcp::resolver::query::canonical_name);
             tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
             tcp::resolver::iterator end;
             if (endpoint_iterator != end) {
@@ -489,12 +486,11 @@ namespace tcp {
         initialConnect();
     }
 
-    TcpServer::TcpServer(
-        asio::io_context& io_context,
-        const std::string& address,
-        const std::string& port,
-        bool port_reuse,
-        int nominalBufferSize):
+    TcpServer::TcpServer(asio::io_context& io_context,
+                         const std::string& address,
+                         const std::string& port,
+                         bool port_reuse,
+                         int nominalBufferSize):
         ioctx(io_context),
         bufferSize(nominalBufferSize), reuse_address(port_reuse)
     {
@@ -598,22 +594,20 @@ namespace tcp {
         return !halted;
     }
 
-    TcpServer::pointer TcpServer::create(
-        asio::io_context& io_context,
-        const std::string& address,
-        uint16_t PortNum,
-        bool reuse_port,
-        int nominalBufferSize)
+    TcpServer::pointer TcpServer::create(asio::io_context& io_context,
+                                         const std::string& address,
+                                         uint16_t PortNum,
+                                         bool reuse_port,
+                                         int nominalBufferSize)
     {
         return pointer(new TcpServer(io_context, address, PortNum, reuse_port, nominalBufferSize));
     }
 
-    TcpServer::pointer TcpServer::create(
-        asio::io_context& io_context,
-        const std::string& address,
-        const std::string& port,
-        bool reuse_port,
-        int nominalBufferSize)
+    TcpServer::pointer TcpServer::create(asio::io_context& io_context,
+                                         const std::string& address,
+                                         const std::string& port,
+                                         bool reuse_port,
+                                         int nominalBufferSize)
     {
         return pointer(new TcpServer(io_context, address, port, reuse_port, nominalBufferSize));
     }
@@ -642,7 +636,7 @@ namespace tcp {
             }
         }
 
-        { // scope for the lock_guard
+        {  // scope for the lock_guard
             std::lock_guard<std::mutex> lock(accepting);
             if (!connections.empty()) {
                 for (auto& conn : connections) {
@@ -676,7 +670,7 @@ namespace tcp {
         new_connection->setDataCall(dataCall);
         new_connection->setErrorCall(errorCall);
         new_connection->startReceive();
-        { // scope for the lock_guard
+        {  // scope for the lock_guard
 
             std::unique_lock<std::mutex> lock(accepting);
             if (!halted.load()) {
@@ -733,5 +727,5 @@ namespace tcp {
         }
     }
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

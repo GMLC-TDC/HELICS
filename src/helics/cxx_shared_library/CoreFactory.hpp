@@ -77,8 +77,8 @@ namespace CoreFactory {
 @param type the type of core to create
 @param args a vector of reversed command line arguments
 */
-    HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
-        create(core_type type, std::vector<std::string> args)
+    HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> create(core_type type,
+                                                               std::vector<std::string> args)
     {
         CoreApp cr(type, args);
         return cr.getCopyofCorePointer();
@@ -125,10 +125,10 @@ namespace CoreFactory {
 
     /** tries to find a named core if it fails it creates a new one
  */
-    HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> FindOrCreate(
-        core_type type,
-        const std::string& coreName,
-        const std::string& initializationString)
+    HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
+        FindOrCreate(core_type type,
+                     const std::string& coreName,
+                     const std::string& initializationString)
     {
         CoreApp cr(type, coreName, initializationString);
         return cr.getCopyofCorePointer();
@@ -194,12 +194,12 @@ registered or when the clean up function is called this prevents some odd thread
     /** make a copy of the core pointer to allow access to the new name
 @return true if the copyFromName was found and the copy successful
  */
-    HELICS_SHARED_DEPRECATED_CORE bool
-        copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName)
+    HELICS_SHARED_DEPRECATED_CORE bool copyCoreIdentifier(const std::string& copyFromName,
+                                                          const std::string& copyToName)
     {
         return false;
     }
 
-} // namespace CoreFactory
+}  // namespace CoreFactory
 
-} // namespace helics
+}  // namespace helics

@@ -12,6 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace apps {
     using CoreApp = CoreApp;
-} // namespace apps
+}  // namespace apps
 
-} // namespace helics
+}  // namespace helics

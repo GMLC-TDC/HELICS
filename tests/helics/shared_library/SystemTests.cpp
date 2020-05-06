@@ -122,7 +122,7 @@ TEST(other_tests, federate_global_value)
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    argv[3] = "--period=frogs"; //this is meant to generate an error in command line processing
+    argv[3] = "--period=frogs";  //this is meant to generate an error in command line processing
 
     auto fi2 = helicsFederateInfoClone(fi, &err);
     EXPECT_NE(fi2, nullptr);

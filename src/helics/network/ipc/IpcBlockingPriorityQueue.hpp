@@ -77,5 +77,5 @@ depending on the number of consumers
         bool empty() const;
     };
 
-} //namespace ipc
-} //namespace helics
+}  //namespace ipc
+}  //namespace helics

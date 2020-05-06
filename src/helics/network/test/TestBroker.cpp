@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TestComms.h"
 
 namespace helics {
-template class NetworkBroker<
-    testcore::TestComms,
-    interface_type::inproc,
-    static_cast<int>(core_type::TEST)>;
-} // namespace helics
+template class NetworkBroker<testcore::TestComms,
+                             interface_type::inproc,
+                             static_cast<int>(core_type::TEST)>;
+}  // namespace helics

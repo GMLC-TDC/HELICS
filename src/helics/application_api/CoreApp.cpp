@@ -254,4 +254,4 @@ void CoreApp::reset()
     name.clear();
 }
 
-} // namespace helics
+}  // namespace helics

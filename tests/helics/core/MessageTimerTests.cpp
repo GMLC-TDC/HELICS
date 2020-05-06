@@ -28,7 +28,7 @@ TEST(messageTimer_tests, basic_test)
     gmlc::libguarded::atomic_guarded<ActionMessage> M;
     auto cback = [&M](ActionMessage&& m) { M = std::move(m); };
     auto mtimer = std::make_shared<MessageTimer>(cback);
-    std::this_thread::yield(); // just get the loop started
+    std::this_thread::yield();  // just get the loop started
     auto index = mtimer->addTimerFromNow(200ms, CMD_PROTOCOL);
     EXPECT_EQ(index, 0);
     EXPECT_TRUE(M.load().action() == CMD_IGNORE);

@@ -39,7 +39,7 @@ TEST(federate_tests, federate_initialize_tests)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::initializing);
     Fed->enterExecutingMode();
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
-    Fed = nullptr; // force the destructor
+    Fed = nullptr;  // force the destructor
 }
 
 TEST(federate_tests, time_step_tests)
@@ -103,8 +103,8 @@ TEST(federate_tests, bad_broker_error_zmq_ci_skip)
     helics::FederateInfo fi(helics::core_type::ZMQ);
     fi.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(
-        auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi),
+                 helics::RegistrationFailure);
 }
 
 TEST(federate_tests, timeout_error_zmq_ci_skip)
@@ -112,8 +112,8 @@ TEST(federate_tests, timeout_error_zmq_ci_skip)
     helics::FederateInfo fi(helics::core_type::ZMQ);
     fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
 
-    EXPECT_THROW(
-        auto fed = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi),
+                 helics::RegistrationFailure);
 }
 
 #endif
@@ -280,8 +280,8 @@ TEST(federate_tests, missing_core)
     fi.coreName = "core_missing";
     fi.coreInitString = "-f 1";
 
-    EXPECT_THROW(
-        auto Fed1 = std::make_shared<helics::Federate>("fed1", fi), helics::HelicsException);
+    EXPECT_THROW(auto Fed1 = std::make_shared<helics::Federate>("fed1", fi),
+                 helics::HelicsException);
 }
 
 TEST(federate_tests, not_open)
@@ -293,8 +293,8 @@ TEST(federate_tests, not_open)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
     Fed1->enterExecutingMode();
 
-    EXPECT_THROW(
-        auto fed2 = std::make_shared<helics::Federate>("fed2", fi), helics::RegistrationFailure);
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2", fi),
+                 helics::RegistrationFailure);
     Fed1->finalize();
 }
 
@@ -317,9 +317,8 @@ TEST(federate_tests, core_ptr)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", nullptr, fi);
     Fed1->enterExecutingMode();
 
-    EXPECT_THROW(
-        auto fed2 = std::make_shared<helics::Federate>("fed2", nullptr, fi),
-        helics::RegistrationFailure);
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2", nullptr, fi),
+                 helics::RegistrationFailure);
     Fed1->finalize();
 }
 
@@ -430,9 +429,8 @@ TEST(federate_tests, from_file9)
     auto fstr4 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr4);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
-    EXPECT_THROW(
-        Fed1->registerFilterInterfaces(std::string(TEST_DIR) + "unusual_filters2.toml"),
-        helics::InvalidParameter);
+    EXPECT_THROW(Fed1->registerFilterInterfaces(std::string(TEST_DIR) + "unusual_filters2.toml"),
+                 helics::InvalidParameter);
     Fed1->finalize();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
@@ -854,8 +852,8 @@ TEST(federate_tests, federateGeneratedGlobalError)
     EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
 
     Fed1->disconnect();
-    EXPECT_THROW(
-        Fed1->globalError(9827, "user generated global error2"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"),
+                 helics::InvalidFunctionCall);
 }
 
 TEST(federate_tests, federateGeneratedlocalErrorEscalation)
@@ -875,8 +873,8 @@ TEST(federate_tests, federateGeneratedlocalErrorEscalation)
     EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
 
     Fed1->disconnect();
-    EXPECT_THROW(
-        Fed1->globalError(9827, "user generated global error2"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"),
+                 helics::InvalidFunctionCall);
 }
 
 TEST(federate_tests, queryTest1)
@@ -975,11 +973,10 @@ TEST(federate_tests, error_after_disconnect)
     EXPECT_THROW(Fed1->addDestinationTarget(f1, "ept"), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->setFilterOperator(f1, {}), helics::InvalidFunctionCall);
 
-    EXPECT_THROW(
-        Fed1->setInterfaceOption(helics::interface_handle{0}, 0, false),
-        helics::InvalidFunctionCall);
-    EXPECT_THROW(
-        Fed1->setInfo(helics::interface_handle{0}, "information"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->setInterfaceOption(helics::interface_handle{0}, 0, false),
+                 helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->setInfo(helics::interface_handle{0}, "information"),
+                 helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->localError(99), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->globalError(99), helics::InvalidFunctionCall);
 }
@@ -1075,7 +1072,6 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     brk->waitForDisconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    federate_tests,
-    federate_global_files,
-    ::testing::ValuesIn(simple_global_files));
+INSTANTIATE_TEST_SUITE_P(federate_tests,
+                         federate_global_files,
+                         ::testing::ValuesIn(simple_global_files));

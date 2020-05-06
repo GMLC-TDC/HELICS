@@ -120,21 +120,25 @@ class Broker {
     @param target the name of the source target*/
     void addSourceFilterToEndpoint(const std::string& filter, const std::string& target)
     {
-        helicsBrokerAddSourceFilterToEndpoint(
-            broker, filter.c_str(), target.c_str(), hThrowOnError());
+        helicsBrokerAddSourceFilterToEndpoint(broker,
+                                              filter.c_str(),
+                                              target.c_str(),
+                                              hThrowOnError());
     }
     /** create a filter connection between a named filter and a named endpoint for destination processing
     @param filter the name of the filter
     @param target the name of the source target*/
     void addDestinationFilterToEndpoint(const std::string& filter, const std::string& target)
     {
-        helicsBrokerAddDestinationFilterToEndpoint(
-            broker, filter.c_str(), target.c_str(), hThrowOnError());
+        helicsBrokerAddDestinationFilterToEndpoint(broker,
+                                                   filter.c_str(),
+                                                   target.c_str(),
+                                                   hThrowOnError());
     }
 
   protected:
-    helics_broker broker; //!< underlying broker information
+    helics_broker broker;  //!< underlying broker information
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 bool hasIndexCode(const std::string& type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
-        if (*(type_name.end() - 2) == '_') { // this check ignores the setup mode
+        if (*(type_name.end() - 2) == '_') {  // this check ignores the setup mode
             return true;
         }
     }
@@ -99,9 +99,8 @@ helics::BrokerApp FederateTestFixture::AddBroker(const std::string& core_type_na
     return AddBroker(core_type_name, std::string("-f ") + std::to_string(count));
 }
 
-helics::BrokerApp FederateTestFixture::AddBroker(
-    const std::string& core_type_name,
-    const std::string& initialization_string)
+helics::BrokerApp FederateTestFixture::AddBroker(const std::string& core_type_name,
+                                                 const std::string& initialization_string)
 {
     helics::BrokerApp broker;
     if (extraBrokerArgs.empty()) {

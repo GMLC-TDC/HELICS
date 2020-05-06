@@ -63,13 +63,13 @@ communication methods*/
         std::unique_ptr<helicsCLI11App> generateArgProcessing();
 
       private:
-        bool zmq_server{false}; //!< activate the ZMQ broker server
-        bool zmq_ss_server{false}; //!< activate the ZMQ SS broker server
-        bool tcp_server{false}; //!< activate the TCP broker server
-        bool udp_server{false}; //!< activate the UDP broker server
+        bool zmq_server{false};  //!< activate the ZMQ broker server
+        bool zmq_ss_server{false};  //!< activate the ZMQ SS broker server
+        bool tcp_server{false};  //!< activate the TCP broker server
+        bool udp_server{false};  //!< activate the UDP broker server
         //bool mpi_server{false}; //!< activate the MPI broker server
-        bool http_server{false}; //!< activate the HTTP web server REST API
-        bool websocket_server{false}; //!< activate the websocket API
+        bool http_server{false};  //!< activate the HTTP web server REST API
+        bool websocket_server{false};  //!< activate the websocket API
         std::atomic<bool> exitall{false};
         std::vector<std::unique_ptr<TypedBrokerServer>> servers;
         std::string configFile_;
@@ -78,5 +78,5 @@ communication methods*/
 
       public:
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

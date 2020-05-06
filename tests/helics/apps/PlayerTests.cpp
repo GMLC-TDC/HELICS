@@ -354,11 +354,13 @@ TEST_P(player_file_tests, test_files_cmd)
 TEST_P(player_file_tests, test_files_exe)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    exeTestRunner playerExe(
-        std::string(HELICS_INSTALL_LOC), std::string(HELICS_BUILD_LOC) + "/apps/", "helics_player");
+    exeTestRunner playerExe(std::string(HELICS_INSTALL_LOC),
+                            std::string(HELICS_BUILD_LOC) + "/apps/",
+                            "helics_player");
 
-    exeTestRunner brokerExe(
-        std::string(HELICS_INSTALL_LOC), std::string(HELICS_BUILD_LOC) + "/apps/", "helics_broker");
+    exeTestRunner brokerExe(std::string(HELICS_INSTALL_LOC),
+                            std::string(HELICS_BUILD_LOC) + "/apps/",
+                            "helics_broker");
 
     ASSERT_TRUE(playerExe.isActive());
     ASSERT_TRUE(brokerExe.isActive());
@@ -635,10 +637,9 @@ TEST_P(player_message_file_tests, message_test_files)
     fut.get();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    player_tests,
-    player_message_file_tests,
-    ::testing::ValuesIn(simple_message_files));
+INSTANTIATE_TEST_SUITE_P(player_tests,
+                         player_message_file_tests,
+                         ::testing::ValuesIn(simple_message_files));
 
 TEST(player_tests, player_test_help)
 {

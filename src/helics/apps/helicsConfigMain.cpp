@@ -32,7 +32,7 @@ static void show_usage(std::string const& name)
     std::cout << "--help, -h, -? returns this help display\n";
 }
 
-using namespace ghc::filesystem; //NOLINT
+using namespace ghc::filesystem;  //NOLINT
 path dir_path(const char* filename, const char* tail)
 {
     path cfile = canonical(absolute(path(filename)));

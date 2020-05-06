@@ -57,11 +57,10 @@ TEST_P(vfed_dual_transfer_ci_skip, float1)
 
 TEST_P(vfed_dual_transfer_ci_skip, string)
 {
-    runDualFederateTest<std::string>(
-        GetParam(),
-        "start",
-        "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runDualFederateTest<std::string>(GetParam(),
+                                     "start",
+                                     "inside of the functional relationship of helics",
+                                     std::string("I am a string"));
 }
 
 /** test case checking that the transfer between two federates works as expected with publication and subscription
@@ -99,14 +98,12 @@ TEST_P(vfed_dual_transfer_ci_skip, obj_float)
 
 TEST_P(vfed_dual_transfer_ci_skip, obj_string)
 {
-    runDualFederateTestObj<std::string>(
-        GetParam(),
-        "start",
-        "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runDualFederateTestObj<std::string>(GetParam(),
+                                        "start",
+                                        "inside of the functional relationship of helics",
+                                        std::string("I am a string"));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    vfed_dual_transfer_tests,
-    vfed_dual_transfer_ci_skip,
-    ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(vfed_dual_transfer_tests,
+                         vfed_dual_transfer_ci_skip,
+                         ::testing::ValuesIn(core_types));

@@ -31,5 +31,5 @@ class CombinationFederate: public ValueFederate, public MessageFederate {
         fed = helicsCreateCombinationFederateFromConfig(configString.c_str(), hThrowOnError());
     }
 };
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

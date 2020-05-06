@@ -33,11 +33,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
-namespace beast = boost::beast; // from <boost/beast.hpp>
-namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
-namespace http = beast::http; // from <boost/beast/http.hpp>
-namespace net = boost::asio; // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast;  // from <boost/beast.hpp>
+namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
+namespace http = beast::http;  // from <boost/beast/http.hpp>
+namespace net = boost::asio;  // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 const std::string localhost{"localhost"};
 
@@ -56,7 +56,7 @@ class webTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc); //NOLINT
+        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);  //NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26247");
@@ -66,9 +66,8 @@ class webTest: public ::testing::Test {
 
         // Set a decorator to change the User-Agent of the handshake
         stream->set_option(websocket::stream_base::decorator([](websocket::request_type& req) {
-            req.set(
-                http::field::user_agent,
-                std::string(HELICS_VERSION_STRING) + " helics-websocket-test");
+            req.set(http::field::user_agent,
+                    std::string(HELICS_VERSION_STRING) + " helics-websocket-test");
         }));
 
         // Perform the websocket handshake
@@ -103,8 +102,8 @@ class webTest: public ::testing::Test {
         return result;
     }
 
-    static std::shared_ptr<helics::Broker>
-        addBroker(helics::core_type ctype, const std::string& init)
+    static std::shared_ptr<helics::Broker> addBroker(helics::core_type ctype,
+                                                     const std::string& init)
     {
         auto brk = helics::BrokerFactory::create(ctype, init);
         if (brk) {

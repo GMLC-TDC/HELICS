@@ -24,12 +24,12 @@ TEST(CoreFactory_tests, ZmqCore_test)
     core->disconnect();
     core = nullptr;
 }
-#else // ENABLE_ZMQ_CORE
+#else  // ENABLE_ZMQ_CORE
 TEST(CoreFactory_tests, ZmqCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::ZMQ), false);
 }
-#endif // ENABLE_ZMQ_CORE
+#endif  // ENABLE_ZMQ_CORE
 
 /*
 #ifdef ENABLE_MPI_CORE

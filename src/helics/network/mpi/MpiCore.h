@@ -32,12 +32,12 @@ namespace mpi {
         virtual std::string generateLocalAddressString() const override;
 
       private:
-        mutable std::mutex dataMutex; //!< mutex protecting the configuration information
-        std::string brokerAddress; //!< the mpi rank:tag of the broker
+        mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+        std::string brokerAddress;  //!< the mpi rank:tag of the broker
         int brokerRank{0};
         int brokerTag{0};
         virtual bool brokerConnect() override;
     };
 
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

@@ -11,4 +11,4 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 template class NetworkBroker<ipc::IpcComms, interface_type::ipc, static_cast<int>(core_type::IPC)>;
-} // namespace helics
+}  // namespace helics
