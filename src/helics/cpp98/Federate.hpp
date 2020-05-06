@@ -122,8 +122,10 @@ class FederateInfo {
     */
     void setFlagOption(int flag, bool value = true)
     {
-        helicsFederateInfoSetFlagOption(
-            fi, flag, value ? helics_true : helics_false, HELICS_NULL_POINTER);
+        helicsFederateInfoSetFlagOption(fi,
+                                        flag,
+                                        value ? helics_true : helics_false,
+                                        HELICS_NULL_POINTER);
     }
     /** set a time federate or core property
     @param timeProperty /ref helics_federate_properties an integer code with the property
@@ -139,21 +141,23 @@ class FederateInfo {
   */
     void setProperty(int integerProperty, int propertyValue)
     {
-        helicsFederateInfoSetIntegerProperty(
-            fi, integerProperty, propertyValue, HELICS_NULL_POINTER);
+        helicsFederateInfoSetIntegerProperty(fi,
+                                             integerProperty,
+                                             propertyValue,
+                                             HELICS_NULL_POINTER);
     }
     /** get the underlying helics_federate_info object*/
     helics_federate_info getInfo() { return fi; }
 
   private:
-    helics_federate_info fi; //!< handle for the underlying federate_info object
+    helics_federate_info fi;  //!< handle for the underlying federate_info object
 };
 
 /** an iteration time structure */
 typedef struct {
   public:
-    helics_time grantedTime; //!< the time of the granted step
-    helics_iteration_result status; //!< the convergence state
+    helics_time grantedTime;  //!< the time of the granted step
+    helics_iteration_result status;  //!< the convergence state
 } helics_iteration_time;
 
 /** Federate object managing a C++98 Federate object*/
@@ -206,8 +210,10 @@ class Federate {
    */
     void setFlagOption(int flag, bool flagValue = true)
     {
-        helicsFederateSetFlagOption(
-            fed, flag, flagValue ? helics_true : helics_false, hThrowOnError());
+        helicsFederateSetFlagOption(fed,
+                                    flag,
+                                    flagValue ? helics_true : helics_false,
+                                    hThrowOnError());
     }
     /**  set a time property option for the federate
     @param tProperty an index of the option to set
@@ -459,8 +465,8 @@ class Federate {
   @param type the type of the filter to register
   @param filterName the name of the filter
   */
-    Filter
-        registerGlobalFilter(helics_filter_type type, const std::string& filterName = std::string())
+    Filter registerGlobalFilter(helics_filter_type type,
+                                const std::string& filterName = std::string())
     {
         return Filter(
             helicsFederateRegisterGlobalFilter(fed, type, filterName.c_str(), hThrowOnError()));
@@ -474,8 +480,9 @@ class Federate {
     */
     CloningFilter registerGlobalCloningFilter(const std::string& deliveryEndpoint)
     {
-        return CloningFilter(helicsFederateRegisterGlobalCloningFilter(
-            fed, deliveryEndpoint.c_str(), hThrowOnError()));
+        return CloningFilter(helicsFederateRegisterGlobalCloningFilter(fed,
+                                                                       deliveryEndpoint.c_str(),
+                                                                       hThrowOnError()));
     }
     /** get the id of a source filter from the name of the endpoint
     @param filterName the name of the filter
@@ -556,9 +563,9 @@ class Federate {
     }
 
   protected:
-    helics_federate fed; //!< underlying helics_federate object
-    bool exec_async_iterate; //!< indicator that the federate is in an async operation
+    helics_federate fed;  //!< underlying helics_federate object
+    bool exec_async_iterate;  //!< indicator that the federate is in an async operation
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

@@ -177,13 +177,12 @@ class Endpoint {
    */
     void sendMessage(const std::string& data, helics_time time)
     {
-        helicsEndpointSendEventRaw(
-            ep,
-            HELICS_NULL_POINTER,
-            data.c_str(),
-            static_cast<int>(data.size()),
-            time,
-            hThrowOnError());
+        helicsEndpointSendEventRaw(ep,
+                                   HELICS_NULL_POINTER,
+                                   data.c_str(),
+                                   static_cast<int>(data.size()),
+                                   time,
+                                   hThrowOnError());
     }
     /** send a string to a particular destination at a particular time
      @param dest the target endpoint to send the data to
@@ -220,13 +219,12 @@ class Endpoint {
    */
     void sendMessage(const std::vector<char>& data, helics_time time)
     {
-        helicsEndpointSendEventRaw(
-            ep,
-            HELICS_NULL_POINTER,
-            data.data(),
-            static_cast<int>(data.size()),
-            time,
-            hThrowOnError());
+        helicsEndpointSendEventRaw(ep,
+                                   HELICS_NULL_POINTER,
+                                   data.data(),
+                                   static_cast<int>(data.size()),
+                                   time,
+                                   hThrowOnError());
     }
     /** send a vector of data to a particular destination at a particular time
      @param dest the target endpoint to send the data to
@@ -260,7 +258,7 @@ class Endpoint {
     }
 
   private:
-    helics_endpoint ep; //!< the underlying helics_endpoint object
+    helics_endpoint ep;  //!< the underlying helics_endpoint object
 };
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

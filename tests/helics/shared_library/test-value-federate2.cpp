@@ -172,8 +172,9 @@ TEST_F(vfed2_tests, json_publish)
     auto s3 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
     auto s4 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input1.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input1.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 1.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 99.9);
     char buffer[50];
@@ -184,8 +185,9 @@ TEST_F(vfed2_tests, json_publish)
     helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count");
 
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input2.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input2.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 2.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 88.2);
 
@@ -218,8 +220,9 @@ TEST_F(vfed2_tests, json_register_publish)
     auto s3 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
     auto s4 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input1.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input1.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 1.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 99.9);
     char buffer[50];
@@ -230,8 +233,9 @@ TEST_F(vfed2_tests, json_register_publish)
     helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count");
 
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input2.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input2.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 2.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 88.2);
 
@@ -244,8 +248,7 @@ TEST_F(vfed2_tests, json_register_publish)
     CE(helicsFederateFinalize(vFed1, &err));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    vfed_tests,
-    vfed2_simple_type_tests,
-    ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests,
+                         vfed2_simple_type_tests,
+                         ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed2_type_tests, ::testing::ValuesIn(core_types));

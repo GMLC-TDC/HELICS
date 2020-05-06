@@ -1275,16 +1275,19 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeIterative)
     auto evil_federate = reinterpret_cast<helics_federate>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    auto res1 = helicsFederateEnterExecutingModeIterative(
-        nullptr, helics_iteration_request_no_iteration, &err);
+    auto res1 = helicsFederateEnterExecutingModeIterative(nullptr,
+                                                          helics_iteration_request_no_iteration,
+                                                          &err);
     EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_iteration_result_error);
     helicsErrorClear(&err);
-    auto res2 = helicsFederateEnterExecutingModeIterative(
-        nullptr, helics_iteration_request_no_iteration, nullptr);
+    auto res2 = helicsFederateEnterExecutingModeIterative(nullptr,
+                                                          helics_iteration_request_no_iteration,
+                                                          nullptr);
     EXPECT_EQ(res2, helics_iteration_result_error);
-    auto res3 = helicsFederateEnterExecutingModeIterative(
-        evil_federate, helics_iteration_request_no_iteration, &err);
+    auto res3 = helicsFederateEnterExecutingModeIterative(evil_federate,
+                                                          helics_iteration_request_no_iteration,
+                                                          &err);
     EXPECT_EQ(res3, helics_iteration_result_error);
     EXPECT_NE(err.error_code, 0);
 }
@@ -1296,13 +1299,15 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeIterativeAsync)
     auto evil_federate = reinterpret_cast<helics_federate>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsFederateEnterExecutingModeIterativeAsync(
-        nullptr, helics_iteration_request_no_iteration, &err);
+    helicsFederateEnterExecutingModeIterativeAsync(nullptr,
+                                                   helics_iteration_request_no_iteration,
+                                                   &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterExecutingModeIterativeAsync(helics_federate fed, helics_iteration_request iterate, nullptr);
-    helicsFederateEnterExecutingModeIterativeAsync(
-        evil_federate, helics_iteration_request_no_iteration, &err);
+    helicsFederateEnterExecutingModeIterativeAsync(evil_federate,
+                                                   helics_iteration_request_no_iteration,
+                                                   &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -1478,13 +1483,17 @@ TEST(evil_federate_test, helicsFederateRequestTimeIterativeAsync)
     auto evil_federate = reinterpret_cast<helics_federate>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsFederateRequestTimeIterativeAsync(
-        nullptr, 1.0, helics_iteration_request_force_iteration, &err);
+    helicsFederateRequestTimeIterativeAsync(nullptr,
+                                            1.0,
+                                            helics_iteration_request_force_iteration,
+                                            &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateRequestTimeIterativeAsync(     helics_federate fed,     helics_time requestTime,     helics_iteration_request iterate,     nullptr);
-    helicsFederateRequestTimeIterativeAsync(
-        evil_federate, 1.0, helics_iteration_request_force_iteration, &err);
+    helicsFederateRequestTimeIterativeAsync(evil_federate,
+                                            1.0,
+                                            helics_iteration_request_force_iteration,
+                                            &err);
     EXPECT_NE(err.error_code, 0);
 }
 

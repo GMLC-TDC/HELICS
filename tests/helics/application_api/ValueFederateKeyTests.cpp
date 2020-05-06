@@ -68,7 +68,7 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     const auto& sub3name = subid3.getTarget();
     EXPECT_EQ(sub3name, "sub3");
 
-    EXPECT_TRUE(subid1.getType().empty()); // def is the default type
+    EXPECT_TRUE(subid1.getType().empty());  // def is the default type
     EXPECT_EQ(subid2.getType(), "int32");
     EXPECT_TRUE(subid3.getType().empty());
     EXPECT_EQ(subid3.getUnits(), "V");
@@ -95,8 +95,10 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     ASSERT_TRUE(vFed1);
     // register the publications
-    helics::Publication pubid(
-        helics::GLOBAL, vFed1.get(), "pub1", helics::data_type::helics_string);
+    helics::Publication pubid(helics::GLOBAL,
+                              vFed1.get(),
+                              "pub1",
+                              helics::data_type::helics_string);
 
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(helics_property_time_delta, 1.0);
@@ -127,11 +129,10 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     vFed1->finalize();
 }
 
-static bool dual_transfer_test(
-    std::shared_ptr<helics::ValueFederate>& vFed1,
-    std::shared_ptr<helics::ValueFederate>& vFed2,
-    helics::Publication& pubid,
-    helics::Input& subid)
+static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
+                               std::shared_ptr<helics::ValueFederate>& vFed2,
+                               helics::Publication& pubid,
+                               helics::Input& subid)
 {
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed2->setProperty(helics_property_time_delta, 1.0);
@@ -497,10 +498,9 @@ TEST_P(valuefed_link_file, dual_transfer_core_link_file)
     EXPECT_TRUE(res);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_tests,
-    valuefed_link_file,
-    ::testing::ValuesIn(simple_connection_files));
+INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+                         valuefed_link_file,
+                         ::testing::ValuesIn(simple_connection_files));
 
 TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
 {
@@ -640,7 +640,7 @@ TEST_P(valuefed_single_type, all_callback)
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 2);
-    ccnt = 0; // reset the counter
+    ccnt = 0;  // reset the counter
     vFed1->publishRaw(pubid3, db);
     vFed1->publish(pubid2, 4);
     vFed1->publish(pubid1, "test string2");
@@ -995,11 +995,9 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     vFed2->finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_key_tests,
-    valuefed_single_type,
-    ::testing::ValuesIn(core_types_single));
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_key_tests,
-    valuefed_all_type_tests,
-    ::testing::ValuesIn(core_types_all));
+INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
+                         valuefed_single_type,
+                         ::testing::ValuesIn(core_types_single));
+INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
+                         valuefed_all_type_tests,
+                         ::testing::ValuesIn(core_types_all));

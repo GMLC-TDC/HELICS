@@ -15,4 +15,4 @@ Header file for inclusion of the entire CPP shared library
 #include "cpp98/Core.hpp"
 #include "cpp98/helics.hpp"
 
-#endif // SRC_HELICS_HELICS98_HPP_
+#endif  // SRC_HELICS_HELICS98_HPP_

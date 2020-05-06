@@ -21,8 +21,8 @@ class AsyncFedCallInfo {
     std::future<iteration_time>
         timeRequestIterativeFuture; /** future for the time request iterative call*/
     std::future<void> finalizeFuture; /** future for the finalize call*/
-    std::atomic<int> queryCounter{0}; //!< counter for the number of queries
+    std::atomic<int> queryCounter{0};  //!< counter for the number of queries
     std::map<int, std::future<std::string>>
-        inFlightQueries; //!< the queries that are actually in flight at a given time
+        inFlightQueries;  //!< the queries that are actually in flight at a given time
 };
-} // namespace helics
+}  // namespace helics

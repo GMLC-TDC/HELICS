@@ -19,22 +19,22 @@ class helicsCLI11App;
  */
 class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   public:
-    int uniqueKey = 0; //!< location for keying the info for application purposes
-    char separator = '/'; //!< separator for global name of localFederates
+    int uniqueKey = 0;  //!< location for keying the info for application purposes
+    char separator = '/';  //!< separator for global name of localFederates
     bool autobroker =
-        false; //!< specify that the core should generate a broker if not found otherwise
-    core_type coreType = core_type::DEFAULT; //!< the type of the core
-    int brokerPort = -1; //!< broker port information
+        false;  //!< specify that the core should generate a broker if not found otherwise
+    core_type coreType = core_type::DEFAULT;  //!< the type of the core
+    int brokerPort = -1;  //!< broker port information
 
-    std::string defName; //!< a default name to use for a federate
-    std::string coreName; //!< the name of the core
-    std::string coreInitString; //!< an initialization string for the core API object
-    std::string brokerInitString; //!< an initialization string for the broker if auto generated
-    std::string broker; //!< connection information for the broker
-    std::string key; //!< key for the broker
+    std::string defName;  //!< a default name to use for a federate
+    std::string coreName;  //!< the name of the core
+    std::string coreInitString;  //!< an initialization string for the core API object
+    std::string brokerInitString;  //!< an initialization string for the broker if auto generated
+    std::string broker;  //!< connection information for the broker
+    std::string key;  //!< key for the broker
     std::string
-        localport; //!< string for defining the local port to use usually a number but other strings are possible
-    std::string fileInUse; //!< string containing a configuration file that was used
+        localport;  //!< string for defining the local port to use usually a number but other strings are possible
+    std::string fileInUse;  //!< string containing a configuration file that was used
     /** default constructor*/
     FederateInfo() = default;
     /** construct from a type
@@ -116,4 +116,4 @@ HELICS_CXX_EXPORT int getPropertyIndex(std::string val);
 */
 HELICS_CXX_EXPORT int getOptionIndex(std::string val);
 
-} // namespace helics
+}  // namespace helics

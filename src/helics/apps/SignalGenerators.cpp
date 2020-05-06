@@ -129,5 +129,5 @@ namespace apps {
         lastTime = signalTime;
         return amplitude * state + std::complex<double>(bias_real, bias_imag);
     }
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

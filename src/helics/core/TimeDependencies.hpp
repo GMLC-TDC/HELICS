@@ -27,16 +27,16 @@ class DependencyInfo {
         error = 7
     };
 
-    global_federate_id fedID{}; //!< identifier for the dependency
-    global_federate_id minFed{}; //!< identifier for the min dependency
-    time_state_t time_state{time_state_t::initialized}; //!< the current state of the dependency
+    global_federate_id fedID{};  //!< identifier for the dependency
+    global_federate_id minFed{};  //!< identifier for the min dependency
+    time_state_t time_state{time_state_t::initialized};  //!< the current state of the dependency
     bool cyclic{
-        false}; //!< indicator that the dependency is cyclic and should be reset more completely on grant
+        false};  //!< indicator that the dependency is cyclic and should be reset more completely on grant
     // 5 byte gap here
-    Time Tnext{negEpsilon}; //!< next possible message or value
-    Time Te{timeZero}; //!< the next currently scheduled event
-    Time Tdemin{timeZero}; //!< min dependency event time
-    Time forwardEvent{Time::maxVal()}; //!< a predicted event
+    Time Tnext{negEpsilon};  //!< next possible message or value
+    Time Te{timeZero};  //!< the next currently scheduled event
+    Time Tdemin{timeZero};  //!< min dependency event time
+    Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
     /** construct from a federate id*/
@@ -51,7 +51,7 @@ class DependencyInfo {
 /** class for managing a set of dependencies*/
 class TimeDependencies {
   private:
-    std::vector<DependencyInfo> dependencies; //!< container
+    std::vector<DependencyInfo> dependencies;  //!< container
   public:
     /** default constructor*/
     TimeDependencies() = default;
@@ -104,4 +104,4 @@ class TimeDependencies {
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
 };
-} // namespace helics
+}  // namespace helics

@@ -26,8 +26,8 @@ namespace inproc {
         virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
 
       private:
-        virtual void queue_rx_function() override; //!< the functional loop for the receive queue
-        virtual void queue_tx_function() override; //!< the loop for transmitting data
+        virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
+        virtual void queue_tx_function() override;  //!< the loop for transmitting data
       public:
         /** return a dummy port number*/
         int getPort() const { return -1; }
@@ -35,5 +35,5 @@ namespace inproc {
         std::string getAddress() const;
     };
 
-} // namespace inproc
-} // namespace helics
+}  // namespace inproc
+}  // namespace helics

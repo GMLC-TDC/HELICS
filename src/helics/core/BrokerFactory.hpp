@@ -31,9 +31,8 @@ namespace BrokerFactory {
     template<class BrokerTYPE>
     class BrokerTypeBuilder final: public BrokerBuilder {
       public:
-        static_assert(
-            std::is_base_of<Broker, BrokerTYPE>::value,
-            "Type does not inherit from helics::Core");
+        static_assert(std::is_base_of<Broker, BrokerTYPE>::value,
+                      "Type does not inherit from helics::Core");
 
         using broker_build_type = BrokerTYPE;
         virtual std::shared_ptr<Broker> build(const std::string& name) override
@@ -129,5 +128,5 @@ registered or when the clean up function is called this prevents some odd thread
 
     /** terminate all running Brokers*/
     void terminateAllBrokers();
-} // namespace BrokerFactory
-} // namespace helics
+}  // namespace BrokerFactory
+}  // namespace helics

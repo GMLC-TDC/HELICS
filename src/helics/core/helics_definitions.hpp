@@ -122,5 +122,5 @@ namespace defs {
         ignore_unit_mismatch = helics_handle_option_ignore_unit_mismatch
     };
 
-} // namespace defs
-} // namespace helics
+}  // namespace defs
+}  // namespace helics

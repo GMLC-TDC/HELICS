@@ -34,14 +34,14 @@ namespace helics {
 /** class to manage a single thread for all logging*/
 class LoggingCore {
   private:
-    static std::atomic<bool> fastShutdown; // set to true to enable a fast shutdown
+    static std::atomic<bool> fastShutdown;  // set to true to enable a fast shutdown
     std::thread
-        loggingThread; //!< the thread object containing the thread running the actual Logger
+        loggingThread;  //!< the thread object containing the thread running the actual Logger
     std::vector<std::function<void(std::string&& message)>>
-        functions; //!< container for the functions
-    std::mutex functionLock; //!< lock for updating the functions
+        functions;  //!< container for the functions
+    std::mutex functionLock;  //!< lock for updating the functions
     gmlc::containers::BlockingQueue<std::pair<int32_t, std::string>>
-        loggingQueue; //!< the actual queue containing the strings to log
+        loggingQueue;  //!< the actual queue containing the strings to log
     gmlc::concurrency::TripWireDetector tripDetector;
 
   public:
@@ -72,8 +72,8 @@ class LoggingCore {
     /** remove a function callback*/
     void haltOperations(int loggerIndex);
     /** update a callback for a particular instance*/
-    void
-        updateProcessingFunction(int index, std::function<void(std::string&& message)> newFunction);
+    void updateProcessingFunction(int index,
+                                  std::function<void(std::string&& message)> newFunction);
     /** enable a fast shutdown in situations where a thread may be force-ably terminated*/
     static void setFastShutdown();
 
@@ -85,9 +85,9 @@ class LoggingCore {
 class LoggerManager {
   private:
     static std::map<std::string, std::shared_ptr<LoggerManager>>
-        loggers; //!< container for pointers to all the available contexts
-    std::string name; //!< context name
-    std::shared_ptr<LoggingCore> loggingControl; //!< pointer to the actual Logger
+        loggers;  //!< container for pointers to all the available contexts
+    std::string name;  //!< context name
+    std::shared_ptr<LoggingCore> loggingControl;  //!< pointer to the actual Logger
     explicit LoggerManager(const std::string& loggerName);
 
   public:
@@ -107,4 +107,4 @@ class LoggerManager {
     /** get the name of the logger*/
     const std::string& getName() const { return name; }
 };
-} // namespace helics
+}  // namespace helics

@@ -35,11 +35,10 @@ namespace tcp {
         };
 
         using pointer = std::shared_ptr<TcpConnection>;
-        static pointer create(
-            asio::io_context& io_context,
-            const std::string& connection,
-            const std::string& port,
-            size_t bufferSize = 10192);
+        static pointer create(asio::io_context& io_context,
+                              const std::string& connection,
+                              const std::string& port,
+                              size_t bufferSize = 10192);
         /** create an RxConnection object using the specified context and bufferSize*/
         static pointer create(asio::io_context& io_context, size_t bufferSize)
         {
@@ -111,19 +110,17 @@ namespace tcp {
    @param callback the callback function to execute when data has been received with signature
    void(TcpConnection::pointer, const char *buffer, size_t dataLength, const std::error_code &error)
     */
-        void async_receive(std::function<void(
-                               TcpConnection::pointer,
-                               const char* buffer,
-                               size_t dataLength,
-                               const std::error_code& error)> callback)
+        void async_receive(std::function<void(TcpConnection::pointer,
+                                              const char* buffer,
+                                              size_t dataLength,
+                                              const std::error_code& error)> callback)
         {
-            socket_.async_receive(
-                asio::buffer(data, data.size()),
-                [connection = shared_from_this(),
-                 callback =
-                     std::move(callback)](const std::error_code& error, size_t bytes_transferred) {
-                    connection->handle_read(bytes_transferred, error, callback);
-                });
+            socket_.async_receive(asio::buffer(data, data.size()),
+                                  [connection = shared_from_this(),
+                                   callback = std::move(callback)](const std::error_code& error,
+                                                                   size_t bytes_transferred) {
+                                      connection->handle_read(bytes_transferred, error, callback);
+                                  });
         }
         /** check if the socket has finished the connection process*/
         bool isConnected() const
@@ -143,11 +140,10 @@ namespace tcp {
             socket_(io_context), context_(io_context), data(bufferSize), idcode(idcounter++)
         {
         }
-        TcpConnection(
-            asio::io_context& io_context,
-            const std::string& connection,
-            const std::string& port,
-            size_t bufferSize);
+        TcpConnection(asio::io_context& io_context,
+                      const std::string& connection,
+                      const std::string& port,
+                      size_t bufferSize);
         /** function for handling the asynchronous return from a read request*/
         void handle_read(const std::error_code& error, size_t bytes_transferred);
         void handle_read(
@@ -169,7 +165,7 @@ namespace tcp {
         const bool connecting{false};
         gmlc::concurrency::TriggerVariable receivingHalt;
         std::atomic<bool> connectionError{false};
-        gmlc::concurrency::TriggerVariable connected; //!< variable indicating connectivity
+        gmlc::concurrency::TriggerVariable connected;  //!< variable indicating connectivity
         std::function<size_t(TcpConnection::pointer, const char*, size_t)> dataCall;
         std::function<bool(TcpConnection::pointer, const std::error_code&)> errorCall;
         std::function<void(int level, const std::string& logMessage)> logFunction;
@@ -249,10 +245,9 @@ namespace tcp {
         TcpAcceptor(asio::io_context& io_context, asio::ip::tcp::endpoint& ep);
         TcpAcceptor(asio::io_context& io_context, uint16_t port);
         /** function for handling the asynchronous return from a read request*/
-        void handle_accept(
-            TcpAcceptor::pointer ptr,
-            TcpConnection::pointer new_connection,
-            const std::error_code& error);
+        void handle_accept(TcpAcceptor::pointer ptr,
+                           TcpConnection::pointer new_connection,
+                           const std::error_code& error);
         asio::ip::tcp::endpoint endpoint_;
         asio::ip::tcp::acceptor acceptor_;
         std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
@@ -267,19 +262,17 @@ namespace tcp {
       public:
         using pointer = std::shared_ptr<TcpServer>;
 
-        static pointer create(
-            asio::io_context& io_context,
-            const std::string& address,
-            const std::string& port,
-            bool reuse_port = false,
-            int nominalBufferSize = 10192);
+        static pointer create(asio::io_context& io_context,
+                              const std::string& address,
+                              const std::string& port,
+                              bool reuse_port = false,
+                              int nominalBufferSize = 10192);
 
-        static pointer create(
-            asio::io_context& io_context,
-            const std::string& address,
-            uint16_t PortNum,
-            bool reuse_port = false,
-            int nominalBufferSize = 10192);
+        static pointer create(asio::io_context& io_context,
+                              const std::string& address,
+                              uint16_t PortNum,
+                              bool reuse_port = false,
+                              int nominalBufferSize = 10192);
         static pointer
             create(asio::io_context& io_context, uint16_t PortNum, int nominalBufferSize = 10192);
 
@@ -313,18 +306,16 @@ namespace tcp {
         TcpConnection::pointer findSocket(int connectorID) const;
 
       private:
-        TcpServer(
-            asio::io_context& io_context,
-            const std::string& address,
-            uint16_t portNum,
-            bool port_reuse,
-            int nominalBufferSize);
-        TcpServer(
-            asio::io_context& io_context,
-            const std::string& address,
-            const std::string& port,
-            bool port_reuse,
-            int nominalBufferSize);
+        TcpServer(asio::io_context& io_context,
+                  const std::string& address,
+                  uint16_t portNum,
+                  bool port_reuse,
+                  int nominalBufferSize);
+        TcpServer(asio::io_context& io_context,
+                  const std::string& address,
+                  const std::string& port,
+                  bool port_reuse,
+                  int nominalBufferSize);
         TcpServer(asio::io_context& io_context, uint16_t portNum, int nominalBufferSize);
 
         void initialConnect();
@@ -341,5 +332,5 @@ namespace tcp {
         std::vector<TcpConnection::pointer> connections;
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

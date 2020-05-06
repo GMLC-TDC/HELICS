@@ -26,4 +26,4 @@ Time loadTimeFromString(std::string timeString, time_units defUnits)
     return gmlc::utilities::loadTimeFromString<Time>(timeString, defUnits);
 }
 
-} // namespace helics
+}  // namespace helics

@@ -32,7 +32,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class MessageTimer {
 };
-} // namespace helics
+}  // namespace helics
 #endif
 
 #include "../common/fmt_format.h"
@@ -85,15 +85,15 @@ static const std::string emptyStr;
 #    else
 #        define LOG_TRACE(message) ((void)0)
 #    endif
-#else // LOGGING_DISABLED
+#else  // LOGGING_DISABLED
 #    define LOG_SUMMARY(message) ((void)0)
 #    define LOG_INTERFACES(message) ((void)0)
 #    define LOG_TIMING(message) ((void)0)
 #    define LOG_DATA(message) ((void)0)
 #    define LOG_TRACE(message) ((void)0)
-#endif // LOGGING_DISABLED
+#endif  // LOGGING_DISABLED
 
-using namespace std::chrono_literals; //NOLINT
+using namespace std::chrono_literals;  //NOLINT
 
 namespace helics {
 FederateState::FederateState(const std::string& name_, const CoreFederateInfo& info_):
@@ -275,12 +275,11 @@ void FederateState::addAction(ActionMessage&& action)
     }
 }
 
-void FederateState::createInterface(
-    handle_type htype,
-    interface_handle handle,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+void FederateState::createInterface(handle_type htype,
+                                    interface_handle handle,
+                                    const std::string& key,
+                                    const std::string& type,
+                                    const std::string& units)
 {
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
@@ -288,31 +287,37 @@ void FederateState::createInterface(
         case handle_type::publication: {
             interfaceInformation.createPublication(handle, key, type, units);
             if (checkActionFlag(getInterfaceFlags(), required_flag)) {
-                interfaceInformation.setPublicationProperty(
-                    handle, defs::options::connection_required, true);
+                interfaceInformation.setPublicationProperty(handle,
+                                                            defs::options::connection_required,
+                                                            true);
             }
             if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
-                interfaceInformation.setPublicationProperty(
-                    handle, defs::options::connection_optional, true);
+                interfaceInformation.setPublicationProperty(handle,
+                                                            defs::options::connection_optional,
+                                                            true);
             }
         } break;
         case handle_type::input: {
             interfaceInformation.createInput(handle, key, type, units);
             if (strict_input_type_checking) {
-                interfaceInformation.setInputProperty(
-                    handle, defs::options::strict_type_checking, true);
+                interfaceInformation.setInputProperty(handle,
+                                                      defs::options::strict_type_checking,
+                                                      true);
             }
             if (ignore_unit_mismatch) {
-                interfaceInformation.setInputProperty(
-                    handle, defs::options::ignore_unit_mismatch, true);
+                interfaceInformation.setInputProperty(handle,
+                                                      defs::options::ignore_unit_mismatch,
+                                                      true);
             }
             if (checkActionFlag(getInterfaceFlags(), required_flag)) {
-                interfaceInformation.setInputProperty(
-                    handle, defs::options::connection_required, true);
+                interfaceInformation.setInputProperty(handle,
+                                                      defs::options::connection_required,
+                                                      true);
             }
             if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
-                interfaceInformation.setInputProperty(
-                    handle, defs::options::connection_optional, true);
+                interfaceInformation.setInputProperty(handle,
+                                                      defs::options::connection_optional,
+                                                      true);
             }
         } break;
         case handle_type::endpoint: {
@@ -372,7 +377,7 @@ stx::optional<ActionMessage>
 
 iteration_result FederateState::waitSetup()
 {
-    if (try_lock()) { // only enter this loop once per federate
+    if (try_lock()) {  // only enter this loop once per federate
         auto ret = processQueue();
         unlock();
         return static_cast<iteration_result>(ret);
@@ -381,7 +386,7 @@ iteration_result FederateState::waitSetup()
     std::lock_guard<FederateState> fedlock(*this);
     iteration_result ret;
     switch (getState()) {
-        case HELICS_CREATED: { // we are still in the created state
+        case HELICS_CREATED: {  // we are still in the created state
             return waitSetup();
         }
         case HELICS_ERROR:
@@ -400,7 +405,7 @@ iteration_result FederateState::waitSetup()
 
 iteration_result FederateState::enterInitializingMode()
 {
-    if (try_lock()) { // only enter this loop once per federate
+    if (try_lock()) {  // only enter this loop once per federate
         auto ret = processQueue();
         unlock();
         if (ret == message_processing_result::next_step) {
@@ -422,7 +427,7 @@ iteration_result FederateState::enterInitializingMode()
         case HELICS_CREATED: {
             return enterInitializingMode();
         }
-        default: // everything >= HELICS_INITIALIZING
+        default:  // everything >= HELICS_INITIALIZING
             ret = iteration_result::next_step;
             break;
     }
@@ -431,7 +436,7 @@ iteration_result FederateState::enterInitializingMode()
 
 iteration_result FederateState::enterExecutingMode(iteration_request iterate)
 {
-    if (try_lock()) { // only enter this loop once per federate
+    if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
         ActionMessage exec(CMD_EXEC_REQUEST);
         exec.source_id = global_id.load();
@@ -507,9 +512,9 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
 
 iteration_time FederateState::requestTime(Time nextTime, iteration_request iterate)
 {
-    if (try_lock()) { // only enter this loop once per federate
+    if (try_lock()) {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime();
-        events.clear(); // clear the event queue
+        events.clear();  // clear the event queue
         LOG_TRACE(timeCoord->printTimeStatus());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
@@ -533,8 +538,9 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
                     realTimeTimerIndex =
                         mTimer->addTimer(current_clock_time + current_lead, std::move(tforce));
                 } else {
-                    mTimer->updateTimer(
-                        realTimeTimerIndex, current_clock_time + current_lead, std::move(tforce));
+                    mTimer->updateTimer(realTimeTimerIndex,
+                                        current_clock_time + current_lead,
+                                        std::move(tforce));
                 }
             } else {
                 ActionMessage tforce(CMD_FORCE_TIME_GRANT);
@@ -592,10 +598,10 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
         unlock();
         if ((retTime.grantedTime > nextTime) && (nextTime > lastTime)) {
             if (!ignore_time_mismatch_warnings) {
-                LOG_WARNING(fmt::format(
-                    "Time mismatch detected granted time >requested time {} vs {}",
-                    static_cast<double>(retTime.grantedTime),
-                    static_cast<double>(nextTime)));
+                LOG_WARNING(
+                    fmt::format("Time mismatch detected granted time >requested time {} vs {}",
+                                static_cast<double>(retTime.grantedTime),
+                                static_cast<double>(nextTime)));
             }
         }
         return retTime;
@@ -648,7 +654,7 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
 
 iteration_result FederateState::genericUnspecifiedQueueProcess()
 {
-    if (try_lock()) { // only 1 thread can enter this loop once per federate
+    if (try_lock()) {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue();
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
@@ -736,9 +742,8 @@ bool FederateState::messageShouldBeDelayed(const ActionMessage& cmd) const
         case 1:
             return (cmd.source_id == delayedFederates.front());
         case 2:
-            return (
-                (cmd.source_id == delayedFederates.front()) ||
-                (cmd.source_id == delayedFederates.back()));
+            return ((cmd.source_id == delayedFederates.front()) ||
+                    (cmd.source_id == delayedFederates.back()));
         default: {
             auto res =
                 std::lower_bound(delayedFederates.begin(), delayedFederates.end(), cmd.source_id);
@@ -844,7 +849,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
-                (cmd.dest_id == parent_broker_id)) { // this sets up a time request
+                (cmd.dest_id == parent_broker_id)) {  // this sets up a time request
                 iteration_request iterate = iteration_request::no_iterations;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?
@@ -874,7 +879,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             }
             FALLTHROUGH
             /* FALLTHROUGH */
-        case CMD_EXEC_CHECK: // just check the time for entry
+        case CMD_EXEC_CHECK:  // just check the time for entry
         {
             if (state != HELICS_INITIALIZING) {
                 break;
@@ -981,7 +986,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_TIME_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
-                (cmd.dest_id == parent_broker_id)) { // this sets up a time request
+                (cmd.dest_id == parent_broker_id)) {  // this sets up a time request
                 iteration_request iterate = iteration_request::no_iterations;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?
@@ -1054,11 +1059,10 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             }
             for (auto& src : subI->input_sources) {
                 if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
-                    subI->addData(
-                        src,
-                        cmd.actionTime,
-                        cmd.counter,
-                        std::make_shared<const data_block>(std::move(cmd.payload)));
+                    subI->addData(src,
+                                  cmd.actionTime,
+                                  cmd.counter,
+                                  std::make_shared<const data_block>(std::move(cmd.payload)));
                     if (!subI->not_interruptible) {
                         timeCoord->updateValueTime(cmd.actionTime);
                         LOG_TRACE(timeCoord->printTimeStatus());
@@ -1127,11 +1131,10 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ADD_PUBLISHER: {
             auto subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
-                subI->addSource(
-                    cmd.getSource(),
-                    cmd.name,
-                    cmd.getString(typeStringLoc),
-                    cmd.getString(unitStringLoc));
+                subI->addSource(cmd.getSource(),
+                                cmd.name,
+                                cmd.getString(typeStringLoc),
+                                cmd.getString(unitStringLoc));
                 addDependency(cmd.source_id);
             }
         } break;
@@ -1156,16 +1159,16 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_REMOVE_NAMED_PUBLICATION: {
             auto subI = interfaceInformation.getInput(cmd.source_handle);
             if (subI != nullptr) {
-                subI->removeSource(
-                    cmd.name, (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+                subI->removeSource(cmd.name,
+                                   (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
             }
             break;
         }
         case CMD_REMOVE_PUBLICATION: {
             auto subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
-                subI->removeSource(
-                    cmd.getSource(), (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+                subI->removeSource(cmd.getSource(),
+                                   (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
             }
             break;
         }
@@ -1269,8 +1272,9 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
     bool used = false;
     switch (static_cast<char>(cmd.counter)) {
         case 'i':
-            used = interfaceInformation.setInputProperty(
-                cmd.dest_handle, cmd.messageID, checkActionFlag(cmd, indicator_flag));
+            used = interfaceInformation.setInputProperty(cmd.dest_handle,
+                                                         cmd.messageID,
+                                                         checkActionFlag(cmd, indicator_flag));
             if (!used) {
                 auto ipt = interfaceInformation.getInput(cmd.dest_handle);
                 if (ipt != nullptr) {
@@ -1283,30 +1287,35 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             }
             break;
         case 'p':
-            used = interfaceInformation.setPublicationProperty(
-                cmd.dest_handle, cmd.messageID, checkActionFlag(cmd, indicator_flag));
+            used =
+                interfaceInformation.setPublicationProperty(cmd.dest_handle,
+                                                            cmd.messageID,
+                                                            checkActionFlag(cmd, indicator_flag));
             if (!used) {
                 auto pub = interfaceInformation.getPublication(cmd.dest_handle);
                 if (pub != nullptr) {
-                    LOG_WARNING(fmt::format(
-                        "property {} not used on Publication {}", cmd.messageID, pub->key));
+                    LOG_WARNING(fmt::format("property {} not used on Publication {}",
+                                            cmd.messageID,
+                                            pub->key));
                 } else {
-                    LOG_WARNING(fmt::format(
-                        "property {} not used on due to unknown Publication", cmd.messageID));
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown Publication",
+                                            cmd.messageID));
                 }
             }
             break;
         case 'e':
-            used = interfaceInformation.setEndpointProperty(
-                cmd.dest_handle, cmd.messageID, checkActionFlag(cmd, indicator_flag));
+            used = interfaceInformation.setEndpointProperty(cmd.dest_handle,
+                                                            cmd.messageID,
+                                                            checkActionFlag(cmd, indicator_flag));
             if (!used) {
                 auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (ept != nullptr) {
-                    LOG_WARNING(fmt::format(
-                        "property {} not used on Endpoint {}", cmd.messageID, ept->key));
+                    LOG_WARNING(fmt::format("property {} not used on Endpoint {}",
+                                            cmd.messageID,
+                                            ept->key));
                 } else {
-                    LOG_WARNING(fmt::format(
-                        "property {} not used on due to unknown Endpoint", cmd.messageID));
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown Endpoint",
+                                            cmd.messageID));
                 }
             }
             break;
@@ -1597,37 +1606,32 @@ void FederateState::setCoreObject(CommonCore* parent)
     unlock();
 }
 
-void FederateState::logMessage(
-    int level,
-    const std::string& logMessageSource,
-    const std::string& message) const
+void FederateState::logMessage(int level,
+                               const std::string& logMessageSource,
+                               const std::string& message) const
 {
     if ((loggerFunction) && (level <= logLevel)) {
-        loggerFunction(
-            level,
-            (logMessageSource.empty()) ?
-                fmt::format("{} ({})", name, global_id.load().baseValue()) :
-                logMessageSource,
-            message);
+        loggerFunction(level,
+                       (logMessageSource.empty()) ?
+                           fmt::format("{} ({})", name, global_id.load().baseValue()) :
+                           logMessageSource,
+                       message);
     }
 }
 
 std::string FederateState::processQueryActual(const std::string& query) const
 {
     if (query == "publications") {
-        return generateStringVector(interfaceInformation.getPublications(), [](auto& pub) {
-            return pub->key;
-        });
+        return generateStringVector(interfaceInformation.getPublications(),
+                                    [](auto& pub) { return pub->key; });
     }
     if (query == "inputs") {
-        return generateStringVector(interfaceInformation.getInputs(), [](auto& inp) {
-            return inp->key;
-        });
+        return generateStringVector(interfaceInformation.getInputs(),
+                                    [](auto& inp) { return inp->key; });
     }
     if (query == "endpoints") {
-        return generateStringVector(interfaceInformation.getEndpoints(), [](auto& ept) {
-            return ept->key;
-        });
+        return generateStringVector(interfaceInformation.getEndpoints(),
+                                    [](auto& ept) { return ept->key; });
     }
     if (query == "interfaces") {
         Json::Value base;
@@ -1653,9 +1657,8 @@ std::string FederateState::processQueryActual(const std::string& query) const
         return str;
     }
     if (query == "dependencies") {
-        return generateStringVector(timeCoord->getDependencies(), [](auto& dep) {
-            return std::to_string(dep.baseValue());
-        });
+        return generateStringVector(timeCoord->getDependencies(),
+                                    [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
     if (query == "current_time") {
         return timeCoord->printTimeStatus();
@@ -1686,9 +1689,8 @@ std::string FederateState::processQueryActual(const std::string& query) const
         return generateJsonString(base);
     }
     if (query == "dependents") {
-        return generateStringVector(timeCoord->getDependents(), [](auto& dep) {
-            return std::to_string(dep.baseValue());
-        });
+        return generateStringVector(timeCoord->getDependents(),
+                                    [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
     if (query == "data_flow_graph") {
         Json::Value base;
@@ -1732,12 +1734,12 @@ std::string FederateState::processQuery(const std::string& query) const
 {
     std::string qstring;
     if (query == "publications" || query == "inputs" ||
-        query == "endpoints") { // these never need to be locked
+        query == "endpoints") {  // these never need to be locked
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
             "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents;current_time";
-    } else { // the rest might to prevent a race condition
+    } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);
             unlock();
@@ -1747,4 +1749,4 @@ std::string FederateState::processQuery(const std::string& query) const
     }
     return qstring;
 }
-} // namespace helics
+}  // namespace helics

@@ -42,10 +42,9 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Clone(
-            const std::string& appName,
-            const std::shared_ptr<Core>& core,
-            const FederateInfo& fi);
+        Clone(const std::string& appName,
+              const std::shared_ptr<Core>& core,
+              const FederateInfo& fi);
 
         /**constructor taking a federate information structure and using the given core
     @param appName the name of the federate (can be empty to use defaults from fi)
@@ -125,27 +124,27 @@ namespace apps {
             }
         };
 
-        bool allow_iteration{false}; //!< trigger to allow Iteration
-        bool verbose{false}; //!< print all captured values to the screen
-        bool fileSaved{false}; //!< true if the file has been saved already
+        bool allow_iteration{false};  //!< trigger to allow Iteration
+        bool verbose{false};  //!< print all captured values to the screen
+        bool fileSaved{false};  //!< true if the file has been saved already
         Time nextPrintTimeStep{
-            helics::timeZero}; //!< the time advancement period for printing markers
-        std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
-        std::vector<ValueCapture> points; //!< lists of points that were captured
-        std::vector<Input> subscriptions; //!< the actual subscription objects
+            helics::timeZero};  //!< the time advancement period for printing markers
+        std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
+        std::vector<ValueCapture> points;  //!< lists of points that were captured
+        std::vector<Input> subscriptions;  //!< the actual subscription objects
         std::vector<std::string>
-            cloneSubscriptionNames; //!< string of the subscriptions of the cloned federate
-        std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
-        std::vector<std::unique_ptr<Message>> messages; //!< list of messages
-        std::map<helics::interface_handle, int> subids; //!< map of the subscription ids
-        std::map<std::string, int> subkeys; //!< translate subscription names to an index
-        std::map<helics::interface_handle, int> eptids; // translate subscription id to index
-        std::map<std::string, int> eptNames; //!< translate endpoint name to index
-        std::string captureFederate; //!< storage for the name of the federate to clone
-        std::string fedConfig; //!< storage for the federateConfiguration
-        std::string outFileName{"clone.json"}; //!< the final output file
-        std::vector<int> pubPointCount; //!< a	vector containing the counts of each publication
+            cloneSubscriptionNames;  //!< string of the subscriptions of the cloned federate
+        std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
+        std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
+        std::map<helics::interface_handle, int> subids;  //!< map of the subscription ids
+        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+        std::map<helics::interface_handle, int> eptids;  // translate subscription id to index
+        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::string captureFederate;  //!< storage for the name of the federate to clone
+        std::string fedConfig;  //!< storage for the federateConfiguration
+        std::string outFileName{"clone.json"};  //!< the final output file
+        std::vector<int> pubPointCount;  //!< a	vector containing the counts of each publication
     };
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

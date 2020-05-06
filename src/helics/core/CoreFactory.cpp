@@ -66,7 +66,7 @@ namespace CoreFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCoreBuilder() = default;
-        std::vector<BuildT> builders; //!< container for the different builders
+        std::vector<BuildT> builders;  //!< container for the different builders
     };
 
     void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
@@ -186,10 +186,9 @@ namespace CoreFactory {
         return core;
     }
 
-    std::shared_ptr<Core> FindOrCreate(
-        core_type type,
-        const std::string& coreName,
-        const std::string& configureString)
+    std::shared_ptr<Core> FindOrCreate(core_type type,
+                                       const std::string& coreName,
+                                       const std::string& configureString)
     {
         std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
@@ -247,10 +246,10 @@ what we do is delay the destruction until it is called in a different thread whi
 need be
 without issue*/
     static gmlc::concurrency::DelayedDestructor<Core>
-        delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
+        delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<Core, core_type>
-        searchableCores; //!< the object managing the searchable cores
+        searchableCores;  //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
@@ -262,8 +261,8 @@ without issue*/
 
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
-        return searchableCores.findObject(
-            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+        return searchableCores.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); },
+                                          type);
     }
 
     static void addExtraTypes(const std::string& name, core_type type)
@@ -354,5 +353,5 @@ without issue*/
         }
     }
 
-} // namespace CoreFactory
-} // namespace helics
+}  // namespace CoreFactory
+}  // namespace helics

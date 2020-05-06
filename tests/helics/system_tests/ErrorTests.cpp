@@ -24,8 +24,8 @@ TEST_F(error_tests, duplicate_federate_names)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    EXPECT_THROW(
-        auto fed2 = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("test1", fi),
+                 helics::RegistrationFailure);
     Fed->finalize();
 }
 
@@ -39,9 +39,8 @@ TEST_F(error_tests, duplicate_federate_names2)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
     helics::FederateInfo fi;
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    EXPECT_THROW(
-        helics::ValueFederate fed3(fed1->getName(), fed2->getCorePointer(), fi),
-        helics::RegistrationFailure);
+    EXPECT_THROW(helics::ValueFederate fed3(fed1->getName(), fed2->getCorePointer(), fi),
+                 helics::RegistrationFailure);
     broker->disconnect();
 }
 
@@ -122,9 +121,8 @@ TEST_F(error_tests, already_init_core)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     fed1->enterExecutingMode();
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    EXPECT_THROW(
-        helics::ValueFederate fed2("fed2", fed1->getCorePointer(), helics::FederateInfo()),
-        helics::RegistrationFailure);
+    EXPECT_THROW(helics::ValueFederate fed2("fed2", fed1->getCorePointer(), helics::FederateInfo()),
+                 helics::RegistrationFailure);
     broker->disconnect();
 }
 
@@ -231,10 +229,12 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->getCorePointer()->setFlagOption(
-        helics::local_core_id, helics_flag_terminate_on_error, true);
-    fed2->getCorePointer()->setFlagOption(
-        helics::local_core_id, helics_flag_terminate_on_error, true);
+    fed1->getCorePointer()->setFlagOption(helics::local_core_id,
+                                          helics_flag_terminate_on_error,
+                                          true);
+    fed2->getCorePointer()->setFlagOption(helics::local_core_id,
+                                          helics_flag_terminate_on_error,
+                                          true);
 
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();

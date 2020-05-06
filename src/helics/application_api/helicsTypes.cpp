@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <unordered_map>
 
-using namespace gmlc::utilities; //NOLINT
+using namespace gmlc::utilities;  //NOLINT
 
 namespace helics {
 
@@ -108,14 +108,14 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(float).name(), data_type::helics_double},
     {typeid(char).name(), data_type::helics_string},
     {typeid(unsigned char).name(), data_type::helics_int},
-    {typeid(short).name(), data_type::helics_int}, // NOLINT
-    {typeid(unsigned short).name(), data_type::helics_int}, // NOLINT
+    {typeid(short).name(), data_type::helics_int},  // NOLINT
+    {typeid(unsigned short).name(), data_type::helics_int},  // NOLINT
     {typeid(int).name(), data_type::helics_int},
     {typeid(unsigned int).name(), data_type::helics_int},
-    {typeid(long).name(), data_type::helics_int}, // NOLINT
-    {typeid(unsigned long).name(), data_type::helics_int}, // NOLINT
-    {typeid(long long).name(), data_type::helics_int}, // NOLINT
-    {typeid(unsigned long long).name(), data_type::helics_int}, // NOLINT
+    {typeid(long).name(), data_type::helics_int},  // NOLINT
+    {typeid(unsigned long).name(), data_type::helics_int},  // NOLINT
+    {typeid(long long).name(), data_type::helics_int},  // NOLINT
+    {typeid(unsigned long long).name(), data_type::helics_int},  // NOLINT
     {typeid(int64_t).name(), data_type::helics_int},
     {typeid(uint64_t).name(), data_type::helics_int},
     {typeid(int32_t).name(), data_type::helics_int},
@@ -240,7 +240,7 @@ std::string helicsVectorString(const std::vector<double>& val)
         vString.push_back(';');
         vString.push_back(' ');
     }
-    if (vString.size() > 3) // 3 for v0[ which would be for an empty vector
+    if (vString.size() > 3)  // 3 for v0[ which would be for an empty vector
     {
         vString.pop_back();
         vString.pop_back();
@@ -259,7 +259,7 @@ std::string helicsVectorString(const double* vals, size_t size)
         vString.push_back(';');
         vString.push_back(' ');
     }
-    if (vString.size() > 3) // 3 for c0[ which would be for an empty vector
+    if (vString.size() > 3)  // 3 for c0[ which would be for an empty vector
     {
         vString.pop_back();
         vString.pop_back();
@@ -377,8 +377,9 @@ static int readSize(const std::string& val)
             // go to the alternative path if this fails
         }
     }
-    auto res = std::count_if(
-                   val.begin() + fb, val.end(), [](auto c) { return (c == ',') || (c == ';'); }) +
+    auto res = std::count_if(val.begin() + fb,
+                             val.end(),
+                             [](auto c) { return (c == ',') || (c == ';'); }) +
         1;
     return static_cast<int>(res);
 }
@@ -633,7 +634,7 @@ data_block typeConvert(data_type type, int64_t val)
             return std::to_string(val);
         case data_type::helics_named_point:
             if (static_cast<uint64_t>(std::abs(val)) >
-                (2ULL << 51U)) // this checks whether the actual value will fit in a double
+                (2ULL << 51U))  // this checks whether the actual value will fit in a double
             {
                 return ValueConverter<NamedPoint>::convert(
                     NamedPoint{std::to_string(val), std::nan("0")});
@@ -806,7 +807,7 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
             return ValueConverter<double>::convert(std::abs(val[0]));
         case data_type::helics_int:
             return ValueConverter<int64_t>::convert(
-                static_cast<int64_t>(std::abs(val[0]))); // NOLINT
+                static_cast<int64_t>(std::abs(val[0])));  // NOLINT
         case data_type::helics_complex:
             return ValueConverter<std::complex<double>>::convert(val[0]);
         case data_type::helics_bool:
@@ -960,4 +961,4 @@ data_block typeConvert(data_type type, const std::string& str, double val)
     return typeConvert(type, str.c_str(), val);
 }
 
-} // namespace helics
+}  // namespace helics

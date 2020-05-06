@@ -226,14 +226,13 @@ namespace mpi {
 
                     // Post an asynchronous receive
                     MPI_Request req;
-                    MPI_Irecv(
-                        buffer.data(),
-                        static_cast<int>(buffer.size()),
-                        MPI_CHAR,
-                        status.MPI_SOURCE,
-                        status.MPI_TAG,
-                        mpiCommunicator,
-                        &req);
+                    MPI_Irecv(buffer.data(),
+                              static_cast<int>(buffer.size()),
+                              MPI_CHAR,
+                              status.MPI_SOURCE,
+                              status.MPI_TAG,
+                              mpiCommunicator,
+                              &req);
 
                     // Wait until the asynchronous receive request has finished
                     int message_received = 0;
@@ -271,14 +270,13 @@ namespace mpi {
                 send_requests.push_back(std::move(sendRequestData));
                 auto& sreq = send_requests.back();
                 // Send the message using asynchronous send
-                MPI_Isend(
-                    sreq.second.data(),
-                    static_cast<int>(sreq.second.size()),
-                    MPI_CHAR,
-                    destRank,
-                    destTag,
-                    mpiCommunicator,
-                    &sreq.first);
+                MPI_Isend(sreq.second.data(),
+                          static_cast<int>(sreq.second.size()),
+                          MPI_CHAR,
+                          destRank,
+                          destTag,
+                          mpiCommunicator,
+                          &sreq.first);
             } else {
                 mpilock.lock();
                 if (comms[destTag] != nullptr) {
@@ -318,17 +316,16 @@ namespace mpi {
                 buffer.resize(recv_size);
 
                 // Receive the message
-                MPI_Recv(
-                    buffer.data(),
-                    static_cast<int>(buffer.size()),
-                    MPI_CHAR,
-                    status.MPI_SOURCE,
-                    status.MPI_TAG,
-                    mpiCommunicator,
-                    &status);
+                MPI_Recv(buffer.data(),
+                         static_cast<int>(buffer.size()),
+                         MPI_CHAR,
+                         status.MPI_SOURCE,
+                         status.MPI_TAG,
+                         mpiCommunicator,
+                         &status);
             }
         }
     }
 
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

@@ -60,4 +60,4 @@ void addTargets(const Json::Value& section, std::string targetName, Callable cal
     }
 }
 
-} // namespace helics
+}  // namespace helics

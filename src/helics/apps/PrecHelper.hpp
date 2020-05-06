@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 class FederateInfo;
-} // namespace helics
+}  // namespace helics
 
 helics::data_type getType(const std::string& typeString);
 

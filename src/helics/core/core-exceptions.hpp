@@ -97,4 +97,4 @@ class HelicsSystemFailure: public HelicsException {
     {
     }
 };
-} // namespace helics
+}  // namespace helics

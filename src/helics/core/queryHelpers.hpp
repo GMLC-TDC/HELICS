@@ -12,9 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 template<typename X, typename Proc>
 std::string generateStringVector(const X& data, Proc generator)
 {
-    static_assert(
-        std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value,
-        "generator output must be convertible to std::string");
+    static_assert(std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value,
+                  "generator output must be convertible to std::string");
     std::string ret(1, '[');
     for (auto& ele : data) {
         ret.append(generator(ele));
@@ -31,9 +30,8 @@ std::string generateStringVector(const X& data, Proc generator)
 template<typename X, typename Proc, typename validator>
 std::string generateStringVector_if(const X& data, Proc generator, validator valid)
 {
-    static_assert(
-        std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value,
-        "generator output must be convertible to std::string");
+    static_assert(std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value,
+                  "generator output must be convertible to std::string");
     std::string ret(1, '[');
     for (auto& ele : data) {
         if (valid(ele)) {

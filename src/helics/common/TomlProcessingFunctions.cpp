@@ -73,8 +73,8 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
             if (val.is_floating()) {
                 return {val.as_floating() * toSecondMultiplier(defaultUnits)};
             }
-            return gmlc::utilities::loadTimeFromString<helics::Time>(
-                tomlAsString(val) + " " + units);
+            return gmlc::utilities::loadTimeFromString<helics::Time>(tomlAsString(val) + " " +
+                                                                     units);
         }
     } else if (timeElement.is_integer()) {
         return {timeElement.as_integer(), defaultUnits};

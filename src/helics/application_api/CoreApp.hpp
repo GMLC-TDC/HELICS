@@ -145,8 +145,8 @@ class HELICS_CXX_EXPORT CoreApp {
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser();
 
-    std::shared_ptr<Core> core; //!< the actual core object
-    std::string name; //!< the name of the core
+    std::shared_ptr<Core> core;  //!< the actual core object
+    std::string name;  //!< the name of the core
 };
 
 /** class that waits for a core to terminate before finishing the destructor*/
@@ -175,4 +175,4 @@ class CoreKeeper {
   private:
     CoreApp cr;
 };
-} // namespace helics
+}  // namespace helics

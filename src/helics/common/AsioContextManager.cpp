@@ -38,7 +38,7 @@ std::shared_ptr<AsioContextManager>
 {
     std::shared_ptr<AsioContextManager> contextPtr;
     std::lock_guard<std::mutex> ctxlock(
-        contextLock); // just to ensure that nothing funny happens if you try
+        contextLock);  // just to ensure that nothing funny happens if you try
     // to get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
@@ -56,7 +56,7 @@ std::shared_ptr<AsioContextManager>
     AsioContextManager::getExistingContextPointer(const std::string& contextName)
 {
     std::lock_guard<std::mutex> ctxlock(
-        contextLock); // just to ensure that nothing funny happens if you try
+        contextLock);  // just to ensure that nothing funny happens if you try
     // to get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
@@ -148,7 +148,7 @@ AsioContextManager::LoopHandle AsioContextManager::runContextLoop(const std::str
 
 AsioContextManager::LoopHandle AsioContextManager::startContextLoop()
 {
-    ++runCounter; // atomic
+    ++runCounter;  // atomic
 
     loop_mode exp = loop_mode::stopped;
     if (running.compare_exchange_strong(exp, loop_mode::starting)) {
@@ -214,7 +214,7 @@ void AsioContextManager::haltContextLoop()
                         }
                     }
                     loopRet.get();
-                    ictx->reset(); // prepare for future runs
+                    ictx->reset();  // prepare for future runs
                     terminateLoop = false;
                 }
             }

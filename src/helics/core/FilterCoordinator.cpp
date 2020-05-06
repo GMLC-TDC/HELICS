@@ -28,4 +28,4 @@ void FilterCoordinator::closeFilter(global_handle filt)
         }
     }
 }
-} // namespace helics
+}  // namespace helics

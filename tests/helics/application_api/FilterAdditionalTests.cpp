@@ -155,8 +155,8 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
     fFed->addSourceTarget(f1, "port1");
     auto filter_op = std::make_shared<helics::RerouteFilterOperation>();
     filter_op->setString("newdestination", "port3");
-    filter_op->setString(
-        "condition", "end"); // match all messages with a destination endpoint stating with
+    filter_op->setString("condition",
+                         "end");  // match all messages with a destination endpoint stating with
     // "end"
     fFed->setFilterOperator(f1, filter_op->getOperator());
 
@@ -215,7 +215,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     filter_op->setString("newdestination", "port3");
     filter_op->setString(
         "condition",
-        "test"); // match all messages with a destination endpoint starting with "test"
+        "test");  // match all messages with a destination endpoint starting with "test"
 
     fFed->setFilterOperator(f1, filter_op->getOperator());
 
@@ -284,7 +284,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::data_block data(100, 'a');
 
-    double timestep = 0.0; // 1 second
+    double timestep = 0.0;  // 1 second
     int max_iterations = 200;
     int dropped = 0;
     for (int i = 0; i < max_iterations; i++) {
@@ -343,7 +343,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::data_block data(100, 'a');
 
-    double timestep = 0.0; // 1 second
+    double timestep = 0.0;  // 1 second
     int max_iterations = 150;
     int count = 0;
     for (int i = 0; i < max_iterations; i++) {
@@ -399,7 +399,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::data_block data(100, 'a');
 
-    double timestep = 0.0; // 1 second
+    double timestep = 0.0;  // 1 second
     int max_iterations = 150;
     int dropped = 0;
     for (int i = 0; i < max_iterations; i++) {
@@ -459,7 +459,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::data_block data(500, 'a');
 
-    double timestep = 0.0; // 1 second
+    double timestep = 0.0;  // 1 second
     int max_iterations = 150;
     int count = 0;
     for (int i = 0; i < max_iterations; i++) {
@@ -505,8 +505,8 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     Filt.addSourceTarget("port1");
     Filt.setString("distribution", "binomial");
 
-    Filt.set("param1", 4); // max_delay=4
-    Filt.set("param2", 0.5); // prob
+    Filt.set("param1", 4);  // max_delay=4
+    Filt.set("param2", 0.5);  // prob
 
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
@@ -516,7 +516,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     helics::data_block data(100, 'a');
     mFed->sendMessage(p1, "port2", data);
 
-    double timestep = 0.0; // 1 second
+    double timestep = 0.0;  // 1 second
     int max_iterations = 4;
     int count = 0;
     double actual_delay = 100.0;

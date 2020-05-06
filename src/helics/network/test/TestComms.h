@@ -26,8 +26,8 @@ namespace testcore {
         virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
 
       private:
-        virtual void queue_rx_function() override; //!< the functional loop for the receive queue
-        virtual void queue_tx_function() override; //!< the loop for transmitting data
+        virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
+        virtual void queue_tx_function() override;  //!< the loop for transmitting data
       public:
         /** user function in the test comms to force the communication to stop immediately for testing purposes*/
         void haltComms();
@@ -37,5 +37,5 @@ namespace testcore {
         std::string getAddress() const;
     };
 
-} // namespace testcore
-} // namespace helics
+}  // namespace testcore
+}  // namespace helics

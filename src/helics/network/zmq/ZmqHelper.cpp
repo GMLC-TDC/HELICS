@@ -75,6 +75,6 @@ socket_type socketTypeFromString(const std::string& socketType)
     if (fnd != socketMap.end()) {
         return fnd->second;
     }
-    assert(false); // NEED to make this a throw operation instead once exceptions are integrated
+    assert(false);  // NEED to make this a throw operation instead once exceptions are integrated
     return socket_type::req;
 }

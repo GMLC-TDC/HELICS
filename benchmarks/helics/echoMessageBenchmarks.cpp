@@ -30,8 +30,9 @@ static void BMecho_singleCore(benchmark::State& state)
 
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
-        auto wcore = helics::CoreFactory::create(
-            core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
+        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+                                                 std::string("--autobroker --federates=") +
+                                                     std::to_string(feds + 1));
         EchoMessageHub hub;
         hub.initialize(wcore->getIdentifier(), "");
         std::vector<EchoMessageLeaf> leafs(feds);
@@ -42,9 +43,9 @@ static void BMecho_singleCore(benchmark::State& state)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
-                std::ref(leafs[ii]));
+            threadlist[ii] =
+                std::thread([&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
+                            std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -75,8 +76,10 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
 
-        auto broker = helics::BrokerFactory::create(
-            cType, "brokerb", std::string("--federates=") + std::to_string(feds + 1));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          "brokerb",
+                                          std::string("--federates=") + std::to_string(feds + 1));
         broker->setLoggingLevel(helics_log_level_no_print);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
@@ -94,9 +97,9 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
-                std::ref(leafs[ii]));
+            threadlist[ii] =
+                std::thread([&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
+                            std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();

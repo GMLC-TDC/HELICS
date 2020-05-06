@@ -16,30 +16,27 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-void InterfaceInfo::createPublication(
-    interface_handle handle,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+void InterfaceInfo::createPublication(interface_handle handle,
+                                      const std::string& key,
+                                      const std::string& type,
+                                      const std::string& units)
 {
     publications.lock()->insert(key, handle, global_handle{global_id, handle}, key, type, units);
 }
 
-void InterfaceInfo::createInput(
-    interface_handle handle,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+void InterfaceInfo::createInput(interface_handle handle,
+                                const std::string& key,
+                                const std::string& type,
+                                const std::string& units)
 {
     auto ciHandle = inputs.lock();
     ciHandle->insert(key, handle, global_handle{global_id, handle}, key, type, units);
     ciHandle->back()->only_update_on_change = only_update_on_change;
 }
 
-void InterfaceInfo::createEndpoint(
-    interface_handle handle,
-    const std::string& endpointName,
-    const std::string& type)
+void InterfaceInfo::createEndpoint(interface_handle handle,
+                                   const std::string& endpointName,
+                                   const std::string& type)
 {
     endpoints.lock()->insert(
         endpointName, handle, global_handle{global_id, handle}, endpointName, type);
@@ -271,18 +268,17 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     for (auto& ipt : ihandle) {
         if (ipt->required) {
             if (!ipt->has_target) {
-                issues.emplace_back(
-                    helics::defs::errors::connection_failure,
-                    fmt::format("Input {} is required but has no connection", ipt->key));
+                issues.emplace_back(helics::defs::errors::connection_failure,
+                                    fmt::format("Input {} is required but has no connection",
+                                                ipt->key));
             }
         }
         if (ipt->single_source) {
             if (ipt->input_sources.size() > 1) {
                 issues.emplace_back(
                     helics::defs::errors::connection_failure,
-                    fmt::format(
-                        "Input {} is single source only but has more than one connection",
-                        ipt->key));
+                    fmt::format("Input {} is single source only but has more than one connection",
+                                ipt->key));
             }
         }
         for (auto& source : ipt->source_info) {
@@ -312,9 +308,9 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     for (auto& pub : phandle) {
         if (pub->required) {
             if (pub->subscribers.empty()) {
-                issues.emplace_back(
-                    helics::defs::errors::connection_failure,
-                    fmt::format("Publication {} is required but has no subscribers", pub->key));
+                issues.emplace_back(helics::defs::errors::connection_failure,
+                                    fmt::format("Publication {} is required but has no subscribers",
+                                                pub->key));
             }
         }
         if (pub->single_destination) {
@@ -453,4 +449,4 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     ehandle.unlock();
 }
 
-} // namespace helics
+}  // namespace helics

@@ -83,7 +83,7 @@ class Filter {
     }
 
   protected:
-    helics_filter filt; //!< the reference to the underlying publication
+    helics_filter filt;  //!< the reference to the underlying publication
 };
 
 /** cloning filter extends some operations on filters
@@ -118,5 +118,5 @@ class CloningFilter: public Filter {
     }
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

@@ -47,4 +47,4 @@ std::ostream& operator<<(std::ostream& os, route_id id)
     os << id.baseValue();
     return os;
 }
-} // namespace helics
+}  // namespace helics

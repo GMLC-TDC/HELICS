@@ -137,11 +137,10 @@ void TimeCoordinator::localError()
     disconnected = true;
 }
 
-void TimeCoordinator::timeRequest(
-    Time nextTime,
-    iteration_request iterate,
-    Time newValueTime,
-    Time newMessageTime)
+void TimeCoordinator::timeRequest(Time nextTime,
+                                  iteration_request iterate,
+                                  Time newValueTime,
+                                  Time newMessageTime)
 {
     iterating = iterate;
 
@@ -216,7 +215,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
 
 void TimeCoordinator::updateValueTime(Time valueUpdateTime)
 {
-    if (!executionMode) // updates before exec mode
+    if (!executionMode)  // updates before exec mode
     {
         if (valueUpdateTime < timeZero) {
             hasInitUpdates = true;
@@ -310,7 +309,7 @@ Time TimeCoordinator::generateAllowedTime(Time testTime) const
 
 void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 {
-    if (!executionMode) // updates before exec mode
+    if (!executionMode)  // updates before exec mode
     {
         if (messageUpdateTime < timeZero) {
             hasInitUpdates = true;
@@ -425,7 +424,7 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             updateTimeGrant();
             return message_processing_result::iterating;
         }
-        if (time_allow == time_exec) // time_allow==time_exec==time_granted
+        if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
             if (dependencies.checkIfReadyForTimeGrant(true, time_exec)) {
                 ++iteration;
@@ -623,9 +622,8 @@ message_processing_result TimeCoordinator::checkExecEntry()
 
 static bool isDelayableMessage(const ActionMessage& cmd, global_federate_id localId)
 {
-    return (
-        ((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
-        (cmd.source_id != localId));
+    return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
+            (cmd.source_id != localId));
 }
 
 message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& cmd)
@@ -717,12 +715,11 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
             }
             if (ltime <= time_block) {
                 if (!timeBlocks.empty()) {
-                    auto res = std::min_element(
-                        timeBlocks.begin(),
-                        timeBlocks.end(),
-                        [](const auto& blk1, const auto& blk2) {
-                            return (blk1.first < blk2.first);
-                        });
+                    auto res = std::min_element(timeBlocks.begin(),
+                                                timeBlocks.end(),
+                                                [](const auto& blk1, const auto& blk2) {
+                                                    return (blk1.first < blk2.first);
+                                                });
                     time_block = res->first;
                 } else {
                     time_block = Time::maxVal();
@@ -879,4 +876,4 @@ void TimeCoordinator::processConfigUpdateMessage(const ActionMessage& cmd)
     }
 }
 
-} // namespace helics
+}  // namespace helics

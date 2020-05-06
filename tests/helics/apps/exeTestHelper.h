@@ -24,10 +24,9 @@ class exeTestRunner {
   public:
     exeTestRunner();
     exeTestRunner(const std::string& baseLocation, const std::string& target);
-    exeTestRunner(
-        const std::string& baseLocation,
-        const std::string& baseLocation2,
-        const std::string& target);
+    exeTestRunner(const std::string& baseLocation,
+                  const std::string& baseLocation2,
+                  const std::string& target);
     bool findFileLocation(const std::string& baseLocation, const std::string& target);
     bool isActive() const { return active; }
 

@@ -72,8 +72,10 @@ class Publication {
     /** publish a vector of doubles*/
     void publish(const std::vector<double>& data)
     {
-        helicsPublicationPublishVector(
-            pub, data.data(), static_cast<int>(data.size() * sizeof(double)), HELICS_IGNORE_ERROR);
+        helicsPublicationPublishVector(pub,
+                                       data.data(),
+                                       static_cast<int>(data.size() * sizeof(double)),
+                                       HELICS_IGNORE_ERROR);
     }
     /** publish a named point with a string and double*/
     void publish(const std::string& name, double val)
@@ -101,8 +103,8 @@ class Publication {
     }
 
   private:
-    helics_publication pub; //!< the reference to the underlying publication
+    helics_publication pub;  //!< the reference to the underlying publication
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

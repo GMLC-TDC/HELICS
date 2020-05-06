@@ -120,4 +120,4 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() 
     return add;
 }
 
-} // namespace helics
+}  // namespace helics

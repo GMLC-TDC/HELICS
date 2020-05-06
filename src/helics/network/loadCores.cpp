@@ -109,12 +109,12 @@ static auto udpcomm =
 static auto ipcc = CoreFactory::addCoreType<ipc::IpcCore>("ipc", static_cast<int>(core_type::IPC));
 static auto ipcb =
     BrokerFactory::addBrokerType<ipc::IpcBroker>("ipc", static_cast<int>(core_type::IPC));
-static auto ipcc2 = CoreFactory::addCoreType<ipc::IpcCore>(
-    "interprocess",
-    static_cast<int>(core_type::INTERPROCESS));
-static auto ipcb2 = BrokerFactory::addBrokerType<ipc::IpcBroker>(
-    "interprocess",
-    static_cast<int>(core_type::INTERPROCESS));
+static auto ipcc2 =
+    CoreFactory::addCoreType<ipc::IpcCore>("interprocess",
+                                           static_cast<int>(core_type::INTERPROCESS));
+static auto ipcb2 =
+    BrokerFactory::addBrokerType<ipc::IpcBroker>("interprocess",
+                                                 static_cast<int>(core_type::INTERPROCESS));
 
 static auto ipccomm1 =
     CommFactory::addCommType<ipc::IpcComms>("ipc", static_cast<int>(core_type::IPC));
@@ -126,9 +126,9 @@ static auto ipccomm2 =
 #ifdef ENABLE_INPROC_CORE
 static auto iprcc =
     CoreFactory::addCoreType<inproc::InprocCore>("inproc", static_cast<int>(core_type::INPROC));
-static auto iprcb = BrokerFactory::addBrokerType<inproc::InprocBroker>(
-    "inproc",
-    static_cast<int>(core_type::INPROC));
+static auto iprcb =
+    BrokerFactory::addBrokerType<inproc::InprocBroker>("inproc",
+                                                       static_cast<int>(core_type::INPROC));
 
 static auto inproccomm =
     CommFactory::addCommType<inproc::InprocComms>("inproc", static_cast<int>(core_type::INPROC));
@@ -150,4 +150,4 @@ bool loadCores()
 {
     return true;
 }
-} // namespace helics
+}  // namespace helics

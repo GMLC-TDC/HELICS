@@ -37,5 +37,5 @@ namespace zeromq {
         virtual bool brokerConnect() override;
     };
 
-} // namespace zeromq
-} // namespace helics
+}  // namespace zeromq
+}  // namespace helics

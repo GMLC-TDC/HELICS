@@ -268,7 +268,7 @@ TEST(UdpCore, udpComm_transmit_add_route)
     }
     EXPECT_EQ(counter3, 1);
     if (counter3 ==
-        1) { // previous test was an assert but that can trigger some out of scope errors if we don't disconnect property
+        1) {  // previous test was an assert but that can trigger some out of scope errors if we don't disconnect property
         // so only do these test actions if the previous test has passed.
         EXPECT_TRUE(act3.lock()->action() == helics::action_message_def::action_t::cmd_ack);
 

@@ -12,7 +12,7 @@ constexpr int DEFAULT_ZMQ_BROKER_PORT_NUMBER = 23404;
 constexpr int BACKUP_ZMQ_BROKER_PORT_NUMBER = 23406;
 
 constexpr int DEFAULT_ZMQSS_BROKER_PORT_NUMBER =
-    23414; // Todo define a different port number (change in HELICS 3.0)
+    23414;  // Todo define a different port number (change in HELICS 3.0)
 constexpr int BACKUP_ZMQSS_BROKER_PORT_NUMBER = 23814;
 
 // for TCP comms

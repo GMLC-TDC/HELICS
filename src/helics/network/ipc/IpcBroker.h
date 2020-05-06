@@ -16,5 +16,5 @@ namespace ipc {
     using IpcBroker =
         NetworkBroker<IpcComms, interface_type::ipc, static_cast<int>(core_type::IPC)>;
 
-} // namespace ipc
-} // namespace helics
+}  // namespace ipc
+}  // namespace helics

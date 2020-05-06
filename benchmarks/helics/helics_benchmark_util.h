@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include <intrin.h>
 // code modified from https://weseetips.wordpress.com/tag/c-get-cpu-name/
 inline std::string getCPUModel()
-{ // Get extended ids.
+{  // Get extended ids.
     int CPUInfo[4] = {-1};
     __cpuid(CPUInfo, 0x80000000);
     unsigned int nExIds = CPUInfo[0];
@@ -47,7 +47,7 @@ inline std::string getCPUModel()
 #    include <cstdlib>
 #    include <cstring>
 inline std::string getCPUModel()
-{ // Get the cpu from /proc/cpuinfo
+{  // Get the cpu from /proc/cpuinfo
     FILE* fp = fopen("/proc/cpuinfo", "r");
     if (fp == nullptr) {
         return std::string{};

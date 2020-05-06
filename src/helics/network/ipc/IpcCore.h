@@ -14,5 +14,5 @@ namespace ipc {
     /** implementation for the core that uses an ipc queue to communicate*/
     using IpcCore = NetworkCore<IpcComms, interface_type::ipc>;
 
-} // namespace ipc
-} // namespace helics
+}  // namespace ipc
+}  // namespace helics

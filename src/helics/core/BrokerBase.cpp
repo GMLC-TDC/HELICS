@@ -117,24 +117,21 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     auto* fmtr = addJsonConfig(hApp.get());
     fmtr->maxLayers(0);
     hApp->option_defaults()->ignore_underscore()->ignore_case();
-    hApp->add_option(
-        "--federates,-f,--minfederates,--minfed,-m",
-        minFederateCount,
-        "the minimum number of federates that will be connecting");
+    hApp->add_option("--federates,-f,--minfederates,--minfed,-m",
+                     minFederateCount,
+                     "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier", identifier, "the name of the broker/core");
-    hApp->add_option(
-            "--maxiter,--maxiterations",
-            maxIterationCount,
-            "the maximum number of iterations allowed")
+    hApp->add_option("--maxiter,--maxiterations",
+                     maxIterationCount,
+                     "the maximum number of iterations allowed")
         ->capture_default_str();
     hApp->add_option(
         "--minbrokers,--minbroker,--minbrokercount",
         minBrokerCount,
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
-    hApp->add_option(
-        "--key,--broker_key",
-        brokerKey,
-        "specify a key to use for all connections to/from a broker");
+    hApp->add_option("--key,--broker_key",
+                     brokerKey,
+                     "specify a key to use for all connections to/from a broker");
     hApp->add_flag(
         "--no_ping,--slow_responding",
         no_ping,
@@ -143,14 +140,14 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--conservative_time_policy,--restrictive_time_policy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
-    hApp->add_flag(
-        "--terminate_on_error,--halt_on_error",
-        terminate_on_error,
-        "specify that a broker should cause the federation to terminate on an error");
+    hApp->add_flag("--terminate_on_error,--halt_on_error",
+                   terminate_on_error,
+                   "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
-    logging_group->add_flag(
-        "--force_logging_flush", forceLoggingFlush, "flush the log after every message");
+    logging_group->add_flag("--force_logging_flush",
+                            forceLoggingFlush,
+                            "flush the log after every message");
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
@@ -161,15 +158,15 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     logging_group
-        ->add_option(
-            "--fileloglevel", fileLogLevel, "the level at which messages get sent to the file")
+        ->add_option("--fileloglevel",
+                     fileLogLevel,
+                     "the level at which messages get sent to the file")
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group
-        ->add_option(
-            "--consoleloglevel",
-            consoleLogLevel,
-            "the level at which messages get sent to the file")
+        ->add_option("--consoleloglevel",
+                     consoleLogLevel,
+                     "the level at which messages get sent to the file")
 
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
@@ -201,11 +198,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
         "like '10s' or '45ms') ");
     timeout_group
-        ->add_option(
-            "--errordelay,--errortimeout",
-            errorDelay,
-            "time to wait after an error state before terminating "
-            "like '10s' or '45ms') ")
+        ->add_option("--errordelay,--errortimeout",
+                     errorDelay,
+                     "time to wait after an error state before terminating "
+                     "like '10s' or '45ms') ")
         ->default_str(std::to_string(static_cast<double>(errorDelay)));
 
     return hApp;
@@ -264,11 +260,10 @@ void BrokerBase::configureBase()
     brokerState = broker_state_t::configured;
 }
 
-bool BrokerBase::sendToLogger(
-    global_federate_id federateID,
-    int logLevel,
-    const std::string& name,
-    const std::string& message) const
+bool BrokerBase::sendToLogger(global_federate_id federateID,
+                              int logLevel,
+                              const std::string& name,
+                              const std::string& message) const
 {
     if ((federateID == parent_broker_id) || (federateID == global_id.load())) {
         if (logLevel > maxLogLevel) {
@@ -278,8 +273,8 @@ bool BrokerBase::sendToLogger(
         if (loggerFunction) {
             loggerFunction(logLevel, fmt::format("{} ({})", name, federateID.baseValue()), message);
         } else if (loggingObj) {
-            loggingObj->log(
-                logLevel, fmt::format("{} ({})::{}", name, federateID.baseValue(), message));
+            loggingObj->log(logLevel,
+                            fmt::format("{} ({})::{}", name, federateID.baseValue(), message));
             if (forceLoggingFlush) {
                 loggingObj->flush();
             }
@@ -484,15 +479,13 @@ void BrokerBase::queueProcessingLoop()
     auto logDump = [&, this]() {
         if (dumplog) {
             for (auto& act : dumpMessages) {
-                sendToLogger(
-                    parent_broker_id,
-                    -10,
-                    identifier,
-                    fmt::format(
-                        "|| dl cmd:{} from {} to {}",
-                        prettyPrintString(act),
-                        act.source_id.baseValue(),
-                        act.dest_id.baseValue()));
+                sendToLogger(parent_broker_id,
+                             -10,
+                             identifier,
+                             fmt::format("|| dl cmd:{} from {} to {}",
+                                         prettyPrintString(act),
+                                         act.source_id.baseValue(),
+                                         act.dest_id.baseValue()));
             }
         }
     };
@@ -601,15 +594,15 @@ void BrokerBase::queueProcessingLoop()
                     auto tcmd = actionQueue.try_pop();
                     while (tcmd) {
                         if (!isDisconnectCommand(*tcmd)) {
-                            LOG_TRACE(
-                                global_broker_id_local,
-                                identifier,
-                                std::string("TI unprocessed command ") + prettyPrintString(*tcmd));
+                            LOG_TRACE(global_broker_id_local,
+                                      identifier,
+                                      std::string("TI unprocessed command ") +
+                                          prettyPrintString(*tcmd));
                         }
                         tcmd = actionQueue.try_pop();
                     }
                 }
-                return; // immediate return
+                return;  // immediate return
             case CMD_STOP:
                 timerStop();
                 if (!haltOperations) {
@@ -621,10 +614,10 @@ void BrokerBase::queueProcessingLoop()
                 auto tcmd = actionQueue.try_pop();
                 while (tcmd) {
                     if (!isDisconnectCommand(*tcmd)) {
-                        LOG_TRACE(
-                            global_broker_id_local,
-                            identifier,
-                            std::string("STOPPED unprocessed command ") + prettyPrintString(*tcmd));
+                        LOG_TRACE(global_broker_id_local,
+                                  identifier,
+                                  std::string("STOPPED unprocessed command ") +
+                                      prettyPrintString(*tcmd));
                     }
                     tcmd = actionQueue.try_pop();
                 }
@@ -711,4 +704,4 @@ const std::string& brokerStateName(BrokerBase::broker_state_t state)
 }
 // LCOV_EXCL_STOP
 
-} // namespace helics
+}  // namespace helics

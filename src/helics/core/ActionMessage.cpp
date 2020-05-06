@@ -22,10 +22,9 @@ ActionMessage::ActionMessage(action_message_def::action_t startingAction):
 {
 }
 
-ActionMessage::ActionMessage(
-    action_message_def::action_t startingAction,
-    global_federate_id sourceId,
-    global_federate_id destId):
+ActionMessage::ActionMessage(action_message_def::action_t startingAction,
+                             global_federate_id sourceId,
+                             global_federate_id destId):
     messageAction(startingAction),
     source_id(sourceId), dest_id(destId), name(payload)
 {
@@ -76,7 +75,7 @@ ActionMessage::ActionMessage(const char* data, size_t size): ActionMessage()
 
 ActionMessage::~ActionMessage() = default;
 
-ActionMessage& ActionMessage::operator=(const ActionMessage& act) //NOLINT
+ActionMessage& ActionMessage::operator=(const ActionMessage& act)  //NOLINT
 {
     messageAction = act.messageAction;
     messageID = act.messageID;
@@ -182,28 +181,28 @@ int ActionMessage::toByteArray(char* data, int buffer_size) const
     data[1] = static_cast<uint8_t>(ssize >> 16U);
     data[2] = static_cast<uint8_t>((ssize >> 8U) & 0xFFU);
     data[3] = static_cast<uint8_t>(ssize & 0xFFU);
-    data += sizeof(uint32_t); // 4
+    data += sizeof(uint32_t);  // 4
     *reinterpret_cast<action_message_def::action_t*>(data) = messageAction;
     data += sizeof(action_message_def::action_t);
     *reinterpret_cast<int32_t*>(data) = messageID;
-    data += sizeof(int32_t); // 8
+    data += sizeof(int32_t);  // 8
     *reinterpret_cast<int32_t*>(data) = source_id.baseValue();
-    data += sizeof(int32_t); // 12
+    data += sizeof(int32_t);  // 12
     *reinterpret_cast<int32_t*>(data) = source_handle.baseValue();
-    data += sizeof(int32_t); // 16
+    data += sizeof(int32_t);  // 16
     *reinterpret_cast<int32_t*>(data) = dest_id.baseValue();
-    data += sizeof(int32_t); // 20
+    data += sizeof(int32_t);  // 20
     *reinterpret_cast<int32_t*>(data) = dest_handle.baseValue();
-    data += sizeof(int32_t); // 24
+    data += sizeof(int32_t);  // 24
     *reinterpret_cast<uint16_t*>(data) = counter;
-    data += sizeof(uint16_t); // 26
+    data += sizeof(uint16_t);  // 26
     *reinterpret_cast<uint16_t*>(data) = flags;
-    data += sizeof(uint16_t); // 28
+    data += sizeof(uint16_t);  // 28
     *reinterpret_cast<int32_t*>(data) = sequenceID;
-    data += sizeof(int32_t); // 32
+    data += sizeof(int32_t);  // 32
     auto bt = actionTime.getBaseTimeCode();
     std::memcpy(data, &(bt), sizeof(Time::baseType));
-    data += sizeof(Time::baseType); // 40
+    data += sizeof(Time::baseType);  // 40
 
     if (messageAction == CMD_TIME_REQUEST) {
         bt = Te.getBaseTimeCode();
@@ -760,13 +759,12 @@ std::string prettyPrintString(const ActionMessage& command)
             break;
         case CMD_PUB:
             ret.push_back(':');
-            ret.append(fmt::format(
-                "From ({}) handle({}) size {} at {} to {}",
-                command.source_id.baseValue(),
-                command.dest_handle.baseValue(),
-                command.payload.size(),
-                static_cast<double>(command.actionTime),
-                command.dest_id.baseValue()));
+            ret.append(fmt::format("From ({}) handle({}) size {} at {} to {}",
+                                   command.source_id.baseValue(),
+                                   command.dest_handle.baseValue(),
+                                   command.payload.size(),
+                                   static_cast<double>(command.actionTime),
+                                   command.dest_id.baseValue()));
             break;
         case CMD_REG_BROKER:
             ret.push_back(':');
@@ -774,21 +772,19 @@ std::string prettyPrintString(const ActionMessage& command)
             break;
         case CMD_TIME_GRANT:
             ret.push_back(':');
-            ret.append(fmt::format(
-                "From ({}) Granted Time({}) to ({})",
-                command.source_id.baseValue(),
-                static_cast<double>(command.actionTime),
-                command.dest_id.baseValue()));
+            ret.append(fmt::format("From ({}) Granted Time({}) to ({})",
+                                   command.source_id.baseValue(),
+                                   static_cast<double>(command.actionTime),
+                                   command.dest_id.baseValue()));
             break;
         case CMD_TIME_REQUEST:
             ret.push_back(':');
-            ret.append(fmt::format(
-                "From ({}) Time({}, {}, {}) to ({})",
-                command.source_id.baseValue(),
-                static_cast<double>(command.actionTime),
-                static_cast<double>(command.Te),
-                static_cast<double>(command.Tdemin),
-                command.dest_id.baseValue()));
+            ret.append(fmt::format("From ({}) Time({}, {}, {}) to ({})",
+                                   command.source_id.baseValue(),
+                                   static_cast<double>(command.actionTime),
+                                   static_cast<double>(command.Te),
+                                   static_cast<double>(command.Tdemin),
+                                   command.dest_id.baseValue()));
             break;
         case CMD_FED_CONFIGURE_TIME:
         case CMD_FED_CONFIGURE_INT:
@@ -796,14 +792,13 @@ std::string prettyPrintString(const ActionMessage& command)
             break;
         case CMD_SEND_MESSAGE:
             ret.push_back(':');
-            ret.append(fmt::format(
-                "From ({})({}:{}) To {} size {} at {}",
-                command.getString(origSourceStringLoc),
-                command.source_id.baseValue(),
-                command.source_handle.baseValue(),
-                command.getString(targetStringLoc),
-                command.payload.size(),
-                static_cast<double>(command.actionTime)));
+            ret.append(fmt::format("From ({})({}:{}) To {} size {} at {}",
+                                   command.getString(origSourceStringLoc),
+                                   command.source_id.baseValue(),
+                                   command.source_handle.baseValue(),
+                                   command.getString(targetStringLoc),
+                                   command.payload.size(),
+                                   static_cast<double>(command.actionTime)));
             break;
         default:
             ret.append(fmt::format(":From {}", command.source_id.baseValue()));
@@ -843,4 +838,4 @@ void setIterationFlags(ActionMessage& command, iteration_request iterate)
             break;
     }
 }
-} // namespace helics
+}  // namespace helics

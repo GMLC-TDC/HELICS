@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager;
 namespace asio {
 class io_context;
-} // namespace asio
+}  // namespace asio
 
 namespace helics {
 namespace tcp {
@@ -38,15 +38,14 @@ namespace tcp {
       private:
         bool reuse_address = false;
         virtual int getDefaultBrokerPort() const override;
-        virtual void queue_rx_function() override; //!< the functional loop for the receive queue
-        virtual void queue_tx_function() override; //!< the loop for transmitting data
+        virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
+        virtual void queue_tx_function() override;  //!< the loop for transmitting data
 
-        virtual void closeReceiver() override; //!< function to instruct the receiver loop to close
+        virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 
         /** make the initial connection to a broker and get setup information*/
-        bool establishBrokerConnection(
-            std::shared_ptr<AsioContextManager>& ioctx,
-            std::shared_ptr<TcpConnection>& brokerConnection);
+        bool establishBrokerConnection(std::shared_ptr<AsioContextManager>& ioctx,
+                                       std::shared_ptr<TcpConnection>& brokerConnection);
         /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
         int processIncomingMessage(ActionMessage&& cmd);
@@ -66,5 +65,5 @@ namespace tcp {
         //  bool errorHandle()
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

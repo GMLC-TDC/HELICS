@@ -83,38 +83,39 @@ class BenchmarkFederate {
         std::string key;
         std::string value;
     };
-    std::vector<Result> results; //!< a vector of output results to print
+    std::vector<Result> results;  //!< a vector of output results to print
 
-    OutputFormat result_format{OutputFormat::PLAIN_TEXT}; //!< output format for printing results
+    OutputFormat result_format{OutputFormat::PLAIN_TEXT};  //!< output format for printing results
 
     // variables to track current state, mainly for gbenchmark piecewise setup
     bool initialized{false};
     bool readyToRun{false};
 
     // parameters most benchmark federates need
-    std::string benchmarkName; //<! the name of the benchmark federate
-    int index{0}; //<! the index for an instance of the benchmark federate
-    int maxIndex{0}; //<! the maximum index + 1 given to a benchmark federate in a run
-    helics::Time deltaTime{helics::Time(10, time_units::ns)}; //<! sampling rate
-    helics::Time finalTime{helics::Time(10000, time_units::ns)}; //<! final time
+    std::string benchmarkName;  //<! the name of the benchmark federate
+    int index{0};  //<! the index for an instance of the benchmark federate
+    int maxIndex{0};  //<! the maximum index + 1 given to a benchmark federate in a run
+    helics::Time deltaTime{helics::Time(10, time_units::ns)};  //<! sampling rate
+    helics::Time finalTime{helics::Time(10000, time_units::ns)};  //<! final time
 
     std::unique_ptr<helics::CombinationFederate>
-        fed; //<! the federate object to use in derived classes
+        fed;  //<! the federate object to use in derived classes
 
     // callbacks for more control when timing code
     std::function<void()> callBeforeFinalize{
-        nullptr}; //<! callback function immediately before helics finalize()
+        nullptr};  //<! callback function immediately before helics finalize()
     std::function<void()> callAfterFinalize{
-        nullptr}; //<! callback function immediately after helics finalize()
+        nullptr};  //<! callback function immediately after helics finalize()
 
     // CLI11 Options for derived classes to change them if needed (e.g. set required)
-    CLI::Option* opt_delta_time{nullptr}; //<! the CLI11 option for --delta_time
-    CLI::Option* opt_final_time{nullptr}; //<! the CLI11 option for --final_time
-    CLI::Option* opt_index{nullptr}; //<! the CLI11 option for --index
-    CLI::Option* opt_max_index{nullptr}; //<! the CLI11 option for --max_index
+    CLI::Option* opt_delta_time{nullptr};  //<! the CLI11 option for --delta_time
+    CLI::Option* opt_final_time{nullptr};  //<! the CLI11 option for --final_time
+    CLI::Option* opt_index{nullptr};  //<! the CLI11 option for --index
+    CLI::Option* opt_max_index{nullptr};  //<! the CLI11 option for --max_index
 
     // Command line options
-    std::unique_ptr<helics::helicsCLI11App> app; //<! the CLI11 app object to use in derived classes
+    std::unique_ptr<helics::helicsCLI11App>
+        app;  //<! the CLI11 app object to use in derived classes
 
     // functions to be overriden by derived benchmark classes
     /** set/override default base parameter values before arguments are parsed, and modify CLI11 options for default arguments*/
@@ -172,9 +173,8 @@ class BenchmarkFederate {
      * @param callOnReady a no argument, void return type function called after doMakeReady is run
      * @param callOnEnd a no argument, void return type function called after helics finalize()
      */
-    void
-        run(const std::function<void()>& callOnReady = {},
-            const std::function<void()>& callOnEnd = {})
+    void run(const std::function<void()>& callOnReady = {},
+             const std::function<void()>& callOnEnd = {})
     {
         if (!readyToRun) {
             makeReady();

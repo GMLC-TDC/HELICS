@@ -17,5 +17,5 @@ namespace testcore {
     using TestBroker =
         NetworkBroker<TestComms, interface_type::inproc, static_cast<int>(core_type::TEST)>;
 
-} // namespace testcore
-} // namespace helics
+}  // namespace testcore
+}  // namespace helics

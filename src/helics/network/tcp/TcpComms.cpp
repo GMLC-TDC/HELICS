@@ -124,23 +124,21 @@ namespace tcp {
             return;
         }
         auto ioctx = AsioContextManager::getContextPointer();
-        auto server = helics::tcp::TcpServer::create(
-            ioctx->getBaseContext(),
-            localTargetAddress,
-            static_cast<uint16_t>(PortNumber.load()),
-            reuse_address,
-            maxMessageSize);
+        auto server = helics::tcp::TcpServer::create(ioctx->getBaseContext(),
+                                                     localTargetAddress,
+                                                     static_cast<uint16_t>(PortNumber.load()),
+                                                     reuse_address,
+                                                     maxMessageSize);
         while (!server->isReady()) {
             if ((autoPortNumber) &&
-                (hasBroker)) { // If we failed and we are on an automatically assigned port number,  just try a different port
+                (hasBroker)) {  // If we failed and we are on an automatically assigned port number,  just try a different port
                 server->close();
                 ++PortNumber;
-                server = helics::tcp::TcpServer::create(
-                    ioctx->getBaseContext(),
-                    localTargetAddress,
-                    static_cast<uint16_t>(PortNumber),
-                    reuse_address,
-                    maxMessageSize);
+                server = helics::tcp::TcpServer::create(ioctx->getBaseContext(),
+                                                        localTargetAddress,
+                                                        static_cast<uint16_t>(PortNumber),
+                                                        reuse_address,
+                                                        maxMessageSize);
             } else {
                 logWarning("retrying tcp bind");
                 std::this_thread::sleep_for(std::chrono::milliseconds(150));
@@ -184,10 +182,9 @@ namespace tcp {
         setRxStatus(connection_status::terminated);
     }
 
-    void TcpComms::txReceive(
-        const char* data,
-        size_t bytes_received,
-        const std::string& errorMessage)
+    void TcpComms::txReceive(const char* data,
+                             size_t bytes_received,
+                             const std::string& errorMessage)
     {
         if (errorMessage.empty()) {
             ActionMessage m(data, bytes_received);
@@ -199,9 +196,8 @@ namespace tcp {
         }
     }
 
-    bool TcpComms::establishBrokerConnection(
-        std::shared_ptr<AsioContextManager>& ioctx,
-        std::shared_ptr<TcpConnection>& brokerConnection)
+    bool TcpComms::establishBrokerConnection(std::shared_ptr<AsioContextManager>& ioctx,
+                                             std::shared_ptr<TcpConnection>& brokerConnection)
     {
         // lambda function that does the proper termination
         auto terminate = [&, this](connection_status status) -> bool {
@@ -217,12 +213,11 @@ namespace tcp {
             brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
         }
         try {
-            brokerConnection = makeConnection(
-                ioctx->getBaseContext(),
-                brokerTargetAddress,
-                std::to_string(brokerPort),
-                maxMessageSize,
-                connectionTimeout);
+            brokerConnection = makeConnection(ioctx->getBaseContext(),
+                                              brokerTargetAddress,
+                                              std::to_string(brokerPort),
+                                              maxMessageSize,
+                                              connectionTimeout);
             int retries = 0;
             while (!brokerConnection) {
                 if (retries == 0) {
@@ -235,12 +230,11 @@ namespace tcp {
                     return terminate(connection_status::error);
                 }
                 std::this_thread::yield();
-                brokerConnection = makeConnection(
-                    ioctx->getBaseContext(),
-                    brokerTargetAddress,
-                    std::to_string(brokerPort),
-                    maxMessageSize,
-                    connectionTimeout);
+                brokerConnection = makeConnection(ioctx->getBaseContext(),
+                                                  brokerTargetAddress,
+                                                  std::to_string(brokerPort),
+                                                  maxMessageSize,
+                                                  connectionTimeout);
             }
             //monitor the total waiting time before connections
             std::chrono::milliseconds cumulativeSleep{0};
@@ -302,12 +296,11 @@ namespace tcp {
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
                             }
-                            brokerConnection = makeConnection(
-                                ioctx->getBaseContext(),
-                                brokerTargetAddress,
-                                std::to_string(brokerPort),
-                                maxMessageSize,
-                                connectionTimeout);
+                            brokerConnection = makeConnection(ioctx->getBaseContext(),
+                                                              brokerTargetAddress,
+                                                              std::to_string(brokerPort),
+                                                              maxMessageSize,
+                                                              connectionTimeout);
                             continue;
                         }
                         if (mess->second.messageID == DELAY_CONNECTION) {
@@ -342,7 +335,7 @@ namespace tcp {
         auto contextLoop = ioctx->startContextLoop();
         TcpConnection::pointer brokerConnection;
 
-        std::map<route_id, TcpConnection::pointer> routes; // for all the other possible routes
+        std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
         if (!brokerTargetAddress.empty()) {
             hasBroker = true;
         }
@@ -385,8 +378,8 @@ namespace tcp {
                                 auto new_connect =
                                     TcpConnection::create(ioctx->getBaseContext(), interface, port);
 
-                                routes.emplace(
-                                    route_id{cmd.getExtraData()}, std::move(new_connect));
+                                routes.emplace(route_id{cmd.getExtraData()},
+                                               std::move(new_connect));
                             }
                             catch (std::exception&) {
                                 // TODO(PT):: do something???
@@ -420,9 +413,8 @@ namespace tcp {
                     catch (const std::system_error& se) {
                         if (se.code() != asio::error::connection_aborted) {
                             if (!isDisconnectCommand(cmd)) {
-                                logError(
-                                    std::string("broker send 0 ") +
-                                    actionMessageType(cmd.action()) + ':' + se.what());
+                                logError(std::string("broker send 0 ") +
+                                         actionMessageType(cmd.action()) + ':' + se.what());
                             }
                         }
                     }
@@ -432,7 +424,7 @@ namespace tcp {
                         //     std::cerr << "transmit failure to broker " << error.message() << '\n';
                     }
                 }
-            } else if (rid == control_route) { // send to rx thread loop
+            } else if (rid == control_route) {  // send to rx thread loop
                 rxMessageQueue.push(cmd);
             } else {
                 //  txlist.push_back(cmd);
@@ -444,9 +436,8 @@ namespace tcp {
                     catch (const std::system_error& se) {
                         if (se.code() != asio::error::connection_aborted) {
                             if (!isDisconnectCommand(cmd)) {
-                                logError(
-                                    std::string("rt send ") + std::to_string(rid.baseValue()) +
-                                    "::" + se.what());
+                                logError(std::string("rt send ") + std::to_string(rid.baseValue()) +
+                                         "::" + se.what());
                             }
                         }
                     }
@@ -458,9 +449,8 @@ namespace tcp {
                         catch (const std::system_error& se) {
                             if (se.code() != asio::error::connection_aborted) {
                                 if (!isDisconnectCommand(cmd)) {
-                                    logError(
-                                        std::string("broker send") +
-                                        std::to_string(rid.baseValue()) + " ::" + se.what());
+                                    logError(std::string("broker send") +
+                                             std::to_string(rid.baseValue()) + " ::" + se.what());
                                 }
                             }
                         }
@@ -491,5 +481,5 @@ namespace tcp {
         rxMessageQueue.push(cmd);
     }
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

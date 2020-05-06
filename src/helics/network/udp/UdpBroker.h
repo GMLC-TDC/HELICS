@@ -14,5 +14,5 @@ namespace udp {
     class UdpComms;
     using UdpBroker = NetworkBroker<UdpComms, interface_type::udp, 7>;
 
-} // namespace udp
-} // namespace helics
+}  // namespace udp
+}  // namespace helics

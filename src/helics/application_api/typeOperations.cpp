@@ -23,4 +23,4 @@ bool isCoreTypeAvailable(core_type type) noexcept
 {
     return core::isCoreTypeAvailable(type);
 }
-} // namespace helics
+}  // namespace helics

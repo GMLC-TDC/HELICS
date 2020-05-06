@@ -15,9 +15,9 @@ namespace helics {
 /** class defining some required information about the federate and any optional properties*/
 class CoreFederateInfo {
   public:
-    std::vector<std::pair<int, Time>> timeProps; //!< container for the timeProperties
-    std::vector<std::pair<int, int>> intProps; //!< container for the integer properties
-    std::vector<std::pair<int, bool>> flagProps; //!< container for the binary flag options
+    std::vector<std::pair<int, Time>> timeProps;  //!< container for the timeProperties
+    std::vector<std::pair<int, int>> intProps;  //!< container for the integer properties
+    std::vector<std::pair<int, bool>> flagProps;  //!< container for the binary flag options
 
     /** double overload for timeprops needs to be there since a literal double will convert to int more easily than
     to Time*/
@@ -28,4 +28,4 @@ class CoreFederateInfo {
     void setFlagOption(int flagId, bool propVal = true) { flagProps.emplace_back(flagId, propVal); }
 };
 
-} // namespace helics
+}  // namespace helics
