@@ -17,8 +17,8 @@ repos:
     args: ['--allow-multiple-documents']
   - id: check-toml
   - id: end-of-file-fixer
-- repo: https://github.com/iconmaster5326/cmake-format-pre-commit-hook
-  rev: v0.6.9
+- repo: https://github.com/cheshirekow/cmake-format-precommit
+  rev: v0.6.10
   hooks:
   - id: cmake-format
     exclude: 'cmake+'
