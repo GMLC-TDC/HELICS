@@ -204,7 +204,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     swig_link_libraries(helics HELICS::helicsSharedLib)
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Ie m6Ot%20jBCQAJ
+        # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Ie%20m6Ot%20jBCQAJ
         # https://github.com/GMLC-TDC/HELICS/commit/633b218f9351aa452d4#commitcomment-27055932
         set_target_properties(
             ${SWIG_MODULE_helics_REAL_NAME} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
