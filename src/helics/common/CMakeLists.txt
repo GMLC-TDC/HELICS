@@ -20,8 +20,13 @@ set(common_headers
     configFileHelpers.hpp
 )
 
-set(common_sources JsonProcessingFunctions.cpp JsonBuilder.cpp TomlProcessingFunctions.cpp
-                   logger.cpp loggerCore.cpp configFileHelpers.cpp
+set(common_sources
+    JsonProcessingFunctions.cpp
+    JsonBuilder.cpp
+    TomlProcessingFunctions.cpp
+    logger.cpp
+    loggerCore.cpp
+    configFileHelpers.cpp
 )
 
 # headers that are part of the public interface

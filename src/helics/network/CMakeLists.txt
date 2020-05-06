@@ -35,8 +35,13 @@ set(ZMQ_SOURCE_FILES
 
 set(UDP_SOURCE_FILES udp/UdpCore.cpp udp/UdpBroker.cpp udp/UdpComms.cpp)
 
-set(TCP_SOURCE_FILES tcp/TcpCore.cpp tcp/TcpBroker.cpp tcp/TcpComms.cpp tcp/TcpCommsSS.cpp
-                     tcp/TcpHelperClasses.cpp tcp/TcpCommsCommon.cpp
+set(TCP_SOURCE_FILES
+    tcp/TcpCore.cpp
+    tcp/TcpBroker.cpp
+    tcp/TcpComms.cpp
+    tcp/TcpCommsSS.cpp
+    tcp/TcpHelperClasses.cpp
+    tcp/TcpCommsCommon.cpp
 )
 
 set(NETWORK_INCLUDE_FILES
@@ -79,8 +84,13 @@ set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService
 
 set(UDP_HEADER_FILES udp/UdpCore.h udp/UdpBroker.h udp/UdpComms.h)
 
-set(TCP_HEADER_FILES tcp/TcpCore.h tcp/TcpBroker.h tcp/TcpComms.h tcp/TcpCommsSS.h
-                     tcp/TcpHelperClasses.h tcp/TcpCommsCommon.h
+set(TCP_HEADER_FILES
+    tcp/TcpCore.h
+    tcp/TcpBroker.h
+    tcp/TcpComms.h
+    tcp/TcpCommsSS.h
+    tcp/TcpHelperClasses.h
+    tcp/TcpCommsCommon.h
 )
 
 if(ENABLE_TEST_CORE)

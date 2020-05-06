@@ -62,8 +62,12 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     add_library(
         helics_apps STATIC
-        ../helics_apps.hpp ${helics_apps_library_files} ${helics_apps_public_headers}
-        ${helics_apps_broker_headers} ${helics_apps_private_headers} ${helics_apps_broker_files}
+        ../helics_apps.hpp
+        ${helics_apps_library_files}
+        ${helics_apps_public_headers}
+        ${helics_apps_broker_headers}
+        ${helics_apps_private_headers}
+        ${helics_apps_broker_files}
     )
 
     target_link_libraries(helics_apps PUBLIC helics_application_api)
