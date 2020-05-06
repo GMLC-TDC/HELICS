@@ -9,12 +9,7 @@
 
 set(betwork_test_headers)
 
-set(
-    network_test_sources
-    network-tests.cpp
-    networkInfoTests.cpp
-    TestCore-tests.cpp
-)
+set(network_test_sources network-tests.cpp networkInfoTests.cpp TestCore-tests.cpp)
 
 if(ENABLE_ZMQ_CORE)
     list(APPEND network_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)

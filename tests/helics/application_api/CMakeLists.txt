@@ -8,10 +8,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 set(application_api_test_headers testFixtures.hpp ValueFederateTestTemplates.hpp
-                                 ../coreTypeLists.hpp)
+                                 ../coreTypeLists.hpp
+)
 
-set(
-    application_api_test_sources
+set(application_api_test_sources
     MessageFederateKeyTests.cpp
     ValueFederateKeyTests.cpp
     FilterTests.cpp
@@ -37,52 +37,49 @@ if(ENABLE_ZMQ_CORE)
     list(APPEND application-api-tests zmqSSTests.cpp)
 endif()
 
-add_executable(application-api-tests ${application_api_test_sources}
-                                     ${application_api_test_headers})
+add_executable(
+    application-api-tests ${application_api_test_sources} ${application_api_test_headers}
+)
 target_link_libraries(application-api-tests helics_application_api helics_test_base)
 
 set_target_properties(application-api-tests PROPERTIES FOLDER tests)
 
-target_compile_definitions(application-api-tests PRIVATE
-                           "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
-target_compile_definitions(application-api-tests PRIVATE
-                           "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
-target_compile_definitions(application-api-tests PRIVATE
-                           "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
+target_compile_definitions(
+    application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\""
+)
+target_compile_definitions(
+    application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\""
+)
+target_compile_definitions(
+    application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
+)
 
 add_test(NAME application-api-tests COMMAND application-api-tests)
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
 # Tests for Continuous Integration builds
-add_test(
-    NAME application-api-ci-tests
-    COMMAND application-api-tests --gtest_filter=-*ci_skip*
-)
+add_test(NAME application-api-ci-tests COMMAND application-api-tests --gtest_filter=-*ci_skip*)
 set_property(TEST application-api-ci-tests PROPERTY LABELS ApplicationApiCI Continuous)
 
 copy_key_files_to_target_location(application-api-tests)
 
-if (HELICS_BUILD_CXX_SHARED_LIB)
-set(
-    shared_cxx_test_sources
-    MessageFederateKeyTests.cpp
-    ValueFederateKeyTests.cpp
-    FilterTests.cpp
-    testFixtures_shared.cpp
-    testFixtures_shared.hpp
+if(HELICS_BUILD_CXX_SHARED_LIB)
+    set(shared_cxx_test_sources MessageFederateKeyTests.cpp ValueFederateKeyTests.cpp
+                                FilterTests.cpp testFixtures_shared.cpp testFixtures_shared.hpp
     )
 
-add_executable(shared_cxx-tests ${shared_cxx_test_sources})
+    add_executable(shared_cxx-tests ${shared_cxx_test_sources})
 
-target_link_libraries(shared_cxx-tests helics_test_base HELICS::helics-shared)
+    target_link_libraries(shared_cxx-tests helics_test_base HELICS::helics-shared)
 
-set_target_properties(shared_cxx-tests PROPERTIES FOLDER tests)
+    set_target_properties(shared_cxx-tests PROPERTIES FOLDER tests)
 
-add_test(NAME shared_cxx-tests COMMAND shared_cxx-tests)
-set_property(TEST shared_cxx-tests PROPERTY LABELS ApplicationApi Coverage Daily)
+    add_test(NAME shared_cxx-tests COMMAND shared_cxx-tests)
+    set_property(TEST shared_cxx-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
-target_compile_definitions(shared_cxx-tests PRIVATE
-                           "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
+    target_compile_definitions(
+        shared_cxx-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
+    )
 
-copy_shared_target(shared_cxx-tests helics-shared)
+    copy_shared_target(shared_cxx-tests helics-shared)
 endif()

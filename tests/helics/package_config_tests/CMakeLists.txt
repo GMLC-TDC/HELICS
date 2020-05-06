@@ -22,9 +22,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
     target_link_libraries(shared-library-test-exe PkgConfig::HELICS-SHARED)
 
     add_test(NAME shared-library-test COMMAND shared-library-test-exe)
-    set_property(
-        TEST shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}"
-    )
+    set_property(TEST shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}")
 
     # Test the helics_app static library target
     if(HELICS_BUILD_APP_LIBRARY)
@@ -33,9 +31,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
         target_link_libraries(apps-library-test-exe PkgConfig::HELICS_APPS)
 
         add_test(NAME apps-library-test COMMAND apps-library-test-exe)
-        set_property(
-            TEST apps-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}"
-        )
+        set_property(TEST apps-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}")
     endif()
 
 endif()
@@ -48,9 +44,7 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     target_link_libraries(c-shared-library-test-exe PkgConfig::HELICSSHAREDLIB)
 
     add_test(NAME c-shared-library-test COMMAND c-shared-library-test-exe)
-    set_property(
-        TEST c-shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}"
-    )
+    set_property(TEST c-shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}")
 
     add_executable(cpp98-shared-library-test-exe ../pkg_test_code/main98.cpp)
     target_link_libraries(cpp98-shared-library-test-exe PkgConfig::HELICSSHAREDLIB)
@@ -58,7 +52,6 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
 
     add_test(NAME cpp98-shared-library-test COMMAND cpp98-shared-library-test-exe)
     set_property(
-        TEST cpp98-shared-library-test PROPERTY PASS_REGULAR_EXPRESSION
-                                                "${HELICS_VERSION}"
+        TEST cpp98-shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}"
     )
 endif()
