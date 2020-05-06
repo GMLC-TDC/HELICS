@@ -1,5 +1,5 @@
 {
-  "line_width": 88,
+  "line_width": 100,
   "dangle_parens": true,
   "command_case": "lower",
   "separate_fn_name_with_space": false,
