@@ -22,5 +22,3 @@ repos:
   hooks:
   - id: cmake-format
     exclude: 'cmake+'
-
-
