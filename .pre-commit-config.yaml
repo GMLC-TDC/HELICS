@@ -30,4 +30,4 @@ repos:
   rev: v1.16.0
   hooks:
   - id: codespell
-    args: ['-w', '--skip="*.csv"', '--ignore-words=config/spelling_whitelist.txt']
+    args: ['-w', '--skip="*.csv"', '--ignore-words=./config/spelling_whitelist.txt']

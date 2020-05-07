@@ -1,4 +1,5 @@
 ans
 Te
+te
 stoll
 endwhile
