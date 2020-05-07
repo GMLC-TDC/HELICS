@@ -1,0 +1,4 @@
+ans
+Te
+stoll
+endwhile
