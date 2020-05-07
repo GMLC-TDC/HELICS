@@ -26,3 +26,9 @@ repos:
   hooks:
   - id: cmake-format
     exclude: 'cmake+'
+- repo: https://github.com/codespell-project/codespell
+  rev: v1.16.0
+  hooks:
+  - id: codespell
+    args: ['-w']
+
