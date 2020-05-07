@@ -67,7 +67,7 @@ public final class helics_federate_flags {
   public final static helics_federate_flags helics_flag_single_thread_federate = new helics_federate_flags("helics_flag_single_thread_federate", helicsJNI.helics_flag_single_thread_federate_get());
   /**
    *  flag specifying that a federate, core, or broker may be slow to respond to pings<br>
-   * 		If the federate goes offline there is no good way to detect it so use with caution
+   *         If the federate goes offline there is no good way to detect it so use with caution
    */
   public final static helics_federate_flags helics_flag_slow_responding = new helics_federate_flags("helics_flag_slow_responding", helicsJNI.helics_flag_slow_responding_get());
   /**
