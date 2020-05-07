@@ -30,5 +30,5 @@ repos:
   rev: v1.16.0
   hooks:
   - id: codespell
-    args: ['-w']
+    args: ['-w', '--skip="*.csv", '-L=stoll,ans,endwhile']
 
