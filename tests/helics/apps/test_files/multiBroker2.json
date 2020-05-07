@@ -1,12 +1,12 @@
 {
-	"master": {
-		"type": "test"
-	},
-	"comms": [{
-		"type": "zmq",
+    "master": {
+        "type": "test"
+    },
+    "comms": [{
+        "type": "zmq",
         "interfaceport":23410
-	}, {
-		"type": "zmq",
+    }, {
+        "type": "zmq",
         "interfaceport":23700
-	}]
+    }]
 }

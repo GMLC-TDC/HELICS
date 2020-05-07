@@ -294,8 +294,8 @@ bool grant=false;
 bool converged=false;
 bool exec_requested = false;
 Time Tnext=timeZero;  //!<next time computation
-Time Te=timeZero;		//!< execution time computation
-Time Tdemin=timeZero;	//!< min dependency event time
+Time Te=timeZero;        //!< execution time computation
+Time Tdemin=timeZero;    //!< min dependency event time
 
 DependencyInfo() = default;
 DependencyInfo(Core::local_federate_id id) :fedID(id) {};

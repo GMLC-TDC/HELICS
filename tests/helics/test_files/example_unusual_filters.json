@@ -32,24 +32,24 @@
 ],
 "filters":[
 {
-	"name":"filtername",  //filters can have names (optional)
+    "name":"filtername",  //filters can have names (optional)
     "cloning":true,
     "optional":true,
-	"sourcetargets":"ept1", // source target for the filter
-	"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"operation":"custom", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"info":"this is an information string for use by the application",
+    "sourcetargets":"ept1", // source target for the filter
+    "inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
+    "outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
+    "operation":"custom", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+    "info":"this is an information string for use by the application",
     "flags":"optional"
 },
 {
     "required":true,
-	"name":"filtername2",  //filters can have names (optional)
-	"sourcetargets":["filterFed/ept2"],  //this is a key field specifying the source targets can be an array
-	"dest":["dest targets"],  // field specifying destination targets
-	"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"operation":"custom", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+    "name":"filtername2",  //filters can have names (optional)
+    "sourcetargets":["filterFed/ept2"],  //this is a key field specifying the source targets can be an array
+    "dest":["dest targets"],  // field specifying destination targets
+    "inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
+    "outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
+    "operation":"custom", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
     "flags":"-optional"
 }
 ]

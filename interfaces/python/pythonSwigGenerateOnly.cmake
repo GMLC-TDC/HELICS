@@ -40,7 +40,7 @@ endif()
         ${CMAKE_CURRENT_SOURCE_DIR}/overwritePythonFiles.cmake
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsPython.c
     )
-	set_target_properties(pyfile_overwrite PROPERTIES FOLDER interfaces)
+    set_target_properties(pyfile_overwrite PROPERTIES FOLDER interfaces)
   else(HELICS_OVERWRITE_INTERFACE_FILES)
   #extra target for generation only and no overwrite
    add_custom_target(
@@ -48,5 +48,5 @@ endif()
       COMMAND
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsPython.c
     )
-	set_target_properties(python_create PROPERTIES FOLDER interfaces)
+    set_target_properties(python_create PROPERTIES FOLDER interfaces)
 endif(HELICS_OVERWRITE_INTERFACE_FILES)

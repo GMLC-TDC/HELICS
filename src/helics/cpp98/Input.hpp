@@ -120,9 +120,9 @@ class Input {
         return result;
     }
     /** get the current value as a vector of doubles
-	@param data pointer to space to store the current values
-	@param maxlen the maximum size of the allowed vector
-	@return the actual size of the vector stored*/
+    @param data pointer to space to store the current values
+    @param maxlen the maximum size of the allowed vector
+    @return the actual size of the vector stored*/
     int getVector(double* data, int maxlen)
     {
         helicsInputGetVector(inp, data, maxlen, &maxlen, hThrowOnError());

@@ -1,29 +1,29 @@
 [submodule "ThirdParty/asio"]
-	path = ThirdParty/asio
-	url = https://github.com/chriskohlhoff/asio
+    path = ThirdParty/asio
+    url = https://github.com/chriskohlhoff/asio
 [submodule "ThirdParty/jsoncpp"]
-	path = ThirdParty/jsoncpp
-	url = https://github.com/phlptp/jsoncpp.git
-	branch = fix_jsoncpp_shadow_warnings
+    path = ThirdParty/jsoncpp
+    url = https://github.com/phlptp/jsoncpp.git
+    branch = fix_jsoncpp_shadow_warnings
 [submodule "ThirdParty/fmtlib"]
-	path = ThirdParty/fmtlib
-	url = https://github.com/fmtlib/fmt.git
+    path = ThirdParty/fmtlib
+    url = https://github.com/fmtlib/fmt.git
 [submodule "ThirdParty/containers"]
-	path = ThirdParty/containers
-	url = https://github.com/GMLC-TDC/containers.git
-	branch = master
+    path = ThirdParty/containers
+    url = https://github.com/GMLC-TDC/containers.git
+    branch = master
 [submodule "ThirdParty/concurrency"]
-	path = ThirdParty/concurrency
-	url = https://github.com/GMLC-TDC/concurrency.git
+    path = ThirdParty/concurrency
+    url = https://github.com/GMLC-TDC/concurrency.git
 [submodule "ThirdParty/utilities"]
-	path = ThirdParty/utilities
-	url = https://github.com/GMLC-TDC/utilities.git
+    path = ThirdParty/utilities
+    url = https://github.com/GMLC-TDC/utilities.git
 [submodule "ThirdParty/units"]
-	path = ThirdParty/units
-	url = https://github.com/LLNL/units.git
+    path = ThirdParty/units
+    url = https://github.com/LLNL/units.git
 [submodule "ThirdParty/toml11"]
-	path = ThirdParty/toml11
-	url = https://github.com/GMLC-TDC/toml11.git
+    path = ThirdParty/toml11
+    url = https://github.com/GMLC-TDC/toml11.git
 [submodule "ThirdParty/netif"]
-	path = ThirdParty/netif
-	url = https://github.com/GMLC-TDC/netif.git
+    path = ThirdParty/netif
+    url = https://github.com/GMLC-TDC/netif.git

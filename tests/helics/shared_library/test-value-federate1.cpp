@@ -943,7 +943,7 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
 
 TEST_P(vfed_type_tests, single_transfer_publisher)
 {
-    //	helics_time stime = 1.0;
+    //    helics_time stime = 1.0;
     helics_time gtime;
 
     char s[STRINGLEN] = "n2";

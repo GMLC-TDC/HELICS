@@ -21,10 +21,10 @@ class Broker {
     /** Default constructor */
     Broker() HELICS_NOTHROW: broker(HELICS_NULL_POINTER) {}
     /** construct broker
-	@param type string with the type of the broker to create
-	@param name the name of the broker
-	@param initString command line argument for starting the broker
-	*/
+    @param type string with the type of the broker to create
+    @param name the name of the broker
+    @param initString command line argument for starting the broker
+    */
     Broker(std::string type, std::string name, std::string initString)
     {
         broker =
@@ -37,7 +37,7 @@ class Broker {
     @param type string with the type of the broker to create
     @param name the name of the broker
     @param argc the number of command line arguments
-	@param argv command line argument strings
+    @param argv command line argument strings
     */
     Broker(std::string type, std::string name, int argc, char** argv)
     {
@@ -77,7 +77,7 @@ class Broker {
     /** cast to the underlying broker*/
     operator helics_broker() { return broker; }
     /** get the underlying helics_broker object
-	@return a helics_broker object*/
+    @return a helics_broker object*/
     helics_broker baseObject() const { return broker; }
     /** check if the broker is connected*/
     bool isConnected() const { return (helicsBrokerIsConnected(broker) != helics_false); }

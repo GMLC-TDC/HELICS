@@ -39,9 +39,9 @@ class ActionMessage {
     uint16_t counter{0};  //!< 26 counter for filter tracking or message counter
     uint16_t flags{0};  //!<  28 set of messageFlags
     uint32_t sequenceID{0};  //!< a sequence number for ordering
-    Time actionTime{timeZero};  //!< 40 the time an action took place or will take place	//32
+    Time actionTime{timeZero};  //!< 40 the time an action took place or will take place    //32
     std::string
-        payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
+        payload;  //!< string containing the data    //96 std::string is 32 bytes on most platforms (except libc++)
     std::string& name;  //!< alias payload to a name reference for registration functions
     Time Te{timeZero};  //!< 48 event time
     Time Tdemin{timeZero};  //!< 56 min dependent event time

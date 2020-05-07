@@ -117,8 +117,8 @@ struct FederateTestFixture {
             case 3: {
                 auto subbroker =
                     AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
-                //	auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count) +
-                //		" --name=subbroker_" + name_prefix);
+                //    auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count) +
+                //        " --name=subbroker_" + name_prefix);
                 if (!subbroker.isConnected()) {
                     throw(std::runtime_error("Unable to connect subbroker"));
                 }
@@ -135,8 +135,8 @@ struct FederateTestFixture {
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
                     auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
-                    //	auto subbroker = AddBroker(core_type_name, initString + " --federates 1 --name=subbroker_" +
-                    //		name_prefix + std::to_string(ii));
+                    //    auto subbroker = AddBroker(core_type_name, initString + " --federates 1 --name=subbroker_" +
+                    //        name_prefix + std::to_string(ii));
                     if (!subbroker->isConnected()) {
                         throw(std::runtime_error("Unable to connect subbroker(mode 4)"));
                     }

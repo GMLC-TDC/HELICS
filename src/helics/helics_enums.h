@@ -108,8 +108,8 @@ typedef enum {
     /** flag indicating that the federate will only interact on a single thread*/
     helics_flag_single_thread_federate = 27,
     /** flag specifying that a federate, core, or broker may be slow to respond to pings
-		If the federate goes offline there is no good way to detect it so use with caution
-		*/
+        If the federate goes offline there is no good way to detect it so use with caution
+        */
     helics_flag_slow_responding = 29,
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     helics_flag_delay_init_entry = 45,
