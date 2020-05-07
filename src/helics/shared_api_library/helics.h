@@ -812,7 +812,7 @@ HELICS_EXPORT void helicsFederateFinalizeAsync(helics_federate fed, helics_error
 HELICS_EXPORT void helicsFederateFinalizeComplete(helics_federate fed, helics_error* err);
 
 /**
- * Release the memory associated withe a federate.
+ * Release the memory associated with a federate.
  */
 HELICS_EXPORT void helicsFederateFree(helics_federate fed);
 

@@ -22,7 +22,7 @@
 "endpoints":[
 {
 "name":"ept1", // the name of the endpoint
- "type":"genmessage", // the type assocaited with a endpoint endpoint types have limited usefullness at present (optional)
+ "type":"genmessage", // the type associated with a endpoint endpoint types have limited usefulness at present (optional)
  "global":true //set to true to make the key global (default is false in which case the endpoint is prepended with the federate name)
 },
 {

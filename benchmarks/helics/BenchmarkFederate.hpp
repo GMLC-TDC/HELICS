@@ -117,7 +117,7 @@ class BenchmarkFederate {
     std::unique_ptr<helics::helicsCLI11App>
         app;  //<! the CLI11 app object to use in derived classes
 
-    // functions to be overriden by derived benchmark classes
+    // functions to be overridden by derived benchmark classes
     /** set/override default base parameter values before arguments are parsed, and modify CLI11 options for default arguments*/
     virtual void setupArgumentParsing() {}
     /** initialization steps after command line options have been parsed, but before the federate object is created

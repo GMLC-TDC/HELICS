@@ -367,7 +367,7 @@ class Core {
      * Register a control input for the specified federate.
      *
      * May only be invoked in the initialize state.
-     * @param federateID the indentifier for the federate to register an input interface on
+     * @param federateID the identifier for the federate to register an input interface on
      * @param key the name of the control input
      * @param type a string describing the type of the federate
      * @param units a string naming the units of the federate

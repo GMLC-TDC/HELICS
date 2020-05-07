@@ -366,7 +366,7 @@ bool TimeCoordinator::updateTimeFactors()
     Time prev_next = time_next;
     updateNextPossibleEventTime();
 
-    //    printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next) {
         update = true;

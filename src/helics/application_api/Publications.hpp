@@ -65,7 +65,7 @@ class HELICS_CXX_EXPORT Publication {
                 const std::string& units = std::string());
 
     /** base constructor for a publication
-    @param valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and -> operator
     that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
@@ -94,7 +94,7 @@ class HELICS_CXX_EXPORT Publication {
                 const std::string& units = std::string());
     /** base constructor for a publication
     @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
-    @param valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and -> operator
     that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication

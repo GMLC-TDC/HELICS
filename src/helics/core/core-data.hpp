@@ -135,7 +135,7 @@ class data_block {
     void push_back(char newchar) { m_data.push_back(newchar); }
 };
 
-/** operator to check if two data blocks are not equal to eachother*/
+/** operator to check if two data blocks are not equal to each other*/
 inline bool operator!=(const data_block& db1, const data_block& db2)
 {
     return !(db1 == db2);
