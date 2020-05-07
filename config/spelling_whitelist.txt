@@ -6,3 +6,4 @@ endwhile
 fo
 emiss
 ist
+copyable
