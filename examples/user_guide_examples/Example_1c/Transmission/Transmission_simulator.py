@@ -144,7 +144,7 @@ if __name__ == "__main__":
 
     # Co-sim Bus  (inputs)
     Cosim_bus_number = 118
-    cosim_bus = Cosim_bus_number - 1  ## Do not chage this line
+    cosim_bus = Cosim_bus_number - 1  ## Do not change this line
     load_amplification_factor = 15
 
     # power_flow

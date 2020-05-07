@@ -333,7 +333,7 @@ For example, voltage is nominally presented and passed as volts (V), but can be 
 
 ### Higher-level Simulator-Type-Specific API
 
-This Simulator-Type-Specific API builds on top of the raw application API described below to provide standardized convience functions for common use cases.
+This Simulator-Type-Specific API builds on top of the raw application API described below to provide standardized convenience functions for common use cases.
 
 **Power Flow Helpers**
 

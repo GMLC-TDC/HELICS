@@ -3,3 +3,6 @@ Te
 te
 stoll
 endwhile
+fo
+emiss
+ist

@@ -29,7 +29,7 @@ static inline helics_endpoint addEndpoint(helics_federate fed, std::unique_ptr<h
 }
 
 static constexpr char nullcstr[] = "";
-const std::string nullStringArgument("the supplied string argument is null and therefor invalid");
+const std::string nullStringArgument("the supplied string argument is null and therefore invalid");
 
 static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
