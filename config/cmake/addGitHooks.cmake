@@ -54,9 +54,9 @@ mark_as_advanced(CLANG_FORMAT)
 
 if (HELICS_ENABLE_GIT_HOOKS AND NOT CLANG_FORMAT_VERSION_OK)
     message(WARNING
-            "HELICS git hooks require clang-format version ${CLANG_FORMAT_MIN_VERSION} or higher."
-            "\nInstall or update clang-format to use git hooks."
-            "\nTo select a different clang-format exectuable, update the CLANG_FORMAT property in CMake.")
+            "HELICS git hooks require clang-format version ${CLANG_FORMAT_MIN_VERSION} or higher.\n"
+            "Install or update clang-format to use git hooks.\n"
+            "To select a different clang-format exectuable, update the CLANG_FORMAT property in CMake.")
 endif ()
 
 if (EXISTS "${PROJECT_SOURCE_DIR}/.git")
