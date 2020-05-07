@@ -33,10 +33,10 @@ Though contained here in this section on value federates, the options below are 
 
 ```
 {
-	...
-	"name":"generic_federate",
-	"coreType": "zmq"
-	...
+    ...
+    "name":"generic_federate",
+    "coreType": "zmq"
+    ...
 }
 ```
 * **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
@@ -47,12 +47,12 @@ Though contained here in this section on value federates, the options below are 
 
 ```
 {
-	...
-	"only_update_on_change":false, //indicator that the federate should only indicate updated values on change
-	"only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
-	"source_only":false,
-	"observer":false,
-	...
+    ...
+    "only_update_on_change":false, //indicator that the federate should only indicate updated values on change
+    "only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
+    "source_only":false,
+    "observer":false,
+    ...
 }
 ```
 * **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one.
@@ -85,13 +85,13 @@ Though contained here in this section on value federates, the options below are 
      "subscriptions" : [
           {
                "required": true,
-			   "key" : "TransmissionSim/transmission_voltage",
+               "key" : "TransmissionSim/transmission_voltage",
                "type" : "complex",
                "unit" : "V",
                "info" : "{
                     \"object\" : \"network_node\",
                     \"property\" : \"positive_sequence_voltage\"
-					}"
+                    }"
           },
           {
           ...
@@ -183,7 +183,7 @@ The figure below shows the total load on the transmission node to which the dist
 
 ![Ex. 1a  transmission bus voltage](../img/Ex1a_Bus_voltage_118.png)
 
-As can be seen, the impacts of co-simulation are relatively modest in this case. Even when the transmission system provides a dynamic high-side substation voltage (rather than just assuming a fixed value) and even with  loads that have been created to be very voltage sensitive, the changing substation voltage doesn't impact the load substantially and change the voltage profiles significantly. (If you're curious to see an even bigger impact, you can disable the voltage regulators in GridLAB-D by editing the `regulator_configuration`	objects so that the `Control` parameter is set to `MANUAL`. This will lock the regulators into place and allow the substation voltage to propagate through the circuit unregulated.) (xxxxxxx - double-check this.)
+As can be seen, the impacts of co-simulation are relatively modest in this case. Even when the transmission system provides a dynamic high-side substation voltage (rather than just assuming a fixed value) and even with  loads that have been created to be very voltage sensitive, the changing substation voltage doesn't impact the load substantially and change the voltage profiles significantly. (If you're curious to see an even bigger impact, you can disable the voltage regulators in GridLAB-D by editing the `regulator_configuration`    objects so that the `Control` parameter is set to `MANUAL`. This will lock the regulators into place and allow the substation voltage to propagate through the circuit unregulated.) (xxxxxxx - double-check this.)
 
 The load of the distribution circuit as seen by the transmission model with and without co-simulation is similarly muted.
 

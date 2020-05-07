@@ -118,7 +118,7 @@ class ValueFederate: public virtual Federate {
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param name the name of the publication
-	@param type the type of publication to register
+    @param type the type of publication to register
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
@@ -171,7 +171,7 @@ class ValueFederate: public virtual Federate {
     the name is registered as a global structure with the index appended
     @param key the name of the publication to register
     @param index1 an index associated with the publication
-	@param type an enumeration value describing the type of the publication
+    @param type an enumeration value describing the type of the publication
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
@@ -191,7 +191,7 @@ class ValueFederate: public virtual Federate {
     @param index1 an index associated with the publication
     @param index2 a second index
     @param type an enumeration value describing the type of the publication
-	@param units  the optional units of the publication
+    @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
     Publication registerIndexedPublication(const std::string& key,
@@ -240,9 +240,9 @@ class ValueFederate: public virtual Federate {
         return registerIndexedPublication(key, index1, index2, type, units);
     }
     /** register publications   from a JSON output file or string
-	@details generates interface based on the data contained in a JSON file
-	or string
-	*/
+    @details generates interface based on the data contained in a JSON file
+    or string
+    */
     void registerFromPublicationJSON(const std::string& json)
     {
         helicsFederateRegisterFromPublicationJSON(fed, json.c_str(), hThrowOnError());
@@ -253,8 +253,8 @@ class ValueFederate: public virtual Federate {
         return Publication(helicsFederateGetPublication(fed, name.c_str(), hThrowOnError()));
     }
     /** get a publication by index
-	@param index a 0 based index of the publication to retrieve
-	@return a Publication object*/
+    @param index a 0 based index of the publication to retrieve
+    @return a Publication object*/
     Publication getPublication(int index)
     {
         return Publication(helicsFederateGetPublicationByIndex(fed, index, hThrowOnError()));
@@ -284,12 +284,12 @@ class ValueFederate: public virtual Federate {
     }
 
     /** register a 2D indexed subscription
-	@param name the base name of the publication to subscribe to
-	@param index1 the first index of the value to subscribe to
-	@param index2 the second index of the value to subscribe to
-	@param units a string containing the requested units of the subscription output
-	@return an input object getting the requested value
-	*/
+    @param name the base name of the publication to subscribe to
+    @param index1 the first index of the value to subscribe to
+    @param index2 the second index of the value to subscribe to
+    @param units a string containing the requested units of the subscription output
+    @return an input object getting the requested value
+    */
     Input registerIndexedSubscription(const std::string& name,
                                       int index1,
                                       int index2,

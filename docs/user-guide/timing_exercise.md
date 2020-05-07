@@ -16,38 +16,38 @@ A few simple exercises about co-simulation timing
 
 1.  Federation Setup \[A:  period=1; B:  period=2; C:  period=3\]
 
-    a. 	Following time 0, which federate could execute next? `___________________________`
+    a.     Following time 0, which federate could execute next? `___________________________`
 
-    b. 	If all federates execute at all allowed times, what is the next time Federate B could have access to data from Federate C.  `__________________`
+    b.     If all federates execute at all allowed times, what is the next time Federate B could have access to data from Federate C.  `__________________`
 
-    c. 	What is the next time all federate will be able to execute simultaneously? `__________________`
+    c.     What is the next time all federate will be able to execute simultaneously? `__________________`
 
      **Key Principle**:  *Federates are interrupted if there is updated data available and allowed time prior to the requested time*
 
 2.   Federation Setup \[A:  period=1,`wait_for_current_time_update`; B:  period=2; C:  period=3\]
 
-     a.	At what time will the data from Federate B published at time 2, be available to Federate A? `______________`
+     a.    At what time will the data from Federate B published at time 2, be available to Federate A? `______________`
 
-     b.	Federate A requests time 4:  Federate B publishes at time 2.  What time is Federate A granted? `_____________`
+     b.    Federate A requests time 4:  Federate B publishes at time 2.  What time is Federate A granted? `_____________`
 
-     c.	Federate A requests time 2:  Federate B publishes at time 2. What time does Federate A receive the data? `_________________`
+     c.    Federate A requests time 2:  Federate B publishes at time 2. What time does Federate A receive the data? `_________________`
 
-     e.	If A did not have the `wait_for_current_time_update` flag active, what time would Federate A receive the data? `________________`
+     e.    If A did not have the `wait_for_current_time_update` flag active, what time would Federate A receive the data? `________________`
 
 
      **Key Principle**:  *Federates are granted the next allowed time after the time specified in a request if they are not interrupted.*
 
 3.   Federation Setup \[A:  period=1; B:  period=2,offset=1,time_delta=2; C:  period=3\]
 
-     a.	After time=0 what is the next allowable time for Federate B? `_______________`
+     a.    After time=0 what is the next allowable time for Federate B? `_______________`
 
-     b.	Federate C requested a time of 4, what time is Federate C granted? `_______________`
+     b.    Federate C requested a time of 4, what time is Federate C granted? `_______________`
 
 4.  Federation Setup \[A:  period=1; B:  period=2,uninterruptible; C:  period=3\]
 
-    a.	Federate C Publishes at time 3,  Federate B requests time 6, what time will it be granted?`______________`
+    a.    Federate C Publishes at time 3,  Federate B requests time 6, what time will it be granted?`______________`
 
-    b.	If Federate B were not uninterruptible what time would it be granted? `_______________`
+    b.    If Federate B were not uninterruptible what time would it be granted? `_______________`
 
      ![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 

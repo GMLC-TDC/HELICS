@@ -140,29 +140,29 @@ M 2.0 3.0 src dest "this is message 3"
 JSON example
 ```
  {
-	"messages": [{
-			"source": "src",
-			"dest": "dest",
-			"time": 1.0,
-			"data":"this is a test message"
-		}, {
-  			"source": "src",
-  			"dest": "dest",
-  			"time": 1.0,
+    "messages": [{
+            "source": "src",
+            "dest": "dest",
+            "time": 1.0,
+            "data":"this is a test message"
+        }, {
+              "source": "src",
+              "dest": "dest",
+              "time": 1.0,
         "encoding":"base64"
-  			"data":AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
-  		},{
-			"source": "src",
-			"dest": "dest",
-			"time": 2.0,
-			"data":"this is test message2"
-		}, {
-			"source": "src",
-			"dest": "dest",
-			"time": 3.0,
-			"data":"this is message 3"
-		}
-	]
+              "data":AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
+          },{
+            "source": "src",
+            "dest": "dest",
+            "time": 2.0,
+            "data":"this is test message2"
+        }, {
+            "source": "src",
+            "dest": "dest",
+            "time": 3.0,
+            "data":"this is message 3"
+        }
+    ]
 }
 ```
 
@@ -179,43 +179,43 @@ JSON example
 Example JSON
 ```
 {
-	"points": [{
-			"key": "pub1",
-			"type": "double",
-			"value": 0.3,
-			"time": -1
-		}, {
+    "points": [{
+            "key": "pub1",
+            "type": "double",
+            "value": 0.3,
+            "time": -1
+        }, {
 
-			"key": "pub2",
-			"type": "double",
-			"value": 0.4,
-			"time": 1.0
-		}, {
-			"key": "pub1",
-			"value": 0.5,
-			"time": 1.0
-		},
-		{
-			"key": "pub1",
-			"value": 0.8,
-			"time": 3.0
-		},
-		{
-			"key": "pub1",
-			"value": 0.7,
-			"time": 2.0
-		},
-		{
-			"key": "pub2",
-			"value": 0.6,
-			"time": 2.0
-		},
-		{
-			"key": "pub2",
-			"value": 0.9,
-			"time": 3.0
-		}
-	]
+            "key": "pub2",
+            "type": "double",
+            "value": 0.4,
+            "time": 1.0
+        }, {
+            "key": "pub1",
+            "value": 0.5,
+            "time": 1.0
+        },
+        {
+            "key": "pub1",
+            "value": 0.8,
+            "time": 3.0
+        },
+        {
+            "key": "pub1",
+            "value": 0.7,
+            "time": 2.0
+        },
+        {
+            "key": "pub2",
+            "value": 0.6,
+            "time": 2.0
+        },
+        {
+            "key": "pub2",
+            "value": 0.9,
+            "time": 3.0
+        }
+    ]
 }
 ```
 

@@ -48,7 +48,7 @@ class MessageFederate: public virtual Federate {
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     @return an Endpoint Object
-	*/
+    */
     Endpoint registerEndpoint(const std::string& name, const std::string& type = std::string())
     {
         helics_endpoint ep =
@@ -61,7 +61,7 @@ class MessageFederate: public virtual Federate {
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
      @return an Endpoint Object
-	*/
+    */
     Endpoint registerGlobalEndpoint(const std::string& name,
                                     const std::string& type = std::string())
     {

@@ -31,29 +31,29 @@ To demonstrate the effects of filters, let's take the same model we were working
 ```
 ...
 "filters":
-	[
-		{
-		"name":"filterEV6",
-		"sourcetarget":"EV_Controller/EV6",
-		"operation":"delay",
-		"properties":
-			{
-			"name":"delay",
-			"value":600
-			}
-		},
-		{
-		"name":"filterEV5",
-		"sourcetarget":"EV_Controller/EV5",
-		"operation":"delay",
-		"properties":
-			{
-			"name":"delay",
-			"value":600
-			}
-		},
-		...
-	]
+    [
+        {
+        "name":"filterEV6",
+        "sourcetarget":"EV_Controller/EV6",
+        "operation":"delay",
+        "properties":
+            {
+            "name":"delay",
+            "value":600
+            }
+        },
+        {
+        "name":"filterEV5",
+        "sourcetarget":"EV_Controller/EV5",
+        "operation":"delay",
+        "properties":
+            {
+            "name":"delay",
+            "value":600
+            }
+        },
+        ...
+    ]
 ```
 
 * **`name`** (optional) - Name of the endpoint filter

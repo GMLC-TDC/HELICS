@@ -2564,7 +2564,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         }
 
             // case CMD_DISCONNECT_ACK:
-            //	break;
+            //    break;
     }
 }
 
@@ -4298,7 +4298,7 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
         } else {
             assert(false);
             // this is an odd condition (not sure what to do yet)
-            /*	m.dest_id = filtFunc->sourceOperators[ii].fed_id;
+            /*    m.dest_id = filtFunc->sourceOperators[ii].fed_id;
                 m.dest_handle = filtFunc->sourceOperators[ii].handle;
                 if ((ii < static_cast<int> (filtFunc->sourceOperators.size() - 1)) ||
                     (filtFunc->finalSourceFilter.fed_id != invalid_fed_id))

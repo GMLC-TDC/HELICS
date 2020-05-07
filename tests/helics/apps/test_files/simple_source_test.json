@@ -1,17 +1,17 @@
 {
-	"publications":[
+    "publications":[
 {
-	"global":true,
+    "global":true,
 "key":"pub1", "type":"double",
-	"start":1.0,
-	"period":1.0
+    "start":1.0,
+    "period":1.0
 }],
 
 "generators":[
 {
-	"name":"ramp",
-	"type":"ramp",
-	"ramp":0.3,
-	"level":1.0
+    "name":"ramp",
+    "type":"ramp",
+    "ramp":0.3,
+    "level":1.0
 }]
 }

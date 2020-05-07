@@ -52,7 +52,7 @@ if(NOT TARGET compile_flags_target)
 endif()
 
 if (NOT TARGET build_flags_target)
-	add_library(build_flags_target INTERFACE)
+    add_library(build_flags_target INTERFACE)
 endif()
 
 target_compile_options(
@@ -126,12 +126,12 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
                 compile_flags_target
                 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough=2 -Wno-psabi>
             )
-			if (CMAKE_CXX_STANDARD GREATER 16)
-			target_compile_options(
+            if (CMAKE_CXX_STANDARD GREATER 16)
+            target_compile_options(
                 compile_flags_target
                 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-declarations>
             )
-			endif()
+            endif()
         endif()
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.9)
             target_compile_options(

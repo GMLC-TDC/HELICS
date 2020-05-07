@@ -145,13 +145,13 @@ TEST_F(vfed2_tests, file_load)
     EXPECT_STREQ(s, "valueFed");
     EXPECT_EQ(helicsFederateGetInputCount(vFed), 3);
     EXPECT_EQ(helicsFederateGetPublicationCount(vFed), 2);
-    //	 helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
+    //     helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     CE(helicsFederateFinalize(vFed, &err));
     //
-    //	 EXPECT_EQ(vFed.getName(), "fedName");
+    //     EXPECT_EQ(vFed.getName(), "fedName");
 
-    //	 EXPECT_EQ(vFed.getSubscriptionCount(), 2);
-    //	 EXPECT_EQ(vFed.getPublicationCount(), 2);
+    //     EXPECT_EQ(vFed.getSubscriptionCount(), 2);
+    //     EXPECT_EQ(vFed.getPublicationCount(), 2);
     helicsFederateFree(vFed);
 }
 

@@ -29,32 +29,32 @@ Once the message topology considering endpoints has been determined, the definit
 
 ```
 {
-	 ...
-	 "endpoints" : [
-		{
-			"name" : "voltage_sensor",
-			"global" : true,
-			"destination" : "voltage_controller",
-			"info" : ""
-		},
-		{
-			"name" : "voltage_controller_1",
-			"global" : true,
-			"info" : ""
-		},
-		{
-			"name" : "voltage_controller_2",
-			"global" : true,
-			"destination" : "voltage_actuator",
-			"info" : ""
-		},
-		{
-			"name" : "voltage_actuator",
-			"global" : true,
-			"info" : ""
-		}
-	 ...
-	 ]
+     ...
+     "endpoints" : [
+        {
+            "name" : "voltage_sensor",
+            "global" : true,
+            "destination" : "voltage_controller",
+            "info" : ""
+        },
+        {
+            "name" : "voltage_controller_1",
+            "global" : true,
+            "info" : ""
+        },
+        {
+            "name" : "voltage_controller_2",
+            "global" : true,
+            "destination" : "voltage_actuator",
+            "info" : ""
+        },
+        {
+            "name" : "voltage_actuator",
+            "global" : true,
+            "info" : ""
+        }
+     ...
+     ]
 }
 ```
 * **`name`** - Analogous to `key` in value federates, this is the unique identifier of the endpoint in the federation and has the same interaction with `global` as the value federates do.
@@ -94,46 +94,46 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 
 ```
 {
-	"name": "EV_Controller",
-	"loglevel": 5,
-	"coreType": "zmq",
-	"timeDelta": 1.0,
-	"uninterruptible": true,
+    "name": "EV_Controller",
+    "loglevel": 5,
+    "coreType": "zmq",
+    "timeDelta": 1.0,
+    "uninterruptible": true,
 
-	"endpoints":[
-	{
-		"name": "EV_Controller/EV6",
-		"destination": "IEEE_123_feeder_0/EV6",
-		"type": "genmessage",
-		"global": true
+    "endpoints":[
+    {
+        "name": "EV_Controller/EV6",
+        "destination": "IEEE_123_feeder_0/EV6",
+        "type": "genmessage",
+        "global": true
 
-	},
-	{
-		"name": "EV_Controller/EV5",
-		"destination": "IEEE_123_feeder_0/EV5",
-		"type": "genmessage",
-		"global": true
-	},
+    },
+    {
+        "name": "EV_Controller/EV5",
+        "destination": "IEEE_123_feeder_0/EV5",
+        "type": "genmessage",
+        "global": true
+    },
    ...
-	],
-	"subscriptions":[
-	{
-		"key": "IEEE_123_feeder_0/totalLoad",
-		"type": "complex",
-		"required": true
-	},
-	{
-		"key": "IEEE_123_feeder_0/charge_EV6",
-		"type": "complex",
-		"required": true
-	},
-	{
-		"key": "IEEE_123_feeder_0/charge_EV5",
-		"type": "complex",
-		"required": true
-	},
-	...
-	]
+    ],
+    "subscriptions":[
+    {
+        "key": "IEEE_123_feeder_0/totalLoad",
+        "type": "complex",
+        "required": true
+    },
+    {
+        "key": "IEEE_123_feeder_0/charge_EV6",
+        "type": "complex",
+        "required": true
+    },
+    {
+        "key": "IEEE_123_feeder_0/charge_EV5",
+        "type": "complex",
+        "required": true
+    },
+    ...
+    ]
 }
 ```
 The first thing to note is the the EV controller has been written as a combination federate, having both endpoints for receiving/sending messages and subscriptions to HELICS values. The HELICS values that the controller has subscribed to give the controller access to both the total load of the feeder (`totalLoad`, presumably) as well as the charging power for each of the individual EVs being controlled (six in total).
@@ -143,9 +143,9 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
 ```
 {
     "name" : "DistributionSim",
-	"loglevel": 5,
-	"coreType": "zmq",
-	"period" : 1.0,
+    "loglevel": 5,
+    "coreType": "zmq",
+    "period" : 1.0,
     "publications" : [
           {
                "global" : true,
@@ -179,27 +179,27 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
           },
           ...
           ],
-	 "endpoints" : [
-		{
-			"global" : true,
-			"name" : "IEEE_123_feeder_0/EV6",
-			"type" : "complex",
-			"info" : "{
-				\"object\" : \"EV6\",
-				\"property\" : \"constant_power_A\"
-			}"
-		},
-		{
-			"global" : true,
-			"name" : "IEEE_123_feeder_0/EV5",
-			"type" : "complex",
-			"info" : "{
-				\"object\" : \"EV5\",
-				\"property\" : \"constant_power_B\"
-			}"
-		},
-		...
-	]
+     "endpoints" : [
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV6",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV6\",
+                \"property\" : \"constant_power_A\"
+            }"
+        },
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV5",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV5\",
+                \"property\" : \"constant_power_B\"
+            }"
+        },
+        ...
+    ]
 }
 
 ```

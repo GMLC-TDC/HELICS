@@ -367,7 +367,7 @@ class Federate {
     helics_time requestNextStep() { return helicsFederateRequestNextStep(fed, hThrowOnError()); }
 
     /** request a time advancement to the next allowed time
-	@param timeDelta the amount of time requested to advance
+    @param timeDelta the amount of time requested to advance
     @return the granted time step*/
     helics_time requestTimeAdvance(helics_time timeDelta)
     {
