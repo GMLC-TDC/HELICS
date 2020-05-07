@@ -80,8 +80,12 @@ if(HELICS_ENABLE_SWIG OR swig_required)
     if(WIN32 AND NOT MSYS)
         if(NOT CMAKE_PROGRAM_PATH)
             set(CMAKE_PROGRAM_PATH
-                "C:/ProgramData/chocolatey/bin" "C:/local/swigwin-4.0.1" "C:/local/swigwin-4.0.0"
-                "C:/local/swigwin-3.0.12" "C:/local/swigwin-3.0.11" "C:/local/swigwin-3.0.10"
+                "C:/ProgramData/chocolatey/bin"
+                "C:/local/swigwin-4.0.1"
+                "C:/local/swigwin-4.0.0"
+                "C:/local/swigwin-3.0.12"
+                "C:/local/swigwin-3.0.11"
+                "C:/local/swigwin-3.0.10"
             )
         else()
             set(CMAKE_PROGRAM_PATH

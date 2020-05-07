@@ -7,8 +7,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(helicsShared_headers helics.h api-data.h ValueFederate.h MessageFederate.h MessageFilters.h
-                         helicsCallbacks.h
+set(helicsShared_headers
+    helics.h
+    api-data.h
+    ValueFederate.h
+    MessageFederate.h
+    MessageFilters.h
+    helicsCallbacks.h
 )
 
 set(helicsShared_sources
