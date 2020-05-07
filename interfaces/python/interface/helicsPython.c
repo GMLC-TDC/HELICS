@@ -2736,24 +2736,24 @@ static void throwHelicsPythonException(helics_error *err) {
     strcat(str, "helics:invalid_function_call - ");
     strcat(str, err->message);
     PyErr_SetString(pHelicsException, str);
-	break;
+    break;
   case   helics_error_execution_failure:
     strcat(str, "helics:execution_failure - ");
     strcat(str, err->message);
     PyErr_SetString(pHelicsException, str);
-	break;
+    break;
   case   helics_error_insufficient_space:
     strcat(str, "helics:insufficient_space - ");
     strcat(str, err->message);
     PyErr_SetString(pHelicsException, str);
-	break;
+    break;
   case   helics_error_other:
   case   helics_error_external_type:
   default:
     strcat(str, "helics:error - ");
     strcat(str, err->message);
     PyErr_SetString(pHelicsException, str);
-	break;
+    break;
   }
 }
 

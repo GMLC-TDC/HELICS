@@ -1251,42 +1251,42 @@ static void throwHelicsMatlabError(helics_error *err) {
   switch (err->error_code)
   {
   case helics_ok:
-	return;
+    return;
   case helics_error_registration_failure:
-	mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
-	break;
+    mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
+    break;
   case   helics_error_connection_failure:
   mexErrMsgIdAndTxt( "helics:connection_failure", err->message);
-	break;
+    break;
   case   helics_error_invalid_object:
   mexErrMsgIdAndTxt( "helics:invalid_object", err->message);
-	break;
+    break;
   case   helics_error_invalid_argument:
   mexErrMsgIdAndTxt( "helics:invalid_argument", err->message);
-	break;
+    break;
   case   helics_error_discard:
   mexErrMsgIdAndTxt( "helics:discard", err->message);
-	break;
+    break;
   case helics_error_system_failure:
-	mexErrMsgIdAndTxt( "helics:system_failure", err->message);
-	break;
+    mexErrMsgIdAndTxt( "helics:system_failure", err->message);
+    break;
   case   helics_error_invalid_state_transition:
   mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->message);
-	break;
+    break;
   case   helics_error_invalid_function_call:
   mexErrMsgIdAndTxt( "helics:invalid_function_call", err->message);
-	break;
+    break;
   case   helics_error_execution_failure:
   mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
-	break;
+    break;
   case   helics_error_insufficient_space:
     mexErrMsgIdAndTxt( "helics:insufficient_space", err->message);
-	break;
+    break;
   case   helics_error_other:
   case   helics_error_external_type:
   default:
   mexErrMsgIdAndTxt( "helics:error", err->message);
-	break;
+    break;
   }
 }
 
