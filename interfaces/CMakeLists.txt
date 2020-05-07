@@ -8,11 +8,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cmake_dependent_option(
-    BUILD_PYTHON_INTERFACE
-    "Build Python extension"
-    OFF
-    "NOT BUILD_PYTHON2_INTERFACE;NOT HELICS_DISABLE_C_SHARED_LIB"
-    OFF
+    BUILD_PYTHON_INTERFACE "Build Python extension" OFF
+    "NOT BUILD_PYTHON2_INTERFACE;NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
 
 cmake_dependent_option(
@@ -23,51 +20,36 @@ cmake_dependent_option(
     OFF
 )
 cmake_dependent_option(
-    BUILD_MATLAB_INTERFACE
-    "Build Matlab Extension"
-    OFF
-    "NOT HELICS_DISABLE_C_SHARED_LIB"
-    OFF
+    BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
 cmake_dependent_option(
-    BUILD_OCTAVE_INTERFACE
-    "Build Octave extension"
-    OFF
-    "NOT HELICS_DISABLE_C_SHARED_LIB"
-    OFF
+    BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
 cmake_dependent_option(
-    BUILD_JAVA_INTERFACE
-    "Build Java extension"
-    OFF
-    "NOT HELICS_DISABLE_C_SHARED_LIB"
-    OFF
+    BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
 
-    # cmake projects are only available for csharp from 3.8 onward
-    cmake_dependent_option(
-        BUILD_CSHARP_INTERFACE
-        "Build C# extension"
-        OFF
-        "NOT HELICS_DISABLE_C_SHARED_LIB;CMAKE_VERSION VERSION_GREATER 3.8"
-        OFF
-    )
+# cmake projects are only available for csharp from 3.8 onward
+cmake_dependent_option(
+    BUILD_CSHARP_INTERFACE "Build C# extension" OFF
+    "NOT HELICS_DISABLE_C_SHARED_LIB;CMAKE_VERSION VERSION_GREATER 3.8" OFF
+)
 
-# these are purposely hidden options since they will only be used for very select
-# purposes
+# these are purposely hidden options since they will only be used for very select purposes
 option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY
-       "Use Swig to generate the interface files but not build" OFF)
+       "Use Swig to generate the interface files but not build" OFF
+)
 hide_variable(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
 option(HELICS_OVERWRITE_INTERFACE_FILES
-       "have cmake automatically overwrite the interface build files" OFF)
+       "have cmake automatically overwrite the interface build files" OFF
+)
 hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
 
-if(
-    BUILD_CSHARP_INTERFACE
-    OR BUILD_PYTHON2_INTERFACE
-    OR BUILD_OCTAVE_INTERFACE
-    OR SWIG_GENERATE_INTERFACE_FILES_ONLY
+if(BUILD_CSHARP_INTERFACE
+   OR BUILD_PYTHON2_INTERFACE
+   OR BUILD_OCTAVE_INTERFACE
+   OR SWIG_GENERATE_INTERFACE_FILES_ONLY
 )
     set(swig_required ON)
 else()
@@ -97,8 +79,7 @@ cmake_dependent_option(
 if(HELICS_ENABLE_SWIG OR swig_required)
     if(WIN32 AND NOT MSYS)
         if(NOT CMAKE_PROGRAM_PATH)
-            set(
-                CMAKE_PROGRAM_PATH
+            set(CMAKE_PROGRAM_PATH
                 "C:/ProgramData/chocolatey/bin"
                 "C:/local/swigwin-4.0.1"
                 "C:/local/swigwin-4.0.0"
@@ -107,8 +88,7 @@ if(HELICS_ENABLE_SWIG OR swig_required)
                 "C:/local/swigwin-3.0.10"
             )
         else()
-            set(
-                CMAKE_PROGRAM_PATH
+            set(CMAKE_PROGRAM_PATH
                 "${CMAKE_PROGRAM_PATH}"
                 "C:/ProgramData/chocolatey/bin"
                 "C:/local/swigwin-4.0.1"
@@ -123,14 +103,9 @@ if(HELICS_ENABLE_SWIG OR swig_required)
     include(${SWIG_USE_FILE})
 endif()
 
-# add base swig interface files as install option, regardless of current
-# interfaces built
+# add base swig interface files as install option, regardless of current interfaces built
 if(NOT HELICS_BINARY_ONLY_INSTALL AND NOT HELICS_DISABLE_C_SHARED_LIB)
-    install(
-        FILES helics.i
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
-        COMPONENT swig
-    )
+    install(FILES helics.i DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig COMPONENT swig)
 endif()
 
 # cmake-format: off

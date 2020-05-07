@@ -9,18 +9,14 @@
 
 if(WIN32)
     configure_file(runTestsWIN32.m.in runTests.m)
-    add_test(
-        NAME octave_tests
-        COMMAND
-            ${OCTAVE_EXECUTABLE} "-q" "run(\"${CMAKE_CURRENT_BINARY_DIR}/runTests.m\")"
+    add_test(NAME octave_tests COMMAND ${OCTAVE_EXECUTABLE} "-q"
+                                       "run(\"${CMAKE_CURRENT_BINARY_DIR}/runTests.m\")"
     )
 
 else()
     configure_file(runTestsUNIX.m.in runTests.m)
-    add_test(
-        NAME octave_tests
-        COMMAND
-            ${OCTAVE_EXECUTABLE} "-q" "run(\"${CMAKE_CURRENT_BINARY_DIR}/runTests.m\")"
+    add_test(NAME octave_tests COMMAND ${OCTAVE_EXECUTABLE} "-q"
+                                       "run(\"${CMAKE_CURRENT_BINARY_DIR}/runTests.m\")"
     )
 endif()
 

@@ -9,8 +9,7 @@
 
 if(HELICS_EXAMPLES_WARNINGS_AS_ERROR)
     # the examples had better compile without warnings otherwise they should not be
-    add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/WX>>
-                        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror>>)
+    add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/WX>> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror>>)
 
 endif()
 
@@ -23,6 +22,6 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(CppInterface)
 endif()
 
-if (HELICS_BUILD_CXX_SHARED_LIB)
-	add_subdirectory(comboFederates_cpp_shared)
+if(HELICS_BUILD_CXX_SHARED_LIB)
+    add_subdirectory(comboFederates_cpp_shared)
 endif()

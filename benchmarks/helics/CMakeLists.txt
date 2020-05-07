@@ -34,17 +34,17 @@ set(HELICS_MULTINODE_BENCHMARKS
     TimingLeafFederate
 )
 
-if (NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
+if(NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
     include(ProcessorCount)
-    ProcessorCount(N)
-    if (N LESS 5)
-       set (HELICS_BENCHMARK_SHIFT_FACTOR -1)
+    processorcount(N)
+    if(N LESS 5)
+        set(HELICS_BENCHMARK_SHIFT_FACTOR -1)
     else()
-       set (HELICS_BENCHMARK_SHIFT_FACTOR 0)
+        set(HELICS_BENCHMARK_SHIFT_FACTOR 0)
     endif()
 endif()
 
-if (NOT HELICS_BENCHMARK_SHIFT_FACTOR GREATER -4)
+if(NOT HELICS_BENCHMARK_SHIFT_FACTOR GREATER -4)
     message(FATAL_ERROR "defined shift factor must be a number and greater than -4")
 endif()
 
@@ -57,7 +57,9 @@ foreach(T ${HELICS_BENCHMARKS})
     target_link_libraries(${T} PUBLIC helics_application_api)
     add_benchmark(${T})
     set_target_properties(${T} PROPERTIES FOLDER benchmarks)
-    target_compile_definitions(${T} PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})")
+    target_compile_definitions(
+        ${T} PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})"
+    )
 endforeach()
 
 add_executable(helics_benchmarks BenchmarkMain.cpp BenchmarkFederate.hpp)
@@ -67,17 +69,18 @@ foreach(T ${HELICS_MULTINODE_BENCHMARKS})
     target_sources(helics_benchmarks PUBLIC ${T}.hpp)
 endforeach()
 
-if (NOT HELICS_DISABLE_C_SHARED_LIB)
-   add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
-   target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
-   add_benchmark(echoBenchmarks_c)
-   set_target_properties(echoBenchmarks_c PROPERTIES FOLDER benchmarks)
-    target_compile_definitions(echoBenchmarks_c PRIVATE  "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})")
-   target_include_directories(
-      echoBenchmarks_c
-      PUBLIC ${HELICS_BINARY_DIR}/helics_generated_includes/
-   )
-   copy_shared_target(echoBenchmarks_c helicsSharedLib)
+if(NOT HELICS_DISABLE_C_SHARED_LIB)
+    add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
+    target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
+    add_benchmark(echoBenchmarks_c)
+    set_target_properties(echoBenchmarks_c PROPERTIES FOLDER benchmarks)
+    target_compile_definitions(
+        echoBenchmarks_c PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})"
+    )
+    target_include_directories(
+        echoBenchmarks_c PUBLIC ${HELICS_BINARY_DIR}/helics_generated_includes/
+    )
+    copy_shared_target(echoBenchmarks_c helicsSharedLib)
 endif()
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
@@ -87,9 +90,10 @@ string(RANDOM rname)
 
 set(BM_RESULT_DIR)
 set(BM_FORMAT --benchmark_format=json)
-if (NOT HELICS_DISABLE_C_SHARED_LIB)
+if(NOT HELICS_DISABLE_C_SHARED_LIB)
     set(HELICS_ECHO_C_COMMANDS COMMAND echoBenchmarks_c ${BM_FORMAT}
-            ">${BM_RESULT_DIR}bm_echo_cResults${current_date}_${rname}.txt")
+                               ">${BM_RESULT_DIR}bm_echo_cResults${current_date}_${rname}.txt"
+    )
 endif()
 # add a custom target to run all the benchmarks in a consistent fashion
 add_custom_target(
@@ -103,8 +107,7 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks"
     COMMAND echoBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_echoResults${current_date}_${rname}.txt"
-    COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks_c"
-    ${HELICS_ECHO_C_COMMANDS}
+    COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks_c" ${HELICS_ECHO_C_COMMANDS}
     COMMAND ${CMAKE_COMMAND} -E echo " running ringBenchmarks"
     COMMAND ringBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_ringResults${current_date}_${rname}.txt"
@@ -135,7 +138,7 @@ foreach(T ${HELICS_BENCHMARKS})
     add_dependencies(RUN_ALL_BENCHMARKS ${T})
 endforeach()
 
-if (NOT HELICS_DISABLE_C_SHARED_LIB)
+if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_dependencies(RUN_ALL_BENCHMARKS echoBenchmarks_c)
 endif()
 
@@ -154,9 +157,9 @@ add_custom_target(
             ">${BM_RESULT_DIR}bmk_timingResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo
             " running messageLookupBenchmarks with filter=/[0-9][0-9][0-9][0-9]/"
-    COMMAND messageLookupBenchmarks --benchmark_format=json
-            --benchmark_filter=/[0-9][0-9][0-9][0-9]/
-            ">${BM_RESULT_DIR}bmk_messageLookupResults${current_date}_${rname}.txt"
+    COMMAND
+        messageLookupBenchmarks --benchmark_format=json --benchmark_filter=/[0-9][0-9][0-9][0-9]/
+        ">${BM_RESULT_DIR}bmk_messageLookupResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running echoMessageBenchmarks with filter=/4"
     COMMAND echoMessageBenchmarks --benchmark_format=json --benchmark_filter=/4
             ">${BM_RESULT_DIR}bmk_echoMessageResults${current_date}_${rname}.txt"

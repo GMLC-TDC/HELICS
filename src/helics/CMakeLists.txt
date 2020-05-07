@@ -24,9 +24,7 @@ cmake_dependent_option(
 )
 
 # for including the helics_export.h
-target_include_directories(
-    helics_base INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-)
+target_include_directories(helics_base INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 # -------------------------------------------------------------
 # Add the main HELICS libraries
@@ -57,9 +55,7 @@ file(COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h
 )
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set_target_properties(
-        helics_application_api helics_common helics_core PROPERTIES FOLDER helics
-    )
+    set_target_properties(helics_application_api helics_common helics_core PROPERTIES FOLDER helics)
 endif()
 
 if(HELICS_BUILD_APP_LIBRARY)
