@@ -1,8 +1,8 @@
 {
     "type": "test",
-	"comms": [{
-		"type": "zmq"
-	}, {
-		"type": "tcp"
-	}]
+    "comms": [{
+        "type": "zmq"
+    }, {
+        "type": "tcp"
+    }]
 }

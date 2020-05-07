@@ -117,19 +117,19 @@ e src1
 JSON example
 ```
 {
-	"subscriptions": [{
-			"key": "pub1",
-			"type": "double"
-		}, {
-			"key": "pub2",
-			"type": "double"
-		}
-	],
-	"endpoints": [{
-			"name": "src1",
-			"global":true
-		}
-	]
+    "subscriptions": [{
+            "key": "pub1",
+            "type": "double"
+        }, {
+            "key": "pub2",
+            "type": "double"
+        }
+    ],
+    "endpoints": [{
+            "name": "src1",
+            "global":true
+        }
+    ]
 }
 ```
 

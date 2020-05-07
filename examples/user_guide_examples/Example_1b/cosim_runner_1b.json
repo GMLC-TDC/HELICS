@@ -7,7 +7,7 @@
             "host":"localhost",
             "name":"PythonTransmissionFederate"
         },
-		{
+        {
             "directory":"./EV_Controller/",
             "exec":"python EV_Controller.py",
             "host":"localhost",

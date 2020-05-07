@@ -143,7 +143,7 @@ class Endpoint {
             ep, HELICS_NULL_POINTER, data, static_cast<int>(data_size), time, hThrowOnError());
     }
     /** send a data block and length
-	@param dest destination to send the message to
+    @param dest destination to send the message to
     @param data pointer to data location
     @param data_size the length of the data
     @param time the time to send the message
@@ -163,7 +163,7 @@ class Endpoint {
     }
 
     /** send a string to a particular destination
-	 @param dest the target endpoint to send the data to
+     @param dest the target endpoint to send the data to
      @param data the information to send
    */
     void sendMessage(const std::string& dest, const std::string& data)
@@ -173,7 +173,7 @@ class Endpoint {
     }
     /** send a string at a particular time
      @param data the information to send
-	 @param time the time the message should be delivered
+     @param time the time the message should be delivered
    */
     void sendMessage(const std::string& data, helics_time time)
     {

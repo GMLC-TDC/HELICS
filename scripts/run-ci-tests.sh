@@ -85,20 +85,20 @@ else
     if [[ "$TEST_CONFIG_GIVEN" == "true" ]]; then
         test_label=$(tr '[:upper:]' '[:lower:]' <<< "$TEST_CONFIG")
         case "${test_label}" in
-	    # Recognize aliases/case-insensitive versions of some values for TEST_CONFIG
+        # Recognize aliases/case-insensitive versions of some values for TEST_CONFIG
             *daily*)
-	        TEST_CONFIG="Daily"
-		;;
+            TEST_CONFIG="Daily"
+        ;;
             *coverage*)
                 TEST_CONFIG="Coverage"
                 ;;
             *continuous*)
                 TEST_CONFIG="Continuous"
-		CTEST_OPTIONS+=" --timeout 600"
+        CTEST_OPTIONS+=" --timeout 600"
                 ;;
             *ci*)
                 TEST_CONFIG="Continuous"
-		CTEST_OPTIONS+=" --timeout 600"
+        CTEST_OPTIONS+=" --timeout 600"
                 ;;
             *)
                 # Use whatever user gave for TEST_CONFIG
@@ -116,7 +116,7 @@ else
                 ;;
             *)
                 TEST_CONFIG="Continuous"
-		CTEST_OPTIONS+=" --timeout 600"
+        CTEST_OPTIONS+=" --timeout 600"
                 ;;
         esac
     fi
@@ -128,12 +128,12 @@ else
 
     # Run the CI tests last so that the execution status is used for the pass/fail status shown
     if [[ "$DISABLE_UNIT_TESTS" != "true" ]]; then
-	if [[ -n "${TEST_CONFIG}" ]]; then
-        	echo "Running ${TEST_CONFIG} tests with filters exclude ${test_exclude_regex} and ${test_match_regex}"
-        	ctest -E "${test_exclude_regex}" -R "${test_match_regex}" -L ${TEST_CONFIG} ${CTEST_OPTIONS}
-	else
-		echo "Running tests matching ${test_match_regex} but not matching ${test_exclude_regex}"
-		ctest ${CTEST_OPTIONS} -E "${test_exclude_regex}" -R "${test_match_regex}"
-	fi
+    if [[ -n "${TEST_CONFIG}" ]]; then
+            echo "Running ${TEST_CONFIG} tests with filters exclude ${test_exclude_regex} and ${test_match_regex}"
+            ctest -E "${test_exclude_regex}" -R "${test_match_regex}" -L ${TEST_CONFIG} ${CTEST_OPTIONS}
+    else
+        echo "Running tests matching ${test_match_regex} but not matching ${test_exclude_regex}"
+        ctest ${CTEST_OPTIONS} -E "${test_exclude_regex}" -R "${test_match_regex}"
+    fi
     fi
 fi

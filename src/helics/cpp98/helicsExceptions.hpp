@@ -19,9 +19,9 @@ namespace helicscpp {
 class HelicsException: public std::runtime_error {
   public:
     /** constructor for the exeception
-	@param error_code an integer code of the error
-	@param error_string a string describing the error
-	*/
+    @param error_code an integer code of the error
+    @param error_string a string describing the error
+    */
     explicit HelicsException(int error_code, const char* error_string):
         std::runtime_error(error_string), eCode(error_code)
     {

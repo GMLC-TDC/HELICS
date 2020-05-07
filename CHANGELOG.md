@@ -267,7 +267,7 @@ Minor release with lots of CMake updates and build changes and a few fixes and a
 ### Deprecated
 -   Use of coreFactory and brokerFactory when using the C++ shared library (use CoreApp and BrokerApp instead)
 -   coreType and helics-time string conversion functions are no longer defined in the helics-time header.  They are still there currently but are deprecated and will be removed in HELICS 3.0
-	use the typeOperations.hpp and timeOperations.hpp header instead which now defines those functions.
+    use the typeOperations.hpp and timeOperations.hpp header instead which now defines those functions.
 
 ### Removed
 -   All tests using boost\:\:test have now been replaced with Google test, so references and linking to boost\:\:test has been removed

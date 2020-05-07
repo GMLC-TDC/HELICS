@@ -147,7 +147,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             time_next = time_minminDe;
         }
     }
-    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    //    printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next) {
         update = true;
@@ -190,7 +190,7 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
         }
         transmitTimingMessage(upd);
 
-        //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+        //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
 }

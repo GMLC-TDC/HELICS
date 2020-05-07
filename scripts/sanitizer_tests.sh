@@ -3,7 +3,7 @@ tests=(
     tests/helics/core/core-tests
     tests/helics/common/common-tests
     "tests/helics/system_tests/system-tests --gtest_filter=-*realtime*"
-	build/tests/helics/apps/helics_apps-tests
+    build/tests/helics/apps/helics_apps-tests
 )
 
 SUMRESULT=0

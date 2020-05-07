@@ -209,14 +209,14 @@ Queries that must traverse the network travel along priority paths.  The calls a
 There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version without the target
 ```
-std::string 	query(const std::string& queryStr)
+std::string     query(const std::string& queryStr)
 ```
 
 make the query of the current federate.
 an asynchronous version is also available.
 
 ```
-query_id_t 	queryAsync(const std::string& target, const std::string& queryStr)
+query_id_t     queryAsync(const std::string& target, const std::string& queryStr)
 ```
 
 This call returns a `query_id_t` that can be use in `queryComplete` and `isQueryComplet` functions.
