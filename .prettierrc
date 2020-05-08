@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "overrides": [
+  {
+      "files": ".prettierrc",
+      "options": { "parser": "json" }
+    },
+    {
+      "files": ".clang-*",
+      "options": { "parser": "yaml" }
+    }
+  ]
+}
