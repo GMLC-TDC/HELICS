@@ -1191,7 +1191,7 @@ def helicsFederateFinalizeComplete(fed: "helics_federate") -> "void":
     return _helics.helicsFederateFinalizeComplete(fed)
 
 def helicsFederateFree(fed: "helics_federate") -> "void":
-    r"""Release the memory associated withe a federate."""
+    r"""Release the memory associated with a federate."""
     return _helics.helicsFederateFree(fed)
 
 def helicsCloseLibrary() -> "void":

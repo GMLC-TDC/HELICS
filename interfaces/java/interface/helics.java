@@ -851,7 +851,7 @@ public class helics {
   }
 
   /**
-   * Release the memory associated withe a federate.
+   * Release the memory associated with a federate.
    */
   public static void helicsFederateFree(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateFree(SWIGTYPE_p_void.getCPtr(fed));
