@@ -198,7 +198,7 @@
   required_instructions:
   -
     count: 1
-    description: "Labels are needed to indentify information about the docker image"
+    description: "Labels are needed to identify information about the docker image"
     instruction: LABEL
     level: error
     message: "No LABELs are defined"
