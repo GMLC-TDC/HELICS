@@ -99,7 +99,7 @@
           reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
-        - 
+        -
           label: "yum_update_all"
           regex: /yum(.+update all|.+upgrade|.+update)/
           level: "info"
@@ -198,7 +198,7 @@
   required_instructions:
   -
     count: 1
-    description: "Labels are needed because...."
+    description: "Labels are needed to indentify information about the docker image"
     instruction: LABEL
     level: error
     message: "No LABELs are defined"
