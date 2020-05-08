@@ -3,10 +3,6 @@
   {
       "files": ".prettierrc",
       "options": { "parser": "json" }
-    },
-    {
-      "files": ["*.json","*.JSON"],
-      "options": { "parser": "json5" }
     }
   ]
 }
