@@ -1,5 +1,4 @@
-Run tests
-=========
+# Run tests
 
 **Python**
 

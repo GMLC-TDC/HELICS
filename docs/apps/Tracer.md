@@ -51,11 +51,13 @@ federate configuration
   -f [ --flags ] arg     named flags for the federate
 
 ```
+
 also permissible are all arguments allowed for federates and any specific broker specified:
 
 [Command line reference](cmdArgs.html)
 
 the tracer executable also takes an untagged argument of a file name for example
+
 ```
 helics_app tracer tracer_file.txt --stop 5
 ```
@@ -67,13 +69,16 @@ Tracers support both delimited text files and JSON files some examples can be fo
 ## Config File Detail
 
 ### subscriptions
+
 a simple example of a recorder file specifying some subscriptions
+
 ```
 #FederateName topic1
 
 sub pub1
 subscription pub2
 ```
+
 `#` signifies a comment
 
 if only a single column is specified it is assumed to be a subscription
@@ -104,9 +109,11 @@ for clone the second can be either source or destination and the third the endpo
 \[for capture it can be either "endpoints" or "subscriptions"\]
 
 ### JSON configuration
+
 Tracers can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
+
 ```
 #list publications and endpoints for a recorder
 
@@ -114,7 +121,9 @@ pub1
 pub2
 e src1
 ```
+
 JSON example
+
 ```
 {
     "subscriptions": [{

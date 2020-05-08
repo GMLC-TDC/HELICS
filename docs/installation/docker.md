@@ -1,13 +1,10 @@
-Docker
-======
+# Docker
 
-Requirements
-------------
+## Requirements
 
-* Docker 17.05 or higher
+- Docker 17.05 or higher
 
-Dockerfile
-----------
+## Dockerfile
 
 This `Dockerfile` will build and install HELICS in Ubuntu 18.04 with
 Python support.
@@ -55,8 +52,7 @@ RUN apt install -y --no-install-recommends python3-dev \
 CMD ["python3", "-c", "import helics; print(helics.helicsGetVersion())"]
 ```
 
-Build
------
+## Build
 
 To build the Docker image, run the following from the directory
 containing the `Dockerfile`:
@@ -65,8 +61,7 @@ containing the `Dockerfile`:
 $ docker build -t helics .
 ```
 
-Run
----
+## Run
 
 To run the Docker image as a container, run the following:
 

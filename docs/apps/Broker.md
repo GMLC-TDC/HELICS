@@ -1,12 +1,10 @@
-Broker
-=======
+# Broker
 
 Brokers function as intermediaries or roots in the HELICS hierarchy
 The Broker can be run through the helics_broker or via helics-app
 
+## Command line arguments
 
-Command line arguments
-----------
 ```
 helics_broker term <broker args...> will start a broker and open a terminal control window for the broker run help in a terminal for more commands
 helics_broker --autorestart <broker args ...> will start a continually regenerating broker there is a 3 second countdown on broker completion to halt the program via ctrl-C
@@ -142,7 +140,8 @@ helics>>help
 helics>>
 ```
 
-`status`  will print out current status of the brokers including counts of federates, brokers, and handles
+`status` will print out current status of the brokers including counts of federates, brokers, and handles
+
 ```
 helics>>status
 Broker (643204-ibrVd-14EWH-unKfh-hExUP) is connected and is accepting new federates
@@ -153,6 +152,7 @@ helics>>
 ```
 
 info prints out name, connection status, and connection information
+
 ```
 helics>>info
 Broker (643204-ibrVd-14EWH-unKfh-hExUP) is connected and is accepting new federates
@@ -163,4 +163,4 @@ The `query` command allows any query to be executed from the command line, `quer
 
 Other available queries are described in [Queries](../user-guide/queries.html).
 
-various restart options are also available, `terminate`, `restart`, `force restart`.  And finally `quit` will exit the terminal and wait for the broker to complete.  enter `terminate` before quit or `terminate*` to terminate and quit.
+various restart options are also available, `terminate`, `restart`, `force restart`. And finally `quit` will exit the terminal and wait for the broker to complete. enter `terminate` before quit or `terminate*` to terminate and quit.

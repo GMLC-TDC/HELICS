@@ -13,6 +13,6 @@
   "enum_char": ".",
   "bullet_char": "*",
   "line_ending": "unix",
-  "first_comment_is_literal":true,
-  "literal_comment_pattern":"Copyright"
+  "first_comment_is_literal": true,
+  "literal_comment_pattern": "Copyright"
 }

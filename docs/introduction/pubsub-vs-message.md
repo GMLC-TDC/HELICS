@@ -1,5 +1,4 @@
-Value vs Message
-==================
+# Value vs Message
 
 ```eval_rst
 +--------------------------------------------------------------------+--------------------------------------------------------+
@@ -21,5 +20,5 @@ Value vs Message
 
 Other Notes:
 
- - Endpoints can subscribe to publications to get a message for each data point
- - Both can be nameless to be non-routable from outside the defining federate
+- Endpoints can subscribe to publications to get a message for each data point
+- Both can be nameless to be non-routable from outside the defining federate

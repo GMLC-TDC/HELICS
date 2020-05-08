@@ -34,11 +34,13 @@ mv helicsMEX.* matlab/
 ## Test HELICS MATLAB extension
 
 Run the following in two separate windows.
+
 ```bash
 matlab -nodesktop -nosplash
 cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab/pi-exchange
 pisender
 ```
+
 The pisender starts a broker so it may work slightly better to start that process first.
 
 ```bash
