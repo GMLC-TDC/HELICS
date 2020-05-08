@@ -956,7 +956,7 @@ void helicsInputGetVector(helics_input inp, double data[], int maxlen, int* actu
     }
     if ((data == nullptr) || (maxlen <= 0)) {
         inpObj->inputPtr->clearUpdate();
-        //this isn't an error, just no data retreived
+        //this isn't an error, just no data retrieved
         return;
     }
     try {

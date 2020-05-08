@@ -23,13 +23,13 @@
 "endpoints":[
 {
 "name":"ept1", // the name of the publication
- "type":"genmessage", // the type assocaited with a endpoint endpoint types have limited usefullness at present (optional)
+ "type":"genmessage", // the type associated with a endpoint endpoint types have limited usefulness at present (optional)
  "global":true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
  "flags":["optional","-required"]
 },
 {
 "name":"ept2", // the name of the publication
- "type":"message2", // the type assocaited with a endpoint (optional)
+ "type":"message2", // the type associated with a endpoint (optional)
  //the fact that there is no global value creates a local endpoint with global name messageFed/ept2
  "knownDestinations":"ept1", //this value can be an array of strings or just a single one it names key paths
  //knownDestinations can be used to optimize the communication pathways inside of HELICS

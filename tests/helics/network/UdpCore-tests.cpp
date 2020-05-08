@@ -172,7 +172,7 @@ TEST(UdpCore, udpComm_transmit_through)
         act2 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on eachother in this case
+    // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
 
     bool connected = comm2.connect();
@@ -236,7 +236,7 @@ TEST(UdpCore, udpComm_transmit_add_route)
         act3 = std::move(m);
     });
 
-    // need to launch the connection commands at the same time since they depend on eachother in this case
+    // need to launch the connection commands at the same time since they depend on each other in this case
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect();

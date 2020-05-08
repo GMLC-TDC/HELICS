@@ -118,7 +118,7 @@ For queries that are not a json value the response will be:
 }
 ```
 
-For queries taht did not result in a valid response the response will be:
+For queries that did not result in a valid response the response will be:
 
 ```json
 {

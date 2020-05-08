@@ -35,7 +35,7 @@ The following was adapted from TDC Simulation Requirements developed by team Nov
   * Linux-based Supercomputers
 * **Modular**:
   * Built to support separate software components
-  * Components can be used in conjuction with other components of the system
+  * Components can be used in conjunction with other components of the system
 * **support diverse TDC+ tools:**
   * T: GridDyn.
     * Short term integration goals : PFLOW (ANL), MatPower
@@ -215,7 +215,7 @@ Note: in each group, a * is used to indicate the configurations (proposed) to be
 
   **Config P6—T\_3ph+multi-D\_3ph Dynamic:** This configuration extends P2 to use full 3-phase simulation for the transmission system. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
 
-  [^1]: QSTS version inserted for v0.4.0 May 12, 2017 (Previously P3 referred to the same setup for dynamics. The new ordering allows consistancy by alternating QSTS and Dynamics
+  [^1]: QSTS version inserted for v0.4.0 May 12, 2017 (Previously P3 referred to the same setup for dynamics. The new ordering allows consistency by alternating QSTS and Dynamics
   [^2]: Huang, Q. & V. Vittal. "Integrated Transmission and Distribution System Power Flow and Dynamic Simulation Using Mixed Three-Sequence/Three-Phase Modeling" IEEE Transactions in Power Systems, 2016
   [^3]: This was called "P3" in version 0.3.0 dated 2/11/2017
 
@@ -232,7 +232,7 @@ Note: in each group, a * is used to indicate the configurations (proposed) to be
 
   In general all of these use cases share a common style where selected points from the physical, powerflow simulation are presented as raw data and/or control signals to electrical equipment are passed to/from another federate.
 
-  Current thinking is that physical domain simulators would always present only higher level data (e.g. 3ph voltage at a node) to the co-simulator. Then an additional federate would handle protocol-specific packetization when required. This allows the domain simulators to maintain a constant interface independant of the type of communication simulation implemented.
+  Current thinking is that physical domain simulators would always present only higher level data (e.g. 3ph voltage at a node) to the co-simulator. Then an additional federate would handle protocol-specific packetization when required. This allows the domain simulators to maintain a constant interface independent of the type of communication simulation implemented.
 
   This opens up three levels of communication simulation that might be used:
 
@@ -288,9 +288,9 @@ Power flow:
 
 \[federate_id/\]transmission_bus0..x\[/feeder0…x\]\[/node0…x\]/value
 
-Here the convention is to match hierarchy of the power systems going as deep as appropriate and ending with the specific value desired. The inital
+Here the convention is to match hierarchy of the power systems going as deep as appropriate and ending with the specific value desired. The initial
 
- For consistancy, values should be taken from the following list:
+ For consistency, values should be taken from the following list:
 
 * voltage—multiphase array of complex values, default units = V (volts)
 * current—multiphase array of complex values, default units = A (amps)
@@ -337,8 +337,8 @@ This Simulator-Type-Specific API builds on top of the raw application API descri
 
 **Power Flow Helpers**
 
-* pfPublish3ph(valueName, value_array, input_format='3ph')—Helper function for publishing voltage and current values. The function accepts any input format from {'3ph(ase)', '3seq(uence)', 'pos(itive sequence)', 'sum'} and automatically converts the values to three phase representation. The 'sum' type is particuarly useful in the Get3ph function to combine the total (complex) power accross all 3 phases.
-* pfGet3ph(valueName, output_format='3ph')—Complementary helper function to recieve 3-phase values and internally convert to other representations
+* pfPublish3ph(valueName, value_array, input_format='3ph')—Helper function for publishing voltage and current values. The function accepts any input format from {'3ph(ase)', '3seq(uence)', 'pos(itive sequence)', 'sum'} and automatically converts the values to three phase representation. The 'sum' type is particularly useful in the Get3ph function to combine the total (complex) power across all 3 phases.
+* pfGet3ph(valueName, output_format='3ph')—Complementary helper function to receive 3-phase values and internally convert to other representations
 
 #### Additional Simulator-Types
 
@@ -356,7 +356,7 @@ Initial test configuration combinations:
 
 
 ## Application
-The general application API will act as a basic interface for applications to translate between the programs and the Core API.  It is anticipated appplication specific API's will be build on top of these basic API's to provide additional functionality.
+The general application API will act as a basic interface for applications to translate between the programs and the Core API.  It is anticipated application specific API's will be build on top of these basic API's to provide additional functionality.
 - *The API will provide functionality for*
     - Federate or Object Management
     - Event Communication
@@ -369,12 +369,12 @@ all types of interfaces will have some properties
 - oberver [yes/no]  means the federate does not publish or transmit any data or message (observe only)
 - timing -- the allowable times at which the federate interacts
     - periodic -only interact at specific time windows requires specification of the minimum time interval
-    - abritrary - can interact at any time interval upto cosim resolution (ns?)
+    - arbitrary - can interact at any time interval up to cosim resolution (ns?)
 - rollback [yes/no]
 
 
 ### API
-The API code itself should have version in C, C++, python, and matlab at a minimum.   The API code will be written in C++, with a shared library layer using only C constructs.  An application could use the C shared libary, or directly include the C++ code in the application.
+The API code itself should have version in C, C++, python, and matlab at a minimum.   The API code will be written in C++, with a shared library layer using only C constructs.  An application could use the C shared library, or directly include the C++ code in the application.
 
 #### Value based API
 This API is used by federates to pass values directly, it can be iterative,  And is meant to emulate a direct physical coupling, though other uses are possible.

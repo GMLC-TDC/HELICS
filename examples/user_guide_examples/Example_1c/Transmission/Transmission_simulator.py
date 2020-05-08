@@ -94,7 +94,7 @@ if __name__ == "__main__":
         sub_key = h.helicsSubscriptionGetKey(subid["m{}".format(i)])
         print("Registered Subscription ---> {}".format(sub_key))
 
-    ######################   Entereing Execution Mode  ##########################################################
+    ######################   Entering Execution Mode  ##########################################################
     h.helicsFederateEnterInitializingMode(fed)
     status = h.helicsFederateEnterExecutingMode(fed)
 

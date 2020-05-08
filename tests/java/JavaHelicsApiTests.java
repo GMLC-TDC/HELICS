@@ -578,7 +578,7 @@ public class JavaHelicsApiTests {
         } finally {
             int totalNumberOfTests = javaHelicsApiTests.numberOfPassingTests + javaHelicsApiTests.numberOfFailedTests;
             double percentagePassed = (javaHelicsApiTests.numberOfPassingTests * 100) / (totalNumberOfTests);
-            System.out.println(String.format("%d of %d tests passed.%n%.0f%% successfull.%n%d tests failed.",
+            System.out.println(String.format("%d of %d tests passed.%n%.0f%% successful.%n%d tests failed.",
                     javaHelicsApiTests.numberOfPassingTests, totalNumberOfTests, percentagePassed,
                     javaHelicsApiTests.numberOfFailedTests));
             if (javaHelicsApiTests.numberOfFailedTests > 0) {

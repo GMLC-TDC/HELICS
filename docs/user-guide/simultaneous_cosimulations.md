@@ -25,7 +25,7 @@ helics_broker_server --tcp
 helics_broker_server --udp
 ```
 
-multiple broker servers can be run simulataneously
+multiple broker servers can be run simultaneously
 ```sh
 helics_broker_server --zmq --tcp --udp
 ```
