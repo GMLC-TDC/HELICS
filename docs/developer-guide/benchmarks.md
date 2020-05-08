@@ -16,7 +16,7 @@ Micro-benchmarks to test the serialization and deserialization of common data ty
 ### Echo
 A set of federates representing a hub and spoke model of communication for value based interfaces
 
-### Echo_c_
+### Echo_c
 A set of federates representing a hub and spoke model of communication for value based interfaces using the C shared library.
 
 ### Echo Message
