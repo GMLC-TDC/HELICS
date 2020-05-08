@@ -16545,7 +16545,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_O, "Finalize the federate. This function halts all communication in the federate and disconnects it from the core."},
 	 { "helicsFederateFinalizeAsync", _wrap_helicsFederateFinalizeAsync, METH_O, "Finalize the federate in an async call."},
 	 { "helicsFederateFinalizeComplete", _wrap_helicsFederateFinalizeComplete, METH_O, "Complete the asynchronous finalize call."},
-	 { "helicsFederateFree", _wrap_helicsFederateFree, METH_O, "Release the memory associated withe a federate."},
+	 { "helicsFederateFree", _wrap_helicsFederateFree, METH_O, "Release the memory associated with a federate."},
 	 { "helicsCloseLibrary", _wrap_helicsCloseLibrary, METH_NOARGS, "\n"
 		"Call when done using the helics library.\n"
 		"This function will ensure the threads are closed properly. If possible this should be the last call before exiting.\n"
