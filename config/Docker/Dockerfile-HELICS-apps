@@ -40,5 +40,15 @@ FROM opensuse/tumbleweed:latest
 # Install the runtime libraries needed for ZeroMQ without development files
 RUN zypper mr -d openSUSE-Tumbleweed-Update && zypper install -y libzmq5 && zypper clean -a
 
+ARG GIT_COMMIT=unspecified
+
+LABEL maintainer="helicsdevelopers@helics.org"
+
+LABEL name="helics.apps"
+LABEL org.helics.description="HELICS applications"
+LABEL org.helics.vcs-ref=$GIT_COMMIT
+LABEL org.helics.vcs-url="https://github.com/GMLC-TDC/helics"
+LABEL version="2.5.1"
+
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/develop/helics-install /usr
