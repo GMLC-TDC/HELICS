@@ -1,6 +1,6 @@
 exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
 repos:
-- repo: github.com/jumanjihouse/pre-commit-hooks
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
   rev: 2.0.2
   hooks:
   - id: markdownlint
