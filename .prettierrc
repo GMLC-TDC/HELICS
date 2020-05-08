@@ -1,0 +1,8 @@
+{
+  "overrides": [
+    {
+      "files": ["*.json","*.JSON"
+      "options": { "parser": "json5" }
+    }
+  ]
+}
