@@ -81,7 +81,7 @@
           level: "error"
           message: "No tag is used"
           description: "lorem ipsum tar"
-          reference_url: 
+          reference_url:
             - "https://docs.docker.com/engine/reference/builder/"
             - "#from"
     MAINTAINER:
@@ -96,7 +96,7 @@
           level: "warn"
           message: "yum clean all is not used"
           description: "the yum cache will remain in this layer making the layer unnecessarily large"
-          reference_url: 
+          reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
         - 
@@ -141,7 +141,7 @@
           level: "info"
           message: "apt-get clean is not used"
           description: "the apt-get cache will remain in this layer making the layer unnecessarily large"
-          reference_url: 
+          reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
         -
@@ -150,7 +150,7 @@
           level: "warn"
           message: "a privileged run container is allowed access to host devices"
           description: "Does this run need to be privileged?"
-          reference_url: 
+          reference_url:
             - "http://docs.docker.com/engine/reference/run/#"
             - "runtime-privilege-and-linux-capabilities"
         -
@@ -160,7 +160,7 @@
           message: "installing SSH in a container is not recommended"
           description: "Do you really need SSH in this image?"
           reference_url: "https://github.com/jpetazzo/nsenter"
-        - 
+        -
           label: "no_ampersand_usage"
           regex: / ; /
           level: "info"
