@@ -75,7 +75,7 @@
     FROM:
       paramSyntaxRegex: /^[\w./\-:]+(:[${}\w.]+)?(-[${}\w.]+)?( as \w+)?$/i
       rules:
-        - 
+        -
           label: "no_tag"
           regex: /^[:]/
           level: "error"
@@ -90,7 +90,7 @@
     RUN:
       paramSyntaxRegex: /.+/
       rules:
-        - 
+        -
           label: "no_yum_clean_all"
           regex: /yum(?!.+clean all|.+\.repo|-config|\.conf)/
           level: "warn"
@@ -132,7 +132,7 @@
           level: "warn"
           message: "gem cleanup all is not used"
           description: "the gem cache will remain in this layer making the layer unnecessarily large"
-          reference_url: 
+          reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
         -
