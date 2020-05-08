@@ -44,11 +44,11 @@ ARG GIT_COMMIT=unspecified
 
 LABEL maintainer="helicsdevelopers@helics.org"
 
-LABEL org.helics.name="helics.apps"
+LABEL name="helics.apps"
 LABEL org.helics.description="HELICS applications"
 LABEL org.helics.vcs-ref=$GIT_COMMIT
 LABEL org.helics.vcs-url="https://github.com/GMLC-TDC/helics"
-LABEL org.helics.version="2.5.1"
+LABEL version="2.5.1"
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/develop/helics-install /usr
