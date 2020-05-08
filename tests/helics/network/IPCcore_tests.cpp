@@ -99,7 +99,7 @@ TEST(IPCCore, ipcComm_transmit_through)
         act2 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on eachother in this case
+    // need to launch the connection commands at the same time since they depend on each other in this case
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect();
@@ -157,7 +157,7 @@ TEST(IPCCore, ipcComm_transmit_add_route)
         act3 = m;
     });
     std::this_thread::sleep_for(100ms);
-    // need to launch the connection commands at the same time since they depend on eachother in this case
+    // need to launch the connection commands at the same time since they depend on each other in this case
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect();

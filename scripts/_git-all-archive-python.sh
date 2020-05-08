@@ -13,7 +13,7 @@ set -C # noclobber
 #
 # installing github for python
 
-usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- archive and upload source tarbal to github
+usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- archive and upload source tarball to github
 where:
     -h  show this help text
     -t  source code tag (v2.1.1)

@@ -86,7 +86,7 @@ Naming Conventions
     const char *helicsGetVersion ();
     ```
 
-8)  All cmake commmands (those defined in cmake itself) should be lower case
+8)  All cmake commands (those defined in cmake itself) should be lower case
 
     ``` cmake
     if as opposed to IF

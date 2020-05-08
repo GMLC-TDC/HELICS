@@ -19,5 +19,5 @@ Timeout
         or '45ms'. Default unit is ms.
 
 --errortimeout <time(ms)>::
-        Time to wait after an error has occured before disconnecting. Can be entered as a time like '10s'
+        Time to wait after an error has occurred before disconnecting. Can be entered as a time like '10s'
         or '45ms'. Default unit is ms.

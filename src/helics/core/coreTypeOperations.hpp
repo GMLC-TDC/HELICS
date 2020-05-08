@@ -30,10 +30,10 @@ helics::core_type::unrecognized if the type is not valid
  */
     bool isCoreTypeAvailable(core_type type) noexcept;
 
-    /** check if two data types are compatible with eachother
+    /** check if two data types are compatible with each other
 @param type1 the first type to match
 @param type2 the second type to check
-@return true if the types are compatible with eachother
+@return true if the types are compatible with each other
 */
     bool matchingTypes(const std::string& type1, const std::string& type2);
 }  // namespace core

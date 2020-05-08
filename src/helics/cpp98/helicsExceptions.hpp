@@ -18,7 +18,7 @@ namespace helicscpp {
 /** defining an exception class for helics errors*/
 class HelicsException: public std::runtime_error {
   public:
-    /** constructor for the exeception
+    /** constructor for the exception
     @param error_code an integer code of the error
     @param error_string a string describing the error
     */

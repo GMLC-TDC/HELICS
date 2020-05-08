@@ -14,7 +14,7 @@ This being said, coupling these simulators together effectively can be summarize
 1. Maintaining synchronization of all the simulator instances running
 2. Facilitating the data transfer between them
 
-Maintaining synchronization is required when working in a heterogenous simulation environment where each simulator's concept of time is different and the computation time required by each simulator instance can vary widely. Without the regulation of the universal co-simulation time, individual simulator instances could easily run ahead of the rest, simulating days and weeks ahead of the others.
+Maintaining synchronization is required when working in a heterogeneous simulation environment where each simulator's concept of time is different and the computation time required by each simulator instance can vary widely. Without the regulation of the universal co-simulation time, individual simulator instances could easily run ahead of the rest, simulating days and weeks ahead of the others.
 
 And when one simulator instance is simulating one week ahead of the others, it becomes impossible for the results from that simulation to affect the rest of the simulator instances; the values it passes and receive are literally from a different point in time then the rest and are effectively meaningless. Without the synchronization of time, there is not way for the simulator instances to affect each other and without this interaction, the results of the co-simulation are meaningless.
 

@@ -113,7 +113,7 @@ def main():
 
     Example:
         . to clone a repository found in current directory
-           > git-all-archive.py   [will archive the curent tag found in current repository]\n
+           > git-all-archive.py   [will archive the current tag found in current repository]\n
         . To clone HELICS repository for version v2.1.1
            > git-all-archive.py --clone https://github.com/GMLC-TDC/HELICS.git --tag v2.1.1\n
         . To upload the binary file to a release you can used <GIT_TOKEN> created in your repository setup.
@@ -213,8 +213,8 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    # You can push the tarbal in any release tag
-    # By deafult use the HELICSTAG
+    # You can push the tarball in any release tag
+    # By default use the HELICSTAG
     if RELEASE is None:
         RELEASE = HELICSTAG.name
 

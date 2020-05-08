@@ -23,7 +23,7 @@
   "publications": [
     {
       "key": "pub1", // the name of the publication
-      "type": "double", // the type assocaited with a publication (optional)
+      "type": "double", // the type associated with a publication (optional)
       "unit": "m", // the units associated with a publication (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
       "info": "this is an information string for use by the application",
@@ -31,7 +31,7 @@
     },
     {
       "key": "pub2", // the name of the publication
-      "type": "double", // the type assocaited with a publication (optional)
+      "type": "double", // the type associated with a publication (optional)
       //no global:true implies this will have the federate name prepended like valueFed/pub2
       "alias": "primary"
     }

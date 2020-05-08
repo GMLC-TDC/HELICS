@@ -120,7 +120,7 @@ if isempty(hasDataRead)
    %if isWIN
    %   Show a warning, if the slower Matlab version is used - commented, because
    %   this is not a problem and it might be even useful when the MEX-folder is
-   %   not inlcuded in the path yet.
+   %   not included in the path yet.
    %   warning('JSimon:GetFullPath:NoMex', ...
    %      ['GetFullPath: Using slow Matlab-version instead of fast Mex.', ...
    %       char(10), 'Compile: InstallMex GetFullPath.c']);
