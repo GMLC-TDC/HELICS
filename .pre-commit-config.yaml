@@ -1,5 +1,9 @@
 exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
 repos:
+- repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+  rev: v1.1.1
+  hooks:
+  - id: dockerfile_lint
 - repo: https://github.com/psf/black
   rev: 19.10b0
   hooks:
