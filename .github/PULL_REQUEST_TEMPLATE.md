@@ -6,5 +6,6 @@ If appropriate, fill in the following sections. Please tag linked issues. e.g. T
 If merged this pull request will
 
 ### Proposed changes
+
 <!-- Describe the highlights of the proposed changes here -->
 -
