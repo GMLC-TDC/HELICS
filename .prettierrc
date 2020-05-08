@@ -3,6 +3,12 @@
   {
       "files": ".prettierrc",
       "options": { "parser": "json" }
+    },
+    {
+      "files": ["*.yml", "*.yaml","*.YML", "*.YAML"],
+      "rules": {
+        "quotes": ["error", "single"]
+      }
     }
   ]
 }
