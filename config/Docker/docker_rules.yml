@@ -72,9 +72,9 @@
                - "http://docs.projectatomic.io/container-best-practices/#"
                - "_recommended_labels_for_your_project"
 
-    FROM: 
+    FROM:
       paramSyntaxRegex: /^[\w./\-:]+(:[${}\w.]+)?(-[${}\w.]+)?( as \w+)?$/i
-      rules: 
+      rules:
         - 
           label: "no_tag"
           regex: /^[:]/
@@ -84,12 +84,12 @@
           reference_url: 
             - "https://docs.docker.com/engine/reference/builder/"
             - "#from"
-    MAINTAINER: 
+    MAINTAINER:
       paramSyntaxRegex: /.+/
       rules: []
-    RUN: 
+    RUN:
       paramSyntaxRegex: /.+/
-      rules: 
+      rules:
         - 
           label: "no_yum_clean_all"
           regex: /yum(?!.+clean all|.+\.repo|-config|\.conf)/
@@ -105,7 +105,7 @@
           level: "info"
           message: "updating the entire base image may add unnecessary size to the container"
           description: "update the entire base image may add unnecessary size to the container"
-          reference_url: 
+          reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
         -
@@ -114,7 +114,7 @@
           level: "warn"
           message: "dnf clean all is not used"
           description: "the dnf cache will remain in this layer making the layer unnecessarily large"
-          reference_url: 
+          reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
         -
@@ -123,7 +123,7 @@
           level: "warn"
           message: "rvm cleanup is not used"
           description: "the rvm cache will remain in this layer making the layer unnecessarily large"
-          reference_url: 
+          reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "_clear_packaging_caches_and_temporary_package_downloads"
         -
@@ -134,7 +134,7 @@
           description: "the gem cache will remain in this layer making the layer unnecessarily large"
           reference_url: 
             - "http://docs.projectatomic.io/container-best-practices/#"
-            - "_clear_packaging_caches_and_temporary_package_downloads" 
+            - "_clear_packaging_caches_and_temporary_package_downloads"
         -
           label: "no_apt-get_clean"
           regex: /apt-get install(?!.+clean)/g
@@ -143,7 +143,7 @@
           description: "the apt-get cache will remain in this layer making the layer unnecessarily large"
           reference_url: 
             - "http://docs.projectatomic.io/container-best-practices/#"
-            - "_clear_packaging_caches_and_temporary_package_downloads" 
+            - "_clear_packaging_caches_and_temporary_package_downloads"
         -
           label: "privileged_run_container"
           regex: /privileged/
@@ -159,7 +159,7 @@
           level: "warn"
           message: "installing SSH in a container is not recommended"
           description: "Do you really need SSH in this image?"
-          reference_url: "https://github.com/jpetazzo/nsenter"	
+          reference_url: "https://github.com/jpetazzo/nsenter"
         - 
           label: "no_ampersand_usage"
           regex: / ; /
@@ -169,15 +169,15 @@
           reference_url:
             - "http://docs.projectatomic.io/container-best-practices/#"
             - "#_using_semi_colons_vs_double_ampersands"
-    EXPOSE: 
+    EXPOSE:
       paramSyntaxRegex: /^[\d-\s\w/\\]+$/
       rules: []
-    ENV: 
+    ENV:
       paramSyntaxRegex: /^[\w-$/\\=\"[\]{}@:,'`\t. ]+$/
       rules: []
-    ADD: 
+    ADD:
       paramSyntaxRegex: /^~?([\w-.~:/?#\[\]\\\/*@!$&'()*+,;=.{}"]+[\s]*)+$/
-    COPY: 
+    COPY:
       paramSyntaxRegex: /.+/
       rules: []
     ENTRYPOINT:
@@ -186,13 +186,13 @@
     VOLUME:
       paramSyntaxRegex: /.+/
       rules: []
-    USER: 
+    USER:
       paramSyntaxRegex: /^[a-z0-9_][a-z0-9_-]{0,40}$/
       rules: []
-    WORKDIR: 
+    WORKDIR:
       paramSyntaxRegex: /^~?[\w\d-\/.{}$\/:]+[\s]*$/
       rules: []
-    ONBUILD: 
+    ONBUILD:
       paramSyntaxRegex: /.+/
       rules: []
   required_instructions:
