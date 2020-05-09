@@ -12,7 +12,6 @@ Good places to start include:
 [C++ Example](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/cpp/valueFederate1/valueFed.cpp)
 [Matlab Example](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/matlab/pi-exchange)
 
-
 ### Running a simple player recorder example
 
 1.  Open three terminal windows

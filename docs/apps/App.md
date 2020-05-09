@@ -1,5 +1,4 @@
-helics_app
-=======
+# helics_app
 
 The HELICS apps executable is one of the HELICS apps available with the library
 Its purpose is to provide a common executable for running any of the other as
@@ -36,7 +35,7 @@ The additional purpose is used as a library object as the basis for additional d
 #### Source
 
 The [Source](Source.html) app is a signal generator like the player except that is can generate signals from defined patterns including some random signals in value and timing, and other patterns like sine, square wave, ramps
-and others.  Used much like the player in situations some test signals are needed.
+and others. Used much like the player in situations some test signals are needed.
 
 #### Broker
 
@@ -44,8 +43,8 @@ The [Broker](Broker.html) executes a broker like the stand alone Broker app, it 
 
 #### Clone
 
-The [Clone](Clone.html) has the ability to copy another federate and record it to a file that can be used by a Player.  It will duplicate all publications and subscriptions of a federate.
+The [Clone](Clone.html) has the ability to copy another federate and record it to a file that can be used by a Player. It will duplicate all publications and subscriptions of a federate.
 
 #### MultiBroker
 
-The Multibroker is an in progress development of a broker that can interact with multiple communication modes.  Such as a single broker that can act as a bridge between MPI and ZeroMQ or other network protocols.  More documentation will be available as the multibroker is developed
+The Multibroker is an in progress development of a broker that can interact with multiple communication modes. Such as a single broker that can act as a bridge between MPI and ZeroMQ or other network protocols. More documentation will be available as the multibroker is developed

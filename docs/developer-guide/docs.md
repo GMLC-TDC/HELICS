@@ -1,11 +1,10 @@
-Generating Documentation
-========================
+# Generating Documentation
 
 The documentation requires Pandoc to convert from Markdown to RST.
 
 You will need the following Python packages.
 
-``` {.sourceCode .bash}
+```{.sourceCode .bash}
 pip install sphinx
 pip install ghp-import
 pip install breathe

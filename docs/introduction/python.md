@@ -65,7 +65,6 @@ If done correctly, you should see an output like so:
 
 ![Python Example](../img/python-example.png)
 
-
 You should see something like the following in the PI RECEIVER window (2nd one in directions above)
 
 ```
@@ -93,7 +92,7 @@ end of master Object Holder destructor
 
 Corresponding output should appear from the PI SENDER (window 1).
 
-__Background:__ Running a HELICS federation (via low level commands) requires first starting a helics broker and then running the desired set of federates with it. In this case, the pisender starts this broker and then joins as a federate.
+**Background:** Running a HELICS federation (via low level commands) requires first starting a helics broker and then running the desired set of federates with it. In this case, the pisender starts this broker and then joins as a federate.
 
 **Tips**
 

@@ -22,7 +22,7 @@ Some basics on using the macOS Terminal (or any Unix/Linux shell) will be useful
 
 ## Setup
 
-*Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
+_Note_: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
 
 To set up your environment:
 
@@ -39,23 +39,23 @@ To set up your environment:
 3. (if needed) Setup a command-line compile environment
 
    a) Install a C++11 compiler (C++14 preferred). e.g. `clang`
-      from the Xcode command line tools. These can be installed
-      from the command line in Terminal by typing
-      `xcode-select --install` and following the on-screen
-      prompts.
+   from the Xcode command line tools. These can be installed
+   from the command line in Terminal by typing
+   `xcode-select --install` and following the on-screen
+   prompts.
    b) Install cmake with `brew install cmake`. Alternately, a DMG
-      file is available for cmake from their
-      [website](https://cmake.org/download/).
+   file is available for cmake from their
+   [website](https://cmake.org/download/).
 
 4. Install most dependencies using homebrew.
 
-    ```bash
-    brew install boost
-    brew install zeromq
-    brew install cmake
-    ```
+   ```bash
+   brew install boost
+   brew install zeromq
+   brew install cmake
+   ```
 
-5. Make sure *cmake* and *git* are available in the Command Prompt
+5. Make sure _cmake_ and _git_ are available in the Command Prompt
    with `which cmake` and `which git` If they aren't, add them to the
    system PATH variable.
 
@@ -65,12 +65,12 @@ Getting and building from source:
 2. Create a build folder. Run cmake and give it the path that HELICS
    was checked out into.
 
-    ```bash
-    git clone https://github.com/GMLC-TDC/HELICS
-    cd HELICS
-    mkdir build
-    cd build
-    ```
+   ```bash
+   git clone https://github.com/GMLC-TDC/HELICS
+   cd HELICS
+   mkdir build
+   cd build
+   ```
 
 ## Compile and Install
 
@@ -181,7 +181,6 @@ boost.org website.
 In the following example we are doing to use [boost v1.69.0](http://www.boost.org/users/history/version_1_69_0.html)
 Keep in mind that your cmake version should be newer than the boost version, so if you have an older cmake you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake as well.
 
-
 Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
 ```bash
@@ -204,7 +203,6 @@ Open `project-config.jam` and changes the lines as follows:
 
 using gcc : 8.2 : /usr/local/bin/g++-8 ;
 ```
-
 
 ```
 $ ./b2
@@ -277,7 +275,6 @@ and running
 Note: See [https://github.com/GMLC-TDC/HELICS/issues/763](https://github.com/GMLC-TDC/HELICS/issues/763) if your installation doesn't point the dylib to the correct location.
 
 </div>
-
 
 You can run the following in two separate windows to test an example from the following repository:
 

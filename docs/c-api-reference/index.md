@@ -1,7 +1,4 @@
-
 # C API Reference
-
-
 
 ```eval_rst
 

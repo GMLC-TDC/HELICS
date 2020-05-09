@@ -1,7 +1,7 @@
 # Federate Timing
 
 Time control in a federation is handled via `timeController` objects in each
-Federate and Core.  This allows Federation timing to be handled in a distributed
+Federate and Core. This allows Federation timing to be handled in a distributed
 fashion and each federate can tune the timing in a way that is appropriate for the
 Federate.
 
@@ -13,7 +13,7 @@ in a federate.
 ### Period and Offset
 
 The period and offset of a Federate determine the allowable times which a federate
-may grant.  All granted times for a federate will be in accordance with the following:
+may grant. All granted times for a federate will be in accordance with the following:
 
 ```
 T=n*Period+offset
@@ -21,7 +21,7 @@ T=n*Period+offset
 
 With the exception that all federates are granted time=0 when entering execution mode.
 `n` can be 0 so if the offset is greater than 0 then the first granted time will T=offset.
-The default values for both period and offset are 0.  Offset can be set to a value bigger than the
+The default values for both period and offset are 0. Offset can be set to a value bigger than the
 period if a federate wishes to skip ahead and ignore transients or other updates going on in the first
 part of a co-simulation.
 
@@ -43,7 +43,7 @@ Basically all values and signals are only acknowledged in the timing calculation
 ### Output Delay
 
 The output delay is symmetrical to the input delay.
-Except it applies to all outgoing messages.  Basically once a time is granted the federate cannot effect other federates until `T+outputDelay`.
+Except it applies to all outgoing messages. Basically once a time is granted the federate cannot effect other federates until `T+outputDelay`.
 
 #### rt_lag
 
@@ -77,17 +77,17 @@ Should be set to true for federates that support rollback
 ### only_update_on_change
 
 If set to true a federate will only trigger a value update if the value has actually changed on a granted time.
-Change is defined as binary equivalence,  Subscription objects can be used for numerical limits and other change detection.
+Change is defined as binary equivalence, Subscription objects can be used for numerical limits and other change detection.
 
 ### only_transmit_on_change
 
-If set to true a federate will only transmit publishes if the value has changed.  Change is defined as binary equivalence.
+If set to true a federate will only transmit publishes if the value has changed. Change is defined as binary equivalence.
 If numerical deltas and ranges are desired use Publication objects for finer grained control.
 This flag applies federate wide.
 
 ### wait_for_current_time_update
 
-If set to true a federate will wait on the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it.  If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.
+If set to true a federate will wait on the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it. If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.
 
 ### realtime
 
@@ -97,4 +97,5 @@ If the federate is running slower than real time this will cause a force grant, 
 `rt_lag` can be set to maxVal to disable force grant
 
 ### restrictive-time-policy
-Using the option `restrictive-time-policy` forces HELICS to use a fully conservative mode in granting time.  This can be useful in situations beyond the current reach of the distributed time algorithms.  It is generally used in cases where it is known that some federate is executing and will trigger someone else, but most federates won't know who that might be.  This prevents extra messages from being sent and a potential for time skips.  It is not needed if some federates are periodic and execute every time step.  It is currently only used in few benchmarks using peculiar configurations.  The flag can be used for federates and for brokers and cores to force very conservative timing.
+
+Using the option `restrictive-time-policy` forces HELICS to use a fully conservative mode in granting time. This can be useful in situations beyond the current reach of the distributed time algorithms. It is generally used in cases where it is known that some federate is executing and will trigger someone else, but most federates won't know who that might be. This prevents extra messages from being sent and a potential for time skips. It is not needed if some federates are periodic and execute every time step. It is currently only used in few benchmarks using peculiar configurations. The flag can be used for federates and for brokers and cores to force very conservative timing.

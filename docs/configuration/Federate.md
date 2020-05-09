@@ -11,9 +11,10 @@ This name is prepended for any local interfaces.
 ## Core information
 
 Certain information is used by the federate to establish linkages to a core object this.
+
 ### Core name
 
- the corename identifies a potentially preexisting core in the same process that can be used
+the corename identifies a potentially preexisting core in the same process that can be used
 or just names the created core.
 
 ### Core type
@@ -24,7 +25,6 @@ See [Core Types](CoreTypes) for more details on the specific types of cores whic
 
 The core init string is a string used by any created core to establish connectivity with a broker.
 This includes port numbers, addresses, and the minimum number of federates. This is usually entered as a string containing command line arguments such as `"--timeout=2s --broker 192.168.2.1"`
-
 
 ## Timing information
 
@@ -38,10 +38,10 @@ The interfaces (Publications, Subscriptions, Endpoints, and a Filters) are how a
 These can be set up through API calls or through Configuration Files
 Json files can also contain information for the FederateInfo structure including timing and connectivity information
 
-The specific different kinds of Federates define the patterns for different elements.  ValueFederates define the interfaces for publications and Input mechanisms.
+The specific different kinds of Federates define the patterns for different elements. ValueFederates define the interfaces for publications and Input mechanisms.
 MessageFederates define interfaces for endpoints and the basic Federate contains API's for interacting with Filters
 
-Filters can be configured via files the following is an example of a JSON file.  TOML configuration files are also supported. You can find [examples here](https://github.com/GMLC-TDC/HELICS-Examples/tree/bdbdf4/example_files)
+Filters can be configured via files the following is an example of a JSON file. TOML configuration files are also supported. You can find [examples here](https://github.com/GMLC-TDC/HELICS-Examples/tree/bdbdf4/example_files)
 
 ```
 

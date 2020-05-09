@@ -3,49 +3,63 @@
 The HELICS repository has a few benchmarks that are intended to test various aspects of the code and record performance over time
 
 ## Baseline benchmarks
+
 These benchmarks run on a single machine using Google Benchmarks and are intended to test various aspects of HELICS over a range of spaces applicable to a single machine.
 
 ### ActionMessage
+
 Micro-benchmarks to test some operations concerning the serialization of the underlying message structure in HELICS
 
 ### Conversion
+
 Micro-benchmarks to test the serialization and deserialization of common data types in HELICS
 
 ## Simulation Benchmarks
 
 ### Echo
+
 A set of federates representing a hub and spoke model of communication for value based interfaces
 
 ### Echo_c
+
 A set of federates representing a hub and spoke model of communication for value based interfaces using the C shared library.
 
 ### Echo Message
+
 A set of federates representing a hub and spoke model of communication for message based interfaces
 
 ### Filter
+
 A variant of the Echo message test that add filters to the messages
 
 ### Ring Benchmark
+
 A ring like structure that passes a value token around a bunch of times
 
 ### Ring Message Benchmark
+
 A ring like structure that passes a message token around a bunch of times.
 
 ### Timing Benchmark
+
 Similar to echo but doesn't actually send any data just pure test of the timing messages
 
 ## Message Benchmarks
+
 Benchmarks testing various aspects of the messaging structure in HELICS
 
 ### MessageLookup
+
 Benchmarks sends messages to random federates, varying the total number of interfaces and federates.
 
 ### MessageSend
+
 Sending messages between 2 federates varying the message size and count per timing loop.
 
 ## Standardized Tests
 
 ### PHold
+
 A standard PHOLD benchmark varying the number of federates.
 
 ## Multinode Benchmarks
