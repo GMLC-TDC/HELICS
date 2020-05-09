@@ -10,7 +10,7 @@ If the project is in Python, Matlab, Java, C#, Octave, or Julia, the language bi
 
 The C based shared library is the way to go. Either link with helicsSharedLib.lib/so/dylib and add the include directory containing a helics folder or link the CMake target HELICS\::helicsSharedLib.
 
-## C\++98 or C\++03.
+## C\++98 or C\++03
 
 Then linking with the C shared library and using the C++98 header only wrapper is the most appropriate choice. The CMake target HELICS\::helicsCpp98 can be used if using CMake.
 

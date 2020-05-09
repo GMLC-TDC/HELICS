@@ -1,6 +1,7 @@
 ---
 title: Specification document for TDC co-simulation tool
 author:
+
   - name: Phil Top
     membership: Lawrence Livermore National Laboratory
     email:
@@ -13,6 +14,7 @@ author:
   - name: Dheepak Krishnamurthy
     membership: National Renewable Energy Laboratory
     email: dheepak.krishnamurthy@nrel.gov
+
 date: May 12, 2017
 abstract: TDC Specification document describing philosophy, layers, APIs, testing requirements, etc.
 version: 0.4.0
@@ -174,7 +176,6 @@ While the co-simulation environment will support any simulation element that mee
 
 1.  General purpose, including HLA and FMI interface standards.
 2.  TDC optimized for common TDC application types:
-
     - _Transmission Simulator_
     - _Distribution Simulator_
     - _Communication Simulator_
@@ -190,7 +191,7 @@ As such the configurations here can in some cases be mixed and matched, for inst
 
 Note: in each group, a \* is used to indicate the configurations (proposed) to be built out first. These are defined in more detail below.
 
-- #### Multiple Power-flows:
+#### Multiple Power-flows
 
   Many configurations: T+D, T+D, D+D, resulting in many combinations First distinguished as **single-pass vs reiterative**, and further distinguished by the type of power flow interface presented:
 

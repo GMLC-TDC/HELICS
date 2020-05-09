@@ -11,7 +11,7 @@ not match nameless publications or filters.
 
 ## Command line arguments
 
-```
+```text
 Helics Clone App
 Usage: helics_app clone [OPTIONS]
 
@@ -36,7 +36,7 @@ also permissible are all arguments allowed for federates and any specific broker
 
 the clone app is accessible through the helics_app
 
-```
+```bash
 helics_app clone fed1 -o fed1.json -stop 10
 ```
 
