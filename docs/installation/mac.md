@@ -272,7 +272,7 @@ and running
 
 <div class="admonition note">
 
-Note: See [https://github.com/GMLC-TDC/HELICS/issues/763/](https://github.com/GMLC-TDC/HELICS/issues/763/), if your installation doesn't point the dylib to the correct location.
+Note: See [Helics issue #763](https://github.com/GMLC-TDC/HELICS/issues/763/), if your installation doesn't point the dylib to the correct location.
 
 </div>
 
