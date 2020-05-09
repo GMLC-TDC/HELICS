@@ -24,7 +24,7 @@ Please provide a minimal working example of the bug if possible.
 - what compiler or setup process did you use
 - HELICS version: <!-- 1.3.0 (07-31-18) -->
 
-```
+```bash
 $ helics_app --version
 ```
 

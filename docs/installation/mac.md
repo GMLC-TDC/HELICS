@@ -127,13 +127,13 @@ Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a
 
 If it does not, you should install MATLAB and add the path to all the MATLAB binaries to your PATH.
 
-```
+```bash
 export PATH="/Applications/MATLAB_R2017b.app/bin/:$PATH"
 ```
 
 </div>
 
-```
+```bash
 git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
@@ -190,7 +190,7 @@ $ ./bootstrap.sh --prefix=/ --prefix=$HOME/local/boost-gcc-1.69.0
 
 Open `project-config.jam` and changes the lines as follows:
 
-```
+```bash
 # Compiler configuration. This definition will be used unless
 # you already have defined some toolsets in your user-config.jam
 # file.
@@ -204,7 +204,7 @@ Open `project-config.jam` and changes the lines as follows:
 using gcc : 8.2 : /usr/local/bin/g++-8 ;
 ```
 
-```
+```bash
 $ ./b2
 $ ./b2 install
 $ # OR
@@ -260,7 +260,7 @@ To run the MATLAB HELICS extension, one would have to load the `helicsSharedLib`
 This is run by the `helicsStartup` function in the generated MATLAB files.
 You can test this by opening MATLAB from the terminal or using the icon.
 
-```
+```bash
 /Applications/MATLAB_R2017b.app/bin/matlab -nodesktop -nosplash -nojvm
 ```
 
@@ -272,13 +272,13 @@ and running
 
 <div class="admonition note">
 
-Note: See [https://github.com/GMLC-TDC/HELICS/issues/763](https://github.com/GMLC-TDC/HELICS/issues/763) if your installation doesn't point the dylib to the correct location.
+Note: See <https://github.com/GMLC-TDC/HELICS/issues/763> if your installation doesn't point the dylib to the correct location.
 
 </div>
 
 You can run the following in two separate windows to test an example from the following repository:
 
-```
+```bash
 git clone https://github.com/GMLC-TDC/HELICS-examples
 ```
 

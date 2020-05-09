@@ -125,8 +125,8 @@ The following layers will be defined in the TDC co-simulation tool.
 
 For each layer, the following are described
 
-    - API
-    - Testing Specification
+- API
+- Testing Specification
 
 ## User Interface
 
@@ -172,12 +172,13 @@ Additionally, the first time a scenario or use case is created is the most diffi
 
 While the co-simulation environment will support any simulation element that meets the minimum requirements, it is envisioned many TDC applications will rely heavily on a common style of simulators. As a result we will define two classes of simulator interfaces:
 
-1. General purpose, including HLA and FMI interface standards.
-2. TDC optimized for common TDC application types:
-   - _Transmission Simulator_
-   - _Distribution Simulator_
-   - _Communication Simulator_
-   - _Market Simulator_
+1.  General purpose, including HLA and FMI interface standards.
+2.  TDC optimized for common TDC application types:
+
+    - _Transmission Simulator_
+    - _Distribution Simulator_
+    - _Communication Simulator_
+    - _Market Simulator_
 
 The lower-level details of these interfaces are defined in the "Application" Section below; however, this section provides two key extensions: standardized data exchange patterns (variable naming, types, timing/synchronization, etc.) and a higher-level API for certain common operations.
 
@@ -407,12 +408,12 @@ Only available in operation mode (currently based on FNCS model)
 
 a different option might be to have the time advancement be callback based in which case the API would be responsible for calling the federate function call to advance in time when appropriate.
 
-### Packet Based API
+#### Packet Based API
 
 I propose a separate interface for communication messages
 Basically data packets. What I would ideally want is a system that routed specific data packets through a comm system model if one were present and just delivered them if one wasn’t. The applications shouldn’t care what if any communication system model was present or not. This means that the power system model should not have to be aware of the communication system model and directly send data to and from it. It should be automatically routed through the appropriate communication system. This implies that the setup for a communication system will have to declare which federates it links with. Some mechanics of cross comm system linking will also need to be worked out but that is at a lower level. These functions should only work in operation mode. These packets will need to be buffered.
 
-#### Federate Management
+##### Federate Management
 
 - register(simConfiguration) --simConfiguration should be structure describing the simulator properties and capabilities, this should be able to be an object or file name containing the description in some format.
   Borrowing ideas from FMI the objects are in a couple different states (startup, initialization, continuous, event, error, terminate). I would propose reducing this to 4 (startup, initialization, operation, finalize), may be want the error state as well. Certain functions then only work in certain modes
@@ -426,7 +427,7 @@ Basically data packets. What I would ideally want is a system that routed specif
 - terminate() -- the result should depend on the type of simulation, an observation only federate should have no impact on the overall simulation.
 - error() -- the federate encountered an error and cannot continue
 
-#### message exchange interface
+##### message exchange interface
 
 - Transmit(source, destination, data, datalength) -destination could be inside the same or different federate.
 - packetCount(destination) --return the number of packets available.
@@ -434,11 +435,11 @@ Basically data packets. What I would ideally want is a system that routed specif
 
 We may want to allow the ability to specify a callback here to be called on packet arrival?
 
-### Packet Filter API
+#### Packet Filter API
 
 The means by which a comm simulation interacts with the other types of simulations is not clear cut, there are timing issues and delays and packet translation an other issues which get awkward if they are not designed in. In the cosimulation framework there is a need for simulating direct physical connections with real values passed back and forth, and those same simulations interact with the digital world translating between physical phenomenon and digital communications, and still others types of federates that interact purely in the digital communication world. This separations of purpose lead to the concept of a separation of functionality to better tune the interface to correspond to the physical world. So In addition to the value based interface and a packet based interface we add a third interface intended to operate on packets, for translating, manipulating, or delaying them.
 
-#### Federate Management
+##### Federate Management
 
 - register(simConfiguration) --simConfiguration should be structure describing the simulator properties and capabilities, this should be able to be an object or file name containing the description in some format.
   Borrowing ideas from FMI the objects are in a couple different states (startup, initialization, continuous, event, error, terminate). I would propose reducing this to 4 (startup, initialization, operation, finalize), may be want the error state as well. Certain functions then only work in certain modes
@@ -452,11 +453,10 @@ The means by which a comm simulation interacts with the other types of simulatio
 NAMESPACE is a flag either GLOBAL or LOCAL Endpoints must be unique in the given namespace, GLOBAL is across the entire cosimulation, LOCAL is within the federate. userType is a user defined string nameing the type of packets that this endpoint generates or receives it should be optional and meant to aid in type checking, if included additional error checking should be included.
 
 - RegisterDestFilter(destEndpoint, inputType) destEndpoint is a named dest endpoint to filter packats before sending to the destination, it can be from a packet generation API or packate filter API
+- terminate() -- the result should depend on the type of simulation, an observation only federate should have no impact on the overall simulation.
+- error() -- the federate encountered an error and cannot continue
 
-* terminate() -- the result should depend on the type of simulation, an observation only federate should have no impact on the overall simulation.
-* error() -- the federate encountered an error and cannot continue
-
-#### message exchange interface
+##### message exchange interface
 
 - Transmit(source, origSource, destination, data, datalength,delay\*) -destination could be inside the same or different federate. optional delay
 - packetCount(destination) --return the number of packets available.

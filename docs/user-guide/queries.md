@@ -232,7 +232,7 @@ This call returns a `query_id_t` that can be use in `queryComplete` and `isQuery
 
 In the header [`<helics\queryFunctions.hpp>`](../doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
-### C-api and interface API's.
+### C-api and interface API's
 
 Queries in the C api work similarly but the mechanics are different.
 The basic operation is to create a query using [`helicsQueryCreate(target,query)`](../doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)

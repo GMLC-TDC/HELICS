@@ -40,13 +40,13 @@ NOTE: these levels currently correspond to (-1 through 7) but this may change in
 
 Lines will often look like
 
-```
+```text
 echo1 (131072) (0)::Time mismatch detected granted time >requested time 5.5 vs 5.0
 ```
 
 or
 
-```
+```text
 commMessage||26516-enRPa-PzaBB-ZG190-lj14t:got new broker information
 ```
 

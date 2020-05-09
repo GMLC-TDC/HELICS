@@ -6,7 +6,7 @@ Mainly for testing and demos
 
 ## Command line arguments
 
-```
+```text
 allowed options:
 
 command line only:
@@ -51,7 +51,7 @@ also permissible are all arguments allowed for federates and any specific broker
 
 the echo executable also takes an untagged argument of a file name for example
 
-```
+```bash
 helics_app echo echo_file.txt --stop 5
 ```
 

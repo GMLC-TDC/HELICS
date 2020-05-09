@@ -32,7 +32,7 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 Though contained here in this section on value federates, the options below are applicable to both value and message federates. As value federates are the more common type, we've put them here.
 
-```
+```json
 {
     ...
     "name":"generic_federate",
@@ -46,7 +46,7 @@ Though contained here in this section on value federates, the options below are 
 
 ### Value Federate Data Exchange Options
 
-```
+```json
 {
     ...
     "only_update_on_change":false, //indicator that the federate should only indicate updated values on change
@@ -67,7 +67,7 @@ Though contained here in this section on value federates, the options below are 
 
 ### Value Federate Interface Configuration
 
-```
+```json
 {
      "publications" : [
           {
@@ -122,9 +122,9 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
 2.  [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
 3.  [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
 
-        * matplotlib
-        * time
-        * logging
+    - matplotlib
+    - time
+    - logging
 
 4.  [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
 5.  [helics_cli](https://github.com/GMLC-TDC/helics-cli) - `pip install git+git://github.com/GMLC-TDC/helics-cli.git@master`
@@ -145,7 +145,7 @@ In this particular case, the Python script executing the transmission model also
 
 To run this simulation, the HELICS team has also developed an application called `helics_cli` (command line interface) which, among other uses, creates a standardized means of launching co-simulations. The application can be downloaded from the [helics_cli repository](https://github.com/GMLC-TDC/helics-cli). Discussion of how to configure `helics_cli` for a given simulation is discussed in the [section on helics_cli](./helics_cli.md) but for all these examples, the configuration has already been done. In this case, that configuration is in the examples folder as "cosim_runner_1a.json" and looks like this:
 
-```
+```json
 {
     "broker": false,
     "federates":[

@@ -8,7 +8,7 @@ Future plans include expanding to all networking core types (ZMQ, ZMQSS, TCP, TC
 
 ## Command line arguments
 
-```
+```text
 The Broker server is a helics broker coordinator that can generate brokers on request
 Usage:helics_broker_server [OPTIONS] [config]
 
@@ -49,7 +49,7 @@ helics_broker_server server types starts a broker with the given args and waits 
 
 If the Broker_server is started with `term` as the first option, a terminal is opened for user entry of commands all command line arguments following term are passed to the broker.
 
-```
+```text
 starting broker Server
 servers started
 helics-broker-server>>help
