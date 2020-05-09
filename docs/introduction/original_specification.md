@@ -176,10 +176,10 @@ While the co-simulation environment will support any simulation element that mee
 
 1.  General purpose, including HLA and FMI interface standards.
 2.  TDC optimized for common TDC application types:
-    - _Transmission Simulator_
-    - _Distribution Simulator_
-    - _Communication Simulator_
-    - _Market Simulator_
+    - Transmission Simulator
+    - Distribution Simulator
+    - Communication Simulator
+    - Market Simulator
 
 The lower-level details of these interfaces are defined in the "Application" Section below; however, this section provides two key extensions: standardized data exchange patterns (variable naming, types, timing/synchronization, etc.) and a higher-level API for certain common operations.
 
@@ -207,9 +207,9 @@ Note: in each group, a \* is used to indicate the configurations (proposed) to b
 
   **\*Config P2—T_ps+multi-D_3ph Dynamic:** For dynamic-scale (ms time step), transient stability simulations, we have a very similar interface to QSTS, but primarily differentiated by the need to provide richer dynamic phasor and frequency data for the interface. Ideally both federates support this data with higher fidelity models, though in some cases only transmission will have full dynamics, while distribution continues to use QSTS. Here reiteration is effectively required, though an "A" suffix can be appended in the case where no-iteration is used.
 
-  **Config P3—T_3sq+multi-D_3ph QSTS[^1]:** This use case builds on recent work by Q. Huang and Vittal (2017)[^2] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
+  **Config P3—T_3sq+multi-D_3ph QSTS\[^1\]:** This use case builds on recent work by Q. Huang and Vittal (2017)\[^2\] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
 
-  **Config P4—T_3sq+multi-D_3ph Dynamic[^3]:** This use case builds on recent work by Q. Huang and Vittal (2017)[^2] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
+  **Config P4—T_3sq+multi-D_3ph Dynamic\[^3\]:** This use case builds on recent work by Q. Huang and Vittal (2017)\[^2\] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
 
   **Config P5—T_3ph+multi-D_3ph QSTS:** This configuration extends P1 to use full 3-phase simulation for the transmission system. As above the the suffix "A" indicates single pass and "B" indicates reiteration.
 
