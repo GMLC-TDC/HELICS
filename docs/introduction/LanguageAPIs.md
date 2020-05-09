@@ -1,5 +1,4 @@
-Interfacing with HELICS
-=======================
+# Interfacing with HELICS
 
 The HELICS framework allows other tool developers to add HELICS
 components to enable co-simulation. Interfacing with HELICS can be done
@@ -19,7 +18,6 @@ build interfaces in the high level programming languages listed below.
 - Java
 - Octave
 - C#
-
 
 SWIG allows cross platform support, i.e. extensions will work for
 Windows, Mac and Linux. The user does not necessarily need to install

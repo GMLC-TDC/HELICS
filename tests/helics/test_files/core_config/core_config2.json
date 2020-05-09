@@ -1,8 +1,8 @@
 {
-"core":{
-    "name":"core_name2",
-    "federates":4,
-    "autobroker":true,
-    "timeout":"2350"
-    }
+  "core": {
+    "name": "core_name2",
+    "federates": 4,
+    "autobroker": true,
+    "timeout": "2350"
+  }
 }

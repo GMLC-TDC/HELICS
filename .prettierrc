@@ -1,0 +1,21 @@
+{
+
+  "overrides": [
+  {
+      "files": ".prettierrc",
+      "options": { "parser": "json" }
+    },
+    {
+      "files": ".clang-format",
+      "options": { "parser": "yaml" }
+    },
+    {
+      "files": ".clang-tidy",
+      "options": { "parser": "yaml" }
+    },
+    {
+      "files": "*.yml",
+      "options": { "parser": "yaml", "singleQuote": true }
+    }
+  ]
+}

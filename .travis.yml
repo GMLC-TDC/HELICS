@@ -25,29 +25,29 @@ env:
 
 # Create aliases for some of shared build configuration
 _basic_env:
-- &daily_linux
-  if: type = cron
-  os: linux
-  compiler: gcc
-  addons:
-    apt:
-      sources:
-        - ubuntu-toolchain-r-test
-      packages:
-        - g++-6
-        - valgrind
-        - lcov
-        - libzmq3-dev
-- &daily_osx
-  if: type = cron
-  os: osx
-  compiler: clang
-- &linux_base
-  os: linux
-  compiler: gcc
-- &osx_base
-  os: osx
-  compiler: clang
+  - &daily_linux
+    if: type = cron
+    os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-6
+          - valgrind
+          - lcov
+          - libzmq3-dev
+  - &daily_osx
+    if: type = cron
+    os: osx
+    compiler: clang
+  - &linux_base
+    os: linux
+    compiler: gcc
+  - &osx_base
+    os: osx
+    compiler: clang
 
 # Install macOS dependencies using Homebrew
 addons:
@@ -60,13 +60,13 @@ jobs:
   fast_finish: true
   allow_failures:
     - os: osx
-    - name: "Clang 5 Thread Sanitizer"
+    - name: 'Clang 5 Thread Sanitizer'
     - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
     # XCode 10.2, OS X 10.14
     - <<: *osx_base
-      name: "XCode 10.2, OS X 10.14"
+      name: 'XCode 10.2, OS X 10.14'
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
         - HOMEBREW_NO_AUTO_UPDATE=1
@@ -75,7 +75,7 @@ jobs:
 
     # XCode 9.4, OS X 10.13
     - <<: *osx_base
-      name: "XCode 9.4, macOS 10.13"
+      name: 'XCode 9.4, macOS 10.13'
       if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=94"
@@ -88,7 +88,7 @@ jobs:
           update: true
 
     - <<: *linux_base
-      name: "GCC 6"
+      name: 'GCC 6'
       addons:
         apt:
           sources:
@@ -105,7 +105,7 @@ jobs:
 
     # Clang 5 build
     - <<: *linux_base
-      name: "Clang 5"
+      name: 'Clang 5'
       compiler: clang
       addons:
         apt:
@@ -125,7 +125,7 @@ jobs:
         - CXX_STANDARD=17
 
     - <<: *linux_base
-      name: "GCC 4.9 (No SWIG, Packaging)"
+      name: 'GCC 4.9 (No SWIG, Packaging)'
       if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
       addons:
         apt:
@@ -144,7 +144,7 @@ jobs:
       after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
 
     - <<: *linux_base
-      name: "Clang 3.6"
+      name: 'Clang 3.6'
       if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
       compiler: clang
       addons:
@@ -164,7 +164,7 @@ jobs:
         - JOB_OPTION_FLAGS="-DHELICS_DISABLE_BOOST=ON"
 
     - os: windows
-      name: "MinGW"
+      name: 'MinGW'
       if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
       env:
         - DISABLE_INTERFACES="Python,Java"
@@ -182,7 +182,7 @@ jobs:
         - choco install boost-msvc-12
 
     - os: windows
-      name: "MSYS"
+      name: 'MSYS'
       if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(msys)/) OR (commit_message =~ /(msys)/)
       env:
         - DISABLE_INTERFACES="Python,Java"
@@ -209,7 +209,7 @@ jobs:
     # Daily ZMQ subproject build with new CMake
     # -----------------------------------------------
     - <<: *daily_linux
-      name: "GCC 6 (CMake 3.11.4, ZMQ Subproject)"
+      name: 'GCC 6 (CMake 3.11.4, ZMQ Subproject)'
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
@@ -223,7 +223,7 @@ jobs:
     # ------------------------------------------------
     # Valgrind build
     - <<: *daily_linux
-      name: "GCC 6 Valgrind"
+      name: 'GCC 6 Valgrind'
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
@@ -233,7 +233,7 @@ jobs:
     # Code coverage build
     - <<: *daily_linux
       if: (type = cron) OR (branch =~ /(codecov)/) OR (commit_message =~ /(codecov)/)
-      name: "GCC 6 Code Coverage"
+      name: 'GCC 6 Code Coverage'
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
@@ -288,4 +288,4 @@ script:
   - if [[ "$ENABLE_CPACK" ]]; then cpack -G STGZ -B $(pwd)/cpack-output ; fi
 
 notifications:
-    email: false
+  email: false
