@@ -31,6 +31,7 @@ The public API includes the following
   - Exceptions: Any function or method dealing with Inputs with data from multiple sources is subject to change, the vector subscriptions, and vector inputs are subject to change. The functionality related to PublishJSON is considered experimental and may change in the future. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries. The data returned via queries is subject to change, in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers.
 
 - Core library headers
+
   - Core.hpp
   - Broker.hpp
   - CoreFactory.hpp (Header is deprecated for public API in 2.3 use CoreApp instead)
