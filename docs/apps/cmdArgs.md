@@ -1,6 +1,6 @@
 # Command Line Arguments
 
-```
+```text
 allowed options:
 
 command line only:
@@ -50,9 +50,5 @@ configuration:
   --localport arg        port number for the local receive port
   --port arg             port number for the broker's port
   --portstart arg        starting port for automatic port definitions
-
-
-
-
 
 ```

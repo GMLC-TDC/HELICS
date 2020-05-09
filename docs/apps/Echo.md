@@ -1,13 +1,12 @@
-Echo
-=======
+# Echo
 
 The Echo application is one of the HELICS apps available with the library
 Its purpose is to provide a easy way to generate an echo response to a message
 Mainly for testing and demos
 
-Command line arguments
-----------
-```
+## Command line arguments
+
+```text
 allowed options:
 
 command line only:
@@ -45,12 +44,14 @@ configuration:
 
 
 ```
+
 also permissible are all arguments allowed for federates and any specific broker specified:
 
 [Command line reference](cmdArgs.html)
 
 the echo executable also takes an untagged argument of a file name for example
-```
+
+```bash
 helics_app echo echo_file.txt --stop 5
 ```
 

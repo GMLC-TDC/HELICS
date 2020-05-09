@@ -1,5 +1,4 @@
-Introduction
-============
+# Introduction
 
 ```eval_rst
 .. toctree::
