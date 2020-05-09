@@ -11,11 +11,11 @@ engines:
 languages:
 
 exclude_paths:
-  - ThirdParty/**/*
-  - ThirdParty/*
-  - config/cmake/test_compiler_cxx/**
-  - interfaces/**/*
-  - scripts/**/*
-  - scripts/*
-  - tests/csharp/*
-  - **.md
+  - 'ThirdParty/**/*'
+  - 'ThirdParty/*'
+  - 'config/cmake/test_compiler_cxx/**'
+  - 'interfaces/**/*'
+  - 'scripts/**/*'
+  - 'scripts/*'
+  - 'tests/csharp/*'
+  - '**.md'
