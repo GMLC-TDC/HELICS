@@ -15,7 +15,7 @@
     },
     {
       "files": "*.yml",
-      "singleQuote": true
+      "options": { "parser": "yaml", "singleQuote": true }
     }
   ]
 }
