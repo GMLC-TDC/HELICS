@@ -3,7 +3,7 @@
 Filters are interfaces which can modify messages including routes, destinations, times, existence, and payloads.
 This is useful for inserting communication modules into a data stream as an optional component they can also be used to clone messages and randomly drop them.
 
-### Filter Creation
+## Filter Creation
 
 Filters are registered with the core or through the application API.
 There are also Filter object that hide some of the API calls in a slightly nicer interface.
@@ -18,19 +18,19 @@ Custom filters may have input and output types associated with them.
 This is used for chaining and automatic ordering of filters.
 Filters do not have to be defined on the same core as the endpoint, and in fact can be anywhere in the federation, any messages will be automatically routed appropriately.
 
-### predefined filters
+## predefined filters
 
 Several predefined filters are available, these are parameterized so they can be tailored to suite the simulation needs
 
-#### reroute
+### reroute
 
 This filter reroutes a message to a new destination. it also has an optional filtering mechanism that will only reroute if some patterns are matching the patterns should be specified by "condition" in the set string the conditions are regular expression pattern matching strings
 
-#### delay
+### delay
 
 This filter will delay a message by a certain amount
 
-#### randomdelay
+### randomdelay
 
 This filter will randomly delay a message according to specified random distribution
 available options include distribution selection, and 2 parameters for the distribution
@@ -58,19 +58,19 @@ some distributions only take one parameter in which case the second is ignored. 
   param1="m" param2="n"
 - [student_t](http://www.cplusplus.com/reference/random/student_t_distribution/) param1="n"
 
-#### randomdrop
+### randomdrop
 
 This filter will randomly drop a message, the drop probability is specified, and is modeled as a uniform distribution.
 
-#### clone
+### clone
 
 this message will copy a message and send it to the original destination plus a new one.
 
-#### firewall
+### firewall
 
 The firewall filter will eventually be able to execute firewall like rules on messages and perform certain actions on them, that can set flags, or drop or reroute the message. The nature of this is still in development and will be available at a later release.
 
-#### custom filters
+### custom filters
 
 Custom filters are allowed as well, these require a callback operator that can be called from any thread
 and modify the message in some way.

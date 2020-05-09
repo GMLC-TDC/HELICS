@@ -43,7 +43,7 @@ MessageFederates define interfaces for endpoints and the basic Federate contains
 
 Filters can be configured via files the following is an example of a JSON file. TOML configuration files are also supported. You can find [examples here](https://github.com/GMLC-TDC/HELICS-Examples/tree/bdbdf4/example_files)
 
-```
+```json
 
 "filters":[
 {
@@ -89,8 +89,6 @@ Filters can be configured via files the following is an example of a JSON file. 
 ]
 
 }
-
-
 
 ```
 

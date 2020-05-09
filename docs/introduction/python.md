@@ -67,7 +67,7 @@ If done correctly, you should see an output like so:
 
 You should see something like the following in the PI RECEIVER window (2nd one in directions above)
 
-```
+```bash
 $ python pireceiver.py
 PI RECEIVER: Helics version = x.x.x (XX-XX-XX)
 PI RECEIVER: Creating Federate Info

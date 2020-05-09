@@ -8,7 +8,7 @@ The main use is a simple visual indicator and a monitoring app
 
 ## Command line arguments
 
-```
+```text
 allowed options:
 
 command line only:
@@ -58,7 +58,7 @@ also permissible are all arguments allowed for federates and any specific broker
 
 the tracer executable also takes an untagged argument of a file name for example
 
-```
+```bash
 helics_app tracer tracer_file.txt --stop 5
 ```
 
@@ -72,7 +72,7 @@ Tracers support both delimited text files and JSON files some examples can be fo
 
 a simple example of a recorder file specifying some subscriptions
 
-```
+```text
 #FederateName topic1
 
 sub pub1
@@ -114,7 +114,7 @@ Tracers can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
 
-```
+```text
 #list publications and endpoints for a recorder
 
 pub1
@@ -124,7 +124,7 @@ e src1
 
 JSON example
 
-```
+```json
 {
     "subscriptions": [{
             "key": "pub1",

@@ -5,7 +5,7 @@ Brokers, Federates, and Cores all have query functions. Federates are also able 
 
 The general function appears like
 
-```
+```cpp
 std::string query(const std::string& target, const std::string& queryStr)
 ```
 
@@ -33,9 +33,9 @@ A target is specified, and can be one of the following. A federate named one of 
 +------------------------------------------+---------------------------------------------------------------------------------------+
 ```
 
-## Queries
+## Query String
 
-The queryStr is a specific data to request, there are a number of different things that can be queried from the system.
+The `queryStr` is a specific data to request, there are a number of different things that can be queried from the system.
 Unrecognized queries or targets return `#invalid`
 Answers to queries can be
 
@@ -217,14 +217,14 @@ Queries that must traverse the network travel along priority paths. The calls ar
 There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version without the target
 
-```
+```cpp
 std::string     query(const std::string& queryStr)
 ```
 
 make the query of the current federate.
 an asynchronous version is also available.
 
-```
+```cpp
 query_id_t     queryAsync(const std::string& target, const std::string& queryStr)
 ```
 

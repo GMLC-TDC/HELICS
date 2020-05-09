@@ -10,12 +10,15 @@ They include `inputDelay`, `outputDelay`, `period`, `minTimeDelta`, and `offset`
 These parameters along with the `timeRequest` functions determine how time advances
 in a federate.
 
+## Timing Parameters
+Thse parameters take a time specification
+
 ### Period and Offset
 
 The period and offset of a Federate determine the allowable times which a federate
 may grant. All granted times for a federate will be in accordance with the following:
 
-```
+```matlab
 T=n*Period+offset
 ```
 
@@ -45,12 +48,12 @@ Basically all values and signals are only acknowledged in the timing calculation
 The output delay is symmetrical to the input delay.
 Except it applies to all outgoing messages. Basically once a time is granted the federate cannot effect other federates until `T+outputDelay`.
 
-#### rt_lag
+### rt_lag
 
 real time tolerance - the maximum time grants can lag real time before HELICS automatically acts
 default=0.2 given this operates on a computer clock, time <0.005 are not going be very accurate or followed that closely unless the OS is specifically setup for that sort of timing level
 
-#### rt_lead
+### rt_lead
 
 real time tolerance - the maximum time grants can lead real time before HELICS forces an additional delay
 

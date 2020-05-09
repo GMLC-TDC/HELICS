@@ -4,7 +4,7 @@ The documentation requires Pandoc to convert from Markdown to RST.
 
 You will need the following Python packages.
 
-```{.sourceCode .bash}
+```bash
 pip install sphinx
 pip install ghp-import
 pip install breathe
@@ -20,12 +20,12 @@ locally.
 
 If you don't have Pandoc, you can install it using `conda`.
 
-```
+```bash
 conda install pandoc
 ```
 
 If you are unable to install `pandoc`, you may be able to generate some of the documentation if you install the following.
 
-```
+```bash
 pip install recommonmark
 ```

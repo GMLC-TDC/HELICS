@@ -137,7 +137,7 @@ Currently only queries are supported, though eventually the plan is to support o
 The response to queries is a string either in plain text or json.
 For example:
 
-```
+```text
 localhost/brokers
 ```
 
@@ -166,19 +166,19 @@ will return
 
 Other queries should be directed to a specific broker such as:
 
-```
+```text
 http://localhost/brokerA/brokers
 ```
 
 which will produce a string vector:
 
-```
+```text
 [41888-wfQ8t-GIGjS-dndI3-e7zuk;41888-e9KF2-HAfm8-Rft0w-JLV4a]
 ```
 
 The following:
 
-```
+```text
 http://localhost/brokerA/federate_map
 ```
 

@@ -7,7 +7,7 @@ or direct endpoints or cloned endpoints which exist elsewhere
 
 ## Command line arguments
 
-```
+```text
 allowed options:
 
 command line only:
@@ -73,7 +73,7 @@ also permissible are all arguments allowed for federates and any specific broker
 
 the player executable also takes an untagged argument of a file name for example
 
-```
+```bash
 helics_recorder record_file.txt --stop 5
 ```
 
@@ -87,7 +87,7 @@ Recorders support both delimited text files and json files some examples can be 
 
 a simple example of a recorder file specifying some subscriptions
 
-```
+```text
 #FederateName topic1
 
 sub pub1
@@ -129,7 +129,7 @@ recorders can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
 
-```
+```text
 #list publications and endpoints for a recorder
 
 pub1
@@ -139,7 +139,7 @@ e src1
 
 JSON example
 
-```
+```json
 {
     "subscriptions": [{
             "key": "pub1",

@@ -206,8 +206,7 @@ you will be asked to proceed with installation, answering `y` will install HELIC
 
 ```bash
 $ helics_broker --version
-2.4.0-master-dirty (2020-02-16)
-
+2.4.0 (2020-02-16)
 ```
 
 The helics apps and libraries are now installed, and can be updated when HELICS gets an update. For the MINGw32 use
@@ -220,6 +219,7 @@ if you are installing both the 32 and 64 bit versions or just want a simpler com
 
 ```bash
 $ pacboy -Sy helics
+:: Synchronizing package databases...
 ```
 
 if the python interface is needed on MSYS2 it can be installed through pip but requires some setup first.

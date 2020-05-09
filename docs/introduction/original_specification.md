@@ -90,20 +90,20 @@ The following was adapted from TDC Simulation Requirements developed by team Nov
 - Single broker will not scale
 - Hierarchical broker may scale better but may put burden on modelers.
 
-### Location/structure of federate configuration data.
+### Location/structure of federate configuration data
 
 - One large definition
 - Individual files
 
 ### Supported data exchange patterns
 
-#### Time coordination:
+#### Time coordination
 
 - Syncing
 - Reiteration
 - Advancement
 
-### What features should we borrow from:
+### What features should we borrow from
 
 - HLA
 - FMI
@@ -412,7 +412,7 @@ a different option might be to have the time advancement be callback based in wh
 I propose a separate interface for communication messages
 Basically data packets. What I would ideally want is a system that routed specific data packets through a comm system model if one were present and just delivered them if one wasn’t. The applications shouldn’t care what if any communication system model was present or not. This means that the power system model should not have to be aware of the communication system model and directly send data to and from it. It should be automatically routed through the appropriate communication system. This implies that the setup for a communication system will have to declare which federates it links with. Some mechanics of cross comm system linking will also need to be worked out but that is at a lower level. These functions should only work in operation mode. These packets will need to be buffered.
 
-##### Federate Management
+#### Federate Management
 
 - register(simConfiguration) --simConfiguration should be structure describing the simulator properties and capabilities, this should be able to be an object or file name containing the description in some format.
   Borrowing ideas from FMI the objects are in a couple different states (startup, initialization, continuous, event, error, terminate). I would propose reducing this to 4 (startup, initialization, operation, finalize), may be want the error state as well. Certain functions then only work in certain modes
@@ -438,7 +438,7 @@ We may want to allow the ability to specify a callback here to be called on pack
 
 The means by which a comm simulation interacts with the other types of simulations is not clear cut, there are timing issues and delays and packet translation an other issues which get awkward if they are not designed in. In the cosimulation framework there is a need for simulating direct physical connections with real values passed back and forth, and those same simulations interact with the digital world translating between physical phenomenon and digital communications, and still others types of federates that interact purely in the digital communication world. This separations of purpose lead to the concept of a separation of functionality to better tune the interface to correspond to the physical world. So In addition to the value based interface and a packet based interface we add a third interface intended to operate on packets, for translating, manipulating, or delaying them.
 
-##### Federate Management
+#### Federate Management
 
 - register(simConfiguration) --simConfiguration should be structure describing the simulator properties and capabilities, this should be able to be an object or file name containing the description in some format.
   Borrowing ideas from FMI the objects are in a couple different states (startup, initialization, continuous, event, error, terminate). I would propose reducing this to 4 (startup, initialization, operation, finalize), may be want the error state as well. Certain functions then only work in certain modes
@@ -479,7 +479,7 @@ Time advances are allowed to be greater than or equal to the current time. If th
 
 ### API
 
-```
+```cpp
 #ifndef _GMLCTDC_CORE_
 #define _GMLCTDC_CORE_
 
@@ -592,7 +592,7 @@ configurations.
 
 ZeroMQ version 4.2.0 or greater is being targeted.
 
-## Languages and Compilers
+### Languages and Compilers
 
 #### C++
 
@@ -627,7 +627,7 @@ MATLAB bindings will be provided using the mex functionality.
 1. Player example
 2. Recorder example
 
-#### Custom plugin API
+### Custom plugin API
 
 Documentation will list the minimum necessary functions that will have to be implemented to build a custom plugin.
 

@@ -9,7 +9,7 @@
 This `Dockerfile` will build and install HELICS in Ubuntu 18.04 with
 Python support.
 
-```
+```dockerfile
 FROM ubuntu:18.04 as builder
 
 RUN apt update && apt install -y \

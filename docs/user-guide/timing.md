@@ -18,7 +18,7 @@ HELICS co-simulations end under one of two conditions: when all federates have b
 
 The same JSON configuration file used to set the publications, subscriptions, and endpoints as discussed in the [section on federates](./federates.md) also has a number of parameters that can be set to influence how the federate manages its timing with the co-simulation.
 
-```
+```json
 {
   "name":"generic_federate",
   ...

@@ -492,6 +492,8 @@ This is a major revision so this changelog will not capture all the changes that
 ### Changed
 
 - wait_for_Broker now uses a condition variable instead of sleep and checking repeatedly
+- changed the logging levels to be error, warning, summary, connections, interfaces, timing, data, and trace to better match debugging levels used in development and make the purpose of each level clearer
+- comm objects now can use the same logging system as the rest of HELICS
 
 ### Fixed
 
@@ -503,11 +505,6 @@ This is a major revision so this changelog will not capture all the changes that
 - federate, broker, and core destroy functions to the C api
 - tcp cores have a --reuse-address flag to allow multiple brokers on the same port, mostly useful for the test suite to prevent spurious failures due to the OS not releasing tcp ports in a timely manner.
 
-### Changed
-
-- changed the logging levels to be error, warning, summary, connections, interfaces, timing, data, and trace to better match debugging levels used in development and make the purpose of each level clearer
-- comm objects now can use the same logging system as the rest of HELICS
-
 ## [1.3.0][] - 2018-07-31
 
 ### Changed
@@ -515,6 +512,10 @@ This is a major revision so this changelog will not capture all the changes that
 - some CMake options have been removed (BUILD_BROKER)
 - major changes to the build of the CTest testing Framework
 - moved most examples to new [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples) Repo
+- added better code for allowing static runtime builds
+- use the CMake version numbers instead of independent variables
+- Environment variables are recognized in CMAKE find options- split API tests from system wide tests
+- added options on MSVC to build with embedded system libraries and embedded debug info.
 
 ### Fixed
 
@@ -531,13 +532,6 @@ This is a major revision so this changelog will not capture all the changes that
 - CPACK can now build a dmg files
 - Players can have multiline comments in input file and omit the tag for repeated messages
 - marker option on player, recorder, tracer to print time advancement message
-
-### Changed
-
-- added better code for allowing static runtime builds
-- use the CMake version numbers instead of independent variables
-- Environment variables are recognized in CMAKE find options- split API tests from system wide tests
-- added options on MSVC to build with embedded system libraries and embedded debug info.
 
 ### Removed
 
@@ -600,10 +594,6 @@ This is a major revision so this changelog will not capture all the changes that
 - getXXSize functions directly in the Subscription object instead of a roundabout call in the C api
 - more complete error catching for the C library
 - added helics-config executable for getting paths and links and used flags
-- added a broker app that can start up a broker easily
-
-### Added
-
 - BrokerApp as a slightly more convenient runner to Brokers
 
 ### Changed

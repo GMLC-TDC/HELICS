@@ -20,7 +20,7 @@ The figure below is an example of a representation of the message topology of a 
 
 ![messages and filters example](../img/messages_and_filters_example.png)
 
-### Example 1c - EV charge controller with HELICS filters
+## Example 1c - EV charge controller with HELICS filters
 
 To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](./message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
 
@@ -28,7 +28,7 @@ To demonstrate the effects of filters, let's take the same model we were working
 
 [The JSON configuration file](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
 
-```
+```json
 ...
 "filters":
     [

@@ -23,7 +23,6 @@ A few simple exercises about co-simulation timing
 
     c. What is the next time all federate will be able to execute simultaneously? **_6_**
 
-
      **Key Principle**:  *Federates are interrupted if there is updated data available and allowed time prior to the requested time*
 
 2.  Federation Setup \[A: period=1,`wait_for_current_time_update`; B: period=2; C: period=3\]
@@ -35,7 +34,6 @@ A few simple exercises about co-simulation timing
     c. Federate A requests time 2: Federate B publishes at time 2. What time does Federate A receive the data? **_2_**
 
     e. If A did not have the `wait_for_current_time_update` flag active, what time would Federate A receive the data? **_3_**
-
 
      **Key Principle**:  *Federates are granted the next allowed time after the time specified in a request if they are not interrupted.*
 

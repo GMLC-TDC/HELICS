@@ -45,7 +45,7 @@ The public API includes the following
   - helics_definitions.hpp
   - NOTE: core headers in the public API are headers that need to be available for the Application API public headers. The core api can be used more directly with static linking but applications are generally recommended to use the application API or other higher level API's
 
-* C Shared Library headers (c)
+- C Shared Library headers (c)
 
   - api-data.h
   - helics.h
@@ -54,7 +54,7 @@ The public API includes the following
   - MessageFilters.h
   - ValueFederate.h
 
-* App Library
+- App Library
 
   - Player.hpp
   - Recorder.hpp
@@ -67,7 +67,7 @@ The public API includes the following
   - CoreApp.hpp (aliased to application_api version)
   - BrokerServer.hpp (removed in 2.3 as not useful for library operations, though still available in the static library)
 
-* Exceptions: Any function dealing with Inputs concerning data from multiple sources is subject to change, the vector subscription Objects, and vector Input objects are subject to change. Also some changes may occur in regard to units on the Application API.
+- Exceptions: Any function dealing with Inputs concerning data from multiple sources is subject to change, the vector subscription Objects, and vector Input objects are subject to change. Also some changes may occur in regard to units on the Application API.
 
 - C++98 Library _All headers are mostly stable. Though we reserve the ability to make changes to make them better match the main C\+\+ API._
 

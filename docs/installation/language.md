@@ -95,7 +95,7 @@ $ make clean; make -j 4; make install
 
 To install HELICS with MATLAB support, you will need to add `BUILD_MATLAB_INTERFACE=ON`.
 
-```
+```bash
 git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build
@@ -107,7 +107,7 @@ make install
 
 On windows using visual studio the command line cmake would look like
 
-```
+```bat
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DENABLE_SWIG=OFF -DBUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
 
 cmake --build . --config Release --target INSTALL
@@ -116,7 +116,7 @@ cmake --build . --config Release --target INSTALL
 Cmake will search for the MATLAB executable and execute a mex command inside MATLAB to build the interface.
 For this operation to succeed MATLAB must be available and mex must be setup to use an appropriate C compiler. The setup is only required once for each MATLAB installation and does not need to repeated unless the compiler changes. From within MATLAB run
 
-```
+```matlab
 >>mex -setup
 ```
 
@@ -126,13 +126,13 @@ Reconstructing the files requires a specific version of SWIG with MATLAB support
 
 Add the install directory path to the MATLAB files to your PATH. This can be the system path, or the MATLAB path through the addpath command or the graphical equivalent
 
-```
+```matlab
 >> addpath('path/to/helics/install/matlab')
 ```
 
 Now in MATLAB, run the following:
 
-```
+```matlab
 helicsStartup
 display(helics.helicsGetVersion())
 ```
@@ -174,7 +174,7 @@ The above instructions will have to be modified slightly to support Windows, CMA
 
 To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`. Swig is required to build the Octave interface from source; it can be installed via package managers such as apt on Ubuntu or [chocolatey](https://chocolatey.org/packages?q=swig) on Windows, Octave can also be installed in this manner.
 
-```
+```bash
 git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build
@@ -186,12 +186,12 @@ make install
 
 add the octave folder in the install directory to the octave path
 
-```
+```bash
 >>helics
 >> helicsGetVersion()
 ans = x.x.x (20XX-XX-XX)
 ```
 
-#### Notes
+### Notes
 
 Octave 4.2 will require swig 3.0.12, Octave 4.4 and 5.0 and higher will require swig 4.0 or higher. The Octave interface has built and run smoothly on Linux systems and on the Windows system with Octave 5.0 installed through Chocolatey. There is a regular CI test that builds and tests the interface on Octave 4.2.

@@ -30,7 +30,7 @@ With the answers to those clarifying questions in mind, let's look at the normal
 
 For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to do something like this:
 
-```
+```python
 import helics as h
 ```
 
@@ -38,7 +38,7 @@ import helics as h
 
 Though not technically a pat of integrating a simulator its important to remember that as a part of running a co-simulation, a broker will need to be created. This can be done as part of what an existing federate does, as a part of a stand-alone broker-creation federate, or with helics_cli. Broker creation is done with just a single API call:
 
-```
+```python
 broker = h.helicsCreateBroker("zmq", "main_broker", "--federates 2")
 
 ```
@@ -55,7 +55,7 @@ There are ways to programmatically ("hard-code") the configuration of the federa
 
 The JSON configuration file, as discussed earlier in this guide, contains information both about the federate in general (which core type is being used, what its time-step is) as well as the information it will be providing to the federate and receiving from it. HELICS has a single API command to read in that file and create the federate:
 
-```
+```python
 fed = h.helicsCreateValueFederateFromConfig('Control.json')
 ```
 
@@ -67,19 +67,19 @@ With all the information provided in the configuration JSON, HELICS is fully awa
 
 The HELICS names for all those messages is in the JSON configuration and you could write a parser to read in that file and make the connection to your internal variables. HELICS has already read and parsed the file, though, and to avoid everybody having to reinvent the wheel, it provides methods to access the necessary information:
 
-```
+```python
 input_count = h.helicsFederateGetInputCount(fed)
 input_ID = h.helicsFederateGetInputByIndex(fed, index)
 input_key = h.helicsSubscriptionGetKey(input_ID)
 ```
 
-```
+```python
 pub_count = h.helicsFederateGetPublicationCount(fed)
 pub_ID = h.helicsFederateGetPublicationByIndex(fed, index)
 pub_key = helicsPublicationGetKey(pub_ID)
 ```
 
-```
+```python
 endpoint_count = h.helicsFederateGetPublicationCount(fed)
 endpoint_ID = h.helicsFederateGetEndpointByIndex(fed, index)
 endpoint_name = helicsEndpointGetName(endpoint_ID)
@@ -92,7 +92,7 @@ Getting the number of the inputs/publications/endpoints and then looping over th
 
 Once any linking between wider federation and the custom federate being created is complete, the federate itself indicates it is ready to begin advancing in time:
 
-```
+```python
 h.helicsFederateEnterExecutingMode(fed)
 ```
 
@@ -102,7 +102,7 @@ And now begins the core of the co-simulation where the following several steps a
 
 - **Request a simulation time**
 
-  ```
+  ```python
   grantedtime = h.helicsFederateRequestTime (fed, time)
   ```
 
@@ -114,7 +114,7 @@ And now begins the core of the co-simulation where the following several steps a
 
 - **Get new input values**
 
-  ```
+  ```python
   int_value = h.helicsInputGetInteger(sub_ID)
   float_value = h.helicsInputGetDouble(sub_ID)
   real_value, imag_value = h.helicsInputGetComplex(sub_ID)
@@ -129,7 +129,7 @@ And now begins the core of the co-simulation where the following several steps a
 
 - **Output new values**
 
-  ```
+  ```python
   helicsPublicationPublishInteger(pub_ID, int_value)
   helicsPublicationPublishDouble(pub_ID, float_value)
   helicsPublicationPublishComplex(pub_ID, real_value, imag_value)
@@ -144,7 +144,7 @@ And now begins the core of the co-simulation where the following several steps a
 
 Once the federate has completed its contribution to the it needs to close out its connection to the federation. Typically a federate knows it has reached the end of the co-simulation when it is granted `maxTime`. To leave the federation cleanly (without causing errors for itself or others in the co-simulation) the following process needs to be followed:
 
-```
+```python
 h.helicsFederateFinalize(fed)
 #wait until the broker is finished (-1 is indefinite timeout otherwise it is the number of ms to wait)
 h.helicsBrokerWaitForDisconnect(broker, -1);
