@@ -7,7 +7,7 @@ or direct endpoints or cloned endpoints which exist elsewhere
 
 ## Command line arguments
 
-```
+```text
 allowed options:
 
 command line only:
@@ -66,12 +66,14 @@ configuration:
                          monitoring
 
 ```
+
 also permissible are all arguments allowed for federates and any specific broker specified:
 
 [Command line reference](cmdArgs.html)
 
 the player executable also takes an untagged argument of a file name for example
-```
+
+```bash
 helics_recorder record_file.txt --stop 5
 ```
 
@@ -82,13 +84,16 @@ Recorders support both delimited text files and json files some examples can be 
 ## config file detail
 
 ### subscriptions
+
 a simple example of a recorder file specifying some subscriptions
-```
+
+```text
 #FederateName topic1
 
 sub pub1
 subscription pub2
 ```
+
 `#` signifies a comment
 
 if only a single column is specified it is assumed to be a subscription
@@ -119,18 +124,22 @@ for clone the second can be either source or destination and the third the endpo
 \[for capture it can be either "endpoints" or "subscriptions"\] NOTE:not fully working yet for capture
 
 ### JSON configuration
+
 recorders can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
-```
+
+```text
 #list publications and endpoints for a recorder
 
 pub1
 pub2
 e src1
 ```
+
 JSON example
-```
+
+```json
 {
     "subscriptions": [{
             "key": "pub1",
@@ -152,9 +161,11 @@ some configuration can also be done through JSON through elements of "stop","loc
 and file elements can be used to load up additional files
 
 ### output
+
 Recorders capture files in a format the Player can read see [Player](Player)
 the `--verbose` option will also print the values to the screen.
 
 ### Map file output
+
 the recorder can generate a live file that can be used in process to see the progress of the Federation
 This is occasionally useful, though for many uses the [Tracer](Tracer) will be more useful when it is completed

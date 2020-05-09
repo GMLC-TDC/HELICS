@@ -1,5 +1,4 @@
-Player
-=======
+# Player
 
 The player application is one of the HELICS apps available with the library
 Its purpose is to provide a easy way to generate data into a federation
@@ -7,9 +6,9 @@ It acts as a federate that can "play" values or messages at specific times
 It exists as a standalone executable but also as library object so could be integrated
 into other components
 
-Command line arguments
-----------
-```
+## Command line arguments
+
+```text
 command line only:
   -? [ --help ]          produce help message
   -v [ --version ]       display a version string
@@ -51,12 +50,14 @@ configuration:
 
 
 ```
+
 also permissible are all arguments allowed for federates and any specific broker specified:
 
 [Command line reference](cmdArgs.html)
 
 the player executable also takes an untagged argument of a file name for example
-```
+
+```sh
 helics_player player_file.txt --stop 5
 ```
 
@@ -67,8 +68,10 @@ Players support both delimited text files and JSON files some examples can be fo
 ## Config File Detail
 
 ### publications
+
 a simple example of a player file publishing values
-```
+
+```text
 #second    topic                type(opt)                    value
 -1.0, pub1, d, 0.3
 1, pub1, 0.5
@@ -80,6 +83,7 @@ a simple example of a player file publishing values
 3, pub2, 0.9
 4, 0.7  # this statement is assumed to refer to pub 2
 ```
+
 `#` signifies a comment
 the first column is time in seconds unless otherwise specified via the `--time_units` flag or other configuration means
 the second column is publication name
@@ -115,30 +119,38 @@ values with times <0 are sent during the initialization phase
 values with time==0 are sent immediately after entering execution phase
 
 ### Messages
+
 messages are specified in one of two forms
-```
+
+```text
 m <time> <source> <dest>  <data>
 ```
+
 or
-```
+
+```text
 m <sendtime> <deliverytime> <source> <dest> <time> <data>
 ```
 
 the second option allows sending events at a different time than they are triggered
-the data portion of messages can be encoded in base64 by marking as b64[<data>] or base64[X]  all data between the brackets will be converted to raw binary.  A ']' must be last
+the data portion of messages can be encoded in base64 by marking as b64[<data>] or base64[X] all data between the brackets will be converted to raw binary. A ']' must be last
 
 ### JSON configuration
+
 player values can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
-```
+
+```text
 #example player file
 mess 1.0 src dest "this is a test message"
 mess 1.0 2.0 src dest "this is test message2"
 M 2.0 3.0 src dest "this is message 3"
 ```
+
 JSON example
-```
+
+```json
  {
     "messages": [{
             "source": "src",
@@ -166,7 +178,7 @@ JSON example
 }
 ```
 
-```
+```text
 #second    topic                type(opt)                    value
 -1 pub1 d 0.3
 1 pub1 d 0.5
@@ -176,8 +188,10 @@ JSON example
 2 pub2 d 0.6
 3 pub2 d 0.9
 ```
+
 Example JSON
-```
+
+```json
 {
     "points": [{
             "key": "pub1",

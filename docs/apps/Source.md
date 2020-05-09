@@ -1,15 +1,13 @@
-Source
-=======
+# Source
 
 The Source app generates signals for other federates, it functions similarly to the
 player but doesn't take a prescribed file instead it generates signals according to some
 mathematical function, like sine, ramp, pulse, or random walk.
 This can be useful for sending probing signals or just testing responses of the federate to various stimuli.
 
+## Command line arguments
 
-Command line arguments
-----------
-```
+```text
 allowed options:
 
 command line only:
@@ -44,12 +42,14 @@ federate configuration
   -f [ --flags ] arg     named flags for the federate
 
 ```
+
 also permissible are all arguments allowed for federates and any specific broker specified:
 
 [Command line reference](cmdArgs.html)
 
 the player executable also takes an untagged argument of a file name for example
-```
+
+```bash
 helics_player player_file.txt --stop 5
 ```
 
@@ -60,8 +60,10 @@ Players support both delimited text files and JSON files some examples can be fo
 ## Config File Detail
 
 ### publications
+
 a simple example of a player file publishing values
-```
+
+```csv
 #second    topic                type(opt)                    value
 -1.0, pub1, d, 0.3
 1, pub1, 0.5
@@ -72,6 +74,7 @@ a simple example of a player file publishing values
 2, pub2, 0.6
 3, pub2, 0.9
 ```
+
 `#` signifies a comment
 the first column is time in seconds unless otherwise specified via the `--time_units` flag or other configuration means
 the second column is publication name
@@ -107,29 +110,37 @@ values with times <0 are sent during the initialization phase
 values with time==0 are sent immediately after entering execution phase
 
 ### Messages
+
 messages are specified in one of two forms
-```
+
+```text
 m <time> <source> <dest>  <data>
 ```
+
 or
-```
+
+```text
 m <sendtime> <deliverytime> <source> <dest> <time> <data>
 ```
 
 the second option allows sending events at a different time than they are triggered
 
 ### JSON configuration
+
 player values can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
-```
+
+```text
 #example player file
 mess 1.0 src dest "this is a test message"
 mess 1.0 2.0 src dest "this is test message2"
 M 2.0 3.0 src dest "this is message 3"
 ```
+
 JSON example
-```
+
+```json
  {
     "messages": [{
             "source": "src",
@@ -151,7 +162,7 @@ JSON example
 }
 ```
 
-```
+```text
 #second    topic                type(opt)                    value
 -1 pub1 d 0.3
 1 pub1 d 0.5
@@ -161,8 +172,10 @@ JSON example
 2 pub2 d 0.6
 3 pub2 d 0.9
 ```
+
 Example JSON
-```
+
+```json
 {
     "points": [{
             "key": "pub1",
