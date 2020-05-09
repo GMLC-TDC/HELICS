@@ -28,7 +28,7 @@ This feature offers the convenience of allowing a message federate to receive me
 
 Once the message topology considering endpoints has been determined, the definitions of these endpoints in the JSON file is straight-forward. Here's what it could look like for the voltage regulator example from above.
 
-```
+```json
 {
      ...
      "endpoints" : [
@@ -92,7 +92,7 @@ The message topology (including the endpoints) and the not very interesting brok
 
 Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/EV_Controller/Control.json) we can learn important details about how the controller works.
 
-```
+```json
 {
     "name": "EV_Controller",
     "loglevel": 5,
@@ -141,7 +141,7 @@ The first thing to note is the the EV controller has been written as a combinati
 
 Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/Distribution/IEEE_123_feeder_0.json) confirms this:
 
-```
+```json
 {
     "name" : "DistributionSim",
     "loglevel": 5,

@@ -20,7 +20,7 @@ rule "MD026", :punctuation => '.,;:' # no trailing punctuation in headers
 rule "MD027" # no multiple spaces after blockquote symbol
 rule "MD028" # no blank lines within blockquote
 #rule "MD029", :style => :ordered # ordered list item prefix, shoulded be ordered
-rule "MD030", :ul_single => 1, :ol_single => 1, :ul_multi => 1, :ol_multi => 1 # spaces after list markers
+#rule "MD030", :ul_single => 1, :ol_single => 1, :ul_multi => 1, :ol_multi => 3 # spaces after list markers, controlled by prettier
 rule "MD031" # fenced code blocks need line surrounding
 rule "MD032" # lists should be surrounded by line
 rule "MD034" # no raw url

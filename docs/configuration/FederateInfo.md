@@ -23,13 +23,13 @@ Specify which type of core to use. See [core types](./CoreTypes) for more detail
 
 They can be generated from a string using the
 
-```
+```cpp
 core_type coreTypeFromString (std::string type) noexcept
 ```
 
 function call. The function
 
-```
+```cpp
 bool isCoreTypeAvailable (core_type type) noexcept;
 ```
 

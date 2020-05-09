@@ -11,15 +11,15 @@
 
 <!--If it is a bug, answer the following questions and add information that you think is relevant.-->
 
-- **What is the current behavior?**
+1. **What is the current behavior?**
 
-* **What is the expected behavior? What is the motivation / use case for changing the behavior?**
+1. **What is the expected behavior? What is the motivation / use case for changing the behavior?**
 
-- **What are the steps to reproduce this bug? Please provide a minimal working example of the bug if possible.**
+1. **What are the steps to reproduce this bug? Please provide a minimal working example of the bug if possible.**
 
-* **Please tell us about your environment:**
+1. **Please tell us about your environment:**
 
-- HELICS version: <!-- 1.3.0 (07-31-18) -->
+1. HELICS version: <!-- 1.3.0 (07-31-18) -->
 
 ```sh
 $ helics_app --version
@@ -29,4 +29,4 @@ $ helics_app --version
 - Operating System: [all | Windows | Mac | Linux]
 - Language Extension: [all | Python | MATLAB | Java]
 
-* **Other information** (e.g. detailed explanation, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. stackoverflow, gitter, etc)
+- **Other information** (e.g. detailed explanation, stacktraces, related issues, suggestions how to fix, links for us to have context, eg. stackoverflow, gitter, etc)

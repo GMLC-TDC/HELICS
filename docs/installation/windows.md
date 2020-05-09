@@ -59,28 +59,26 @@ Getting and building from source:
 2.  Open a command prompt. Use git clone to check out a copy of
     HELICS.
 
-    ```bash
+```bash
     git clone https://github.com/GMLC-TDC/HELICS.git
-    ```
+```
 
 3.  Go to the checked out HELICS project folder (the default folder
     name is HELICS). Create a build folder and open the build
     folder. Alternatively, cmake-gui can be used.
 
-    ```bash
+```bash
     cd HELICS
     mkdir build
     cd build
-    ```
+```
 
 4.  Run CMake. It should automatically detect where MPI is installed
     if the system path variables are set up correctly, otherwise you
-    will have to set the CMake path manually. ZMQ_LOCAL_BUILD is set to ON
+    will have to set the CMake path manually. `ZMQ_LOCAL_BUILD` is set to ON
     so ZeroMQ will automatically be built unless the option is changed.
 
-    ```bash
-    CMake ..
-    ```
+    `cmake ..`
 
     If you need CMake to use a generator other than the default (ex:
     selecting between a 32-bit or 64-bit project), the -G option can be
@@ -109,7 +107,7 @@ Getting and building from source:
 A quick test is to double check the versions of the HELICS player and
 recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 
-```bash
+```bat
 > cd C:/Path/To/build/src/helics/apps/Debug
 
 > helics_player.exe --version

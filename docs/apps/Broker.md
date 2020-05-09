@@ -5,7 +5,7 @@ The Broker can be run through the helics_broker or via helics-app
 
 ## Command line arguments
 
-```
+```text
 helics_broker term <broker args...> will start a broker and open a terminal control window for the broker run help in a terminal for more commands
 helics_broker --autorestart <broker args ...> will start a continually regenerating broker there is a 3 second countdown on broker completion to halt the program via ctrl-C
 helics_broker <broker args ..> just starts a broker with the given args and waits for it to complete
@@ -124,7 +124,7 @@ configuration:
 
 If the Broker is started with `term` as the first option, a terminal is opened for user entry of commands all command line arguments following term are passed to the broker.
 
-```
+```bash
 starting broker
 helics>>help
 `quit` -> close the terminal application and wait for broker to finish
@@ -142,7 +142,7 @@ helics>>
 
 `status` will print out current status of the brokers including counts of federates, brokers, and handles
 
-```
+```bash
 helics>>status
 Broker (643204-ibrVd-14EWH-unKfh-hExUP) is connected and is accepting new federates
 {"brokers":0,
@@ -153,7 +153,7 @@ helics>>
 
 info prints out name, connection status, and connection information
 
-```
+```bash
 helics>>info
 Broker (643204-ibrVd-14EWH-unKfh-hExUP) is connected and is accepting new federates
 address=tcp://127.0.0.1:23404

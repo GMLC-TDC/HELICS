@@ -16,7 +16,7 @@ The Endpoint object api contains those calls in a separate object.
 
 File based configuration looks primarily at an "endpoints" JSON array
 
-```
+```json
 //this should be a valid JSON file (except comments are not recognized in standard JSON)
 { //example JSON configuration file for a message federate all arguments are optional
     "name":"messageFed", // the name of the federate
