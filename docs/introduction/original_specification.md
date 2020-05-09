@@ -1,7 +1,6 @@
 ---
 title: Specification document for TDC co-simulation tool
 author:
-
   - name: Phil Top
     membership: Lawrence Livermore National Laboratory
     email:
@@ -193,29 +192,30 @@ Note: in each group, a \* is used to indicate the configurations (proposed) to b
 
 #### Multiple Power-flows
 
-  Many configurations: T+D, T+D, D+D, resulting in many combinations First distinguished as **single-pass vs reiterative**, and further distinguished by the type of power flow interface presented:
+Many configurations: T+D, T+D, D+D, resulting in many combinations First distinguished as **single-pass vs reiterative**, and further distinguished by the type of power flow interface presented:
 
-  - 3-ph unbalanced
-  - positive sequence
-  - 3-sequence
+- 3-ph unbalanced
+- positive sequence
+- 3-sequence
 
-  For each, the raw power signals will typically be exchanged using 3-ph representation, but the higher-level APIs provide mechanisms to manage positive sequence and 3-sequence to 3-ph unbalanced conversion.
+For each, the raw power signals will typically be exchanged using 3-ph representation, but the higher-level APIs provide mechanisms to manage positive sequence and 3-sequence to 3-ph unbalanced conversion.
 
-  **\*Config P0—Single Power flow:** The null power flow case with only a single simulator. This could be for T+C, D+C, or either with building or external controllers.
+**\*Config P0—Single Power flow:** The null power flow case with only a single simulator. This could be for T+C, D+C, or either with building or external controllers.
 
-  **\*Config P1—T_ps+multi-D_3ph QSTS:** Perhaps the most common is expected to be steady-state transmission with multiple distribution federates for quasi-steady-state time series (QSTS) analysis. In this case, a single transmission simulator typically provides positive sequence powerflow (e.g. MatPower, PSSE, etc.) that interacts with with multiple 3-ph unbalanced distribution simulation and nominally utilizes reiteration, though single-pass interactions also acceptable. The single pass configuration can be clarified using an "A" suffix (e.g. P1A), while reiteration is fully "P1B".
+**\*Config P1—T_ps+multi-D_3ph QSTS:** Perhaps the most common is expected to be steady-state transmission with multiple distribution federates for quasi-steady-state time series (QSTS) analysis. In this case, a single transmission simulator typically provides positive sequence powerflow (e.g. MatPower, PSSE, etc.) that interacts with with multiple 3-ph unbalanced distribution simulation and nominally utilizes reiteration, though single-pass interactions also acceptable. The single pass configuration can be clarified using an "A" suffix (e.g. P1A), while reiteration is fully "P1B".
 
-  **\*Config P2—T_ps+multi-D_3ph Dynamic:** For dynamic-scale (ms time step), transient stability simulations, we have a very similar interface to QSTS, but primarily differentiated by the need to provide richer dynamic phasor and frequency data for the interface. Ideally both federates support this data with higher fidelity models, though in some cases only transmission will have full dynamics, while distribution continues to use QSTS. Here reiteration is effectively required, though an "A" suffix can be appended in the case where no-iteration is used.
+**\*Config P2—T_ps+multi-D_3ph Dynamic:** For dynamic-scale (ms time step), transient stability simulations, we have a very similar interface to QSTS, but primarily differentiated by the need to provide richer dynamic phasor and frequency data for the interface. Ideally both federates support this data with higher fidelity models, though in some cases only transmission will have full dynamics, while distribution continues to use QSTS. Here reiteration is effectively required, though an "A" suffix can be appended in the case where no-iteration is used.
 
-  **Config P3—T_3sq+multi-D_3ph QSTS[^1]:** This use case builds on recent work by Q. Huang and Vittal (2017)[^2] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
+**Config P3—T_3sq+multi-D_3ph QSTS[^1]:** This use case builds on recent work by Q. Huang and Vittal (2017)[^2] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
 
-  **Config P4—T_3sq+multi-D_3ph Dynamic[^3]:** This use case builds on recent work by Q. Huang and Vittal (2017)[^2] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
+**Config P4—T_3sq+multi-D_3ph Dynamic[^3]:** This use case builds on recent work by Q. Huang and Vittal (2017)[^2] that represents the transmission dynamics using separate simulations for each of the 3-sequences and then converts to 3-phase for the distribution simulators. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
 
-  **Config P5—T_3ph+multi-D_3ph QSTS:** This configuration extends P1 to use full 3-phase simulation for the transmission system. As above the the suffix "A" indicates single pass and "B" indicates reiteration.
+**Config P5—T_3ph+multi-D_3ph QSTS:** This configuration extends P1 to use full 3-phase simulation for the transmission system. As above the the suffix "A" indicates single pass and "B" indicates reiteration.
 
-  **Config P6—T_3ph+multi-D_3ph Dynamic:** This configuration extends P2 to use full 3-phase simulation for the transmission system. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
+**Config P6—T_3ph+multi-D_3ph Dynamic:** This configuration extends P2 to use full 3-phase simulation for the transmission system. As above, reiteration is effectively required and an "A" should be appended if no reiteration used.
 
-  [^1]: QSTS version inserted for v0.4.0 May 12, 2017 (Previously P3 referred to the same setup for dynamics. The new ordering allows consistency by alternating QSTS and Dynamics
+[^1]:
+  QSTS version inserted for v0.4.0 May 12, 2017 (Previously P3 referred to the same setup for dynamics. The new ordering allows consistency by alternating QSTS and Dynamics
   [^2]: Huang, Q. & V. Vittal. "Integrated Transmission and Distribution System Power Flow and Dynamic Simulation Using Mixed Three-Sequence/Three-Phase Modeling" IEEE Transactions in Power Systems, 2016
   [^3]: This was called "P3" in version 0.3.0 dated 2/11/2017
 
