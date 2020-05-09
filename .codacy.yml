@@ -18,3 +18,4 @@ exclude_paths:
   - scripts/**/*
   - scripts/*
   - tests/csharp/*
+  - **.md
