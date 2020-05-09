@@ -13,7 +13,7 @@ A few simple exercises about co-simulation timing
 - **Uninteruptible**: a federate can only be granted requested times
 - **wait_for_current_time_update**: specify that a federate should wait until all federates executing at the current time have finished.
 
-![Connectivity Diagram](../img/timing_fed_setup.png 'Exercise Federate Setup')
+![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 
 1.  Federation Setup \[A: period=1; B: period=2; C: period=3\]
 
@@ -23,7 +23,7 @@ A few simple exercises about co-simulation timing
 
     c. What is the next time all federate will be able to execute simultaneously? **_6_**
 
-     **Key Principle**:  *Federates are interrupted if there is updated data available and allowed time prior to the requested time*
+    **Key Principle**: _Federates are interrupted if there is updated data available and allowed time prior to the requested time_
 
 2.  Federation Setup \[A: period=1,`wait_for_current_time_update`; B: period=2; C: period=3\]
 
@@ -35,7 +35,7 @@ A few simple exercises about co-simulation timing
 
     e. If A did not have the `wait_for_current_time_update` flag active, what time would Federate A receive the data? **_3_**
 
-     **Key Principle**:  *Federates are granted the next allowed time after the time specified in a request if they are not interrupted.*
+    **Key Principle**: _Federates are granted the next allowed time after the time specified in a request if they are not interrupted._
 
 3.  Federation Setup \[A: period=1; B: period=2,offset=1,time_delta=2; C: period=3\]
 
@@ -49,7 +49,7 @@ A few simple exercises about co-simulation timing
 
     b. If Federate B were not uninterruptible what time would it be granted? **_4_**
 
-    ![Connectivity Diagram](../img/timing_fed_setup.png 'Exercise Federate Setup')
+    ![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 
 5.  Federation Setup \[A: period=1; B: period=2; C: period=3\], Federates will send an update when they have received an update from the all other connected federates. Federate A sends an update at time 0, what is the Update sequence
 

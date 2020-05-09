@@ -11,6 +11,7 @@ These parameters along with the `timeRequest` functions determine how time advan
 in a federate.
 
 ## Timing Parameters
+
 Thse parameters take a time specification
 
 ### Period and Offset

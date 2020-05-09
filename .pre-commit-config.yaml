@@ -9,7 +9,7 @@ repos:
     rev: 19.10b0
     hooks:
       - id: black
-        args: ['--line-length=100']
+        args: ["--line-length=100"]
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.1.7
     hooks:
@@ -23,7 +23,7 @@ repos:
       - id: check-merge-conflict
       - id: check-case-conflict
       - id: check-yaml
-        args: ['--allow-multiple-documents']
+        args: ["--allow-multiple-documents"]
       - id: check-toml
       - id: end-of-file-fixer
   - repo: https://github.com/prettier/prettier
@@ -40,14 +40,14 @@ repos:
     rev: v0.6.10
     hooks:
       - id: cmake-format
-        exclude: 'cmake+'
+        exclude: "cmake+"
   - repo: https://github.com/codespell-project/codespell
     rev: v1.16.0
     hooks:
       - id: codespell
         args:
           [
-            '-w',
+            "-w",
             '--skip="*.csv"',
-            '--ignore-words=./config/spelling_whitelist.txt',
+            "--ignore-words=./config/spelling_whitelist.txt",
           ]

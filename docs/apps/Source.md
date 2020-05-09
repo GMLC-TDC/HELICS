@@ -141,24 +141,27 @@ M 2.0 3.0 src dest "this is message 3"
 JSON example
 
 ```json
- {
-    "messages": [{
-            "source": "src",
-            "dest": "dest",
-            "time": 1.0,
-            "data":"this is a test message"
-        }, {
-            "source": "src",
-            "dest": "dest",
-            "time": 2.0,
-            "data":"this is test message2"
-        }, {
-            "source": "src",
-            "dest": "dest",
-            "time": 3.0,
-            "data":"this is message 3"
-        }
-    ]
+{
+  "messages": [
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 1.0,
+      "data": "this is a test message"
+    },
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 2.0,
+      "data": "this is test message2"
+    },
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 3.0,
+      "data": "this is message 3"
+    }
+  ]
 }
 ```
 
@@ -177,43 +180,45 @@ Example JSON
 
 ```json
 {
-    "points": [{
-            "key": "pub1",
-            "type": "double",
-            "value": 0.3,
-            "time": -1
-        }, {
-
-            "key": "pub2",
-            "type": "double",
-            "value": 0.4,
-            "time": 1.0
-        }, {
-            "key": "pub1",
-            "value": 0.5,
-            "time": 1.0
-        },
-        {
-            "key": "pub1",
-            "value": 0.8,
-            "time": 3.0
-        },
-        {
-            "key": "pub1",
-            "value": 0.7,
-            "time": 2.0
-        },
-        {
-            "key": "pub2",
-            "value": 0.6,
-            "time": 2.0
-        },
-        {
-            "key": "pub2",
-            "value": 0.9,
-            "time": 3.0
-        }
-    ]
+  "points": [
+    {
+      "key": "pub1",
+      "type": "double",
+      "value": 0.3,
+      "time": -1
+    },
+    {
+      "key": "pub2",
+      "type": "double",
+      "value": 0.4,
+      "time": 1.0
+    },
+    {
+      "key": "pub1",
+      "value": 0.5,
+      "time": 1.0
+    },
+    {
+      "key": "pub1",
+      "value": 0.8,
+      "time": 3.0
+    },
+    {
+      "key": "pub1",
+      "value": 0.7,
+      "time": 2.0
+    },
+    {
+      "key": "pub2",
+      "value": 0.6,
+      "time": 2.0
+    },
+    {
+      "key": "pub2",
+      "value": 0.9,
+      "time": 3.0
+    }
+  ]
 }
 ```
 
