@@ -270,13 +270,11 @@ and running
 >> helicsStartup
 ```
 
-<!-- markdownlint-disable -->
 <div class="admonition note">
 
 Note: See [Helics issue #763](https://github.com/GMLC-TDC/HELICS/issues/763/), if your installation doesn't point the dylib to the correct location.
 
 </div>
-<!-- markdownlint-enable -->
 
 You can run the following in two separate windows to test an example from the following repository:
 

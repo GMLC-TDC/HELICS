@@ -36,6 +36,7 @@ repos:
     hooks:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
+        exclude: "mac.md"
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.10
     hooks:
