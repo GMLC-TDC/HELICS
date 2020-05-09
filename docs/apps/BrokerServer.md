@@ -1,16 +1,14 @@
-Broker Server
-=======
+# Broker Server
 
 [Brokers](Broker.md) function as intermediaries or roots in the HELICS hierarchy
 The broker server is an executable that can be used to automatically generate brokers on an as needed basis
-and coordinate their control and management.  It is considered experimental as version 2.2 only works with the ZMQ core type.  Future versions will expand this significantly.
+and coordinate their control and management. It is considered experimental as version 2.2 only works with the ZMQ core type. Future versions will expand this significantly.
 
 Future plans include expanding to all networking core types (ZMQ, ZMQSS, TCP, TCPSS, UDP, and MPI), expanding the abilities of a terminal program and making a Restful interface to the server and underlying brokers.
 
+## Command line arguments
 
-Command line arguments
-----------
-```
+```text
 The Broker server is a helics broker coordinator that can generate brokers on request
 Usage:helics_broker_server [OPTIONS] [config]
 
@@ -51,7 +49,7 @@ helics_broker_server server types starts a broker with the given args and waits 
 
 If the Broker_server is started with `term` as the first option, a terminal is opened for user entry of commands all command line arguments following term are passed to the broker.
 
-```
+```text
 starting broker Server
 servers started
 helics-broker-server>>help
@@ -62,6 +60,5 @@ helics-broker-server>>help
 
 helics-broker-server>>
 ```
-
 
 more commands will be added in future releases

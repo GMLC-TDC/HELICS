@@ -18,7 +18,7 @@ These objects can be used through ValueFederate calls or as independent object w
 
 File based configuration looks primarily at an "publications" or "subscriptions" JSON array.
 
-```
+```json
 //this should be a valid json file (except comments are not recognized in standard JSON)
 { //example json configuration file for a value federate all arguments are optional
 "name":"valueFed", // the name of the federate
@@ -75,7 +75,6 @@ File based configuration looks primarily at an "publications" or "subscriptions"
 
 "globals":[["global1","this is a global1 value"],["global2","this is another global value"]]
 }
-
 
 ```
 

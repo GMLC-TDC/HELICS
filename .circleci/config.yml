@@ -1,6 +1,5 @@
 version: 2
 aliases:
-
   - &setup_helics
     name: setup_helics
     environment:
@@ -13,44 +12,44 @@ aliases:
   - &run_octave_tests
     name: run_octave_tests
     command: |
-       cd build
-       make install
-       cd ${OCTAVETEST}
-       # this return the write error code in RESULT
-       octave -W -V --eval "source('runTestsCIRCLECI.m');"
-       RESULT=$?
-       echo "*** Octave test result: "${RESULT}
-       exit $RESULT
+      cd build
+      make install
+      cd ${OCTAVETEST}
+      # this return the write error code in RESULT
+      octave -W -V --eval "source('runTestsCIRCLECI.m');"
+      RESULT=$?
+      echo "*** Octave test result: "${RESULT}
+      exit $RESULT
 
   - &run_helics_tests
     name: run_helics_tests
     command: |
-       /root/project/scripts/run-circleci-tests.sh
-       RESULT=$?
-       exit $RESULT
+      /root/project/scripts/run-circleci-tests.sh
+      RESULT=$?
+      exit $RESULT
 
   - &run_installer_tests
     name: run_installer_tests
     command: |
-       cd build
-       make install
-       ctest -V -R find-package-tests
-       ctest -V -R package-config-tests
+      cd build
+      make install
+      ctest -V -R find-package-tests
+      ctest -V -R package-config-tests
 
   - &run_benchmarks
     name: run_benchmarks
     command: |
-       mkdir /tmp/bm_results
-       cd build
-       make RUN_KEY_BENCHMARKS
+      mkdir /tmp/bm_results
+      cd build
+      make RUN_KEY_BENCHMARKS
 
 jobs:
   helicsoctave:
     docker:
       - image: helics/buildenv:octave
     environment:
-      OCTAVETEST: "/root/project/tests/octave"
-      CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
+      OCTAVETEST: '/root/project/tests/octave'
+      CMAKE_FLAGS: '-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON'
     steps:
       - checkout
       - run: *setup_helics
@@ -166,7 +165,7 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "0 8 * * *"
+          cron: '0 8 * * *'
           filters:
             branches:
               only:
@@ -182,7 +181,7 @@ workflows:
   benchmark:
     triggers:
       - schedule:
-          cron: "17 9 * * 0,2,5"
+          cron: '17 9 * * 0,2,5'
           filters:
             branches:
               only:
