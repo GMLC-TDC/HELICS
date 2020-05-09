@@ -26,10 +26,9 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
 
    _Time step size_ - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to run to a time that is has no concept of (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). Configuration of the timing is further discussed in the a later [section on timing](./timing.md).
 
+   Below is an example of how a very generic configuration for the transmission federate could look followed by one for the distribution federate.
 
-    Below is an example of how a very generic configuration for the transmission federate could look followed by one for the distribution federate.
-
-    ```json
+```json
     {
         "name":"transmission_federate",
         "coreType":"ZMQ"
@@ -46,9 +45,9 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
             "required":true
         }],
     }
-    ```
+```
 
-    ```json
+```json
     {
         "name":"distribution_federate",
         "coreType":"ZMQ"
@@ -65,7 +64,7 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
             "required":true
         }],
     }
-    ```
+```
 
 3. **Launch co-simulation/Initialize federates** - This will create the federates as entities recognized by the broker, set-up the communication channels for their messages to be passed, pass some initial messages and execute some preliminary code as preparation for the beginning of the co-simulation proper. The later is particularly important if the various federates need to reach a self-consistent state as an initial condition of the system.
 

@@ -4,8 +4,6 @@
 
 The following is a set of guidelines for contributing to HELICS and associated projects. These are suggested guidelines. Use your best judgment.
 
-#### Table Of Contents
-
 ## Licensing
 
 HELICS is distributed under the terms of the BSD-3 clause license. All new

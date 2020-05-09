@@ -19,10 +19,11 @@
 
 * **Please tell us about your environment:**
 
-  - HELICS version: <!-- 1.3.0 (07-31-18) -->
+- HELICS version: <!-- 1.3.0 (07-31-18) -->
 
-```
+```sh
 $ helics_app --version
+2.4.2 (2020-03-28)
 ```
 
 - Operating System: [all | Windows | Mac | Linux]
