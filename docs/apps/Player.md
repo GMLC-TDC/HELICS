@@ -8,7 +8,7 @@ into other components
 
 ## Command line arguments
 
-```
+```text
 command line only:
   -? [ --help ]          produce help message
   -v [ --version ]       display a version string
@@ -57,7 +57,7 @@ also permissible are all arguments allowed for federates and any specific broker
 
 the player executable also takes an untagged argument of a file name for example
 
-```
+```sh
 helics_player player_file.txt --stop 5
 ```
 
@@ -71,7 +71,7 @@ Players support both delimited text files and JSON files some examples can be fo
 
 a simple example of a player file publishing values
 
-```
+```text
 #second    topic                type(opt)                    value
 -1.0, pub1, d, 0.3
 1, pub1, 0.5
@@ -122,13 +122,13 @@ values with time==0 are sent immediately after entering execution phase
 
 messages are specified in one of two forms
 
-```
+```text
 m <time> <source> <dest>  <data>
 ```
 
 or
 
-```
+```text
 m <sendtime> <deliverytime> <source> <dest> <time> <data>
 ```
 
@@ -141,7 +141,7 @@ player values can also be specified via JSON files
 
 here are two examples of the text format and equivalent JSON
 
-```
+```text
 #example player file
 mess 1.0 src dest "this is a test message"
 mess 1.0 2.0 src dest "this is test message2"
@@ -150,7 +150,7 @@ M 2.0 3.0 src dest "this is message 3"
 
 JSON example
 
-```
+```json
  {
     "messages": [{
             "source": "src",
@@ -178,7 +178,7 @@ JSON example
 }
 ```
 
-```
+```text
 #second    topic                type(opt)                    value
 -1 pub1 d 0.3
 1 pub1 d 0.5
@@ -191,7 +191,7 @@ JSON example
 
 Example JSON
 
-```
+```json
 {
     "points": [{
             "key": "pub1",
