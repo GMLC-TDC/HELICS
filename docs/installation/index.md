@@ -1,5 +1,4 @@
-Installation
-============
+# Installation
 
 The first step to using HELICS is to install it.
 You’ll need an internet connection to run the commands in this chapter, as we’ll be downloading HELICS from the internet.
@@ -8,7 +7,7 @@ We’ll be showing a number of commands as code snippets in the following presen
 You don’t need to type in the `$` character; they are there to indicate the start of each command.
 Lines that don’t start with `$` are typically showing the output of the previous command.
 
-### Quick start
+## Quick start
 
 Get the latest installers from [GitHub Releases](https://github.com/GMLC-TDC/HELICS/releases/latest).
 
@@ -39,7 +38,7 @@ spack install helics
 
 For more information on supported options (e.g. using a custom HELICS build with MPI support) and troubleshooting tips, see the [package managers](https://helics.readthedocs.io/en/latest/installation/package_manager.html) page for more details, or the documentation for your package manager.
 
-### Using an installer for your operating system
+## Using an installer for your operating system
 
 Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS/releases/latest) and add them to your path.
 Windows users should install the latest version of the [Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads).
@@ -52,7 +51,7 @@ On MacOS or Linux, you can edit your `~/.bashrc` to add the necessary PATH, PYTH
 
 Be sure to restart your CMD prompt on Windows or Terminal on your MacOS/Linux to ensure the new environment variables are in effect.
 
-### Using a package manager for your operating system
+## Using a package manager for your operating system
 
 You can install it using one of the supported package managers.
 
@@ -65,8 +64,7 @@ You can install it using one of the supported package managers.
 
 Alternatively, you can install from source. See the next section for more information.
 
-### OS Specific installation from source
-
+## OS Specific installation from source
 
 ```eval_rst
 .. toctree::
@@ -118,4 +116,4 @@ This means you can pass it configurations settings as a key value pair by adding
 For example, to build the Python extension all you need to do is pass in `-DBUILD_PYTHON_INTERFACE=ON`.
 You can also run `ccmake .` in the build folder, to get a command line interactive prompt to change configuration settings.
 On Windows, you can use the cmake GUI to do the same.
-Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required.  Available CMake options for HELICS are documented [here](https://helics.readthedocs.io/en/latest/installation/helics_cmake_options.html).
+Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](https://helics.readthedocs.io/en/latest/installation/helics_cmake_options.html).

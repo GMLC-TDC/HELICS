@@ -21,14 +21,14 @@ The format is json.
 
 ```json
 {
-    "http":{
-        "port":8080,
-        "interface":"0.0.0.0"
-    },
-    "webscoket":{
-        "port":8008,
-        "interface":"0.0.0.0"
-    }
+  "http": {
+    "port": 8080,
+    "interface": "0.0.0.0"
+  },
+  "webscoket": {
+    "port": 8008,
+    "interface": "0.0.0.0"
+  }
 }
 ```
 
@@ -82,11 +82,11 @@ The running webserver will start a process that can respond to HTTP requests.
 +-------------+---------------------------------------------------------------------------------------+
 ```
 
-Valid commands for the ``command`` parameter in either JSON or the URI:
+Valid commands for the `command` parameter in either JSON or the URI:
 
--   `query`, `search` :  run a query
--   `create` : create a broker
--   `delete`, `remove` : remove a broker
+- `query`, `search` : run a query
+- `create` : create a broker
+- `delete`, `remove` : remove a broker
 
 ## Websocket API
 
@@ -98,14 +98,14 @@ For create/delete commands the response will be:
 
 ```json
 {
-    "status":0
+  "status": 0
 }
 ```
 
 ```json
 {
-    "status":0,
-    "value":"<query result>"
+  "status": 0,
+  "value": "<query result>"
 }
 ```
 
@@ -113,8 +113,8 @@ For queries that are not a json value the response will be:
 
 ```json
 {
-    "status":401, //or some other code
-    "error":"error message"
+  "status": 401, //or some other code
+  "error": "error message"
 }
 ```
 
@@ -122,8 +122,8 @@ For queries that did not result in a valid response the response will be:
 
 ```json
 {
-    "status":404,
-    "error":"error message"
+  "status": 404,
+  "error": "error message"
 }
 ```
 
@@ -137,7 +137,7 @@ Currently only queries are supported, though eventually the plan is to support o
 The response to queries is a string either in plain text or json.
 For example:
 
-```
+```text
 localhost/brokers
 ```
 
@@ -145,41 +145,40 @@ will return
 
 ```json
 {
-   "brokers" :
-   [
-      {
-         "address" : "tcp://127.0.0.1:23408",
-         "isConnected" : true,
-         "isOpen" : false,
-         "isRoot" : true,
-         "name" : "brokerA"
-      },
-      {
-         "address" : "tcp://127.0.0.1:23410",
-         "isConnected" : true,
-         "isOpen" : true,
-         "isRoot" : true,
-         "name" : "brokerB"
-      }
-   ]
+  "brokers": [
+    {
+      "address": "tcp://127.0.0.1:23408",
+      "isConnected": true,
+      "isOpen": false,
+      "isRoot": true,
+      "name": "brokerA"
+    },
+    {
+      "address": "tcp://127.0.0.1:23410",
+      "isConnected": true,
+      "isOpen": true,
+      "isRoot": true,
+      "name": "brokerB"
+    }
+  ]
 }
 ```
 
 Other queries should be directed to a specific broker such as:
 
-```
+```text
 http://localhost/brokerA/brokers
 ```
 
 which will produce a string vector:
 
-```
+```text
 [41888-wfQ8t-GIGjS-dndI3-e7zuk;41888-e9KF2-HAfm8-Rft0w-JLV4a]
 ```
 
 The following:
 
-```
+```text
 http://localhost/brokerA/federate_map
 ```
 
@@ -187,53 +186,50 @@ will produce a map of the federates in the federation:
 
 ```json
 {
-   "brokers" : [],
-   "cores" :
-   [
-      {
-         "federates" :
-         [
-            {
-               "id" : 131072,
-               "name" : "fedA_1",
-               "parent" : 1879048192
-            }
-         ],
-         "id" : 1879048192,
-         "name" : "41888-wfQ8t-GIGjS-dndI3-e7zuk",
-         "parent" : 1
-      },
-      {
-         "federates" :
-         [
-            {
-               "id" : 131073,
-               "name" : "fedA_2",
-               "parent" : 1879048193
-            }
-         ],
-         "id" : 1879048193,
-         "name" : "41888-e9KF2-HAfm8-Rft0w-JLV4a",
-         "parent" : 1
-      }
-   ],
-   "id" : 1,
-   "name" : "brokerA"
+  "brokers": [],
+  "cores": [
+    {
+      "federates": [
+        {
+          "id": 131072,
+          "name": "fedA_1",
+          "parent": 1879048192
+        }
+      ],
+      "id": 1879048192,
+      "name": "41888-wfQ8t-GIGjS-dndI3-e7zuk",
+      "parent": 1
+    },
+    {
+      "federates": [
+        {
+          "id": 131073,
+          "name": "fedA_2",
+          "parent": 1879048193
+        }
+      ],
+      "id": 1879048193,
+      "name": "41888-e9KF2-HAfm8-Rft0w-JLV4a",
+      "parent": 1
+    }
+  ],
+  "id": 1,
+  "name": "brokerA"
 }
 ```
 
 Making an invalid query will produce:
 
-`http://localhost/brokerA/i_dont_care`  -> `#invalid`
+`http://localhost/brokerA/i_dont_care` -> `#invalid`
 
 Queries can be make in a number of different formats, the following are equivalent:
 
--   `http://localhost/brokerA/publications`
--   `http://localhost/brokerA`
--   `http://localhost/brokerA?query=publications`
--   `http://localhost/brokerA/publications`
--   `http://localhost/brokerA/root/publications`
--   `http://localhost?broker=brokerA&query=publications&target=root`
+- `http://localhost/brokerA/publications`
+- `http://localhost/brokerA`
+- `http://localhost/brokerA?query=publications`
+- `http://localhost/brokerA/publications`
+- `http://localhost/brokerA/root/publications`
+- `http://localhost?broker=brokerA&query=publications&target=root`
 
 In the example, these will all produce `[pub1;fedA_1/pub_string]` which is a list of the publications.
 POST requests can also be made using a similar format.
@@ -254,10 +250,10 @@ For example:
 
 ```json
 {
-    "command":"search",
-    "broker":"broker1",
-    "target":"federate0",
-    "query":"current_state"
+  "command": "search",
+  "broker": "broker1",
+  "target": "federate0",
+  "query": "current_state"
 }
 ```
 
