@@ -30,7 +30,7 @@ across different compilers*/
         cmd_register_route = -15,  //!< instructions to create a direct route to another federate
         cmd_reg_fed = -105,  //!< register a federate
         cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that
-                                  //!< doesn't do anything
+        //!< doesn't do anything
         cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
         cmd_set_global = -cmd_info_basis - 55,  //!< set a global value
         cmd_broker_query = -37,  //!< send a query to a core
