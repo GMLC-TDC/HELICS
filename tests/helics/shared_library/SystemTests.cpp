@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -100,7 +100,8 @@ TEST(other_tests, core_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
-// test global value creation from a federate and some error pathways for queries and global creation
+// test global value creation from a federate and some error pathways for queries and global
+// creation
 TEST(other_tests, federate_global_value)
 {
     auto err = helicsErrorInitialize();
@@ -122,7 +123,7 @@ TEST(other_tests, federate_global_value)
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    argv[3] = "--period=frogs";  //this is meant to generate an error in command line processing
+    argv[3] = "--period=frogs";  // this is meant to generate an error in command line processing
 
     auto fi2 = helicsFederateInfoClone(fi, &err);
     EXPECT_NE(fi2, nullptr);
@@ -195,7 +196,8 @@ TEST(other_tests, federate_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
-// test global value creation from a federate and some error pathways for queries and global creation
+// test global value creation from a federate and some error pathways for queries and global
+// creation
 TEST(other_tests, federate_add_dependency)
 {
     auto err = helicsErrorInitialize();

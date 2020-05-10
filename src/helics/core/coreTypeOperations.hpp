@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -26,8 +26,8 @@ helics::core_type::unrecognized if the type is not valid
     core_type coreTypeFromString(std::string type) noexcept;
 
     /**
- * Returns true if core/broker type specified is available in current compilation.
- */
+     * Returns true if core/broker type specified is available in current compilation.
+     */
     bool isCoreTypeAvailable(core_type type) noexcept;
 
     /** check if two data types are compatible with each other

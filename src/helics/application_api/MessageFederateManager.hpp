@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -28,7 +28,8 @@ namespace helics {
 class Core;
 class MessageFederate;
 /** class handling the implementation details of a value Federate
-@details the functions will parallel those in message Federate and contain the actual implementation details
+@details the functions will parallel those in message Federate and contain the actual implementation
+details
 */
 class MessageFederateManager {
   public:

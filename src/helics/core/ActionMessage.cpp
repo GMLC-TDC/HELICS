@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ActionMessage.hpp"
@@ -75,7 +75,7 @@ ActionMessage::ActionMessage(const char* data, size_t size): ActionMessage()
 
 ActionMessage::~ActionMessage() = default;
 
-ActionMessage& ActionMessage::operator=(const ActionMessage& act)  //NOLINT
+ActionMessage& ActionMessage::operator=(const ActionMessage& act)  // NOLINT
 {
     messageAction = act.messageAction;
     messageID = act.messageID;
@@ -157,8 +157,8 @@ static inline std::uint8_t isLittleEndian()
     return (*reinterpret_cast<std::int8_t*>(&test) == 1) ? std::uint8_t(1) : 0;
 }
 
-// action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload
-// size(4 bytes)+1 byte for number of strings=45
+// action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8
+// bytes)+payload size(4 bytes)+1 byte for number of strings=45
 static constexpr int action_message_base_size = static_cast<int>(
     7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1);
 
@@ -574,8 +574,9 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
 
 static constexpr char unknownStr[] = "unknown";
 
-// done in this screwy way because this can be called after things have started to be deconstructed so static
-// consts can cause seg faults someday will change to frozen::  once we can use all of C++14
+// done in this screwy way because this can be called after things have started to be deconstructed
+// so static consts can cause seg faults someday will change to frozen::  once we can use all of
+// C++14
 
 static constexpr std::pair<action_message_def::action_t, const char*> actionStrings[] = {
     // priority commands
@@ -676,15 +677,16 @@ static constexpr std::pair<action_message_def::action_t, const char*> actionStri
     {action_message_def::action_t::cmd_time_barrier_request, "request time barrier"},
     {action_message_def::action_t::cmd_time_barrier, "time barrier"},
     {action_message_def::action_t::cmd_time_barrier_clear, "clear time barrier"},
-    // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
+    // protocol messages are meant for the communication standard and are not used in the
+    // Cores/Brokers
     {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
     {action_message_def::action_t::cmd_protocol, "protocol"},
     {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
 using actionPair = std::pair<action_message_def::action_t, const char*>;
 static constexpr size_t actEnd = sizeof(actionStrings) / sizeof(actionPair);
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
-// can (in actuality) be used as the program is shutting down
+// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
+// this function can (in actuality) be used as the program is shutting down
 const char* actionMessageType(action_message_def::action_t action)
 {
     const auto* pptr = static_cast<const actionPair*>(actionStrings);
@@ -709,8 +711,9 @@ static constexpr std::pair<int, const char*> errorStrings[] = {
 using errorPair = std::pair<int, const char*>;
 static constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
 
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
-// can (in actuality-there was a case that did this) be used as the program is shutting down
+// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
+// this function can (in actuality-there was a case that did this) be used as the program is
+// shutting down
 const char* commandErrorString(int errorcode)
 {
     const auto* pptr = static_cast<const errorPair*>(errorStrings);

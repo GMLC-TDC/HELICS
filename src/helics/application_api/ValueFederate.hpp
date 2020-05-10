@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -27,13 +27,16 @@ class HELICS_CXX_EXPORT ValueFederate:
 {
   public:
     /**constructor taking a federate information structure and using the default core
-    @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+    @param fedName the name of the federate, can be empty to use the name from fi or an auto
+    generated one
     @param fi  a federate information structure
     */
     ValueFederate(const std::string& fedName, const FederateInfo& fi);
 
-    /**constructor taking a core and a federate information structure, core information in fi is ignored
-    @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+    /**constructor taking a core and a federate information structure, core information in fi is
+    ignored
+    @param fedName the name of the federate, can be empty to use the name from fi or an auto
+    generated one
     @param core a shared ptr to a core to join
     @param fi  a federate information structure
     */
@@ -51,15 +54,15 @@ class HELICS_CXX_EXPORT ValueFederate:
                   const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a string with the required information
-    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string
+    containing JSON code
     */
     explicit ValueFederate(const std::string& configString);
 
     /**constructor taking a name and a string with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
-    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code or a string with command line arguments
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string
+    containing JSON code or a string with command line arguments
     */
     ValueFederate(const std::string& fedName, const std::string& configString);
 
@@ -237,7 +240,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     }
 
     /** register a required subscription
-    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+    @details call is only valid in startup mode, register an optional subscription for a 1D array of
+    values
     @param key the name of the subscription
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
@@ -271,7 +275,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     }
 
     /** register a required subscription
-    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+    @details call is only valid in startup mode, register an optional subscription for a 1D array of
+    values
     @param key the name of the subscription
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
@@ -395,17 +400,18 @@ class HELICS_CXX_EXPORT ValueFederate:
     void setDefaultValue(const Input& inp, data_view block);
 
     /** register a set of interfaces defined in a file
-    @details call is only valid in startup mode to add an TOML files must have extension .toml or .TOML
-    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate the
-    interfaces
+    @details call is only valid in startup mode to add an TOML files must have extension .toml or
+    .TOML
+    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate
+    the interfaces
     */
     virtual void registerInterfaces(const std::string& configString) override;
 
     /** register a set of value interfaces (publications and subscriptions)
-    @details call is only valid in startup mode it is a protected call to add an TOML files must have extension
-    .toml or .TOML
-    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate the
-    interfaces
+    @details call is only valid in startup mode it is a protected call to add an TOML files must
+    have extension .toml or .TOML
+    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate
+    the interfaces
     */
     void registerValueInterfaces(const std::string& configString);
 
@@ -491,7 +497,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     void removeTarget(const Input& inp, const std::string& target);
 
     /** add a 1-d Indexed target to an interface
-   @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+   @details call is only valid in startup mode, register an optional subscription for a 1D array of
+   values
    @param iObject an interface object to add the target to
    @param target the name of the target
    @param index1 the index into a 1 dimensional array of values
@@ -545,44 +552,55 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return empty string if an invalid input is passed or it has no target*/
     const std::string& getTarget(const Input& inp) const;
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(const std::string& key) const;
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     Input& getInput(const std::string& key);
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(int index) const;
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     Input& getInput(int index);
     /** get the id of a subscription from a vector of subscriptions
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(const std::string& key, int index1) const;
     /** get an input object from a 2-d vector of inputs
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(const std::string& key, int index1, int index2) const;
 
     /** get the input id based on target
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getSubscription(const std::string& target) const;
 
     /** get an input based on target
     @details this will only get the first subscription with a specific target
-   @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+   @return an invalid input object if the target is valid otherwise a reference to the corresponding
+   input*/
     Input& getSubscription(const std::string& target);
 
     /** get a publication from its name
     @param key the name of the publication
-    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding
+    publication*/
     Publication& getPublication(const std::string& key);
     /** get a publication from its key
     @param key the name of the publication
-    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding
+    publication*/
     const Publication& getPublication(const std::string& key) const;
     /** get a publication from its index
     @param index the 0 based index of the publication to retrieve
-    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding
+    publication*/
     Publication& getPublication(int index);
     /** get a publication from its index
     @param index the 0 based index of the publication to retrieve

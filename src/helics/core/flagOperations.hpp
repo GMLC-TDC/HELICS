@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -34,7 +34,7 @@ enum operation_flags : uint16_t {
 };
 
 constexpr uint16_t slow_responding_flag =
-    14;  //overload of extra_flag4 indicating a federate, core or broker is slow responding
+    14;  // overload of extra_flag4 indicating a federate, core or broker is slow responding
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

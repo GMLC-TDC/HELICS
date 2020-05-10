@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -25,7 +25,8 @@ enum class interface_networks : char;
  */
 class CommsInterface {
   public:
-    /** enumeration of whether the threading system should generate a single thread or multiple threads*/
+    /** enumeration of whether the threading system should generate a single thread or multiple
+     * threads*/
     enum class thread_generation {
         single,  // indicate that a single thread is used for transmitting and receiving
         dual  // indicate that separate threads are used 1 for transmission and one for reception
@@ -97,7 +98,8 @@ class CommsInterface {
     void logMessage(const std::string& message) const;
 
   protected:
-    /// enumeration of the connection status flags for more immediate feedback from the processing threads
+    /// enumeration of the connection status flags for more immediate feedback from the processing
+    /// threads
     enum class connection_status : int {
 
         startup = -1,  //!< the connection is in startup mode
@@ -141,8 +143,8 @@ class CommsInterface {
         loggingCallback;  //!< callback for logging
     gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
         txQueue;  //!< set of messages waiting to be transmitted
-    // closing the files or connection can take some time so there is a need for inter-thread communication to not
-    // spit out warning messages if it is in the process of disconnecting
+    // closing the files or connection can take some time so there is a need for inter-thread
+    // communication to not spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
         false};  //!< flag indicating that the comm system is in the process of disconnecting
     interface_networks interfaceNetwork = interface_networks::local;

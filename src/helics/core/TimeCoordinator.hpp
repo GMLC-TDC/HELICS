@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -47,7 +47,8 @@ class tcoptions {
 };
 
 /** class managing the coordination of time in HELICS
-the time coordinator manages dependencies and computes whether time can advance or enter execution mode
+the time coordinator manages dependencies and computes whether time can advance or enter execution
+mode
 */
 class TimeCoordinator {
   private:
@@ -68,7 +69,8 @@ class TimeCoordinator {
     shared_guarded_m<std::vector<global_federate_id>>
         dependent_federates;  //!< these are to maintain an accessible record of dependent federates
     shared_guarded_m<std::vector<global_federate_id>>
-        dependency_federates;  //!< these are to maintain an accessible record of dependency federates
+        dependency_federates;  //!< these are to maintain an accessible record of dependency
+                               //!< federates
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id>
         dependents;  //!< federates which temporally depend on this federate
@@ -81,13 +83,13 @@ class TimeCoordinator {
     global_federate_id source_id{
         0};  //!< the identifier for inserting into the source id field of any generated messages;
     iteration_request iterating{
-        iteration_request::
-            no_iterations};  //!< indicator that the coordinator should be iterating if need be
+        iteration_request::no_iterations};  //!< indicator that the coordinator should be iterating
+                                            //!< if need be
     bool checkingExec{
         false};  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
-    bool hasInitUpdates{
-        false};  //!< flag indicating that a value or message was received during initialization stage
+    bool hasInitUpdates{false};  //!< flag indicating that a value or message was received during
+                                 //!< initialization stage
   private:
     std::atomic<int32_t> iteration{0};  //!< iteration counter
     bool disconnected{false};

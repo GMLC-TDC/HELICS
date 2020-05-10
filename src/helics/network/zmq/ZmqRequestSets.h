@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -31,9 +31,9 @@ namespace zeromq {
 
     /** class for dealing with the priority message paths from a ZMQ comm object
 @details it manages a set of routes to different priority queues and handles the responses
-THIS CLASS IS NOT THREAD SAFE- ZMQ sockets cannot be transferred between threads without special care so it would
-be VERY problematic to use this where multiple threads will interact with it,  thus no reason to make it thread
-safe
+THIS CLASS IS NOT THREAD SAFE- ZMQ sockets cannot be transferred between threads without special
+care so it would be VERY problematic to use this where multiple threads will interact with it,  thus
+no reason to make it thread safe
 */
     class ZmqRequestSets {
       public:
@@ -69,8 +69,8 @@ safe
         std::vector<WaitingResponse> active_messages;  //!< more information about waiting messages
         std::vector<std::pair<int, ActionMessage>>
             waiting_messages;  //!< messages that are queued up to send
-        std::deque<ActionMessage>
-            Responses;  //!< message that have been received and are waiting to be sent to the holder
+        std::deque<ActionMessage> Responses;  //!< message that have been received and are waiting
+                                              //!< to be sent to the holder
         std::shared_ptr<ZmqContextManager> ctx;  //!< the ZMQ context manager
     };
 }  // namespace zeromq

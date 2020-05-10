@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/common/AsioContextManager.h"
@@ -216,7 +216,8 @@ TEST(TcpSSCore, tcpSSComm_transmit_through)
         ++counter2;
         act2 = m;
     });
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
     auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
     bool connected1 = comm2.connect();
     ASSERT_TRUE(connected1);
@@ -287,8 +288,9 @@ TEST(TcpSSCore, tcpSSComm_transmit_add_route)
         act3 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on each other in this case
-    // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect();
+    // });
 
     bool connected = comm2.connect();
     ASSERT_TRUE(connected);

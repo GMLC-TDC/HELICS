@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -22,11 +22,10 @@ class HandleManager {
     /** use deque here as there are several use cases which use two properties of a deque vs vector
     namely that references are not invalidated by emplace back, which is unlike a vector
     and that the memory growth is a stable and not subject to large copy operations
-    this allows much more stable growth to bigger sizes if need be since we don't need contiguous memory,
-    just iterators, so these properties outweigh the slight decrease in overall performance, otherwise we would
-    need two classes that do basically
-    the same thing just with different container types so using deque reduce the amount of the code to maintain as
-    well*/
+    this allows much more stable growth to bigger sizes if need be since we don't need contiguous
+    memory, just iterators, so these properties outweigh the slight decrease in overall performance,
+    otherwise we would need two classes that do basically the same thing just with different
+    container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
     std::unordered_map<std::string, interface_handle>
         publications;  //!< map of all local publications

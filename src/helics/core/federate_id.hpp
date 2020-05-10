@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -105,7 +105,8 @@ struct hash<helics::local_federate_id> {
     }
 };
 
-/** define a template specialization for hash function for interface_handle so it can be used in unordered_map*/
+/** define a template specialization for hash function for interface_handle so it can be used in
+ * unordered_map*/
 template<>
 struct hash<helics::interface_handle> {
     using argument_type = helics::interface_handle;  //!< type of object to hash

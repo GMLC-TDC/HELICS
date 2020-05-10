@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/common/AsioContextManager.h"
@@ -299,7 +299,8 @@ TEST(TcpCore, tcpComm_transmit_through)
         ++counter2;
         act2 = m;
     });
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
 
     bool connected1 = comm2.connect();
     ASSERT_TRUE(connected1);

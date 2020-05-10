@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -264,7 +264,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     EXPECT_EQ(time, 1.0);
 
     auto opt_val = helicsEndpointGetOption(epid, helics_handle_option_ignore_interrupts);
-    //someday this might get implemented but for now it isn't so we expect false
+    // someday this might get implemented but for now it isn't so we expect false
     EXPECT_EQ(opt_val, false);
 
     auto res = helicsFederateHasMessage(mFed1);
@@ -391,7 +391,7 @@ TEST(message_object, test1)
     helicsMessageSetMessageID(m1, 10, nullptr);
     EXPECT_EQ(helicsMessageGetMessageID(m1), 10);
 
-    //89 is an invalid flag
+    // 89 is an invalid flag
     EXPECT_EQ(helicsMessageCheckFlag(m1, 89), helics_false);
 
     helicsMessageSetString(m2, "raw data", nullptr);

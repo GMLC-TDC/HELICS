@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -850,8 +850,8 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
 
     EXPECT_EQ(s, "string2");
     vFed1->publish(pubid, "string3");
-    // so in theory the remove target could take a little while since it needs to route through the core on
-    // occasion
+    // so in theory the remove target could take a little while since it needs to route through the
+    // core on occasion
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
     gtime = vFed2->requestTime(3.0);
     EXPECT_EQ(gtime, 3.0);
@@ -882,7 +882,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
     vFed2->enterExecutingMode();
     f1finish.wait();
-    //both at executionMode
+    // both at executionMode
     // publish string1 at time=0.0;
     vFed1->publish(pubid, "string1");
     auto gtime = vFed1->requestTime(1.0);
@@ -895,7 +895,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     EXPECT_EQ(gtime, 3.0);
     vFed1->finalize();
 
-    //now start on vFed2
+    // now start on vFed2
     gtime = vFed2->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // get the value
@@ -920,8 +920,8 @@ TEST_F(valuefed_tests, rem_target_single_test)
 
     EXPECT_EQ(s, "string2");
 
-    // so in theory the remove target could take a little while since it needs to route through the core on
-    // occasion
+    // so in theory the remove target could take a little while since it needs to route through the
+    // core on occasion
     gtime = vFed2->requestTime(3.0);
     EXPECT_EQ(gtime, 3.0);
 

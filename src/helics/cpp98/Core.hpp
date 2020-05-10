@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_CORE_HPP_
@@ -86,7 +86,8 @@ class Core {
     const char* getAddress() const { return helicsCoreGetAddress(core); }
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
-    a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+    a few extra features of name matching to function on the federate interface but otherwise
+    equivalent behavior
     @param type the type of filter to create
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
@@ -97,8 +98,8 @@ class Core {
     }
 
     /** create a cloning Filter on the specified federate
-    @details cloning filters copy a message and send it to multiple locations source and destination can be added
-    through other functions
+    @details cloning filters copy a message and send it to multiple locations source and destination
+    can be added through other functions
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */

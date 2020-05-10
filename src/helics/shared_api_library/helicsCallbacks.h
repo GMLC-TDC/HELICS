@@ -34,11 +34,10 @@ extern "C" {
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerSetLoggingCallback(
-    helics_broker broker,
-    void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
-    void* userdata,
-    helics_error* err);
+HELICS_EXPORT void helicsBrokerSetLoggingCallback(helics_broker broker,
+                                                  void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
+                                                  void* userdata,
+                                                  helics_error* err);
 
 /**
  * Set the logging callback for a core.
@@ -54,11 +53,10 @@ HELICS_EXPORT void helicsBrokerSetLoggingCallback(
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreSetLoggingCallback(
-    helics_core core,
-    void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
-    void* userdata,
-    helics_error* err);
+HELICS_EXPORT void helicsCoreSetLoggingCallback(helics_core core,
+                                                void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
+                                                void* userdata,
+                                                helics_error* err);
 
 /**
  * Set the logging callback for a federate.
@@ -75,11 +73,11 @@ HELICS_EXPORT void helicsCoreSetLoggingCallback(
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetLoggingCallback(
-    helics_federate fed,
-    void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
-    void* userdata,
-    helics_error* err);
+HELICS_EXPORT void
+    helicsFederateSetLoggingCallback(helics_federate fed,
+                                     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
+                                     void* userdata,
+                                     helics_error* err);
 
 /**
  * Set a general callback for a custom filter.
@@ -95,11 +93,10 @@ HELICS_EXPORT void helicsFederateSetLoggingCallback(
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterSetCustomCallback(
-    helics_filter filter,
-    void (*filtCall)(helics_message_object message, void* userData),
-    void* userdata,
-    helics_error* err);
+HELICS_EXPORT void helicsFilterSetCustomCallback(helics_filter filter,
+                                                 void (*filtCall)(helics_message_object message, void* userData),
+                                                 void* userdata,
+                                                 helics_error* err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -81,8 +81,8 @@ std::pair<double, int> runInitIterations(helics_federate vfed, int index, int to
         auto val2 = helicsInputGetDouble(sub_low, nullptr);
         cval = (val1 + val2) / 2.0;
         ++itcount;
-        //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 : index -
-        //   1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
+        //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
+        //   index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
     }
     return {cval, itcount};
 }

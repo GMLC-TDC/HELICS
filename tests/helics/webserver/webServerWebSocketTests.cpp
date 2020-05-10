@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -56,7 +56,7 @@ class webTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);  //NOLINT
+        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);  // NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26247");

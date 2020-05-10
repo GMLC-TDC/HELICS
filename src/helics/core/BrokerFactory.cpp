@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -26,8 +26,8 @@ namespace helics {
 namespace BrokerFactory {
 
     /*** class to hold the set of builders
-    @details this doesn't work as a global since it tends to get initialized after some of the things that call it
-    so it needs to be a static member of function call*/
+    @details this doesn't work as a global since it tends to get initialized after some of the
+    things that call it so it needs to be a static member of function call*/
     class MasterBrokerBuilder {
       public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
@@ -142,21 +142,21 @@ namespace BrokerFactory {
         return broker;
     }
 
-    /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
- * loops*/
+    /** lambda function to join cores before the destruction happens to avoid potential problematic
+     * calls in the loops*/
     static auto destroyerCallFirst = [](auto& broker) {
         auto tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
         if (tbroker) {
-            tbroker->processDisconnect(
-                true);  // use true here as it is possible the searchableObjectHolder is deleted already
+            tbroker->processDisconnect(true);  // use true here as it is possible the
+                                               // searchableObjectHolder is deleted already
             tbroker->joinAllThreads();
         }
     };
-    /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
-that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
-can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
-what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
-need be without issue*/
+    /** so the problem this is addressing is that unregister can potentially cause a destructor to
+fire that destructor can delete a thread variable, unfortunately it is possible that a thread stored
+in this variable can do the unregister operation and destroy itself meaning it is unable to join and
+thus will call std::terminate what we do is delay the destruction until it is called in a different
+thread which allows the destructor to fire if need be without issue*/
 
     static gmlc::concurrency::DelayedDestructor<Broker>
         delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction

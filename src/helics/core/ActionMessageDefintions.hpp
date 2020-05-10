@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -29,8 +29,8 @@ across different compilers*/
         cmd_route_ack = -16,  //!< acknowledge reply to a route registration
         cmd_register_route = -15,  //!< instructions to create a direct route to another federate
         cmd_reg_fed = -105,  //!< register a federate
-        cmd_priority_ack =
-            -254,  //!< priority commands usually have an ack this is an ack that doesn't do anything
+        cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that
+                                  //!< doesn't do anything
         cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
         cmd_set_global = -cmd_info_basis - 55,  //!< set a global value
         cmd_broker_query = -37,  //!< send a query to a core
@@ -85,8 +85,8 @@ across different compilers*/
         cmd_warning = 9990,  //!< indicate some sort of warning
         cmd_error = 10000,  //!< indicate an error with a federate
         cmd_local_error = 10003,  //!< indicate a local error within a federate/core/broker
-        cmd_global_error =
-            10005,  //!< indicate a global error with a federate/core/broker and the federation should terminate
+        cmd_global_error = 10005,  //!< indicate a global error with a federate/core/broker and the
+                                   //!< federation should terminate
         cmd_error_check = 10001,  //!< check some status for error and error timeouts
         cmd_invalid = 1010101,  //!< indicates that command has generated an invalid state
         cmd_send_route = 75,  //!< command to define a route information

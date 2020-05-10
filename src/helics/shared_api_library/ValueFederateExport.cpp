@@ -155,12 +155,11 @@ helics_publication
     return nullptr;
 }
 
-helics_publication helicsFederateRegisterGlobalTypePublication(
-    helics_federate fed,
-    const char* key,
-    const char* type,
-    const char* units,
-    helics_error* err)
+helics_publication helicsFederateRegisterGlobalTypePublication(helics_federate fed,
+                                                               const char* key,
+                                                               const char* type,
+                                                               const char* units,
+                                                               helics_error* err)
 {
     // now generate a generic subscription
     auto fedObj = getValueFedSharedPtr(fed, err);
@@ -179,12 +178,11 @@ helics_publication helicsFederateRegisterGlobalTypePublication(
     return nullptr;
 }
 
-helics_publication helicsFederateRegisterGlobalPublication(
-    helics_federate fed,
-    const char* key,
-    helics_data_type type,
-    const char* units,
-    helics_error* err)
+helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
+                                                           const char* key,
+                                                           helics_data_type type,
+                                                           const char* units,
+                                                           helics_error* err)
 {
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
@@ -203,8 +201,9 @@ helics_publication helicsFederateRegisterGlobalPublication(
 
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
-        pub->pubPtr = &(fedObj->registerGlobalPublication(
-            AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
+        pub->pubPtr = &(fedObj->registerGlobalPublication(AS_STRING(key),
+                                                          helics::typeNameStringRef(static_cast<helics::data_type>(type)),
+                                                          AS_STRING(units)));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
     }
@@ -320,7 +319,7 @@ helics_input
 
 void helicsFederateRegisterFromPublicationJSON(helics_federate fed, const char* json, helics_error* err)
 {
-    if (json == nullptr) { // this isn't an error, just doesn't do anything
+    if (json == nullptr) {  // this isn't an error, just doesn't do anything
         return;
     }
     auto fedObj = getValueFedSharedPtr(fed, err);
@@ -337,7 +336,7 @@ void helicsFederateRegisterFromPublicationJSON(helics_federate fed, const char* 
 
 void helicsFederatePublishJSON(helics_federate fed, const char* json, helics_error* err)
 {
-    if (json == nullptr) { // this isn't an error just doesn't do anything
+    if (json == nullptr) {  // this isn't an error just doesn't do anything
         return;
     }
     auto fedObj = getValueFedSharedPtr(fed, err);
@@ -730,7 +729,7 @@ bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
 void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* actualSize, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
-    if (actualSize != nullptr) { // for initialization
+    if (actualSize != nullptr) {  // for initialization
         *actualSize = 0;
     }
     if (inpObj == nullptr) {
@@ -763,7 +762,7 @@ void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* a
 
 void helicsInputGetString(helics_input inp, char* outputString, int maxStringLen, int* actualLength, helics_error* err)
 {
-    if (actualLength != nullptr) { // for initialization
+    if (actualLength != nullptr) {  // for initialization
         *actualLength = 0;
     }
     auto* inpObj = verifyInput(inp, err);
@@ -776,7 +775,7 @@ void helicsInputGetString(helics_input inp, char* outputString, int maxStringLen
     }
     try {
         int length = inpObj->inputPtr->getValue(outputString, maxStringLen);
-        if (actualLength != nullptr) { // for initialization
+        if (actualLength != nullptr) {  // for initialization
             *actualLength = length;
         }
     }
@@ -857,7 +856,7 @@ char helicsInputGetChar(helics_input inp, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return '\x15'; //NAK (negative acknowledgment) symbol
+        return '\x15';  // NAK (negative acknowledgment) symbol
     }
     try {
         return inpObj->inputPtr->getValue<char>();
@@ -865,7 +864,7 @@ char helicsInputGetChar(helics_input inp, helics_error* err)
     // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return '\x15'; //NAK (negative acknowledgment) symbol
+        return '\x15';  // NAK (negative acknowledgment) symbol
     }
     // LCOV_EXCL_STOP
 }
@@ -956,7 +955,7 @@ void helicsInputGetVector(helics_input inp, double data[], int maxlen, int* actu
     }
     if ((data == nullptr) || (maxlen <= 0)) {
         inpObj->inputPtr->clearUpdate();
-        //this isn't an error, just no data retrieved
+        // this isn't an error, just no data retrieved
         return;
     }
     try {

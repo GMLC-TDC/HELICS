@@ -1,12 +1,13 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-/** the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
+/** the purpose of these objects are to convert a specific type into a data block for use in the
+ * core algorithms
  */
 
 #include "../core/core-data.hpp"
@@ -238,7 +239,7 @@ template<typename T>
 struct is_iterable<T,
                    typename std::enable_if_t<std::is_same<
                        decltype(std::begin(T()) != std::end(T()),  // begin/end and operator != and
-                                // has default constructor
+                                                                   // has default constructor
                                 void(),
                                 void(*std::begin(T())),  // dereference operator
                                 std::true_type{}),

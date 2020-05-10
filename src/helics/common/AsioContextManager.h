@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -27,8 +27,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 
-// The choice for noexcept isn't set correctly in asio::io_context (including asio.hpp instead didn't help)
-// With Boost 1.58 this resulted in a compile error, apparently from the BOOST_NOEXCEPT define being empty
+// The choice for noexcept isn't set correctly in asio::io_context (including asio.hpp instead
+// didn't help) With Boost 1.58 this resulted in a compile error, apparently from the BOOST_NOEXCEPT
+// define being empty
 #ifdef ASIO_ERROR_CATEGORY_NOEXCEPT
 #    undef ASIO_ERROR_CATEGORY_NOEXCEPT
 #endif
@@ -109,10 +110,11 @@ class AsioContextManager: public std::enable_shared_from_this<AsioContextManager
 
     static void closeContext(const std::string& contextName = std::string());
     /** tell the context to free the pointer and leak the memory on delete
-    @details You may ask why, well in windows systems when operating in a DLL if this context is closed after
-    certain other operations that happen when the DLL is unlinked bad things can happen, and since in nearly all
-    cases this happens at Shutdown leaking really doesn't matter that much and if you don't the context could
-    terminate before some other parts of the program which cause all sorts of odd errors and issues
+    @details You may ask why, well in windows systems when operating in a DLL if this context is
+    closed after certain other operations that happen when the DLL is unlinked bad things can
+    happen, and since in nearly all cases this happens at Shutdown leaking really doesn't matter
+    that much and if you don't the context could terminate before some other parts of the program
+    which cause all sorts of odd errors and issues
     */
     static void setContextToLeakOnDelete(const std::string& contextName = std::string());
     virtual ~AsioContextManager();
@@ -124,15 +126,17 @@ class AsioContextManager: public std::enable_shared_from_this<AsioContextManager
     asio::io_context& getBaseContext() const { return *ictx; }
 
     /** run a single thread for the context manager to execute asynchronous contexts in
-    @details will run a single thread for the io_context,  it will not stop the thread until either the context
-    manager is closed or the haltContextLoop function is called and there is no more work
+    @details will run a single thread for the io_context,  it will not stop the thread until either
+    the context manager is closed or the haltContextLoop function is called and there is no more
+    work
     @param contextName the name of the context
     */
     static LoopHandle runContextLoop(const std::string& contextName = std::string{});
 
     /** run a single thread for the context manager to execute asynchronous contexts in
-    @details will run a single thread for the io_context,  it will not stop the thread until either the context
-    manager is closed or the haltContextLoop function is called and there is no more work
+    @details will run a single thread for the io_context,  it will not stop the thread until either
+    the context manager is closed or the haltContextLoop function is called and there is no more
+    work
     */
     LoopHandle startContextLoop();
     /** check if the contextLoopo is running*/

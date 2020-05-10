@@ -1,7 +1,8 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/Publications.hpp"
@@ -109,8 +110,8 @@ TEST_F(timing_tests, simple_timing_test_message)
     res = vFed1->requestTimeComplete();
     EXPECT_EQ(res, 2.4);
     vFed1->finalize();
-    vFed2
-        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag)
@@ -154,8 +155,8 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
     vFed1->finalize();
-    vFed2
-        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag_option)
@@ -199,8 +200,8 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
     vFed1->finalize();
-    vFed2
-        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
@@ -249,8 +250,8 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
     vFed1->finalize();
-    vFed2
-        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
 }
 
 TEST_F(timing_tests, timing_with_input_delay)
@@ -275,17 +276,17 @@ TEST_F(timing_tests, timing_with_input_delay)
     ept1.send("e2", "test1");
     vFed1->requestTimeAsync(1.9);
     res = vFed2->requestTimeComplete();
-    EXPECT_EQ(
-        res,
-        1.1);  // the message should show up at the next available time point after the impact window
+    EXPECT_EQ(res,
+              1.1);  // the message should show up at the next available time point after the impact
+                     // window
     vFed2->requestTimeAsync(2.0);
     res = vFed1->requestTimeComplete();
     EXPECT_EQ(res, 1.9);
     res = vFed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);
     vFed1->finalize();
-    vFed2
-        ->finalize();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
 }
 
 TEST_F(timing_tests, timing_with_minDelta_change)

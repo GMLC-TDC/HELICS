@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helicsApp.hpp"
@@ -133,7 +133,7 @@ namespace apps {
 
     void App::loadTextFile(const std::string& textFile)
     {
-        //using namespace gmlc::utilities::stringOps;
+        // using namespace gmlc::utilities::stringOps;
         std::ifstream infile(textFile);
         std::string str;
 

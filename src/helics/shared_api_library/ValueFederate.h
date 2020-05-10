@@ -96,12 +96,11 @@ HELICS_EXPORT helics_publication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(
-    helics_federate fed,
-    const char* key,
-    helics_data_type type,
-    const char* units,
-    helics_error* err);
+HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
+                                                                         const char* key,
+                                                                         helics_data_type type,
+                                                                         const char* units,
+                                                                         helics_error* err);
 
 /**
  * Register a global publication with a defined type.
@@ -119,12 +118,11 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(
-    helics_federate fed,
-    const char* key,
-    const char* type,
-    const char* units,
-    helics_error* err);
+HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(helics_federate fed,
+                                                                             const char* key,
+                                                                             const char* type,
+                                                                             const char* units,
+                                                                             helics_error* err);
 
 /**
  * Register a named input.
@@ -297,12 +295,12 @@ HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* js
  */
 
 /**
-  * Check if a publication is valid.
-  *
-  * @param pub The publication to check.
-  *
-  * @return helics_true if the publication is a valid publication.
-  */
+ * Check if a publication is valid.
+ *
+ * @param pub The publication to check.
+ *
+ * @return helics_true if the publication is a valid publication.
+ */
 HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
 
 /**
@@ -575,7 +573,8 @@ HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
  *
  * @param ipt The input to get the data for.
  * @forcpponly
- * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an error.
+ * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
+ * error.
  * @endforcpponly
  *
  * @return A helics_complex structure with the value.

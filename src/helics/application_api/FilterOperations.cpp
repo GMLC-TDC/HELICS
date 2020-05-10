@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -109,8 +109,8 @@ double randDouble(random_dists_t dist, double p1, double p2)
         std::random_device{}() +
         static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
 #    else
-    // this will leak on thread termination,  older apple clang does not have proper thread_local variables so
-    // there really isn't any option
+    // this will leak on thread termination,  older apple clang does not have proper thread_local
+    // variables so there really isn't any option
     //  static __thread std::mt19937 *genPtr =
     //    new std::mt19937(std::random_device{}() +
     //        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));

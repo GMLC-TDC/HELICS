@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -127,8 +127,8 @@ void CoreBroker::setLoggingCallback(
 uint16_t CoreBroker::getNextAirlockIndex()
 {
     uint16_t index = nextAirLock++;
-    if (index >
-        2) {  // this is an atomic operation if the nextAirLock was not adjusted this could result in an out of bounds
+    if (index > 2) {  // this is an atomic operation if the nextAirLock was not adjusted this could
+                      // result in an out of bounds
         // exception if this check were not done
         index %= 2;
     }
@@ -534,8 +534,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 auto route = broker->route;
                 _brokers.addSearchTerm(global_broker_id(command.dest_id), broker->name);
                 routing_table.emplace(broker->global_id, route);
-                command.source_id =
-                    global_broker_id_local;  // we want the intermediate broker to change the source_id
+                command.source_id = global_broker_id_local;  // we want the intermediate broker to
+                                                             // change the source_id
                 transmit(route, command);
             } else {
                 _brokers.insert(command.name, global_broker_id(command.dest_id), command.name);
@@ -765,7 +765,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 if (ignore) {
                     break;
                 }
-                if (partDisconnected) {  // we are going to assume it disconnected just assume broker even though it may be a core, there
+                if (partDisconnected) {  // we are going to assume it disconnected just assume
+                                         // broker even though it may be a core, there
                     // probably isn't any difference for this purpose
                     LOG_CONNECTIONS(global_broker_id_local,
                                     getIdentifier(),
@@ -968,8 +969,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
         } break;
         case CMD_STOP:
             if ((getAllConnectionState() <
-                 connection_state::
-                     disconnected)) {  // only send a disconnect message if we haven't done so already
+                 connection_state::disconnected)) {  // only send a disconnect message if we haven't
+                                                     // done so already
                 timeCoord->disconnect();
                 if (!isRootc) {
                     ActionMessage m(CMD_DISCONNECT);
@@ -1721,8 +1722,8 @@ void CoreBroker::processDisconnect(bool skipUnregister)
 void CoreBroker::unregister()
 {
     /*We need to ensure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
-    that will be destroyed on function exit
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a
+    local variable that will be destroyed on function exit
     */
     auto keepBrokerAlive = BrokerFactory::findBroker(identifier);
     if (keepBrokerAlive) {
@@ -2104,7 +2105,7 @@ void CoreBroker::processError(ActionMessage& command)
         case CMD_LOCAL_ERROR:
         case CMD_ERROR:
             if (terminate_on_error) {
-                //upgrade the error to a global error and reprocess
+                // upgrade the error to a global error and reprocess
                 command.setAction(CMD_GLOBAL_ERROR);
                 processError(command);
                 return;
@@ -2369,7 +2370,7 @@ void CoreBroker::setGlobal(const std::string& valueName, const std::string& valu
     querycmd.setStringData(value);
     transmitToParent(std::move(querycmd));
 }
-//enumeration of subqueries that cascade and need multiple levels of processing
+// enumeration of subqueries that cascade and need multiple levels of processing
 enum subqueries : std::uint16_t {
     general_query = 0,
     federate_map = 1,
@@ -2800,8 +2801,8 @@ void CoreBroker::checkDependencies()
             }
         }
     } else {
-        // if there is more than 2 dependents(higher broker + 2 or more other objects then we need to be a
-        // timeCoordinator
+        // if there is more than 2 dependents(higher broker + 2 or more other objects then we need
+        // to be a timeCoordinator
         if (timeCoord->getDependents().size() > 2) {
             return;
         }
@@ -2863,7 +2864,7 @@ bool CoreBroker::allInitReady() const
         return false;
     }
     return getAllConnectionState() >= connection_state::init_requested;
-    //return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
+    // return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
     //   return ((brk._nonLocal) || (brk.state==connection_state::init_requested));
     //});
 }

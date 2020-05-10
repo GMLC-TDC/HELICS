@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -366,7 +366,8 @@ bool TimeCoordinator::updateTimeFactors()
     Time prev_next = time_next;
     updateNextPossibleEventTime();
 
-    //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id,
+    //    static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next) {
         update = true;
@@ -473,8 +474,8 @@ void TimeCoordinator::updateTimeGrant()
     }
     transmitTimingMessage(treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
-    // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
-    // static_cast<double>(time_minDe));
+    // static_cast<double>(time_allow), static_cast<double>(time_next),
+    // static_cast<double>(time_exec), static_cast<double>(time_minDe));
 }
 std::string TimeCoordinator::printTimeStatus() const
 {
@@ -651,7 +652,8 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_DISCONNECT_BROKER:
         case CMD_GLOBAL_ERROR:
         case CMD_LOCAL_ERROR:
-            // this command requires removing dependents as well as dealing with dependency processing
+            // this command requires removing dependents as well as dealing with dependency
+            // processing
             removeDependent(global_federate_id(cmd.source_id));
             break;
 

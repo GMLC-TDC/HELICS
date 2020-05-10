@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -29,7 +29,7 @@ namespace ipc {
         /** reverse the order in which the data will be extracted*/
         void dataBlock::reverse() {}
 
-        using namespace boost::interprocess;  //NOLINT
+        using namespace boost::interprocess;  // NOLINT
 
         /** default constructor*/
         IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(void* dataBlock,
@@ -44,7 +44,7 @@ namespace ipc {
             scoped_lock<interprocess_mutex> pushLock(m_pushLock);  // second pushLock
             pullData.clear();
             pushData.clear();
-            //TODO(PT): add the priority block
+            // TODO(PT): add the priority block
             queueEmptyFlag = true;
         }
 
@@ -65,11 +65,11 @@ val the value to push on the queue
                     conditionLock.unlock();
                     // release the push lock so we don't get a potential deadlock condition
                     pushLock.unlock();
-                    //all locks released
-                    //no lock the pulllock
+                    // all locks released
+                    // no lock the pulllock
                     scoped_lock<interprocess_mutex> pullLock(m_pullLock);
                     conditionLock.lock();
-                    queueEmptyFlag = false;  //reset the queueEmptyflag
+                    queueEmptyFlag = false;  // reset the queueEmptyflag
                     conditionLock.unlock();
                     if (pullData.empty()) {
                         pullData.push(data, size);
@@ -269,7 +269,8 @@ element in the queue
 
         /** blocking call that will call the specified functor
 if the queue is empty
-@param callOnWaitFunction an nullary functor that will be called if the initial query does not return a value
+@param callOnWaitFunction an nullary functor that will be called if the initial query does not
+return a value
 @details  after calling the function the call will check again and if still empty
 will block and wait.
 */
@@ -330,8 +331,8 @@ depending on the number of consumers
             std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
             if (!pushElements.empty()) {  // on the off chance the queue got out of sync
                 std::swap(pushElements, pullElements);
-                pushLock
-                    .unlock();  // we can free the push function to accept more elements after the swap call;
+                pushLock.unlock();  // we can free the push function to accept more elements after
+                                    // the swap call;
                 std::reverse(pullElements.begin(), pullElements.end());
                 stx::optional<T> val(
                     std::move(pullElements.back()));  // do it this way to allow movable only types
@@ -341,7 +342,8 @@ depending on the number of consumers
                     if (!pushElements.empty())  // more elements could have been added
                     {  // this is the potential for slow operations
                         std::swap(pushElements, pullElements);
-                        // we can free the push function to accept more elements after the swap call;
+                        // we can free the push function to accept more elements after the swap
+                        // call;
                         pushLock.unlock();
                         std::reverse(pullElements.begin(), pullElements.end());
                     } else {

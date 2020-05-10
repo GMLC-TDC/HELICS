@@ -44,7 +44,7 @@ FedObject* getFedObject(helics_federate fed, helics_error* err) noexcept
     }
     return nullptr;
 }
-} // namespace helics
+}  // namespace helics
 
 helics::Federate* getFed(helics_federate fed, helics_error* err)
 {
@@ -195,7 +195,7 @@ void helicsFederateInfoFree(helics_federate_info fi)
 {
     auto* info = getFedInfo(fi, nullptr);
     if (info == nullptr) {
-        //fprintf(stderr, "The helics_federate_info object is not valid\n");
+        // fprintf(stderr, "The helics_federate_info object is not valid\n");
         return;
     }
     info->uniqueKey = 0;
@@ -230,8 +230,8 @@ void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename
     try {
         info->coreName = AS_STRING(corename);
     }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -244,8 +244,8 @@ void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* co
     try {
         info->coreInitString = AS_STRING(coreinit);
     }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -258,8 +258,8 @@ void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* 
     try {
         info->brokerInitString = AS_STRING(brokerinit);
     }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -302,8 +302,8 @@ void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, he
     try {
         info->broker = AS_STRING(broker);
     }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -316,8 +316,8 @@ void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerk
     try {
         info->key = AS_STRING(brokerkey);
     }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -757,7 +757,7 @@ static helics_iteration_result getIterationStatus(helics::iteration_result itera
         case helics::iteration_result::error:
         default:
             // most cases of this return error directly without going through this function
-            return helics_iteration_result_error; // LCOV_EXCL_LINE
+            return helics_iteration_result_error;  // LCOV_EXCL_LINE
         case helics::iteration_result::halted:
             return helics_iteration_result_halted;
     }
@@ -884,12 +884,11 @@ helics_time helicsFederateRequestNextStep(helics_federate fed, helics_error* err
     }
 }
 
-helics_time helicsFederateRequestTimeIterative(
-    helics_federate fed,
-    helics_time requestTime,
-    helics_iteration_request iterate,
-    helics_iteration_result* outIteration,
-    helics_error* err)
+helics_time helicsFederateRequestTimeIterative(helics_federate fed,
+                                               helics_time requestTime,
+                                               helics_iteration_request iterate,
+                                               helics_iteration_result* outIteration,
+                                               helics_error* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
@@ -944,11 +943,10 @@ helics_time helicsFederateRequestTimeComplete(helics_federate fed, helics_error*
     }
 }
 
-void helicsFederateRequestTimeIterativeAsync(
-    helics_federate fed,
-    helics_time requestTime,
-    helics_iteration_request iterate,
-    helics_error* err)
+void helicsFederateRequestTimeIterativeAsync(helics_federate fed,
+                                             helics_time requestTime,
+                                             helics_iteration_request iterate,
+                                             helics_error* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
@@ -1207,7 +1205,7 @@ void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_e
         if (cr) {
             cr->setLogFile(AS_STRING(logFile));
             // LCOV_EXCL_START
-        } else { //this can theoretically happen but it we be pretty odd
+        } else {  // this can theoretically happen but it we be pretty odd
             if (err != nullptr) {
                 err->error_code = helics_error_invalid_function_call;
                 err->message = invalidFederateCore;

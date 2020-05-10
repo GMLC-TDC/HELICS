@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../application_api/BrokerApp.hpp"
@@ -25,7 +25,7 @@ void terminalFunction(std::vector<std::string> args);
 
 static const bool amb = helics::allowMultiBroker();
 
-int main(int argc, char* argv[])  //NOLINT
+int main(int argc, char* argv[])  // NOLINT
 {
     int ret{0};
     bool runterminal{false};
@@ -94,8 +94,8 @@ int main(int argc, char* argv[])  //NOLINT
             terminalFunction(cmdLine.remaining_for_passthrough());
         } else if (autorestart) {
             while (true) {
-                // I am purposely making an object that creates and destroys itself on the same line because this
-                // will run until termination so will take a while
+                // I am purposely making an object that creates and destroys itself on the same line
+                // because this will run until termination so will take a while
                 {
                     helics::BrokerKeeper brkapp{cmdLine.remaining_for_passthrough(true)};
                 }
@@ -266,9 +266,8 @@ void terminalFunction(std::vector<std::string> args)
         std::string cmdin;
         std::cout << "\nhelics_broker>>";
         std::getline(std::cin, cmdin);
-        if (cmdin == "exit" ||
-            cmdin ==
-                "q") {  // provide a fast path to exit without going through the terminal command line processor
+        if (cmdin == "exit" || cmdin == "q") {  // provide a fast path to exit without going through
+                                                // the terminal command line processor
             cmdcont = false;
             continue;
         }

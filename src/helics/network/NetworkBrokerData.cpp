@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -319,14 +319,16 @@ std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> hi
             result.push_back(r_addr);
         }
     }
-    // Second choice: high-priority addresses found by the OS (likely link-local addresses or loop-back)
+    // Second choice: high-priority addresses found by the OS (likely link-local addresses or
+    // loop-back)
     for (const auto& i_addr : high) {
         // add the address if it isn't already in the list
         if (std::find(result.begin(), result.end(), i_addr) == result.end()) {
             result.push_back(i_addr);
         }
     }
-    // Last choice: low-priority addresses returned by the resolver (OS doesn't know about them so may be invalid)
+    // Last choice: low-priority addresses returned by the resolver (OS doesn't know about them so
+    // may be invalid)
     for (const auto& r_addr : low) {
         // add the address if it isn't already in the list
         if (std::find(low.begin(), low.end(), r_addr) == low.end()) {

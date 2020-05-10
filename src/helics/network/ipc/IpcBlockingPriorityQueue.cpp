@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "IpcBlockingPriorityQueue.hpp"
 
@@ -18,8 +18,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <vector>
 
 /** class implementing a blocking queue with a priority channel
-@details this class uses locks one for push and pull it can exhibit longer blocking times if the internal
-operations require a swap, however in high usage the two locks will reduce contention in most cases.
+@details this class uses locks one for push and pull it can exhibit longer blocking times if the
+internal operations require a swap, however in high usage the two locks will reduce contention in
+most cases.
 */
 template<typename T>
 class BlockingPriorityQueue {
@@ -313,7 +314,8 @@ class BlockingPriorityQueue {
 
     /** blocking call that will call the specified functor
     if the queue is empty
-    @param callOnWaitFunction an nullary functor that will be called if the initial query does not return a value
+    @param callOnWaitFunction an nullary functor that will be called if the initial query does not
+    return a value
     @details  after calling the function the call will check again and if still empty
     will block and wait.
     */
@@ -374,8 +376,8 @@ stx::optional<T> BlockingPriorityQueue<T>::try_pop()
         std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
         if (!pushElements.empty()) {  // on the off chance the queue got out of sync
             std::swap(pushElements, pullElements);
-            pushLock
-                .unlock();  // we can free the push function to accept more elements after the swap call;
+            pushLock.unlock();  // we can free the push function to accept more elements after the
+                                // swap call;
             std::reverse(pullElements.begin(), pullElements.end());
             stx::optional<T> val(
                 std::move(pullElements.back()));  // do it this way to allow movable only types

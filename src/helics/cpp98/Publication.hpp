@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_PUBLICATION_HPP_
@@ -30,7 +30,8 @@ class Publication {
         pub = publication.pub;
         return *this;
     }
-    // there is no need for move operators since copying the underlying object is fine, it is a non-owning pointer
+    // there is no need for move operators since copying the underlying object is fine, it is a
+    // non-owning pointer
     /** cast operator to the underlying helics_publication object*/
     operator helics_publication() const { return pub; }
     /** return the underlying helics_publication object*/

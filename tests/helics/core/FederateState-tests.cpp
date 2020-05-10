@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/core/CoreFederateInfo.hpp"
@@ -256,16 +256,17 @@ TEST_F(federateStateTests, basic_processmessage_test)
 
     fs->reset();
 
-    // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done; returns 1 if
-    // fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true
+    // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done;
+    // returns 1 if fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true
     cmd.setAction(helics::CMD_EXEC_GRANT);
 
     // Test CMD_TIME_REQUEST/CMD_TIME_GRANT
     cmd.setAction(helics::CMD_TIME_GRANT);
 
-    /* CMD_TIME_REQUEST and CMD_TIME_GRANT; manipulate time factors in ways to ensure behavior is correct for
-    deciding event to allow or not; test based on desired functionality time_next and time_minDe compared against
-    everything else Time Tallow(std::max(time_next, time_minDe)); if (time_event <= Tallow)
+    /* CMD_TIME_REQUEST and CMD_TIME_GRANT; manipulate time factors in ways to ensure behavior is
+    correct for deciding event to allow or not; test based on desired functionality time_next and
+    time_minDe compared against everything else Time Tallow(std::max(time_next, time_minDe)); if
+    (time_event <= Tallow)
     {
         return 2;  //we can grant the time request
     }

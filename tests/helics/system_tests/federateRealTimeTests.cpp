@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 
 SPDX-License-Identifier: BSD-3-Clause
 */
@@ -54,7 +54,8 @@ TEST_F(federate_realtime_tests, federate_delay_tests_ci_skip)
 
         if (tdiff < -0.15) {
             ++outofTimeBounds;
-            //   printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
+            //   printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double>
+            //   (reqTime));
         }
         reqTime += 0.5;
     }
@@ -92,8 +93,8 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
     std::this_thread::sleep_for(std::chrono::seconds(5));
     helics::Time reqTime = 0.5;
     for (int ii = 0; ii < 8; ++ii) {
-        if (ii <
-            5) {  // this is designed to go faster than real time for a little while, then the dependency will halt and
+        if (ii < 5) {  // this is designed to go faster than real time for a little while, then the
+                       // dependency will halt and
             // should trigger the force grant
             pubid.publish(static_cast<double>(reqTime));
             fed2->requestTimeAsync(reqTime);
@@ -139,8 +140,8 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
     helics::Time reqTime = 0.5;
     int outofTimeBounds = 0;
     for (int ii = 0; ii < 8; ++ii) {
-        if (ii <
-            5) {  // this is designed to go faster than real time for a little while, then the dependency will halt and
+        if (ii < 5) {  // this is designed to go faster than real time for a little while, then the
+                       // dependency will halt and
             // should trigger the force grant
             pubid.publish(static_cast<double>(reqTime));
             fed2->requestTimeAsync(reqTime);
@@ -154,11 +155,13 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
         EXPECT_TRUE(tdiff >= -0.15);
         if (tdiff < -0.15) {
             ++outofTimeBounds;
-            // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
+            // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double>
+            // (reqTime));
         }
         if (tdiff > 0.15) {
             ++outofTimeBounds;
-            // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
+            // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double>
+            // (reqTime));
         }
         reqTime += 0.5;
         if (ii < 5) {

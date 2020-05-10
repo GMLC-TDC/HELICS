@@ -1,7 +1,8 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
@@ -161,7 +162,7 @@ TEST_F(error_tests, duplicate_publication_names2)
     catch (const helics::RegistrationFailure&) {
         gotException = true;
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
-        //this should do nothing
+        // this should do nothing
         EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
     }
@@ -172,7 +173,7 @@ TEST_F(error_tests, duplicate_publication_names2)
     catch (const helics::RegistrationFailure&) {
         gotException = true;
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
-        //this should do nothing
+        // this should do nothing
         EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
     }
@@ -431,8 +432,9 @@ TEST_F(error_tests, missing_required_pub_with_default)
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
     // this is definitely not how you would normally do this,
-    // we are calling finalize while an async call is active, this should result in finalize throwing since it was
-    // a global connection failure,  depending on how things go this will be a registration failure or a connection failure
+    // we are calling finalize while an async call is active, this should result in finalize
+    // throwing since it was a global connection failure,  depending on how things go this will be a
+    // registration failure or a connection failure
     EXPECT_THROW(fed1->finalize(), helics::HelicsException);
     fed2->finalize();
     broker->disconnect();
@@ -512,7 +514,8 @@ INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(core
 
 constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 
-// TCP core is odd for this test and doesn't work on all platforms due to the way TCP handles ports duplication
+// TCP core is odd for this test and doesn't work on all platforms due to the way TCP handles ports
+// duplication
 class network_error_tests:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {

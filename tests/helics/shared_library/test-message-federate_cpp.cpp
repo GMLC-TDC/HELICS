@@ -1,7 +1,8 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../src/helics/cpp98/MessageFederate.hpp"
@@ -236,7 +237,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
 
 
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types),
+core_type)
 {
     SetupTest<helicscpp::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
@@ -363,7 +365,8 @@ class PingPongFed
             if (messString == "ping")
             {
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive ping from " << std::string (mess->source) << " at time "
+                std::cout << name << " :receive ping from " << std::string (mess->source) << " at
+time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
                 mess->data = "pong";
@@ -378,7 +381,8 @@ class PingPongFed
             {
                 pongs++;
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive pong from " << std::string (mess->source) << " at time "
+                std::cout << name << " :receive pong from " << std::string (mess->source) << " at
+time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
             }
@@ -527,7 +531,8 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
 
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    helicscpp::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.json");
+    helicscpp::MessageFederate mFed (std::string (TEST_DIR) +
+"/test_files/example_message_fed.json");
 
     EXPECT_EQ (mFed.getName (), "messageFed");
 

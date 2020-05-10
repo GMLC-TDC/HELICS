@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -86,8 +86,8 @@ class Logger;
 class TimeoutMonitor;
 
 /** class implementing most of the functionality of a generic broker
-Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
-or does something else if it is the root of the tree
+Basically acts as a router for information,  deals with stuff internally if it can and sends higher
+up if it can't or does something else if it is the root of the tree
 */
 class CoreBroker: public Broker, public BrokerBase {
   protected:
@@ -113,7 +113,8 @@ class CoreBroker: public Broker, public BrokerBase {
     std::unordered_map<global_federate_id, route_id>
         routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, route_id>
-        knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
+        knownExternalEndpoints;  //!< external map for all known external endpoints with names and
+                                 //!< route
     std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
@@ -144,14 +145,17 @@ class CoreBroker: public Broker, public BrokerBase {
     void processBrokerConfigureCommands(ActionMessage& cmd);
 
     gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
+        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed
+                             //!< for a certain time
     /* function to transmit the delayed messages*/
     void transmitDelayedMessages();
-    /**function for routing a message,  it will override the destination id with the specified argument
+    /**function for routing a message,  it will override the destination id with the specified
+     * argument
      */
     void routeMessage(ActionMessage& cmd, global_federate_id dest);
     void routeMessage(ActionMessage&& cmd, global_federate_id dest);
-    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    /** function for routing a message from based on the destination specified in the
+     * ActionMessage*/
     void routeMessage(const ActionMessage& cmd);
     void routeMessage(ActionMessage&& cmd);
     /** transmit a message to the parent or root */
@@ -184,8 +188,8 @@ class CoreBroker: public Broker, public BrokerBase {
     /** unregister the broker from the factory find methods*/
     void unregister();
     /** disconnect the broker from any other brokers and communications
-    **if the flag is set it should not do the unregister step of the disconnection, if this is set it is presumed
-    the unregistration has already happened or it will be taken care of manually
+    **if the flag is set it should not do the unregister step of the disconnection, if this is set
+    it is presumed the unregistration has already happened or it will be taken care of manually
     */
     virtual void processDisconnect(bool skipUnregister = false) override final;
     /** check if the broker is connected*/
@@ -224,16 +228,18 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void transmit(route_id route, const ActionMessage& command) = 0;
     /** this function is the one that will change for various flavors of broker communication
     @details it takes a route info- a code of where to send the data and an action message
-    and proceeds to transmit it to the appropriate location, this variant does a move operation instead of copy
+    and proceeds to transmit it to the appropriate location, this variant does a move operation
+    instead of copy
     @param route -the identifier for the routing information
     @param command the actionMessage to transmit
     */
     virtual void transmit(route_id route, ActionMessage&& command) = 0;
     /** add a route to the type specific routing information and establish the connection
-    @details add a route to a table, the connection information is contained in the string with the described
-    identifier
+    @details add a route to a table, the connection information is contained in the string with the
+    described identifier
     @param rid the identification of the route
-    @param interfaceId an interface id code that can be used to identify the interface route should be added to, in most cases this should be zero since there is only one interface
+    @param interfaceId an interface id code that can be used to identify the interface route should
+    be added to, in most cases this should be zero since there is only one interface
     @param routeInfo a string containing the information necessary to connect
     */
     virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;

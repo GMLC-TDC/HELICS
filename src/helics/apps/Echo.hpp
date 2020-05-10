@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -16,12 +16,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace apps {
-    /** class implementing an Echo object, which will generate endpoint interfaces and send a data message back to the
-source at the with a specified delay
-@details  the Echo class is NOT threadsafe in general,  don't try to use it from multiple threads without external
-protection, that will result in undefined behavior.  One exception is the setEchoDelay function is threadsafe, and
-const methods will not cause problems but may not give consistent answers if used from multiple threads unless
-protected.
+    /** class implementing an Echo object, which will generate endpoint interfaces and send a data
+message back to the source at the with a specified delay
+@details  the Echo class is NOT threadsafe in general,  don't try to use it from multiple threads
+without external protection, that will result in undefined behavior.  One exception is the
+setEchoDelay function is threadsafe, and const methods will not cause problems but may not give
+consistent answers if used from multiple threads unless protected.
 */
     class HELICS_CXX_EXPORT Echo: public App {
       public:

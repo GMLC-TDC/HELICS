@@ -1,7 +1,7 @@
 /*
  Copyright (c) 2017-2020,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ZmqCommsSS.h"
@@ -142,7 +142,7 @@ namespace zeromq {
                 } break;
                 case DELAY_CONNECTION:
                     std::this_thread::sleep_for(std::chrono::seconds(2));
-                    status = 5;  //need to reconnect after this
+                    status = 5;  // need to reconnect after this
                     break;
                 default:
                     handled = false;
@@ -337,7 +337,7 @@ namespace zeromq {
             brokerConnection.close();
             setTxStatus(connection_status::connected);
         }
-        //setTxStatus(connection_status::connected);
+        // setTxStatus(connection_status::connected);
 
         std::vector<zmq::pollitem_t> poller(2);
         std::vector<zmq::socket_t*> sockets(2);

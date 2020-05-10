@@ -2,10 +2,10 @@
 Copyright (c) 2017-2020, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC.  See the
-top-level NOTICE for additional details. and the Lawrence Livermore National Laboratory, operated by Lawrence
-Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle
+Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for
+Sustainable Energy, LLC.  See the top-level NOTICE for additional details. and the Lawrence
+Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
 #include "cpptestFixtures.hpp"
