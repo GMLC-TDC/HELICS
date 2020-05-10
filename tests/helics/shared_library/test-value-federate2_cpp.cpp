@@ -145,8 +145,8 @@ TEST_F(vfed_tests, test_file_load)
     EXPECT_EQ(s, "valueFed");
     EXPECT_EQ(vFed.getInputCount(), 3);
     EXPECT_EQ(vFed.getPublicationCount(), 2);
-    //     helicscpp::ValueFederate vFed(std::string(TEST_DIR) +
-    //     "/test_files/example_value_fed.json");
+    //  helicscpp::ValueFederate vFed(std::string(TEST_DIR) +
+    //  "/test_files/example_value_fed.json");
     vFed.finalize();
 }
 
