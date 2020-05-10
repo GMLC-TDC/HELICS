@@ -196,10 +196,11 @@ class Core {
      * Change the federate state to the Executing state.
      *
      * May only be invoked in Initializing state.
-     @param federateID  the identifier of the federate
-     @param iterate  the requested iteration mode
-     if nonconverged the federate requests an iterative update
-     @return an iteration result enumeration value indicating the current state of iterations
+     *@param federateID  the identifier of the federate
+     *@param iterate  the requested iteration mode
+     *if nonconverged the federate requests an iterative update
+     *
+     *@return an iteration result enumeration value indicating the current state of iterations
      */
     virtual iteration_result enterExecutingMode(local_federate_id federateID,
                                                 iteration_request iterate = NO_ITERATION) = 0;
@@ -390,20 +391,23 @@ class Core {
      */
     virtual const std::string& getHandleName(interface_handle handle) const = 0;
     /** remove a target from a handles operation
-    @param handle the handle from the publication, input, endpoint or filter
-    @param targetToRemove the name of the target to remove*/
+    *@param handle the handle from the publication, input, endpoint or filter
+    *@param targetToRemove the name of the target to remove
+    */
     virtual void removeTarget(interface_handle handle, const std::string& targetToRemove) = 0;
 
     /**
-     * Returns units for specified handle.
+     * @return the unit string for the specified handle.
      */
     virtual const std::string& getExtractionUnits(interface_handle handle) const = 0;
     /** get the injection units for an interface,  this is the type for data coming into an
-   interface
-   @details for publications this is the units associated with the transmitted data,  for inputs
-   this is the units of the transmitting publication
-   @param handle the interface handle to get the injection type for
-   @return a const ref to  std::string  */
+   *interface
+   *@details for publications this is the units associated with the transmitted data,  for inputs
+   *this is the units of the transmitting publication
+   *@param handle the interface handle to get the injection type for
+   *
+   *@return a const ref to  std::string
+   */
     virtual const std::string& getInjectionUnits(interface_handle handle) const = 0;
 
     /**
@@ -415,11 +419,12 @@ class Core {
         return getExtractionUnits(handle);
     }
     /** get the injection type for an interface,  this is the type for data coming into an interface
-    @details for filters this is the input type, for publications this is type used to transmit
-    data, for endpoints this is the specified type and for inputs this is the type of the
-    transmitting publication
-    @param handle the interface handle to get the injection type for
-    @return a const ref to  std::string  */
+    *@details for filters this is the input type, for publications this is type used to transmit
+    *data, for endpoints this is the specified type and for inputs this is the type of the
+    *transmitting publication
+    *@param handle the interface handle to get the injection type for
+    *@return a const ref to  std::string
+    */
     virtual const std::string& getInjectionType(interface_handle handle) const = 0;
 
     /** get the type for which data comes out of an interface,  this is the type for data coming
@@ -431,9 +436,9 @@ class Core {
     virtual const std::string& getExtractionType(interface_handle handle) const = 0;
 
     /** set a handle option
-    @param handle the handle from the publication, input, endpoint or filter
-    @param option the option to set
-    @param option_value the value to set the option (mostly 0 or 1)
+    *@param handle the handle from the publication, input, endpoint or filter
+    *@param option the option to set
+    *@param option_value the value to set the option (mostly 0 or 1)
     */
     virtual void setHandleOption(interface_handle handle, int32_t option, bool option_value) = 0;
 

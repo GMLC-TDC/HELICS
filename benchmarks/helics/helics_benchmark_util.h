@@ -95,8 +95,9 @@ inline std::string getCPUModel()
     return std::string{};
 }
 #endif
-/// Generate a report of the compilers used and zmq version linked as well as the version info for
-/// HELICS for use with the benchmarks
+/** Generate a report of the compilers used and zmq version linked as well as the version info for
+* HELICS for use with the benchmarks
+*/
 inline void printHELICSsystemInfo()
 {
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: "

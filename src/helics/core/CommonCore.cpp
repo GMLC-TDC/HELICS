@@ -1680,9 +1680,8 @@ void CommonCore::deliverMessage(ActionMessage& message)
                                         createMessageFromCommand(message));
                                     for (auto& msg : new_messages) {
                                         if (msg) {
-                                            if (msg->dest == localP->key)  // in case the clone
-                                                                           // filter send to itself.
-                                            {
+                                            if (msg->dest == localP->key)  {
+                                                // in case the clone filter send to itself.
                                                 ActionMessage cmd(std::move(msg));
                                                 cmd.dest_id = localP->handle.fed_id;
                                                 cmd.dest_handle = localP->handle.handle;
