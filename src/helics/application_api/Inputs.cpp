@@ -198,8 +198,8 @@ size_t Input::getStringSize()
             if (np.name.empty()) {
                 return 30;  //"#invalid" string +20
             }
-            // +20 is just in case the converted string is actually being requested in which case the
-            // +20 is for the string representation of a double
+            // +20 is just in case the converted string is actually being requested in which case
+            // the +20 is for the string representation of a double
             return np.name.size() + 20;
         }
         auto& out = getValueRef<std::string>();
