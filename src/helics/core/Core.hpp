@@ -280,7 +280,7 @@ class Core {
      *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param iterate the requested iteration mode /ref iteration_request
-     @return an /ref iteration_time object with two field grantedTime and a enumeration indicating
+     * @return an /ref iteration_time object with two field grantedTime and a enumeration indicating
      the state of the iteration
      */
     virtual iteration_time requestTimeIterative(local_federate_id federateID,

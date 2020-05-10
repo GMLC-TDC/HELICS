@@ -200,7 +200,7 @@ std::shared_ptr<helicsCLI11App> MultiBroker::generateCLI()
     app->add_subcommand(netApp);
     app->addTypeOption();
     app->setDefaultCoreType(type);
-    // this ia null flag options for forcing the callback to run
+    // this is a null flag option for forcing the callback to run
     app->add_flag("-_", "")->group("")->force_callback();
     auto* app_p = app.get();
     app->final_callback([this, app_p]() {
