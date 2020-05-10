@@ -381,8 +381,8 @@ class PingPongFed
             {
                 pongs++;
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive pong from " << std::string (mess->source) << " at
-time "
+                std::cout << name << " :receive pong from "
+                          << std::string (mess->source) << " at time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
             }
