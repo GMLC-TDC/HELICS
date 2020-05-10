@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Source.hpp"
@@ -99,7 +99,8 @@ namespace apps {
 
     void Source::loadJsonFile(const std::string& jsonString)
     {
-        // we want to load the default period before constructing the interfaces so the default period works
+        // we want to load the default period before constructing the interfaces so the default
+        // period works
         auto doc = loadJson(jsonString);
 
         if (doc.isMember("source")) {

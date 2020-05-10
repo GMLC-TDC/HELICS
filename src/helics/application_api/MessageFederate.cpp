@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MessageFederate.hpp"
@@ -62,7 +62,8 @@ MessageFederate::MessageFederate()
 }
 
 MessageFederate::MessageFederate(bool /*unused*/)
-{  // this constructor should only be called by child class that has already constructed the underlying federate in
+{  // this constructor should only be called by child class that has already constructed the
+   // underlying federate in
     // a virtual inheritance
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
@@ -71,8 +72,8 @@ MessageFederate::MessageFederate(MessageFederate&&) noexcept = default;
 MessageFederate& MessageFederate::operator=(MessageFederate&& mFed) noexcept
 {
     mfManager = std::move(mFed.mfManager);
-    if (getID() !=
-        mFed.getID()) {  // the id won't be moved, as it is copied so use it as a test if it has moved already
+    if (getID() != mFed.getID()) {  // the id won't be moved, as it is copied so use it as a test if
+                                    // it has moved already
         Federate::operator=(std::move(mFed));
     }
     return *this;

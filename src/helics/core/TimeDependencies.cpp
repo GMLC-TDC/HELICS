@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -37,8 +37,8 @@ bool DependencyInfo::ProcessMessage(const ActionMessage& m)
                 time_state_t::time_requested_iterative :
                 time_state_t::time_requested;
             //   printf("%d Request from %d time %f, te=%f, Tdemin=%f\n", fedID, m.source_id,
-            //   static_cast<double>(m.actionTime), static_cast<double>(m.Te), static_cast<double>(m.Tdemin));
-            //   assert(m.actionTime >= Tnext);
+            //   static_cast<double>(m.actionTime), static_cast<double>(m.Te),
+            //   static_cast<double>(m.Tdemin)); assert(m.actionTime >= Tnext);
             Tnext = m.actionTime;
             Te = m.Te;
             Tdemin = m.Tdemin;
@@ -53,7 +53,8 @@ bool DependencyInfo::ProcessMessage(const ActionMessage& m)
             break;
         case CMD_TIME_GRANT:
             time_state = time_state_t::time_granted;
-            //    printf("%d Grant from %d time %f\n", fedID, m.source_id, static_cast<double>(m.actionTime));
+            //    printf("%d Grant from %d time %f\n", fedID, m.source_id,
+            //    static_cast<double>(m.actionTime));
             //   assert(m.actionTime >= Tnext);
             Tnext = m.actionTime;
             Te = Tnext;

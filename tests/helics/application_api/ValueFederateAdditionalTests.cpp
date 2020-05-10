@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -298,7 +298,8 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
 TEST_P(valuefed_add_all_type_tests_ci_skip, dual_transfer_string)
 {
     // this one is going to test really ugly strings
-    // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
+    // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data
+    // test case
     decltype(auto) cstr = "inside\n\0 of the \0\n functional\r \brelationship of helics\n";
     std::string specialString(cstr, sizeof(cstr));
     runDualFederateTest<std::string>(GetParam(),
@@ -333,7 +334,8 @@ TEST_F(valuefed_add_tests_ci_skip, dual_transfer_complex_long)
 
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj8)
 {
-    // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
+    // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data
+    // test case
     decltype(auto) cstr = "inside\n\0 of the \0\n functional\r \brelationship of helics\n";
     std::string specialString(cstr, sizeof(cstr));
 
@@ -576,8 +578,9 @@ TEST_F(valuefed_add_tests_ci_skip, test_move_calls)
 
     helics::ValueFederate vFedMoved(std::move(vFed));
     EXPECT_EQ(vFedMoved.getName(), "test1");
-    // verify that this was moved so this does produce a warning on some systems about use after move
-    EXPECT_NE(vFed.getName(), "test1");  //NOLINT
+    // verify that this was moved so this does produce a warning on some systems about use after
+    // move
+    EXPECT_NE(vFed.getName(), "test1");  // NOLINT
 }
 
 static constexpr const char* config_files[] = {"example_value_fed.json", "example_value_fed.toml"};
@@ -742,7 +745,7 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
     helics::ValueFederate vFed("test2", fi);
 
     vFed.registerPublication<double>("pub1");
-    //this tests an already registered publication
+    // this tests an already registered publication
     vFed.registerFromPublicationJSON(std::string(TEST_DIR) + "example_pub_input1.json");
     auto& s1 = vFed.registerSubscription("test2/pub1");
     auto& s2 = vFed.registerSubscription("test2/pub2");

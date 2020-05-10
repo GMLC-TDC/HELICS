@@ -51,8 +51,10 @@ HELICS_EXPORT helics_filter helicsFederateRegisterFilter(helics_federate fed, he
  *
  * @return A helics_filter object.
  */
-HELICS_EXPORT helics_filter
-    helicsFederateRegisterGlobalFilter(helics_federate fed, helics_filter_type type, const char* name, helics_error* err);
+HELICS_EXPORT helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed,
+                                                               helics_filter_type type,
+                                                               const char* name,
+                                                               helics_error* err);
 
 /**
  * Create a cloning Filter on the specified federate.
@@ -137,7 +139,8 @@ HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
+ * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name
+ * exists.
  */
 HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const char* name, helics_error* err);
 /**

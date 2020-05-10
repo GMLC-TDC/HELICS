@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -32,7 +32,7 @@ static void show_usage(std::string const& name)
     std::cout << "--help, -h, -? returns this help display\n";
 }
 
-using namespace ghc::filesystem;  //NOLINT
+using namespace ghc::filesystem;  // NOLINT
 path dir_path(const char* filename, const char* tail)
 {
     path cfile = canonical(absolute(path(filename)));

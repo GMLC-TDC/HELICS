@@ -52,7 +52,7 @@ BrokerObject* getBrokerObject(helics_broker broker, helics_error* err) noexcept;
 class CoreObject {
   public:
     std::shared_ptr<Core> coreptr;
-    std::vector<std::unique_ptr<FilterObject>> filters; //!< list of filters created directly through the core
+    std::vector<std::unique_ptr<FilterObject>> filters;  //!< list of filters created directly through the core
     int index{0};
     int valid{-2};
     CoreObject() = default;
@@ -124,8 +124,8 @@ class EndpointObject {
 /** object wrapping a source filter*/
 class FilterObject {
   public:
-    bool cloning{false}; //!< indicator that the filter is a cloning filter
-    bool custom{false}; //!< indicator that the filter is a custom filter and requires a callback
+    bool cloning{false};  //!< indicator that the filter is a cloning filter
+    bool custom{false};  //!< indicator that the filter is a custom filter and requires a callback
     int valid{0};
     Filter* filtPtr{nullptr};
     std::unique_ptr<Filter> uFilter;
@@ -136,16 +136,16 @@ class FilterObject {
 /** object representing a query*/
 class QueryObject {
   public:
-    std::string target; //!< the target of the query
-    std::string query; //!< the actual query itself
-    std::string response; //!< the response to the query
-    std::shared_ptr<Federate> activeFed; //!< pointer to the fed with the active Query
-    query_id_t asyncIndexCode; //!< the index to use for the queryComplete call
+    std::string target;  //!< the target of the query
+    std::string query;  //!< the actual query itself
+    std::string response;  //!< the response to the query
+    std::shared_ptr<Federate> activeFed;  //!< pointer to the fed with the active Query
+    query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
     bool activeAsync{false};
     int valid{0};
 };
 
-} // namespace helics
+}  // namespace helics
 
 /** definitions to simplify error returns if an error already exists*/
 #define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
@@ -199,8 +199,8 @@ class MasterObjectHolder {
     guarded<std::deque<std::unique_ptr<helics::BrokerObject>>> brokers;
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
-    gmlc::concurrency::TripWireDetector tripDetect; //!< detector for library termination
-    guarded<std::deque<std::string>> errorStrings; //!< container for strings generated from error conditions
+    gmlc::concurrency::TripWireDetector tripDetect;  //!< detector for library termination
+    guarded<std::deque<std::string>> errorStrings;  //!< container for strings generated from error conditions
   public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();

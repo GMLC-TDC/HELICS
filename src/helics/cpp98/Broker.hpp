@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_BROKER_HPP_
@@ -114,8 +114,8 @@ class Broker {
     {
         helicsBrokerDataLink(broker, source.c_str(), target.c_str(), hThrowOnError());
     }
-    /** create a filter connection between a named filter and a named endpoint for messages coming from that
-    endpoint
+    /** create a filter connection between a named filter and a named endpoint for messages coming
+    from that endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
     void addSourceFilterToEndpoint(const std::string& filter, const std::string& target)
@@ -125,7 +125,8 @@ class Broker {
                                               target.c_str(),
                                               hThrowOnError());
     }
-    /** create a filter connection between a named filter and a named endpoint for destination processing
+    /** create a filter connection between a named filter and a named endpoint for destination
+    processing
     @param filter the name of the filter
     @param target the name of the source target*/
     void addDestinationFilterToEndpoint(const std::string& filter, const std::string& target)

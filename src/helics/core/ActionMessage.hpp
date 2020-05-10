@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -27,7 +27,8 @@ constexpr int32_t cmd_info_basis{65536};
 
 /** class defining the primary message object used in HELICS */
 class ActionMessage {
-    // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
+    // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT
+    // there yet
   private:
     action_message_def::action_t messageAction{CMD_IGNORE};  // 4 -- command
   public:
@@ -40,8 +41,8 @@ class ActionMessage {
     uint16_t flags{0};  //!<  28 set of messageFlags
     uint32_t sequenceID{0};  //!< a sequence number for ordering
     Time actionTime{timeZero};  //!< 40 the time an action took place or will take place    //32
-    std::string
-        payload;  //!< string containing the data    //96 std::string is 32 bytes on most platforms (except libc++)
+    std::string payload;  //!< string containing the data    //96 std::string is 32 bytes on most
+                          //!< platforms (except libc++)
     std::string& name;  //!< alias payload to a name reference for registration functions
     Time Te{timeZero};  //!< 48 event time
     Time Tdemin{timeZero};  //!< 56 min dependent event time
@@ -104,8 +105,9 @@ class ActionMessage {
     const std::vector<std::string>& getStringData() const { return stringData; }
 
     void clearStringData() { stringData.clear(); }
-    // most use cases for this involve short strings, or already have references that need to be copied so
-    // supporting move isn't  going to be that useful here, the long strings are going in the payload
+    // most use cases for this involve short strings, or already have references that need to be
+    // copied so supporting move isn't  going to be that useful here, the long strings are going in
+    // the payload
     void setStringData(const std::string& string1)
     {
         stringData.resize(1);
@@ -197,13 +199,13 @@ inline bool operator<(const ActionMessage& cmd, const ActionMessage& cmd2)
     return (cmd.actionTime < cmd2.actionTime);
 }
 
-/** create a new message object that copies all the information from the ActionMessage into newly allocated memory
- * for the message
+/** create a new message object that copies all the information from the ActionMessage into newly
+ * allocated memory for the message
  */
 std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd);
 
-/** create a new message object that moves all the information from the ActionMessage into newly allocated memory
- * for the message
+/** create a new message object that moves all the information from the ActionMessage into newly
+ * allocated memory for the message
  */
 std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd);
 

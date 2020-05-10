@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -570,11 +570,11 @@ TEST_F(mfed_tests, send_message1)
 TEST(messageFederate, constructor1)
 {
     helics::MessageFederate mf1("fed1", "--type=test --autobroker --corename=mfc");
-    //try out loading a file
+    // try out loading a file
     EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")),
                  helics::HelicsException);
     helics::MessageFederate mf2;
-    //test move assignment
+    // test move assignment
     mf2 = std::move(mf1);
 
     EXPECT_FALSE(mf2.hasMessage());
@@ -651,7 +651,7 @@ TEST(messageFederate, constructor4)
 TEST(messageFederate, constructor5)
 {
     helics::MessageFederate mf1("--type=test --autobroker --corename=mfc5 --name=fedmd");
-    //try out loading a file
+    // try out loading a file
 
     EXPECT_EQ(mf1.getName(), "fedmd");
     EXPECT_EQ(mf1.getCorePointer()->getIdentifier(), "mfc5");

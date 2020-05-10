@@ -212,13 +212,12 @@ void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, co
     }
 }
 
-void helicsEndpointSendEventRaw(
-    helics_endpoint endpoint,
-    const char* dest,
-    const void* data,
-    int inputDataLength,
-    helics_time time,
-    helics_error* err)
+void helicsEndpointSendEventRaw(helics_endpoint endpoint,
+                                const char* dest,
+                                const void* data,
+                                int inputDataLength,
+                                helics_time time,
+                                helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -456,7 +455,7 @@ void MessageHolder::clear()
     messages.clear();
 }
 
-} // namespace helics
+}  // namespace helics
 
 // LCOV_EXCL_START
 

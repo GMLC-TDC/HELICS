@@ -1,7 +1,8 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../src/helics/cpp98/ValueFederate.hpp"
@@ -144,7 +145,8 @@ TEST_F(vfed_tests, test_file_load)
     EXPECT_EQ(s, "valueFed");
     EXPECT_EQ(vFed.getInputCount(), 3);
     EXPECT_EQ(vFed.getPublicationCount(), 2);
-    //     helicscpp::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
+    //  helicscpp::ValueFederate vFed(std::string(TEST_DIR) +
+    //  "/test_files/example_value_fed.json");
     vFed.finalize();
 }
 

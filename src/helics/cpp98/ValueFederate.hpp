@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_VALUE_FEDERATE_HPP_
@@ -41,7 +41,8 @@ class ValueFederate: public virtual Federate {
   public:
     friend class helicscpp::FederateInfo;
     /**constructor taking a federate information structure and using the default core
-   @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+   @param fedName the name of the federate, can be empty to use the name from fi or an auto
+   generated one
    @param fi  a federate information structure
    */
     explicit ValueFederate(const std::string& fedName, FederateInfo& fi)
@@ -52,8 +53,8 @@ class ValueFederate: public virtual Federate {
         }
     }
     /**constructor taking a string with the required information
-    @param configString can be either a JSON file, a TOML file (with extension TOML), or a string containing JSON
-    code
+    @param configString can be either a JSON file, a TOML file (with extension TOML), or a string
+    containing JSON code
     */
     explicit ValueFederate(const std::string& configString)
     {

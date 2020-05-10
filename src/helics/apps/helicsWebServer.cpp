@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -60,14 +60,14 @@ namespace apps {
         net::io_context ioc{1};
     };
 }  // namespace apps
-}  //namespace helics
+}  // namespace helics
 
 static std::string loadFile(const std::string& fileName)
 {
     std::ifstream t(fileName);
     return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
-//decode a URI to clean up a string, convert character codes in a URI to the original character
+// decode a URI to clean up a string, convert character codes in a URI to the original character
 static std::string uriDecode(beast::string_view str)
 {
     std::string ret;
@@ -280,14 +280,14 @@ std::pair<return_val, std::string>
         if (!type.empty()) {
             ctype = helics::core::coreTypeFromString(type);
             if (!helics::core::isCoreTypeAvailable(ctype)) {
-                //return send(bad_request(type + " is not available"));
+                // return send(bad_request(type + " is not available"));
                 return {return_val::bad_request, type + " is not available"};
             }
         }
         brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
         if (!brkr) {
             return {return_val::bad_request, "unable to create broker"};
-            //return send(bad_request("unable to create broker"));
+            // return send(bad_request("unable to create broker"));
         }
         return {return_val::ok, emptyString};
     }
@@ -425,7 +425,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second;  //NOLINT
+            boost::beast::ostream(buffer) << res.second;  // NOLINT
             ws.async_write(buffer.data(),
                            beast::bind_front_handler(&WebSocketsession::on_write,
                                                      shared_from_this()));
@@ -451,7 +451,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer) << generateJsonString(response);  //NOLINT
+        boost::beast::ostream(buffer) << generateJsonString(response);  // NOLINT
         ws.async_write(buffer.data(),
                        beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
     }

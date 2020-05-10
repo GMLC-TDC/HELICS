@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -205,17 +205,17 @@ TEST_F(function_tests, input_test)
 
     auto val2 = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val2, val);
-    //expect error entering initializing Mode again
+    // expect error entering initializing Mode again
     helicsFederateEnterInitializingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    //expect error entering initializing Mode again
+    // expect error entering initializing Mode again
     helicsFederateEnterInitializingModeAsync(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    //expect error entering initializing Mode again
+    // expect error entering initializing Mode again
     helicsFederateEnterInitializingModeComplete(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -268,7 +268,7 @@ TEST_F(function_tests, raw)
     helicsErrorClear(&err);
     char loc[50] = "";
     int sz{0};
-    //named point can generate a string
+    // named point can generate a string
     helicsInputGetNamedPoint(subid, loc, 50, &sz, &val, &err);
     EXPECT_EQ(err.error_code, 0);
 
@@ -331,7 +331,7 @@ TEST_F(function_tests, raw2)
     EXPECT_EQ(res, helics_iteration_result_halted);
 }
 
-//check string conversions and duplicate publication errors
+// check string conversions and duplicate publication errors
 TEST_F(function_tests, string)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -372,7 +372,7 @@ TEST_F(function_tests, string)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-//check duplicate publication and inputs error pathways
+// check duplicate publication and inputs error pathways
 TEST_F(function_tests, typePub)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -418,7 +418,7 @@ TEST_F(function_tests, typePub)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-//check duplicate GlobalTypePublications and inputs and failures in register interface functions
+// check duplicate GlobalTypePublications and inputs and failures in register interface functions
 TEST_F(function_tests, typePub2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -475,7 +475,7 @@ TEST_F(function_tests, typePub2)
     helicsFederateClearUpdates(vFed1);
 
     helicsFederateFinalize(vFed1, nullptr);
-    //run a bunch of publish fails
+    // run a bunch of publish fails
     helicsPublicationPublishRaw(pubid, str, actLen, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -591,7 +591,7 @@ TEST_F(function_tests, initError2)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
-    //unknown publication
+    // unknown publication
     auto pub3 = helicsFederateGetPublication(vFed1, "unknown", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -606,13 +606,13 @@ TEST_F(function_tests, initError2)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    //unknown input
+    // unknown input
     auto inp4 = helicsFederateGetInput(vFed1, "unknown", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(inp4, nullptr);
 
-    //invalid input index
+    // invalid input index
     auto inp5 = helicsFederateGetInputByIndex(vFed1, 4, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -859,7 +859,7 @@ TEST_F(function_tests, messageFed)
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(ept2, nullptr);
     helicsErrorClear(&err);
-    //not a valid endpoint
+    // not a valid endpoint
     auto ept3 = helicsFederateGetEndpoint(mFed1, "invalid", &err);
     EXPECT_EQ(ept3, nullptr);
     EXPECT_NE(err.error_code, 0);
@@ -878,17 +878,17 @@ TEST_F(function_tests, messageFed)
     helicsFederateEnterExecutingMode(mFed1, nullptr);
     helicsEndpointSetDefaultDestination(ept1, "fed0/ept1", nullptr);
 
-    //test out messages without specifying endpoints
+    // test out messages without specifying endpoints
     helicsEndpointSendMessageRaw(ept1, nullptr, nullptr, 0, &err);
 
     helicsEndpointSendMessageRaw(ept1, "fed0/ept1", nullptr, 0, &err);
 
     helicsFederateRequestNextStep(mFed1, nullptr);
-    //make sure the message got through
+    // make sure the message got through
     auto cnt = helicsEndpointPendingMessages(ept1);
     EXPECT_EQ(cnt, 2);
 
-    //message Federates do not have publications so should be 0
+    // message Federates do not have publications so should be 0
     cnt = helicsFederateGetPublicationCount(mFed1);
     EXPECT_EQ(cnt, 0);
 
@@ -911,7 +911,7 @@ TEST_F(function_tests, messageFed_event)
 
     helicsFederateEnterExecutingMode(mFed1, nullptr);
 
-    //send events without destinations
+    // send events without destinations
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
 
     helicsEndpointSendEventRaw(ept1, nullptr, nullptr, 0, 0.0, &err);
@@ -956,7 +956,7 @@ TEST_F(function_tests, messageFed_messageObject)
     mess0 = helicsFederateGetMessageObject(mFed1);
     EXPECT_EQ(helicsMessageGetRawDataSize(mess0), 0);
 
-    //send a series of different messages testing different code paths
+    // send a series of different messages testing different code paths
     helics_message_object mess1 = helicsFederateCreateMessageObject(mFed1, nullptr);
 
     helicsMessageSetTime(mess1, 0.0, nullptr);

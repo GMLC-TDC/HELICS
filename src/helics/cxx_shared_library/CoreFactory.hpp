@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -39,10 +39,10 @@ namespace CoreFactory {
         return cr.getCopyofCorePointer();
     }
     /**
- * Creates a Core API object of the specified type.
- *
- * Invokes initialize() on the instantiated Core object.
- */
+     * Creates a Core API object of the specified type.
+     *
+     * Invokes initialize() on the instantiated Core object.
+     */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
         create(core_type type, const std::string& initializationString)
     {
@@ -63,7 +63,8 @@ namespace CoreFactory {
     }
 
     /** create a core from arguments
-@details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
+@details an argument of '--coretype' must be specified to define the type,  otherwise the default
+type is used
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
@@ -85,7 +86,8 @@ namespace CoreFactory {
     }
 
     /** create a core from arguments
-@details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
+@details an argument of '--coretype' must be specified to define the type,  otherwise the default
+type is used
 @param argc the number of arguments
 @param argv the actual argument parameters
 @return a pointer to the created core
@@ -124,7 +126,7 @@ namespace CoreFactory {
     }
 
     /** tries to find a named core if it fails it creates a new one
- */
+     */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
         FindOrCreate(core_type type,
                      const std::string& coreName,
@@ -135,7 +137,7 @@ namespace CoreFactory {
     }
 
     /** tries to find a named core if it fails it creates a new one
- */
+     */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
         FindOrCreate(core_type type, const std::string& coreName, int argc, char* argv[])
     {
@@ -144,7 +146,7 @@ namespace CoreFactory {
     }
 
     /** tries to find a named core if it fails it creates a new one
- */
+     */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
         FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
@@ -167,8 +169,8 @@ namespace CoreFactory {
     }
 
     /** register a testCore so it can be found by others
-@details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by
-calling cleanUpBrokers earlier if desired
+@details also cleans up any leftover bCoresrokers that were previously unregistered this can be
+controlled by calling cleanUpBrokers earlier if desired
 @param core a pointer to a testCore object that should be found globally
 @return true if the registration was successful false otherwise*/
     HELICS_SHARED_DEPRECATED_CORE bool registerCore(const std::shared_ptr<Core>& core) {}
@@ -178,14 +180,14 @@ calling cleanUpBrokers earlier if desired
 */
     HELICS_SHARED_DEPRECATED_CORE void unregisterCore(const std::string& name) {}
     /** clean up unused cores
-@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new
+Core is registered or when the clean up function is called this prevents some odd threading issues
 @return the number of cores still operating
 */
     HELICS_SHARED_DEPRECATED_CORE size_t cleanUpCores() { return 0; }
     /** clean up unused cores
-@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new
+Core is registered or when the clean up function is called this prevents some odd threading issues
 @param delay the delay time in milliseconds to wait for the cores to finish before destroying
 @return the number of cores still operating
 */

@@ -203,7 +203,7 @@ BrokerObject* getBrokerObject(helics_broker broker, helics_error* err) noexcept
     return nullptr;
 }
 
-} // namespace helics
+}  // namespace helics
 helics::Core* getCore(helics_core core, helics_error* err)
 {
     auto* coreObj = helics::getCoreObject(core, err);
@@ -1010,7 +1010,7 @@ MasterObjectHolder::~MasterObjectHolder()
 {
 #ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete()) {
-        ZmqContextManager::closeContext(); // LCOV_EXCL_LINE
+        ZmqContextManager::closeContext();  // LCOV_EXCL_LINE
     }
 #endif
     helics::LoggingCore::setFastShutdown();

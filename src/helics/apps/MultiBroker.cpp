@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -129,7 +129,7 @@ bool MultiBroker::brokerConnect()
         }
         uint16_t index = 0;
         while (moreComms) {
-            netInfo = NetworkBrokerData();  //to reset the networkBrokerData
+            netInfo = NetworkBrokerData();  // to reset the networkBrokerData
             app->get_config_formatter_base()->section("comms")->index(index);
             app->setDefaultCoreType(core_type::MULTI);
             app->parse(configString);
@@ -200,7 +200,7 @@ std::shared_ptr<helicsCLI11App> MultiBroker::generateCLI()
     app->add_subcommand(netApp);
     app->addTypeOption();
     app->setDefaultCoreType(type);
-    //this ia null flag options for forcing the callback to run
+    // this is a null flag option for forcing the callback to run
     app->add_flag("-_", "")->group("")->force_callback();
     auto* app_p = app.get();
     app->final_callback([this, app_p]() {

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -26,7 +26,7 @@ using ipc_state = boost::interprocess::shared_memory_object;
 namespace helics {
 namespace ipc {
     /** translate a string to a C++ qualified name for variable naming purposes
- */
+     */
     inline std::string stringTranslateToCppName(std::string in)
     {
         std::replace_if(
@@ -42,8 +42,9 @@ namespace ipc {
         closing = 3,
     };
 
-    /** class defining a shared queue state meaning interaction with a queue the object is not the owner of
- */
+    /** class defining a shared queue state meaning interaction with a queue the object is not the
+     * owner of
+     */
     class SharedQueueState {
       private:
         using ipcmutex = boost::interprocess::interprocess_mutex;

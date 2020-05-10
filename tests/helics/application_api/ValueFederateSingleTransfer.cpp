@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -76,8 +76,8 @@ TEST_P(valuefed_single_transfer, types9)
 
 TEST_P(valuefed_single_transfer, types10)
 {
-    // this is a bizarre string since it contains a \0 and in icc 17 can't be used inside a boost data test case
-    // for some unknown reason
+    // this is a bizarre string since it contains a \0 and in icc 17 can't be used inside a boost
+    // data test case for some unknown reason
     decltype(auto) cstr = "this is the third\0 string";
     std::string specialString(cstr, sizeof(cstr));
     std::vector<std::string> sv1{"hip", "hop"};

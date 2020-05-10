@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -19,8 +19,8 @@ namespace helics {
 class Core;
 class helicsCLI11App;
 
-/** class implementing a Core object.  This object is meant to a be a very simple core executor with a similar
- * interface to the other apps
+/** class implementing a Core object.  This object is meant to a be a very simple core executor with
+ * a similar interface to the other apps
  */
 class HELICS_CXX_EXPORT CoreApp {
   public:
@@ -105,7 +105,8 @@ class HELICS_CXX_EXPORT CoreApp {
     const std::string& getAddress() const;
 
     /** make a query at the core
-    @param target the target of the query "federation", "parent", "core","broker" or a specific named object
+    @param target the target of the query "federation", "parent", "core","broker" or a specific
+    named object
     @param queryStr the query to make
     @return a string containing the query results
     */

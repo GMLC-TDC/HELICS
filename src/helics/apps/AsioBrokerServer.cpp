@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -126,7 +126,7 @@ namespace apps {
     {
         std::string ext_interface = "0.0.0.0";
         int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
-        //std::chrono::milliseconds timeout(20000);
+        // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("tcp")) {
             auto V = (*config_)["tcp"];
             replaceIfMember(V, "interface", ext_interface);
@@ -177,7 +177,7 @@ namespace apps {
     {
         std::string ext_interface = "0.0.0.0";
         int udpport = DEFAULT_UDP_BROKER_PORT_NUMBER;
-        //std::chrono::milliseconds timeout(20000);
+        // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("udp")) {
             auto V = (*config_)["udp"];
             replaceIfMember(V, "interface", ext_interface);

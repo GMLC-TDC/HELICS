@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -80,7 +80,7 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateEnterInitializingModeAsync(vFed1, &err));
     CE(helicsFederateEnterInitializingMode(vFed2, &err));
     CE(helicsFederateEnterInitializingModeComplete(vFed1, &err));
-    //expected to be false since it isn't associated with a asynchronous query
+    // expected to be false since it isn't associated with a asynchronous query
     auto qcomplete = helicsQueryIsCompleted(q1);
     EXPECT_EQ(qcomplete, helics_false);
 

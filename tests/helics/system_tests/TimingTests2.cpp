@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -108,7 +108,8 @@ TEST_F(timing_tests2, small_period_test)
             ++cnt;
             while (erx.hasMessage()) {
                 auto m = erx.getMessage();
-                // std::cout << "receiver: message from " << m->source << " with data " << m->data.to_string ()
+                // std::cout << "receiver: message from " << m->source << " with data " <<
+                // m->data.to_string ()
                 //           << std::endl;
                 ++cmess;
             }
@@ -125,7 +126,8 @@ TEST_F(timing_tests2, small_period_test)
             ctime += 1.0;
             ctime = send1->requestTime(ctime);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            //   std::cout << "sender1: sending message at time " << static_cast<double> (ctime) << std::endl;
+            //   std::cout << "sender1: sending message at time " << static_cast<double> (ctime) <<
+            //   std::endl;
             s1.send("fed0/data", "3.14");
         }
         send1->finalize();
@@ -138,7 +140,8 @@ TEST_F(timing_tests2, small_period_test)
             ctime += 1.0;
             ctime = send2->requestTime(ctime);
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            // std::cout << "sender2: sending message at time " << static_cast<double> (ctime) << std::endl;
+            // std::cout << "sender2: sending message at time " << static_cast<double> (ctime) <<
+            // std::endl;
             s2.send("fed0/data", "3.14");
         }
         send2->finalize();

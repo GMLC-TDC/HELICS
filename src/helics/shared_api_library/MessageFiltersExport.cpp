@@ -92,8 +92,10 @@ helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed, helics_fil
 
     try {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtPtr = &helics::make_filter(
-            helics::interface_visibility::global, static_cast<helics::filter_types>(type), fedObj.get(), AS_STRING(name));
+        filt->filtPtr = &helics::make_filter(helics::interface_visibility::global,
+                                             static_cast<helics::filter_types>(type),
+                                             fedObj.get(),
+                                             AS_STRING(name));
         filt->fedptr = std::move(fedObj);
         filt->custom = (type == helics_filter_type_custom);
         return federateAddFilter(fed, std::move(filt));
@@ -478,11 +480,10 @@ helics_bool helicsFilterGetOption(helics_filter filt, int option)
     // LCOV_EXCL_STOP
 }
 
-void helicsFilterSetCustomCallback(
-    helics_filter filt,
-    void (*filtCall)(helics_message_object message, void* userData),
-    void* userdata,
-    helics_error* err)
+void helicsFilterSetCustomCallback(helics_filter filt,
+                                   void (*filtCall)(helics_message_object message, void* userData),
+                                   void* userdata,
+                                   helics_error* err)
 {
     auto* fObj = getFilterObj(filt, err);
     if (fObj == nullptr || fObj->filtPtr == nullptr) {
@@ -508,7 +509,7 @@ void helicsFilterSetCustomCallback(
     try {
         fObj->filtPtr->setOperator(std::move(op));
     }
-    catch (...) { // LCOV_EXCL_LINE
-        helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }

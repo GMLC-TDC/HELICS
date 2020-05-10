@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -624,7 +624,7 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
         res += " --key=";
         res.append(fi.key);
     }
-    if (!fi.fileInUse.empty()) {  //we used the file, specify a core section
+    if (!fi.fileInUse.empty()) {  // we used the file, specify a core section
         res += " --config_section=core --config-file=";
         res.append(fi.fileInUse);
     }

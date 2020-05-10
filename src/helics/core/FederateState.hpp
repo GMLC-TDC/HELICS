@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -43,7 +43,8 @@ class FederateState {
   public:
     /** constructor from name and information structure*/
     FederateState(const std::string& name_, const CoreFederateInfo& info_);
-    // the destructor is defined so some classes linked with unique ptrs don't have to be defined in the header
+    // the destructor is defined so some classes linked with unique ptrs don't have to be defined in
+    // the header
     /** DISABLE_COPY_AND_ASSIGN */
     FederateState(const FederateState&) = delete;
     FederateState& operator=(const FederateState&) = delete;
@@ -60,8 +61,8 @@ class FederateState {
 
   private:
     std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
-    bool only_transmit_on_change{
-        false};  //!< flag indicating that values should only be transmitted if different than previous values
+    bool only_transmit_on_change{false};  //!< flag indicating that values should only be
+                                          //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool source_only{false};  //!< flag indicating the federate is a source_only
@@ -90,10 +91,10 @@ class FederateState {
         false};  //!< this federate has requested entry to initialization
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
-    bool timeGranted_mode{
-        false};  //!< indicator if the federate is in a granted state or a requested state waiting to grant
-    bool terminate_on_error{
-        false};  //!< indicator that if the federate encounters a configuration error it should cause a co-simulation abort
+    bool timeGranted_mode{false};  //!< indicator if the federate is in a granted state or a
+                                   //!< requested state waiting to grant
+    bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
+                                     //!< error it should cause a co-simulation abort
     int logLevel{1};  //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;
@@ -148,7 +149,8 @@ class FederateState {
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
     uint64_t getQueueSize(interface_handle id) const;
-    /** get the sum of all message queue sizes i.e. the total number of messages available in all endpoints*/
+    /** get the sum of all message queue sizes i.e. the total number of messages available in all
+     * endpoints*/
     uint64_t getQueueSize() const;
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
@@ -227,7 +229,8 @@ class FederateState {
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
     1.  the initialization state has been entered
-    2.  the execution state has been granted (or initialization state reentered from a iterative request)
+    2.  the execution state has been granted (or initialization state reentered from a iterative
+    request)
     3.  time has been granted
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
@@ -237,7 +240,8 @@ class FederateState {
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
     1.  the initialization state has been entered
-    2.  the execution state has been granted (or initialization state reentered from a iterative request)
+    2.  the execution state has been granted (or initialization state reentered from a iterative
+    request)
     3.  time has been granted
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
@@ -332,8 +336,8 @@ class FederateState {
                     const std::string& message) const;
 
     /** set the logging function
-    @details function must have signature void(int level, const std::string &sourceName, const std::string
-    &message)
+    @details function must have signature void(int level, const std::string &sourceName, const
+    std::string &message)
     */
     void setLogger(std::function<void(int, const std::string&, const std::string&)> logFunction)
     {
@@ -348,10 +352,11 @@ class FederateState {
     }
     /** generate the result of a query string
     @param query a query string
-    @return the resulting string from the query or "#wait" if the federate is not available to answer immediately*/
+    @return the resulting string from the query or "#wait" if the federate is not available to
+    answer immediately*/
     std::string processQuery(const std::string& query) const;
-    /** check if a value should be published or not and if needed archive it as a changed value for future change
-    detection
+    /** check if a value should be published or not and if needed archive it as a changed value for
+    future change detection
     @param pub_id the handle of the publication
     @param data the raw data to check
     @param len the length of the data

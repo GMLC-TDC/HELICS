@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -66,10 +66,10 @@ namespace CoreFactory {
     std::shared_ptr<Core>
         create(core_type type, const std::string& coreName, const std::string& configureString);
     /**
- * Creates a Core API object of the specified type.
- *
- * Invokes initialize() on the instantiated Core object.
- */
+     * Creates a Core API object of the specified type.
+     *
+     * Invokes initialize() on the instantiated Core object.
+     */
     std::shared_ptr<Core> create(core_type type, const std::string& configureString);
 
     /** create a core from a type and command line arguments
@@ -80,7 +80,8 @@ namespace CoreFactory {
     std::shared_ptr<Core> create(core_type type, int argc, char* argv[]);
 
     /** create a core from arguments
-@details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
+@details an argument of '--coretype' must be specified to define the type,  otherwise the default
+type is used
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
@@ -93,7 +94,8 @@ namespace CoreFactory {
     std::shared_ptr<Core> create(core_type type, std::vector<std::string> args);
 
     /** create a core from arguments
-@details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
+@details an argument of '--coretype' must be specified to define the type,  otherwise the default
+type is used
 @param argc the number of arguments
 @param argv the actual argument parameters
 @return a pointer to the created core
@@ -120,18 +122,18 @@ namespace CoreFactory {
         create(core_type type, const std::string& coreName, std::vector<std::string> args);
 
     /** tries to find a named core if it fails it creates a new one
- */
+     */
     std::shared_ptr<Core> FindOrCreate(core_type type,
                                        const std::string& coreName,
                                        const std::string& initializationString);
 
     /** tries to find a named core if it fails it creates a new one
- */
+     */
     std::shared_ptr<Core>
         FindOrCreate(core_type type, const std::string& coreName, int argc, char* argv[]);
 
     /** tries to find a named core if it fails it creates a new one
- */
+     */
     std::shared_ptr<Core>
         FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args);
     /** try to find a joinable core of a specific type*/
@@ -143,8 +145,8 @@ namespace CoreFactory {
     std::shared_ptr<Core> findCore(const std::string& name);
 
     /** register a testCore so it can be found by others
-@details also cleans up any leftover Cores that were previously unregistered this can be controlled by
-calling cleanUpCores earlier if desired
+@details also cleans up any leftover Cores that were previously unregistered this can be controlled
+by calling cleanUpCores earlier if desired
 @param core a pointer to a testCore object that should be found globally
 @return true if the registration was successful false otherwise*/
     bool registerCore(const std::shared_ptr<Core>& core, core_type type);
@@ -158,14 +160,14 @@ calling cleanUpCores earlier if desired
     void addAssociatedCoreType(const std::string& name, core_type type);
 
     /** clean up unused cores
-@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new
+Core is registered or when the clean up function is called this prevents some odd threading issues
 @return the number of cores still operating
 */
     size_t cleanUpCores();
     /** clean up unused cores
-@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new Core is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when Cores are unregistered they get put in a holding area that gets cleaned up when a new
+Core is registered or when the clean up function is called this prevents some odd threading issues
 @param delay the delay time in milliseconds to wait for the cores to finish before destroying
 @return the number of cores still operating
 */

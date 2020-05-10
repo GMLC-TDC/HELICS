@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -31,8 +31,8 @@ class BrokerBase {
   protected:
     std::atomic<global_broker_id> global_id{
         parent_broker_id};  //!< the unique identifier for the broker(core or broker)
-    global_broker_id
-        global_broker_id_local{};  //!< meant to be the same as global_id but not atomically protected
+    global_broker_id global_broker_id_local{};  //!< meant to be the same as global_id but not
+                                                //!< atomically protected
     global_broker_id higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{
         1};  //!< the logging level to use levels >=this will be ignored
@@ -48,10 +48,11 @@ class BrokerBase {
     Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
     std::string identifier;  //!< an identifier for the broker
-    std::string
-        brokerKey;  //!< a key that all joining federates must have to connect if empty no key is required
-    // address is mutable since during initial phases it may not be fixed so to maintain a consistent public
-    // interface for extracting it this variable may need to be updated in a constant function
+    std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
+                            //!< key is required
+    // address is mutable since during initial phases it may not be fixed so to maintain a
+    // consistent public interface for extracting it this variable may need to be updated in a
+    // constant function
     mutable std::string address;  //!< network location of the broker
     std::unique_ptr<Logger>
         loggingObj;  //!< default logging object to use if the logging callback is not specified
@@ -138,9 +139,9 @@ class BrokerBase {
     void addActionMessage(ActionMessage&& m);
 
     /** set the logging callback function
-    @param logFunction a function with a signature of void(int level,  const std::string &source,  const
-    std::string &message) the function takes a level indicating the logging level string with the source name and a
-    string with the message
+    @param logFunction a function with a signature of void(int level,  const std::string &source,
+    const std::string &message) the function takes a level indicating the logging level string with
+    the source name and a string with the message
     */
     void setLoggerFunction(
         std::function<void(int, const std::string&, const std::string&)> logFunction);
@@ -177,8 +178,8 @@ class BrokerBase {
     @details cmd may be modified by this function*/
     virtual void processCommand(ActionMessage&& cmd) = 0;
     /** function to process a priority command independent of the main queue
-    @details called when processing a priority command.  The priority command has a response message which gets
-    sent this mainly deals with some of the registration functions
+    @details called when processing a priority command.  The priority command has a response message
+    which gets sent this mainly deals with some of the registration functions
     @param command the command to process
     */
     virtual void processPriorityCommand(ActionMessage&& command) = 0;
@@ -217,6 +218,6 @@ class BrokerBase {
 };
 
 /** helper function to generate the name of a state as a string
-*/
+ */
 const std::string& brokerStateName(BrokerBase::broker_state_t state);
 }  // namespace helics

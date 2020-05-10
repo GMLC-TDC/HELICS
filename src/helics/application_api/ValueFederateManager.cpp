@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederateManager.hpp"
@@ -244,13 +244,15 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 
                     inpHandle.unlock();  // need to free the lock
 
-                    // callbacks can do all sorts of things, best not to have it locked during the callback
+                    // callbacks can do all sorts of things, best not to have it locked during the
+                    // callback
                     iData->callback(inp, CurrentTime);
                     inpHandle = inputs.lock();
                 } else if (allCall) {
                     Input& inp = *fid;
                     inpHandle.unlock();  // need to free the lock
-                    // callbacks can do all sorts of strange things, best not to have it locked during the callback
+                    // callbacks can do all sorts of strange things, best not to have it locked
+                    // during the callback
                     allCall(inp, CurrentTime);
                     inpHandle = inputs.lock();
                 }

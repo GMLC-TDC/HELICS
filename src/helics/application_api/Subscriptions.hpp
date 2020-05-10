@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -58,8 +58,8 @@ inline InputT<X> make_subscription(ValueFederate& valueFed,
 
 /** get a value directly from the subscription key name
 @details this is a convenience function to get a value directly from the subscription key name
-this function should not be used as the primary means of retrieving value as it does involve an additional map find
-operation vs the member getValue calls
+this function should not be used as the primary means of retrieving value as it does involve an
+additional map find operation vs the member getValue calls
 @param fed a reference to a valueFederate
 @param key  the name of the publication
 */
@@ -71,8 +71,8 @@ X getValue(ValueFederate& fed, const std::string& key)
 
 /** get a value directly from the subscription key name
 @details this is a convenience function to get a value directly from the subscription key name
-this function should not be used as the primary means of retrieving value as it does involve an additional map find
-operation vs the member getValue calls
+this function should not be used as the primary means of retrieving value as it does involve an
+additional map find operation vs the member getValue calls
 @param fed a reference to a valueFederate
 @param key  the name of the publication
 @param obj the obj to store the retrieved value

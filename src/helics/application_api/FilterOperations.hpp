@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -77,7 +77,8 @@ class RandomDelayFilterOperation: public FilterOperations {
   public:
     /** default constructor*/
     RandomDelayFilterOperation();
-    // the destructor is defined mainly to prevent the need to define the randomDelayGenerator object here
+    // the destructor is defined mainly to prevent the need to define the randomDelayGenerator
+    // object here
     /** destructor*/
     ~RandomDelayFilterOperation();
     virtual void set(const std::string& property, double val) override;

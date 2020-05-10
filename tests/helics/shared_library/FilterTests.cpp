@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -286,7 +286,8 @@ TEST_P(filter_simple_type_tests, function_mObj)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 TEST_P(filter_type_tests, function_two_stage)
 {
@@ -369,7 +370,8 @@ TEST_P(filter_type_tests, function_two_stage)
 }
 
 /** test two filter operators
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_type_tests, function2)
@@ -394,7 +396,7 @@ TEST_P(filter_type_tests, function2)
     helicsFilterAddSourceTarget(f2, "port2", nullptr);
     EXPECT_TRUE(f2 != nullptr);
     CE(helicsFilterSet(f2, "delay", 2.5, &err));
-    //this is expected to fail since a regular filter doesn't have a delivery endpoint
+    // this is expected to fail since a regular filter doesn't have a delivery endpoint
     helicsFilterAddDeliveryEndpoint(f2, "port1", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -611,7 +613,7 @@ TEST_F(filter_tests, clone_test_connections)
 
     CE(helicsCoreAddSourceFilterToEndpoint(cr, "filt1", "src", &err));
 
-    //error test
+    // error test
     helicsCoreAddSourceFilterToEndpoint(cr, nullptr, "src", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -622,10 +624,10 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
-    //this is testing the filtered_endpoints query for cloning source filters
+    // this is testing the filtered_endpoints query for cloning source filters
     auto q = helicsCreateQuery("", "filtered_endpoints");
     std::string filteredEndpoints = helicsQueryExecute(q, sFed, nullptr);
-    //std::cout << filteredEndpoints << std::endl;
+    // std::cout << filteredEndpoints << std::endl;
     EXPECT_TRUE(filteredEndpoints.find("(cloning)") != std::string::npos);
     EXPECT_TRUE(filteredEndpoints.find("srcFilters") != std::string::npos);
     helicsQueryFree(q);
@@ -695,7 +697,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
 
     CE(helicsBrokerAddSourceFilterToEndpoint(brokers[0], "filt1", "src", &err));
 
-    //error test
+    // error test
     helicsBrokerAddSourceFilterToEndpoint(brokers[0], nullptr, "src", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -773,7 +775,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     CE(helicsCoreAddDestinationFilterToEndpoint(cr, "filt1", "dest", &err));
 
-    //error test
+    // error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
 
     EXPECT_NE(err.error_code, 0);
@@ -788,7 +790,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     auto q = helicsCreateQuery("", "filtered_endpoints");
     std::string filteredEndpoints = helicsQueryExecute(q, dFed, nullptr);
-    //std::cout << filteredEndpoints << std::endl;
+    // std::cout << filteredEndpoints << std::endl;
     EXPECT_TRUE(filteredEndpoints.find("cloningdestFilter") != std::string::npos);
     helicsQueryFree(q);
 
@@ -860,7 +862,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
 
     CE(helicsBrokerAddDestinationFilterToEndpoint(brokers[0], "filt1", "dest", &err));
 
-    //error test
+    // error test
     helicsBrokerAddDestinationFilterToEndpoint(brokers[0], nullptr, "dest", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);

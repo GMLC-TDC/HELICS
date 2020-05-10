@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -28,8 +28,8 @@ enum handle_flag_definitions {
         extra_flag2,  //!< indicator that an endpoint or message has a source filter
     has_dest_filter_flag =
         extra_flag3,  //!< indicator that an endpoint or message has a destination filter
-    has_non_cloning_dest_filter_flag =
-        extra_flag4  //!< indicator that the endpoint or filter has a destination filter that alters the message
+    has_non_cloning_dest_filter_flag = extra_flag4  //!< indicator that the endpoint or filter has a
+                                                    //!< destination filter that alters the message
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -49,8 +49,9 @@ class BasicHandleInfo {
         type_out(units)
 
     {
-        /* NOTE:: all current cases already have std::string they are passing into the function and most are
-        short,so we are taking by reference to avoid a copy then move  and just have a copy*/
+        /* NOTE:: all current cases already have std::string they are passing into the function and
+        most are short,so we are taking by reference to avoid a copy then move  and just have a
+        copy*/
     }
 
     const global_handle handle{};  //!< the global federate id for the creator of the handle

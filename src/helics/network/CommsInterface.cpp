@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommsInterface.hpp"
@@ -21,8 +21,8 @@ namespace helics {
 
 namespace CommFactory {
     /*** class to hold the set of builders for comm interfaces
-       @details this doesn't work as a global since it tends to get initialized after some of the things that call it
-       so it needs to be a static member of function call*/
+       @details this doesn't work as a global since it tends to get initialized after some of the
+       things that call it so it needs to be a static member of function call*/
     class MasterCommBuilder {
       public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;

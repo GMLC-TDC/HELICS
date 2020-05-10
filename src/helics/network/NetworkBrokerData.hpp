@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -55,13 +55,13 @@ class NetworkBrokerData {
     int maxRetries{5};  //!< the maximum number of retries to establish a network connection
     interface_networks interfaceNetwork{interface_networks::local};
     bool reuse_address{false};  //!< allow reuse of binding address
-    bool use_os_port{
-        false};  //!< specify that any automatic port allocation should use operating system allocation
+    bool use_os_port{false};  //!< specify that any automatic port allocation should use operating
+                              //!< system allocation
     bool autobroker{false};  //!< flag for specifying an automatic broker generation
     bool appendNameToAddress{
         false};  //!< flag indicating that the name should be appended to the address
-    bool noAckConnection{
-        false};  //!< flag indicating that a connection ack message is not required for broker connections
+    bool noAckConnection{false};  //!< flag indicating that a connection ack message is not required
+                                  //!< for broker connections
     server_mode_options server_mode{server_mode_options::unspecified};  //!< setup a server mode
   public:
     NetworkBrokerData() = default;
@@ -127,8 +127,8 @@ void insertProtocol(std::string& networkAddress, interface_type interfaceT);
  */
 bool isipv6(const std::string& address);
 
-/** create a combined address list with choices in a rough order of priority based on if they appear in both lists,
-followed by the high priority addresses, and low priority addresses last
+/** create a combined address list with choices in a rough order of priority based on if they appear
+in both lists, followed by the high priority addresses, and low priority addresses last
 
 @param high addresses that should be considered before low addresses
 @param low addresses that should be considered last
@@ -141,17 +141,20 @@ std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> hi
  */
 std::string getLocalExternalAddressV4();
 
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed
+ * server*/
 std::string getLocalExternalAddress(const std::string& server);
 
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed
+ * server*/
 std::string getLocalExternalAddressV4(const std::string& server);
 
 /** get the external ipv4 address of the current computer
  */
 std::string getLocalExternalAddressV6();
 
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed
+ * server*/
 std::string getLocalExternalAddressV6(const std::string& server);
 
 /** generate an interface that matches a defined server or network specification

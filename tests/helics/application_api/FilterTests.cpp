@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -80,7 +80,8 @@ TEST_P(filter_single_type_test, message_filter_registration)
 }
 
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 TEST_P(filter_single_type_test, message_filter_function)
 {
@@ -146,7 +147,8 @@ TEST_P(filter_single_type_test, message_filter_function)
 }
 
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_single_type_test, message_filter_object)
@@ -206,7 +208,8 @@ TEST_P(filter_single_type_test, message_filter_object)
 }
 
 /** test a remove dest filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_single_type_test, message_dest_filter_function)
@@ -268,7 +271,8 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
 }
 
 /** test a remote dest filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_all_type_test, message_dest_filter_function_t2)
@@ -326,7 +330,8 @@ TEST_P(filter_all_type_test, message_dest_filter_function_t2)
 }
 
 /** test a remove dest filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_single_type_test, message_dest_filter_object)
@@ -476,7 +481,8 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     return correct;
 }
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_single_type_test, message_filter_function_two_stage)
@@ -727,7 +733,8 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
 }
 
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
@@ -810,7 +817,8 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
     EXPECT_TRUE(!mCore->isConnected());
 }
 /** test two filter operators
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 TEST_P(filter_single_type_test, message_filter_function2)

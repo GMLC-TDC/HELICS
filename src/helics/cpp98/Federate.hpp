@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_FEDERATE_HPP_
@@ -253,17 +253,18 @@ class Federate {
     {
         return helicsFederateGetIntegerProperty(fed, intProperty, hThrowOnError());
     }
-    /** specify a separator to use for naming separation between the federate name and the interface name
-     setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
-    setSeparator('/') will result in fedName/endpoint
-    the default is '/'  any character can be used though many will not make that much sense.  This call is not
-    thread safe and should be called before any local interfaces are created otherwise it may not be possible to
+    /** specify a separator to use for naming separation between the federate name and the interface
+    name setSeparator('.') will result in future registrations of local endpoints such as
+    fedName.endpoint setSeparator('/') will result in fedName/endpoint the default is '/'  any
+    character can be used though many will not make that much sense.  This call is not thread safe
+    and should be called before any local interfaces are created otherwise it may not be possible to
     retrieve them without using the full name.  recommended possibilities are ('.','/', ':','-','_')
      */
     void setSeparator(char sep) { helicsFederateSetSeparator(fed, sep, HELICS_NULL_POINTER); }
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
-    @param configString  the location of the file or config String to load to generate the interfaces
+    @param configString  the location of the file or config String to load to generate the
+    interfaces
     */
     void registerInterfaces(const std::string& configString)
     {
@@ -279,23 +280,25 @@ class Federate {
     */
     void enterInitializingMode() { helicsFederateEnterInitializingMode(fed, hThrowOnError()); }
     /** enter the initialization mode after all interfaces have been defined
-   @details  the call will not block but a call to \ref enterInitializingModeComplete should be made to complete
-   the call sequence
+   @details  the call will not block but a call to \ref enterInitializingModeComplete should be made
+   to complete the call sequence
    */
     void enterInitializingModeAsync()
     {
         helicsFederateEnterInitializingModeAsync(fed, hThrowOnError());
     }
-    /** called after one of the async calls and will indicate true if an async operation has completed
-    @details only call from the same thread as the one that called the initial async call and will return false
-    if called when no aysnc operation is in flight*/
+    /** called after one of the async calls and will indicate true if an async operation has
+    completed
+    @details only call from the same thread as the one that called the initial async call and will
+    return false if called when no aysnc operation is in flight*/
     bool isAsyncOperationCompleted() const
     {
         // returns int, 1 = true, 0 = false
         return helicsFederateIsAsyncOperationCompleted(fed, HELICS_NULL_POINTER) > 0;
     }
     /** second part of the async process for entering initializationState call after a call to
-    enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall exception*/
+    enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall
+    exception*/
     void enterInitializingModeComplete()
     {
         helicsFederateEnterInitializingModeComplete(fed, hThrowOnError());
@@ -316,8 +319,8 @@ class Federate {
         return out_iterate;
     }
     /** enter the normal execution mode
-    @details call will return immediately but \ref enterExecutingModeComplete should be called to complete the
-    operation
+    @details call will return immediately but \ref enterExecutingModeComplete should be called to
+    complete the operation
     @param iterate an optional flag indicating the desired iteration mode
     */
     void enterExecutingModeAsync(
@@ -333,8 +336,8 @@ class Federate {
     }
 
     /** complete the async call for entering Execution state
-    @details call will not block but will return quickly.  The enterInitializingModeComplete must be called
-    before doing other operations
+    @details call will not block but will return quickly.  The enterInitializingModeComplete must be
+    called before doing other operations
     */
     helics_iteration_result enterExecutingModeComplete()
     {
@@ -347,8 +350,8 @@ class Federate {
         return out_iterate;
     }
     /** terminate the simulation
-   @details call is will block until the finalize has been acknowledged, no commands that interact with the core
-   may be called after this function function */
+   @details call is will block until the finalize has been acknowledged, no commands that interact
+   with the core may be called after this function function */
     void finalize() { helicsFederateFinalize(fed, hThrowOnError()); }
     /** terminate the simulation in a non-blocking call
     @details finalizeComplete must be called after this call to complete the finalize procedure*/
@@ -394,7 +397,8 @@ class Federate {
     }
 
     /** request a time advancement with iterative call and return for asynchronous function.
-  @details /ref requestTimeIterativeComplete should be called to finish the operation and get the result
+  @details /ref requestTimeIterativeComplete should be called to finish the operation and get the
+  result
   @param time the next requested time step
   @param iterate a requested iteration level (none, require, optional)
   */
@@ -411,7 +415,8 @@ class Federate {
     }
 
     /** finalize the time advancement request
-  @return the granted time step in an iteration_time structure which contains a time and iteration result*/
+  @return the granted time step in an iteration_time structure which contains a time and iteration
+  result*/
     helics_iteration_time requestTimeIterativeComplete()
     {
         helics_iteration_time itTime;
@@ -422,14 +427,15 @@ class Federate {
     /** get the federate name*/
     const char* getName() const { return helicsFederateGetName(fed); }
     /** make a query of the core
-    @details this call is blocking until the value is returned which make take some time depending on the size of
-    the federation and the specific string being queried
-    @param target  the target of the query can be "federation", "federate", "broker", "core", or a specific name of
-    a federate, core, or broker
-    @param queryStr a string with the query see other documentation for specific properties to query, can be
-    defined by the federate
-    @return a string with the value requested.  this is either going to be a vector of strings value or a JSON
-    string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
+    @details this call is blocking until the value is returned which make take some time depending
+    on the size of the federation and the specific string being queried
+    @param target  the target of the query can be "federation", "federate", "broker", "core", or a
+    specific name of a federate, core, or broker
+    @param queryStr a string with the query see other documentation for specific properties to
+    query, can be defined by the federate
+    @return a string with the value requested.  this is either going to be a vector of strings value
+    or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
+    if the query was not valid
     */
     std::string query(const std::string& target, const std::string& queryStr) const
     {
@@ -450,8 +456,8 @@ class Federate {
     }
 
     /** create a cloning Filter on the specified federate
-    @details cloning filters copy a message and send it to multiple locations source and destination can be added
-    through other functions
+    @details cloning filters copy a message and send it to multiple locations source and destination
+    can be added through other functions
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
@@ -473,8 +479,8 @@ class Federate {
     }
 
     /** create a cloning Filter on the specified federate
-    @details cloning filters copy a message and send it to multiple locations source and destination can be added
-    through other functions
+    @details cloning filters copy a message and send it to multiple locations source and destination
+    can be added through other functions
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a CloningFilter object
     */

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -40,7 +40,8 @@ class hThrowOnError {
     /** constructor which creates and initializing an error object*/
     hThrowOnError(): eObj(helicsErrorInitialize()) {}
     /** throwing destructor
-    @details if the error code object contains a non-zero error code the destructor will emit an exception */
+    @details if the error code object contains a non-zero error code the destructor will emit an
+    exception */
     ~hThrowOnError() HELICS_THROWS_EXCEPTION
     {
         if (eObj.error_code != 0) {

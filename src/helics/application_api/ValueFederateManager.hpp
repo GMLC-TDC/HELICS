@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -145,7 +145,8 @@ class ValueFederateManager {
     /** generate results for a local query */
     std::string localQuery(const std::string& queryStr) const;
     /** get a list of all the values that have been updated since the last call
-    @return a vector of subscription_ids with all the values that have not been retrieved since updated
+    @return a vector of subscription_ids with all the values that have not been retrieved since
+    updated
     */
     std::vector<int> queryUpdates();
 

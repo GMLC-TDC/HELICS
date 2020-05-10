@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../application_api/Federate.hpp"
@@ -170,7 +170,8 @@ void terminalFunction(std::vector<std::string> args)
         auto id = (*broker)->getIdentifier ();
         if (connected)
         {
-            std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
+            std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is
+    not")
                       << "accepting new federates\n";
             if (addAddress)
             {
@@ -213,20 +214,20 @@ void terminalFunction(std::vector<std::string> args)
         });
     /*
     auto restart =
-      termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
-    restart->callback (
-      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
+      termProg.add_subcommand ("restart", "restart the broker if it is not currently
+    executing")->allow_extras (); restart->callback ( [restartBroker, &restart] () { restartBroker
+    (restart->remaining_for_passthrough (), false); });
 
     auto frestart =
-      termProg.add_subcommand ("restart!", "forceably terminate the broker and restart it")->allow_extras ();
-    frestart->callback (
-      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
+      termProg.add_subcommand ("restart!", "forceably terminate the broker and restart
+    it")->allow_extras (); frestart->callback ( [restartBroker, &restart] () { restartBroker
+    (restart->remaining_for_passthrough (), true); });
 
-    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([&status] () {
-        status (false);
+    termProg.add_subcommand ("status", "generate the current status of the broker")->callback
+    ([&status] () { status (false);
     });
-    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status] () {
-        status (true);
+    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback
+    ([&status] () { status (true);
     });
     */
     termProg.add_subcommand("help", "display the help")->callback([&termProg]() {
@@ -259,8 +260,8 @@ void terminalFunction(std::vector<std::string> args)
         }
     };
     auto querySub = termProg.add_subcommand (
-      "query", "make a query of some target >>query <target> <query> or query <query> to query the broker");
-    auto qgroup1 = querySub->add_option_group ("targetGroup")->enabled_by_default ();
+      "query", "make a query of some target >>query <target> <query> or query <query> to query the
+    broker"); auto qgroup1 = querySub->add_option_group ("targetGroup")->enabled_by_default ();
     qgroup1->add_option ("target", target, "the name of object to target");
     auto qgroup2 = querySub->add_option_group ("queryGroup");
     qgroup2->add_option ("query", query, "the query to make")->required ();
@@ -277,9 +278,8 @@ void terminalFunction(std::vector<std::string> args)
         std::string cmdin;
         std::cout << "\nhelics_broker_server>>";
         std::getline(std::cin, cmdin);
-        if (cmdin == "exit" ||
-            cmdin ==
-                "q") {  // provide a fast path to exit without going through the terminal command line processor
+        if (cmdin == "exit" || cmdin == "q") {  // provide a fast path to exit without going through
+                                                // the terminal command line processor
             cmdcont = false;
             continue;
         }
