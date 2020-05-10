@@ -365,8 +365,8 @@ class PingPongFed
             if (messString == "ping")
             {
 #ifdef ENABLE_OUTPUT
-                std::cout << name << " :receive ping from " << std::string (mess->source) << " at
-time "
+                std::cout << name << " :receive ping from "
+                          << std::string (mess->source) << " at time "
                           << static_cast<double> (currentTime) << '\n';
 #endif
                 mess->data = "pong";
