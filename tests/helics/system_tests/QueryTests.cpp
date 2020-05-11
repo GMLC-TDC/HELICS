@@ -274,12 +274,14 @@ TEST_F(query, current_time)
 
     res = mFed1->query("root", "current_time");
     EXPECT_EQ(res, "{}");
+    mFed1->finalize();
+    mFed2->finalize();
 }
 
 
 TEST_F(query, version)
 {
-    SetupTest<helics::MessageFederate>("test_6", 2);
+    SetupTest<helics::MessageFederate>("test", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
@@ -304,6 +306,8 @@ TEST_F(query, version)
     res = mFed1->query("root", "version_all");
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["version"].asString(), helics::versionString);
+    mFed1->finalize();
+    mFed2->finalize();
 }
 
 TEST_F(query, current_state)
