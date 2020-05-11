@@ -12,17 +12,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
-
+#include "helics/core/helicsVersion.hpp"
 #include "gtest/gtest.h"
 #include <thread>
 
-struct query_tests: public FederateTestFixture, public ::testing::Test {
+struct query: public FederateTestFixture, public ::testing::Test {
 };
 
-class query_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
+class query_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
 /** test simple creation and destruction*/
-TEST_P(query_type_tests, publication_queries)
+TEST_P(query_type, publication_queries)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -58,7 +58,7 @@ TEST_P(query_type_tests, publication_queries)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_P(query_type_tests, broker_queries)
+TEST_P(query_type, broker_queries)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -80,7 +80,7 @@ TEST_P(query_type_tests, broker_queries)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_P(query_type_tests, publication_fed_queries)
+TEST_P(query_type, publication_fed_queries)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -108,9 +108,9 @@ TEST_P(query_type_tests, publication_fed_queries)
     vFed2->finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(query_tests, query_type_tests, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(query, query_type, ::testing::ValuesIn(core_types));
 
-TEST_F(query_tests, federate_map)
+TEST_F(query, federate_map)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -132,7 +132,7 @@ TEST_F(query_tests, federate_map)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, federate_map2)
+TEST_F(query, federate_map2)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -154,7 +154,7 @@ TEST_F(query_tests, federate_map2)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, federate_map3)
+TEST_F(query, federate_map3)
 {
     SetupTest<helics::ValueFederate>("test_3", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -181,7 +181,7 @@ TEST_F(query_tests, federate_map3)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, dependency_graph)
+TEST_F(query, dependency_graph)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -203,7 +203,7 @@ TEST_F(query_tests, dependency_graph)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, global_time)
+TEST_F(query, global_time)
 {
     SetupTest<helics::ValueFederate>("test_3", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -246,7 +246,7 @@ TEST_F(query_tests, global_time)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, current_time)
+TEST_F(query, current_time)
 {
     SetupTest<helics::MessageFederate>("test_3", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -276,7 +276,37 @@ TEST_F(query_tests, current_time)
     EXPECT_EQ(res, "{}");
 }
 
-TEST_F(query_tests, current_state)
+
+TEST_F(query, version)
+{
+    SetupTest<helics::MessageFederate>("test_6", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    mFed1->registerEndpoint("ept1");
+    mFed2->registerEndpoint("ept2");
+
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    mFed1->requestTimeAsync(1.0);
+    mFed2->requestTime(1.0);
+    mFed1->requestTimeComplete();
+    auto res = mFed1->query("version");
+    EXPECT_EQ(res,helics::versionString);
+    res = mFed1->query("broker", "version");
+    EXPECT_EQ(res, helics::versionString);
+    res = mFed1->query("core", "version");
+    EXPECT_EQ(res, helics::versionString);
+    res = mFed1->query("root", "version");
+    EXPECT_EQ(res, helics::versionString);
+    res = mFed1->query("root", "version_all");
+    auto val = loadJsonStr(res);
+    EXPECT_EQ(val["version"].asString(), helics::versionString);
+}
+
+TEST_F(query, current_state)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -321,7 +351,7 @@ TEST_F(query_tests, current_state)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, current_state_core)
+TEST_F(query, current_state_core)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -352,7 +382,7 @@ TEST_F(query_tests, current_state_core)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, data_flow_graph)
+TEST_F(query, data_flow_graph)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -385,7 +415,7 @@ TEST_F(query_tests, data_flow_graph)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, data_flow_graph_concurrent)
+TEST_F(query, data_flow_graph_concurrent)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -425,7 +455,7 @@ TEST_F(query_tests, data_flow_graph_concurrent)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, updates_indices)
+TEST_F(query, updates_indices)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -457,7 +487,7 @@ TEST_F(query_tests, updates_indices)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, updates_names)
+TEST_F(query, updates_names)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -489,7 +519,7 @@ TEST_F(query_tests, updates_names)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, update_values)
+TEST_F(query, update_values)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -529,7 +559,7 @@ TEST_F(query_tests, update_values)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, update_values_local)
+TEST_F(query, update_values_local)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -569,7 +599,7 @@ TEST_F(query_tests, update_values_local)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, update_values_all)
+TEST_F(query, update_values_all)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -610,7 +640,7 @@ TEST_F(query_tests, update_values_all)
 }
 
 #ifdef ENABLE_ZMQ_CORE
-TEST_F(query_tests, query_subscriptions)
+TEST_F(query, query_subscriptions)
 {
     SetupTest<helics::ValueFederate>("zmq2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -633,7 +663,7 @@ TEST_F(query_tests, query_subscriptions)
     helics::cleanupHelicsLibrary();
 }
 
-TEST_F(query_tests, queries_query)
+TEST_F(query, queries_query)
 {
     SetupTest<helics::CombinationFederate>("zmq2", 2);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);

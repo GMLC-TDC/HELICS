@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/logger.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "helicsVersion.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -1915,7 +1916,7 @@ enum subqueries : std::uint16_t {
     general_query = 0,
     current_time_map = 2,
     dependency_graph = 3,
-    data_flow_graph = 4
+    data_flow_graph = 4,
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2014,6 +2015,9 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     if ((queryStr == "exists") || (queryStr == "exist")) {
         return "true";
     }
+    if (queryStr == "version") {
+        return versionString;
+    }
     if (queryStr == "isinit") {
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
@@ -2024,7 +2028,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return filteredEndpointQuery(fed);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return std::string("[exists;isinit;state;queries;filtered_endpoints;current_time;") +
+        return std::string("[exists;isinit;state;version;queries;filtered_endpoints;current_time;") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -2034,13 +2038,16 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
+               "publications;filters;version;version_all;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
     }
     if (queryStr == "name") {
         return getIdentifier();
+    }
+    if (queryStr == "version") {
+        return versionString;
     }
     return std::string{};
 }
@@ -2196,6 +2203,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "address") {
         return getAddress();
     }
+    if (queryStr == "version") {
+        return versionString;
+    }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
     }
@@ -2205,6 +2215,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         } else {
             return "{}";
         }
+    }
+    if (queryStr == "version_all") {
+        Json::Value base;
+        loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
+        base["version"] = versionString;
+        return generateJsonString(base);
     }
     if (queryStr == "current_state") {
         Json::Value base;
@@ -2289,6 +2305,9 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         }
         if (queryStr == "address") {
             return getAddress();
+        }
+        if (queryStr == "version") {
+            return versionString;
         }
         querycmd.setAction(CMD_BROKER_QUERY);
         querycmd.dest_id = direct_core_id;

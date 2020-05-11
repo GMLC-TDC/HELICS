@@ -2376,7 +2376,8 @@ enum subqueries : std::uint16_t {
     federate_map = 1,
     current_time_map = 2,
     dependency_graph = 3,
-    data_flow_graph = 4
+    data_flow_graph = 4,
+    version_all = 5
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2384,6 +2385,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"federate_map", {federate_map, false}},
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
+    {"version_all", {version_all, false}},
 };
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request)
@@ -2401,10 +2403,13 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_time]";
+               "current_time;current_state;global_time;version;version_all]";
     }
     if (request == "address") {
         return getAddress();
+    }
+    if (request == "version") {
+        return versionString;
     }
     if (request == "counts") {
         Json::Value base;
@@ -2620,6 +2625,9 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
             }
         } break;
         case data_flow_graph:
+            break;
+        case version_all:
+            base["version"] = versionString;
             break;
     }
 }
