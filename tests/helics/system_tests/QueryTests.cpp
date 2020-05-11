@@ -45,7 +45,7 @@ TEST_P(query_type, publication_queries)
     EXPECT_EQ(res, "[pub1;fed0/pub2]");
     auto rvec = helics::vectorizeQueryResult(res);
 
-    ASSERT_EQ(rvec.size(), 2u);
+    ASSERT_EQ(rvec.size(), 2U);
     EXPECT_EQ(rvec[0], "pub1");
     EXPECT_EQ(rvec[1], "fed0/pub2");
     EXPECT_EQ(vFed2->query("fed0", "publications"), "[pub1;fed0/pub2]");
@@ -100,7 +100,7 @@ TEST_P(query_type, publication_fed_queries)
 
     auto rvec = helics::vectorizeAndSortQueryResult(res);
 
-    ASSERT_EQ(rvec.size(), 3u);
+    ASSERT_EQ(rvec.size(), 3U);
     EXPECT_EQ(rvec[0], "fed0/pub1");
     EXPECT_EQ(rvec[1], "fed1/pub2");
     EXPECT_EQ(rvec[2], "fed1/pub3");
@@ -121,8 +121,8 @@ TEST_F(query, federate_map)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 1u);
-    EXPECT_EQ(val["cores"][0]["federates"].size(), 2u);
+    EXPECT_EQ(val["cores"].size(), 1U);
+    EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
     EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
@@ -143,8 +143,8 @@ TEST_F(query, federate_map2)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 2u);
-    EXPECT_EQ(val["cores"][1]["federates"].size(), 1u);
+    EXPECT_EQ(val["cores"].size(), 2U);
+    EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(val["cores"][1]["parent"].asInt(), val["id"].asInt());
     auto v2 = val["cores"][1]["federates"][0];
     EXPECT_EQ(v2["parent"].asInt(), val["cores"][1]["id"].asInt());
@@ -166,12 +166,12 @@ TEST_F(query, federate_map3)
     vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0u);
-    EXPECT_EQ(val["brokers"].size(), 1u);
+    EXPECT_EQ(val["brokers"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["parent"].asInt(), val["id"].asInt());
     auto brk = val["brokers"][0];
-    EXPECT_EQ(brk["cores"].size(), 2u);
+    EXPECT_EQ(brk["cores"].size(), 2U);
     EXPECT_EQ(brk["brokers"].size(), 0u);
-    EXPECT_EQ(brk["cores"][1]["federates"].size(), 1u);
+    EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(brk["cores"][1]["parent"].asInt(), brk["id"].asInt());
     auto v2 = brk["cores"][1]["federates"][0];
     EXPECT_EQ(v2["parent"].asInt(), brk["cores"][1]["id"].asInt());
@@ -192,8 +192,8 @@ TEST_F(query, dependency_graph)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 1u);
-    EXPECT_EQ(val["cores"][0]["federates"].size(), 2u);
+    EXPECT_EQ(val["cores"].size(), 1U);
+    EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
     EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
@@ -218,10 +218,10 @@ TEST_F(query, global_time)
 
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0u);
-    EXPECT_EQ(val["brokers"].size(), 1u);
-    ASSERT_EQ(val["brokers"][0]["cores"].size(), 2u);
-    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1u);
-    EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1u);
+    EXPECT_EQ(val["brokers"].size(), 1U);
+    ASSERT_EQ(val["brokers"][0]["cores"].size(), 2U);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1U);
+    EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].asDouble(), 0.0);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].asDouble(), 0.0);
 
@@ -233,10 +233,10 @@ TEST_F(query, global_time)
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0u);
-    EXPECT_EQ(val["brokers"].size(), 1u);
-    ASSERT_EQ(val["brokers"][0]["cores"].size(), 2u);
-    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1u);
-    EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1u);
+    EXPECT_EQ(val["brokers"].size(), 1U);
+    ASSERT_EQ(val["brokers"][0]["cores"].size(), 2U);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1U);
+    EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].asDouble(), 1.0);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].asDouble(), 1.0);
 
@@ -324,8 +324,8 @@ TEST_F(query, current_state)
     auto res = core->query("root", "current_state");
 
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["federates"].size(), 2u);
-    EXPECT_EQ(val["cores"].size(), 2u);
+    EXPECT_EQ(val["federates"].size(), 2U);
+    EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
 
     vFed1->localError(-3, "test error");
@@ -334,8 +334,8 @@ TEST_F(query, current_state)
     res = core->query("root", "current_state");
 
     val = loadJsonStr(res);
-    EXPECT_EQ(val["federates"].size(), 2u);
-    EXPECT_EQ(val["cores"].size(), 2u);
+    EXPECT_EQ(val["federates"].size(), 2U);
+    EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"].size(), 0u);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
 
@@ -346,7 +346,7 @@ TEST_F(query, current_state)
     res = core->query("root", "current_state");
 
     val = loadJsonStr(res);
-    EXPECT_EQ(val["federates"].size(), 2u);
+    EXPECT_EQ(val["federates"].size(), 2U);
     EXPECT_STREQ(val["federates"][1]["state"].asCString(), "disconnected");
     EXPECT_STREQ(val["cores"][1]["state"].asCString(), "disconnected");
     core = nullptr;
@@ -368,7 +368,7 @@ TEST_F(query, current_state_core)
     auto res = vFed1->query("core", "current_state");
 
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["federates"].size(), 1u);
+    EXPECT_EQ(val["federates"].size(), 1U);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
 
     vFed1->localError(-3, "test error");
@@ -377,7 +377,7 @@ TEST_F(query, current_state_core)
     res = vFed1->query("core", "current_state");
 
     val = loadJsonStr(res);
-    EXPECT_EQ(val["federates"].size(), 1u);
+    EXPECT_EQ(val["federates"].size(), 1U);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
 
     vFed2->finalize();
@@ -401,7 +401,7 @@ TEST_F(query, data_flow_graph)
     auto core = vFed1->getCorePointer();
     auto res = core->query("root", "data_flow_graph");
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 1u);
+    EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
@@ -436,7 +436,7 @@ TEST_F(query, data_flow_graph_concurrent)
     auto core = vFed1->getCorePointer();
     auto res = core->query("root", "data_flow_graph");
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 1u);
+    EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
