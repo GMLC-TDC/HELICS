@@ -1754,10 +1754,10 @@ void CoreBroker::disconnect()
                     "main loop is stopped but have not received disconnect notice, assuming disconnected");
                 return;
             }
-                LOG_WARNING(global_id.load(),
-                            getIdentifier(),
-                            fmt::format("sending disconnect again; total message count = {}",
-                                        currentMessageCounter()));
+            LOG_WARNING(global_id.load(),
+                        getIdentifier(),
+                        fmt::format("sending disconnect again; total message count = {}",
+                                    currentMessageCounter()));
             addActionMessage(udisconnect);
         }
     }
@@ -1972,7 +1972,7 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
 {
     auto subHandles = unknownHandles.checkForPublications(handleInfo.key);
-    for (const auto &sub : subHandles) {
+    for (const auto& sub : subHandles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
         m.setSource(sub.first);
@@ -1992,7 +1992,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
     }
 
     auto Pubtargets = unknownHandles.checkForLinks(handleInfo.key);
-    for (const auto &sub : Pubtargets) {
+    for (const auto& sub : Pubtargets) {
         ActionMessage m(CMD_ADD_NAMED_INPUT);
         m.name = sub;
         m.setSource(handleInfo.handle);
@@ -2006,7 +2006,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForEndpoints(handleInfo.key);
-    for (const auto &target : Handles) {
+    for (const auto& target : Handles) {
         // notify the filter about its endpoint
         ActionMessage m(CMD_ADD_ENDPOINT);
         m.setSource(handleInfo.handle);
@@ -2029,7 +2029,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForFilters(handleInfo.key);
-    for (const auto &target : Handles) {
+    for (const auto& target : Handles) {
         // notify the endpoint about a filter
         ActionMessage m(CMD_ADD_FILTER);
         m.setSource(handleInfo.handle);
@@ -2051,7 +2051,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(handleInfo.key);
-    for (const auto &target : FiltDestTargets) {
+    for (const auto& target : FiltDestTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.setSource(handleInfo.handle);
@@ -2064,7 +2064,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 
     auto FiltSourceTargets = unknownHandles.checkForFilterSourceTargets(handleInfo.key);
-    for (const auto &target : FiltSourceTargets) {
+    for (const auto& target : FiltSourceTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.flags = handleInfo.flags;

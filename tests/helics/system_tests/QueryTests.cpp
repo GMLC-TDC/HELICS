@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
+
 #include "gtest/gtest.h"
 #include <thread>
 
@@ -278,7 +279,6 @@ TEST_F(query, current_time)
     mFed2->finalize();
 }
 
-
 TEST_F(query, version)
 {
     SetupTest<helics::MessageFederate>("test", 2);
@@ -296,7 +296,7 @@ TEST_F(query, version)
     mFed2->requestTime(1.0);
     mFed1->requestTimeComplete();
     auto res = mFed1->query("version");
-    EXPECT_EQ(res,helics::versionString);
+    EXPECT_EQ(res, helics::versionString);
     res = mFed1->query("broker", "version");
     EXPECT_EQ(res, helics::versionString);
     res = mFed1->query("core", "version");
