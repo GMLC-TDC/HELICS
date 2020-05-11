@@ -17,24 +17,28 @@ where:
 
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
-
 while getopts p:d:n: options; do
-   case ${options} in
-      p) PREFIX=${OPTARG}
-         ;;
-      d) DIRECTORY=${OPTARG}
-         ;;
-      n) NAME=${OPTARG}
-         ;;
-      :) printf "missing argument for -%s\n" "$OPTARG" >&2
-         echo "$usage" >&2
-         exit 1
-         ;;
-     \?) printf "illegal option: -%s\n" "$OPTARG" >&2
-         echo "$usage" >&2
-         exit 1
-         ;;
-   esac
+	case ${options} in
+	p)
+		PREFIX=${OPTARG}
+		;;
+	d)
+		DIRECTORY=${OPTARG}
+		;;
+	n)
+		NAME=${OPTARG}
+		;;
+	:)
+		printf "missing argument for -%s\n" "$OPTARG" >&2
+		echo "$usage" >&2
+		exit 1
+		;;
+	\?)
+		printf "illegal option: -%s\n" "$OPTARG" >&2
+		echo "$usage" >&2
+		exit 1
+		;;
+	esac
 done
 shift $((OPTIND - 1))
 cd "${DIRECTORY}"

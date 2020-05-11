@@ -1,6 +1,9 @@
 #!/bin/bash
 
-command -v clang-format >/dev/null 2>&1 || { echo >&2 "Githooks require clang-format but it's not available in this environment. Bypassing githook."; exit 0; }
+command -v clang-format >/dev/null 2>&1 || {
+	echo >&2 "Githooks require clang-format but it's not available in this environment. Bypassing githook."
+	exit 0
+}
 
 files=()
 for file in $(git diff --cached --name-only --diff-filter=ACMRT ':!interfaces' ':!ThirdParty' | grep -E "\.(cpp|hpp|c|h)$"); do
@@ -15,5 +18,5 @@ if [[ ${#files[@]} -ne 0 ]]; then
     echo "Run clang-format -i <filename> to resolve the issue before committing, or commit with --no-verify"
 #    exit 1
 else
-    echo "Clang-format check passed successfully."
+	echo "Clang-format check passed successfully."
 fi
