@@ -1,4 +1,4 @@
-#
+#!/bin/bash
 # Copyright (c) 2017-2019,
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 # the top-level NOTICE for additional details. All rights reserved.
@@ -26,38 +26,48 @@ where:
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
 while getopts ':ht:r:l:k:i:s:' option; do
-  case "$option" in
-    h) echo "$usage"
-       exit
-       ;;
-    t) tag=$OPTARG
-       ;;
-    r) repo=$OPTARG
-       ;;
-    l) release=$OPTARG
-       ;;
-    k) GITHUB_TOKEN=$OPTARG
-       ;;
-    i) CLIENT_ID=$OPTARG
-       ;;
-    s) CLIENT_SECRET=$OPTARG
-       ;;
-    :) printf "missing argument for -%s\n" "$OPTARG" >&2
-       echo "$usage" >&2
-       exit 1
-       ;;
-   \?) printf "illegal option: -%s\n" "$OPTARG" >&2
-       echo "$usage" >&2
-       exit 1
-       ;;
-  esac
+    case "$option" in
+    h)
+        echo "$usage"
+        exit
+        ;;
+    t)
+        tag=$OPTARG
+        ;;
+    r)
+        repo=$OPTARG
+        ;;
+    l)
+        release=$OPTARG
+        ;;
+    k)
+        GITHUB_TOKEN=$OPTARG
+        ;;
+    i)
+        CLIENT_ID=$OPTARG
+        ;;
+    s)
+        CLIENT_SECRET=$OPTARG
+        ;;
+    :)
+        printf "missing argument for -%s\n" "$OPTARG" >&2
+        echo "$usage" >&2
+        exit 1
+        ;;
+    \?)
+        printf "illegal option: -%s\n" "$OPTARG" >&2
+        echo "$usage" >&2
+        exit 1
+        ;;
+    esac
 done
 shift $((OPTIND - 1))
 
 pip install pygithub
 
 echo "> creating root archive"
-export ROOT_ARCHIVE_DIR="$(pwd)"
+ROOT_ARCHIVE_DIR="$(pwd)"
+export ROOT_ARCHIVE_DIR
 
 git checkout "$tag"
 git submodule update --init
@@ -67,17 +77,18 @@ git archive --verbose --prefix "repo/" --format "tar" --output "$ROOT_ARCHIVE_DI
 
 echo "> appending submodule archives"
 # for each of git submodules append to the root archive
+# shellcheck disable=SC2016
 git submodule foreach --recursive 'git archive --verbose --prefix=repo/$path/ --format tar master --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
 
-if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
-  # combine all archives into one tar
-  echo
-  echo "> combining all tars"
-  tar --file repo-output.tar --append repo-output-sub*.tar
+if (($(find repo-output-sub*.tar | wc -l) != 0)); then
+    # combine all archives into one tar
+    echo
+    echo "> combining all tars"
+    tar --file repo-output.tar --append repo-output-sub*.tar
 
-  # remove sub tars
-  echo "> removing all sub tars"
-  rm -rf repo-output-sub*.tar
+    # remove sub tars
+    echo "> removing all sub tars"
+    rm -rf repo-output-sub*.tar
 fi
 
 # gzip the tar

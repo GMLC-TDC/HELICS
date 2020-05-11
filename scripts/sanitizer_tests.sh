@@ -12,7 +12,7 @@ for test in "${tests[@]}"; do
     eval "${test}"
     RESULT=$?
     echo "***Latest test result: "${RESULT}
-    SUMRESULT=$(( SUMRESULT + RESULT ))
+    SUMRESULT=$((SUMRESULT + RESULT))
 done
 # Return 0 or a positive integer for failure
 exit ${SUMRESULT}
