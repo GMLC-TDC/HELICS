@@ -17,6 +17,8 @@ do
             ;;
         --cachegrind)
             echo "Running cachegrind tests"
+            # shellcheck disable=SC2034
+            # this option is currently disabled
             RUN_CACHEGRIND=true
             ;;
         --asan)
@@ -130,9 +132,13 @@ else
     if [[ "$DISABLE_UNIT_TESTS" != "true" ]]; then
     if [[ -n "${TEST_CONFIG}" ]]; then
             echo "Running ${TEST_CONFIG} tests with filters exclude ${test_exclude_regex} and ${test_match_regex}"
+            # shellcheck disable=SC2086
+            # some options depend on word splitting to get passed to ctest correclty
             ctest -E "${test_exclude_regex}" -R "${test_match_regex}" -L ${TEST_CONFIG} ${CTEST_OPTIONS}
     else
         echo "Running tests matching ${test_match_regex} but not matching ${test_exclude_regex}"
+        # shellcheck disable=SC2086
+        # some options depend on word splitting to get passed to ctest correctly
         ctest ${CTEST_OPTIONS} -E "${test_exclude_regex}" -R "${test_match_regex}"
     fi
     fi

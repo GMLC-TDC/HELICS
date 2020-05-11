@@ -13,23 +13,20 @@ set -e
 set -C # noclobber
 #
 
-usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- create archive source tarball with all submodules
+usage="$(basename "$0") [-h] [-t s] [-l s] -- create archive source tarball with all submodules
 where:
     -h  show this help text
     -t  source code tag (v2.1.1)
-    -r  repo (GMLC-TDC/HELICS)
     -l  release tag (can be different than checkout tag ex: v0.0.0archive)
 
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
-while getopts ':ht:r:l:' option; do
+while getopts ':ht:l:' option; do
   case "$option" in
     h) echo "$usage"
        exit
        ;;
     t) tag=$OPTARG
-       ;;
-    r) repo=$OPTARG
        ;;
     l) release=$OPTARG
        ;;
@@ -46,7 +43,8 @@ done
 shift $((OPTIND - 1))
 
 echo "> creating root archive"
-export ROOT_ARCHIVE_DIR="$(pwd)"
+ROOT_ARCHIVE_DIR="$(pwd)"
+export ROOT_ARCHIVE_DIR
 
 # Checkout a tag if provided
 if [[ -n "$tag" ]];
@@ -70,14 +68,16 @@ git archive --verbose --format "tar" --output "${ROOT_ARCHIVE_DIR}/${OUTPUT_BASE
 
 echo "> appending submodule archives"
 # for each of git submodules append to the root archive
+# uses single quotes because it is the command run recursively by git submodule foreach and should not expand variables
+# shellcheck disable=SC2016
 git submodule foreach --recursive 'git archive --verbose --prefix=$path/ --format tar "$(git rev-parse --abbrev-ref HEAD)" --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
 
 
-if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
+if (( $(find repo-output-sub*.tar | wc -l) != 0  )); then
   # combine all archives into one tar
   echo
   echo "> combining all tars"
-  for archivetar in $(ls repo-output-sub*.tar); do
+  for archivetar in repo-output-sub*.tar; do
     echo "$archivetar"
     tar --concatenate --file="${OUTPUT_BASENAME}.tar" "$archivetar"
   done
