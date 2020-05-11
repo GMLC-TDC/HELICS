@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ "$SET_MSYS_PATH" == "true" ]]; then
-	export PATH="/c/tools/msys64/mingw64/bin:$PATH"
-	echo "$PATH"
+    export PATH="/c/tools/msys64/mingw64/bin:$PATH"
+    echo "$PATH"
 fi
 
 # Flag variables are left unquoted for globbing and word splitting by bash (enable them to contain multiple arguments)
