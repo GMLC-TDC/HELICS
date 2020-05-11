@@ -113,7 +113,7 @@ ActionMessage& ActionMessage::operator=(ActionMessage&& act) noexcept
     return *this;
 }
 
-void ActionMessage::moveInfo(std::unique_ptr<Message> message)
+ActionMessage& ActionMessage::operator=(std::unique_ptr<Message> message) noexcept
 {
     messageAction = CMD_SEND_MESSAGE;
     messageID = message->messageID;
@@ -123,6 +123,7 @@ void ActionMessage::moveInfo(std::unique_ptr<Message> message)
                   std::move(message->source),
                   std::move(message->original_source),
                   std::move(message->original_dest)};
+    return *this;
 }
 
 void ActionMessage::setAction(action_message_def::action_t newAction)
