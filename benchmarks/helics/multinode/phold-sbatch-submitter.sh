@@ -7,11 +7,11 @@
 coretypes_arr=("zmq" "zmqss" "tcp" "tcpss" "udp")
 numnodes_arr=(1 2 4 8)
 if [ "$#" -ne 0 ]; then
-	numnodes_arr=("$@")
+    numnodes_arr=("$@")
 fi
 
 for ct in "${coretypes_arr[@]}"; do
-	for numnodes in "${numnodes_arr[@]}"; do
-		sbatch --export="CORE_TYPE=${ct}" -N "${numnodes}" phold.sbatch
-	done
+    for numnodes in "${numnodes_arr[@]}"; do
+        sbatch --export="CORE_TYPE=${ct}" -N "${numnodes}" phold.sbatch
+    done
 done
