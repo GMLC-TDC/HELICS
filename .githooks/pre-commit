@@ -6,7 +6,7 @@ command -v clang-format >/dev/null 2>&1 || {
 }
 
 files=()
-for file in $(git diff --cached --name-only --diff-filter=ACMRT ':!interfaces' ':!ThirdParty' | grep -E "\.(cpp|hpp|c|h)$"); do
+for file in `git diff --cached --name-only --diff-filter=ACMRT ':!interfaces' ':!ThirdParty' | grep -E "\.(cpp|hpp|c|h)$"`; do  
   if ! cmp -s <(git show ":${file}") <(git show ":${file}"|clang-format); then
     files+=("${file}")
   fi
