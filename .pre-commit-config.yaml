@@ -52,7 +52,7 @@ repos:
             '--skip="*.csv"',
             "--ignore-words=./config/spelling_whitelist.txt",
           ]
-- repo: local
+  - repo: local
     hooks:
       - id: docker-clang-format
         name: Docker Clang Format
@@ -64,4 +64,3 @@ repos:
         args:
           - -style=file
           - -i
-
