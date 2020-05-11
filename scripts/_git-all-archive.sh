@@ -13,23 +13,20 @@ set -e
 set -C # noclobber
 #
 
-usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- create archive source tarball with all submodules
+usage="$(basename "$0") [-h] [-t s] [-l s] -- create archive source tarball with all submodules
 where:
     -h  show this help text
     -t  source code tag (v2.1.1)
-    -r  repo (GMLC-TDC/HELICS)
     -l  release tag (can be different than checkout tag ex: v0.0.0archive)
 
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
-while getopts ':ht:r:l:' option; do
+while getopts ':ht:l:' option; do
   case "$option" in
     h) echo "$usage"
        exit
        ;;
     t) tag=$OPTARG
-       ;;
-    r) repo=$OPTARG
        ;;
     l) release=$OPTARG
        ;;
