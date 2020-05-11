@@ -364,7 +364,7 @@ void CommonCore::globalError(local_federate_id federateID,
                              int error_code,
                              const std::string& error_string)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid error"));
     }
@@ -387,7 +387,7 @@ void CommonCore::localError(local_federate_id federateID,
                             int error_code,
                             const std::string& error_string)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid error"));
     }
@@ -408,7 +408,7 @@ void CommonCore::localError(local_federate_id federateID,
 
 void CommonCore::finalize(local_federate_id federateID)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
@@ -447,7 +447,7 @@ bool CommonCore::allDisconnected() const
 operation_state CommonCore::minFederateState() const
 {
     operation_state op{operation_state::disconnected};
-    for (auto& fed : loopFederates) {
+    for (const auto& fed : loopFederates) {
         if (fed.state < op) {
             op = fed.state;
         }
@@ -487,7 +487,7 @@ static void generateFederateException(const FederateState* fed)
 }
 void CommonCore::enterInitializingMode(local_federate_id federateID)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid for Entering Init"));
     }
@@ -596,7 +596,7 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
 
 const std::string& CommonCore::getFederateName(local_federate_id federateID) const
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (federateName)"));
     }
@@ -607,14 +607,14 @@ static const std::string unknownString("#unknown");
 
 const std::string& CommonCore::getFederateNameNoThrow(global_federate_id federateID) const noexcept
 {
-    auto fed = getFederateAt(local_federate_id(federateID.localIndex()));
+    auto* fed = getFederateAt(local_federate_id(federateID.localIndex()));
     return (fed == nullptr) ? unknownString : fed->getIdentifier();
 }
 
 local_federate_id CommonCore::getFederateId(const std::string& name) const
 {
     auto feds = federates.lock();
-    auto fed = feds->find(name);
+    auto* fed = feds->find(name);
     if (fed != nullptr) {
         return fed->local_id;
     }
@@ -633,7 +633,7 @@ int32_t CommonCore::getFederationSize()
 
 Time CommonCore::timeRequest(local_federate_id federateID, Time next)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequest"));
     }
@@ -660,7 +660,7 @@ iteration_time CommonCore::requestTimeIterative(local_federate_id federateID,
                                                 Time next,
                                                 iteration_request iterate)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequestIterative"));
     }
@@ -691,7 +691,7 @@ iteration_time CommonCore::requestTimeIterative(local_federate_id federateID,
 
 Time CommonCore::getCurrentTime(local_federate_id federateID) const
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw InvalidIdentifier("federateID not valid (getCurrentTime)");
     }
@@ -700,7 +700,7 @@ Time CommonCore::getCurrentTime(local_federate_id federateID) const
 
 uint64_t CommonCore::getCurrentReiteration(local_federate_id federateID) const
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw InvalidIdentifier("federateID not valid (getCurrentReiteration)");
     }
@@ -723,7 +723,7 @@ void CommonCore::setIntegerProperty(local_federate_id federateID,
         addActionMessage(cmd);
         return;
     }
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (getMaximumIterations)"));
     }
@@ -735,7 +735,7 @@ void CommonCore::setIntegerProperty(local_federate_id federateID,
 
 void CommonCore::setTimeProperty(local_federate_id federateID, int32_t property, Time time)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (setTimeDelta)"));
     }
@@ -751,7 +751,7 @@ void CommonCore::setTimeProperty(local_federate_id federateID, int32_t property,
 
 Time CommonCore::getTimeProperty(local_federate_id federateID, int32_t property) const
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (setTimeDelta)"));
     }
@@ -764,7 +764,7 @@ int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t pro
         // TODO(PT): add some code to actually get the properties from the core if appropriate
         return 0;
     }
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (setTimeDelta)"));
     }
@@ -793,7 +793,7 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
         return;
     }
 
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (setFlag)"));
     }
@@ -810,7 +810,7 @@ bool CommonCore::getFlagOption(local_federate_id federateID, int32_t flag) const
     if (federateID == local_core_id) {
         return false;
     }
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (setTimeDelta)"));
     }
@@ -840,16 +840,15 @@ interface_handle CommonCore::registerInput(local_federate_id federateID,
                                            const std::string& type,
                                            const std::string& units)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (registerNamedInput)"));
     }
-    auto ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
-    if (ci != nullptr)  // this key is already found
-    {
+    const auto *ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
+    if (ci != nullptr)  {// this key is already found
         throw(RegistrationFailure("named Input already exists"));
     }
-    auto& handle = createBasicHandle(fed->global_id,
+    const auto& handle = createBasicHandle(fed->global_id,
                                      fed->local_id,
                                      handle_type::input,
                                      key,
@@ -876,7 +875,7 @@ interface_handle CommonCore::registerInput(local_federate_id federateID,
 
 interface_handle CommonCore::getInput(local_federate_id federateID, const std::string& key) const
 {
-    auto ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
+    const auto *ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
     if (ci->local_fed_id != federateID) {
         return {};
     }
@@ -888,12 +887,12 @@ interface_handle CommonCore::registerPublication(local_federate_id federateID,
                                                  const std::string& type,
                                                  const std::string& units)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (registerPublication)"));
     }
     LOG_INTERFACES(parent_broker_id, fed->getIdentifier(), fmt::format("registering PUB {}", key));
-    auto pub = handles.read([&key](auto& hand) { return hand.getPublication(key); });
+    const auto* pub = handles.read([&key](auto& hand) { return hand.getPublication(key); });
     if (pub != nullptr)  // this key is already found
     {
         throw(RegistrationFailure("Publication key already exists"));
@@ -923,9 +922,9 @@ interface_handle CommonCore::registerPublication(local_federate_id federateID,
 interface_handle CommonCore::getPublication(local_federate_id federateID,
                                             const std::string& key) const
 {
-    auto pub = handles.read([&key](auto& hand) { return hand.getPublication(key); });
+    const auto* pub = handles.read([&key](auto& hand) { return hand.getPublication(key); });
     if (pub->local_fed_id != federateID) {
-        return interface_handle();
+        return {};
     }
     return pub->getInterfaceHandle();
 }
@@ -934,7 +933,7 @@ const std::string emptyStr;
 
 const std::string& CommonCore::getHandleName(interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         return handleInfo->key;
     }
@@ -943,12 +942,12 @@ const std::string& CommonCore::getHandleName(interface_handle handle) const
 
 const std::string& CommonCore::getInjectionUnits(interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         switch (handleInfo->handleType) {
             case handle_type::input: {
-                auto fed = getFederateAt(handleInfo->local_fed_id);
-                auto inpInfo = fed->interfaces().getInput(handle);
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
                     if (!inpInfo->inputUnits.empty()) {
                         return inpInfo->inputUnits;
@@ -967,7 +966,7 @@ const std::string& CommonCore::getInjectionUnits(interface_handle handle) const
 
 const std::string& CommonCore::getExtractionUnits(interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         switch (handleInfo->handleType) {
             case handle_type::input:
@@ -982,12 +981,12 @@ const std::string& CommonCore::getExtractionUnits(interface_handle handle) const
 
 const std::string& CommonCore::getInjectionType(interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         switch (handleInfo->handleType) {
             case handle_type::input: {
-                auto fed = getFederateAt(handleInfo->local_fed_id);
-                auto inpInfo = fed->interfaces().getInput(handle);
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
                     if (!inpInfo->inputType.empty()) {
                         return inpInfo->inputType;
@@ -1008,7 +1007,7 @@ const std::string& CommonCore::getInjectionType(interface_handle handle) const
 
 const std::string& CommonCore::getExtractionType(interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         switch (handleInfo->handleType) {
             case handle_type::publication:
@@ -1026,7 +1025,7 @@ const std::string& CommonCore::getExtractionType(interface_handle handle) const
 
 void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool option_value)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         return;
     }
@@ -1043,7 +1042,7 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool o
         setActionFlag(fcn, indicator_flag);
     }
     if (handleInfo->handleType != handle_type::filter) {
-        auto fed = getHandleFederate(handle);
+        auto* fed = getHandleFederate(handle);
         if (fed != nullptr) {
             fcn.dest_id = fed->global_id;
             fed->setProperties(fcn);
@@ -1055,7 +1054,7 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool o
 
 bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         return false;
     }
@@ -1068,7 +1067,7 @@ bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
             break;
     }
     if (handleInfo->handleType != handle_type::filter) {
-        auto fed = getFederateAt(handleInfo->local_fed_id);
+        auto* fed = getFederateAt(handleInfo->local_fed_id);
         if (fed != nullptr) {
             return fed->getHandleOption(handle, static_cast<char>(handleInfo->handleType), option);
         }
@@ -1080,7 +1079,7 @@ bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
 
 void CommonCore::closeHandle(interface_handle handle)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
@@ -1097,7 +1096,7 @@ void CommonCore::closeHandle(interface_handle handle)
 
 void CommonCore::removeTarget(interface_handle handle, const std::string& targetToRemove)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
@@ -1105,7 +1104,7 @@ void CommonCore::removeTarget(interface_handle handle, const std::string& target
     ActionMessage cmd;
     cmd.setSource(handleInfo->handle);
     cmd.name = targetToRemove;
-    auto fed = getFederateAt(handleInfo->local_fed_id);
+    auto* fed = getFederateAt(handleInfo->local_fed_id);
     if (fed != nullptr) {
         cmd.actionTime = fed->grantedTime();
     }
@@ -1131,7 +1130,7 @@ void CommonCore::removeTarget(interface_handle handle, const std::string& target
 
 void CommonCore::addDestinationTarget(interface_handle handle, const std::string& dest)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
@@ -1171,7 +1170,7 @@ void CommonCore::addDestinationTarget(interface_handle handle, const std::string
 
 void CommonCore::addSourceTarget(interface_handle handle, const std::string& targetName)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
@@ -1206,7 +1205,7 @@ void CommonCore::addSourceTarget(interface_handle handle, const std::string& tar
 
 void CommonCore::setValue(interface_handle handle, const char* data, uint64_t len)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("Handle not valid (setValue)"));
     }
@@ -1240,7 +1239,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
 
             actionQueue.push(std::move(mv));
             return;
-        } else {
+        } 
             ActionMessage package(CMD_MULTI_MESSAGE);
             package.source_id = handleInfo->getFederateId();
             package.source_handle = handle;
@@ -1265,13 +1264,12 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
                 }
             }
             actionQueue.push(std::move(package));
-        }
     }
 }
 
 std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("Handle is invalid (getValue)"));
     }
@@ -1285,7 +1283,7 @@ std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
 
 std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interface_handle handle)
 {
-    auto handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("Handle is invalid (getValue)"));
     }
@@ -1299,7 +1297,7 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interfac
 
 const std::vector<interface_handle>& CommonCore::getValueUpdates(local_federate_id federateID)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (getValueUpdates)"));
     }
@@ -1310,11 +1308,11 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
                                               const std::string& name,
                                               const std::string& type)
 {
-    auto fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (registerEndpoint)"));
     }
-    auto ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
+    const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept != nullptr) {
         throw(RegistrationFailure("endpoint name is already used"));
     }
@@ -1344,7 +1342,7 @@ interface_handle CommonCore::getEndpoint(local_federate_id federateID,
 {
     auto ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept->local_fed_id != federateID) {
-        return interface_handle();
+        return {};
     }
     return ept->handle.handle;
 }
@@ -1430,11 +1428,11 @@ interface_handle CommonCore::registerCloningFilter(const std::string& filterName
 
 interface_handle CommonCore::getFilter(const std::string& name) const
 {
-    auto filt = handles.read([&name](auto& hand) { return hand.getFilter(name); });
+    const auto* filt = handles.read([&name](auto& hand) { return hand.getFilter(name); });
     if ((filt != nullptr) && (filt->handleType == handle_type::filter)) {
         return filt->getInterfaceHandle();
     }
-    return interface_handle{};
+    return {};
 }
 
 FilterInfo* CommonCore::createFilter(global_broker_id dest,
@@ -1451,7 +1449,7 @@ FilterInfo* CommonCore::createFilter(global_broker_id dest,
                                              type_out,
                                              false);
 
-    auto retTarget = filt.get();
+    auto* retTarget = filt.get();
     auto actualKey = key;
     retTarget->cloning = cloning;
     if (actualKey.empty()) {
@@ -1527,7 +1525,7 @@ void CommonCore::send(interface_handle sourceHandle,
                       const char* data,
                       uint64_t length)
 {
-    auto hndl = getHandleInfo(sourceHandle);
+    const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
         throw(InvalidIdentifier("handle is not valid"));
     }
@@ -1554,7 +1552,7 @@ void CommonCore::sendEvent(Time time,
                            const char* data,
                            uint64_t length)
 {
-    auto hndl = getHandleInfo(sourceHandle);
+    const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
         throw(InvalidIdentifier("handle is not valid"));
     }
@@ -1585,7 +1583,7 @@ void CommonCore::sendMessage(interface_handle sourceHandle, std::unique_ptr<Mess
         addActionMessage(std::move(m));
         return;
     }
-    auto hndl = getHandleInfo(sourceHandle);
+    const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
         throw(InvalidIdentifier("handle is not valid"));
     }
@@ -1612,7 +1610,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
     switch (message.action()) {
         case CMD_SEND_MESSAGE: {
             // Find the destination endpoint
-            auto localP = (message.dest_id == parent_broker_id) ?
+            auto* localP = (message.dest_id == parent_broker_id) ?
                 loopHandles.getEndpoint(message.getString(targetStringLoc)) :
                 loopHandles.findHandle(message.getDest());
             if (localP == nullptr) {
@@ -1626,7 +1624,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
             }
             // now we deal with local processing
             if (checkActionFlag(*localP, has_dest_filter_flag)) {
-                auto ffunc = getFilterCoordinator(localP->getInterfaceHandle());
+                auto* ffunc = getFilterCoordinator(localP->getInterfaceHandle());
                 if (ffunc != nullptr) {
                     if (ffunc->destFilter != nullptr) {
                         if (!checkActionFlag(*(ffunc->destFilter), disconnected_flag)) {
@@ -1659,9 +1657,9 @@ void CommonCore::deliverMessage(ActionMessage& message)
                             if (ffunc->destFilter->filterOp) {
                                 auto nmessage =
                                     ffunc->destFilter->filterOp->process(std::move(tempMessage));
-                                message.moveInfo(std::move(nmessage));
+                                message=std::move(nmessage);
                             } else {
-                                message.moveInfo(std::move(tempMessage));
+                                message=std::move(tempMessage);
                             }
                         }
                     }
