@@ -13,6 +13,7 @@ Everything within a major version number should be code compatible (with the exc
 ### Changed
 
 - All ZeroMQ related files are now located in the network library and under a single namespace
+- Use Python 3.8 instead of 3.6 for any release build installers that include a copy of the Python interface (`pip` or `anaconda` are the recommended ways to install the Python interface)
 
 ### Fixed
 
