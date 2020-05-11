@@ -13,12 +13,13 @@ package com.java.helics;
  */
 public final class helics_handle_options {
   /**
-   *  specify that a connection is required for an interface and will generate an error if not available
+   *  specify that a connection is required for an interface and will generate an error if not<br>
+   *        available
    */
   public final static helics_handle_options helics_handle_option_connection_required = new helics_handle_options("helics_handle_option_connection_required", helicsJNI.helics_handle_option_connection_required_get());
   /**
-   *  specify that a connection is NOT required for an interface and will only be made if available<br>
-   *         no warning will be issues if not available
+   *  specify that a connection is NOT required for an interface and will only be made if<br>
+   *        available no warning will be issues if not available
    */
   public final static helics_handle_options helics_handle_option_connection_optional = new helics_handle_options("helics_handle_option_connection_optional", helicsJNI.helics_handle_option_connection_optional_get());
   /**

@@ -67,12 +67,14 @@ public final class helics_core_type {
    */
   public final static helics_core_type helics_core_type_websocket = new helics_core_type("helics_core_type_websocket", helicsJNI.helics_core_type_websocket_get());
   /**
-   *  an in process core type for handling communications in shared memory<br>
-   *                                    it is pretty similar to the test core but stripped from the "test" components
+   *  an in process core type for handling communications in shared<br>
+   *                                      memory it is pretty similar to the test core but stripped from<br>
+   *                                      the "test" components
    */
   public final static helics_core_type helics_core_type_inproc = new helics_core_type("helics_core_type_inproc", helicsJNI.helics_core_type_inproc_get());
   /**
-   *  an explicit core type that is recognized but explicitly doesn't exist, for testing and a few other assorted reasons
+   *  an explicit core type that is recognized but explicitly doesn't<br>
+   *                                   exist, for testing and a few other assorted reasons
    */
   public final static helics_core_type helics_core_type_null = new helics_core_type("helics_core_type_null", helicsJNI.helics_core_type_null_get());
 

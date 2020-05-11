@@ -95,11 +95,15 @@ helics_core_type_websocket = _helics.helics_core_type_websocket
 r""" a core using websockets for communication"""
 helics_core_type_inproc = _helics.helics_core_type_inproc
 r"""
-    an in process core type for handling communications in shared memory
-                                      it is pretty similar to the test core but stripped from the "test" components
+    an in process core type for handling communications in shared
+                                        memory it is pretty similar to the test core but stripped from
+                                        the "test" components
     """
 helics_core_type_null = _helics.helics_core_type_null
-r""" an explicit core type that is recognized but explicitly doesn't exist, for testing and a few other assorted reasons"""
+r"""
+    an explicit core type that is recognized but explicitly doesn't
+                                     exist, for testing and a few other assorted reasons
+    """
 helics_data_type_string = _helics.helics_data_type_string
 r""" a sequence of characters"""
 helics_data_type_double = _helics.helics_data_type_double
@@ -137,19 +141,20 @@ r"""
     """
 helics_flag_only_update_on_change = _helics.helics_flag_only_update_on_change
 r"""
-     flag indicating a federate/interface should only trigger an update if a value has changed (binary
-    equivalence)
+     flag indicating a federate/interface should only trigger an update if a value has changed
+    (binary equivalence)
     """
 helics_flag_wait_for_current_time_update = _helics.helics_flag_wait_for_current_time_update
 r"""
-     flag indicating a federate should only grant time if all other federates have already passed the
-    requested time
+     flag indicating a federate should only grant time if all other federates have already passed
+    the requested time
     """
 helics_flag_restrictive_time_policy = _helics.helics_flag_restrictive_time_policy
 r"""
-    flag indicating a federate should operate on a restrictive time policy, which disallows some 2nd order
-           time evaluation and can be useful for certain types of dependency cycles
-           and update patterns, but generally shouldn't be used as it can lead to some very slow update conditions
+    flag indicating a federate should operate on a restrictive time policy, which disallows some
+          2nd order time evaluation and can be useful for certain types of dependency cycles
+           and update patterns, but generally shouldn't be used as it can lead to some very slow update
+          conditions
     """
 helics_flag_rollback = _helics.helics_flag_rollback
 r""" flag indicating that a federate has rollback capability"""
@@ -227,11 +232,14 @@ r""" the property controlling the period for a federate"""
 helics_property_time_offset = _helics.helics_property_time_offset
 r""" the property controlling time offset for the period of federate"""
 helics_property_time_rt_lag = _helics.helics_property_time_rt_lag
-r""" the property controlling real time lag for a federate the max time a federate can lag real time"""
+r"""
+    the property controlling real time lag for a federate the max time a federate can lag real
+          time
+    """
 helics_property_time_rt_lead = _helics.helics_property_time_rt_lead
 r"""
-    the property controlling real time lead for a federate the max time a federate can be ahead of real
-              time
+    the property controlling real time lead for a federate the max time a federate can be ahead
+          of real time
     """
 helics_property_time_rt_tolerance = _helics.helics_property_time_rt_tolerance
 r""" the property controlling real time tolerance for a federate sets both rt_lag and rt_lead"""
@@ -244,15 +252,24 @@ r""" integer property controlling the maximum number of iterations in a federate
 helics_property_int_log_level = _helics.helics_property_int_log_level
 r""" integer property controlling the log level in a federate see 'helics_log_levels'"""
 helics_property_int_file_log_level = _helics.helics_property_int_file_log_level
-r""" integer property controlling the log level for file logging in a federate see 'helics_log_levels'"""
+r"""
+    integer property controlling the log level for file logging in a federate see
+          helics_log_levels
+    """
 helics_property_int_console_log_level = _helics.helics_property_int_console_log_level
-r""" integer property controlling the log level for file logging in a federate see 'helics_log_levels'"""
+r"""
+    integer property controlling the log level for file logging in a federate see
+          helics_log_levels
+    """
 helics_handle_option_connection_required = _helics.helics_handle_option_connection_required
-r""" specify that a connection is required for an interface and will generate an error if not available"""
+r"""
+    specify that a connection is required for an interface and will generate an error if not
+          available
+    """
 helics_handle_option_connection_optional = _helics.helics_handle_option_connection_optional
 r"""
-    specify that a connection is NOT required for an interface and will only be made if available
-           no warning will be issues if not available
+    specify that a connection is NOT required for an interface and will only be made if
+          available no warning will be issues if not available
     """
 helics_handle_option_single_connection_only = _helics.helics_handle_option_single_connection_only
 r""" specify that only a single connection is allowed for an interface"""
@@ -284,8 +301,8 @@ helics_filter_type_clone = _helics.helics_filter_type_clone
 r""" a filter type that duplicates a message and sends the copy to a different destination"""
 helics_filter_type_firewall = _helics.helics_filter_type_firewall
 r"""
-    a customizable filter type that can perform different actions on a message based on firewall like
-              rules
+    a customizable filter type that can perform different actions on a message based on firewall
+          like rules
     """
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
@@ -463,7 +480,8 @@ def helicsCreateBroker(type: "char const *", name: "char const *", initString: "
     :param name: The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.
     :type initString: string
     :param initString: An initialization string to send to the core-the format is similar to command line arguments.
-                          Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates, or the address.
+                          Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,
+        or the address.
 
 
     :rtype: void
@@ -828,7 +846,8 @@ def helicsCreateMessageFederate(fedName: "char const *", fi: "helics_federate_in
     r"""
     Create a message federate from a federate info object.
 
-    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.
+    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
+    argument.
 
     :type fedName: string
     :param fedName: The name of the federate to create.
@@ -845,7 +864,8 @@ def helicsCreateMessageFederateFromConfig(configFile: "char const *") -> "helics
     r"""
     Create a message federate from a JSON file or JSON string or TOML file.
 
-    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.
+    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
+    argument.
 
     :type configFile: string
     :param configFile: A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.
@@ -1167,8 +1187,8 @@ def helicsFederateLocalError(fed: "helics_federate", error_code: "int", error_st
     r"""
     Generate a local error in a federate.
 
-    This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
-             allow some interaction with a core for a brief time.
+    This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize
+    but does allow some interaction with a core for a brief time.
     :type fed: void
     :param fed: The federate to create an error in.
     :type error_code: int
@@ -1205,8 +1225,8 @@ def helicsFederateEnterInitializingMode(fed: "helics_federate") -> "void":
     r"""
     Enter the initialization state of a federate.
 
-    The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution state.
-             This is a blocking call and will block until the core allows it to proceed.
+    The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution
+    state. This is a blocking call and will block until the core allows it to proceed.
 
     :type fed: void
     :param fed: The federate to operate on.
@@ -1262,7 +1282,8 @@ def helicsFederateEnterExecutingModeAsync(fed: "helics_federate") -> "void":
     r"""
     Request that the federate enter the Execution mode.
 
-    This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call sequence.
+    This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call
+    sequence.
 
     :type fed: void
     :param fed: The federate object to complete the call.
@@ -1818,7 +1839,8 @@ def helicsQueryExecuteComplete(query: "helics_query") -> "char const *":
     r"""
     Complete the return from a query called with /ref helicsExecuteQueryAsync.
 
-    The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not.
+    The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or
+    not.
 
     :type query: void
     :param query: The query object to complete execution of.
@@ -3706,7 +3728,8 @@ def helicsFederateGetFilter(fed: "helics_federate", name: "char const *") -> "he
 
 
     :rtype: void
-    :return: A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
+    :return: A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name
+        exists.
     """
     return _helics.helicsFederateGetFilter(fed, name)
 

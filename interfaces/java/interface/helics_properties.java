@@ -25,12 +25,13 @@ public final class helics_properties {
    */
   public final static helics_properties helics_property_time_offset = new helics_properties("helics_property_time_offset", helicsJNI.helics_property_time_offset_get());
   /**
-   *  the property controlling real time lag for a federate the max time a federate can lag real time
+   *  the property controlling real time lag for a federate the max time a federate can lag real<br>
+   *        time
    */
   public final static helics_properties helics_property_time_rt_lag = new helics_properties("helics_property_time_rt_lag", helicsJNI.helics_property_time_rt_lag_get());
   /**
-   *  the property controlling real time lead for a federate the max time a federate can be ahead of real<br>
-   *            time
+   *  the property controlling real time lead for a federate the max time a federate can be ahead<br>
+   *        of real time
    */
   public final static helics_properties helics_property_time_rt_lead = new helics_properties("helics_property_time_rt_lead", helicsJNI.helics_property_time_rt_lead_get());
   /**
@@ -54,11 +55,13 @@ public final class helics_properties {
    */
   public final static helics_properties helics_property_int_log_level = new helics_properties("helics_property_int_log_level", helicsJNI.helics_property_int_log_level_get());
   /**
-   *  integer property controlling the log level for file logging in a federate see <a href="#helics_log_levels">helics_log_levels</a>
+   *  integer property controlling the log level for file logging in a federate see <br>
+   *        helics_log_levels
    */
   public final static helics_properties helics_property_int_file_log_level = new helics_properties("helics_property_int_file_log_level", helicsJNI.helics_property_int_file_log_level_get());
   /**
-   *  integer property controlling the log level for file logging in a federate see <a href="#helics_log_levels">helics_log_levels</a>
+   *  integer property controlling the log level for file logging in a federate see <br>
+   *        helics_log_levels
    */
   public final static helics_properties helics_property_int_console_log_level = new helics_properties("helics_property_int_console_log_level", helicsJNI.helics_property_int_console_log_level_get());
 
