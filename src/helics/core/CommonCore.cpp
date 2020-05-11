@@ -2203,9 +2203,6 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "address") {
         return getAddress();
     }
-    if (queryStr == "version") {
-        return versionString;
-    }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
     }
