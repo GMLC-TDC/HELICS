@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -145,8 +145,8 @@ class EchoLeaf_c {
     void mainLoop()
     {
         int cnt = 0;
-        // this is  to make a fixed size string that is different for each federate but has sufficient length to
-        // get beyond SSO
+        // this is  to make a fixed size string that is different for each federate but has
+        // sufficient length to get beyond SSO
         const std::string txstring = std::to_string(100000 + index_) + std::string(100, '1');
         char tbuffer[256];
         const int iter = 5000;

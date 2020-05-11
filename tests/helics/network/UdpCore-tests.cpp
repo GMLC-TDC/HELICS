@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/common/AsioContextManager.h"
@@ -172,7 +172,8 @@ TEST(UdpCore, udpComm_transmit_through)
         act2 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
     auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
 
     bool connected = comm2.connect();
@@ -236,8 +237,9 @@ TEST(UdpCore, udpComm_transmit_add_route)
         act3 = std::move(m);
     });
 
-    // need to launch the connection commands at the same time since they depend on each other in this case
-    // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect();
+    // });
 
     bool connected = comm2.connect();
     ASSERT_TRUE(connected);
@@ -267,8 +269,8 @@ TEST(UdpCore, udpComm_transmit_add_route)
         std::this_thread::sleep_for(250ms);
     }
     EXPECT_EQ(counter3, 1);
-    if (counter3 ==
-        1) {  // previous test was an assert but that can trigger some out of scope errors if we don't disconnect property
+    if (counter3 == 1) {  // previous test was an assert but that can trigger some out of scope
+                          // errors if we don't disconnect property
         // so only do these test actions if the previous test has passed.
         EXPECT_TRUE(act3.lock()->action() == helics::action_message_def::action_t::cmd_ack);
 

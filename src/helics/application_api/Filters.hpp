@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -117,7 +117,8 @@ class HELICS_CXX_EXPORT Filter {
     /** set an interface option for a filter*/
     void setOption(int32_t option, bool value);
     /** close a filter during an active simulation
-    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    @details it is not necessary to call this function unless you are continuing the simulation
+    after the close*/
     void close();
 
     /** get the current value of a flag for the handle*/
@@ -175,7 +176,8 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
 @param type the type of filter to create
 @param fed the federate to create the filter through
 @param name the name of the filter (optional)
-@return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a destination Filter object,  note destroying the object does not
+deactivate the filter
 */
 HELICS_CXX_EXPORT Filter&
     make_filter(filter_types type, Federate* fed, const std::string& name = EMPTY_STRING);
@@ -185,7 +187,8 @@ HELICS_CXX_EXPORT Filter&
 @param type the type of filter to create
 @param fed the federate to create the filter through
 @param name the name of the filter (optional)
-@return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a destination Filter object,  note destroying the object does not
+deactivate the filter
 */
 HELICS_CXX_EXPORT Filter& make_filter(interface_visibility locality,
                                       filter_types type,
@@ -196,7 +199,8 @@ HELICS_CXX_EXPORT Filter& make_filter(interface_visibility locality,
 @param type the type of filter to create
 @param cr the core to create the filter through
 @param name the name of the filter (optional)
-@return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a source Filter object,  note destroying the object does not deactivate
+the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
     make_filter(filter_types type, Core* cr, const std::string& name = EMPTY_STRING);
@@ -205,7 +209,8 @@ HELICS_CXX_EXPORT std::unique_ptr<Filter>
 @param type the type of filter to create
 @param cr the core to create the filter through
 @param name the name of the filter (optional)
-@return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a source Filter object,  note destroying the object does not deactivate
+the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
     make_filter(filter_types type, CoreApp& cr, const std::string& name = EMPTY_STRING);
@@ -215,7 +220,8 @@ HELICS_CXX_EXPORT std::unique_ptr<Filter>
 @param fed the federate to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
-@return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a destination Filter object,  note destroying the object does not
+deactivate the filter
 */
 HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(filter_types type,
                                                      Federate* fed,
@@ -228,7 +234,8 @@ HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(filter_types type,
 @param fed the federate to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
-@return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a destination Filter object,  note destroying the object does not
+deactivate the filter
 */
 HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(interface_visibility locality,
                                                      filter_types type,
@@ -241,7 +248,8 @@ HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(interface_visibility locali
 @param cr the core to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
-@return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a source Filter object,  note destroying the object does not deactivate
+the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(filter_types type,
@@ -254,7 +262,8 @@ HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
 @param cr the core to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
-@return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
+@return a unique pointer to a source Filter object,  note destroying the object does not deactivate
+the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(filter_types type,

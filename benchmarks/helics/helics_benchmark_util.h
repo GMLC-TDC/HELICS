@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -95,8 +95,9 @@ inline std::string getCPUModel()
     return std::string{};
 }
 #endif
-/// Generate a report of the compilers used and zmq version linked as well as the version info for HELICS
-/// for use with the benchmarks
+/** Generate a report of the compilers used and zmq version linked as well as the version info for
+ * HELICS for use with the benchmarks
+ */
 inline void printHELICSsystemInfo()
 {
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: "

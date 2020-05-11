@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -404,7 +404,8 @@ static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
         TimerRunning = res.second;
         ++ii;
         if (ii == 100) {
-            // assume the timer was never started so just exit and hope it doesn't somehow get called later and generate a seg fault.
+            // assume the timer was never started so just exit and hope it doesn't somehow get
+            // called later and generate a seg fault.
             return false;
         }
     }
@@ -576,8 +577,8 @@ void BrokerBase::queueProcessingLoop()
                 }
                 break;
             case CMD_PING:
-                // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
-                // comes from the parent
+                // ping is processed normally but doesn't count as an actual message for timeout
+                // purposes unless it comes from the parent
                 if (command.source_id != parent_broker_id) {
                     ++messagesSinceLastTick;
                 }
@@ -643,7 +644,8 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
                 NMess.from_string(command.getString(ii));
                 auto V = commandProcessor(NMess);
                 if (V != CMD_IGNORE) {
-                    // overwrite the abort command but ignore ticks in a multi-message context they shouldn't be there
+                    // overwrite the abort command but ignore ticks in a multi-message context they
+                    // shouldn't be there
                     if (V != CMD_TICK) {
                         command = NMess;
                         return V;

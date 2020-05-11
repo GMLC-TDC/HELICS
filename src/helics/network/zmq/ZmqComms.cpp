@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 
 */
@@ -421,7 +421,8 @@ namespace zeromq {
         zmq::socket_t brokerPushSocket(ctx->getContext(), ZMQ_PUSH);
         brokerPushSocket.setsockopt(ZMQ_LINGER, 200);
         std::map<route_id, zmq::socket_t> routes;  // for all the other possible routes
-        // ZmqRequestSets priority_routes;  //!< object to handle the management of the priority routes
+        // ZmqRequestSets priority_routes;  //!< object to handle the management of the priority
+        // routes
 
         if (hasBroker) {
             //   priority_routes.addRoutes (0, makePortAddress (brokerTargetAddress, brokerPort+1));
@@ -528,7 +529,8 @@ namespace zeromq {
                 controlSocket.send(std::string("close"), zmq::send_flags::dontwait);
             }
             catch (const zmq::error_t&) {
-                // this probably just means it got closed simultaneously which would be unusual but not impossible
+                // this probably just means it got closed simultaneously which would be unusual but
+                // not impossible
             }
         }
 

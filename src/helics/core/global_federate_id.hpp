@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "federate_id.hpp"
 
 namespace helics {
-/** a shift in the global federate id numbers to allow discrimination between local ids and global ones
-    this value allows 131072 federates to be available in each core
-    1,878,917,120 allowable federates in the system and
-    268,435,455 brokers allowed  if we need more than that this, program has been phenomenally successful beyond
-    all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
+/** a shift in the global federate id numbers to allow discrimination between local ids and global
+   ones this value allows 131072 federates to be available in each core 1,878,917,120 allowable
+   federates in the system and 268,435,455 brokers allowed  if we need more than that this, program
+   has been phenomenally successful beyond all wildest imaginations and we can probably afford to
+   change these to 64 bit numbers to accommodate
     */
 constexpr identififier_base_type global_federate_id_shift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
@@ -57,7 +57,7 @@ constexpr global_broker_id parent_broker_id{0};
 constexpr global_broker_id root_broker_id{1};
 
 /** stream operator for a federate_id
-     */
+ */
 std::ostream& operator<<(std::ostream& os, global_broker_id id);
 /** class holder a globally unique identifier for federates*/
 class global_federate_id {
@@ -113,7 +113,7 @@ class global_federate_id {
 constexpr global_federate_id direct_core_id{-235262};
 
 /** stream operator for a federate_id
-     */
+ */
 std::ostream& operator<<(std::ostream& os, global_federate_id id);
 
 /** class merging a global id and handle together */
@@ -156,7 +156,7 @@ class global_handle {
 };
 
 /** stream operator for a federate_id
-     */
+ */
 std::ostream& operator<<(std::ostream& os, global_handle id);
 
 /** class defining a specific type for labeling a route*/
@@ -193,7 +193,8 @@ std::ostream& operator<<(std::ostream& os, route_id id);
 }  // namespace helics
 
 namespace std {
-/** define a template specialization for hash function for global_federate_id so it can be used in unordered_map*/
+/** define a template specialization for hash function for global_federate_id so it can be used in
+ * unordered_map*/
 template<>
 struct hash<helics::global_federate_id> {
     using argument_type = helics::global_federate_id;  //!< typedef for input type of hash
@@ -205,7 +206,8 @@ struct hash<helics::global_federate_id> {
     }
 };
 
-/** define a template specialization for hash function for global_broker_id so it can be used in unordered_map*/
+/** define a template specialization for hash function for global_broker_id so it can be used in
+ * unordered_map*/
 template<>
 struct hash<helics::global_broker_id> {
     using argument_type = helics::global_broker_id;  //!< typedef for input type of hash
@@ -217,7 +219,8 @@ struct hash<helics::global_broker_id> {
     }
 };
 
-/** define a template specialization for hash function for route_id so it can be used in unordered_map*/
+/** define a template specialization for hash function for route_id so it can be used in
+ * unordered_map*/
 template<>
 struct hash<helics::route_id> {
     using argument_type = helics::route_id;  //!< typedef for input type of hash
@@ -229,7 +232,8 @@ struct hash<helics::route_id> {
     }
 };
 
-/** define a template specialization for hash function for global_handle so it can be used in unordered_map
+/** define a template specialization for hash function for global_handle so it can be used in
+unordered_map
 @details based on hash of std::uint64_t*/
 template<>
 struct hash<helics::global_handle> {

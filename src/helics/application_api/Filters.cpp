@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -245,7 +245,8 @@ void Filter::setOption(int32_t option, bool value)
     corePtr->setHandleOption(handle, option, value);
 }
 /** close a filter during an active simulation
-@details it is not necessary to call this function unless you are continuing the simulation after the close*/
+@details it is not necessary to call this function unless you are continuing the simulation after
+the close*/
 void Filter::close()
 {
     corePtr->closeHandle(handle);

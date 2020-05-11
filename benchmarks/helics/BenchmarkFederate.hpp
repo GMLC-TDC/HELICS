@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -118,15 +118,20 @@ class BenchmarkFederate {
         app;  //<! the CLI11 app object to use in derived classes
 
     // functions to be overridden by derived benchmark classes
-    /** set/override default base parameter values before arguments are parsed, and modify CLI11 options for default arguments*/
+    /** set/override default base parameter values before arguments are parsed, and modify CLI11
+     * options for default arguments*/
     virtual void setupArgumentParsing() {}
-    /** initialization steps after command line options have been parsed, but before the federate object is created
-     * @param fi a reference to a helics::FederateInfo object that can be used to change how the federate object is made
+    /** initialization steps after command line options have been parsed, but before the federate
+     * object is created
+     * @param fi a reference to a helics::FederateInfo object that can be used to change how the
+     * federate object is made
      */
     virtual void doParamInit(helics::FederateInfo& fi) { (void)fi; }
-    /** initialization that needs to happen after the federate object is created, such as creating endpoints and inputs*/
+    /** initialization that needs to happen after the federate object is created, such as creating
+     * endpoints and inputs*/
     virtual void doFedInit() {}
-    /** initialization that requires the federation to be set up, but before timing starts, like creating initial events*/
+    /** initialization that requires the federation to be set up, but before timing starts, like
+     * creating initial events*/
     virtual void doMakeReady() {}
     /** the main loop for the benchmark*/
     virtual void doMainLoop() {}
@@ -191,7 +196,8 @@ class BenchmarkFederate {
 
     /** initialize function parses options and sets up parameters
      * @param coreName the name of the core to connect to
-     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings)
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of
+     * strings)
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>
@@ -204,7 +210,8 @@ class BenchmarkFederate {
 
     /** initialize function parses options and sets up parameters
      * @param fi a helics::FederateInfo object
-     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings)
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of
+     * strings)
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>
@@ -279,7 +286,8 @@ class BenchmarkFederate {
     /** do the main loop for the benchmark -- callbacks for extra timing info could be added here*/
     void execute() { doMainLoop(); }
 
-    /** internal initialization function that handles federate info arguments and calling derived class virtual functions*/
+    /** internal initialization function that handles federate info arguments and calling derived
+     * class virtual functions*/
     int internalInitialize(helics::FederateInfo fi, int parseArgsResult)
     {
         if (parseArgsResult != 0) {

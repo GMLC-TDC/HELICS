@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -22,7 +22,7 @@ class socket_t;
 namespace helics {
 namespace zeromq {
     /** implementation for the communication interface that uses ZMQ messages to communicate using
- * single socket and using ROUTER-DEALER communication pattern */
+     * single socket and using ROUTER-DEALER communication pattern */
     class ZmqCommsSS final: public NetworkCommsInterface {
       public:
         /** default constructor*/

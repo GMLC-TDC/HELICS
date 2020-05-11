@@ -1,8 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
-See the top-level NOTICE for additional details.
-All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC. See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -50,7 +49,8 @@ namespace mpi {
     void MpiService::serviceLoop()
     {
         // Startup/teardown for MPI can all go in separate functions
-        // For integrating helics MPI calls with existing MPI applications, user may want to call from their own thread
+        // For integrating helics MPI calls with existing MPI applications, user may want to call
+        // from their own thread
 
         // Initialize MPI
         if (initMPI()) {
@@ -88,7 +88,8 @@ namespace mpi {
             int mpi_initialized;
             MPI_Initialized(&mpi_initialized);
 
-            // Probably not a necessary check, a user using MPI should have also initialized it themselves
+            // Probably not a necessary check, a user using MPI should have also initialized it
+            // themselves
             if (mpi_initialized != 0) {
                 std::cout << "About to finalize MPI for rank " << commRank << std::endl;
                 MPI_Finalize();
@@ -104,7 +105,8 @@ namespace mpi {
         comms_connected++;
         auto tag = comms.size() - 1;
         dataLock.unlock();
-        // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
+        // If somehow this gets called while MPI is still initializing, wait until MPI
+        // initialization completes
         while (startup_flag && !stop_service) {
             ;
         }
@@ -130,7 +132,8 @@ namespace mpi {
         std::unique_lock<std::mutex> dataLock(mpiDataLock);
         for (unsigned int i = 0; i < comms.size(); i++) {
             if (comms[i] == comm) {
-                // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
+                // If somehow this gets called while MPI is still initializing, wait until MPI
+                // initialization completes
                 while (startup_flag && !stop_service) {
                     ;
                 }
@@ -145,7 +148,8 @@ namespace mpi {
 
     int MpiService::getRank()
     {
-        // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
+        // If somehow this gets called while MPI is still initializing, wait until MPI
+        // initialization completes
         while (startup_flag && !stop_service) {
             ;
         }
@@ -199,8 +203,9 @@ namespace mpi {
     {
         // Eventually this entire loop should be redone
         // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
-        // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
-        // Also, a method of doing time synchronization using MPI reductions should be added
+        // If we know that a message will get received, a blocking MPI_Wait_any could be used for
+        // send requests Also, a method of doing time synchronization using MPI reductions should be
+        // added
         std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
         std::unique_lock<std::mutex> mpilock(mpiDataLock);
         for (unsigned int i = 0; i < comms.size(); i++) {

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -30,8 +30,8 @@ class DependencyInfo {
     global_federate_id fedID{};  //!< identifier for the dependency
     global_federate_id minFed{};  //!< identifier for the min dependency
     time_state_t time_state{time_state_t::initialized};  //!< the current state of the dependency
-    bool cyclic{
-        false};  //!< indicator that the dependency is cyclic and should be reset more completely on grant
+    bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
+                         //!< completely on grant
     // 5 byte gap here
     Time Tnext{negEpsilon};  //!< next possible message or value
     Time Te{timeZero};  //!< the next currently scheduled event
@@ -43,7 +43,8 @@ class DependencyInfo {
     explicit DependencyInfo(global_federate_id id): fedID(id) {}
 
     /** process a dependency related message
-    @param m  a reference to an action message that contains some instructions for modifying dependencies
+    @param m  a reference to an action message that contains some instructions for modifying
+    dependencies
     @return the results of processing the message*/
     bool ProcessMessage(const ActionMessage& m);
 };

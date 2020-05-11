@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/core/ActionMessage.hpp"
@@ -21,8 +21,9 @@ TEST(ActionMessage_tests, action_test_to_string_conversion)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-        printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-        printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+        printf("sizeof(extraInfo)=%d\n",
+    static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>))); printf("payload
+    %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */
@@ -55,8 +56,9 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-    printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+    printf("sizeof(extraInfo)=%d\n",
+    static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>))); printf("payload
+    %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */
@@ -95,8 +97,9 @@ TEST(ActionMessage_tests, action_test_to_string_time_request)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-    printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+    printf("sizeof(extraInfo)=%d\n",
+    static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>))); printf("payload
+    %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -454,7 +454,7 @@ TEST(federate_tests, enterInit)
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
     Fed1->enterInitializingModeAsync();
-    //make sure it doesn't error if called twice
+    // make sure it doesn't error if called twice
     EXPECT_NO_THROW(Fed1->enterInitializingModeAsync());
     EXPECT_NO_THROW(Fed1->isAsyncOperationCompleted());
     EXPECT_NO_THROW(Fed1->enterInitializingMode());
@@ -471,7 +471,7 @@ TEST(federate_tests, enterInitComplete)
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
-    //this should be the same as just calling enterInitializingMode
+    // this should be the same as just calling enterInitializingMode
     EXPECT_NO_THROW(Fed1->enterInitializingModeComplete());
 
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::initializing);
@@ -487,7 +487,7 @@ TEST(federate_tests, enterExec)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
     Fed1->enterInitializingModeAsync();
     Fed1->setProperty(helics_properties::helics_property_time_delta, helics::Time(1.0));
-    //make sure it doesn't error if called twice
+    // make sure it doesn't error if called twice
     EXPECT_NO_THROW(Fed1->enterInitializingModeAsync());
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
     EXPECT_NO_THROW(Fed1->isAsyncOperationCompleted());
@@ -648,7 +648,7 @@ TEST(federate_tests, enterRequestTimeAsyncIterativeFinalize)
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(1.0, helics::iteration_request::force_iteration);
     EXPECT_NO_THROW(Fed1->finalize());
-    //check time results after finalize
+    // check time results after finalize
     auto tm = Fed1->requestTime(3.0);
     EXPECT_EQ(tm, helics::Time::maxVal());
 }

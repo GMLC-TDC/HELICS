@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
@@ -663,8 +663,8 @@ TEST( player_tests,simple_player_test_exe)
 
     auto res = brokerExe.runAsync ("1 --coretype=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";
-    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc " +
-exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc "
++ exampleFile);
 
     auto val = res2.get ();
     auto val2 = res.get ();

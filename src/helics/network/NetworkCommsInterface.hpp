@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -53,7 +53,7 @@ class NetworkCommsInterface: public CommsInterface {
     virtual void setFlag(const std::string& flag, bool val) override;
 
   protected:
-    int brokerPort{-1};  //!<standardized broker port to use for connection to the brokers
+    int brokerPort{-1};  //!< standardized broker port to use for connection to the brokers
     std::atomic<int> PortNumber{-1};  //!< port to use for the local connection
     bool autoPortNumber{true};  //!< use an automatic port numbering based on broker responses
     bool useOsPortAllocation{false};  //!< use the operating system to allocate a port number

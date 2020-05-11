@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 /*
@@ -32,8 +32,8 @@ constexpr int always_log = -100000;  //!< level that will always log
 constexpr int log_everything = 100;  //!< level that will log everything
 
 /** class implementing a thread safe Logger
-@details the Logger uses a queuing mechanism and condition variable to store messages to a queue and print/display
-them in a single thread allowing for asynchronous logging
+@details the Logger uses a queuing mechanism and condition variable to store messages to a queue and
+print/display them in a single thread allowing for asynchronous logging
 */
 class Logger {
   private:
@@ -100,7 +100,8 @@ class LoggerNoThread {
   public:
     /** default constructor*/
     LoggerNoThread();
-    /**this does nothing with the argument since it is not threaded here to match the API of Logger*/
+    /**this does nothing with the argument since it is not threaded here to match the API of
+     * Logger*/
     explicit LoggerNoThread(const std::shared_ptr<LoggingCore>& core);
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
@@ -114,7 +115,8 @@ class LoggerNoThread {
     /** overload of /ref startLogging with unspecified logging levels*/
     void startLogging() { startLogging(consoleLevel, fileLevel); }
     // NOTE:: the interface for log in the noThreadLogging is slightly different
-    // due to the threaded Logger making use of move semantics which isn't that useful in the noThreadLogger
+    // due to the threaded Logger making use of move semantics which isn't that useful in the
+    // noThreadLogger
     /** log a message at a particular level
     @param level the level of the message
     @param logMessage the actual message to log

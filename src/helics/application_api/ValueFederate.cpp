@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederate.hpp"
@@ -84,8 +84,8 @@ void ValueFederate::disconnect()
 ValueFederate& ValueFederate::operator=(ValueFederate&& fed) noexcept
 {
     vfManager = std::move(fed.vfManager);
-    if (getID() !=
-        fed.getID()) {  // the id won't be moved, as it is copied so use it as a test if it has moved already
+    if (getID() != fed.getID()) {  // the id won't be moved, as it is copied so use it as a test if
+                                   // it has moved already
         Federate::operator=(std::move(fed));
     }
     return *this;
@@ -316,7 +316,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "subscriptions")) {
         auto subs = toml::find(doc, "subscriptions");
         if (!subs.is_array()) {
-            //this line is tested in the publications section so not really necessary to check again since it is an expensive test
+            // this line is tested in the publications section so not really necessary to check
+            // again since it is an expensive test
             throw(helics::InvalidParameter(
                 "subscriptions section in toml file must be an array"));  // LCOV_EXCL_LINE
         }

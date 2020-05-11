@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -31,7 +31,8 @@ namespace apps {
         // source type
     };
 
-    /** parent class for a signal generator which generates values to feed into a helics federation*/
+    /** parent class for a signal generator which generates values to feed into a helics
+     * federation*/
     class HELICS_CXX_EXPORT SignalGenerator {
       protected:
         Time lastTime{timeZero};
@@ -51,10 +52,10 @@ namespace apps {
         void setTime(Time indexTime) { keyTime = indexTime; }
     };
 
-    /** class implementing a source federate, which is capable of generating signals of various kinds
-and sending signals at the appropriate times
-@details  the source class is NOT threadsafe,  don't try to use it from multiple threads without external
-protection, that will result in undefined behavior
+    /** class implementing a source federate, which is capable of generating signals of various
+kinds and sending signals at the appropriate times
+@details  the source class is NOT threadsafe,  don't try to use it from multiple threads without
+external protection, that will result in undefined behavior
 */
     class HELICS_CXX_EXPORT Source: public App {
       public:

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -165,7 +165,8 @@ class HELICS_CXX_EXPORT Input {
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
     @param callback a function with signature void( Time time)
-    time is the time the value was updated  This callback is a notification callback and doesn't return the value
+    time is the time the value was updated  This callback is a notification callback and doesn't
+    return the value
     */
     void registerNotificationCallback(std::function<void(Time)> callback)
     {
@@ -225,8 +226,8 @@ class HELICS_CXX_EXPORT Input {
     bool getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer
-    @param assumeUpdate if set to true will assume there was a publication and not check it first, if set to
-    false[default] it will check the federate first
+    @param assumeUpdate if set to true will assume there was a publication and not check it first,
+    if set to false[default] it will check the federate first
     @return true if the value has been updated*/
     bool checkUpdate(bool assumeUpdate = false);
 
@@ -236,11 +237,11 @@ class HELICS_CXX_EXPORT Input {
      */
     bool isUpdated();
     /** check if the value has been updated,
-    @details the const version can in some circumstances return true even if the value would not be updated
-    the circumstances in which this is true are a minimum change has been set, checkUpdate has not been
-    call(meaning it is a standalone copy, not the one stored with the federate, and the value has been published
-    but would not trigger the change detection. If this is to be avoided use the non-const version or call
-    checkUpdate before calling this function.
+    @details the const version can in some circumstances return true even if the value would not be
+    updated the circumstances in which this is true are a minimum change has been set, checkUpdate
+    has not been call(meaning it is a standalone copy, not the one stored with the federate, and the
+    value has been published but would not trigger the change detection. If this is to be avoided
+    use the non-const version or call checkUpdate before calling this function.
      */
     bool isUpdated() const;
 
@@ -405,7 +406,8 @@ class HELICS_CXX_EXPORT Input {
     /** get the number of elements in the data if it were a vector*/
     size_t getVectorSize();
     /** close a input during an active simulation
-    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    @details it is not necessary to call this function unless you are continuing the simulation
+    after the close*/
     void close() { fed->closeInterface(handle); }
     /** get the HELICS data type for the input*/
     data_type getHelicsType() const { return type; }
@@ -586,7 +588,8 @@ const X& Input::getValueRef()
             valueExtract(dv, type, lastValue);
         }
     } else {
-        // TODO(PT): make some logic that it can get the raw data from the core again if it was converted already
+        // TODO(PT): make some logic that it can get the raw data from the core again if it was
+        // converted already
     }
 
     return getValueRefImpl<remove_cv_ref<X>>(lastValue);

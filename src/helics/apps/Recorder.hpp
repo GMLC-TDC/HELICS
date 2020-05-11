@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -25,7 +25,8 @@ namespace apps {
     class HELICS_CXX_EXPORT Recorder: public App {
       public:
         /** construct from a FederateInfo structure
-    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param name the name of the Recorder, can be left empty for the default or to pull from the
+    federateInfo object
     @param fi  a federate information structure
     */
         Recorder(const std::string& name, FederateInfo& fi);
@@ -37,7 +38,8 @@ namespace apps {
         Recorder(int argc, char* argv[]);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param name the name of the Recorder, can be left empty for the default or to pull from the
+    federateInfo object
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */

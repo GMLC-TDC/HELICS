@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpComms.h"
@@ -131,7 +131,8 @@ namespace tcp {
                                                      maxMessageSize);
         while (!server->isReady()) {
             if ((autoPortNumber) &&
-                (hasBroker)) {  // If we failed and we are on an automatically assigned port number,  just try a different port
+                (hasBroker)) {  // If we failed and we are on an automatically assigned port number,
+                                // just try a different port
                 server->close();
                 ++PortNumber;
                 server = helics::tcp::TcpServer::create(ioctx->getBaseContext(),
@@ -236,7 +237,7 @@ namespace tcp {
                                                   maxMessageSize,
                                                   connectionTimeout);
             }
-            //monitor the total waiting time before connections
+            // monitor the total waiting time before connections
             std::chrono::milliseconds cumulativeSleep{0};
             const std::chrono::milliseconds popTimeout{200};
 
@@ -421,7 +422,8 @@ namespace tcp {
 
                     // if (error)
                     {
-                        //     std::cerr << "transmit failure to broker " << error.message() << '\n';
+                        //     std::cerr << "transmit failure to broker " << error.message() <<
+                        //     '\n';
                     }
                 }
             } else if (rid == control_route) {  // send to rx thread loop

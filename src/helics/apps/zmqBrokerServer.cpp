@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -200,7 +200,7 @@ namespace apps {
             handleMessage.emplace_back([this](zmq::socket_t* skt, portData& pdata) {
                 zmq::message_t msg1;
                 zmq::message_t msg2;
-                skt->recv(msg1);  //should be null
+                skt->recv(msg1);  // should be null
                 skt->recv(msg2);
                 std::string response = generateResponseToMessage(msg2, pdata, core_type::ZMQ_SS);
                 skt->send(msg1, zmq::send_flags::sndmore);

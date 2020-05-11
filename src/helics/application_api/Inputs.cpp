@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -198,8 +198,8 @@ size_t Input::getStringSize()
             if (np.name.empty()) {
                 return 30;  //"#invalid" string +20
             }
-            //+20 is just in case the converted string is actually being requested in which case the +20 is for
-            // the string representation of a double
+            // +20 is just in case the converted string is actually being requested in which case
+            // the +20 is for the string representation of a double
             return np.name.size() + 20;
         }
         auto& out = getValueRef<std::string>();
@@ -215,8 +215,8 @@ size_t Input::getStringSize()
         if (np.name.empty()) {
             return 30;  //"~length of #invalid" string +20
         }
-        //+20 is just in case the converted string is actually being requested in which case it the 20 accounts
-        // for the string representation of a double
+        // +20 is just in case the converted string is actually being requested in which case the
+        // +20 accounts for the string representation of a double
         return np.name.size() + 20;
     }
     auto& out = getValueRef<std::string>();

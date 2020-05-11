@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -46,14 +46,14 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
 
     /**constructor taking a federate name and a file with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
-    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code or a string with command line arguments
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string
+    containing JSON code or a string with command line arguments
     */
     CombinationFederate(const std::string& fedName, const std::string& configString);
 
     /**constructor taking a file with the required information
-     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code or a string with command line arguments
+     @param configString can be either a JSON file a TOML file (with extension TOML) or a string
+    containing JSON code or a string with command line arguments
     */
     explicit CombinationFederate(const std::string& configString);
 

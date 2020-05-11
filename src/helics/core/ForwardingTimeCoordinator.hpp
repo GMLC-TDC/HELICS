@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -18,7 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** class managing the coordination of time in HELICS for forwarding object (cores, brokers)
-the time coordinator manages dependencies and computes whether time can advance or enter execution mode
+the time coordinator manages dependencies and computes whether time can advance or enter execution
+mode
 */
 class ForwardingTimeCoordinator {
   private:
@@ -30,8 +31,8 @@ class ForwardingTimeCoordinator {
     DependencyInfo::time_state_t time_state{
         DependencyInfo::time_state_t::time_requested};  //!< the current forwarding time state
     global_federate_id lastMinFed{};  //!< the latest minimum fed
-    // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which should also be a
-    // ForwardingTimeCoordinator
+    // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
+    // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id>
         dependents;  //!< federates which temporally depend on this federate
@@ -79,7 +80,8 @@ class ForwardingTimeCoordinator {
     /**send out the latest time request command*/
     void sendTimeRequest() const;
     void transmitTimingMessage(ActionMessage& msg) const;
-    /** generate a new timing request message by recalculating the times ignoring a particular brokers input
+    /** generate a new timing request message by recalculating the times ignoring a particular
+     * brokers input
      */
     ActionMessage generateTimeRequestIgnoreDependency(const ActionMessage& msg,
                                                       global_federate_id iFed) const;

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Federate.hpp"
@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-//a key link that does very little yet, but forces linking to a particular file
+// a key link that does very little yet, but forces linking to a particular file
 static const auto ldcores = loadCores();
 
-using namespace std::chrono_literals;  //NOLINT
+using namespace std::chrono_literals;  // NOLINT
 void cleanupHelicsLibrary()
 {
     BrokerFactory::cleanUpBrokers(100ms);
@@ -128,7 +128,8 @@ Federate::Federate(const std::string& configString): Federate(std::string{}, con
 
 Federate::Federate() noexcept
 {
-    // this function needs to be defined for the virtual inheritance to compile but shouldn't actually be executed
+    // this function needs to be defined for the virtual inheritance to compile but shouldn't
+    // actually be executed
 }
 
 Federate::Federate(Federate&& fed) noexcept

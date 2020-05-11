@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -87,9 +87,10 @@ struct FederateTestFixture {
             default: {
                 size_t offset = federates.size();
                 auto core_type = helics::core::coreTypeFromString(core_type_name);
-                //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string
-                //  (offset),
-                //                                          initString + " --federates " + std::to_string (count));
+                //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" +
+                //  std::to_string (offset),
+                //                                          initString + " --federates " +
+                //                                          std::to_string (count));
                 auto core = helics::CoreFactory::create(core_type,
                                                         initString + " --federates " +
                                                             std::to_string(count));
@@ -108,8 +109,8 @@ struct FederateTestFixture {
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ++ii) {
                     //     auto core =
-                    //     helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string (ii +
-                    //     offset),
+                    //     helics::CoreFactory::create (core_type, name_prefix + "_core_" +
+                    //     std::to_string (ii + offset),
                     //                                    initString + " --federates 1");
                     auto core =
                         helics::CoreFactory::create(core_type, initString + " --federates 1");
@@ -123,7 +124,8 @@ struct FederateTestFixture {
             case 3: {
                 auto subbroker =
                     AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
-                //    auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count) +
+                //    auto subbroker = AddBroker(core_type_name, initString + " --federates " +
+                //    std::to_string(count) +
                 //        " --name=subbroker_" + name_prefix);
                 if (!subbroker->isConnected()) {
                     throw(std::runtime_error("Unable to connect subbroker"));
@@ -141,7 +143,8 @@ struct FederateTestFixture {
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
                     auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
-                    //    auto subbroker = AddBroker(core_type_name, initString + " --federates 1 --name=subbroker_" +
+                    //    auto subbroker = AddBroker(core_type_name, initString + " --federates 1
+                    //    --name=subbroker_" +
                     //        name_prefix + std::to_string(ii));
                     if (!subbroker->isConnected()) {
                         throw(std::runtime_error("Unable to connect subbroker(mode 4)"));

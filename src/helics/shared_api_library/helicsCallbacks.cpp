@@ -18,11 +18,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-void helicsBrokerSetLoggingCallback(
-    helics_broker broker,
-    void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
-    void* userdata,
-    helics_error* err)
+void helicsBrokerSetLoggingCallback(helics_broker broker,
+                                    void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
+                                    void* userdata,
+                                    helics_error* err)
 {
     auto brk = getBroker(broker, err);
     if (brk == nullptr) {
@@ -37,16 +36,15 @@ void helicsBrokerSetLoggingCallback(
             });
         }
     }
-    catch (...) { // LCOV_EXCL_LINE
-        helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
-void helicsCoreSetLoggingCallback(
-    helics_core core,
-    void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
-    void* userdata,
-    helics_error* err)
+void helicsCoreSetLoggingCallback(helics_core core,
+                                  void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
+                                  void* userdata,
+                                  helics_error* err)
 {
     auto cr = getCore(core, err);
     if (cr == nullptr) {
@@ -56,22 +54,21 @@ void helicsCoreSetLoggingCallback(
         if (logger == nullptr) {
             cr->setLoggingCallback(helics::local_core_id, {});
         } else {
-            cr->setLoggingCallback(
-                helics::local_core_id, [logger, userdata](int loglevel, const std::string& ident, const std::string& message) {
-                    logger(loglevel, ident.c_str(), message.c_str(), userdata);
-                });
+            cr->setLoggingCallback(helics::local_core_id,
+                                   [logger, userdata](int loglevel, const std::string& ident, const std::string& message) {
+                                       logger(loglevel, ident.c_str(), message.c_str(), userdata);
+                                   });
         }
     }
-    catch (...) { // LCOV_EXCL_LINE
-        helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
-void helicsFederateSetLoggingCallback(
-    helics_federate fed,
-    void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
-    void* userdata,
-    helics_error* err)
+void helicsFederateSetLoggingCallback(helics_federate fed,
+                                      void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
+                                      void* userdata,
+                                      helics_error* err)
 {
     auto fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
@@ -87,7 +84,7 @@ void helicsFederateSetLoggingCallback(
             });
         }
     }
-    catch (...) { // LCOV_EXCL_LINE
-        helicsErrorHandler(err); // LCOV_EXCL_LINE
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }

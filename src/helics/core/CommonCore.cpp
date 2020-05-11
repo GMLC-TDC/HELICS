@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommonCore.hpp"
@@ -236,8 +236,8 @@ bool CommonCore::waitForDisconnect(std::chrono::milliseconds msToWait) const
 void CommonCore::unregister()
 {
     /*We need to ensure that the destructor is not called immediately upon calling unregister
-    otherwise this would be a mess and probably cause segmentation faults so we capture it in a local variable
-    that will be destroyed on function exit
+    otherwise this would be a mess and probably cause segmentation faults so we capture it in a
+    local variable that will be destroyed on function exit
     */
     auto keepCoreAlive = CoreFactory::findCore(identifier);
     if (keepCoreAlive) {
@@ -532,7 +532,8 @@ iteration_result CommonCore::enterExecutingMode(local_federate_id federateID,
     if (HELICS_INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
     }
-    // do an exec check on the fed to process previously received messages so it can't get in a deadlocked state
+    // do an exec check on the fed to process previously received messages so it can't get in a
+    // deadlocked state
     ActionMessage exec(CMD_EXEC_CHECK);
     fed->addAction(exec);
     // TODO(PT): check for error conditions?
@@ -572,7 +573,8 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     }
     // setting up the Logger
     // auto ptr = fed.get();
-    // if we are using the Logger, log all messages coming from the federates so they can control the level*/
+    // if we are using the Logger, log all messages coming from the federates so they can control
+    // the level*/
     fed->setLogger([this](int /*level*/, const std::string& ident, const std::string& message) {
         sendToLogger(parent_broker_id, log_level::error - 2, ident, message);
     });
@@ -1628,8 +1630,10 @@ void CommonCore::deliverMessage(ActionMessage& message)
                     if (ffunc->destFilter != nullptr) {
                         if (!checkActionFlag(*(ffunc->destFilter), disconnected_flag)) {
                             if (ffunc->destFilter->core_id !=
-                                global_broker_id_local) {  // now we have deal with non-local processing destination filter
-                                // first block the federate time advancement until the return is received
+                                global_broker_id_local) {  // now we have deal with non-local
+                                                           // processing destination filter
+                                // first block the federate time advancement until the return is
+                                // received
                                 auto fed_id = localP->getFederateId();
                                 ActionMessage tblock(CMD_TIME_BLOCK,
                                                      global_broker_id_local,
@@ -1670,15 +1674,14 @@ void CommonCore::deliverMessage(ActionMessage& message)
                                 global_handle(global_broker_id_local, clFilter->handle));
                             if (FiltI != nullptr) {
                                 if (FiltI->filterOp != nullptr) {
-                                    // this is a cloning filter so it generates a bunch(?) of new messages
+                                    // this is a cloning filter so it generates a bunch(?) of new
+                                    // messages
                                     auto new_messages = FiltI->filterOp->processVector(
                                         createMessageFromCommand(message));
                                     for (auto& msg : new_messages) {
                                         if (msg) {
-                                            if (msg->dest ==
-                                                localP
-                                                    ->key)  //in case the clone filter send to itself.
-                                            {
+                                            if (msg->dest == localP->key) {
+                                                // in case the clone filter send to itself.
                                                 ActionMessage cmd(std::move(msg));
                                                 cmd.dest_id = localP->handle.fed_id;
                                                 cmd.dest_handle = localP->handle.handle;
@@ -1841,8 +1844,8 @@ void CommonCore::setLoggingCallback(
 uint16_t CommonCore::getNextAirlockIndex()
 {
     uint16_t index = nextAirLock++;
-    if (index >
-        3) {  // the increment is an atomic operation if the nextAirLock was not adjusted this could result in an out of
+    if (index > 3) {  // the increment is an atomic operation if the nextAirLock was not adjusted
+                      // this could result in an out of
         // bounds exception if this check were not done
         index %= 4;
     }
@@ -1907,7 +1910,7 @@ void CommonCore::setIdentifier(const std::string& name)
     }
 }
 
-//enumeration of subqueries that cascade and need multiple levels of processing
+// enumeration of subqueries that cascade and need multiple levels of processing
 enum subqueries : std::uint16_t {
     general_query = 0,
     current_time_map = 2,
@@ -2379,8 +2382,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             addActionMessage(resend);
         } break;
         case CMD_REG_BROKER:
-            // These really shouldn't happen here probably means something went wrong in setup but we can handle it
-            // forward the connection request to the higher level
+            // These really shouldn't happen here probably means something went wrong in setup but
+            // we can handle it forward the connection request to the higher level
             if (command.name == identifier) {
                 LOG_ERROR(
                     global_broker_id_local,
@@ -2585,8 +2588,8 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
     auto msg = delayTransmitQueue.pop();
     while (msg) {
         if ((*msg).action() == CMD_QUERY ||
-            (*msg).action() ==
-                CMD_BROKER_QUERY) {  // deal with in flight queries that will block unless a response is given
+            (*msg).action() == CMD_BROKER_QUERY) {  // deal with in flight queries that will block
+                                                    // unless a response is given
             activeQueries.setDelayedValue((*msg).messageID, std::string("#error:") + estring);
         }
         // else other message which might get into here shouldn't need any action, just drop them
@@ -2614,7 +2617,8 @@ void CommonCore::transmitDelayedMessages(global_federate_id source)
     while (msg) {
         if (msg->source_id == source) {
             routeMessage(*msg);
-        } else {  // these messages were delayed for a different purpose and will be dealt with in a different way
+        } else {  // these messages were delayed for a different purpose and will be dealt with in a
+                  // different way
             buffer.push_back(std::move(*msg));
         }
         msg = delayTransmitQueue.pop();
@@ -2697,9 +2701,8 @@ void CommonCore::processCommand(ActionMessage&& command)
         break;
         case CMD_USER_DISCONNECT:
             if (isConnected()) {
-                if (brokerState <
-                    broker_state_t::
-                        terminating) {  // only send a disconnect message if we haven't done so already
+                if (brokerState < broker_state_t::terminating) {  // only send a disconnect message
+                                                                  // if we haven't done so already
                     brokerState = broker_state_t::terminating;
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -2707,15 +2710,15 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             } else if (brokerState ==
-                       broker_state_t::errored) {  //we are disconnecting in an error state
+                       broker_state_t::errored) {  // we are disconnecting in an error state
                 sendDisconnect();
                 ActionMessage m(CMD_DISCONNECT);
                 m.source_id = global_broker_id_local;
                 transmit(parent_route_id, m);
             }
             addActionMessage(CMD_STOP);
-            // we can't just fall through since this may have generated other messages that need to be forwarded or
-            // processed
+            // we can't just fall through since this may have generated other messages that need to
+            // be forwarded or processed
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);
@@ -2725,9 +2728,8 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_STOP:
 
             if (isConnected()) {
-                if (brokerState <
-                    broker_state_t::
-                        terminating) {  // only send a disconnect message if we haven't done so already
+                if (brokerState < broker_state_t::terminating) {  // only send a disconnect message
+                                                                  // if we haven't done so already
                     brokerState = broker_state_t::terminating;
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -3588,8 +3590,8 @@ void CommonCore::checkDependencies()
     if (hasFilters) {
         return;
     }
-    // if there is more than 2 dependents or dependencies (higher broker + 2 or more federates) then we need to be
-    // a timeCoordinator
+    // if there is more than 2 dependents or dependencies (higher broker + 2 or more federates) then
+    // we need to be a timeCoordinator
     if (timeCoord->getDependents().size() > 2) {
         return;
     }
@@ -3620,8 +3622,8 @@ void CommonCore::checkDependencies()
             return;
         }
     }
-    // remove the core from the time dependency chain since it is just adding to the communication noise in this
-    // case
+    // remove the core from the time dependency chain since it is just adding to the communication
+    // noise in this case
     timeCoord->removeDependency(brkid);
     timeCoord->removeDependency(fedid);
     timeCoord->removeDependent(brkid);
@@ -3693,7 +3695,8 @@ void CommonCore::organizeFilterOperations()
                             someUnused = true;
                         }
                     } else {
-                        // TODO(PT): this will need some work to finish sorting out but should work for initial tests
+                        // TODO(PT): this will need some work to finish sorting out but should work
+                        // for initial tests
                         if (core::matchingTypes(fi->allSourceFilters[ii]->inputType, currentType)) {
                             used[ii] = true;
                             usedMore = true;
@@ -4173,9 +4176,9 @@ void CommonCore::processFilterReturn(ActionMessage& cmd)
         }
         auto filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {
-            for (
-                decltype(cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size();
-                ++ii) {  // cloning filters come first so we don't need to check for them in this code branch
+            for (decltype(cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size();
+                 ++ii) {  // cloning filters come first so we don't need to check for them in this
+                          // code branch
                 auto filt = filtFunc->sourceFilters[ii];
                 if (checkActionFlag(*filt, disconnected_flag)) {
                     continue;
@@ -4276,7 +4279,8 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
                     }
                 }
             } else {
-                // the filter didn't have a function or was deactivated but still was requested to process
+                // the filter didn't have a function or was deactivated but still was requested to
+                // process
                 bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                 bool returnToSender =
                     ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);

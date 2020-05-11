@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -22,10 +22,10 @@ namespace BrokerFactory {
     [[deprecated(                                                                                  \
         "Broker Factory is deprecated for use in the C++ shared library use BrokerApp instead if you really need the functionality either link to the static library and/or contact the developers with the requirements to potentially add it to BrokerApp")]]
     /**
- * Creates a Broker object of the specified type.
- *
- * Invokes initialize() on the instantiated Core object.
- */
+     * Creates a Broker object of the specified type.
+     *
+     * Invokes initialize() on the instantiated Core object.
+     */
     HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
                                                             const std::string& initializationString)
     {
@@ -91,8 +91,8 @@ namespace BrokerFactory {
     HELICS_SHARED_DEPRECATED bool brokersActive() { return false; }
 
     /** register a coreBroker so it can be found by others
-@details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling
-cleanUpBrokers earlier if desired
+@details also cleans up any leftover brokers that were previously unregistered this can be
+controlled by calling cleanUpBrokers earlier if desired
 @param broker a pointer to a Broker object that should be able to be found globally
 @return true if the registration was successful false otherwise*/
     HELICS_SHARED_DEPRECATED bool registerBroker(const std::shared_ptr<Broker>& broker)
@@ -104,15 +104,17 @@ cleanUpBrokers earlier if desired
 */
     HELICS_SHARED_DEPRECATED void unregisterBroker(const std::string& name) {}
     /** clean up unused brokers
-@details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when brokers are unregistered they get put in a holding area that gets cleaned up when a
+new broker is registered or when the clean up function is called this prevents some odd threading
+issues
 @return the number of brokers still operating
 */
     HELICS_SHARED_DEPRECATED size_t cleanUpBrokers() { return 0; }
 
     /** clean up unused brokers
-@details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when brokers are unregistered they get put in a holding area that gets cleaned up when a
+new broker is registered or when the clean up function is called this prevents some odd threading
+issues
 @param delay the number of milliseconds to wait to ensure stuff is cleaned up
 @return the number of brokers still operating
 */

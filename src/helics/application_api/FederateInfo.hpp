@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -32,8 +32,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     std::string brokerInitString;  //!< an initialization string for the broker if auto generated
     std::string broker;  //!< connection information for the broker
     std::string key;  //!< key for the broker
-    std::string
-        localport;  //!< string for defining the local port to use usually a number but other strings are possible
+    std::string localport;  //!< string for defining the local port to use usually a number but
+                            //!< other strings are possible
     std::string fileInUse;  //!< string containing a configuration file that was used
     /** default constructor*/
     FederateInfo() = default;
@@ -53,7 +53,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     FederateInfo(int argc, char* argv[]);
     /** load a federateInfo object from arguments stored in a vector
     @details calls /ref loadInfoFromArgs in the constructor
-    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
+    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the
+    vector
     */
     explicit FederateInfo(std::vector<std::string>& args);
     /** load a federateInfo object from command line arguments outside the constructor
@@ -68,7 +69,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     */
     std::vector<std::string> loadInfoFromArgs(int argc, char* argv[]);
     /** load a federateInfo object from command line arguments contained in a vector
-    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
+    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the
+    vector
     */
     void loadInfoFromArgs(std::vector<std::string>& args);
     /** load a federateInfo object from command line arguments outside the constructor
@@ -105,13 +107,15 @@ HELICS_CXX_EXPORT FederateInfo loadFederateInfo(const std::string& configString)
 HELICS_CXX_EXPORT std::string generateFullCoreInitString(const FederateInfo& fi);
 
 /** get an integer property/flag from a string name of the property or flag
-@param val a name of property to get an integer index code for used in /ref CoreFederateInfo::setProperty
+@param val a name of property to get an integer index code for used in /ref
+CoreFederateInfo::setProperty
 @return the integer code for a given property
 */
 HELICS_CXX_EXPORT int getPropertyIndex(std::string val);
 
 /** get an integer option index for a binary flag option
-@param val a name of flag option to get an integer index code for used in /ref CoreFederateInfo::setOptionFlag
+@param val a name of flag option to get an integer index code for used in /ref
+CoreFederateInfo::setOptionFlag
 @return the integer code for a given property
 */
 HELICS_CXX_EXPORT int getOptionIndex(std::string val);

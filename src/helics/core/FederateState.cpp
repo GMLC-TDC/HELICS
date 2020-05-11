@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
@@ -93,7 +93,7 @@ static const std::string emptyStr;
 #    define LOG_TRACE(message) ((void)0)
 #endif  // LOGGING_DISABLED
 
-using namespace std::chrono_literals;  //NOLINT
+using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
 FederateState::FederateState(const std::string& name_, const CoreFederateInfo& info_):
@@ -477,8 +477,8 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate)
 #endif
         return static_cast<iteration_result>(ret);
     }
-    // the following code is for situation which this has been called multiple times, which really shouldn't be
-    // done but it isn't really an error so we need to deal with it.
+    // the following code is for situation which this has been called multiple times, which really
+    // shouldn't be done but it isn't really an error so we need to deal with it.
     std::lock_guard<FederateState> plock(*this);
     iteration_result ret;
     switch (getState()) {

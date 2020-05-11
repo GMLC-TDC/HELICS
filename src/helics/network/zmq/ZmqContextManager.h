@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -27,16 +27,16 @@ class context_t;
 }  // namespace zmq
 
 /** class defining a global context manager for all zmq usage
-@details the zmq::context_t is stored in global structure so more than one can exist, but most use cases it is just
-the equivalent of a singleton*/
+@details the zmq::context_t is stored in global structure so more than one can exist, but most use
+cases it is just the equivalent of a singleton*/
 class ZmqContextManager {
   private:
     static std::map<std::string, std::shared_ptr<ZmqContextManager>>
         contexts;  //!< container for pointers to all the available contexts
     std::string name;  //!< context name
     std::unique_ptr<zmq::context_t> zcontext;  //!< pointer to the actual context
-    std::atomic<bool> leakOnDelete{
-        true};  //!< this is done to prevent some errors if zmq is not built properly or the OS shuts it down early
+    std::atomic<bool> leakOnDelete{true};  //!< this is done to prevent some errors if zmq is not
+                                           //!< built properly or the OS shuts it down early
 
     /** the constructor is private to make sure it is created through the static functions*/
     explicit ZmqContextManager(const std::string& contextName);
@@ -52,12 +52,13 @@ class ZmqContextManager {
     /** close a ZMQ context if it exists*/
     static void closeContext(const std::string& contextName = std::string{});
     /** tell the context to free the pointer and leak the memory on delete
-    @details You may ask why, well in windows systems when operating in a DLL if this context is closed after
-    certain other operations that happen when the DLL is unlinked bad things can happen, and since in nearly all
-    cases this happens at Shutdown leaking really doesn't matter that much, it also seem to be required when the
-    zmq library is built with curve instead of turning off the encryption or with sodium,  in that case there seems
-    to be some issues in the zmq library itself when closing the context, causing some issue that eventually leads
-    to something trying to access a deleted mutex on program shutdown.  Which is annoying.
+    @details You may ask why, well in windows systems when operating in a DLL if this context is
+    closed after certain other operations that happen when the DLL is unlinked bad things can
+    happen, and since in nearly all cases this happens at Shutdown leaking really doesn't matter
+    that much, it also seem to be required when the zmq library is built with curve instead of
+    turning off the encryption or with sodium,  in that case there seems to be some issues in the
+    zmq library itself when closing the context, causing some issue that eventually leads to
+    something trying to access a deleted mutex on program shutdown.  Which is annoying.
     @return true if the context was found and the flag set, false otherwise
     */
     static bool setContextToLeakOnDelete(const std::string& contextName = std::string{});

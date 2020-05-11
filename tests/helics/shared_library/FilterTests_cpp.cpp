@@ -2,9 +2,10 @@
 Copyright (c) 2017-2018, Battelle Memorial Institute
 All rights reserved.
 
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle
+Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for
+Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence
+Livermore National Security, LLC.
 */
 
 #include "ctestFixtures.hpp"
@@ -53,7 +54,8 @@ BOOST_DATA_TEST_CASE(message_filter_registration, bdata::make(core_types), core_
 }
 
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 BOOST_TEST_DECORATOR(*utf::timeout(12))
@@ -117,7 +119,8 @@ BOOST_DATA_TEST_CASE(message_filter_function, bdata::make(core_types), core_type
 }
 
 /** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 BOOST_TEST_DECORATOR(*utf::timeout(20))
@@ -196,7 +199,8 @@ BOOST_DATA_TEST_CASE(message_filter_function_two_stage, bdata::make(core_types),
 }
 
 /** test two filter operators
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
+The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
+simulation
 */
 
 BOOST_TEST_DECORATOR(*utf::timeout(12))

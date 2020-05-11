@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -24,8 +24,9 @@ all user functions are found in this namespace along with many other functions i
  */
 namespace helics {
 /** basic data object for use in the user API layer
-@details An adapter over a string,  many objects will be strings actually so this is just a wrapper for that
-common use case, and many other objects are small, so the small string optimization takes advantage of that
+@details An adapter over a string,  many objects will be strings actually so this is just a wrapper
+for that common use case, and many other objects are small, so the small string optimization takes
+advantage of that
 */
 class data_block {
   private:

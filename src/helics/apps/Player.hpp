@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -34,10 +34,10 @@ namespace apps {
         Message mess;
     };
 
-    /** class implementing a Player object, which is capable of reading a file and generating interfaces
-and sending signals at the appropriate times
-@details  the Player class is not thread-safe,  don't try to use it from multiple threads without external
-protection, that will result in undefined behavior
+    /** class implementing a Player object, which is capable of reading a file and generating
+interfaces and sending signals at the appropriate times
+@details  the Player class is not thread-safe,  don't try to use it from multiple threads without
+external protection, that will result in undefined behavior
 */
     class HELICS_CXX_EXPORT Player: public App {
       public:
@@ -71,8 +71,8 @@ protection, that will result in undefined behavior
         Player(const std::string& name, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param appName the name of the app
-    @param configString JSON, TOML or text file or JSON string defining the federate information and other
-    configuration
+    @param configString JSON, TOML or text file or JSON string defining the federate information and
+    other configuration
     */
         Player(const std::string& appName, const std::string& configString);
 
@@ -82,9 +82,10 @@ protection, that will result in undefined behavior
         Player& operator=(Player&& fed) = default;
 
         /** initialize the Player federate
-    @details generate all the publications and organize the points, the final publication count will be available
-    after this time and the Player will enter the initialization mode, which means it will not be possible to add
-    more publications calling run will automatically do this if necessary
+    @details generate all the publications and organize the points, the final publication count will
+    be available after this time and the Player will enter the initialization mode, which means it
+    will not be possible to add more publications calling run will automatically do this if
+    necessary
     */
         virtual void initialize() override;
 

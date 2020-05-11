@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -226,7 +226,7 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     tmp = helicsPublicationGetUnits(pubid_c);
     EXPECT_STREQ(tmp, "volts");
 
-    //this one should be invalid
+    // this one should be invalid
     auto pubid_d = helicsFederateGetPublicationByIndex(vFed1, 5, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(pubid_d, nullptr);
@@ -268,7 +268,7 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     helicsInputSetOption(inp_double2, helics_handle_option_connection_required, helics_true, &err);
     EXPECT_EQ(helicsInputIsValid(inp_double2), helics_true);
-    //anonymous publication
+    // anonymous publication
     auto pub = helicsFederateRegisterPublication(vFed1, nullptr, helics_data_type_int, "MW", &err);
     helicsPublicationSetOption(pub, helics_handle_option_connection_required, helics_true, &err);
     helicsPublicationAddTarget(pub, "fed0/key7", &err);
@@ -284,7 +284,7 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     helicsInputSetDefaultTime(inp_time, 12.3, &err);
     helicsInputSetDefaultChar(inp_char, 'q', &err);
-    //this should be ok since the data is NULL regardless of specified length
+    // this should be ok since the data is NULL regardless of specified length
     helicsInputSetDefaultVector(inp_vect, nullptr, 7, &err);
     helicsInputSetDefaultNamedPoint(inp_np, data, 15.7, &err);
 
@@ -298,7 +298,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     auto c2 = helicsInputGetChar(inp_char, &err);
     EXPECT_EQ(c2, 'q');
     int actSize = 56;
-    //this should not be an error
+    // this should not be an error
     helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 0);

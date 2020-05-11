@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -63,8 +63,8 @@ TEST_P(vfed_dual_transfer_ci_skip, string)
                                      std::string("I am a string"));
 }
 
-/** test case checking that the transfer between two federates works as expected with publication and subscription
- * objects
+/** test case checking that the transfer between two federates works as expected with publication
+ * and subscription objects
  */
 TEST_P(vfed_dual_transfer_ci_skip, obj_double)
 {

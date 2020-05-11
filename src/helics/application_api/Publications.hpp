@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -65,8 +65,8 @@ class HELICS_CXX_EXPORT Publication {
                 const std::string& units = std::string());
 
     /** base constructor for a publication
-    @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and -> operator
-    that results in a valueFederate object
+    @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and
+    -> operator that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
     @param units an optional string defining the units*/
@@ -82,7 +82,8 @@ class HELICS_CXX_EXPORT Publication {
             "first argument must be a pointer to a ValueFederate");
     }
     /** base constructor for a publication
-    @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
+    @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global
+    identifier
     @param valueFed a pointer to a value federate
     @param key the identifier for the publication
     @param type the type of the publication
@@ -93,9 +94,10 @@ class HELICS_CXX_EXPORT Publication {
                 const std::string& type,
                 const std::string& units = std::string());
     /** base constructor for a publication
-    @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
-    @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and -> operator
-    that results in a valueFederate object
+    @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global
+    identifier
+    @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and
+    -> operator that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
     @param units an optional string defining the units*/
@@ -215,7 +217,8 @@ class HELICS_CXX_EXPORT Publication {
         fed->removeTarget(*this, targetToRemove);
     }
     /** close a input during an active simulation
-    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    @details it is not necessary to call this function unless you are continuing the simulation
+    after the close*/
     void close() { fed->closeInterface(handle); }
     /** send a value for publication
     @param val the value to publish*/
@@ -282,9 +285,9 @@ class HELICS_CXX_EXPORT Publication {
 
   private:
     /** implementation of the integer publications
-    @details this is the same as the other publish function but is used in the template due to template overload
-    resolution rules I wanted to be able to call this inside a template which took all Int types and without this
-    it would be recursive
+    @details this is the same as the other publish function but is used in the template due to
+    template overload resolution rules I wanted to be able to call this inside a template which took
+    all Int types and without this it would be recursive
     */
     void publishInt(int64_t val);
     friend class ValueFederateManager;
@@ -478,8 +481,8 @@ class PublicationOnChange: public PublicationT<X> {
 
 /** publish directly from the publication key name
 @details this is a convenience function to publish directly from the publication key
-this function should not be used as the primary means of publications as it does involve an additional map find
-operation vs the member publish calls
+this function should not be used as the primary means of publications as it does involve an
+additional map find operation vs the member publish calls
 @param fed a reference to a valueFederate
 @param pubKey  the name of the publication
 @param pargs any combination of arguments that go into the other publish commands

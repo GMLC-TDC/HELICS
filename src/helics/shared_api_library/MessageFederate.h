@@ -60,8 +60,10 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint
-    helicsFederateRegisterGlobalEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
+HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed,
+                                                                   const char* name,
+                                                                   const char* type,
+                                                                   helics_error* err);
 
 /**
  * Get an endpoint object from a name.
@@ -164,13 +166,12 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendEventRaw(
-    helics_endpoint endpoint,
-    const char* dest,
-    const void* data,
-    int inputDataLength,
-    helics_time time,
-    helics_error* err);
+HELICS_EXPORT void helicsEndpointSendEventRaw(helics_endpoint endpoint,
+                                              const char* dest,
+                                              const void* data,
+                                              int inputDataLength,
+                                              helics_time time,
+                                              helics_error* err);
 
 /**
  * Send a message object from a specific endpoint.

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -64,13 +64,14 @@ class FedInfo {
 
 /** base class implementing a standard interaction strategy between federates
 @details the CommonCore is virtual class that manages local federates and handles most of the
-interaction between federate it is meant to be instantiated for specific inter-federate communication
-strategies*/
+interaction between federate it is meant to be instantiated for specific inter-federate
+communication strategies*/
 class CommonCore: public Core, public BrokerBase {
   public:
     /** default constructor*/
     CommonCore() noexcept;
-    /**function mainly to match some other object constructors does the same thing as the default constructor*/
+    /**function mainly to match some other object constructors does the same thing as the default
+     * constructor*/
     explicit CommonCore(bool arg) noexcept;
     /** construct from a core name*/
     explicit CommonCore(const std::string& coreName);
@@ -225,8 +226,8 @@ class CommonCore: public Core, public BrokerBase {
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override final;
     /** unregister the core from any process find functions*/
     void unregister();
-    /**TODO(PT): figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
-     * class of some sort*/
+    /**TODO(PT): figure out how to make this non-public, it needs to be called in a lambda function,
+     * may need a helper class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
     virtual void setInterfaceInfo(interface_handle handle, std::string info) override final;
@@ -255,7 +256,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void transmit(route_id rid, ActionMessage&& cmd) = 0;
     /** add a route to whatever internal structure manages the routes
     @param rid the identification of the route
-    @param interfaceId an interface id code that can be used to identify the interface route should be added to, in most cases this should be zero since there is only one interface
+    @param interfaceId an interface id code that can be used to identify the interface route should
+    be added to, in most cases this should be zero since there is only one interface
     @param routeInfo a string containing the information necessary to connect
     */
     virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;
@@ -298,9 +300,11 @@ class CommonCore: public Core, public BrokerBase {
     std::map<global_federate_id, route_id>
         routing_table;  //!< map for external routes  <global federate id, route id>
     gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
+        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed
+                             //!< for a certain time
     std::unordered_map<std::string, route_id>
-        knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
+        knownExternalEndpoints;  //!< external map for all known external endpoints with names and
+                                 //!< route
 
     std::unique_ptr<TimeoutMonitor>
         timeoutMon;  //!< class to handle timeouts and disconnection notices
@@ -315,12 +319,14 @@ class CommonCore: public Core, public BrokerBase {
 
     /**function for doing the actual routing either to a local fed or up the broker chain*/
     void routeMessage(ActionMessage& cmd, global_federate_id dest);
-    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    /** function for routing a message from based on the destination specified in the
+     * ActionMessage*/
     void routeMessage(const ActionMessage& cmd);
 
     /**function for doing the actual routing either to a local fed or up the broker chain*/
     void routeMessage(ActionMessage&& cmd, global_federate_id dest);
-    /** function for routing a message from based on the destination specified in the ActionMessage*/
+    /** function for routing a message from based on the destination specified in the
+     * ActionMessage*/
     void routeMessage(ActionMessage&& cmd);
 
     /** process any filter or route the message*/
@@ -360,7 +366,8 @@ class CommonCore: public Core, public BrokerBase {
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
 
-    /** generate results for some core queries that do not depend on the main processing loop running*/
+    /** generate results for some core queries that do not depend on the main processing loop
+     * running*/
     std::string quickCoreQueries(const std::string& queryStr) const;
 
     /** generate the filteredEndpoint query results for a particular federate*/
@@ -368,8 +375,8 @@ class CommonCore: public Core, public BrokerBase {
 
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
-    std::atomic<int16_t> delayInitCounter{
-        0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
+    std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to
+                                               //!< initialization Mode was explicitly delayed
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
         federates;  //!< threadsafe local federate information list for external functions
     gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
@@ -380,8 +387,8 @@ class CommonCore: public Core, public BrokerBase {
     //!< confusion
 
     ordered_guarded<HandleManager> handles;  //!< local handle information;
-    HandleManager
-        loopHandles;  //!< copy of handles to use in the primary processing loop without thread protection
+    HandleManager loopHandles;  //!< copy of handles to use in the primary processing loop without
+                                //!< thread protection
     std::map<int32_t, std::set<int32_t>>
         ongoingFilterProcesses;  //!< sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>>
@@ -391,8 +398,9 @@ class CommonCore: public Core, public BrokerBase {
         delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{
         1};  //!< counter for queries start at 1 so the default value isn't used
-    gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
-        /// holder for the query map builder information
+    gmlc::concurrency::DelayedObjects<std::string>
+        activeQueries;  //!< holder for active queries
+                        /// holder for the query map builder information
     mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>>
         filterCoord;  //!< map of all local filters
@@ -440,8 +448,8 @@ class CommonCore: public Core, public BrokerBase {
     void checkForNamedInterface(ActionMessage& cmd);
     /** function to remove a named target*/
     void removeNamedTarget(ActionMessage& cmd);
-    /** indicate that a handle interface is used and if the used status has changed make sure it is indicated
-    in all the needed places*/
+    /** indicate that a handle interface is used and if the used status has changed make sure it is
+    indicated in all the needed places*/
     void setAsUsed(BasicHandleInfo* hand);
     /** function to consolidate the registration of interfaces in the core*/
     void registerInterface(ActionMessage& cmd);
@@ -459,8 +467,8 @@ class CommonCore: public Core, public BrokerBase {
     /** generate a query response for a federate if possible
     @param fed a pointer to the federateState object to query
     @param queryStr  the string containing the actual query
-    @return "#wait" if the lock cannot be granted immediately and no result can be obtained otherwise an answer to
-    the query
+    @return "#wait" if the lock cannot be granted immediately and no result can be obtained
+    otherwise an answer to the query
     */
     std::string federateQuery(const FederateState* fed, const std::string& queryStr) const;
 
