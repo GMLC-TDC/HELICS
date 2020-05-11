@@ -82,6 +82,8 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``queries``        | list of available queries [sv]                             |
 +--------------------+------------------------------------------------------------+
+| ``version``        | the version string of the helics library [string]          |
++--------------------+------------------------------------------------------------+
 ```
 
 ### Local Federate Queries
@@ -154,6 +156,10 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``queries``          | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
+|``version_all``       | data structure with the version string and the federates[JSON]                      |
++----------------------+-------------------------------------------------------------------------------------+
+| ``version``          | the version string for the helics library [string]                                  |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
 The last two are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.
@@ -203,6 +209,10 @@ The Following queries will be answered by a broker.
 | ``data_flow_graph``  | a representation of the data connections from all interfaces in a federation [JSON] |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``queries``          | list of dependent objects [sv]                                                      |
++----------------------+-------------------------------------------------------------------------------------+
+|``version_all``       | data structure with the version strings of all broker components [JSON]             |
++----------------------+-------------------------------------------------------------------------------------+
+| ``version``          | the version string for the helics library [string]                                  |
 +----------------------+-------------------------------------------------------------------------------------+
 ```
 
