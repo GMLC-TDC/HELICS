@@ -52,3 +52,16 @@ repos:
             '--skip="*.csv"',
             "--ignore-words=./config/spelling_whitelist.txt",
           ]
+- repo: local
+    hooks:
+      - id: docker-clang-format
+        name: Docker Clang Format
+        language: docker_image
+        types:
+          - c++
+          - c
+        entry: unibeautify/clang-format:latest
+        args:
+          - -style=file
+          - -i
+
