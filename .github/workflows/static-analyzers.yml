@@ -23,4 +23,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run clang-tidy on changed files
       shell: bash
-      run: ./.github/workflows/run-clang-tidy-pr.sh
+      run: ./.github/actions/run-clang-tidy-pr.sh
