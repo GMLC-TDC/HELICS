@@ -146,7 +146,8 @@ public class helics {
    * @param type The type of the broker to create.<br>
    * @param name The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.<br>
    * @param initString An initialization string to send to the core-the format is similar to command line arguments.<br>
-   *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates, or the address.<br>
+   *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,<br>
+   * or the address.<br>
    * <br>
    * <br>
    * @return A helics_broker object.
@@ -501,7 +502,8 @@ public class helics {
   /**
    * Create a message federate from a federate info object.<br>
    * <br>
-   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.<br>
+   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an<br>
+   * argument.<br>
    * <br>
    * @param fedName The name of the federate to create.<br>
    * @param fi The federate info object that contains details on the federate.<br>
@@ -517,7 +519,8 @@ public class helics {
   /**
    * Create a message federate from a JSON file or JSON string or TOML file.<br>
    * <br>
-   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.<br>
+   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an<br>
+   * argument.<br>
    * <br>
    * @param configFile A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.<br>
    * <br>
@@ -819,8 +822,8 @@ public class helics {
   /**
    * Generate a local error in a federate.<br>
    * <br>
-   * This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does<br>
-   *          allow some interaction with a core for a brief time.<br>
+   * This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize<br>
+   * but does allow some interaction with a core for a brief time.<br>
    * @param fed The federate to create an error in.<br>
    * @param error_code The integer code for the error.<br>
    * @param error_string A string describing the error.
@@ -868,8 +871,8 @@ public class helics {
   /**
    * Enter the initialization state of a federate.<br>
    * <br>
-   * The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution state.<br>
-   *          This is a blocking call and will block until the core allows it to proceed.<br>
+   * The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution<br>
+   * state. This is a blocking call and will block until the core allows it to proceed.<br>
    * <br>
    * @param fed The federate to operate on.
    */
@@ -924,7 +927,8 @@ public class helics {
   /**
    * Request that the federate enter the Execution mode.<br>
    * <br>
-   * This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call sequence.<br>
+   * This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call<br>
+   * sequence.<br>
    * <br>
    * @param fed The federate object to complete the call.
    */
@@ -1425,7 +1429,8 @@ public class helics {
   /**
    * Complete the return from a query called with /ref helicsExecuteQueryAsync.<br>
    * <br>
-   * The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not.<br>
+   * The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or<br>
+   * not.<br>
    * <br>
    * @param query The query object to complete execution of.<br>
    * <br>
@@ -3172,7 +3177,8 @@ public class helics {
    * @param name The name of the filter.<br>
    * <br>
    * <br>
-   * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
+   * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name<br>
+   * exists.
    */
   public static SWIGTYPE_p_void helicsFederateGetFilter(SWIGTYPE_p_void fed, String name) {
     long cPtr = helicsJNI.helicsFederateGetFilter(SWIGTYPE_p_void.getCPtr(fed), name);

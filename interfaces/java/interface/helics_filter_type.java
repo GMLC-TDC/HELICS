@@ -37,8 +37,8 @@ public final class helics_filter_type {
    */
   public final static helics_filter_type helics_filter_type_clone = new helics_filter_type("helics_filter_type_clone", helicsJNI.helics_filter_type_clone_get());
   /**
-   *  a customizable filter type that can perform different actions on a message based on firewall like<br>
-   *            rules
+   *  a customizable filter type that can perform different actions on a message based on firewall<br>
+   *        like rules
    */
   public final static helics_filter_type helics_filter_type_firewall = new helics_filter_type("helics_filter_type_firewall", helicsJNI.helics_filter_type_firewall_get());
 
