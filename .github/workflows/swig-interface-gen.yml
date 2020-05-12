@@ -5,6 +5,7 @@ on:
     branches: 
       - master
       - develop
+      - helics3
 
 jobs:
   build:

@@ -4,10 +4,12 @@ on:
     branches:
       - develop
       - master
+      - helics3
   pull_request:
     branches:
       - develop
       - master
+      - helics3
 
 jobs:
   pre-commit:

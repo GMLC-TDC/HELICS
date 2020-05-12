@@ -2,7 +2,15 @@ name: Static Analyzers
 
 on:
   push:
+    branches:
+      - develop
+      - master
+      - helics3
   pull_request:
+    branches:
+      - develop
+      - master
+      - helics3
 
 jobs:
   cpplint:
