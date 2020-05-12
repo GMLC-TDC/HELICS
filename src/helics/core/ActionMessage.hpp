@@ -80,7 +80,7 @@ class ActionMessage {
     ActionMessage& operator=(const ActionMessage& act);
     /** move assignment*/
     ActionMessage& operator=(ActionMessage&& act) noexcept;
-    /** move assignement from message data into the actionMessage
+    /** move assignment from message data into the actionMessage
     @details take ownership of the message and move the contents out then destroy the message shell
     @param message the message to move.
     */
