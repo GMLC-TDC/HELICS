@@ -165,7 +165,7 @@ jobs:
 
     - os: windows
       name: 'MinGW'
-      if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR(branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
+      if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
       env:
         - DISABLE_INTERFACES="Python,Java"
         - CI_TEST_MATCH="core-ci-tests"

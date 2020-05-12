@@ -42,8 +42,8 @@
   </tr>
   <td>Docs</td>
   <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=develop" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=helics3" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   </tr>
 </table>
 
@@ -67,7 +67,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools. However, it is possible to use HELICS for co-simulation in any domain. Previous and existing HELICS efforts have stretched across a wide range of scales in time and space: From transient dynamics (e.g. power system frequency response or electromechanical transient simulation) through steady-state power flow and markets to long-term planning studies. And from individual appliance behaviors, through distribution & bulk systems, and to nation-wide simulations.
 
-HELICS is also highly scalable, enabling everything from simple connections between 2 software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including Python, C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
+HELICS is also highly scalable, enabling everything from simple connections between 2 software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including [Python](#pip), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
 
 **Brief History:** HELICS began as the core software development of the Grid Modernization Laboratory Consortium ([GMLC](https://gridmod.labworks.org/)) project on integrated Transmission-Distribution-Communication simulation (TDC, GMLC project 1.4.15) supported by the U.S. Department of Energy's Offices of Electricity Delivery and Energy Reliability ([OE](https://www.energy.gov/oe/office-electricity-delivery-and-energy-reliability)) and Energy Efficiency and Renewable Energy ([EERE](https://www.energy.gov/eere/office-energy-efficiency-renewable-energy)). As such, its first use cases were around modern electric power systems, though today it is used for a much larger range of applications. HELICS's layered, high-performance, co-simulation framework builds on the collective experience of multiple national labs.
 
