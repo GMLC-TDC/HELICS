@@ -195,8 +195,8 @@ void CoreBroker::addDestinationFilterToEndpoint(const std::string& filter,
 
 route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 {
-    auto& endpointName = mess.getString(targetStringLoc);
-    auto eptInfo = handles.getEndpoint(endpointName);
+    const auto& endpointName = mess.getString(targetStringLoc);
+    auto* eptInfo = handles.getEndpoint(endpointName);
     if (eptInfo != nullptr) {
         mess.setDestination(eptInfo->handle);
         return getRoute(eptInfo->handle.fed_id);
@@ -545,7 +545,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             }
         } break;
         case CMD_PRIORITY_DISCONNECT: {
-            auto brk = getBrokerById(global_broker_id(command.source_id));
+            auto* brk = getBrokerById(global_broker_id(command.source_id));
             if (brk != nullptr) {
                 brk->state = connection_state::disconnected;
             }
@@ -565,9 +565,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 earlyMessages.push_back(std::move(command));
                 break;
             }
-            if (command.dest_id == global_broker_id_local) {
-                processLocalQuery(command);
-            } else if ((isRootc) && (command.dest_id == parent_broker_id)) {
+            if (command.dest_id == global_broker_id_local ||
+                (isRootc && command.dest_id == parent_broker_id)) {
                 processLocalQuery(command);
             } else {
                 routeMessage(command);
@@ -608,7 +607,7 @@ std::string CoreBroker::generateFederationSummary() const
     int epts = 0;
     int ipts = 0;
     int filt = 0;
-    for (auto& hand : handles) {
+    for (const auto& hand : handles) {
         switch (hand.handleType) {
             case handle_type::publication:
                 ++pubs;
@@ -631,10 +630,10 @@ std::string CoreBroker::generateFederationSummary() const
         minFederateCount,
         std::count_if(_brokers.begin(),
                       _brokers.end(),
-                      [](auto& brk) { return brk._core == false; }),
+                      [](auto& brk) { return !static_cast<bool>(brk._core); }),
         std::count_if(_brokers.begin(),
                       _brokers.end(),
-                      [](auto& brk) { return brk._core == true; }),
+                      [](auto& brk) { return static_cast<bool>(brk._core); }),
         minBrokerCount,
         pubs,
         ipts,
@@ -751,7 +750,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 bool partDisconnected{false};
                 bool ignore{false};
-                for (auto& brk : _brokers) {
+                for (const auto& brk : _brokers) {
                     if (brk.state == connection_state::disconnected) {
                         partDisconnected = true;
                     }
@@ -800,7 +799,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_INIT: {
-            auto brk = getBrokerById(static_cast<global_broker_id>(command.source_id));
+            auto* brk = getBrokerById(static_cast<global_broker_id>(command.source_id));
             if (brk != nullptr) {
                 brk->state = connection_state::init_requested;
             }
@@ -823,7 +822,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             if (allInitReady()) {
                 transmit(parent_route_id, command);
             }
-            auto brk = getBrokerById(global_broker_id(command.source_id));
+            auto* brk = getBrokerById(global_broker_id(command.source_id));
             if (brk != nullptr) {
                 brk->state = connection_state::connected;
             }
@@ -835,7 +834,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                             " Broker started with universal key");
             }
             brokerState = broker_state_t::operating;
-            for (auto& brk : _brokers) {
+            for (const auto& brk : _brokers) {
                 transmit(brk.route, command);
             }
             {
@@ -865,14 +864,14 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         }
         case CMD_DATA_LINK: {
-            auto pub = handles.getPublication(command.name);
+            auto* pub = handles.getPublication(command.name);
             if (pub != nullptr) {
                 command.name = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_INPUT);
                 command.setSource(pub->handle);
                 checkForNamedInterface(command);
             } else {
-                auto input = handles.getInput(command.getString(targetStringLoc));
+                auto* input = handles.getInput(command.getString(targetStringLoc));
                 if (input == nullptr) {
                     if (isRootc) {
                         unknownHandles.addDataLink(command.name,
@@ -888,7 +887,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
         } break;
         case CMD_FILTER_LINK: {
-            auto filt = handles.getFilter(command.name);
+            auto* filt = handles.getFilter(command.name);
             if (filt != nullptr) {
                 command.name = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -898,7 +897,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 }
                 checkForNamedInterface(command);
             } else {
-                auto ept = handles.getEndpoint(command.getString(targetStringLoc));
+                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
                 if (ept == nullptr) {
                     if (isRootc) {
                         if (checkActionFlag(command, destination_target)) {
@@ -1178,7 +1177,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
     bool foundInterface = false;
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
-            auto pub = handles.getPublication(command.name);
+            auto* pub = handles.getPublication(command.name);
             if (pub != nullptr) {
                 auto fed = _federates.find(pub->getFederateId());
                 if (fed->state < connection_state::error) {
@@ -1203,13 +1202,13 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_INPUT: {
-            auto inp = handles.getInput(command.name);
+            auto* inp = handles.getInput(command.name);
             if (inp != nullptr) {
                 auto fed = _federates.find(inp->getFederateId());
                 if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_PUBLISHER);
                     command.setDestination(inp->handle);
-                    auto pub = handles.findHandle(command.getSource());
+                    auto* pub = handles.findHandle(command.getSource());
                     if (pub != nullptr) {
                         command.setStringData(pub->type, pub->units);
                     }
@@ -1232,7 +1231,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_FILTER: {
-            auto filt = handles.getFilter(command.name);
+            auto* filt = handles.getFilter(command.name);
             if (filt != nullptr) {
                 command.setAction(CMD_ADD_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -1251,14 +1250,14 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_ENDPOINT: {
-            auto ept = handles.getEndpoint(command.name);
+            auto* ept = handles.getEndpoint(command.name);
             if (ept != nullptr) {
                 auto fed = _federates.find(ept->getFederateId());
                 if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_FILTER);
                     command.setDestination(ept->handle);
                     command.name.clear();
-                    auto filt = handles.findHandle(command.getSource());
+                    auto* filt = handles.findHandle(command.getSource());
                     if (filt != nullptr) {
                         if ((!filt->type_in.empty()) || (!filt->type_out.empty())) {
                             command.setStringData(filt->type_in, filt->type_out);
@@ -1299,7 +1298,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                                                    command.getSource(),
                                                    command.flags);
                     if (!command.getStringData().empty()) {
-                        auto pub = handles.findHandle(command.getSource());
+                        auto* pub = handles.findHandle(command.getSource());
                         if (pub == nullptr) {
                             // an anonymous publisher is adding an input
                             auto& apub = handles.addHandle(command.source_id,
@@ -1318,7 +1317,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                                                       command.getSource(),
                                                       command.flags);
                     if (!command.getStringData().empty()) {
-                        auto filt = handles.findHandle(command.getSource());
+                        auto* filt = handles.findHandle(command.getSource());
                         if (filt == nullptr) {
                             // an anonymous filter is adding an endpoint
                             auto& afilt = handles.addHandle(command.source_id,
@@ -1354,7 +1353,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
     bool foundInterface = false;
     switch (command.action()) {
         case CMD_REMOVE_NAMED_PUBLICATION: {
-            auto pub = handles.getPublication(command.name);
+            auto* pub = handles.getPublication(command.name);
             if (pub != nullptr) {
                 command.setAction(CMD_REMOVE_SUBSCRIBER);
                 command.setDestination(pub->handle);
@@ -1367,7 +1366,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_INPUT: {
-            auto inp = handles.getInput(command.name);
+            auto* inp = handles.getInput(command.name);
             if (inp != nullptr) {
                 command.setAction(CMD_REMOVE_PUBLICATION);
                 command.setDestination(inp->handle);
@@ -1380,7 +1379,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_FILTER: {
-            auto filt = handles.getFilter(command.name);
+            auto* filt = handles.getFilter(command.name);
             if (filt != nullptr) {
                 command.setAction(CMD_REMOVE_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -1393,7 +1392,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_ENDPOINT: {
-            auto ept = handles.getEndpoint(command.name);
+            auto* ept = handles.getEndpoint(command.name);
             if (ept != nullptr) {
                 command.setAction(CMD_REMOVE_FILTER);
                 command.setDestination(ept->handle);
@@ -1754,12 +1753,11 @@ void CoreBroker::disconnect()
                     getIdentifier(),
                     "main loop is stopped but have not received disconnect notice, assuming disconnected");
                 return;
-            } else {
+            }
                 LOG_WARNING(global_id.load(),
                             getIdentifier(),
                             fmt::format("sending disconnect again; total message count = {}",
                                         currentMessageCounter()));
-            }
             addActionMessage(udisconnect);
         }
     }
@@ -1828,7 +1826,7 @@ void CoreBroker::routeMessage(ActionMessage&& cmd)
 
 void CoreBroker::broadcast(ActionMessage& cmd)
 {
-    for (auto& broker : _brokers) {
+    for (const auto& broker : _brokers) {
         if ((!broker._nonLocal) && (broker.state < connection_state::disconnected)) {
             cmd.dest_id = broker.global_id;
             transmit(broker.route, cmd);
@@ -1877,6 +1875,14 @@ void CoreBroker::executeInitializationOperations()
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload);
                             break;
+                        default:
+                            // LCOV_EXCL_START
+                            eMiss.payload =
+                                fmt::format("Unable to connect to required unknown target {}",
+                                            target);
+                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload);
+                            break;
+                            // LCOV_EXCL_STOP
                     }
                     eMiss.setDestination(handle);
                     routeMessage(eMiss);
@@ -1914,6 +1920,13 @@ void CoreBroker::executeInitializationOperations()
                                 fmt::format("Unable to connect to endpoint target {}", target);
                             LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload);
                             break;
+                        default:
+                            // LCOV_EXCL_START
+                            wMiss.payload =
+                                fmt::format("Unable to connect to undefined target {}", target);
+                            LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload);
+                            break;
+                            // LCOV_EXCL_STOP
                     }
                     wMiss.setDestination(handle);
                     routeMessage(wMiss);
@@ -1951,7 +1964,7 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
         m.setSource(target.first);
         m.setDestination(handleInfo.handle);
         m.flags = target.second;
-        auto pub = handles.findHandle(target.first);
+        auto* pub = handles.findHandle(target.first);
         if (pub != nullptr) {
             m.setStringData(pub->type, pub->units);
         }
@@ -1966,7 +1979,7 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
 {
     auto subHandles = unknownHandles.checkForPublications(handleInfo.key);
-    for (auto sub : subHandles) {
+    for (const auto &sub : subHandles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
         m.setSource(sub.first);
@@ -1986,7 +1999,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
     }
 
     auto Pubtargets = unknownHandles.checkForLinks(handleInfo.key);
-    for (auto sub : Pubtargets) {
+    for (const auto &sub : Pubtargets) {
         ActionMessage m(CMD_ADD_NAMED_INPUT);
         m.name = sub;
         m.setSource(handleInfo.handle);
@@ -2000,7 +2013,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForEndpoints(handleInfo.key);
-    for (auto target : Handles) {
+    for (const auto &target : Handles) {
         // notify the filter about its endpoint
         ActionMessage m(CMD_ADD_ENDPOINT);
         m.setSource(handleInfo.handle);
@@ -2023,7 +2036,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForFilters(handleInfo.key);
-    for (auto target : Handles) {
+    for (const auto &target : Handles) {
         // notify the endpoint about a filter
         ActionMessage m(CMD_ADD_FILTER);
         m.setSource(handleInfo.handle);
@@ -2045,7 +2058,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(handleInfo.key);
-    for (auto target : FiltDestTargets) {
+    for (const auto &target : FiltDestTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.setSource(handleInfo.handle);
@@ -2058,7 +2071,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 
     auto FiltSourceTargets = unknownHandles.checkForFilterSourceTargets(handleInfo.key);
-    for (auto target : FiltSourceTargets) {
+    for (const auto &target : FiltSourceTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.flags = handleInfo.flags;
@@ -2091,7 +2104,7 @@ void CoreBroker::processError(ActionMessage& command)
         broadcast(command);
     }
 
-    auto brk = getBrokerById(global_broker_id(command.source_id));
+    auto* brk = getBrokerById(global_broker_id(command.source_id));
     if (brk == nullptr) {
         auto fed = _federates.find(command.source_id);
         if (fed != _federates.end()) {
@@ -2135,7 +2148,7 @@ void CoreBroker::processError(ActionMessage& command)
 
 void CoreBroker::processDisconnect(ActionMessage& command)
 {
-    auto brk = getBrokerById(global_broker_id(command.source_id));
+    auto* brk = getBrokerById(global_broker_id(command.source_id));
     switch (command.action()) {
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -2243,7 +2256,8 @@ void CoreBroker::processDisconnect(ActionMessage& command)
 void CoreBroker::markAsDisconnected(global_broker_id brkid)
 {
     bool isCore{false};
-    for (size_t ii = 0; ii < _brokers.size(); ++ii) {
+    //using regular loop here since dual mapped vector shouldn't produce a modifyable lvalue
+    for (size_t ii = 0; ii < _brokers.size(); ++ii) { // NOLINT
         auto& brk = _brokers[ii];
         if (brk.global_id == brkid) {
             if (brk.state != connection_state::error) {
@@ -2259,7 +2273,7 @@ void CoreBroker::markAsDisconnected(global_broker_id brkid)
         }
     }
     if (isCore) {
-        for (size_t ii = 0; ii < _federates.size(); ++ii) {
+        for (size_t ii = 0; ii < _federates.size(); ++ii) { // NOLINT
             auto& fed = _federates[ii];
 
             if (fed.parent == brkid) {
@@ -2281,7 +2295,7 @@ void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
             broadcast(dis);
             unknownHandles.clearFederateUnknowns(brk.global_id);
             if (!brk._core) {
-                for (auto& subbrk : _brokers) {
+                for (const auto& subbrk : _brokers) {
                     if ((subbrk.parent == brk.global_id) && (subbrk._core)) {
                         unknownHandles.clearFederateUnknowns(subbrk.global_id);
                     }
@@ -2320,7 +2334,8 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(index);
         return ret;
-    } else if (target == "parent") {
+    }
+    if (target == "parent") {
         if (isRootc) {
             return "#na";
         }
@@ -2333,7 +2348,8 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(querycmd.messageID);
         return ret;
-    } else if ((target == "root") || (target == "rootbroker")) {
+    }
+    if ((target == "root") || (target == "rootbroker")) {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
@@ -2345,7 +2361,8 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(index);
         return ret;
-    } else {
+    }
+    
         ActionMessage querycmd(CMD_QUERY);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
@@ -2358,7 +2375,7 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(index);
         return ret;
-    }
+
     //  return "#invalid";
 }
 
@@ -2376,7 +2393,8 @@ enum subqueries : std::uint16_t {
     federate_map = 1,
     current_time_map = 2,
     dependency_graph = 3,
-    data_flow_graph = 4
+    data_flow_graph = 4,
+    version_all = 5
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2384,6 +2402,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"federate_map", {federate_map, false}},
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
+    {"version_all", {version_all, false}},
 };
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request)
@@ -2401,10 +2420,13 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_time]";
+               "current_time;current_state;global_time;version;version_all]";
     }
     if (request == "address") {
         return getAddress();
+    }
+    if (request == "version") {
+        return versionString;
     }
     if (request == "counts") {
         Json::Value base;
@@ -2436,7 +2458,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
         base["state"] = brokerStateName(brokerState.load());
         base["federates"] = Json::arrayValue;
-        for (auto& fed : _federates) {
+        for (const auto& fed : _federates) {
             Json::Value fedstate;
             fedstate["name"] = fed.name;
             fedstate["state"] = state_string(fed.state);
@@ -2445,7 +2467,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
         base["brokers"] = Json::arrayValue;
         base["cores"] = Json::arrayValue;
-        for (auto& brk : _brokers) {
+        for (const auto& brk : _brokers) {
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
             brkstate["name"] = brk.name;
@@ -2459,11 +2481,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return generateJsonString(base);
     }
     if (request == "current_time") {
-        if (hasTimeDependency) {
-            return timeCoord->printTimeStatus();
-        } else {
+        if (!hasTimeDependency) {
             return "{}";
         }
+        return timeCoord->printTimeStatus();
     }
     auto mi = mapIndex.find(request);
     if (mi != mapIndex.end()) {
@@ -2527,11 +2548,11 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
             base["parent"] = higher_broker_id.baseValue();
         }
         base["dependents"] = Json::arrayValue;
-        for (auto& dep : timeCoord->getDependents()) {
+        for (const auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());
         }
         base["dependencies"] = Json::arrayValue;
-        for (auto& dep : timeCoord->getDependencies()) {
+        for (const auto& dep : timeCoord->getDependencies()) {
             base["dependencies"].append(dep.baseValue());
         }
         return generateJsonString(base);
@@ -2552,7 +2573,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back('[');
     size_t index = 0;
     while (index + 1 < val.size()) {
-        auto info = handles.findHandle(
+        const auto *info = handles.findHandle(
             global_handle(global_federate_id(val[index]), interface_handle(val[index + 1])));
         if (info != nullptr) {
             gidString.append(info->key);
@@ -2587,7 +2608,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
     bool hasCores = false;
-    for (auto& broker : _brokers) {
+    for (const auto& broker : _brokers) {
         if (broker.parent == global_broker_id_local) {
             int brkindex;
             if (broker._core) {
@@ -2606,20 +2627,22 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
     }
     switch (index) {
         case federate_map:
-            break;
         case current_time_map:
+        case data_flow_graph:
+        default:
             break;
         case dependency_graph: {
             base["dependents"] = Json::arrayValue;
-            for (auto& dep : timeCoord->getDependents()) {
+            for (const auto& dep : timeCoord->getDependents()) {
                 base["dependents"].append(dep.baseValue());
             }
             base["dependencies"] = Json::arrayValue;
-            for (auto& dep : timeCoord->getDependencies()) {
+            for (const auto& dep : timeCoord->getDependencies()) {
                 base["dependencies"].append(dep.baseValue());
             }
         } break;
-        case data_flow_graph:
+        case version_all:
+            base["version"] = versionString;
             break;
     }
 }
@@ -2643,12 +2666,10 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 
 void CoreBroker::processQuery(ActionMessage& m)
 {
-    auto& target = m.getString(targetStringLoc);
-    if ((target == getIdentifier()) || (target == "broker")) {
+    const auto& target = m.getString(targetStringLoc);
+    if ((target == getIdentifier() || target == "broker")||(isRootc && (target == "root" || target == "federation"))) {
         processLocalQuery(m);
-    } else if ((isRootc) && ((target == "root") || (target == "federation"))) {
-        processLocalQuery(m);
-    } else if ((isRootc) && (target == "gid_to_name")) {
+    } else if (isRootc && target == "gid_to_name") {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
@@ -2737,7 +2758,8 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                 }
             }
             if (requestors.back().dest_id == global_broker_id_local) {
-                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+                // TODO(PT) add rvalue reference method
+                activeQueries.setDelayedValue(requestors.back().messageID, str);
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));
@@ -2809,7 +2831,7 @@ void CoreBroker::checkDependencies()
 
         global_federate_id fedid;
         int localcnt = 0;
-        for (auto& dep : timeCoord->getDependents()) {
+        for (const auto& dep : timeCoord->getDependents()) {
             if (dep != higher_broker_id) {
                 ++localcnt;
                 fedid = dep;
@@ -2842,7 +2864,7 @@ connection_state CoreBroker::getAllConnectionState() const
 {
     connection_state res = connection_state::disconnected;
     int cnt{0};
-    for (auto& brk : _brokers) {
+    for (const auto& brk : _brokers) {
         if (brk._nonLocal) {
             continue;
         }

@@ -63,7 +63,6 @@ repos:
         language: docker_image
         types:
           - c++
-          - c
         entry: unibeautify/clang-format:latest
         args:
           - -style=file

@@ -343,7 +343,7 @@ TEST(ActionMessage_tests, message_message_conversion_test)
     EXPECT_EQ(cmd.payload, msg->data.to_string());
 
     ActionMessage cmd2;
-    cmd2.moveInfo(std::move(msg));
+    cmd2=std::move(msg);
     EXPECT_TRUE(cmd.action() == CMD_SEND_MESSAGE);
     EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
     EXPECT_EQ(cmd.getString(0), cmd2.getString(0));
