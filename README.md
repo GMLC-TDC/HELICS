@@ -6,6 +6,10 @@
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
 [![](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&utm_medium=referral&utm_content=GMLC-TDC/HELICS&utm_campaign=Badge_Grade;branch=develop)
+[![](https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true)](https://ci.appveyor.com/project/HELICS/helics/history)
+[![Cirrus Status](https://api.cirrus-ci.com/github/GMLC-TDC/HELICS.svg)](https://cirrus-ci.com/github/GMLC-TDC/HELICS)
+[![Drone IO Status](https://cloud.drone.io/api/badges/GMLC-TDC/HELICS/status.svg?ref=refs/heads/develop)](https://cloud.drone.io/GMLC-TDC/HELICS)
+[![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 
@@ -31,27 +35,15 @@
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=helics3"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=helics3" alt="Build Status" /></a></td>
   </tr>
   <tr>
-  <td>Appveyor</td>
-  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/master?svg=true" alt="Build Status" /></a></td>
-  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true" alt="Build Status" /></a></td>
-    <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/helics3"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/helics3?svg=true" alt="Build Status" /></a></td>
-  </tr>
-  <tr>
   <td>Circle-CI</td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master.svg?style=svg" alt="Build Status" /></a></td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg" alt="Build Status" /></a></td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3.svg?style=svg" alt="Build Status" /></a></td>
   </tr>
-  <tr>
-  <td>Coverage</td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/master/graph/badge.svg" alt="codecov" /></a></td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS/branch/helics2"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/helics3/graph/badge.svg" alt="codecov" /></a></td>
-  </tr>
   <td>Docs</td>
-  <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="codecov" /></a></td>
-  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=develop" alt="codecov" /></a></td>
-  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=helics3" alt="codecov" /></a></td>
+  <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=develop" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=helics3" alt="docs" /></a></td>
   </tr>
 </table>
 
