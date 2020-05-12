@@ -32,6 +32,9 @@ rm -rf _CPack_Packages
 ZIP_FILE="$(ls Helics-*.zip)"
 7z x "$ZIP_FILE" -y
 rm "$ZIP_FILE"
+# shellcheck disable=SC2035
+# using * instead of -- * or ./* because weird things with paths have happened before with 7z on Windows
+# may be okay to change it with careful testing to make sure things don't break
 7z a "$ZIP_FILE" -r *
 mkdir ../artifact
 mv "$ZIP_FILE" "../artifact/${ZIP_FILE/-win/-${MSVC_VER}-win}"

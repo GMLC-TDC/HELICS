@@ -3,8 +3,19 @@ root = true
 [*]
 end_of_line = lf
 
+# Shell scripts
+[*.{sh,sbatch}]
+indent_style = space
+indent_size = 4
+
+[.githooks/pre-commit]
+indent_style = space
+indent_size = 4
+
 [*.bat]
 end_of_line = crlf
+indent_style = space
+indent_size = 4
 
 # HELICS C/C++ source files
 [{benchmarks,examples,src,tests}/**.{cpp,hpp,c,h}]

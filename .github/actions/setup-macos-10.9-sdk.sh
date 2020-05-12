@@ -13,4 +13,3 @@ tar -xf "MacOSX${SDK_VER}.sdk.tar.xz" -C "${XCODE_MACOS_SDK_PATH}"
 
 # Set the MinimumSDKVersion for XCode
 /usr/libexec/PlistBuddy -c "Set :MinimumSDKVersion ${SDK_VER}" "${XCODE_MACOS_PLATFORM_PATH}/Info.plist"
-

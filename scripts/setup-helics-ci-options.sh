@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Save the bash setting for not matching case
-SHELLNOCASEMATCH=$(shopt -p nocasematch; true)
+SHELLNOCASEMATCH=$(
+    shopt -p nocasematch
+    true
+)
 shopt -s nocasematch
 
 # Setup the flags for configuring HELICS with CMake
@@ -65,7 +68,9 @@ fi
 if [[ "$USE_MPI" ]]; then
     OPTION_FLAGS_ARR+=("-DENABLE_MPI_CORE=ON")
     CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc
+    export CC
     CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++
+    export CXX
 fi
 
 # Compiler/language options
@@ -77,7 +82,7 @@ fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON")
 fi
-export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
+export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[*]}
 
 # Set any HELICS flags for finding dependencies
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -119,7 +124,7 @@ fi
 if [[ "$DISABLE_CI_TESTS" ]]; then
     TEST_FLAGS_ARR+=("--disable-unit-tests")
 fi
-export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
+export CI_TEST_FLAGS=${TEST_FLAGS_ARR[*]}
 
 # Restore the origin nocasematch setting
 $SHELLNOCASEMATCH

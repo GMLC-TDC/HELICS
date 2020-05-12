@@ -37,6 +37,10 @@ repos:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
+      - id: shellcheck
+      - id: shfmt
+        args: [-w]
+      - id: script-must-have-extension
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.10
     hooks:
