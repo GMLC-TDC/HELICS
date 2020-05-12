@@ -6,8 +6,10 @@
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
 [![](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&utm_medium=referral&utm_content=GMLC-TDC/HELICS&utm_campaign=Badge_Grade;branch=develop)
-[![CircleCI](https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg)](https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop)
-[![Documentation Status](https://readthedocs.org/projects/helics/badge/?version=latest)](https://helics.readthedocs.io/en/latest/?badge=latest)
+[![](https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true)](https://ci.appveyor.com/project/HELICS/helics/history)
+[![Cirrus Status](https://api.cirrus-ci.com/github/GMLC-TDC/HELICS.svg)](https://cirrus-ci.com/github/GMLC-TDC/HELICS)
+[![Drone IO Status](https://cloud.drone.io/api/badges/GMLC-TDC/HELICS/status.svg?ref=refs/heads/develop)](https://cloud.drone.io/GMLC-TDC/HELICS)
+[![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 
@@ -18,26 +20,30 @@
     <td><b>Service</b></td>
     <td><b>Master</b></td>
     <td><b>Develop</b></td>
+    <td><b>helics3</b></td>
   </tr>
   <tr>
   <td>Travis CI</td>
   <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=master" alt="Build Status" /></a></td>
   <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=helics3" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Azure</td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=master"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=master" alt="Build Status" /></a></td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
+  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=helics3"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=helics3" alt="Build Status" /></a></td>
   </tr>
   <tr>
-  <td>Appveyor</td>
-  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/master?svg=true" alt="Build Status" /></a></td>
-  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true" alt="Build Status" /></a></td>
+  <td>Circle-CI</td>
+  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master.svg?style=svg" alt="Build Status" /></a></td>
+  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg" alt="Build Status" /></a></td>
+  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3.svg?style=svg" alt="Build Status" /></a></td>
   </tr>
-  <tr>
-  <td>Coverage</td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/master/graph/badge.svg" alt="codecov" /></a></td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
+  <td>Docs</td>
+  <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   </tr>
 </table>
 
@@ -61,7 +67,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools. However, it is possible to use HELICS for co-simulation in any domain. Previous and existing HELICS efforts have stretched across a wide range of scales in time and space: From transient dynamics (e.g. power system frequency response or electromechanical transient simulation) through steady-state power flow and markets to long-term planning studies. And from individual appliance behaviors, through distribution & bulk systems, and to nation-wide simulations.
 
-HELICS is also highly scalable, enabling everything from simple connections between 2 software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including Python, C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
+HELICS is also highly scalable, enabling everything from simple connections between 2 software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including [Python](#pip), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
 
 **Brief History:** HELICS began as the core software development of the Grid Modernization Laboratory Consortium ([GMLC](https://gridmod.labworks.org/)) project on integrated Transmission-Distribution-Communication simulation (TDC, GMLC project 1.4.15) supported by the U.S. Department of Energy's Offices of Electricity Delivery and Energy Reliability ([OE](https://www.energy.gov/oe/office-electricity-delivery-and-energy-reliability)) and Energy Efficiency and Renewable Energy ([EERE](https://www.energy.gov/eere/office-energy-efficiency-renewable-energy)). As such, its first use cases were around modern electric power systems, though today it is used for a much larger range of applications. HELICS's layered, high-performance, co-simulation framework builds on the collective experience of multiple national labs.
 

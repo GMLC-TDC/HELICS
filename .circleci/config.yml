@@ -170,6 +170,7 @@ workflows:
             branches:
               only:
                 - develop
+                - helics3
     jobs:
       - helicsoctave
       - helicsMSan
@@ -186,5 +187,6 @@ workflows:
             branches:
               only:
                 - develop
+                - helics3
     jobs:
       - benchmarkjob
