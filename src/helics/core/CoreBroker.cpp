@@ -1754,10 +1754,10 @@ void CoreBroker::disconnect()
                     "main loop is stopped but have not received disconnect notice, assuming disconnected");
                 return;
             }
-                LOG_WARNING(global_id.load(),
-                            getIdentifier(),
-                            fmt::format("sending disconnect again; total message count = {}",
-                                        currentMessageCounter()));
+            LOG_WARNING(global_id.load(),
+                        getIdentifier(),
+                        fmt::format("sending disconnect again; total message count = {}",
+                                    currentMessageCounter()));
             addActionMessage(udisconnect);
         }
     }
@@ -1979,7 +1979,7 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
 {
     auto subHandles = unknownHandles.checkForPublications(handleInfo.key);
-    for (const auto &sub : subHandles) {
+    for (const auto& sub : subHandles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
         m.setSource(sub.first);
@@ -1999,7 +1999,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
     }
 
     auto Pubtargets = unknownHandles.checkForLinks(handleInfo.key);
-    for (const auto &sub : Pubtargets) {
+    for (const auto& sub : Pubtargets) {
         ActionMessage m(CMD_ADD_NAMED_INPUT);
         m.name = sub;
         m.setSource(handleInfo.handle);
@@ -2013,7 +2013,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForEndpoints(handleInfo.key);
-    for (const auto &target : Handles) {
+    for (const auto& target : Handles) {
         // notify the filter about its endpoint
         ActionMessage m(CMD_ADD_ENDPOINT);
         m.setSource(handleInfo.handle);
@@ -2036,7 +2036,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForFilters(handleInfo.key);
-    for (const auto &target : Handles) {
+    for (const auto& target : Handles) {
         // notify the endpoint about a filter
         ActionMessage m(CMD_ADD_FILTER);
         m.setSource(handleInfo.handle);
@@ -2058,7 +2058,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(handleInfo.key);
-    for (const auto &target : FiltDestTargets) {
+    for (const auto& target : FiltDestTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.setSource(handleInfo.handle);
@@ -2071,7 +2071,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 
     auto FiltSourceTargets = unknownHandles.checkForFilterSourceTargets(handleInfo.key);
-    for (const auto &target : FiltSourceTargets) {
+    for (const auto& target : FiltSourceTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.flags = handleInfo.flags;
@@ -2256,8 +2256,8 @@ void CoreBroker::processDisconnect(ActionMessage& command)
 void CoreBroker::markAsDisconnected(global_broker_id brkid)
 {
     bool isCore{false};
-    //using regular loop here since dual mapped vector shouldn't produce a modifyable lvalue
-    for (size_t ii = 0; ii < _brokers.size(); ++ii) { // NOLINT
+    // using regular loop here since dual mapped vector shouldn't produce a modifiable lvalue
+    for (size_t ii = 0; ii < _brokers.size(); ++ii) {  // NOLINT
         auto& brk = _brokers[ii];
         if (brk.global_id == brkid) {
             if (brk.state != connection_state::error) {
@@ -2273,7 +2273,7 @@ void CoreBroker::markAsDisconnected(global_broker_id brkid)
         }
     }
     if (isCore) {
-        for (size_t ii = 0; ii < _federates.size(); ++ii) { // NOLINT
+        for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
             auto& fed = _federates[ii];
 
             if (fed.parent == brkid) {
@@ -2362,19 +2362,19 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         activeQueries.finishedWithValue(index);
         return ret;
     }
-    
-        ActionMessage querycmd(CMD_QUERY);
-        querycmd.source_id = gid;
-        auto index = ++queryCounter;
-        querycmd.messageID = index;
-        querycmd.payload = queryStr;
-        querycmd.setStringData(target);
-        auto queryResult = activeQueries.getFuture(querycmd.messageID);
-        transmitToParent(std::move(querycmd));
 
-        auto ret = queryResult.get();
-        activeQueries.finishedWithValue(index);
-        return ret;
+    ActionMessage querycmd(CMD_QUERY);
+    querycmd.source_id = gid;
+    auto index = ++queryCounter;
+    querycmd.messageID = index;
+    querycmd.payload = queryStr;
+    querycmd.setStringData(target);
+    auto queryResult = activeQueries.getFuture(querycmd.messageID);
+    transmitToParent(std::move(querycmd));
+
+    auto ret = queryResult.get();
+    activeQueries.finishedWithValue(index);
+    return ret;
 
     //  return "#invalid";
 }
@@ -2573,7 +2573,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back('[');
     size_t index = 0;
     while (index + 1 < val.size()) {
-        const auto *info = handles.findHandle(
+        const auto* info = handles.findHandle(
             global_handle(global_federate_id(val[index]), interface_handle(val[index + 1])));
         if (info != nullptr) {
             gidString.append(info->key);
@@ -2667,7 +2667,8 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 void CoreBroker::processQuery(ActionMessage& m)
 {
     const auto& target = m.getString(targetStringLoc);
-    if ((target == getIdentifier() || target == "broker")||(isRootc && (target == "root" || target == "federation"))) {
+    if ((target == getIdentifier() || target == "broker") ||
+        (isRootc && (target == "root" || target == "federation"))) {
         processLocalQuery(m);
     } else if (isRootc && target == "gid_to_name") {
         ActionMessage queryResp(CMD_QUERY_REPLY);

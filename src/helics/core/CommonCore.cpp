@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/logger.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
-#include "helicsVersion.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -26,6 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "coreTypeOperations.hpp"
 #include "fileConnections.hpp"
 #include "gmlc/concurrency/DelayedObjects.hpp"
+#include "helicsVersion.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
@@ -844,17 +844,17 @@ interface_handle CommonCore::registerInput(local_federate_id federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (registerNamedInput)"));
     }
-    const auto *ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
-    if (ci != nullptr)  {// this key is already found
+    const auto* ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
+    if (ci != nullptr) {  // this key is already found
         throw(RegistrationFailure("named Input already exists"));
     }
     const auto& handle = createBasicHandle(fed->global_id,
-                                     fed->local_id,
-                                     handle_type::input,
-                                     key,
-                                     type,
-                                     units,
-                                     fed->getInterfaceFlags());
+                                           fed->local_id,
+                                           handle_type::input,
+                                           key,
+                                           type,
+                                           units,
+                                           fed->getInterfaceFlags());
 
     auto id = handle.getInterfaceHandle();
     fed->createInterface(handle_type::input, id, key, type, units);
@@ -875,7 +875,7 @@ interface_handle CommonCore::registerInput(local_federate_id federateID,
 
 interface_handle CommonCore::getInput(local_federate_id federateID, const std::string& key) const
 {
-    const auto *ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
+    const auto* ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
     if (ci->local_fed_id != federateID) {
         return {};
     }
@@ -898,12 +898,12 @@ interface_handle CommonCore::registerPublication(local_federate_id federateID,
         throw(RegistrationFailure("Publication key already exists"));
     }
     const auto& handle = createBasicHandle(fed->global_id,
-                                     fed->local_id,
-                                     handle_type::publication,
-                                     key,
-                                     type,
-                                     units,
-                                     fed->getInterfaceFlags());
+                                           fed->local_id,
+                                           handle_type::publication,
+                                           key,
+                                           type,
+                                           units,
+                                           fed->getInterfaceFlags());
 
     auto id = handle.handle.handle;
     fed->createInterface(handle_type::publication, id, key, type, units);
@@ -1239,31 +1239,31 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
 
             actionQueue.push(std::move(mv));
             return;
-        } 
-            ActionMessage package(CMD_MULTI_MESSAGE);
-            package.source_id = handleInfo->getFederateId();
-            package.source_handle = handle;
+        }
+        ActionMessage package(CMD_MULTI_MESSAGE);
+        package.source_id = handleInfo->getFederateId();
+        package.source_handle = handle;
 
-            ActionMessage mv(CMD_PUB);
-            mv.source_id = handleInfo->getFederateId();
-            mv.source_handle = handle;
-            mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
-            mv.payload = std::string(data, len);
-            mv.actionTime = fed->nextAllowedSendTime();
+        ActionMessage mv(CMD_PUB);
+        mv.source_id = handleInfo->getFederateId();
+        mv.source_handle = handle;
+        mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
+        mv.payload = std::string(data, len);
+        mv.actionTime = fed->nextAllowedSendTime();
 
-            for (auto& target : subs) {
-                mv.setDestination(target);
-                auto res = appendMessage(package, mv);
-                if (res < 0)  // deal with max package size if there are a lot of subscribers
-                {
-                    actionQueue.push(std::move(package));
-                    package = ActionMessage(CMD_MULTI_MESSAGE);
-                    package.source_id = handleInfo->getFederateId();
-                    package.source_handle = handle;
-                    appendMessage(package, mv);
-                }
+        for (auto& target : subs) {
+            mv.setDestination(target);
+            auto res = appendMessage(package, mv);
+            if (res < 0)  // deal with max package size if there are a lot of subscribers
+            {
+                actionQueue.push(std::move(package));
+                package = ActionMessage(CMD_MULTI_MESSAGE);
+                package.source_id = handleInfo->getFederateId();
+                package.source_handle = handle;
+                appendMessage(package, mv);
             }
-            actionQueue.push(std::move(package));
+        }
+        actionQueue.push(std::move(package));
     }
 }
 
@@ -1317,12 +1317,12 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
         throw(RegistrationFailure("endpoint name is already used"));
     }
     const auto& handle = createBasicHandle(fed->global_id,
-                                     fed->local_id,
-                                     handle_type::endpoint,
-                                     name,
-                                     type,
-                                     std::string{},
-                                     fed->getInterfaceFlags());
+                                           fed->local_id,
+                                           handle_type::endpoint,
+                                           name,
+                                           type,
+                                           std::string{},
+                                           fed->getInterfaceFlags());
 
     auto id = handle.getInterfaceHandle();
     fed->createInterface(handle_type::endpoint, id, name, type, emptyStr);
@@ -1405,12 +1405,12 @@ interface_handle CommonCore::registerCloningFilter(const std::string& filterName
     auto brkid = global_id.load();
 
     const auto& handle = createBasicHandle(brkid,
-                                     local_federate_id(),
-                                     handle_type::filter,
-                                     filterName,
-                                     type_in,
-                                     type_out,
-                                     make_flags(clone_flag));
+                                           local_federate_id(),
+                                           handle_type::filter,
+                                           filterName,
+                                           type_in,
+                                           type_out,
+                                           make_flags(clone_flag));
 
     auto id = handle.getInterfaceHandle();
 
@@ -1657,9 +1657,9 @@ void CommonCore::deliverMessage(ActionMessage& message)
                             if (ffunc->destFilter->filterOp) {
                                 auto nmessage =
                                     ffunc->destFilter->filterOp->process(std::move(tempMessage));
-                                message=std::move(nmessage);
+                                message = std::move(nmessage);
                             } else {
-                                message=std::move(tempMessage);
+                                message = std::move(tempMessage);
                             }
                         }
                     }
@@ -1864,7 +1864,7 @@ void CommonCore::setFilterOperator(interface_handle filter,
                                    std::shared_ptr<FilterOperator> callback)
 {
     static std::shared_ptr<FilterOperator> nullFilt = std::make_shared<NullFilterOperator>();
-    const auto *hndl = getHandleInfo(filter);
+    const auto* hndl = getHandleInfo(filter);
     if (hndl == nullptr) {
         throw(InvalidIdentifier("filter is not a valid handle"));
     }
@@ -2026,7 +2026,8 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return filteredEndpointQuery(fed);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return std::string("[exists;isinit;state;version;queries;filtered_endpoints;current_time;") +
+        return std::string(
+                   "[exists;isinit;state;version;queries;filtered_endpoints;current_time;") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -2143,7 +2144,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 }
             }
             break;
-         default:
+        default:
             break;
     }
 }
@@ -2210,7 +2211,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         if (!hasTimeDependency) {
             return "{}";
         }
-        return timeCoord->printTimeStatus();   
+        return timeCoord->printTimeStatus();
     }
     if (queryStr == "version_all") {
         Json::Value base;
@@ -2341,7 +2342,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                         }
                     }
                     default:
-                        status = std::future_status::ready; //LCOV_EXCL_LINE
+                        status = std::future_status::ready;  // LCOV_EXCL_LINE
                 }
             }
             return "#error";  // LCOV_EXCL_LINE
@@ -3209,7 +3210,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_INPUT: {
-            const auto inputName = command.name; //need to copy the name
+            const auto inputName = command.name;  // need to copy the name
             auto* inp = loopHandles.getInput(inputName);
             if (inp != nullptr) {
                 if (checkActionFlag(*inp, disconnected_flag)) {
@@ -3567,7 +3568,7 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             }
             if (requestors.back().dest_id == global_broker_id_local ||
                 requestors.back().dest_id == direct_core_id) {
-                //TODO(PT) make setDelayedValue have move set function
+                // TODO(PT) make setDelayedValue have move set function
                 activeQueries.setDelayedValue(requestors.back().messageID, str);
             } else {
                 requestors.back().payload = std::move(str);
@@ -4199,7 +4200,8 @@ void CommonCore::processFilterReturn(ActionMessage& cmd)
         }
         auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {
-            for (auto ii = static_cast<size_t>(cmd.counter) + 1; ii < filtFunc->sourceFilters.size();
+            for (auto ii = static_cast<size_t>(cmd.counter) + 1;
+                 ii < filtFunc->sourceFilters.size();
                  ++ii) {
                 // cloning filters come first so we don't need to check for them in this code branch
                 auto* filt = filtFunc->sourceFilters[ii];
