@@ -361,8 +361,8 @@ bool CommonCore::isOpenToNewFederates() const
     return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating));
 }
 void CommonCore::globalError(local_federate_id federateID,
-                             int error_code,
-                             const std::string& error_string)
+                             int errorCode,
+                             const std::string& errorString)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -370,8 +370,8 @@ void CommonCore::globalError(local_federate_id federateID,
     }
     ActionMessage m(CMD_GLOBAL_ERROR);
     m.source_id = fed->global_id.load();
-    m.messageID = error_code;
-    m.payload = error_string;
+    m.messageID = errorCode;
+    m.payload = errorString;
     addActionMessage(m);
     fed->addAction(m);
     iteration_result ret = iteration_result::next_step;
@@ -384,8 +384,8 @@ void CommonCore::globalError(local_federate_id federateID,
 }
 
 void CommonCore::localError(local_federate_id federateID,
-                            int error_code,
-                            const std::string& error_string)
+                            int errorCode,
+                            const std::string& errorString)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -393,8 +393,8 @@ void CommonCore::localError(local_federate_id federateID,
     }
     ActionMessage m(CMD_LOCAL_ERROR);
     m.source_id = fed->global_id.load();
-    m.messageID = error_code;
-    m.payload = error_string;
+    m.messageID = errorCode;
+    m.payload = errorString;
     addActionMessage(m);
     fed->addAction(m);
     iteration_result ret = iteration_result::next_step;
@@ -1340,7 +1340,7 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
 interface_handle CommonCore::getEndpoint(local_federate_id federateID,
                                          const std::string& name) const
 {
-    auto ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
+    const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept->local_fed_id != federateID) {
         return {};
     }
@@ -2125,7 +2125,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
         case data_flow_graph:
             if (filters.size() > 0) {
                 base["filters"] = Json::arrayValue;
-                for (auto& filt : filters) {
+                for (const auto& filt : filters) {
                     Json::Value filter;
                     filter["id"] = filt->handle.baseValue();
                     filter["name"] = filt->key;
@@ -2325,16 +2325,23 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
             std::future_status status = std::future_status::timeout;
             while (status == std::future_status::timeout) {
                 status = queryResult.wait_for(std::chrono::milliseconds(50));
-                if (status == std::future_status::ready) {
-                    auto qres = queryResult.get();
-                    activeQueries.finishedWithValue(index);
-                    return qres;
-                }
-                // federate query may need to wait or can get the result now
-                ret = federateQuery(fed, queryStr);
-                if (ret != "#wait") {
-                    activeQueries.finishedWithValue(index);
-                    return ret;
+                switch (status) {
+                    case std::future_status::ready:
+                    case std::future_status::deferred: {
+                        auto qres = queryResult.get();
+                        activeQueries.finishedWithValue(index);
+                        return qres;
+                    }
+                    case std::future_status::timeout: {  // federate query may need to wait or can
+                                                         // get the result now
+                        ret = federateQuery(fed, queryStr);
+                        if (ret != "#wait") {
+                            activeQueries.finishedWithValue(index);
+                            return ret;
+                        }
+                    }
+                    default:
+                        return "#error";  // LCOV_EXCL_LINE
                 }
             }
         }
@@ -2478,7 +2485,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 std::string repStr = coreQuery(command.payload);
                 if (repStr != "#wait") {
                     if (command.source_id == direct_core_id) {
-                        activeQueries.setDelayedValue(command.messageID, std::move(repStr));
+                        // TODO(PT) make setDelayedValue have a move method
+                        activeQueries.setDelayedValue(command.messageID, repStr);
                     } else {
                         ActionMessage queryResp(CMD_QUERY_REPLY);
                         queryResp.dest_id = command.source_id;
@@ -3032,7 +3040,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             processCoreConfigureCommands(command);
             break;
         case CMD_INIT: {
-            auto fed = getFederateCore(command.source_id);
+            auto* fed = getFederateCore(command.source_id);
             if (fed != nullptr) {
                 fed->init_transmitted = true;
                 if (allInitReady()) {
@@ -3178,7 +3186,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
 {
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
-            auto pub = loopHandles.getPublication(command.name);
+            auto* pub = loopHandles.getPublication(command.name);
             if (pub != nullptr) {
                 if (checkActionFlag(*pub, disconnected_flag)) {
                     // TODO(PT): this might generate an error if the required flag was set
@@ -3211,7 +3219,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                 command.setDestination(inp->handle);
                 command.name.clear();
                 if (command.getStringData().empty()) {
-                    auto pub = loopHandles.findHandle(command.getSource());
+                    auto* pub = loopHandles.findHandle(command.getSource());
                     if (pub != nullptr) {
                         command.setStringData(pub->type, pub->units);
                     }
@@ -3418,7 +3426,7 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
             if (!checkActionFlag(command, error_flag)) {
                 fed->addAction(command);
             }
-            auto handle = loopHandles.getHandleInfo(command.dest_handle.baseValue());
+            auto* handle = loopHandles.getHandleInfo(command.dest_handle.baseValue());
             if (handle != nullptr) {
                 setAsUsed(handle);
             }
@@ -3436,7 +3444,7 @@ void CommonCore::removeTargetFromInterface(ActionMessage& command)
         filterC->closeFilter(command.getSource());
     } else if (command.dest_id == global_broker_id_local) {
         if (command.action() == CMD_REMOVE_ENDPOINT) {
-            auto filtI = filters.find(command.getDest());
+            auto* filtI = filters.find(command.getDest());
             if (filtI != nullptr) {
                 filtI->removeTarget(command.getSource());
             }
@@ -3529,7 +3537,7 @@ void CommonCore::processFilterInfo(ActionMessage& command)
             }
             filterC->allSourceFilters.push_back(newFilter);
             filterC->hasSourceFilters = true;
-            auto endhandle = loopHandles.getEndpoint(command.dest_handle);
+            auto* endhandle = loopHandles.getEndpoint(command.dest_handle);
             if (endhandle != nullptr) {
                 setActionFlag(*endhandle, has_source_filter_flag);
             }
@@ -3558,7 +3566,8 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             }
             if (requestors.back().dest_id == global_broker_id_local ||
                 requestors.back().dest_id == direct_core_id) {
-                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+                //TODO(PT) make setDelayedValue have move set function
+                activeQueries.setDelayedValue(requestors.back().messageID, str);
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));
@@ -4051,12 +4060,12 @@ void CommonCore::routeMessage(ActionMessage&& cmd)
 // Checks for filter operations
 ActionMessage& CommonCore::processMessage(ActionMessage& m)
 {
-    auto handle = loopHandles.getEndpoint(m.source_handle);
+    auto* handle = loopHandles.getEndpoint(m.source_handle);
     if (handle == nullptr) {
         return m;
     }
     if (checkActionFlag(*handle, has_source_filter_flag)) {
-        auto filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
+        auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {
             //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
             size_t ii = 0;
@@ -4117,7 +4126,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
 
 void CommonCore::processDestFilterReturn(ActionMessage& command)
 {
-    auto handle = loopHandles.getEndpoint(command.dest_handle);
+    auto* handle = loopHandles.getEndpoint(command.dest_handle);
     if (handle == nullptr) {
         return;
     }
@@ -4133,7 +4142,7 @@ void CommonCore::processDestFilterReturn(ActionMessage& command)
             routeMessage(removeTimeBlock);
             return;
         }
-        auto filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
+        auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
 
         // now go to the cloning filters
         for (auto* clFilter : filtFunc->cloningDestFilters) {
@@ -4190,9 +4199,9 @@ void CommonCore::processFilterReturn(ActionMessage& cmd)
         auto filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {
             for (decltype(cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size();
-                 ++ii) {  // cloning filters come first so we don't need to check for them in this
-                          // code branch
-                auto filt = filtFunc->sourceFilters[ii];
+                 ++ii) {
+                // cloning filters come first so we don't need to check for them in this code branch
+                auto* filt = filtFunc->sourceFilters[ii];
                 if (checkActionFlag(*filt, disconnected_flag)) {
                     continue;
                 }

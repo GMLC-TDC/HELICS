@@ -84,10 +84,10 @@ class CommonCore: public Core, public BrokerBase {
     virtual bool isOpenToNewFederates() const override final;
     virtual void globalError(local_federate_id federateID,
                              int errorCode,
-                             const std::string& error_string) override final;
+                             const std::string& errorString) override final;
     virtual void localError(local_federate_id federateID,
                             int errorCode,
-                            const std::string& error_string) override final;
+                            const std::string& errorString) override final;
     virtual void finalize(local_federate_id federateID) override final;
     virtual void enterInitializingMode(local_federate_id federateID) override final;
     virtual void setCoreReadyToInit() override final;
@@ -242,18 +242,18 @@ class CommonCore: public Core, public BrokerBase {
     virtual void brokerDisconnect() = 0;
 
   protected:
-    virtual void processCommand(ActionMessage&& cmd) override final;
+    virtual void processCommand(ActionMessage&& command) override final;
 
-    virtual void processPriorityCommand(ActionMessage&& cmd) override final;
+    virtual void processPriorityCommand(ActionMessage&& command) override final;
 
     /** transit an ActionMessage to another core or broker
     @param rid the identifier for the route information to send the message to
-    @param cmd the actionMessage to send*/
-    virtual void transmit(route_id rid, const ActionMessage& cmd) = 0;
+    @param command the actionMessage to send*/
+    virtual void transmit(route_id rid, const ActionMessage& command) = 0;
     /** transit an ActionMessage to another core or broker
     @param rid the identifier for the route information to send the message to
-    @param cmd the actionMessage to send*/
-    virtual void transmit(route_id rid, ActionMessage&& cmd) = 0;
+    @param command the actionMessage to send*/
+    virtual void transmit(route_id rid, ActionMessage&& command) = 0;
     /** add a route to whatever internal structure manages the routes
     @param rid the identification of the route
     @param interfaceId an interface id code that can be used to identify the interface route should

@@ -2749,7 +2749,8 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                 }
             }
             if (requestors.back().dest_id == global_broker_id_local) {
-                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+                // TODO(PT) add rvalue reference method
+                activeQueries.setDelayedValue(requestors.back().messageID, str);
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));
