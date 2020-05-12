@@ -2481,11 +2481,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return generateJsonString(base);
     }
     if (request == "current_time") {
-        if (hasTimeDependency) {
-            return timeCoord->printTimeStatus();
-        } else {
+        if (!hasTimeDependency) {
             return "{}";
         }
+        return timeCoord->printTimeStatus();
     }
     auto mi = mapIndex.find(request);
     if (mi != mapIndex.end()) {
@@ -2574,7 +2573,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back('[');
     size_t index = 0;
     while (index + 1 < val.size()) {
-        auto info = handles.findHandle(
+        const auto *info = handles.findHandle(
             global_handle(global_federate_id(val[index]), interface_handle(val[index + 1])));
         if (info != nullptr) {
             gidString.append(info->key);
@@ -2609,7 +2608,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
     bool hasCores = false;
-    for (auto& broker : _brokers) {
+    for (const auto& broker : _brokers) {
         if (broker.parent == global_broker_id_local) {
             int brkindex;
             if (broker._core) {
@@ -2630,14 +2629,15 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
         case federate_map:
         case current_time_map:
         case data_flow_graph:
+        default:
             break;
         case dependency_graph: {
             base["dependents"] = Json::arrayValue;
-            for (auto& dep : timeCoord->getDependents()) {
+            for (const auto& dep : timeCoord->getDependents()) {
                 base["dependents"].append(dep.baseValue());
             }
             base["dependencies"] = Json::arrayValue;
-            for (auto& dep : timeCoord->getDependencies()) {
+            for (const auto& dep : timeCoord->getDependencies()) {
                 base["dependencies"].append(dep.baseValue());
             }
         } break;
@@ -2666,10 +2666,10 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 
 void CoreBroker::processQuery(ActionMessage& m)
 {
-    auto& target = m.getString(targetStringLoc);
+    const auto& target = m.getString(targetStringLoc);
     if ((target == getIdentifier() || target == "broker")||(isRootc && (target == "root" || target == "federation"))) {
         processLocalQuery(m);
-    } else if ((isRootc) && (target == "gid_to_name")) {
+    } else if (isRootc && target == "gid_to_name") {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;

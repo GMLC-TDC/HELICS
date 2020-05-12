@@ -4347,7 +4347,7 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
 
 const std::string& CommonCore::getInterfaceInfo(interface_handle handle) const
 {
-    auto* handleInfo = getHandleInfo(handle);
+    const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         return handleInfo->interface_info;
     }
