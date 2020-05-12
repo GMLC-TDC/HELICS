@@ -80,15 +80,16 @@ class ActionMessage {
     ActionMessage& operator=(const ActionMessage& act);
     /** move assignment*/
     ActionMessage& operator=(ActionMessage&& act) noexcept;
+    /** move assignment from message data into the actionMessage
+    @details take ownership of the message and move the contents out then destroy the message shell
+    @param message the message to move.
+    */
+    ActionMessage& operator=(std::unique_ptr<Message> message) noexcept;
     /** get the action of the message*/
     action_message_def::action_t action() const noexcept { return messageAction; }
     /** set the action*/
     void setAction(action_message_def::action_t newAction);
-    /** move a message data into the actionMessage
-    @details take ownership of the message and move the contents out then destroy the message shell
-    @param message the message to move.
-    */
-    void moveInfo(std::unique_ptr<Message> message);
+
     /** set the source from a global handle*/
     void setSource(global_handle hand)
     {

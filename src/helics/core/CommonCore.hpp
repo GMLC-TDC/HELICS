@@ -84,10 +84,10 @@ class CommonCore: public Core, public BrokerBase {
     virtual bool isOpenToNewFederates() const override final;
     virtual void globalError(local_federate_id federateID,
                              int errorCode,
-                             const std::string& error_string) override final;
+                             const std::string& errorString) override final;
     virtual void localError(local_federate_id federateID,
                             int errorCode,
-                            const std::string& error_string) override final;
+                            const std::string& errorString) override final;
     virtual void finalize(local_federate_id federateID) override final;
     virtual void enterInitializingMode(local_federate_id federateID) override final;
     virtual void setCoreReadyToInit() override final;
@@ -242,18 +242,18 @@ class CommonCore: public Core, public BrokerBase {
     virtual void brokerDisconnect() = 0;
 
   protected:
-    virtual void processCommand(ActionMessage&& cmd) override final;
+    virtual void processCommand(ActionMessage&& command) override final;
 
-    virtual void processPriorityCommand(ActionMessage&& cmd) override final;
+    virtual void processPriorityCommand(ActionMessage&& command) override final;
 
     /** transit an ActionMessage to another core or broker
     @param rid the identifier for the route information to send the message to
-    @param cmd the actionMessage to send*/
-    virtual void transmit(route_id rid, const ActionMessage& cmd) = 0;
+    @param command the actionMessage to send*/
+    virtual void transmit(route_id rid, const ActionMessage& command) = 0;
     /** transit an ActionMessage to another core or broker
     @param rid the identifier for the route information to send the message to
-    @param cmd the actionMessage to send*/
-    virtual void transmit(route_id rid, ActionMessage&& cmd) = 0;
+    @param command the actionMessage to send*/
+    virtual void transmit(route_id rid, ActionMessage&& command) = 0;
     /** add a route to whatever internal structure manages the routes
     @param rid the identification of the route
     @param interfaceId an interface id code that can be used to identify the interface route should
@@ -334,7 +334,7 @@ class CommonCore: public Core, public BrokerBase {
     /** process a filter message return*/
     void processFilterReturn(ActionMessage& cmd);
     /** process a destination filter message return*/
-    void processDestFilterReturn(ActionMessage& cmd);
+    void processDestFilterReturn(ActionMessage& command);
     /** create a source filter */
     FilterInfo* createFilter(global_broker_id dest,
                              interface_handle handle,
@@ -443,22 +443,22 @@ class CommonCore: public Core, public BrokerBase {
     /** process a message for potential additions to the filter ordering
     @param cmd the message to process
     */
-    void processFilterInfo(ActionMessage& cmd);
+    void processFilterInfo(ActionMessage& command);
     /** function to check for a named interface*/
-    void checkForNamedInterface(ActionMessage& cmd);
+    void checkForNamedInterface(ActionMessage& command);
     /** function to remove a named target*/
-    void removeNamedTarget(ActionMessage& cmd);
+    void removeNamedTarget(ActionMessage& command);
     /** indicate that a handle interface is used and if the used status has changed make sure it is
     indicated in all the needed places*/
     void setAsUsed(BasicHandleInfo* hand);
     /** function to consolidate the registration of interfaces in the core*/
-    void registerInterface(ActionMessage& cmd);
+    void registerInterface(ActionMessage& command);
     /** function to handle adding a target to an interface*/
-    void addTargetToInterface(ActionMessage& cmd);
+    void addTargetToInterface(ActionMessage& command);
     /** function to deal with removing a target from an interface*/
-    void removeTargetFromInterface(ActionMessage& cmd);
+    void removeTargetFromInterface(ActionMessage& command);
     /** function disconnect a single interface*/
-    void disconnectInterface(ActionMessage& cmd);
+    void disconnectInterface(ActionMessage& command);
     /** organize filters
     @details organize the filter and report and potential warnings and errors
     */

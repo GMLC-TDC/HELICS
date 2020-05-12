@@ -23,6 +23,7 @@ Everything within a major version number should be code compatible (with the exc
 
 - A helics::zmq target was added for linking with zeromq if using HELICS as a subproject
 - A `HELICS_BENCHMARK_SHIFT_FACTOR` CMake option was added to allow the benchmarks to scale depending on computational resources
+- "version" and "version_all" queries to get the local version string and the version strings of all the cores/brokers in the federation
 
 ### Deprecated
 
