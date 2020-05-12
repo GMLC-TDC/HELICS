@@ -1208,7 +1208,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                 if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_PUBLISHER);
                     command.setDestination(inp->handle);
-                    auto pub = handles.findHandle(command.getSource());
+                    auto* pub = handles.findHandle(command.getSource());
                     if (pub != nullptr) {
                         command.setStringData(pub->type, pub->units);
                     }
@@ -1920,6 +1920,13 @@ void CoreBroker::executeInitializationOperations()
                                 fmt::format("Unable to connect to endpoint target {}", target);
                             LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload);
                             break;
+                        default:
+                            // LCOV_EXCL_START
+                            wMiss.payload =
+                                fmt::format("Unable to connect to undefined target {}", target);
+                            LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload);
+                            break;
+                            // LCOV_EXCL_STOP
                     }
                     wMiss.setDestination(handle);
                     routeMessage(wMiss);
@@ -2249,7 +2256,8 @@ void CoreBroker::processDisconnect(ActionMessage& command)
 void CoreBroker::markAsDisconnected(global_broker_id brkid)
 {
     bool isCore{false};
-    for (size_t ii = 0; ii < _brokers.size(); ++ii) {
+    //using regular loop here since dual mapped vector shouldn't produce a modifyable lvalue
+    for (size_t ii = 0; ii < _brokers.size(); ++ii) { // NOLINT
         auto& brk = _brokers[ii];
         if (brk.global_id == brkid) {
             if (brk.state != connection_state::error) {
@@ -2265,7 +2273,7 @@ void CoreBroker::markAsDisconnected(global_broker_id brkid)
         }
     }
     if (isCore) {
-        for (size_t ii = 0; ii < _federates.size(); ++ii) {
+        for (size_t ii = 0; ii < _federates.size(); ++ii) { // NOLINT
             auto& fed = _federates[ii];
 
             if (fed.parent == brkid) {
@@ -2326,7 +2334,8 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(index);
         return ret;
-    } else if (target == "parent") {
+    }
+    if (target == "parent") {
         if (isRootc) {
             return "#na";
         }
@@ -2339,7 +2348,8 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(querycmd.messageID);
         return ret;
-    } else if ((target == "root") || (target == "rootbroker")) {
+    }
+    if ((target == "root") || (target == "rootbroker")) {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
@@ -2351,7 +2361,8 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(index);
         return ret;
-    } else {
+    }
+    
         ActionMessage querycmd(CMD_QUERY);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
@@ -2364,7 +2375,7 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto ret = queryResult.get();
         activeQueries.finishedWithValue(index);
         return ret;
-    }
+
     //  return "#invalid";
 }
 
@@ -2656,9 +2667,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 void CoreBroker::processQuery(ActionMessage& m)
 {
     auto& target = m.getString(targetStringLoc);
-    if ((target == getIdentifier()) || (target == "broker")) {
-        processLocalQuery(m);
-    } else if ((isRootc) && ((target == "root") || (target == "federation"))) {
+    if ((target == getIdentifier() || target == "broker")||(isRootc && (target == "root" || target == "federation"))) {
         processLocalQuery(m);
     } else if ((isRootc) && (target == "gid_to_name")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);

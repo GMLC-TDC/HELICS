@@ -2341,9 +2341,10 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                         }
                     }
                     default:
-                        return "#error";  // LCOV_EXCL_LINE
+                        status = std::future_status::ready; //LCOV_EXCL_LINE
                 }
             }
+            return "#error";  // LCOV_EXCL_LINE
         }
     }
 
@@ -4196,9 +4197,9 @@ void CommonCore::processFilterReturn(ActionMessage& cmd)
                 transmitDelayedMessages(fid);
             }
         }
-        auto filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
+        auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {
-            for (decltype(cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size();
+            for (auto ii = static_cast<size_t>(cmd.counter) + 1; ii < filtFunc->sourceFilters.size();
                  ++ii) {
                 // cloning filters come first so we don't need to check for them in this code branch
                 auto* filt = filtFunc->sourceFilters[ii];
@@ -4346,7 +4347,7 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
 
 const std::string& CommonCore::getInterfaceInfo(interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         return handleInfo->interface_info;
     }

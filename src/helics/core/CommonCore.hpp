@@ -334,7 +334,7 @@ class CommonCore: public Core, public BrokerBase {
     /** process a filter message return*/
     void processFilterReturn(ActionMessage& cmd);
     /** process a destination filter message return*/
-    void processDestFilterReturn(ActionMessage& cmd);
+    void processDestFilterReturn(ActionMessage& command);
     /** create a source filter */
     FilterInfo* createFilter(global_broker_id dest,
                              interface_handle handle,
@@ -443,22 +443,22 @@ class CommonCore: public Core, public BrokerBase {
     /** process a message for potential additions to the filter ordering
     @param cmd the message to process
     */
-    void processFilterInfo(ActionMessage& cmd);
+    void processFilterInfo(ActionMessage& command);
     /** function to check for a named interface*/
-    void checkForNamedInterface(ActionMessage& cmd);
+    void checkForNamedInterface(ActionMessage& command);
     /** function to remove a named target*/
-    void removeNamedTarget(ActionMessage& cmd);
+    void removeNamedTarget(ActionMessage& command);
     /** indicate that a handle interface is used and if the used status has changed make sure it is
     indicated in all the needed places*/
     void setAsUsed(BasicHandleInfo* hand);
     /** function to consolidate the registration of interfaces in the core*/
-    void registerInterface(ActionMessage& cmd);
+    void registerInterface(ActionMessage& command);
     /** function to handle adding a target to an interface*/
-    void addTargetToInterface(ActionMessage& cmd);
+    void addTargetToInterface(ActionMessage& command);
     /** function to deal with removing a target from an interface*/
-    void removeTargetFromInterface(ActionMessage& cmd);
+    void removeTargetFromInterface(ActionMessage& command);
     /** function disconnect a single interface*/
-    void disconnectInterface(ActionMessage& cmd);
+    void disconnectInterface(ActionMessage& command);
     /** organize filters
     @details organize the filter and report and potential warnings and errors
     */
