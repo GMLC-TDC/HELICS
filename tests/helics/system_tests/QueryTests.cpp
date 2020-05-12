@@ -165,12 +165,12 @@ TEST_F(query, federate_map3)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 0u);
+    EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["brokers"].size(), 1U);
     EXPECT_EQ(val["brokers"][0]["parent"].asInt(), val["id"].asInt());
     auto brk = val["brokers"][0];
     EXPECT_EQ(brk["cores"].size(), 2U);
-    EXPECT_EQ(brk["brokers"].size(), 0u);
+    EXPECT_EQ(brk["brokers"].size(), 0U);
     EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
     EXPECT_EQ(brk["cores"][1]["parent"].asInt(), brk["id"].asInt());
     auto v2 = brk["cores"][1]["federates"][0];
@@ -217,7 +217,7 @@ TEST_F(query, global_time)
     auto res = core->query("root", "global_time");
 
     auto val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 0u);
+    EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["brokers"].size(), 1U);
     ASSERT_EQ(val["brokers"][0]["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1U);
@@ -232,7 +232,7 @@ TEST_F(query, global_time)
     res = core->query("root", "global_time");
 
     val = loadJsonStr(res);
-    EXPECT_EQ(val["cores"].size(), 0u);
+    EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["brokers"].size(), 1U);
     ASSERT_EQ(val["brokers"][0]["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1U);
@@ -336,7 +336,7 @@ TEST_F(query, current_state)
     val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 2U);
     EXPECT_EQ(val["cores"].size(), 2U);
-    EXPECT_EQ(val["brokers"].size(), 0u);
+    EXPECT_EQ(val["brokers"].size(), 0U);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
 
     vFed2->finalize();
