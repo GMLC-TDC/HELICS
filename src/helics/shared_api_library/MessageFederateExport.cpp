@@ -945,10 +945,8 @@ void helicsMessageClearFlags(helics_message_object message)
     mess->flags = 0;
 }
 
-
 void helicsMessageSetFlagOption(helics_message_object message, int flag, helics_bool flagValue, helics_error* err)
 {
-    
     auto* mess = getMessageObj(message, err);
     if (mess == nullptr) {
         return;

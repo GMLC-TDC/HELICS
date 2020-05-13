@@ -156,8 +156,9 @@ class QueryObject {
     } while (false)
 
 /** assign and error string and code to an error object if it exists*/
-inline void assignError(helics_error* err, int errorCode, const char* string) {
-    if (err!=nullptr) {
+inline void assignError(helics_error* err, int errorCode, const char* string)
+{
+    if (err != nullptr) {
         err->error_code = errorCode;
         err->message = string;
     }
@@ -170,7 +171,7 @@ extern const std::string nullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, helics_error_invalid_argument,nullStringArgument.c_str()); \
+            assignError(err, helics_error_invalid_argument, nullStringArgument.c_str());                                                   \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
