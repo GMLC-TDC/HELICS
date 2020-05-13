@@ -34,7 +34,7 @@ function launch_federation_with_broker() {
     fi
     {
         echo "${helics_broker}" >"${broker_output}"
-        timeout "${timeout_len}" "${helics_broker}" "${num_federates}" >>"${broker_output}"
+        timeout "${timeout_len}" "${helics_broker}" "-f${num_federates}" >>"${broker_output}"
         echo "${helics_broker} exitcode:$?" >"${broker_returncode}"
     } &
 
