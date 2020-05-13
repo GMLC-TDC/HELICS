@@ -53,6 +53,21 @@ namespace BrokerFactory {
             }
             return std::get<2>(blder->builders[index]);
         }
+
+        static const std::shared_ptr<BrokerBuilder>& getDefaultBuilder()
+        {
+            const auto& blder = instance();
+            for (auto& bb : instance()->builders) {
+                if (std::get<0>(bb) <= 10) {
+                    return std::get<2>(bb);
+                }
+            }
+            if (blder->builders.empty()) {
+                throw(HelicsException("core type is not available"));
+            }
+            return std::get<2>(blder->builders[0]);
+        }
+
         static const std::shared_ptr<MasterBrokerBuilder>& instance()
         {
             static std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
@@ -77,7 +92,7 @@ namespace BrokerFactory {
             throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         }
         if (type == core_type::DEFAULT) {
-            return MasterBrokerBuilder::getIndexedBuilder(0)->build(name);
+            return MasterBrokerBuilder::getDefaultBuilder()->build(name);
         }
         return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->build(name);
     }
