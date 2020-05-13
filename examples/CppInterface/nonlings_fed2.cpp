@@ -4,23 +4,21 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include <cmath>
 #include <cpp98/ValueFederate.hpp>
 #include <cpp98/helics.hpp>  // helicsVersionString
-#include <math.h>
-#include <stdio.h>
+#include <iostream>
 
 int main(int /*argc*/, char** /*argv*/)
 {
     std::string fedinitstring = "--federates=1";
     double deltat = 0.01;
-    helicscpp::Input sub;
-    helicscpp::Publication pub;
 
     std::string helicsversion = helicscpp::getHelicsVersionString();
 
     if (helicsversion.find("error") == std::string::npos) {
         // this has to do with tests passing on CI builds
-        printf(" Helics version = %s\n", helicsversion.c_str());
+        std::cout << "Helics version = " << helicsversion << '\n';
     }
 
     /* Create Federate Info object that describes the federate properties
@@ -39,27 +37,25 @@ int main(int /*argc*/, char** /*argv*/)
 
     /* Create value federate */
     helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestB Federate", fi);
-    printf(" Value federate created\n");
+    std::cout << " Value federate created\n";
 
-    sub = vfed->registerSubscription("testA");
-    printf(" Subscription registered\n");
+    helicscpp::Input sub = vfed->registerSubscription("testA");
+    std::cout << " Subscription registered\n";
 
     /* Register the publication */
-    pub = vfed->registerGlobalPublication("testB", helics_data_type_double);
-    printf(" Publication registered\n");
+    helicscpp::Publication pub = vfed->registerGlobalPublication("testB", helics_data_type_double);
+    std::cout << " Publication registered\n";
 
     /* Enter initialization state */
     vfed->enterInitializingMode();  // can throw helicscpp::InvalidStateTransition exception
-    printf(" Entered initialization state\n");
-    double y = 1.0, /*xprv = 100,*/ yprv = 100;
-
+    std::cout << " Entered initialization state" << std::endl;
+    double y = 1.0;
+    double yprv = 100.0;
     pub.publish(y);
-    fflush(NULL);
     /* Enter execution state */
     vfed->enterExecutingMode();  // can throw helicscpp::InvalidStateTransition exception
-    printf(" Entered execution state\n");
+    std::cout << " Entered execution state\n";
 
-    fflush(NULL);
     helics_time currenttime = 0.0;
     helicscpp::helics_iteration_time currenttimeiter;
     currenttimeiter.status = helics_iteration_result_iterating;
@@ -89,25 +85,22 @@ int main(int /*argc*/, char** /*argv*/)
 
             y = y - f2 / J2;
         }
-        printf("Fed2 iteration %d y=%f, x=%f\n", helics_iter, y, x);
+        std::cout << "Fed2: iteration " << helics_iter << " x=" << x << ", y=" << y << '\n';
 
         if ((fabs(y - yprv) > tol) || (helics_iter < 5)) {
             pub.publish(y);
-            printf("Fed2: publishing y\n");
+            std::cout << "Fed2: publishing y" << std::endl;
         }
-        fflush(NULL);
         currenttimeiter =
             vfed->requestTimeIterative(currenttime, helics_iteration_request_iterate_if_needed);
         yprv = y;
     }
 
     vfed->finalize();
-    printf("NLIN2: Federate finalized\n");
-    fflush(NULL);
+    std::cout << "NLIN2: Federate finalized" << std::endl;
     // Destructor for ValueFederate must be called before close library
     delete vfed;
     helicsCloseLibrary();
-    printf("NLIN2: Library Closed\n");
-    fflush(NULL);
+    std::cout << "NLIN2: Library Closed" << std::endl;
     return (0);
 }
