@@ -56,16 +56,14 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << " Publication registered\n";
     /* Register the subscription */
     helicscpp::Input sub = vfed->registerSubscription("testB");
-     std::cout<<" Subscription registered\n";
-
-    
+    std::cout << " Subscription registered\n";
 
     /* Enter initialization state */
     vfed->enterInitializingMode();  // can throw helicscpp::InvalidStateTransition exception
-     std::cout<<" Entered initialization state\n";
+    std::cout << " Entered initialization state\n";
 
     double x = 0.0;
-    double xprv = 100.0;/*yprv = 100,*/ 
+    double xprv = 100.0; /*yprv = 100,*/
     helics_time currenttime = 0.0;
     helicscpp::helics_iteration_time currenttimeiter;
     currenttimeiter.status = helics_iteration_result_iterating;
@@ -75,7 +73,7 @@ int main(int /*argc*/, char** /*argv*/)
     pub.publish(x);
     /* Enter execution state */
     vfed->enterExecutingMode();  // can throw helicscpp::InvalidStateTransition exception
-     std::cout<<" Entered execution state\n";
+    std::cout << " Entered execution state\n";
 
     int helics_iter = 0;
     while (currenttimeiter.status == helics_iteration_result_iterating) {
@@ -111,7 +109,7 @@ int main(int /*argc*/, char** /*argv*/)
         xprv = x;
     }
 
-     std::cout<<"NLIN1: Federate finalized\n";
+    std::cout << "NLIN1: Federate finalized\n";
     // Destructor for ValueFederate must be called before close library
     delete vfed;
     while (broker.isConnected()) {
@@ -121,8 +119,8 @@ int main(int /*argc*/, char** /*argv*/)
         usleep(50000); /* Sleep for 50 millisecond */
 #endif
     }
-     std::cout<<"NLIN1: Broker disconnected\n";
+    std::cout << "NLIN1: Broker disconnected\n";
     helicsCloseLibrary();
-     std::cout << "NLIN1: Library closed" << std::endl;
+    std::cout << "NLIN1: Library closed" << std::endl;
     return (0);
 }
