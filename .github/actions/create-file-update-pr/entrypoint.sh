@@ -3,7 +3,7 @@
 PR_URL=$(jq --raw-output .repository.pulls_url "$GITHUB_EVENT_PATH")
 PR_URL=${PR_URL%\{*}
 API_VERSION=v3
-API_HEADER="Accept: application/vnd.github.${API_VERSION}+json; application/vnd.github.shadow-cat-preview+json; application/vnd.github.symmetra-preview+json; application/vnd.github.sailor-v-preview+json"
+API_HEADER="Accept: application/vnd.github.${API_VERSION}+json; application/vnd.github.sailor-v-preview+json"
 AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
 # Only commit and open a PR if files have changed
