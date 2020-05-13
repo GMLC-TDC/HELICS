@@ -67,15 +67,16 @@ int main(int /*argc*/, char** /*argv*/)
         //    xprv = x;
         double x = sub.getDouble();
         ++helics_iter;
-        int newt_conv = 0, max_iter = 10, iter = 0;
-
+        bool newt_conv = false;
+        int max_iter = 10;
+        int iter = 0;
         /* Solve the equation using Newton */
         while (!newt_conv && iter < max_iter) {
             /* Function value */
             double f2 = x * x + 4 * y * y - 4;
 
             if (fabs(f2) < tol) {
-                newt_conv = 1;
+                newt_conv = true;
                 break;
             }
             iter++;

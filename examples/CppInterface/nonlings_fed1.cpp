@@ -54,11 +54,11 @@ int main(int /*argc*/, char** /*argv*/)
     /* Register the publication */
     helicscpp::Publication pub = vfed->registerGlobalPublication("testA", "double");
     std::cout << " Publication registered\n";
-
-    helicscpp::Input sub = vfed->registerSubscription("testB";
+    /* Register the subscription */
+    helicscpp::Input sub = vfed->registerSubscription("testB");
      std::cout<<" Subscription registered\n";
 
-    /* Register the subscription */
+    
 
     /* Enter initialization state */
     vfed->enterInitializingMode();  // can throw helicscpp::InvalidStateTransition exception
@@ -81,7 +81,7 @@ int main(int /*argc*/, char** /*argv*/)
     while (currenttimeiter.status == helics_iteration_result_iterating) {
         //    yprv = y;
         double y = sub.getDouble();
-        int newt_conv = 0;
+        bool newt_conv = false;
         int max_iter = 10;
         int iter = 0;
         /* Solve the equation using Newton */
@@ -90,7 +90,7 @@ int main(int /*argc*/, char** /*argv*/)
             double f1 = x * x - 2 * x - y + 0.5;
 
             if (fabs(f1) < tol) {
-                newt_conv = 1;
+                newt_conv = true;
                 break;
             }
             iter++;
