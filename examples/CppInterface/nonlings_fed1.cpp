@@ -25,9 +25,11 @@ int main(int /*argc*/, char** /*argv*/)
     helicscpp::Input sub;
 
     std::string helicsversion = helicscpp::getHelicsVersionString();
-
-    printf(" Helics version = %s\n", helicsversion.c_str());
-
+    if (helicsversion.find("error") == std::string::npos) {
+        // this has to do with tests passing on CI builds
+        printf(" Helics version = %s\n", helicsversion.c_str());
+    }
+    
     /* Create broker */
     helicscpp::Broker broker("zmq", "", initstring);
 

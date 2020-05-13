@@ -18,7 +18,10 @@ int main(int /*argc*/, char** /*argv*/)
 
     std::string helicsversion = helicscpp::getHelicsVersionString();
 
-    printf(" Helics version = %s\n", helicsversion.c_str());
+    if (helicsversion.find("error") == std::string::npos) {
+        // this has to do with tests passing on CI builds
+        printf(" Helics version = %s\n", helicsversion.c_str());
+    }
 
     /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
