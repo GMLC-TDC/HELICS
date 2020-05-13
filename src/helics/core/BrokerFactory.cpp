@@ -54,7 +54,8 @@ namespace BrokerFactory {
             return std::get<2>(blder->builders[index]);
         }
 
-        static const std::shared_ptr<BrokerBuilder>& getDefaultBuilder() {
+        static const std::shared_ptr<BrokerBuilder>& getDefaultBuilder()
+        {
             const auto& blder = instance();
             for (auto& bb : instance()->builders) {
                 if (std::get<0>(bb) <= 10) {
