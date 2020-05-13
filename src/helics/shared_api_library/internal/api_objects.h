@@ -155,6 +155,14 @@ class QueryObject {
         }                                                                                                                                  \
     } while (false)
 
+/** assign and error string and code to an error object if it exists*/
+inline void assignError(helics_error* err, int errorCode, const char* string) {
+    if (err!=nullptr) {
+        err->error_code = errorCode;
+        err->message = string;
+    }
+}
+
 extern const std::string emptyStr;
 extern const std::string nullStringArgument;
 #define AS_STRING(str) ((str) != nullptr) ? std::string(str) : emptyStr
@@ -162,10 +170,7 @@ extern const std::string nullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            if (err != nullptr) {                                                                                                          \
-                err->error_code = helics_error_invalid_argument;                                                                           \
-                err->message = nullStringArgument.c_str();                                                                                 \
-            }                                                                                                                              \
+            assignError(err, helics_error_invalid_argument,nullStringArgument.c_str()); \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
