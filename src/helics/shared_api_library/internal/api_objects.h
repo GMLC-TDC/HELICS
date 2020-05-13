@@ -155,7 +155,7 @@ class QueryObject {
         }                                                                                                                                  \
     } while (false)
 
-/** assign and error string and code to an error object if it exists*/
+/** assign an error string and code to an error object if it exists*/
 inline void assignError(helics_error* err, int errorCode, const char* string)
 {
     if (err != nullptr) {
