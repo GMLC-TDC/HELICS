@@ -109,7 +109,7 @@ class BrokerBase {
     bool no_ping{false};  //!< indicator that the broker is not very responsive to ping requests
     decltype(std::chrono::steady_clock::now())
         errorTimeStart;  //!< time when the error condition started related to the errorDelay
-    std::atomic<int> errorCode{0};  //!< storage for last error code
+    std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
 
   public:
