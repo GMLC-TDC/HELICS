@@ -77,7 +77,6 @@ int main(int /*argc*/, char** /*argv*/)
 
             if (fabs(f2) < tol) {
                 newt_conv = true;
-                break;
             }
             iter++;
 
