@@ -517,7 +517,7 @@ class HELICS_CXX_EXPORT Federate {
     /** get the federate name*/
     const std::string& getName() const { return name; }
     /** get a shared pointer to the core object used by the federate*/
-    const std::shared_ptr<Core> &getCorePointer() { return coreObject; }
+    const std::shared_ptr<Core>& getCorePointer() { return coreObject; }
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount() const;

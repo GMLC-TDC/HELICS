@@ -121,7 +121,7 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
-       /** make a query of the core
+    /** make a query of the core
 @details this call is blocking until the value is returned which make take some time depending
 on the size of the federation and the specific string being queried
 @param target  the target of the query can be "federation", "federate", "broker", "core", or a
@@ -140,6 +140,7 @@ if the query was not valid
         helicsQueryFree(q);
         return result;
     }
+
   protected:
     helics_core core;  //!< reference to the underlying core object
 };

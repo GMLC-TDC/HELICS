@@ -342,13 +342,13 @@ TEST_F(query, exists)
     res = mFed1->query(brk->getIdentifier(), "exists");
     EXPECT_EQ(res, "true");
 
-    res= brk->query(mFed1->getName(), "exists");
+    res = brk->query(mFed1->getName(), "exists");
     EXPECT_EQ(res, "true");
 
-     res = brk->query(mFed2->getName(), "exists");
+    res = brk->query(mFed2->getName(), "exists");
     EXPECT_EQ(res, "true");
 
-     res = brk->query("root", "exists");
+    res = brk->query("root", "exists");
     EXPECT_EQ(res, "true");
 
     res = brk->query(mFed1->getCorePointer()->getIdentifier(), "exists");
@@ -356,7 +356,6 @@ TEST_F(query, exists)
 
     res = brk->query(mFed2->getCorePointer()->getIdentifier(), "exists");
     EXPECT_EQ(res, "true");
-
 
     res = brk->query("unknown_fed", "exists");
     EXPECT_EQ(res, "false");
@@ -366,7 +365,6 @@ TEST_F(query, exists)
     mFed1->finalize();
     mFed2->finalize();
 }
-
 
 TEST_F(query, current_state)
 {

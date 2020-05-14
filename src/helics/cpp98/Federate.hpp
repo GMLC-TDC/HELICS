@@ -449,7 +449,8 @@ class Federate {
 
     /** make a query of the federate
     @details this call is blocking until the value is returned which make take some time depending
-    on the size of the federation and the specific string being queried, query without a target assumes the target is the federate
+    on the size of the federation and the specific string being queried, query without a target
+    assumes the target is the federate
 
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
@@ -589,8 +590,8 @@ class Federate {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }
     /** get a Core Object*/
-    helics_core getCore() { return helicsFederateGetCoreObject(fed, hThrowOnError());
-    }
+    helics_core getCore() { return helicsFederateGetCoreObject(fed, hThrowOnError()); }
+
   protected:
     helics_federate fed;  //!< underlying helics_federate object
     bool exec_async_iterate;  //!< indicator that the federate is in an async operation
