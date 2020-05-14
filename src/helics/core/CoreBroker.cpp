@@ -2323,7 +2323,7 @@ void CoreBroker::setLogFile(const std::string& lfile)
 std::string CoreBroker::query(const std::string& target, const std::string& queryStr)
 {
     auto gid = global_id.load();
-    if ((target == "broker") || (target == getIdentifier())) {
+    if (target == "broker" || target == getIdentifier()||target.empty()) {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
@@ -2414,13 +2414,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "isconnected") {
         return (isConnected()) ? std::string("true") : std::string("false");
     }
-    if (request == "name") {
+    if (request == "name" || request=="identifier") {
         return getIdentifier();
     }
+    if (request == "exists" ) {
+        return "true";
+    }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
+        return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_time;version;version_all]";
+               "current_time;current_state;global_time;version;version_all;exists]";
     }
     if (request == "address") {
         return getAddress();
