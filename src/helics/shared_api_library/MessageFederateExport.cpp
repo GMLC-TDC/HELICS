@@ -1010,7 +1010,7 @@ void helicsMessageCopy(helics_message_object source_message, helics_message_obje
     mess_dest->flags = mess_src->flags;
 }
 
-helics_message_object helicsMessageClone(helics_message_object message,  helics_error* err)
+helics_message_object helicsMessageClone(helics_message_object message, helics_error* err)
 {
     auto* mess = getMessageObj(message, err);
     if (mess == nullptr) {
@@ -1021,8 +1021,8 @@ helics_message_object helicsMessageClone(helics_message_object message,  helics_
         assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
         return nullptr;
     }
-    auto* mess_clone=messages->newMessage();
-          
+    auto* mess_clone = messages->newMessage();
+
     mess_clone->data = mess->data;
     mess_clone->dest = mess->dest;
     mess_clone->original_source = mess->original_source;

@@ -116,12 +116,11 @@ TEST_F(mfed_tests, Message)
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
 
-    auto m1=epid.createMessage();
+    auto m1 = epid.createMessage();
     std::string data(500, 'a');
     m1.data(data).time(0.0).destination("ep2");
     epid.sendMessage(m1);
     epid.sendMessageZeroCopy(m1);
-
 
     mFed1->requestTimeAsync(2.0);
     helics_time time = mFed2->requestTime(1.0);
@@ -129,8 +128,8 @@ TEST_F(mfed_tests, Message)
     EXPECT_EQ(time, 1.0);
 
     auto cnt = epid2.pendingMessages();
-    EXPECT_EQ(cnt,2U);
-    
+    EXPECT_EQ(cnt, 2U);
+
     auto M1 = epid2.getMessage();
     auto M2 = epid2.getMessage();
     EXPECT_STREQ(M1.c_str(), M2.c_str());
@@ -151,10 +150,8 @@ TEST_F(mfed_tests, Message)
 
     helicscpp::Message M5(std::move(M3));
 
-     EXPECT_EQ(M5.messageID(), M4.messageID());
+    EXPECT_EQ(M5.messageID(), M4.messageID());
     EXPECT_STREQ(M5.source(), M4.source());
-    EXPECT_FALSE(M3.isValid()); // NOLINT
+    EXPECT_FALSE(M3.isValid());  // NOLINT
     mFed1->finalize();
-    
 }
-

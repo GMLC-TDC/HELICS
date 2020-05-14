@@ -25,17 +25,20 @@ class Message {
     explicit Message(helics_message_object hmo) HELICS_NOTHROW: mo(hmo) {}
 
     /** copy constructor*/
-    Message(const Message& mess) HELICS_NOTHROW: mo(helicsMessageClone(mess.mo, HELICS_IGNORE_ERROR)) {}
+    Message(const Message& mess) HELICS_NOTHROW:
+        mo(helicsMessageClone(mess.mo, HELICS_IGNORE_ERROR))
+    {
+    }
     /** copy assignment*/
     Message& operator=(const Message& mess) HELICS_NOTHROW
     {
-        if (mo!=HELICS_NULL_POINTER) {
+        if (mo != HELICS_NULL_POINTER) {
             helicsMessageFree(mo);
         }
         mo = helicsMessageClone(mess.mo, HELICS_IGNORE_ERROR);
         return *this;
     }
-#    ifdef HELICS_HAS_RVALUE_REFS
+#ifdef HELICS_HAS_RVALUE_REFS
     /** copy constructor*/
     Message(Message&& mess) HELICS_NOTHROW: mo(mess.release()) {}
     /** copy assignment*/
@@ -65,7 +68,7 @@ class Message {
         return *this;
     }
     /** set the message source*/
-    Message& source(const char *src)
+    Message& source(const char* src)
     {
         helicsMessageSetSource(mo, src, hThrowOnError());
         return *this;
@@ -79,12 +82,13 @@ class Message {
         return *this;
     }
     /** set the message destination */
-    Message& destination(const char * dest)
+    Message& destination(const char* dest)
     {
         helicsMessageSetDestination(mo, dest, hThrowOnError());
         return *this;
     }
-    /** get the original message source which may be different than source if the message was filtered */
+    /** get the original message source which may be different than source if the message was
+     * filtered */
     const char* originalSource() const { return helicsMessageGetOriginalSource(mo); }
     /** set the original source field*/
     Message& originalSource(const std::string& osrc)
@@ -104,7 +108,8 @@ class Message {
     int size() const { return helicsMessageGetRawDataSize(mo); }
     /** set the size of the message data field*/
     void resize(int newSize) { helicsMessageResize(mo, newSize, hThrowOnError()); }
-    /** reserve a certain amount of size in the message data field which is useful for the append operation*/
+    /** reserve a certain amount of size in the message data field which is useful for the append
+     * operation*/
     void reserve(int newSize) { helicsMessageReserve(mo, newSize, hThrowOnError()); }
     /** get a pointer to the raw data field*/
     void* data() const { return helicsMessageGetRawDataPointer(mo); }
@@ -127,7 +132,7 @@ class Message {
         return *this;
     }
     /** append data to the message data field*/
-     Message& append(const void* raw, int size)
+    Message& append(const void* raw, int size)
     {
         helicsMessageAppendData(mo, raw, size, hThrowOnError());
         return *this;
@@ -149,12 +154,13 @@ class Message {
         return *this;
     }
     /** set an indexed flag in the message*/
-    Message& setFlag(int flag,bool val) { helicsMessageSetFlagOption(mo, flag,val?helics_true:helics_false,hThrowOnError());
+    Message& setFlag(int flag, bool val)
+    {
+        helicsMessageSetFlagOption(mo, flag, val ? helics_true : helics_false, hThrowOnError());
         return *this;
     }
     /** check an indexed flag in the message valid numbers are [0,15]*/
-    bool checkFlag(int flag) const { return (helicsMessageCheckFlag(mo, flag) == helics_true);
-    }
+    bool checkFlag(int flag) const { return (helicsMessageCheckFlag(mo, flag) == helics_true); }
     /** get the messageID*/
     int messageID() const { return helicsMessageGetMessageID(mo); }
     /** set the messageID field of a message object*/
@@ -165,14 +171,15 @@ class Message {
     }
     /** release a C message_object from the structure
     @details for use with the C shared library*/
-    helics_message_object release() { 
+    helics_message_object release()
+    {
         helics_message_object mreturn = mo;
         mo = HELICS_NULL_POINTER;
         return mreturn;
     }
 
   private:
-    helics_message_object mo; //!< C shared library message_object
+    helics_message_object mo;  //!< C shared library message_object
 };
 
 /** Class to manage helics endpoint operations*/
@@ -215,7 +222,7 @@ class Endpoint {
     /** Get a packet from an endpoint **/
     Message getMessage() { return Message(helicsEndpointGetMessageObject(ep)); }
 
-     /** create a message object */
+    /** create a message object */
     Message createMessage()
     {
         return Message(helicsEndpointCreateMessageObject(ep, hThrowOnError()));
@@ -354,7 +361,7 @@ class Endpoint {
         // returns helicsStatus
         helicsEndpointSendMessageObject(ep, message, hThrowOnError());
     }
-#    ifdef HELICS_HAS_RVALUE_REFS
+#ifdef HELICS_HAS_RVALUE_REFS
     /** send a message object
      */
     void sendMessage(Message&& message)
@@ -362,13 +369,15 @@ class Endpoint {
         // returns helicsStatus
         helicsEndpointSendMessageObjectZeroCopy(ep, message.release(), hThrowOnError());
     }
-#endif 
-        /** send a message object
+#endif
+    /** send a message object
      */
     void sendMessageZeroCopy(Message& message)
     {
         // returns helicsStatus
-        helicsEndpointSendMessageObjectZeroCopy(ep, static_cast<helics_message_object>(message), hThrowOnError());
+        helicsEndpointSendMessageObjectZeroCopy(ep,
+                                                static_cast<helics_message_object>(message),
+                                                hThrowOnError());
         message.release();
     }
     /** get the name of the endpoint*/

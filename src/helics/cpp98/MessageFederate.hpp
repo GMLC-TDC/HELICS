@@ -98,7 +98,7 @@ class MessageFederate: public virtual Federate {
 
     /** Get a packet for any endpoints in the federate **/
     Message getMessage() { return Message(helicsFederateGetMessageObject(fed)); }
-    
+
     /** create a message object */
     Message createMessage()
     {
