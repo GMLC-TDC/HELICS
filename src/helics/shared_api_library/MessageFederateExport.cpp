@@ -1009,3 +1009,40 @@ void helicsMessageCopy(helics_message_object source_message, helics_message_obje
     mess_dest->messageID = mess_src->messageID;
     mess_dest->flags = mess_src->flags;
 }
+
+helics_message_object helicsMessageClone(helics_message_object message,  helics_error* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return nullptr;
+    }
+    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
+    if (messages == nullptr) {
+        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
+        return nullptr;
+    }
+    auto mess_clone=messages->newMessage();
+          
+    mess_clone->data = mess->data;
+    mess_clone->dest = mess->dest;
+    mess_clone->original_source = mess->original_source;
+    mess_clone->source = mess->source;
+    mess_clone->original_dest = mess->original_dest;
+    mess_clone->time = mess->time;
+    mess_clone->messageID = mess->messageID;
+    mess_clone->flags = mess->flags;
+    return mess_clone;
+}
+
+void helicsMessageFree(helics_message_object message)
+{
+    auto* mess = getMessageObj(message, nullptr);
+    if (mess == nullptr) {
+        return;
+    }
+    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
+    if (messages == nullptr) {
+        return;
+    }
+    messages->freeMessage(mess->counter);
+}

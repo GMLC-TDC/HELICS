@@ -25,48 +25,131 @@ class Message {
     explicit Message(helics_message_object hmo) HELICS_NOTHROW: mo(hmo) {}
 
     /** copy constructor*/
-    Message(const Message& mess) HELICS_NOTHROW: mo(mess.mo) {}
+    Message(const Message& mess) HELICS_NOTHROW: mo(helicsMessageClone(mess.mo, HELICS_IGNORE_ERROR)) {}
     /** copy assignment*/
-    Message& operator=(const Message& mess)
+    Message& operator=(const Message& mess) HELICS_NOTHROW
     {
-        mo = mess.mo;
+        if (mo!=HELICS_NULL_POINTER) {
+            helicsMessageFree(mo);
+        }
+        mo = helicsMessageClone(mess.mo, HELICS_IGNORE_ERROR);
+        return *this;
+    }
+#    ifdef HELICS_HAS_RVALUE_REFS
+    /** copy constructor*/
+    Message(Message&& mess) HELICS_NOTHROW: mo(mess.release()) {}
+    /** copy assignment*/
+    Message& operator=(Message&& mess) HELICS_NOTHROW
+    {
+        mo = mess.release();
+        return *this;
+    }
+#endif
+    ~Message()
+    {
+        if (mo != HELICS_NULL_POINTER) {
+            helicsMessageFree(mo);
+        }
+    }
+    /** cast to a helics_message object*/
+    operator helics_message_object() const { return mo; }
+
+    bool isValid() const { return (helicsMessageIsValid(mo) == helics_true); }
+
+    const char* source() const { return helicsMessageGetSource(mo); }
+    Message& source(const std::string& src)
+    {
+        helicsMessageSetSource(mo, src.c_str(), hThrowOnError());
         return *this;
     }
 
-    /** cast to a helics_message object*/
-    operator helics_message_object() { return mo; }
-
-    const char* source() const { return helicsMessageGetSource(mo); }
-    void source(const std::string& src)
-    {
-        return helicsMessageSetSource(mo, src.c_str(), hThrowOnError());
-    }
-
     const char* destination() const { return helicsMessageGetDestination(mo); }
-    void destination(const std::string& dest)
+    Message& destination(const std::string& dest)
     {
-        return helicsMessageSetDestination(mo, dest.c_str(), hThrowOnError());
+        helicsMessageSetDestination(mo, dest.c_str(), hThrowOnError());
+        return *this;
     }
     const char* originalSource() const { return helicsMessageGetOriginalSource(mo); }
-    void originalSource(const std::string& osrc)
+    Message& originalSource(const std::string& osrc)
     {
-        return helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
+        helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
+        return *this;
     }
     const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
-    void originalDestination(const std::string& odest)
+    Message& originalDestination(const std::string& odest)
     {
-        return helicsMessageSetOriginalDestination(mo, odest.c_str(), hThrowOnError());
+        helicsMessageSetOriginalDestination(mo, odest.c_str(), hThrowOnError());
+        return *this;
     }
 
     int size() const { return helicsMessageGetRawDataSize(mo); }
 
+    void resize(int newSize) { helicsMessageResize(mo, newSize, hThrowOnError()); }
+
+    void reserve(int newSize) { helicsMessageReserve(mo, newSize, hThrowOnError()); }
+
     void* data() const { return helicsMessageGetRawDataPointer(mo); }
+
+    Message& data(const void* raw, int size)
+    {
+        helicsMessageSetData(mo, raw, size, hThrowOnError());
+        return *this;
+    }
+
+    Message& data(const std::string& str)
+    {
+        helicsMessageSetString(mo, str.c_str(), hThrowOnError());
+        return *this;
+    }
+
+    Message& data(const char* str)
+    {
+        helicsMessageSetString(mo, str, hThrowOnError());
+        return *this;
+    }
+
+     Message& append(const void* raw, int size)
+    {
+        helicsMessageAppendData(mo, raw, size, hThrowOnError());
+        return *this;
+    }
+
+    Message& append(const std::string& str)
+    {
+        helicsMessageAppendData(mo, str.c_str(), static_cast<int>(str.size()), hThrowOnError());
+        return *this;
+    }
 
     const char* c_str() const { return helicsMessageGetString(mo); }
 
     helics_time time() const { return helicsMessageGetTime(mo); }
 
-    void time(helics_time val) { return helicsMessageSetTime(mo, val, hThrowOnError()); }
+    Message& time(helics_time val)
+    {
+        helicsMessageSetTime(mo, val, hThrowOnError());
+        return *this;
+    }
+
+    Message& setFlag(int flag,bool val) { helicsMessageSetFlagOption(mo, flag,val?helics_true:helics_false,hThrowOnError());
+        return *this;
+    }
+
+    bool checkFlag(int flag) const { return (helicsMessageCheckFlag(mo, flag) == helics_true);
+    }
+
+    int messageID() const { return helicsMessageGetMessageID(mo); }
+
+    Message& messageID(int newId)
+    {
+        helicsMessageSetMessageID(mo, newId, hThrowOnError());
+        return *this;
+    }
+
+    helics_message_object release() { 
+        helics_message_object mreturn = mo;
+        mo = HELICS_NULL_POINTER;
+        return mreturn;
+    }
 
   private:
     helics_message_object mo;
@@ -110,6 +193,12 @@ class Endpoint {
 
     /** Get a packet from an endpoint **/
     Message getMessage() { return Message(helicsEndpointGetMessageObject(ep)); }
+
+     /** create a message object */
+    Message createMessage()
+    {
+        return Message(helicsEndpointCreateMessageObject(ep, hThrowOnError()));
+    }
 
     /** Methods for sending a message **/
     /** send a data block and length
@@ -239,10 +328,27 @@ class Endpoint {
 
     /** send a message object
      */
-    void sendMessage(Message& message)
+    void sendMessage(const Message& message)
     {
         // returns helicsStatus
         helicsEndpointSendMessageObject(ep, message, hThrowOnError());
+    }
+#    ifdef HELICS_HAS_RVALUE_REFS
+    /** send a message object
+     */
+    void sendMessage(Message&& message)
+    {
+        // returns helicsStatus
+        helicsEndpointSendMessageObjectZeroCopy(ep, message.release(), hThrowOnError());
+    }
+#endif 
+        /** send a message object
+     */
+    void sendMessageZeroCopy(Message& message)
+    {
+        // returns helicsStatus
+        helicsEndpointSendMessageObjectZeroCopy(ep, static_cast<helics_message_object>(message), hThrowOnError());
+        message.release();
     }
     /** get the name of the endpoint*/
     const char* getName() const { return helicsEndpointGetName(ep); }
