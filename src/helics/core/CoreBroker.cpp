@@ -2730,7 +2730,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             queryResp.source_id = global_broker_id_local;
             queryResp.messageID = m.messageID;
 
-            queryResp.payload = "#invalid";
+            queryResp.payload = (m.payload=="exists")?"false":"#invalid";
             if (queryResp.dest_id == global_broker_id_local) {
                 activeQueries.setDelayedValue(m.messageID, queryResp.payload);
             } else {

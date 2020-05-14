@@ -32,7 +32,7 @@ class Core {
         core = helicsCreateCoreFromArgs(type.c_str(), name.c_str(), argc, argv, hThrowOnError());
     }
     /** construct a core from a core pointer */
-    Core(helics_core cr) HELICS_NOTHROW: core(cr) {}
+    explicit Core(helics_core cr) HELICS_NOTHROW: core(cr) {}
 
     /** destructor*/
     ~Core() { helicsCoreFree(core); }
