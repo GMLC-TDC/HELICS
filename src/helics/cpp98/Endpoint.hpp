@@ -45,6 +45,7 @@ class Message {
         return *this;
     }
 #endif
+    /** destructor*/
     ~Message()
     {
         if (mo != HELICS_NULL_POINTER) {
@@ -53,98 +54,117 @@ class Message {
     }
     /** cast to a helics_message object*/
     operator helics_message_object() const { return mo; }
-
+    /** check if a message_object is valid*/
     bool isValid() const { return (helicsMessageIsValid(mo) == helics_true); }
-
+    /** get the message source endpoint name*/
     const char* source() const { return helicsMessageGetSource(mo); }
+    /** set the message source*/
     Message& source(const std::string& src)
     {
         helicsMessageSetSource(mo, src.c_str(), hThrowOnError());
         return *this;
     }
-
+    /** set the message source*/
+    Message& source(const char *src)
+    {
+        helicsMessageSetSource(mo, src, hThrowOnError());
+        return *this;
+    }
+    /** get the message destination */
     const char* destination() const { return helicsMessageGetDestination(mo); }
+    /** set the message destination */
     Message& destination(const std::string& dest)
     {
         helicsMessageSetDestination(mo, dest.c_str(), hThrowOnError());
         return *this;
     }
+    /** set the message destination */
+    Message& destination(const char * dest)
+    {
+        helicsMessageSetDestination(mo, dest, hThrowOnError());
+        return *this;
+    }
+    /** get the original message source which may be different than source if the message was filtered */
     const char* originalSource() const { return helicsMessageGetOriginalSource(mo); }
+    /** set the original source field*/
     Message& originalSource(const std::string& osrc)
     {
         helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
         return *this;
     }
+    /** get the originali message destination if a filtered altered it*/
     const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
+    /** set the original destination field*/
     Message& originalDestination(const std::string& odest)
     {
         helicsMessageSetOriginalDestination(mo, odest.c_str(), hThrowOnError());
         return *this;
     }
-
+    /** get the size of the message data field*/
     int size() const { return helicsMessageGetRawDataSize(mo); }
-
+    /** set the size of the message data field*/
     void resize(int newSize) { helicsMessageResize(mo, newSize, hThrowOnError()); }
-
+    /** reserve a certain amount of size in the message data field which is useful for the append operation*/
     void reserve(int newSize) { helicsMessageReserve(mo, newSize, hThrowOnError()); }
-
+    /** get a pointer to the raw data field*/
     void* data() const { return helicsMessageGetRawDataPointer(mo); }
-
+    /** set the message data from a raw pointer and size*/
     Message& data(const void* raw, int size)
     {
         helicsMessageSetData(mo, raw, size, hThrowOnError());
         return *this;
     }
-
+    /** set the data from a string*/
     Message& data(const std::string& str)
     {
         helicsMessageSetString(mo, str.c_str(), hThrowOnError());
         return *this;
     }
-
+    /** set the data from a c string pointer assume null terminated*/
     Message& data(const char* str)
     {
         helicsMessageSetString(mo, str, hThrowOnError());
         return *this;
     }
-
+    /** append data to the message data field*/
      Message& append(const void* raw, int size)
     {
         helicsMessageAppendData(mo, raw, size, hThrowOnError());
         return *this;
     }
-
+    /** append a string to a message data field*/
     Message& append(const std::string& str)
     {
         helicsMessageAppendData(mo, str.c_str(), static_cast<int>(str.size()), hThrowOnError());
         return *this;
     }
-
+    /** get a the data as a null terminated C string*/
     const char* c_str() const { return helicsMessageGetString(mo); }
-
+    /** get the time of the message*/
     helics_time time() const { return helicsMessageGetTime(mo); }
-
+    /** set the time the message should be scheduled for*/
     Message& time(helics_time val)
     {
         helicsMessageSetTime(mo, val, hThrowOnError());
         return *this;
     }
-
+    /** set an indexed flag in the message*/
     Message& setFlag(int flag,bool val) { helicsMessageSetFlagOption(mo, flag,val?helics_true:helics_false,hThrowOnError());
         return *this;
     }
-
+    /** check an indexed flag in the message valid numbers are [0,15]*/
     bool checkFlag(int flag) const { return (helicsMessageCheckFlag(mo, flag) == helics_true);
     }
-
+    /** get the messageID*/
     int messageID() const { return helicsMessageGetMessageID(mo); }
-
+    /** set the messageID field of a message object*/
     Message& messageID(int newId)
     {
         helicsMessageSetMessageID(mo, newId, hThrowOnError());
         return *this;
     }
-
+    /** release a C message_object from the structure
+    @details for use with the C shared library*/
     helics_message_object release() { 
         helics_message_object mreturn = mo;
         mo = HELICS_NULL_POINTER;
@@ -152,9 +172,10 @@ class Message {
     }
 
   private:
-    helics_message_object mo;
+    helics_message_object mo; //!< C shared library message_object
 };
 
+/** Class to manage helics endpoint operations*/
 class Endpoint {
   public:
     /** construct from a helics_endpoint object*/
