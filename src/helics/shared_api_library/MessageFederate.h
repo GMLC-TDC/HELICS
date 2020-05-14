@@ -710,7 +710,7 @@ HELICS_EXPORT helics_message_object helicsMessageClone(helics_message_object mes
  * Free a message object from memory
  * @details memory for message is managed so not using this function does not create memory leaks, this is an indication
  * to the system that the memory for this message is done being used and can be reused for a new message.
- * helicsFederateclearMessages() can also be used to clear up all stored messages at once
+ * helicsFederateClearMessages() can also be used to clear up all stored messages at once
  */
 HELICS_EXPORT void helicsMessageFree(helics_message_object message);
 
