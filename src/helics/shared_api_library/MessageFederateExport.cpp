@@ -1021,7 +1021,7 @@ helics_message_object helicsMessageClone(helics_message_object message,  helics_
         assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
         return nullptr;
     }
-    auto mess_clone=messages->newMessage();
+    auto* mess_clone=messages->newMessage();
           
     mess_clone->data = mess->data;
     mess_clone->dest = mess->dest;

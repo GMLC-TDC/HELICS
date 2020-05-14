@@ -153,7 +153,7 @@ TEST_F(mfed_tests, Message)
 
      EXPECT_EQ(M5.messageID(), M4.messageID());
     EXPECT_STREQ(M5.source(), M4.source());
-    EXPECT_FALSE(M3.isValid());
+    EXPECT_FALSE(M3.isValid()); // NOLINT
     mFed1->finalize();
     
 }
