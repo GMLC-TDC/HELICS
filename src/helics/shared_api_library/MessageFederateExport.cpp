@@ -237,7 +237,43 @@ void helicsEndpointSendEventRaw(helics_endpoint endpoint,
 
 static constexpr char emptyMessageErrorString[] = "the message is NULL";
 
-void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message message, helics_error* err)
+void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message, helics_error* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    if (message == nullptr) {
+        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
+        return;
+    }
+
+    try {
+        if ((message->original_source == nullptr) || (endObj->endPtr->getName() == message->original_source)) {
+            if (message->dest == nullptr) {
+                endObj->endPtr->send(message->data, message->length, message->time);
+            } else {
+                endObj->endPtr->send(message->dest, message->data, message->length, message->time);
+            }
+        } else {
+            helics::Message nmessage;
+            nmessage.time = message->time;
+            nmessage.source = AS_STRING(message->source);
+            nmessage.dest = AS_STRING(message->dest);
+            nmessage.original_dest = AS_STRING(message->original_dest);
+            nmessage.original_source = message->original_source;
+            if (message->data != nullptr && message->length > 0) {
+                nmessage.data.assign(message->data, message->length);
+            }
+            endObj->endPtr->send(nmessage);
+        }
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_object message, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
