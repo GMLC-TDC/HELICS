@@ -2323,7 +2323,7 @@ void CoreBroker::setLogFile(const std::string& lfile)
 std::string CoreBroker::query(const std::string& target, const std::string& queryStr)
 {
     auto gid = global_id.load();
-    if (target == "broker" || target == getIdentifier()||target.empty()) {
+    if (target == "broker" || target == getIdentifier() || target.empty()) {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
@@ -2414,10 +2414,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "isconnected") {
         return (isConnected()) ? std::string("true") : std::string("false");
     }
-    if (request == "name" || request=="identifier") {
+    if (request == "name" || request == "identifier") {
         return getIdentifier();
     }
-    if (request == "exists" ) {
+    if (request == "exists") {
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
@@ -2730,7 +2730,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             queryResp.source_id = global_broker_id_local;
             queryResp.messageID = m.messageID;
 
-            queryResp.payload = (m.payload=="exists")?"false":"#invalid";
+            queryResp.payload = (m.payload == "exists") ? "false" : "#invalid";
             if (queryResp.dest_id == global_broker_id_local) {
                 activeQueries.setDelayedValue(m.messageID, queryResp.payload);
             } else {

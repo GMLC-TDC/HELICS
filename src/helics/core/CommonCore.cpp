@@ -2042,7 +2042,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
     }
-    if (queryStr == "name" || queryStr=="identifier") {
+    if (queryStr == "name" || queryStr == "identifier") {
         return getIdentifier();
     }
     if (queryStr == "exists") {
@@ -2298,7 +2298,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
     querycmd.messageID = index;
     querycmd.setStringData(target);
 
-    if (target == "core" || target == getIdentifier()||target.empty()) {
+    if (target == "core" || target == getIdentifier() || target.empty()) {
         auto res = quickCoreQueries(queryStr);
         if (!res.empty()) {
             return res;
