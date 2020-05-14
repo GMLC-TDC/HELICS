@@ -31,7 +31,8 @@ set(cpp_shared_library_test_sources
     test-value-federate2_cpp.cpp
     # FilterTests_cpp.cpp
     test-message-federate_cpp.cpp
-    # FederateTests.cpp TimingTests.cpp iterationTests.cpp subPubObjectTests.cpp QueryTests.cpp
+    # FederateTests.cpp TimingTests.cpp iterationTests.cpp subPubObjectTests.cpp 
+    QueryTests_cpp.cpp
 )
 
 add_executable(
