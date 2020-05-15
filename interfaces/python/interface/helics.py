@@ -124,8 +124,6 @@ helics_data_type_time = _helics.helics_data_type_time
 r""" time data type"""
 helics_data_type_raw = _helics.helics_data_type_raw
 r""" raw data type"""
-helics_data_type_multi = _helics.helics_data_type_multi
-r""" the data type can change"""
 helics_data_type_any = _helics.helics_data_type_any
 r""" open type that can be anything"""
 helics_flag_observer = _helics.helics_flag_observer
@@ -263,27 +261,6 @@ r"""
     integer property controlling the log level for file logging in a federate see
           helics_log_levels
     """
-helics_multi_input_no_op = _helics.helics_multi_input_no_op
-r""" time and priority order the inputs from the core library"""
-helics_multi_input_vectorize_operation = _helics.helics_multi_input_vectorize_operation
-r""" vectorize the inputs either double vector or string vector"""
-helics_multi_input_and_operation = _helics.helics_multi_input_and_operation
-r""" all inputs are assumed to be boolean and all must be true to return true"""
-helics_multi_input_or_operation = _helics.helics_multi_input_or_operation
-r""" all inputs are assumed to be boolean and at least one must be true to return true"""
-helics_multi_input_sum_operation = _helics.helics_multi_input_sum_operation
-r""" sum all the inputs"""
-helics_multi_input_diff_operation = _helics.helics_multi_input_diff_operation
-r"""
-    do a difference operation on the inputs, first-sum(rest)
-       for double input, vector diff for vector input
-    """
-helics_multi_input_max_operation = _helics.helics_multi_input_max_operation
-r""" find the max of the inputs"""
-helics_multi_input_min_operation = _helics.helics_multi_input_min_operation
-r""" find the min of the inputs"""
-helics_multi_input_average_operation = _helics.helics_multi_input_average_operation
-r""" take the average of the inputs"""
 helics_handle_option_connection_required = _helics.helics_handle_option_connection_required
 r"""
     specify that a connection is required for an interface and will generate an error if not
@@ -299,7 +276,7 @@ r""" specify that only a single connection is allowed for an interface"""
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 r""" specify that multiple connections are allowed for an interface"""
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
-r""" specify that the last data should be buffered and sent on subscriptions after init"""
+r""" specify that the last data should be buffered and send on subscriptions after init"""
 helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
 r""" specify that the types should be checked strictly for pub/sub and filters"""
 helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
@@ -310,14 +287,6 @@ helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_u
 r""" specify that an interface will only update if the value has actually changed"""
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
 r""" specify that an interface does not participate in determining time interrupts"""
-helics_handle_option_multi_input_handling_method = _helics.helics_handle_option_multi_input_handling_method
-r""" specify the multi-input processing method for inputs"""
-helics_handle_option_input_priority_location = _helics.helics_handle_option_input_priority_location
-r""" specify the source index with the highest priority"""
-helics_handle_option_clear_priority_list = _helics.helics_handle_option_clear_priority_list
-r""" specify that the priority list should be cleared or question if it is cleared"""
-helics_handle_option_connections = _helics.helics_handle_option_connections
-r""" specify the required number of connections or get the actual number of connections"""
 helics_filter_type_custom = _helics.helics_filter_type_custom
 r""" a custom filter type that executes a user defined callback"""
 helics_filter_type_delay = _helics.helics_filter_type_delay
@@ -390,6 +359,32 @@ helics_time_invalid = cvar.helics_time_invalid
 helics_time_maxtime = cvar.helics_time_maxtime
 helics_true = cvar.helics_true
 helics_false = cvar.helics_false
+
+class helics_message(object):
+    r"""
+     Message_t mapped to a c compatible structure
+
+    use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
+    """
+
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    time = property(_helics.helics_message_time_get, _helics.helics_message_time_set, doc=r""" message time""")
+    data = property(_helics.helics_message_data_get, _helics.helics_message_data_set, doc=r""" message data""")
+    length = property(_helics.helics_message_length_get, _helics.helics_message_length_set, doc=r""" message length""")
+    messageID = property(_helics.helics_message_messageID_get, _helics.helics_message_messageID_set, doc=r""" message identification information""")
+    flags = property(_helics.helics_message_flags_get, _helics.helics_message_flags_set, doc=r""" flags related to the message""")
+    original_source = property(_helics.helics_message_original_source_get, _helics.helics_message_original_source_set, doc=r""" original source""")
+    source = property(_helics.helics_message_source_get, _helics.helics_message_source_set, doc=r""" the most recent source""")
+    dest = property(_helics.helics_message_dest_get, _helics.helics_message_dest_set, doc=r""" the final destination""")
+    original_dest = property(_helics.helics_message_original_dest_get, _helics.helics_message_original_dest_set, doc=r""" the original destination of the message""")
+
+    def __init__(self):
+        _helics.helics_message_swiginit(self, _helics.new_helics_message())
+    __swig_destroy__ = _helics.delete_helics_message
+
+# Register helics_message in _helics:
+_helics.helics_message_swigregister(helics_message)
 
 
 def helicsGetVersion() -> "char const *":
@@ -1094,16 +1089,6 @@ def helicsGetPropertyIndex(val: "char const *") -> "int":
     """
     return _helics.helicsGetPropertyIndex(val)
 
-def helicsGetFlagIndex(val: "char const *") -> "int":
-    r"""
-    Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,
-    :type val: string
-    :param val: A string with the option name.
-    :rtype: int
-    :return: An int with the property code or (-1) if not a valid property.
-    """
-    return _helics.helicsGetFlagIndex(val)
-
 def helicsGetOptionIndex(val: "char const *") -> "int":
     r"""
     Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
@@ -1116,19 +1101,6 @@ def helicsGetOptionIndex(val: "char const *") -> "int":
     :return: An int with the option index or (-1) if not a valid property.
     """
     return _helics.helicsGetOptionIndex(val)
-
-def helicsGetOptionValue(val: "char const *") -> "int":
-    r"""
-    Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
-    /ref helicsFilterSetOption.
-
-    :type val: string
-    :param val: A string representing the value.
-
-    :rtype: int
-    :return: An int with the option value or (-1) if not a valid value.
-    """
-    return _helics.helicsGetOptionValue(val)
 
 def helicsFederateInfoSetFlagOption(fi: "helics_federate_info", flag: "int", value: "helics_bool") -> "void":
     r"""
@@ -1894,29 +1866,6 @@ def helicsQueryIsCompleted(query: "helics_query") -> "helics_bool":
     """
     return _helics.helicsQueryIsCompleted(query)
 
-def helicsQuerySetTarget(query: "helics_query", target: "char const *") -> "void":
-    r"""
-    Update the target of a query.
-
-    :type query: void
-    :param query: The query object to change the target of.
-    :type target: string
-    :param target: the name of the target to query
-
-    """
-    return _helics.helicsQuerySetTarget(query, target)
-
-def helicsQuerySetQueryString(query: "helics_query", queryString: "char const *") -> "void":
-    r"""
-    Update the queryString of a query.
-
-    :type query: void
-    :param query: The query object to change the target of.
-    :type queryString: string
-    :param queryString: the new queryString
-    """
-    return _helics.helicsQuerySetQueryString(query, queryString)
-
 def helicsQueryFree(query: "helics_query") -> "void":
     r"""Free the memory associated with a query object."""
     return _helics.helicsQueryFree(query)
@@ -2207,37 +2156,19 @@ def helicsFederateGetSubscription(fed: "helics_federate", key: "char const *") -
     return _helics.helicsFederateGetSubscription(fed, key)
 
 def helicsFederateClearUpdates(fed: "helics_federate") -> "void":
-    r"""
-    Clear all the update flags from a federates inputs.
-
-    :type fed: void
-    :param fed: The value federate object for which to clear update flags.
-    """
+    r"""Clear all the update flags from a federates inputs."""
     return _helics.helicsFederateClearUpdates(fed)
 
 def helicsFederateRegisterFromPublicationJSON(fed: "helics_federate", json: "char const *") -> "void":
     r"""
     Register the publications via JSON publication string.
 
-    :type fed: void
-    :param fed: The value federate object to use to register the publications.
-    :type json: string
-    :param json: The JSON publication string.
-
-
     This would be the same JSON that would be used to publish data.
     """
     return _helics.helicsFederateRegisterFromPublicationJSON(fed, json)
 
 def helicsFederatePublishJSON(fed: "helics_federate", json: "char const *") -> "void":
-    r"""
-    Publish data contained in a JSON file or string.
-
-    :type fed: void
-    :param fed: The value federate object through which to publish the data.
-    :type json: string
-    :param json: The publication file name or literal JSON data string.
-    """
+    r"""Publish data contained in a json file or string."""
     return _helics.helicsFederatePublishJSON(fed, json)
 
 def helicsPublicationIsValid(pub: "helics_publication") -> "helics_bool":
@@ -2860,9 +2791,9 @@ def helicsPublicationSetInfo(pub: "helics_publication", info: "char const *") ->
     """
     return _helics.helicsPublicationSetInfo(pub, info)
 
-def helicsInputGetOption(inp: "helics_input", option: "int") -> "int":
+def helicsInputGetOption(inp: "helics_input", option: "int") -> "helics_bool":
     r"""
-    Get the current value of an input handle option
+    Get the data in the info field of an input.
 
     :type inp: void
     :param inp: The input to query.
@@ -2870,13 +2801,13 @@ def helicsInputGetOption(inp: "helics_input", option: "int") -> "int":
     :param option: Integer representation of the option in question see /ref helics_handle_options.
 
     :rtype: int
-    :return: An integer value with the current value of the given option.
+    :return: A string with the info field string.
     """
     return _helics.helicsInputGetOption(inp, option)
 
-def helicsInputSetOption(inp: "helics_input", option: "int", value: "int") -> "void":
+def helicsInputSetOption(inp: "helics_input", option: "int", value: "helics_bool") -> "void":
     r"""
-    Set an option on an input
+    Set the data in the info field for an input.
 
     :type inp: void
     :param inp: The input to query.
@@ -2887,9 +2818,9 @@ def helicsInputSetOption(inp: "helics_input", option: "int", value: "int") -> "v
     """
     return _helics.helicsInputSetOption(inp, option, value)
 
-def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "int":
+def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "helics_bool":
     r"""
-    Get the value of an option for a publication
+    Get the data in the info field of a publication.
 
     :type pub: void
     :param pub: The publication to query.
@@ -2901,9 +2832,9 @@ def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "int
     """
     return _helics.helicsPublicationGetOption(pub, option)
 
-def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "int") -> "void":
+def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "helics_bool") -> "void":
     r"""
-    Set the value of an option for a publication
+    Set the data in the info field for a publication.
 
     :type pub: void
     :param pub: The publication to query.
@@ -3117,15 +3048,26 @@ def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dest: "char const *"
 def helicsEndpointSendMessage(endpoint: "helics_endpoint", message: "helics_message") -> "void":
     r"""
     Send a message object from a specific endpoint.
+    Deprecated: Use helicsEndpointSendMessageObject instead.
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type message: :py:class:`helics_message`
+    :param message: The actual message to send.
+    """
+    return _helics.helicsEndpointSendMessage(endpoint, message)
+
+def helicsEndpointSendMessageObject(endpoint: "helics_endpoint", message: "helics_message_object") -> "void":
+    r"""
+    Send a message object from a specific endpoint.
 
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
     :type message: void
     :param message: The actual message to send which will be copied.
     """
-    return _helics.helicsEndpointSendMessage(endpoint, message)
+    return _helics.helicsEndpointSendMessageObject(endpoint, message)
 
-def helicsEndpointSendMessageZeroCopy(endpoint: "helics_endpoint", message: "helics_message") -> "void":
+def helicsEndpointSendMessageObjectZeroCopy(endpoint: "helics_endpoint", message: "helics_message_object") -> "void":
     r"""
     Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
     after the call.
@@ -3135,7 +3077,7 @@ def helicsEndpointSendMessageZeroCopy(endpoint: "helics_endpoint", message: "hel
     :type message: void
     :param message: The actual message to send which will be copied.
     """
-    return _helics.helicsEndpointSendMessageZeroCopy(endpoint, message)
+    return _helics.helicsEndpointSendMessageObjectZeroCopy(endpoint, message)
 
 def helicsEndpointSubscribe(endpoint: "helics_endpoint", key: "char const *") -> "void":
     r"""
@@ -3194,29 +3136,58 @@ def helicsEndpointGetMessage(endpoint: "helics_endpoint") -> "helics_message":
     r"""
     Receive a packet from a particular endpoint.
 
+    Deprecated: This function is deprecated and will be removed in Helics 3.0.
+                Use helicsEndpointGetMessageObject instead.
+
+    endpoint The identifier for the endpoint.
+
+    :rtype: :py:class:`helics_message`
+    :return: A message object.
+    """
+    return _helics.helicsEndpointGetMessage(endpoint)
+
+def helicsEndpointGetMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
+    r"""
+    Receive a packet from a particular endpoint.
+
     endpoint The identifier for the endpoint.
 
     :rtype: void
     :return: A message object.
     """
-    return _helics.helicsEndpointGetMessage(endpoint)
+    return _helics.helicsEndpointGetMessageObject(endpoint)
 
-def helicsEndpointCreateMessage(endpoint: "helics_endpoint") -> "helics_message":
+def helicsEndpointCreateMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
     r"""
     Create a new empty message object.
 
     The message is empty and isValid will return false since there is no data associated with the message yet.
 
-    :type endpoint: void
-    :param endpoint: The endpoint object to associate the message with.
+    :param fed: the endpoint object to associate the message with
 
 
     :rtype: void
-    :return: A new helics_message.
+    :return: A new helics_message_object.
     """
-    return _helics.helicsEndpointCreateMessage(endpoint)
+    return _helics.helicsEndpointCreateMessageObject(endpoint)
 
 def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
+    r"""
+    Receive a communication message for any endpoint in the federate.
+
+    Deprecated: This function is deprecated and will be removed in Helics 3.0.
+                Use helicsFederateGetMessageObject instead.
+
+    The return order will be in order of endpoint creation.
+             So all messages that are available for the first endpoint, then all for the second, and so on.
+             Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
+
+    :rtype: :py:class:`helics_message`
+    :return: A unique_ptr to a Message object containing the message data.
+    """
+    return _helics.helicsFederateGetMessage(fed)
+
+def helicsFederateGetMessageObject(fed: "helics_federate") -> "helics_message_object":
     r"""
     Receive a communication message for any endpoint in the federate.
 
@@ -3225,11 +3196,11 @@ def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
              Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
 
     :rtype: void
-    :return: A helics_message which references the data in the message.
+    :return: A helics_message_object which references the data in the message.
     """
-    return _helics.helicsFederateGetMessage(fed)
+    return _helics.helicsFederateGetMessageObject(fed)
 
-def helicsFederateCreateMessage(fed: "helics_federate") -> "helics_message":
+def helicsFederateCreateMessageObject(fed: "helics_federate") -> "helics_message_object":
     r"""
     Create a new empty message object.
 
@@ -3240,20 +3211,33 @@ def helicsFederateCreateMessage(fed: "helics_federate") -> "helics_message":
 
 
     :rtype: void
-    :return: A helics_message containing the message data.
+    :return: A helics_message_object containing the message data.
     """
-    return _helics.helicsFederateCreateMessage(fed)
+    return _helics.helicsFederateCreateMessageObject(fed)
 
 def helicsFederateClearMessages(fed: "helics_federate") -> "void":
     r"""
     Clear all stored messages from a federate.
 
-    This clears messages retrieved through helicsEndpointGetMessage or helicsFederateGetMessage
+    This clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
 
     :type fed: void
     :param fed: The federate to clear the message for.
     """
     return _helics.helicsFederateClearMessages(fed)
+
+def helicsEndpointClearMessages(endpoint: "helics_endpoint") -> "void":
+    r"""
+    Clear all message from an endpoint.
+
+    Deprecated: This function does nothing and will be removed.
+                Use helicsFederateClearMessages to free all messages,
+                or helicsMessageFree to clear an individual message.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object to operate on.
+    """
+    return _helics.helicsEndpointClearMessages(endpoint)
 
 def helicsEndpointGetType(endpoint: "helics_endpoint") -> "char const *":
     r"""
@@ -3314,7 +3298,7 @@ def helicsEndpointSetInfo(end: "helics_endpoint", info: "char const *") -> "void
     """
     return _helics.helicsEndpointSetInfo(end, info)
 
-def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "int") -> "void":
+def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "helics_bool") -> "void":
     r"""
     Set a handle option on an endpoint.
 
@@ -3327,7 +3311,7 @@ def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "int")
     """
     return _helics.helicsEndpointSetOption(end, option, value)
 
-def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "int":
+def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "helics_bool":
     r"""
     Set a handle option on an endpoint.
 
@@ -3335,12 +3319,10 @@ def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "int":
     :param end: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
-    :rtype: int
-    :return: the value of the option, for boolean options will be 0 or 1
     """
     return _helics.helicsEndpointGetOption(end, option)
 
-def helicsMessageGetSource(message: "helics_message") -> "char const *":
+def helicsMessageGetSource(message: "helics_message_object") -> "char const *":
     r"""
     Get the source endpoint of a message.
 
@@ -3352,7 +3334,7 @@ def helicsMessageGetSource(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetSource(message)
 
-def helicsMessageGetDestination(message: "helics_message") -> "char const *":
+def helicsMessageGetDestination(message: "helics_message_object") -> "char const *":
     r"""
     Get the destination endpoint of a message.
 
@@ -3364,7 +3346,7 @@ def helicsMessageGetDestination(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetDestination(message)
 
-def helicsMessageGetOriginalSource(message: "helics_message") -> "char const *":
+def helicsMessageGetOriginalSource(message: "helics_message_object") -> "char const *":
     r"""
     Get the original source endpoint of a message, the source may have been modified by filters or other actions.
 
@@ -3376,7 +3358,7 @@ def helicsMessageGetOriginalSource(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetOriginalSource(message)
 
-def helicsMessageGetOriginalDestination(message: "helics_message") -> "char const *":
+def helicsMessageGetOriginalDestination(message: "helics_message_object") -> "char const *":
     r"""
     Get the original destination endpoint of a message, the destination may have been modified by filters or other actions.
 
@@ -3388,7 +3370,7 @@ def helicsMessageGetOriginalDestination(message: "helics_message") -> "char cons
     """
     return _helics.helicsMessageGetOriginalDestination(message)
 
-def helicsMessageGetTime(message: "helics_message") -> "helics_time":
+def helicsMessageGetTime(message: "helics_message_object") -> "helics_time":
     r"""
     Get the helics time associated with a message.
 
@@ -3400,7 +3382,7 @@ def helicsMessageGetTime(message: "helics_message") -> "helics_time":
     """
     return _helics.helicsMessageGetTime(message)
 
-def helicsMessageGetString(message: "helics_message") -> "char const *":
+def helicsMessageGetString(message: "helics_message_object") -> "char const *":
     r"""
     Get the payload of a message as a string.
 
@@ -3412,7 +3394,7 @@ def helicsMessageGetString(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetString(message)
 
-def helicsMessageGetMessageID(message: "helics_message") -> "int":
+def helicsMessageGetMessageID(message: "helics_message_object") -> "int":
     r"""
     Get the messageID of a message.
 
@@ -3424,7 +3406,7 @@ def helicsMessageGetMessageID(message: "helics_message") -> "int":
     """
     return _helics.helicsMessageGetMessageID(message)
 
-def helicsMessageCheckFlag(message: "helics_message", flag: "int") -> "helics_bool":
+def helicsMessageCheckFlag(message: "helics_message_object", flag: "int") -> "helics_bool":
     r"""
     Check if a flag is set on a message.
 
@@ -3438,7 +3420,7 @@ def helicsMessageCheckFlag(message: "helics_message", flag: "int") -> "helics_bo
     """
     return _helics.helicsMessageCheckFlag(message, flag)
 
-def helicsMessageGetRawDataSize(message: "helics_message") -> "int":
+def helicsMessageGetRawDataSize(message: "helics_message_object") -> "int":
     r"""
     Get the size of the data payload in bytes.
 
@@ -3450,7 +3432,7 @@ def helicsMessageGetRawDataSize(message: "helics_message") -> "int":
     """
     return _helics.helicsMessageGetRawDataSize(message)
 
-def helicsMessageGetRawData(message: "helics_message") -> "int *":
+def helicsMessageGetRawData(message: "helics_message_object") -> "int *":
     r"""
     Get the raw data for a message object.
 
@@ -3464,7 +3446,7 @@ def helicsMessageGetRawData(message: "helics_message") -> "int *":
     """
     return _helics.helicsMessageGetRawData(message)
 
-def helicsMessageIsValid(message: "helics_message") -> "helics_bool":
+def helicsMessageIsValid(message: "helics_message_object") -> "helics_bool":
     r"""
     A check if the message contains a valid payload.
 
@@ -3476,7 +3458,7 @@ def helicsMessageIsValid(message: "helics_message") -> "helics_bool":
     """
     return _helics.helicsMessageIsValid(message)
 
-def helicsMessageSetSource(message: "helics_message", src: "char const *") -> "void":
+def helicsMessageSetSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
     Set the source of a message.
 
@@ -3487,7 +3469,7 @@ def helicsMessageSetSource(message: "helics_message", src: "char const *") -> "v
     """
     return _helics.helicsMessageSetSource(message, src)
 
-def helicsMessageSetDestination(message: "helics_message", dest: "char const *") -> "void":
+def helicsMessageSetDestination(message: "helics_message_object", dest: "char const *") -> "void":
     r"""
     Set the destination of a message.
 
@@ -3498,7 +3480,7 @@ def helicsMessageSetDestination(message: "helics_message", dest: "char const *")
     """
     return _helics.helicsMessageSetDestination(message, dest)
 
-def helicsMessageSetOriginalSource(message: "helics_message", src: "char const *") -> "void":
+def helicsMessageSetOriginalSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
     Set the original source of a message.
 
@@ -3509,7 +3491,7 @@ def helicsMessageSetOriginalSource(message: "helics_message", src: "char const *
     """
     return _helics.helicsMessageSetOriginalSource(message, src)
 
-def helicsMessageSetOriginalDestination(message: "helics_message", dest: "char const *") -> "void":
+def helicsMessageSetOriginalDestination(message: "helics_message_object", dest: "char const *") -> "void":
     r"""
     Set the original destination of a message.
 
@@ -3520,7 +3502,7 @@ def helicsMessageSetOriginalDestination(message: "helics_message", dest: "char c
     """
     return _helics.helicsMessageSetOriginalDestination(message, dest)
 
-def helicsMessageSetTime(message: "helics_message", time: "helics_time") -> "void":
+def helicsMessageSetTime(message: "helics_message_object", time: "helics_time") -> "void":
     r"""
     Set the delivery time for a message.
 
@@ -3531,7 +3513,7 @@ def helicsMessageSetTime(message: "helics_message", time: "helics_time") -> "voi
     """
     return _helics.helicsMessageSetTime(message, time)
 
-def helicsMessageReserve(message: "helics_message", reserveSize: "int") -> "void":
+def helicsMessageReserve(message: "helics_message_object", reserveSize: "int") -> "void":
     r"""
     Reserve space in a buffer but don't actually resize.
 
@@ -3544,7 +3526,7 @@ def helicsMessageReserve(message: "helics_message", reserveSize: "int") -> "void
     """
     return _helics.helicsMessageReserve(message, reserveSize)
 
-def helicsMessageSetMessageID(message: "helics_message", messageID: "int32_t") -> "void":
+def helicsMessageSetMessageID(message: "helics_message_object", messageID: "int32_t") -> "void":
     r"""
     Set the message ID for the message.
 
@@ -3557,7 +3539,7 @@ def helicsMessageSetMessageID(message: "helics_message", messageID: "int32_t") -
     """
     return _helics.helicsMessageSetMessageID(message, messageID)
 
-def helicsMessageClearFlags(message: "helics_message") -> "void":
+def helicsMessageClearFlags(message: "helics_message_object") -> "void":
     r"""
     Clear the flags of a message.
 
@@ -3566,7 +3548,7 @@ def helicsMessageClearFlags(message: "helics_message") -> "void":
     """
     return _helics.helicsMessageClearFlags(message)
 
-def helicsMessageSetFlagOption(message: "helics_message", flag: "int", flagValue: "helics_bool") -> "void":
+def helicsMessageSetFlagOption(message: "helics_message_object", flag: "int", flagValue: "helics_bool") -> "void":
     r"""
     Set a flag on a message.
 
@@ -3579,7 +3561,7 @@ def helicsMessageSetFlagOption(message: "helics_message", flag: "int", flagValue
     """
     return _helics.helicsMessageSetFlagOption(message, flag, flagValue)
 
-def helicsMessageSetString(message: "helics_message", str: "char const *") -> "void":
+def helicsMessageSetString(message: "helics_message_object", str: "char const *") -> "void":
     r"""
     Set the data payload of a message as a string.
 
@@ -3590,7 +3572,7 @@ def helicsMessageSetString(message: "helics_message", str: "char const *") -> "v
     """
     return _helics.helicsMessageSetString(message, str)
 
-def helicsMessageSetData(message: "helics_message", data: "void const *") -> "int":
+def helicsMessageSetData(message: "helics_message_object", data: "void const *") -> "int":
     r"""
     Set the data payload of a message as raw data.
 
@@ -3603,7 +3585,7 @@ def helicsMessageSetData(message: "helics_message", data: "void const *") -> "in
     """
     return _helics.helicsMessageSetData(message, data)
 
-def helicsMessageAppendData(message: "helics_message", data: "void const *") -> "int":
+def helicsMessageAppendData(message: "helics_message_object", data: "void const *") -> "int":
     r"""
     Append data to the payload.
 
@@ -3616,7 +3598,7 @@ def helicsMessageAppendData(message: "helics_message", data: "void const *") -> 
     """
     return _helics.helicsMessageAppendData(message, data)
 
-def helicsMessageCopy(source_message: "helics_message", dest_message: "helics_message") -> "void":
+def helicsMessageCopy(source_message: "helics_message_object", dest_message: "helics_message_object") -> "void":
     r"""
     Copy a message object.
 
@@ -3627,7 +3609,7 @@ def helicsMessageCopy(source_message: "helics_message", dest_message: "helics_me
     """
     return _helics.helicsMessageCopy(source_message, dest_message)
 
-def helicsMessageClone(message: "helics_message") -> "helics_message":
+def helicsMessageClone(message: "helics_message_object") -> "helics_message_object":
     r"""
     Clone a message object.
 
@@ -3636,7 +3618,7 @@ def helicsMessageClone(message: "helics_message") -> "helics_message":
     """
     return _helics.helicsMessageClone(message)
 
-def helicsMessageFree(message: "helics_message") -> "void":
+def helicsMessageFree(message: "helics_message_object") -> "void":
     r"""
     Free a message object from memory
     memory for message is managed so not using this function does not create memory leaks, this is an indication
@@ -3935,7 +3917,7 @@ def helicsFilterSetInfo(filt: "helics_filter", info: "char const *") -> "void":
     """
     return _helics.helicsFilterSetInfo(filt, info)
 
-def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "int") -> "void":
+def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "helics_bool") -> "void":
     r"""
     Set the data in the info field for a filter.
 
@@ -3944,11 +3926,11 @@ def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "int") ->
     :type option: int
     :param option: The option to set /ref helics_handle_options.
     :type value: int
-    :param value: The value of the option commonly 0 for false 1 for true.
+    :param value: The value of the option (helics_true or helics_false).
     """
     return _helics.helicsFilterSetOption(filt, option, value)
 
-def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "int":
+def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "helics_bool":
     r"""
     Get a handle option for the filter.
 
