@@ -2340,7 +2340,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                             activeQueries.finishedWithValue(index);
                             return ret;
                         }
-                    }
+                    } break;
                     default:
                         status = std::future_status::ready;  // LCOV_EXCL_LINE
                 }
