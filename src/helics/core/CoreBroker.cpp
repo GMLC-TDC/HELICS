@@ -2668,13 +2668,14 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 }
 
 /** check for fed queries that can be answered by the broker*/
-std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query) {
+std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query)
+{
     std::string response;
     if (query == "exists") {
         response = "true";
     } else if (query == "isconnected") {
-        response = (fed.state >= connection_state::connected &&
-                    fed.state <= connection_state::operating) ?
+        response =
+            (fed.state >= connection_state::connected && fed.state <= connection_state::operating) ?
             "true" :
             "false";
     } else if (query == "state" ) {
@@ -2766,7 +2767,7 @@ void CoreBroker::processQuery(ActionMessage& m)
                 route = broker->route;
                 m.dest_id = broker->global_id;
                 response = checkBrokerQuery(*broker, m.payload);
-            } else if (isRootc&&m.payload == "exists") {
+            } else if (isRootc && m.payload == "exists") {
                 response = "false";
             }
         }
