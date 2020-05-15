@@ -2668,16 +2668,17 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 }
 
 /** check for fed queries that can be answered by the broker*/
-std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query) {
+std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query)
+{
     std::string response;
     if (query == "exists") {
         response = "true";
     } else if (query == "isconnected") {
-        response = (fed.state >= connection_state::connected &&
-                    fed.state <= connection_state::operating) ?
+        response =
+            (fed.state >= connection_state::connected && fed.state <= connection_state::operating) ?
             "true" :
             "false";
-    } else if (query == "state" || query=="current_state") {
+    } else if (query == "state" || query == "current_state") {
         response = state_string(fed.state);
     }
     return response;
@@ -2757,14 +2758,13 @@ void CoreBroker::processQuery(ActionMessage& m)
                 route = broker->route;
                 m.dest_id = broker->global_id;
                 response = checkBrokerQuery(*broker, m.payload);
-            } else if (isRootc&&m.payload == "exists") {
+            } else if (isRootc && m.payload == "exists") {
                 response = "false";
             }
         }
-        if (((route == parent_route_id) && (isRootc))||!response.empty()) {
-            if (response.empty())
-            {
-                response = "#invald";
+        if (((route == parent_route_id) && (isRootc)) || !response.empty()) {
+            if (response.empty()) {
+                response = "#invalid";
             }
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
