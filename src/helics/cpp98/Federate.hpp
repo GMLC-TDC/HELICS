@@ -448,11 +448,11 @@ class Federate {
     }
 
     /** make a query of the federate
-    @details this call is blocking until the value is returned which make take some time depending
+    @details this call is blocking until the value is returned which may take some time depending
     on the size of the federation and the specific string being queried, query without a target
     assumes the target is the federate
 
-    @param queryStr a string with the query see other documentation for specific properties to
+    @param queryStr a string with the query, see other documentation for specific properties to
     query, can be defined by the federate
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
