@@ -2677,9 +2677,16 @@ std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string
                     fed.state <= connection_state::operating) ?
             "true" :
             "false";
-    } else if (query == "state" || query=="current_state") {
+    } else if (query == "state" ) {
         response = state_string(fed.state);
     }
+else if (query == "isinit")
+{
+    response =
+        (fed.state >= connection_state::operating) ?
+        "true" :
+        "false";
+}
     return response;
 }
 /** check for broker queries that can be answered by the broker*/
@@ -2693,8 +2700,10 @@ std::string CoreBroker::checkBrokerQuery(const BasicBrokerInfo& brk, const std::
             (brk.state >= connection_state::connected && brk.state <= connection_state::operating) ?
             "true" :
             "false";
-    } else if (query == "state" || query == "current_state") {
+    } else if (query == "state" ) {
         response = state_string(brk.state);
+    } else if (query == "isinit") {
+        response = (brk.state >= connection_state::operating) ? "true" : "false";
     }
     return response;
 }
@@ -2764,7 +2773,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         if (((route == parent_route_id) && (isRootc))||!response.empty()) {
             if (response.empty())
             {
-                response = "#invald";
+                response = "#invalid";
             }
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
