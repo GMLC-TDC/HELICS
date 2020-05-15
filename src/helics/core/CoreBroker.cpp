@@ -2667,6 +2667,38 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     }
 }
 
+/** check for fed queries that can be answered by the broker*/
+std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query) {
+    std::string response;
+    if (query == "exists") {
+        response = "true";
+    } else if (query == "isconnected") {
+        response = (fed.state >= connection_state::connected &&
+                    fed.state <= connection_state::operating) ?
+            "true" :
+            "false";
+    } else if (query == "state" || query=="current_state") {
+        response = state_string(fed.state);
+    }
+    return response;
+}
+/** check for broker queries that can be answered by the broker*/
+std::string CoreBroker::checkBrokerQuery(const BasicBrokerInfo& brk, const std::string& query)
+{
+    std::string response;
+    if (query == "exists") {
+        response = "true";
+    } else if (query == "isconnected") {
+        response =
+            (brk.state >= connection_state::connected && brk.state <= connection_state::operating) ?
+            "true" :
+            "false";
+    } else if (query == "state" || query == "current_state") {
+        response = state_string(brk.state);
+    }
+    return response;
+}
+
 void CoreBroker::processQuery(ActionMessage& m)
 {
     const auto& target = m.getString(targetStringLoc);
@@ -2714,23 +2746,32 @@ void CoreBroker::processQuery(ActionMessage& m)
     } else {
         route_id route = parent_route_id;
         auto fed = _federates.find(target);
+        std::string response;
         if (fed != _federates.end()) {
             route = fed->route;
             m.dest_id = fed->parent;
+            response = checkFedQuery(*fed, m.payload);
         } else {
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
                 m.dest_id = broker->global_id;
+                response = checkBrokerQuery(*broker, m.payload);
+            } else if (isRootc&&m.payload == "exists") {
+                response = "false";
             }
         }
-        if ((route == parent_route_id) && (isRootc)) {
+        if (((route == parent_route_id) && (isRootc))||!response.empty()) {
+            if (response.empty())
+            {
+                response = "#invald";
+            }
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
             queryResp.source_id = global_broker_id_local;
             queryResp.messageID = m.messageID;
 
-            queryResp.payload = (m.payload == "exists") ? "false" : "#invalid";
+            queryResp.payload = response;
             if (queryResp.dest_id == global_broker_id_local) {
                 activeQueries.setDelayedValue(m.messageID, queryResp.payload);
             } else {

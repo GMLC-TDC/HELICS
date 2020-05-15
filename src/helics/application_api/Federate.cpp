@@ -1024,7 +1024,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->getIdentifier();
         } else {
-            res = "#unknown";
+            res = "#disconnected";
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1035,7 +1035,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->query(getName(), queryStr);
         } else {
-            res = "#unknown";
+            res = "#disconnected";
         }
     }
     return res;
@@ -1050,7 +1050,7 @@ std::string Federate::query(const std::string& target, const std::string& queryS
         if (coreObject) {
             res = coreObject->query(target, queryStr);
         } else {
-            res = "#invalid";
+            res = "#disconnected";
         }
     }
     return res;
