@@ -310,6 +310,62 @@ TEST_F(query, version)
     mFed2->finalize();
 }
 
+TEST_F(query, exists)
+{
+    SetupTest<helics::MessageFederate>("test_3", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    mFed1->registerEndpoint("ept1");
+    mFed2->registerEndpoint("ept2");
+
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    mFed1->requestTimeAsync(1.0);
+    mFed2->requestTime(1.0);
+    mFed1->requestTimeComplete();
+    auto res = mFed1->query("exists");
+    EXPECT_EQ(res, "true");
+
+    res = mFed1->query(mFed2->getName(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = mFed1->query(mFed1->getCorePointer()->getIdentifier(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = mFed1->query(mFed2->getCorePointer()->getIdentifier(), "exists");
+    EXPECT_EQ(res, "true");
+
+    auto brk = brokers.front();
+    res = mFed1->query(brk->getIdentifier(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = brk->query(mFed1->getName(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = brk->query(mFed2->getName(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = brk->query("root", "exists");
+    EXPECT_EQ(res, "true");
+
+    res = brk->query(mFed1->getCorePointer()->getIdentifier(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = brk->query(mFed2->getCorePointer()->getIdentifier(), "exists");
+    EXPECT_EQ(res, "true");
+
+    res = brk->query("unknown_fed", "exists");
+    EXPECT_EQ(res, "false");
+
+    res = mFed1->getCorePointer()->query("unknown_fed", "exists");
+
+    mFed1->finalize();
+    mFed2->finalize();
+}
+
 TEST_F(query, current_state)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);

@@ -2005,12 +2005,12 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
 std::string CommonCore::federateQuery(const FederateState* fed, const std::string& queryStr) const
 {
     if (fed == nullptr) {
-        if ((queryStr == "exists") || (queryStr == "exist")) {
+        if (queryStr == "exists") {
             return "false";
         }
         return "#invalid";
     }
-    if ((queryStr == "exists") || (queryStr == "exist")) {
+    if (queryStr == "exists") {
         return "true";
     }
     if (queryStr == "version") {
@@ -2036,14 +2036,17 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
+        return "[isinit;isconnected;exists;name;identifier;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
                "publications;filters;version;version_all;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
     }
-    if (queryStr == "name") {
+    if (queryStr == "name" || queryStr == "identifier") {
         return getIdentifier();
+    }
+    if (queryStr == "exists") {
+        return "true";
     }
     if (queryStr == "version") {
         return versionString;
@@ -2279,7 +2282,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
 std::string CommonCore::query(const std::string& target, const std::string& queryStr)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
-        if ((target == "core") || (target == getIdentifier())) {
+        if (target == "core" || target == getIdentifier() || target.empty()) {
             auto res = quickCoreQueries(queryStr);
             if (!res.empty()) {
                 return res;
@@ -2295,16 +2298,13 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
     querycmd.messageID = index;
     querycmd.setStringData(target);
 
-    if ((target == "core") || (target == getIdentifier())) {
+    if (target == "core" || target == getIdentifier() || target.empty()) {
         auto res = quickCoreQueries(queryStr);
         if (!res.empty()) {
             return res;
         }
         if (queryStr == "address") {
             return getAddress();
-        }
-        if (queryStr == "version") {
-            return versionString;
         }
         querycmd.setAction(CMD_BROKER_QUERY);
         querycmd.dest_id = direct_core_id;
@@ -2340,7 +2340,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                             activeQueries.finishedWithValue(index);
                             return ret;
                         }
-                    }
+                    } break;
                     default:
                         status = std::future_status::ready;  // LCOV_EXCL_LINE
                 }
