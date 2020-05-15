@@ -2323,7 +2323,7 @@ void CoreBroker::setLogFile(const std::string& lfile)
 std::string CoreBroker::query(const std::string& target, const std::string& queryStr)
 {
     auto gid = global_id.load();
-    if ((target == "broker") || (target == getIdentifier())) {
+    if (target == "broker" || target == getIdentifier() || target.empty()) {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
@@ -2414,13 +2414,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "isconnected") {
         return (isConnected()) ? std::string("true") : std::string("false");
     }
-    if (request == "name") {
+    if (request == "name" || request == "identifier") {
         return getIdentifier();
     }
+    if (request == "exists") {
+        return "true";
+    }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
+        return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_time;version;version_all]";
+               "current_time;current_state;global_time;version;version_all;exists]";
     }
     if (request == "address") {
         return getAddress();
@@ -2664,6 +2667,38 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     }
 }
 
+/** check for fed queries that can be answered by the broker*/
+std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query) {
+    std::string response;
+    if (query == "exists") {
+        response = "true";
+    } else if (query == "isconnected") {
+        response = (fed.state >= connection_state::connected &&
+                    fed.state <= connection_state::operating) ?
+            "true" :
+            "false";
+    } else if (query == "state" || query=="current_state") {
+        response = state_string(fed.state);
+    }
+    return response;
+}
+/** check for broker queries that can be answered by the broker*/
+std::string CoreBroker::checkBrokerQuery(const BasicBrokerInfo& brk, const std::string& query)
+{
+    std::string response;
+    if (query == "exists") {
+        response = "true";
+    } else if (query == "isconnected") {
+        response =
+            (brk.state >= connection_state::connected && brk.state <= connection_state::operating) ?
+            "true" :
+            "false";
+    } else if (query == "state" || query == "current_state") {
+        response = state_string(brk.state);
+    }
+    return response;
+}
+
 void CoreBroker::processQuery(ActionMessage& m)
 {
     const auto& target = m.getString(targetStringLoc);
@@ -2711,23 +2746,32 @@ void CoreBroker::processQuery(ActionMessage& m)
     } else {
         route_id route = parent_route_id;
         auto fed = _federates.find(target);
+        std::string response;
         if (fed != _federates.end()) {
             route = fed->route;
             m.dest_id = fed->parent;
+            response = checkFedQuery(*fed, m.payload);
         } else {
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
                 m.dest_id = broker->global_id;
+                response = checkBrokerQuery(*broker, m.payload);
+            } else if (isRootc&&m.payload == "exists") {
+                response = "false";
             }
         }
-        if ((route == parent_route_id) && (isRootc)) {
+        if (((route == parent_route_id) && (isRootc))||!response.empty()) {
+            if (response.empty())
+            {
+                response = "#invald";
+            }
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
             queryResp.source_id = global_broker_id_local;
             queryResp.messageID = m.messageID;
 
-            queryResp.payload = "#invalid";
+            queryResp.payload = response;
             if (queryResp.dest_id == global_broker_id_local) {
                 activeQueries.setDelayedValue(m.messageID, queryResp.payload);
             } else {
