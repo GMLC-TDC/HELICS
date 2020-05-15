@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** data class for managing information about a subscription*/
-class NamedInputInfo {
+class InputInfo {
   public:
     /** data structure containing a helics data value recorded from a publication*/
     struct dataRecord {
@@ -39,7 +39,7 @@ class NamedInputInfo {
     };
 
     /** constructor with all the information*/
-    NamedInputInfo(global_handle handle,
+    InputInfo(global_handle handle,
                    const std::string& key_,
                    const std::string& type_,
                    const std::string& units_):

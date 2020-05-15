@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "TimeDependencies.hpp"

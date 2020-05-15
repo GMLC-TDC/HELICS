@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "../common/GuardedTypes.hpp"
 #include "EndpointInfo.hpp"
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "federate_id_extra.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
@@ -29,10 +29,10 @@ class InterfaceInfo {
     const PublicationInfo* getPublication(interface_handle handle) const;
     PublicationInfo* getPublication(const std::string& pubName);
     PublicationInfo* getPublication(interface_handle handle);
-    const NamedInputInfo* getInput(const std::string& inputName) const;
-    const NamedInputInfo* getInput(interface_handle handle) const;
-    NamedInputInfo* getInput(const std::string& inputName);
-    NamedInputInfo* getInput(interface_handle handle);
+    const InputInfo* getInput(const std::string& inputName) const;
+    const InputInfo* getInput(interface_handle handle) const;
+    InputInfo* getInput(const std::string& inputName);
+    InputInfo* getInput(interface_handle handle);
     const EndpointInfo* getEndpoint(const std::string& endpointName) const;
     const EndpointInfo* getEndpoint(interface_handle handle) const;
     EndpointInfo* getEndpoint(const std::string& endpointName);
@@ -92,7 +92,7 @@ class InterfaceInfo {
         gmlc::containers::DualMappedPointerVector<EndpointInfo, std::string, interface_handle>>
         endpoints;  //!< storage for all the endpoints
     shared_guarded<
-        gmlc::containers::DualMappedPointerVector<NamedInputInfo, std::string, interface_handle>>
+        gmlc::containers::DualMappedPointerVector<InputInfo, std::string, interface_handle>>
         inputs;  //!< storage for all the endpoints
 };
 }  // namespace helics

@@ -72,22 +72,22 @@ PublicationInfo* InterfaceInfo::getPublication(interface_handle handle)
     return publications.lock()->find(handle);
 }
 
-const NamedInputInfo* InterfaceInfo::getInput(const std::string& inputName) const
+const InputInfo* InterfaceInfo::getInput(const std::string& inputName) const
 {
     return inputs.lock_shared()->find(inputName);
 }
 
-const NamedInputInfo* InterfaceInfo::getInput(interface_handle handle) const
+const InputInfo* InterfaceInfo::getInput(interface_handle handle) const
 {
     return inputs.lock()->find(handle);
 }
 
-NamedInputInfo* InterfaceInfo::getInput(const std::string& inputName)
+InputInfo* InterfaceInfo::getInput(const std::string& inputName)
 {
     return inputs.lock()->find(inputName);
 }
 
-NamedInputInfo* InterfaceInfo::getInput(interface_handle handle)
+InputInfo* InterfaceInfo::getInput(interface_handle handle)
 {
     return inputs.lock()->find(handle);
 }

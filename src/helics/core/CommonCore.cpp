@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterCoordinator.hpp"
 #include "FilterInfo.hpp"
 #include "ForwardingTimeCoordinator.hpp"
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"

@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 
 #include "units/units/units.hpp"
 
@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData()
+std::vector<std::shared_ptr<const data_block>> InputInfo::getAllData()
 {
     std::vector<std::shared_ptr<const data_block>> out;
     out.reserve(current_data.size());
@@ -25,7 +25,7 @@ std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData()
     return out;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData(int index)
+std::shared_ptr<const data_block> InputInfo::getData(int index)
 {
     if (isValidIndex(index, current_data)) {
         return current_data[index].data;
@@ -33,7 +33,7 @@ std::shared_ptr<const data_block> NamedInputInfo::getData(int index)
     return nullptr;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData()
+std::shared_ptr<const data_block> InputInfo::getData()
 {
     int ind = 0;
     int mxind = -1;
@@ -51,14 +51,14 @@ std::shared_ptr<const data_block> NamedInputInfo::getData()
     return nullptr;
 }
 
-static auto recordComparison = [](const NamedInputInfo::dataRecord& rec1,
-                                  const NamedInputInfo::dataRecord& rec2) {
+static auto recordComparison = [](const InputInfo::dataRecord& rec1,
+                                  const InputInfo::dataRecord& rec2) {
     return (rec1.time < rec2.time) ?
         true :
         ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
-void NamedInputInfo::addData(global_handle source_id,
+void InputInfo::addData(global_handle source_id,
                              Time valueTime,
                              unsigned int iteration,
                              std::shared_ptr<const data_block> data)
@@ -89,7 +89,7 @@ void NamedInputInfo::addData(global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource(global_handle newSource,
+void InputInfo::addSource(global_handle newSource,
                                const std::string& sourceName,
                                const std::string& stype,
                                const std::string& sunits)
@@ -106,7 +106,7 @@ void NamedInputInfo::addSource(global_handle newSource,
     has_target = true;
 }
 
-void NamedInputInfo::removeSource(global_handle sourceToRemove, Time minTime)
+void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
 {
     for (size_t ii = 0; ii < input_sources.size(); ++ii) {
         if (input_sources[ii] == sourceToRemove) {
@@ -121,7 +121,7 @@ void NamedInputInfo::removeSource(global_handle sourceToRemove, Time minTime)
     }
 }
 
-void NamedInputInfo::removeSource(const std::string& sourceName, Time minTime)
+void InputInfo::removeSource(const std::string& sourceName, Time minTime)
 {
     for (size_t ii = 0; ii < source_info.size(); ++ii) {
         if (std::get<0>(source_info[ii]) == sourceName) {
@@ -136,14 +136,14 @@ void NamedInputInfo::removeSource(const std::string& sourceName, Time minTime)
     }
 }
 
-void NamedInputInfo::clearFutureData()
+void InputInfo::clearFutureData()
 {
     for (auto& vec : data_queues) {
         vec.clear();
     }
 }
 
-bool NamedInputInfo::updateTimeUpTo(Time newTime)
+bool InputInfo::updateTimeUpTo(Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -174,7 +174,7 @@ bool NamedInputInfo::updateTimeUpTo(Time newTime)
     return updated;
 }
 
-bool NamedInputInfo::updateTimeNextIteration(Time newTime)
+bool InputInfo::updateTimeNextIteration(Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -214,7 +214,7 @@ bool NamedInputInfo::updateTimeNextIteration(Time newTime)
     return updated;
 }
 
-bool NamedInputInfo::updateTimeInclusive(Time newTime)
+bool InputInfo::updateTimeInclusive(Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -244,7 +244,7 @@ bool NamedInputInfo::updateTimeInclusive(Time newTime)
     return updated;
 }
 
-bool NamedInputInfo::updateData(dataRecord&& update, int index)
+bool InputInfo::updateData(dataRecord&& update, int index)
 {
     if (!only_update_on_change || !current_data[index].data) {
         current_data[index] = std::move(update);
@@ -262,7 +262,7 @@ bool NamedInputInfo::updateData(dataRecord&& update, int index)
     return false;
 }
 
-Time NamedInputInfo::nextValueTime() const
+Time InputInfo::nextValueTime() const
 {
     Time nvtime = Time::maxVal();
     if (not_interruptible) {
