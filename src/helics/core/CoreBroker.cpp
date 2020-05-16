@@ -2681,7 +2681,10 @@ static std::string checkFedQuery(const BasicFedInfo& fed, const std::string& que
     } else if (query == "state") {
         response = state_string(fed.state);
     } else if (query == "isinit") {
-        response = (fed.state >= connection_state::operating) ? "true" : "false";
+        if (fed.state >= connection_state::operating) {
+            response = "true";
+            // if it is false we need to actually go check the federate directly
+        }
     }
     return response;
 }
@@ -2699,7 +2702,10 @@ static std::string checkBrokerQuery(const BasicBrokerInfo& brk, const std::strin
     } else if (query == "state") {
         response = state_string(brk.state);
     } else if (query == "isinit") {
-        response = (brk.state >= connection_state::operating) ? "true" : "false";
+        if (brk.state >= connection_state::operating) {
+            response = "true";
+            // if it is false we need to actually go check the federate directly
+        }
     }
     return response;
 }
