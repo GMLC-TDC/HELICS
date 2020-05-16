@@ -279,7 +279,6 @@ if(HELICS_BUILD_TESTS AND HELICS_TEST_CODE_COVERAGE)
     endif()
 endif()
 
-
 if(HELICS_GENERATE_DOXYGEN_DOC)
     find_package(Doxygen)
     if(DOXYGEN_FOUND)
