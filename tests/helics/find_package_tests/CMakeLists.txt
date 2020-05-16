@@ -7,14 +7,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.4.0)
+cmake_minimum_required(VERSION 3.10...3.17)
 
 project(HELICS-find-package-test)
 
 include(CTest)
 
 # Test the HELICS CMake package config
-find_package(HELICS 2.3 REQUIRED)
+find_package(HELICS 3.0 REQUIRED)
 
 # add some tests inside of the CMake
 if(NOT TARGET HELICS::helics_broker)
