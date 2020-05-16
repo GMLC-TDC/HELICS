@@ -13,6 +13,14 @@ target_link_libraries(comboFed PUBLIC helics_apps)
 target_link_libraries(comboFed PRIVATE compile_flags_target)
 set_target_properties(comboFed PROPERTIES FOLDER examples)
 
+if(HELICS_BUILD_TESTS AND NOT MSVC)
+    add_test(NAME comboFed_broker_example
+             COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 --broker
+                     $<TARGET_FILE:helics_broker> $<TARGET_FILE:comboFed>
+    )
+    set_property(TEST comboFed_broker_example PROPERTY LABELS Continuous)
+endif()
+
 # configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.sh ${CMAKE_CURRENT_BINARY_DIR}/run.sh COPYONLY)
 
 add_custom_command(

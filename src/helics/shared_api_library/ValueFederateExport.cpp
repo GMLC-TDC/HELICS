@@ -28,18 +28,12 @@ static helics::InputObject* verifyInput(helics_input inp, helics_error* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (inp == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidInputString;
-        }
+        assignError(err, helics_error_invalid_object, invalidInputString);
         return nullptr;
     }
     auto* inpObj = reinterpret_cast<helics::InputObject*>(inp);
     if (inpObj->valid != InputValidationIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidInputString;
-        }
+        assignError(err, helics_error_invalid_object, invalidInputString);
         return nullptr;
     }
     return inpObj;
@@ -49,18 +43,12 @@ static helics::PublicationObject* verifyPublication(helics_publication pub, heli
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (pub == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidPublicationString;
-        }
+        assignError(err, helics_error_invalid_object, invalidPublicationString);
         return nullptr;
     }
     auto* pubObj = reinterpret_cast<helics::PublicationObject*>(pub);
     if (pubObj->valid != PublicationValidationIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidInputString;
-        }
+        assignError(err, helics_error_invalid_object, invalidPublicationString);
         return nullptr;
     }
     return pubObj;
@@ -124,7 +112,7 @@ helics_publication
     }
     return nullptr;
 }
-
+static constexpr char unknownTypeCode[] = "unrecognized type code";
 helics_publication
     helicsFederateRegisterPublication(helics_federate fed, const char* key, helics_data_type type, const char* units, helics_error* err)
 {
@@ -136,10 +124,7 @@ helics_publication
         if (type == helics_data_type_raw) {
             return helicsFederateRegisterTypePublication(fed, key, "raw", units, err);
         }
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = getMasterHolder()->addErrorString("unrecognized type code");
-        }
+        assignError(err, helics_error_invalid_argument, unknownTypeCode);
         return nullptr;
     }
     try {
@@ -192,10 +177,7 @@ helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
         if (type == helics_data_type_raw) {
             return helicsFederateRegisterGlobalTypePublication(fed, key, "raw", units, err);
         }
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = getMasterHolder()->addErrorString("unrecognized type code");
-        }
+        assignError(err, helics_error_invalid_argument, unknownTypeCode);
         return nullptr;
     }
 
@@ -243,10 +225,7 @@ helics_input helicsFederateRegisterInput(helics_federate fed, const char* key, h
             return helicsFederateRegisterTypeInput(fed, key, "raw", units, err);
         }
         if (type != helics_data_type_any) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = getMasterHolder()->addErrorString("unrecognized type code");
-            }
+            assignError(err, helics_error_invalid_argument, unknownTypeCode);
             return nullptr;
         }
     }
@@ -296,10 +275,7 @@ helics_input
             return helicsFederateRegisterGlobalTypeInput(fed, key, "raw", units, err);
         }
         if (type != helics_data_type_any) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = getMasterHolder()->addErrorString("unrecognized type code");
-            }
+            assignError(err, helics_error_invalid_argument, unknownTypeCode);
             return nullptr;
         }
     }
@@ -363,10 +339,7 @@ helics_publication helicsFederateGetPublication(helics_federate fed, const char*
     try {
         auto& pub = fedObj->getPublication(key);
         if (!pub.isValid()) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = invalidPubName;
-            }
+            assignError(err, helics_error_invalid_argument, invalidPubName);
             return nullptr;
         }
         auto pubObj = std::make_unique<helics::PublicationObject>();
@@ -391,10 +364,7 @@ helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int 
     try {
         auto& id = fedObj->getPublication(index);
         if (!id.isValid()) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = invalidPubIndex;
-            }
+            assignError(err, helics_error_invalid_argument, invalidPubIndex);
             return nullptr;
         }
         auto pub = std::make_unique<helics::PublicationObject>();
@@ -424,10 +394,7 @@ helics_input helicsFederateGetInput(helics_federate fed, const char* key, helics
     try {
         auto& id = fedObj->getInput(key);
         if (!id.isValid()) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = invalidInputName;
-            }
+            assignError(err, helics_error_invalid_argument, invalidInputName);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -452,10 +419,7 @@ helics_input helicsFederateGetInputByIndex(helics_federate fed, int index, helic
     try {
         auto& id = fedObj->getInput(index);
         if (!id.isValid()) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = invalidInputIndex;
-            }
+            assignError(err, helics_error_invalid_argument, invalidInputIndex);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -483,8 +447,7 @@ helics_input helicsFederateGetSubscription(helics_federate fed, const char* key,
     try {
         auto& id = fedObj->getSubscription(key);
         if (!id.isValid()) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidSubKey;
+            assignError(err, helics_error_invalid_argument, invalidSubKey);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -717,10 +680,7 @@ bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
 {
     static constexpr char invalidOutputString[] = "Output string location is invalid";
     if ((outputString == nullptr) || (maxlen <= 0)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidOutputString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidOutputString);
         return false;
     }
     return true;
