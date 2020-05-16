@@ -7,19 +7,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10...3.17)
 project(helicsMATLAB)
 
 get_directory_property(hasParent PARENT_DIRECTORY)
 
 if(NOT hasParent)
     message(STATUS "Standalone MATLAB interface build")
-
-    if(CMAKE_VERSION VERSION_LESS 3.17)
-        cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-    else()
-        cmake_policy(VERSION 3.17)
-    endif()
 
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the MATLAB interface files" ON)
@@ -54,7 +48,7 @@ endif()
 # ##################################################################################################
 # Find HELICS
 if(NOT hasParent OR NOT TARGET HELICS::helicsSharedLib)
-    find_package(HELICS 2 REQUIRED)
+    find_package(HELICS 3 REQUIRED)
 endif()
 
 if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
@@ -103,11 +97,6 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.12)
     set(USE_MODERNIZED_SWIG ON)
 else()
     set(USE_MODERNIZED_SWIG OFF)
-endif()
-
-# This can be removed in HELICS 3 if the minimum CMake version is >= 3.8
-if(NOT CMAKE_VERSION VERSION_LESS 3.8)
-    set(USE_SWIG_ADD_LIBRARY ON)
 endif()
 
 # ##################################################################################################

@@ -3157,6 +3157,20 @@ def helicsEndpointGetMessageObject(endpoint: "helics_endpoint") -> "helics_messa
     """
     return _helics.helicsEndpointGetMessageObject(endpoint)
 
+def helicsEndpointCreateMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
+    r"""
+    Create a new empty message object.
+
+    The message is empty and isValid will return false since there is no data associated with the message yet.
+
+    :param fed: the endpoint object to associate the message with
+
+
+    :rtype: void
+    :return: A new helics_message_object.
+    """
+    return _helics.helicsEndpointCreateMessageObject(endpoint)
+
 def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
     r"""
     Receive a communication message for any endpoint in the federate.
@@ -3191,6 +3205,10 @@ def helicsFederateCreateMessageObject(fed: "helics_federate") -> "helics_message
     Create a new empty message object.
 
     The message is empty and isValid will return false since there is no data associated with the message yet.
+
+    :type fed: void
+    :param fed: the federate object to associate the message with
+
 
     :rtype: void
     :return: A helics_message_object containing the message data.
@@ -3590,6 +3608,24 @@ def helicsMessageCopy(source_message: "helics_message_object", dest_message: "he
     :param dest_message: The message object to copy to.
     """
     return _helics.helicsMessageCopy(source_message, dest_message)
+
+def helicsMessageClone(message: "helics_message_object") -> "helics_message_object":
+    r"""
+    Clone a message object.
+
+    :type message: void
+    :param message: The message object to copy from.
+    """
+    return _helics.helicsMessageClone(message)
+
+def helicsMessageFree(message: "helics_message_object") -> "void":
+    r"""
+    Free a message object from memory
+    memory for message is managed so not using this function does not create memory leaks, this is an indication
+    to the system that the memory for this message is done being used and can be reused for a new message.
+    helicsFederateClearMessages() can also be used to clear up all stored messages at once
+    """
+    return _helics.helicsMessageFree(message)
 
 def helicsFederateRegisterFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""

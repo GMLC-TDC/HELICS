@@ -13611,6 +13611,47 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsEndpointCreateMessageObject(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  helics_message_object result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointCreateMessageObject" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (helics_message_object)helicsEndpointCreateMessageObject(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateGetMessage(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -14887,6 +14928,67 @@ fail:
       return NULL;
     }
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsMessageClone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  helics_message_object result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageClone" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (helics_message_object)helicsMessageClone(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsMessageFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageFree" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  helicsMessageFree(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -18042,6 +18144,17 @@ static PyMethodDef SwigMethods[] = {
 		":rtype: void\n"
 		":return: A message object.\n"
 		""},
+	 { "helicsEndpointCreateMessageObject", _wrap_helicsEndpointCreateMessageObject, METH_O, "\n"
+		"Create a new empty message object.\n"
+		"\n"
+		"The message is empty and isValid will return false since there is no data associated with the message yet.\n"
+		"\n"
+		":param fed: the endpoint object to associate the message with\n"
+		"\n"
+		"\n"
+		":rtype: void\n"
+		":return: A new helics_message_object.\n"
+		""},
 	 { "helicsFederateGetMessage", _wrap_helicsFederateGetMessage, METH_O, "\n"
 		"Receive a communication message for any endpoint in the federate.\n"
 		"\n"
@@ -18069,6 +18182,10 @@ static PyMethodDef SwigMethods[] = {
 		"Create a new empty message object.\n"
 		"\n"
 		"The message is empty and isValid will return false since there is no data associated with the message yet.\n"
+		"\n"
+		":type fed: void\n"
+		":param fed: the federate object to associate the message with\n"
+		"\n"
 		"\n"
 		":rtype: void\n"
 		":return: A helics_message_object containing the message data.\n"
@@ -18367,6 +18484,18 @@ static PyMethodDef SwigMethods[] = {
 		":param source_message: The message object to copy from.\n"
 		":type dest_message: void\n"
 		":param dest_message: The message object to copy to.\n"
+		""},
+	 { "helicsMessageClone", _wrap_helicsMessageClone, METH_O, "\n"
+		"Clone a message object.\n"
+		"\n"
+		":type message: void\n"
+		":param message: The message object to copy from.\n"
+		""},
+	 { "helicsMessageFree", _wrap_helicsMessageFree, METH_O, "\n"
+		"Free a message object from memory\n"
+		"memory for message is managed so not using this function does not create memory leaks, this is an indication\n"
+		"to the system that the memory for this message is done being used and can be reused for a new message.\n"
+		"helicsFederateClearMessages() can also be used to clear up all stored messages at once\n"
 		""},
 	 { "helicsFederateRegisterFilter", _wrap_helicsFederateRegisterFilter, METH_VARARGS, "\n"
 		"Create a source Filter on the specified federate.\n"

@@ -7782,6 +7782,33 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsEndpointGetMessage
 }
 
 
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsEndpointCreateMessageObject(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  helics_message_object result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_endpoint *)&jarg1; 
+  result = (helics_message_object)helicsEndpointCreateMessageObject(arg1,arg2);
+  *(helics_message_object *)&jresult = result; 
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetMessage(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -8522,6 +8549,43 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageCopy(JNIEnv 
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsMessageClone(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  helics_message_object result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_message_object *)&jarg1; 
+  result = (helics_message_object)helicsMessageClone(arg1,arg2);
+  *(helics_message_object *)&jresult = result; 
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageFree(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_message_object *)&jarg1; 
+  helicsMessageFree(arg1);
 }
 
 

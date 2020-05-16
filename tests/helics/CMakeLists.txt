@@ -109,7 +109,6 @@ if(HELICS_ENABLE_SUBPROJECT_TESTS)
 endif()
 
 if(NOT MSVC AND HELICS_INSTALL_PACKAGE_TESTS)
-    if(NOT CMAKE_VERSION VERSION_LESS 3.6.0)
         # Tests for other CMake projects using the package_config files
         add_test(
             package-config-tests
@@ -133,5 +132,4 @@ if(NOT MSVC AND HELICS_INSTALL_PACKAGE_TESTS)
             ${package_test_command}
         )
         set_property(TEST package-config-tests PROPERTY LABELS Packaging)
-    endif()
 endif()

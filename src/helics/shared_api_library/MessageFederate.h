@@ -273,6 +273,20 @@ HELICS_DEPRECATED_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint
 HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint);
 
 /**
+ * Create a new empty message object.
+ *
+ * @details The message is empty and isValid will return false since there is no data associated with the message yet.
+ *
+ * @param fed the endpoint object to associate the message with
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ *
+ * @return A new helics_message_object.
+ */
+HELICS_EXPORT helics_message_object helicsEndpointCreateMessageObject(helics_endpoint endpoint, helics_error* err);
+
+/**
  * Receive a communication message for any endpoint in the federate.
  *
  * @deprecated This function is deprecated and will be removed in Helics 3.0.
@@ -301,6 +315,11 @@ HELICS_EXPORT helics_message_object helicsFederateGetMessageObject(helics_federa
  * Create a new empty message object.
  *
  * @details The message is empty and isValid will return false since there is no data associated with the message yet.
+ *
+ * @param fed the federate object to associate the message with
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
  *
  * @return A helics_message_object containing the message data.
  */
@@ -676,6 +695,24 @@ HELICS_EXPORT void helicsMessageAppendData(helics_message_object message, const 
  * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error* err);
+
+/**
+ * Clone a message object.
+ *
+ * @param message The message object to copy from.
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT helics_message_object helicsMessageClone(helics_message_object message, helics_error* err);
+
+/**
+ * Free a message object from memory
+ * @details memory for message is managed so not using this function does not create memory leaks, this is an indication
+ * to the system that the memory for this message is done being used and can be reused for a new message.
+ * helicsFederateClearMessages() can also be used to clear up all stored messages at once
+ */
+HELICS_EXPORT void helicsMessageFree(helics_message_object message);
 
 /**@}*/
 #ifdef __cplusplus

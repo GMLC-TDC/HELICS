@@ -925,8 +925,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     command.source_id = brk->global_id;
                 }
             }
-            FALLTHROUGH
-            /* FALLTHROUGH */
+            [[fallthrough]];
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:

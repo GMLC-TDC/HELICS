@@ -95,11 +95,8 @@ namespace std {
 /** define a hash function for local_federate_id*/
 template<>
 struct hash<helics::local_federate_id> {
-    using argument_type = helics::local_federate_id;  //!< type of object to hash
-    using result_type =
-        hash<helics::local_federate_id::base_type>::result_type;  //!< the type of the return result
     /** actual hash operator*/
-    result_type operator()(argument_type const& key) const noexcept
+    std::size_t operator()(helics::local_federate_id const& key) const noexcept
     {
         return std::hash<helics::local_federate_id::base_type>{}(key.baseValue());
     }
@@ -109,11 +106,8 @@ struct hash<helics::local_federate_id> {
  * unordered_map*/
 template<>
 struct hash<helics::interface_handle> {
-    using argument_type = helics::interface_handle;  //!< type of object to hash
-    using result_type =
-        hash<helics::interface_handle::base_type>::result_type;  //!< the type of the return result
     /** actual hash operator*/
-    result_type operator()(argument_type const& key) const noexcept
+    std::size_t operator()(helics::interface_handle const& key) const noexcept
     {
         return std::hash<helics::interface_handle::base_type>{}(key.baseValue());
     }
