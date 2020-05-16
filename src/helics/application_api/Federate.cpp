@@ -1078,7 +1078,7 @@ query_id_t Federate::queryAsync(const std::string& queryStr)
     return query_id_t(cnt);
 }
 
-std::string Federate::queryComplete(query_id_t queryIndex)
+std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());

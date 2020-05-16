@@ -316,10 +316,6 @@ class CoreBroker: public Broker, public BrokerBase {
     void removeNamedTarget(ActionMessage& command);
     /** answer a query or route the message the appropriate location*/
     void processQuery(ActionMessage& m);
-    /** check for fed queries that can be answered by the broker*/
-    std::string checkFedQuery(const BasicFedInfo& fed, const std::string& query);
-    /** check for broker queries that can be answered by the broker*/
-    std::string checkBrokerQuery(const BasicBrokerInfo& brk, const std::string& query);
 
     /** answer a query or route the message the appropriate location*/
     void processQueryResponse(const ActionMessage& m);

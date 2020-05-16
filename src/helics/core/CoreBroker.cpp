@@ -2668,7 +2668,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
 }
 
 /** check for fed queries that can be answered by the broker*/
-std::string CoreBroker::checkFedQuery(const BasicFedInfo& fed, const std::string& query)
+static std::string checkFedQuery(const BasicFedInfo& fed, const std::string& query)
 {
     std::string response;
     if (query == "exists") {
@@ -2691,7 +2691,7 @@ else if (query == "isinit")
     return response;
 }
 /** check for broker queries that can be answered by the broker*/
-std::string CoreBroker::checkBrokerQuery(const BasicBrokerInfo& brk, const std::string& query)
+static std::string checkBrokerQuery(const BasicBrokerInfo& brk, const std::string& query)
 {
     std::string response;
     if (query == "exists") {
