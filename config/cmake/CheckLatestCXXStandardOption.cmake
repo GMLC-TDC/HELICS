@@ -57,7 +57,7 @@ else()
                 set(CXX_STANDARD_FLAG -std=c++1z)
             endif()
         endif()
-    
+
     else()
         message(FATAL_ERROR "HELICS requires C++17 or Higher")
     endif()

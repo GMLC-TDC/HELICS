@@ -131,12 +131,12 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
     endif()
 
-        swig_add_library(
-            helicsJava
-            TYPE MODULE
-            LANGUAGE java
-            SOURCES helicsJava.i
-        )
+    swig_add_library(
+        helicsJava
+        TYPE MODULE
+        LANGUAGE java
+        SOURCES helicsJava.i
+    )
 
     swig_link_libraries(helicsJava HELICS::helicsSharedLib)
     swig_link_libraries(helicsJava ${JAVA_LIBRARIES})
