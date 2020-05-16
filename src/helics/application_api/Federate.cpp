@@ -274,8 +274,7 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
         case modes::startup:
         case modes::pending_init:
             enterInitializingMode();
-            FALLTHROUGH
-            /* FALLTHROUGH */
+            [[fallthrough]];
         case modes::initializing: {
             res = coreObject->enterExecutingMode(fedID, iterate);
             switch (res) {
@@ -335,8 +334,7 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
         } break;
         case modes::pending_init:
             enterInitializingModeComplete();
-            FALLTHROUGH
-            /* FALLTHROUGH */
+            [[fallthrough]];
         case modes::initializing: {
             auto eExecFunc = [this, iterate]() {
                 return coreObject->enterExecutingMode(fedID, iterate);
@@ -628,8 +626,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
         switch (iterativeTime.state) {
             case iteration_result::next_step:
                 currentTime = iterativeTime.grantedTime;
-                FALLTHROUGH
-                /* FALLTHROUGH */
+                [[fallthrough]];
             case iteration_result::iterating:
                 updateTime(currentTime, oldTime);
                 break;
@@ -708,8 +705,7 @@ iteration_time Federate::requestTimeIterativeComplete()
         switch (iterativeTime.state) {
             case iteration_result::next_step:
                 currentTime = iterativeTime.grantedTime;
-                FALLTHROUGH
-                /* FALLTHROUGH */
+                [[fallthrough]];
             case iteration_result::iterating:
                 updateTime(currentTime, oldTime);
                 break;
