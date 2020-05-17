@@ -37,7 +37,7 @@ if(hasParent)
 
 else()
     cmake_minimum_required(VERSION 3.10..3.17)
-    
+
     set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
     set(BUILD_PYTHON_INTERFACE OFF CACHE INTERNAL "")
     set(BUILD_PYTHON2_INTERFACE OFF CACHE INTERNAL "")

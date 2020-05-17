@@ -176,12 +176,12 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
     endif()
 
-        swig_add_library(
-            helics
-            TYPE MODULE
-            LANGUAGE python
-            SOURCES helicsPython${_py_ver}.i
-        )
+    swig_add_library(
+        helics
+        TYPE MODULE
+        LANGUAGE python
+        SOURCES helicsPython${_py_ver}.i
+    )
 
     swig_link_libraries(helics HELICS::helicsSharedLib)
 
