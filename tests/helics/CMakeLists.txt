@@ -109,29 +109,27 @@ if(HELICS_ENABLE_SUBPROJECT_TESTS)
 endif()
 
 if(NOT MSVC AND HELICS_INSTALL_PACKAGE_TESTS)
-    if(NOT CMAKE_VERSION VERSION_LESS 3.6.0)
-        # Tests for other CMake projects using the package_config files
-        add_test(
-            package-config-tests
-            ${CMAKE_CTEST_COMMAND}
-            -C
-            ${CMAKE_BUILD_TYPE}
-            --build-and-test
-            "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests"
-            "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
-            --build-generator
-            "${CMAKE_GENERATOR}"
-            --build-generator-platform
-            "${CMAKE_GENERATOR_PLATFORM}"
-            --build-options
-            "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
-            "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
-            "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
-            "-DHELICS_VERSION=${HELICS_VERSION}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-            "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-            ${package_test_command}
-        )
-        set_property(TEST package-config-tests PROPERTY LABELS Packaging)
-    endif()
+    # Tests for other CMake projects using the package_config files
+    add_test(
+        package-config-tests
+        ${CMAKE_CTEST_COMMAND}
+        -C
+        ${CMAKE_BUILD_TYPE}
+        --build-and-test
+        "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests"
+        "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
+        --build-generator
+        "${CMAKE_GENERATOR}"
+        --build-generator-platform
+        "${CMAKE_GENERATOR_PLATFORM}"
+        --build-options
+        "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
+        "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+        "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
+        "-DHELICS_VERSION=${HELICS_VERSION}"
+        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+        "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+        ${package_test_command}
+    )
+    set_property(TEST package-config-tests PROPERTY LABELS Packaging)
 endif()

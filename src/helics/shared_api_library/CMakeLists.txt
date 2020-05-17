@@ -70,31 +70,25 @@ install(
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-if(CMAKE_VERSION VERSION_GREATER 3.6)
-    set(HELICS_EXCLUSION_COMMAND EXCLUDE_FROM_ALL)
-else()
-    set(HELICS_EXCLUSION_COMMAND)
-endif()
-
 if(WIN32)
     install(
         FILES $<TARGET_LINKER_FILE:helicsSharedLib>
         DESTINATION ${CMAKE_INSTALL_LIBDIR}
         COMPONENT libs
-        ${HELICS_EXCLUSION_COMMAND}
+        EXCLUDE_FROM_ALL
     )
     install(
         FILES $<TARGET_FILE:helicsSharedLib>
         DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT Runtime
-        ${HELICS_EXCLUSION_COMMAND}
+        EXCLUDE_FROM_ALL
     )
 else()
     install(
         TARGETS helicsSharedLib
         DESTINATION ${CMAKE_INSTALL_LIBDIR}
         COMPONENT RUNTIME
-        ${HELICS_EXCLUSION_COMMAND}
+        EXCLUDE_FROM_ALL
     )
 endif()
 

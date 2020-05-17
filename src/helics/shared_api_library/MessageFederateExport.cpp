@@ -38,10 +38,7 @@ static helics::EndpointObject* verifyEndpoint(helics_endpoint ept, helics_error*
     HELICS_ERROR_CHECK(err, nullptr);
     auto* endObj = reinterpret_cast<helics::EndpointObject*>(ept);
     if (endObj == nullptr || endObj->valid != EndpointValidationIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidEndpoint;
-        }
+        assignError(err, helics_error_invalid_object, invalidEndpoint);
         return nullptr;
     }
     return endObj;
@@ -101,10 +98,7 @@ helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name,
     try {
         auto& id = fedObj->getEndpoint(name);
         if (!id.isValid()) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = invalidEndName;
-            }
+            assignError(err, helics_error_invalid_argument, invalidEndName);
             return nullptr;
         }
         auto end = std::make_unique<helics::EndpointObject>();
@@ -130,10 +124,7 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
     try {
         auto& id = fedObj->getEndpoint(index);
         if (!id.isValid()) {
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_argument;
-                err->message = invalidEndIndex;
-            }
+            assignError(err, helics_error_invalid_argument, invalidEndIndex);
             return nullptr;
         }
         auto end = std::make_unique<helics::EndpointObject>();
@@ -252,10 +243,7 @@ void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message
         return;
     }
     if (message == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = emptyMessageErrorString;
-        }
+        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
         return;
     }
 
@@ -324,9 +312,8 @@ void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_me
                 helicsErrorHandler(err);
             }
         }
-    } else if (err != nullptr) {
-        err->error_code = helics_error_invalid_argument;
-        err->message = emptyMessageErrorString;
+    } else {
+        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
     }
 }
 
@@ -728,10 +715,7 @@ helics::Message* getMessageObj(helics_message_object message, helics_error* err)
     HELICS_ERROR_CHECK(err, nullptr);
     auto* mess = reinterpret_cast<helics::Message*>(message);
     if (mess == nullptr || mess->messageValidation != messageKeyCode) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidMessageObject;
-        }
+        assignError(err, helics_error_invalid_argument, invalidMessageObject);
         return nullptr;
     }
     return mess;
@@ -833,7 +817,6 @@ int helicsMessageGetRawDataSize(helics_message_object message)
 
 void helicsMessageGetRawData(helics_message_object message, void* data, int maxMessagelen, int* actualSize, helics_error* err)
 {
-    static constexpr char invalidInsufficient[] = "the given storage was not sufficient to store the message";
     auto* mess = getMessageObj(message, err);
     if (mess == nullptr || mess->data.empty()) {
         if (actualSize != nullptr) {
@@ -842,13 +825,11 @@ void helicsMessageGetRawData(helics_message_object message, void* data, int maxM
         return;
     }
     if (data == nullptr || maxMessagelen <= 0 || static_cast<int>(mess->data.size()) > maxMessagelen) {
+        static constexpr char invalidInsufficient[] = "the given storage was not sufficient to store the message";
         if (actualSize != nullptr) {
             *actualSize = 0;
         }
-        if (err != nullptr) {
-            err->error_code = helics_error_insufficient_space;
-            err->message = invalidInsufficient;
-        }
+        assignError(err, helics_error_insufficient_space, invalidInsufficient);
         return;
     }
 
@@ -971,10 +952,8 @@ void helicsMessageSetFlagOption(helics_message_object message, int flag, helics_
         return;
     }
     if (flag > 15 || flag < 0) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = getMasterHolder()->addErrorString("flag variable is out of bounds must be in [0,15]");
-        }
+        static constexpr const char invalidFlagIndex[] = "flag variable is out of bounds must be in [0,15]";
+        assignError(err, helics_error_invalid_argument, invalidFlagIndex);
         return;
     }
     if (flagValue == helics_true) {
@@ -1029,4 +1008,41 @@ void helicsMessageCopy(helics_message_object source_message, helics_message_obje
     mess_dest->time = mess_src->time;
     mess_dest->messageID = mess_src->messageID;
     mess_dest->flags = mess_src->flags;
+}
+
+helics_message_object helicsMessageClone(helics_message_object message, helics_error* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return nullptr;
+    }
+    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
+    if (messages == nullptr) {
+        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
+        return nullptr;
+    }
+    auto* mess_clone = messages->newMessage();
+
+    mess_clone->data = mess->data;
+    mess_clone->dest = mess->dest;
+    mess_clone->original_source = mess->original_source;
+    mess_clone->source = mess->source;
+    mess_clone->original_dest = mess->original_dest;
+    mess_clone->time = mess->time;
+    mess_clone->messageID = mess->messageID;
+    mess_clone->flags = mess->flags;
+    return mess_clone;
+}
+
+void helicsMessageFree(helics_message_object message)
+{
+    auto* mess = getMessageObj(message, nullptr);
+    if (mess == nullptr) {
+        return;
+    }
+    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
+    if (messages == nullptr) {
+        return;
+    }
+    messages->freeMessage(mess->counter);
 }

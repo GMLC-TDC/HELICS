@@ -28,20 +28,14 @@ FedObject* getFedObject(helics_federate fed, helics_error* err) noexcept
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (fed == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFedString;
-        }
+        assignError(err, helics_error_invalid_object, invalidFedString);
         return nullptr;
     }
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     if (fedObj->valid == fedValidationIdentifier) {
         return fedObj;
     }
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = invalidFedString;
-    }
+    assignError(err, helics_error_invalid_object, invalidFedString);
     return nullptr;
 }
 }  // namespace helics
@@ -66,12 +60,7 @@ helics::ValueFederate* getValueFed(helics_federate fed, helics_error* err)
             return rval;
         }
     }
-    // LCOV_EXCL_START
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = notValueFedString;
-    }
-    // LCOV_EXCL_STOP
+    assignError(err, helics_error_invalid_object, notValueFedString);
     return nullptr;
 }
 
@@ -89,13 +78,7 @@ helics::MessageFederate* getMessageFed(helics_federate fed, helics_error* err)
             return rval;
         }
     }
-    // this next section is not currently used since no calls actually use an error return
-    // LCOV_EXCL_START
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = notMessageFedString;
-    }
-    // LCOV_EXCL_STOP
+    assignError(err, helics_error_invalid_object, notMessageFedString);
     return nullptr;
 }
 
@@ -120,10 +103,7 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed,
             return rval;
         }
     }
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = notValueFedString;
-    }
+    assignError(err, helics_error_invalid_object, notValueFedString);
     return nullptr;
 }
 
@@ -139,10 +119,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_federate 
             return rval;
         }
     }
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = notMessageFedString;
-    }
+    assignError(err, helics_error_invalid_object, notMessageFedString);
     return nullptr;
 }
 
@@ -164,18 +141,12 @@ static helics::FederateInfo* getFedInfo(helics_federate_info fi, helics_error* e
         return nullptr;
     }
     if (fi == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFedInfoString;
-        }
+        assignError(err, helics_error_invalid_object, invalidFedInfoString);
         return nullptr;
     }
     auto* ptr = reinterpret_cast<helics::FederateInfo*>(fi);
     if (ptr->uniqueKey != FederateInfoValidationIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFedInfoString;
-        }
+        assignError(err, helics_error_invalid_object, invalidFedInfoString);
         return nullptr;
     }
     return ptr;
@@ -574,10 +545,7 @@ void helicsFederateRegisterInterfaces(helics_federate fed, const char* file, hel
         return;
     }
     if (file == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidFile;
-        }
+        assignError(err, helics_error_invalid_argument, invalidFile);
         return;
     }
     try {
@@ -1152,10 +1120,7 @@ void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const c
         return;
     }
     if (valueName == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidGlobalString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidGlobalString);
         return;
     }
     try {
@@ -1176,10 +1141,7 @@ void helicsFederateAddDependency(helics_federate fed, const char* fedName, helic
         return;
     }
     if (fedName == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidFedNameString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidFedNameString);
         return;
     }
     try {
@@ -1206,10 +1168,7 @@ void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_e
             cr->setLogFile(AS_STRING(logFile));
             // LCOV_EXCL_START
         } else {  // this can theoretically happen but it we be pretty odd
-            if (err != nullptr) {
-                err->error_code = helics_error_invalid_function_call;
-                err->message = invalidFederateCore;
-            }
+            assignError(err, helics_error_invalid_function_call, invalidFederateCore);
             return;
             // LCOV_EXCL_STOP
         }

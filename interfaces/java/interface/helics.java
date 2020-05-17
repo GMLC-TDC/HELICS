@@ -2654,6 +2654,21 @@ public class helics {
   }
 
   /**
+   * Create a new empty message object.<br>
+   * <br>
+   * The message is empty and isValid will return false since there is no data associated with the message yet.<br>
+   * <br>
+   * <br>
+   * <br>
+   * <br>
+   * @return A new helics_message_object.
+   */
+  public static SWIGTYPE_p_void helicsEndpointCreateMessageObject(SWIGTYPE_p_void endpoint) {
+    long cPtr = helicsJNI.helicsEndpointCreateMessageObject(SWIGTYPE_p_void.getCPtr(endpoint));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
    * Receive a communication message for any endpoint in the federate.<br>
    * <br>
    * @deprecated This function is deprecated and will be removed in Helics 3.0.<br>
@@ -2687,6 +2702,9 @@ public class helics {
    * Create a new empty message object.<br>
    * <br>
    * The message is empty and isValid will return false since there is no data associated with the message yet.<br>
+   * <br>
+   * @param fed the federate object to associate the message with<br>
+   * <br>
    * <br>
    * @return A helics_message_object containing the message data.
    */
@@ -3052,6 +3070,26 @@ public class helics {
    */
   public static void helicsMessageCopy(SWIGTYPE_p_void source_message, SWIGTYPE_p_void dest_message) {
     helicsJNI.helicsMessageCopy(SWIGTYPE_p_void.getCPtr(source_message), SWIGTYPE_p_void.getCPtr(dest_message));
+  }
+
+  /**
+   * Clone a message object.<br>
+   * <br>
+   * @param message The message object to copy from.
+   */
+  public static SWIGTYPE_p_void helicsMessageClone(SWIGTYPE_p_void message) {
+    long cPtr = helicsJNI.helicsMessageClone(SWIGTYPE_p_void.getCPtr(message));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   * Free a message object from memory<br>
+   * memory for message is managed so not using this function does not create memory leaks, this is an indication<br>
+   * to the system that the memory for this message is done being used and can be reused for a new message.<br>
+   * helicsFederateClearMessages() can also be used to clear up all stored messages at once
+   */
+  public static void helicsMessageFree(SWIGTYPE_p_void message) {
+    helicsJNI.helicsMessageFree(SWIGTYPE_p_void.getCPtr(message));
   }
 
   /**

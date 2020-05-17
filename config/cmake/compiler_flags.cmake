@@ -114,25 +114,11 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # this option produces a number of warnings in third party libraries but useful
         # for checking for any internal usages
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
             target_compile_options(
                 compile_flags_target
                 INTERFACE
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond -Wnull-dereference -Wshadow>
+                    $<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond -Wnull-dereference -Wshadow -Wimplicit-fallthrough=2 -Wno-psabi -Wno-deprecated-declarations>
             )
-        endif()
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-            target_compile_options(
-                compile_flags_target
-                INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough=2 -Wno-psabi>
-            )
-            if (CMAKE_CXX_STANDARD GREATER 16)
-            target_compile_options(
-                compile_flags_target
-                INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-declarations>
-            )
-            endif()
-        endif()
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.9)
             target_compile_options(
                 compile_flags_target
@@ -163,6 +149,13 @@ if(MSVC)
         compile_flags_target
         INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
     )
+    if(MSVC_VERSION LESS 1920)
+        #this is a bug in the visual studio 2017 compiler with C++17
+        target_compile_options(
+            compile_flags_target
+            INTERFACE -D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+        )
+    endif()
     # these next two should be global
     add_compile_options(/EHsc /MP)
     target_compile_options(build_flags_target INTERFACE /EHsc)
