@@ -78,7 +78,11 @@ if(NOT MSVC)
 endif()
 
 if(GOOGLE_TEST_INDIVIDUAL)
-    include(GoogleTest)
+    if(NOT CMAKE_VERSION VERSION_LESS 3.9)
+        include(GoogleTest)
+    else()
+        set(GOOGLE_TEST_INDIVIDUAL OFF)
+    endif()
 endif()
 
 # Target must already exist
@@ -86,6 +90,17 @@ macro(add_gtest TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC gtest gmock gtest_main)
 
     if(GOOGLE_TEST_INDIVIDUAL)
+        if(CMAKE_VERSION VERSION_LESS 3.10)
+            gtest_add_tests(
+                TARGET
+                ${TESTNAME}
+                TEST_PREFIX
+                "${TESTNAME}."
+                TEST_LIST
+                TmpTestList
+            )
+            set_tests_properties(${TmpTestList} PROPERTIES FOLDER "Tests")
+        else()
             gtest_discover_tests(
                 ${TESTNAME}
                 TEST_PREFIX
@@ -94,6 +109,8 @@ macro(add_gtest TESTNAME)
                 FOLDER
                 "Tests"
             )
+
+        endif()
     else()
         add_test(${TESTNAME} ${TESTNAME})
         set_target_properties(${TESTNAME} PROPERTIES FOLDER "Tests")
@@ -114,6 +131,7 @@ set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Exter
 
 if(MSVC)
     # add_compile_options( /wd4459)
+    if(MSVC_VERSION GREATER 1899)
         target_compile_definitions(gtest PUBLIC
                                    _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
         target_compile_definitions(gtest_main PUBLIC
@@ -122,4 +140,5 @@ if(MSVC)
                                    _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
         target_compile_definitions(gmock_main PUBLIC
                                    _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    endif()
 endif()
