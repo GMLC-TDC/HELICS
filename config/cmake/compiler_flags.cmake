@@ -163,6 +163,13 @@ if(MSVC)
         compile_flags_target
         INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
     )
+    if(MSVC_VERSION GREATER 1899 AND MSVC_VERSION LESS 1920 AND CMAKE_CXX_STANDARD GREATER 14)
+        #this is a bug in the visual studio 2017 compiler with C++17
+        target_compile_options(
+            compile_flags_target
+            INTERFACE -D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+        )
+    endif()
     # these next two should be global
     add_compile_options(/EHsc /MP)
     target_compile_options(build_flags_target INTERFACE /EHsc)

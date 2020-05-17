@@ -131,7 +131,7 @@ set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Exter
 
 if(MSVC)
     # add_compile_options( /wd4459)
-    if(MSVC_VERSION GREATER_EQUAL 1900)
+    if(MSVC_VERSION GREATER 1899)
         target_compile_definitions(gtest PUBLIC
                                    _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
         target_compile_definitions(gtest_main PUBLIC
