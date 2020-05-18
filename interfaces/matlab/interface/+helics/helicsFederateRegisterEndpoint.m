@@ -1,3 +1,3 @@
 function varargout = helicsFederateRegisterEndpoint(varargin)
-  [varargout{1:nargout}] = helicsMEX(233, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(235, varargin{:});
 end

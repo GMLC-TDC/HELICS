@@ -259,6 +259,8 @@ public class helicsJNI {
   public final static native void helicsQueryExecuteAsync(long jarg1, long jarg2);
   public final static native String helicsQueryExecuteComplete(long jarg1);
   public final static native int helicsQueryIsCompleted(long jarg1);
+  public final static native void helicsQuerySetTarget(long jarg1, String jarg2);
+  public final static native void helicsQuerySetQueryString(long jarg1, String jarg2);
   public final static native void helicsQueryFree(long jarg1);
   public final static native void helicsCleanupLibrary();
   public final static native long helicsFederateRegisterSubscription(long jarg1, String jarg2, String jarg3);
