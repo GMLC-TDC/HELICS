@@ -1456,6 +1456,26 @@ public class helics {
   }
 
   /**
+   * Update the target of a query.<br>
+   * <br>
+   * @param query The query object to change the target of.<br>
+   * @param target the name of the target to query
+   */
+  public static void helicsQuerySetTarget(SWIGTYPE_p_void query, String target) {
+    helicsJNI.helicsQuerySetTarget(SWIGTYPE_p_void.getCPtr(query), target);
+  }
+
+  /**
+   * Update the queryString of a query.<br>
+   * <br>
+   * @param query The query object to change the target of.<br>
+   * @param queryString the new queryString
+   */
+  public static void helicsQuerySetQueryString(SWIGTYPE_p_void query, String queryString) {
+    helicsJNI.helicsQuerySetQueryString(SWIGTYPE_p_void.getCPtr(query), queryString);
+  }
+
+  /**
    * Free the memory associated with a query object.
    */
   public static void helicsQueryFree(SWIGTYPE_p_void query) {
