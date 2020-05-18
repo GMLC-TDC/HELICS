@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
@@ -369,10 +370,10 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
     }
 }
 
-stx::optional<ActionMessage>
+std::optional<ActionMessage>
     FederateState::processPostTerminationAction(const ActionMessage& /*action*/)
 {
-    return stx::nullopt;
+    return {};
 }
 
 iteration_result FederateState::waitSetup()
