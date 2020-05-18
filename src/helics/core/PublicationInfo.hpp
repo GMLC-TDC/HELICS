@@ -38,7 +38,7 @@ class PublicationInfo {
     bool single_destination =
         false;  //!< indicator that the publication should only have a single destination
     /** check the value if it is the same as the most recent data and if changed, store it*/
-    bool CheckSetValue(const char* checkData, uint64_t len);
+    bool CheckSetValue(const char* dataToCheck, uint64_t len);
     /** remove a subscriber*/
     void removeSubscriber(global_handle subscriberToRemove);
 };

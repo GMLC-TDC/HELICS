@@ -443,6 +443,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=0")
+target_compile_definitions(helics_base INTERFACE "USE_STD_OPTIONAL=1")
 # -------------------------------------------------------------
 # add some additional libraries for MINGW and MSYS
 # -------------------------------------------------------------
