@@ -1866,6 +1866,29 @@ def helicsQueryIsCompleted(query: "helics_query") -> "helics_bool":
     """
     return _helics.helicsQueryIsCompleted(query)
 
+def helicsQuerySetTarget(query: "helics_query", target: "char const *") -> "void":
+    r"""
+    Update the target of a query.
+
+    :type query: void
+    :param query: The query object to change the target of.
+    :type target: string
+    :param target: the name of the target to query
+
+    """
+    return _helics.helicsQuerySetTarget(query, target)
+
+def helicsQuerySetQueryString(query: "helics_query", queryString: "char const *") -> "void":
+    r"""
+    Update the queryString of a query.
+
+    :type query: void
+    :param query: The query object to change the target of.
+    :type queryString: string
+    :param queryString: the new queryString
+    """
+    return _helics.helicsQuerySetQueryString(query, queryString)
+
 def helicsQueryFree(query: "helics_query") -> "void":
     r"""Free the memory associated with a query object."""
     return _helics.helicsQueryFree(query)
