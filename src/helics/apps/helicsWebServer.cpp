@@ -27,18 +27,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 
 #include <algorithm>
-#include <boost/config.hpp>
-#include <boost/container/flat_map.hpp>
-#include <boost/beast/http.hpp>
-
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/strand.hpp>
-
 #include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 #include <boost/beast/websocket.hpp>
-
-
+#include <boost/config.hpp>
+#include <boost/container/flat_map.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <functional>
