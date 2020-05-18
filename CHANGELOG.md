@@ -25,6 +25,7 @@ Everything within a major version number should be code compatible (with the exc
 - A `HELICS_BENCHMARK_SHIFT_FACTOR` CMake option was added to allow the benchmarks to scale depending on computational resources
 - "version" and "version_all" queries to get the local version string and the version strings of all the cores/brokers in the federation
 - A few missing operations to the C++98 interface for Message objects, add `helicsMessageClone` and `helicsEndpointCreateMessage` functions in the C interface. Add a test case for some of the C++98 message operations.
+- `helicsQuerySetTarget` and `helicsQuerySetQueryString` operations to modify an existing query in the C interface
 
 ### Deprecated
 

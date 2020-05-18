@@ -33,7 +33,6 @@ set(cpp_shared_library_test_sources
     test-message-federate_cpp.cpp
     # FederateTests.cpp TimingTests.cpp iterationTests.cpp subPubObjectTests.cpp
     QueryTests_cpp.cpp
-    MultiInputTests.cpp
 )
 
 add_executable(
@@ -94,3 +93,6 @@ add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS SharedLibraryCI Continuous)
 set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS SharedLibraryCppCI Continuous)
+
+copy_key_files_to_target_location(shared-library-tests)
+copy_shared_target(shared-library-tests helicsSharedLib)

@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CoreBroker.hpp"
 
-#include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logger.h"
@@ -624,24 +623,23 @@ std::string CoreBroker::generateFederationSummary() const
                 break;
         }
     }
-    Json::Value summary;
-    Json::Value block;
-    block["federates"] = _federates.size();
-    block["min_federates"] = minFederateCount;
-    block["brokers"] = std::count_if(_brokers.begin(),
-                                     _brokers.end(),
-                                     [](auto& brk) { return !static_cast<bool>(brk._core); }),
-    block["cores"] = std::count_if(_brokers.begin(),
-                                   _brokers.end(),
-                                   [](auto& brk) { return static_cast<bool>(brk._core); }),
-    block["min_brokers"] = minBrokerCount;
-    block["publications"] = pubs;
-    block["inputs"] = ipts;
-    block["filters"] = filt;
-    block["endpoints"] = epts;
-    summary["summary"] = block;
-
-    return generateJsonString(summary);
+    std::string output = fmt::format(
+        "Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
+        "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+        _federates.size(),
+        minFederateCount,
+        std::count_if(_brokers.begin(),
+                      _brokers.end(),
+                      [](auto& brk) { return !static_cast<bool>(brk._core); }),
+        std::count_if(_brokers.begin(),
+                      _brokers.end(),
+                      [](auto& brk) { return static_cast<bool>(brk._core); }),
+        minBrokerCount,
+        pubs,
+        ipts,
+        epts,
+        filt);
+    return output;
 }
 
 void CoreBroker::transmitDelayedMessages()
@@ -927,7 +925,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     command.source_id = brk->global_id;
                 }
             }
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:
@@ -1158,7 +1157,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
             } else {
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
-                    auto M = std::any_cast<
+                    auto M = stx::any_cast<
                         std::function<void(int, const std::string&, const std::string&)>>(
                         std::move(*op));
                     M(0, identifier, "logging callback activated");
@@ -2338,7 +2337,7 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
     }
     if (target == "parent") {
         if (isRootc) {
-            return generateJsonErrorResponse(404, "broker has no parent");  // LCOV_EXCL_LINE
+            return "#na";
         }
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = gid;
@@ -2416,38 +2415,25 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return (isConnected()) ? std::string("true") : std::string("false");
     }
     if (request == "name" || request == "identifier") {
-        return std::string{"\""} + getIdentifier() + '"';
+        return getIdentifier();
     }
     if (request == "exists") {
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
-               "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
-               "\"current_time\",\"current_state\",\"status\",\"global_time\",\"version\",\"version_all\",\"exists\"]";
+        return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
+               "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
+               "current_time;current_state;global_time;version;version_all;exists]";
     }
     if (request == "address") {
-        return std::string{"\""} + getAddress() + '"';
+        return getAddress();
     }
     if (request == "version") {
-        return std::string{"\""} + versionString + '"';
-    }
-    if (request == "status") {
-        Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["state"] = brokerStateName(brokerState.load());
-        base["status"] = isConnected();
-        return generateJsonString(base);
+        return versionString;
     }
     if (request == "counts") {
         Json::Value base;
         base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
         base["id"] = global_broker_id_local.baseValue();
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
@@ -2469,15 +2455,11 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "current_state") {
         Json::Value base;
         base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
         base["id"] = global_broker_id_local.baseValue();
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
         }
         base["state"] = brokerStateName(brokerState.load());
-        base["status"] = isConnected();
         base["federates"] = Json::arrayValue;
         for (const auto& fed : _federates) {
             Json::Value fedstate;
@@ -2564,9 +2546,6 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "dependencies") {
         Json::Value base;
         base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
         base["id"] = global_broker_id_local.baseValue();
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
@@ -2581,7 +2560,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
         return generateJsonString(base);
     }
-    return generateJsonErrorResponse(400, "unrecognized broker query");
+    return "#invalid";
 }
 
 std::string CoreBroker::getNameList(std::string gidString) const
@@ -2592,7 +2571,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     if (gidString.front() == '[') {
         gidString = gidString.substr(1);
     }
-    auto val = gmlc::utilities::str2vector<int>(gidString, -23, ",:;");
+    auto val = gmlc::utilities::str2vector<int>(gidString, -23, ";:");
     gidString.clear();
     gidString.push_back('[');
     size_t index = 0;
@@ -2600,13 +2579,13 @@ std::string CoreBroker::getNameList(std::string gidString) const
         const auto* info = handles.findHandle(
             global_handle(global_federate_id(val[index]), interface_handle(val[index + 1])));
         if (info != nullptr) {
-            gidString.append(generateJsonQuotedString(info->key));
-            gidString.push_back(',');
+            gidString.append(info->key);
+            gidString.push_back(';');
         }
 
         index += 2;
     }
-    if (gidString.back() == ',') {
+    if (gidString.back() == ';') {
         gidString.pop_back();
     }
     gidString.push_back(']');
@@ -2622,9 +2601,6 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
     builder.reset();
     Json::Value& base = builder.getJValue();
     base["name"] = getIdentifier();
-    if (uuid_like) {
-        base["uuid"] = getIdentifier();
-    }
     base["id"] = global_broker_id_local.baseValue();
     if (!isRootc) {
         base["parent"] = higher_broker_id.baseValue();
@@ -2703,9 +2679,7 @@ static std::string checkFedQuery(const BasicFedInfo& fed, const std::string& que
             "true" :
             "false";
     } else if (query == "state") {
-        response.push_back('"');
-        response.append(state_string(fed.state));
-        response.push_back('"');
+        response = state_string(fed.state);
     } else if (query == "isinit") {
         if (fed.state >= connection_state::operating) {
             response = "true";
@@ -2773,7 +2747,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             }
             queryResp.payload = globalSet.generate();
         } else {
-            queryResp.payload = generateJsonErrorResponse(404, "Global value not found");
+            queryResp.payload = "#invalid";
         }
         if (queryResp.dest_id == global_broker_id_local) {
             activeQueries.setDelayedValue(m.messageID, queryResp.payload);
@@ -2800,7 +2774,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         }
         if (((route == parent_route_id) && (isRootc)) || !response.empty()) {
             if (response.empty()) {
-                response = generateJsonErrorResponse(404, "query not valid");
+                response = "#invalid";
             }
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;

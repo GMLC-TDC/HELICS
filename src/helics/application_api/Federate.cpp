@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 
 #include "../common/GuardedTypes.hpp"
-#include "../common/JsonGeneration.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
 #include "../core/BrokerFactory.hpp"
@@ -275,7 +274,8 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
         case modes::startup:
         case modes::pending_init:
             enterInitializingMode();
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case modes::initializing: {
             res = coreObject->enterExecutingMode(fedID, iterate);
             switch (res) {
@@ -335,7 +335,8 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
         } break;
         case modes::pending_init:
             enterInitializingModeComplete();
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case modes::initializing: {
             auto eExecFunc = [this, iterate]() {
                 return coreObject->enterExecutingMode(fedID, iterate);
@@ -551,6 +552,16 @@ void Federate::completeOperation()
     }
 }
 
+void Federate::error(int errorcode)
+{
+    localError(errorcode);
+}
+
+void Federate::error(int errorcode, const std::string& message)
+{
+    localError(errorcode, message);
+}
+
 void Federate::localError(int errorcode)
 {
     std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + name;
@@ -617,7 +628,8 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
         switch (iterativeTime.state) {
             case iteration_result::next_step:
                 currentTime = iterativeTime.grantedTime;
-                [[fallthrough]];
+                FALLTHROUGH
+                /* FALLTHROUGH */
             case iteration_result::iterating:
                 updateTime(currentTime, oldTime);
                 break;
@@ -696,7 +708,8 @@ iteration_time Federate::requestTimeIterativeComplete()
         switch (iterativeTime.state) {
             case iteration_result::next_step:
                 currentTime = iterativeTime.grantedTime;
-                [[fallthrough]];
+                FALLTHROUGH
+                /* FALLTHROUGH */
             case iteration_result::iterating:
                 updateTime(currentTime, oldTime);
                 break;
@@ -786,11 +799,14 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
             filt.setOption(getOptionIndex(target.substr(2)), false);
         }
     });
-    processOptions(
-        data,
-        [](const std::string& option) { return getOptionIndex(option); },
-        [](const std::string& value) { return getOptionValue(value); },
-        [&filt](int32_t option, int32_t value) { filt.setOption(option, value); });
+    bool optional = getOrDefault(data, "optional", false);
+    if (optional) {
+        filt.setOption(defs::options::connection_optional, optional);
+    }
+    bool required = getOrDefault(data, "required", false);
+    if (required) {
+        filt.setOption(defs::options::connection_required, required);
+    }
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
@@ -1003,12 +1019,12 @@ std::string Federate::query(const std::string& queryStr)
 {
     std::string res;
     if (queryStr == "name") {
-        res = generateJsonQuotedString(getName());
+        res = getName();
     } else if (queryStr == "corename") {
         if (coreObject) {
-            res = generateJsonQuotedString(coreObject->getIdentifier());
+            res = coreObject->getIdentifier();
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res = "#disconnected";
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1019,7 +1035,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->query(getName(), queryStr);
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res = "#disconnected";
         }
     }
     return res;
@@ -1034,7 +1050,7 @@ std::string Federate::query(const std::string& target, const std::string& queryS
         if (coreObject) {
             res = coreObject->query(target, queryStr);
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res = "#disconnected";
         }
     }
     return res;
@@ -1069,10 +1085,10 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     if (fnd != asyncInfo->inFlightQueries.end()) {
         return fnd->second.get();
     }
-    return generateJsonErrorResponse(404, "No Async queries are available");
+    return {"#invalid"};
 }
 
-bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
+bool Federate::isQueryCompleted(query_id_t queryIndex) const
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
@@ -1216,7 +1232,7 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
     }
 }
 
-void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value)
+void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool option_value)
 {
     if (coreObject) {
         coreObject->setHandleOption(handle, option, option_value);
@@ -1227,9 +1243,9 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32
 }
 
 /** get the current value for an interface option*/
-int32_t Federate::getInterfaceOption(interface_handle handle, int32_t option)
+bool Federate::getInterfaceOption(interface_handle handle, int32_t option)
 {
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : 0;
+    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
 }
 
 void Federate::closeInterface(interface_handle handle)

@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommonCore.hpp"
 
-#include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logger.h"
@@ -19,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterCoordinator.hpp"
 #include "FilterInfo.hpp"
 #include "ForwardingTimeCoordinator.hpp"
-#include "InputInfo.hpp"
+#include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
@@ -950,7 +949,9 @@ const std::string& CommonCore::getInjectionUnits(interface_handle handle) const
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
-                    return inpInfo->getInjectionUnits();
+                    if (!inpInfo->inputUnits.empty()) {
+                        return inpInfo->inputUnits;
+                    }
                 }
                 break;
             }
@@ -987,7 +988,9 @@ const std::string& CommonCore::getInjectionType(interface_handle handle) const
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
-                    return inpInfo->getInjectionType();
+                    if (!inpInfo->inputType.empty()) {
+                        return inpInfo->inputType;
+                    }
                 }
                 break;
             }
@@ -1020,7 +1023,7 @@ const std::string& CommonCore::getExtractionType(interface_handle handle) const
     return emptyStr;
 }
 
-void CommonCore::setHandleOption(interface_handle handle, int32_t option, int32_t option_value)
+void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool option_value)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1034,8 +1037,8 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, int32_
     fcn.dest_handle = handle;
     fcn.messageID = option;
     fcn.counter = static_cast<uint16_t>(handleInfo->handleType);
-    fcn.setExtraDestData(option_value);
-    if (option_value != 0) {
+
+    if (option_value) {
         setActionFlag(fcn, indicator_flag);
     }
     if (handleInfo->handleType != handle_type::filter) {
@@ -1049,11 +1052,11 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, int32_
     }
 }
 
-int32_t CommonCore::getHandleOption(interface_handle handle, int32_t option) const
+bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
-        return 0;
+        return false;
     }
     switch (option) {
         case defs::options::connection_required:
@@ -1071,7 +1074,7 @@ int32_t CommonCore::getHandleOption(interface_handle handle, int32_t option) con
     } else {
         // must be for filter
     }
-    return 0;
+    return false;
 }
 
 void CommonCore::closeHandle(interface_handle handle)
@@ -1264,8 +1267,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
     }
 }
 
-const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle handle,
-                                                              uint32_t* inputIndex)
+std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1275,13 +1277,11 @@ const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle h
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    auto& fed = *getFederateAt(handleInfo->local_fed_id);
-    std::lock_guard<FederateState> lk(fed);
-    return fed.getValue(handle, inputIndex);
+    // TODO(PT): this is a long chain should be refactored
+    return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getData();
 }
 
-const std::vector<std::shared_ptr<const data_block>>&
-    CommonCore::getAllValues(interface_handle handle)
+std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interface_handle handle)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1291,9 +1291,8 @@ const std::vector<std::shared_ptr<const data_block>>&
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    auto& fed = *getFederateAt(handleInfo->local_fed_id);
-    std::lock_guard<FederateState> lk(fed);
-    return fed.getAllValues(handle);
+    // TODO(PT): this is a long chain should be refactored
+    return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getAllData();
 }
 
 const std::vector<interface_handle>& CommonCore::getValueUpdates(local_federate_id federateID)
@@ -2009,13 +2008,13 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         if (queryStr == "exists") {
             return "false";
         }
-        return generateJsonErrorResponse(404, "Federate not found");
+        return "#invalid";
     }
     if (queryStr == "exists") {
         return "true";
     }
     if (queryStr == "version") {
-        return std::string{"\""} + versionString + '"';
+        return versionString;
     }
     if (queryStr == "isinit") {
         return (fed->init_transmitted.load()) ? "true" : "false";
@@ -2028,7 +2027,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   R"(["exists","isinit","state","version","queries","filtered_endpoints","current_time",)") +
+                   "[exists;isinit;state;version;queries;filtered_endpoints;current_time;") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -2037,20 +2036,20 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
-               "\"publications\",\"filters\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\",\"current_time\",\"global_time\",\"current_state\"]";
+        return "[isinit;isconnected;exists;name;identifier;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
+               "publications;filters;version;version_all;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
     }
     if (queryStr == "name" || queryStr == "identifier") {
-        return std::string{"\""} + getIdentifier() + '"';
+        return getIdentifier();
     }
     if (queryStr == "exists") {
         return "true";
     }
     if (queryStr == "version") {
-        return std::string{"\""} + versionString + '"';
+        return versionString;
     }
     return std::string{};
 }
@@ -2206,7 +2205,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     }
 
     if (queryStr == "address") {
-        return std::string{"\""} + getAddress() + '"';
+        return getAddress();
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
@@ -2277,7 +2276,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
         return generateJsonString(base);
     }
-    return generateJsonErrorResponse(400, "unrecognized core query");
+    return "#invalid";
 }
 
 std::string CommonCore::query(const std::string& target, const std::string& queryStr)
@@ -2289,7 +2288,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                 return res;
             }
         }
-        return generateJsonErrorResponse(410, "Core has terminated");
+        return "#disconnected";
     }
     ActionMessage querycmd(CMD_QUERY);
     querycmd.source_id = direct_core_id;
@@ -2305,8 +2304,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
             return res;
         }
         if (queryStr == "address") {
-            res = generateJsonQuotedString(getAddress());
-            return res;
+            return getAddress();
         }
         querycmd.setAction(CMD_BROKER_QUERY);
         querycmd.dest_id = direct_core_id;
@@ -2347,7 +2345,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                         status = std::future_status::ready;  // LCOV_EXCL_LINE
                 }
             }
-            return generateJsonErrorResponse(500, "Unexpected Error #13");  // LCOV_EXCL_LINE
+            return "#error";  // LCOV_EXCL_LINE
         }
     }
 
@@ -3789,7 +3787,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             } else {
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
-                    auto M = std::any_cast<
+                    auto M = stx::any_cast<
                         std::function<void(int, const std::string&, const std::string&)>>(
                         std::move(*op));
                     M(0, identifier, "logging callback activated");
@@ -3802,7 +3800,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             int ii = cmd.counter;
             auto op = dataAirlocks[ii].try_unload();
             if (op) {
-                auto M = std::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
+                auto M = stx::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
                 FiltI->filterOp = std::move(M);
             }
         } break;
