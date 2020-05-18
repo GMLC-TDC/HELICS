@@ -37,7 +37,7 @@ TEST(data_view_tests, constructor_tests)
     EXPECT_EQ(dv3.size(), 7u);
     EXPECT_EQ(dv3.string(), "this is");
 
-    stx::string_view stv(str, 10);
+    std::string_view stv(str, 10);
     // test copy constructor
     data_view db6(stv);
     EXPECT_EQ(db6.size(), stv.size());
