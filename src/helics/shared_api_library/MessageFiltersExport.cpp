@@ -24,18 +24,12 @@ static helics::FilterObject* getFilterObj(helics_filter filt, helics_error* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (filt == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFilterString;
-        }
+        assignError(err, helics_error_invalid_object, invalidFilterString);
         return nullptr;
     }
     auto* fObj = reinterpret_cast<helics::FilterObject*>(filt);
     if (fObj->valid != filterValidationIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFilterString;
-        }
+        assignError(err, helics_error_invalid_object, invalidFilterString);
         return nullptr;
     }
     return fObj;
@@ -270,11 +264,8 @@ static helics::CloningFilter* getCloningFilter(helics_filter filt, helics_error*
         return nullptr;
     }
     if (!fObj->cloning) {
-        if (err != nullptr) {
-            static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
-            err->error_code = helics_error_invalid_object;
-            err->message = nonCloningFilterString;
-        }
+        static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
+        assignError(err, helics_error_invalid_object, nonCloningFilterString);
         return nullptr;
     }
     return dynamic_cast<helics::CloningFilter*>(fObj->filtPtr);
@@ -491,11 +482,8 @@ void helicsFilterSetCustomCallback(helics_filter filt,
     }
 
     if (!fObj->custom) {
-        if (err != nullptr) {
-            static constexpr char nonCustomFilterString[] = "filter must be a custom filter to specify callback";
-            err->error_code = helics_error_invalid_object;
-            err->message = nonCustomFilterString;
-        }
+        static constexpr char nonCustomFilterString[] = "filter must be a custom filter to specify callback";
+        assignError(err, helics_error_invalid_object, nonCustomFilterString);
         return;
     }
     auto op = std::make_shared<helics::CustomMessageOperator>();

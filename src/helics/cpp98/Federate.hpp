@@ -426,7 +426,8 @@ class Federate {
     }
     /** get the federate name*/
     const char* getName() const { return helicsFederateGetName(fed); }
-    /** make a query of the core
+
+    /** make a query of the federate
     @details this call is blocking until the value is returned which make take some time depending
     on the size of the federation and the specific string being queried
     @param target  the target of the query can be "federation", "federate", "broker", "core", or a
@@ -445,6 +446,27 @@ class Federate {
         helicsQueryFree(q);
         return result;
     }
+
+    /** make a query of the federate
+    @details this call is blocking until the value is returned which may take some time depending
+    on the size of the federation and the specific string being queried, query without a target
+    assumes the target is the federate
+
+    @param queryStr a string with the query, see other documentation for specific properties to
+    query, can be defined by the federate
+    @return a string with the value requested.  this is either going to be a vector of strings value
+    or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
+    if the query was not valid
+    */
+    std::string query(const std::string& queryStr) const
+    {
+        // returns helics_query
+        helics_query q = helicsCreateQuery(HELICS_NULL_POINTER, queryStr.c_str());
+        std::string result(helicsQueryExecute(q, fed, hThrowOnError()));
+        helicsQueryFree(q);
+        return result;
+    }
+
     /** define a filter interface
     @details a filter will modify messages coming from or going to target endpoints
     @param type the type of the filter to register
@@ -567,6 +589,8 @@ class Federate {
     {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }
+    /** get a Core Object*/
+    helics_core getCore() { return helicsFederateGetCoreObject(fed, hThrowOnError()); }
 
   protected:
     helics_federate fed;  //!< underlying helics_federate object

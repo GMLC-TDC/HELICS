@@ -6,14 +6,17 @@ jobs:
           imageName: 'vs2017-win2016'
           langArch: 'x86'
           vsArch: 'Win32'
+          extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON'
         VS2017-64bit:
           imageName: 'vs2017-win2016'
           langArch: 'x64'
           vsArch: 'x64'
+          extraFlags: ''
         VS2019-64bit:
           imageName: 'windows-2019'
           langArch: 'x64'
           vsArch: 'x64'
+          extraFlags: ''
     pool:
       vmImage: $(imageName)
 
@@ -41,7 +44,7 @@ jobs:
           echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT_1_72_0"
       - task: CMake@1
         inputs:
-          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON $(extraFlags) ..
         displayName: 'Configure HELICS'
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 

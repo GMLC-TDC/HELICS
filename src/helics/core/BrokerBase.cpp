@@ -292,7 +292,7 @@ void BrokerBase::generateNewIdentifier()
 void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {
     lastErrorString = estring;
-    errorCode = eCode;
+    lastErrorCode = eCode;
     if (brokerState.load() != broker_state_t::errored) {
         brokerState.store(broker_state_t::errored);
         if (errorDelay <= timeZero) {

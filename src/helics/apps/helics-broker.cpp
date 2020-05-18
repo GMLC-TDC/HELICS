@@ -91,13 +91,13 @@ int main(int argc, char* argv[])  // NOLINT
 #endif
     try {
         if (runterminal) {
-            terminalFunction(cmdLine.remaining_for_passthrough());
+            terminalFunction(cmdLine.remainArgs());
         } else if (autorestart) {
             while (true) {
                 // I am purposely making an object that creates and destroys itself on the same line
                 // because this will run until termination so will take a while
                 {
-                    helics::BrokerKeeper brkapp{cmdLine.remaining_for_passthrough(true)};
+                    helics::BrokerKeeper brkapp{cmdLine.remainArgs()};
                 }
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])  // NOLINT
                 std::cout << "broker restarting" << std::endl;
             }
         } else {
-            helics::BrokerKeeper broker(cmdLine.remaining_for_passthrough());
+            helics::BrokerKeeper broker(cmdLine.remainArgs());
         }
     }
     catch (const std::invalid_argument& ia) {

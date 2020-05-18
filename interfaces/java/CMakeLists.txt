@@ -7,19 +7,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.10...3.17)
 project(helicsJAVA)
 
 get_directory_property(hasParent PARENT_DIRECTORY)
 
 if(NOT hasParent)
     message(STATUS "Standalone Java interface build")
-
-    if(CMAKE_VERSION VERSION_LESS 3.17)
-        cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-    else()
-        cmake_policy(VERSION 3.17)
-    endif()
 
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Java interface files" ON)
@@ -97,13 +91,6 @@ else()
     set(USE_MODERNIZED_SWIG OFF)
 endif()
 
-# This can be removed in HELICS 3 if the minimum CMake version is >= 3.8
-if(NOT CMAKE_VERSION VERSION_LESS 3.8)
-    set(USE_SWIG_ADD_LIBRARY ON)
-else()
-    set(USE_SWIG_ADD_LIBRARY OFF)
-endif()
-
 # ##################################################################################################
 # Run SWIG only (no build)
 # ##################################################################################################
@@ -144,16 +131,12 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
     endif()
 
-    if(USE_SWIG_ADD_LIBRARY)
-        swig_add_library(
-            helicsJava
-            TYPE MODULE
-            LANGUAGE java
-            SOURCES helicsJava.i
-        )
-    else()
-        swig_add_module(helicsJava java helicsJava.i)
-    endif()
+    swig_add_library(
+        helicsJava
+        TYPE MODULE
+        LANGUAGE java
+        SOURCES helicsJava.i
+    )
 
     swig_link_libraries(helicsJava HELICS::helicsSharedLib)
     swig_link_libraries(helicsJava ${JAVA_LIBRARIES})
