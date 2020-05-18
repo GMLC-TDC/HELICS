@@ -26,12 +26,12 @@ namespace helics {
 /** define a variant with the different types*/
 
 using defV = std::variant<double,
-                            int64_t,
-                            std::string,
-                            std::complex<double>,
-                            std::vector<double>,
-                            std::vector<std::complex<double>>,
-                            NamedPoint>;
+                          int64_t,
+                          std::string,
+                          std::complex<double>,
+                          std::vector<double>,
+                          std::vector<std::complex<double>>,
+                          NamedPoint>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location {

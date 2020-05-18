@@ -85,13 +85,13 @@ void Input::handleCallback(Time time)
         } break;
         case complex_loc: {
             auto val = getValue<std::complex<double>>();
-            std::get<std::function<void(const std::complex<double>&, Time)>>(
-                value_callback)(val, time);
+            std::get<std::function<void(const std::complex<double>&, Time)>>(value_callback)(val,
+                                                                                             time);
         } break;
         case vector_loc: {
             auto val = getValue<std::vector<double>>();
             std::get<std::function<void(const std::vector<double>&, Time)>>(value_callback)(val,
-                                                                                              time);
+                                                                                            time);
         } break;
         case complex_vector_loc: {
             auto val = getValue<std::vector<std::complex<double>>>();
