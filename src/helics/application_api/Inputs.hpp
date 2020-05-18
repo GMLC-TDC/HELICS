@@ -42,14 +42,14 @@ class HELICS_CXX_EXPORT Input {
     std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
     std::variant<std::function<void(const double&, Time)>,
-                   std::function<void(const int64_t&, Time)>,
-                   std::function<void(const std::string&, Time)>,
-                   std::function<void(const std::complex<double>&, Time)>,
-                   std::function<void(const std::vector<double>&, Time)>,
-                   std::function<void(const std::vector<std::complex<double>>&, Time)>,
-                   std::function<void(const NamedPoint&, Time)>,
-                   std::function<void(const bool&, Time)>,
-                   std::function<void(const Time&, Time)>>
+                 std::function<void(const int64_t&, Time)>,
+                 std::function<void(const std::string&, Time)>,
+                 std::function<void(const std::complex<double>&, Time)>,
+                 std::function<void(const std::vector<double>&, Time)>,
+                 std::function<void(const std::vector<std::complex<double>>&, Time)>,
+                 std::function<void(const NamedPoint&, Time)>,
+                 std::function<void(const bool&, Time)>,
+                 std::function<void(const Time&, Time)>>
         value_callback;  //!< callback function for the federate
   public:
     /** Default constructor*/
