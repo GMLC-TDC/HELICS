@@ -8,12 +8,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-data.hpp"
 #include "../core/helics-time.hpp"
-#include "helics/external/string_view.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -21,7 +21,7 @@ namespace helics {
 /** class containing a constant view of data block*/
 class data_view {
   private:
-    stx::string_view dblock;  //!< using a string_view to represent the data
+    std::string_view dblock;  //!< using a string_view to represent the data
     std::shared_ptr<const data_block>
         ref;  //!< need to capture a reference to the data being viewed if it is from a shared_ptr
   public:
@@ -52,7 +52,7 @@ class data_view {
     data_view(const std::vector<char>& dvec) noexcept:
         dblock(dvec.data(), dvec.size()) {}  // NOLINT
     /** construct from a string_view*/
-    data_view(const stx::string_view& sview) noexcept:
+    data_view(const std::string_view& sview) noexcept:
         dblock(sview){};  // NOLINT (intended implicit)
     /** assignment operator from another ata_view*/
     data_view& operator=(const data_view& dv) noexcept = default;
@@ -79,7 +79,7 @@ class data_view {
         return *this;
     }
     /** assignment from a string_view*/
-    data_view& operator=(const stx::string_view& str) noexcept
+    data_view& operator=(const std::string_view& str) noexcept
     {
         dblock = str;
         ref = nullptr;
@@ -110,7 +110,7 @@ class data_view {
     /** return a string of the data
     @details this actually does a copy to a new string
     */
-    std::string string() const { return dblock.to_string(); }
+    std::string string() const { return std::string(dblock); }
     /** random access operator*/
     char operator[](int index) const { return dblock[index]; }
     /** begin iterator*/
