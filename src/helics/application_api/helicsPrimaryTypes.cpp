@@ -15,7 +15,7 @@ namespace helics {
 bool changeDetected(const defV& prevValue, const std::string& val, double /*deltaV*/)
 {
     if (prevValue.index() == string_loc) {
-        return (val != mpark::get<std::string>(prevValue));
+        return (val != std::get<std::string>(prevValue));
     }
     return true;
 }
@@ -23,7 +23,7 @@ bool changeDetected(const defV& prevValue, const std::string& val, double /*delt
 bool changeDetected(const defV& prevValue, const char* val, double /*deltaV*/)
 {
     if (prevValue.index() == string_loc) {
-        return (mpark::get<std::string>(prevValue) != val);
+        return (std::get<std::string>(prevValue) != val);
     }
     return true;
 }
@@ -57,10 +57,10 @@ static bool isTrueString(const std::string& str)
 bool changeDetected(const defV& prevValue, bool val, double /*deltaV*/)
 {
     if (prevValue.index() == string_loc) {
-        return (isTrueString(mpark::get<std::string>(prevValue)) != val);
+        return (isTrueString(std::get<std::string>(prevValue)) != val);
     }
     if (prevValue.index() == int_loc) {
-        return ((mpark::get<int64_t>(prevValue) != 0) != val);
+        return ((std::get<int64_t>(prevValue) != 0) != val);
     }
     return true;
 }
@@ -68,7 +68,7 @@ bool changeDetected(const defV& prevValue, bool val, double /*deltaV*/)
 bool changeDetected(const defV& prevValue, const std::vector<double>& val, double deltaV)
 {
     if (prevValue.index() == vector_loc) {
-        const auto& prevV = mpark::get<std::vector<double>>(prevValue);
+        const auto& prevV = std::get<std::vector<double>>(prevValue);
         if (val.size() == prevV.size()) {
             for (size_t ii = 0; ii < val.size(); ++ii) {
                 if (std::abs(prevV[ii] - val[ii]) > deltaV) {
@@ -86,7 +86,7 @@ bool changeDetected(const defV& prevValue,
                     double deltaV)
 {
     if (prevValue.index() == complex_vector_loc) {
-        const auto& prevV = mpark::get<std::vector<std::complex<double>>>(prevValue);
+        const auto& prevV = std::get<std::vector<std::complex<double>>>(prevValue);
         if (val.size() == prevV.size()) {
             for (size_t ii = 0; ii < val.size(); ++ii) {
                 if (std::abs(prevV[ii] - val[ii]) > deltaV) {
@@ -102,7 +102,7 @@ bool changeDetected(const defV& prevValue,
 bool changeDetected(const defV& prevValue, const double* vals, size_t size, double deltaV)
 {
     if (prevValue.index() == vector_loc) {
-        const auto& prevV = mpark::get<std::vector<double>>(prevValue);
+        const auto& prevV = std::get<std::vector<double>>(prevValue);
         if (size == prevV.size()) {
             for (size_t ii = 0; ii < size; ++ii) {
                 if (std::abs(prevV[ii] - vals[ii]) > deltaV) {
@@ -118,7 +118,7 @@ bool changeDetected(const defV& prevValue, const double* vals, size_t size, doub
 bool changeDetected(const defV& prevValue, const std::complex<double>& val, double deltaV)
 {
     if (prevValue.index() == complex_loc) {
-        const auto& prevV = mpark::get<std::complex<double>>(prevValue);
+        const auto& prevV = std::get<std::complex<double>>(prevValue);
         if (std::abs(prevV.real() - val.real()) > deltaV) {
             return true;
         }
@@ -133,7 +133,7 @@ bool changeDetected(const defV& prevValue, const std::complex<double>& val, doub
 bool changeDetected(const defV& prevValue, double val, double deltaV)
 {
     if (prevValue.index() == double_loc) {
-        return (std::abs(mpark::get<double>(prevValue) - val) > deltaV);
+        return (std::abs(std::get<double>(prevValue) - val) > deltaV);
     }
     return true;
 }
@@ -141,10 +141,10 @@ bool changeDetected(const defV& prevValue, double val, double deltaV)
 bool changeDetected(const defV& prevValue, Time val, double deltaV)
 {
     if (prevValue.index() == double_loc) {
-        return (std::abs(mpark::get<double>(prevValue) - static_cast<double>(val)) > deltaV);
+        return (std::abs(std::get<double>(prevValue) - static_cast<double>(val)) > deltaV);
     }
     if (prevValue.index() == int_loc) {
-        return (std::abs(Time(mpark::get<int64_t>(prevValue), time_units::ns) - val) > deltaV);
+        return (std::abs(Time(std::get<int64_t>(prevValue), time_units::ns) - val) > deltaV);
     }
     return true;
 }
@@ -152,7 +152,7 @@ bool changeDetected(const defV& prevValue, Time val, double deltaV)
 bool changeDetected(const defV& prevValue, int64_t val, double deltaV)
 {
     if (prevValue.index() == int_loc) {
-        return (std::abs(mpark::get<int64_t>(prevValue) - val) > static_cast<int64_t>(deltaV));
+        return (std::abs(std::get<int64_t>(prevValue) - val) > static_cast<int64_t>(deltaV));
     }
     return true;
 }
@@ -160,11 +160,11 @@ bool changeDetected(const defV& prevValue, int64_t val, double deltaV)
 bool changeDetected(const defV& prevValue, const NamedPoint& val, double deltaV)
 {
     if ((prevValue.index() == double_loc) && (!std::isnan(val.value))) {
-        return (std::abs(mpark::get<double>(prevValue) - val.value) > deltaV);
+        return (std::abs(std::get<double>(prevValue) - val.value) > deltaV);
     }
     if (prevValue.index() == named_point_loc) {
-        if ((mpark::get<NamedPoint>(prevValue).name == val.name) && (!std::isnan(val.value))) {
-            return (std::abs(mpark::get<NamedPoint>(prevValue).value - val.value) > deltaV);
+        if ((std::get<NamedPoint>(prevValue).name == val.name) && (!std::isnan(val.value))) {
+            return (std::abs(std::get<NamedPoint>(prevValue).value - val.value) > deltaV);
         }
     }
     return true;
@@ -174,26 +174,26 @@ void valueExtract(const defV& dv, std::string& val)
 {
     switch (dv.index()) {
         case double_loc:  // double
-            val = std::to_string(mpark::get<double>(dv));
+            val = std::to_string(std::get<double>(dv));
             break;
         case int_loc:  // int64_t
-            val = std::to_string(mpark::get<int64_t>(dv));
+            val = std::to_string(std::get<int64_t>(dv));
             break;
         case string_loc:  // string
         default:
-            val = mpark::get<std::string>(dv);
+            val = std::get<std::string>(dv);
             break;
         case complex_loc:  // complex
-            val = helicsComplexString(mpark::get<std::complex<double>>(dv));
+            val = helicsComplexString(std::get<std::complex<double>>(dv));
             break;
         case vector_loc:  // vector
-            val = helicsVectorString(mpark::get<std::vector<double>>(dv));
+            val = helicsVectorString(std::get<std::vector<double>>(dv));
             break;
         case complex_vector_loc:  // vector
-            val = helicsComplexVectorString(mpark::get<std::vector<std::complex<double>>>(dv));
+            val = helicsComplexVectorString(std::get<std::vector<std::complex<double>>>(dv));
             break;
         case named_point_loc: {
-            auto& np = mpark::get<NamedPoint>(dv);
+            auto& np = std::get<NamedPoint>(dv);
             val = (std::isnan(np.value)) ? np.name : helicsNamedPointString(np);
             break;
         }
@@ -204,21 +204,21 @@ void valueExtract(const defV& dv, std::complex<double>& val)
 {
     switch (dv.index()) {
         case double_loc:  // double
-            val = std::complex<double>(mpark::get<double>(dv), 0.0);
+            val = std::complex<double>(std::get<double>(dv), 0.0);
             break;
         case int_loc:  // int64_t
-            val = std::complex<double>(static_cast<double>(mpark::get<int64_t>(dv)), 0.0);
+            val = std::complex<double>(static_cast<double>(std::get<int64_t>(dv)), 0.0);
             break;
         case string_loc:  // string
         default:
-            val = getComplexFromString(mpark::get<std::string>(dv));
+            val = getComplexFromString(std::get<std::string>(dv));
             break;
         case complex_loc:  // complex
-            val = mpark::get<std::complex<double>>(dv);
+            val = std::get<std::complex<double>>(dv);
             break;
         case vector_loc:  // vector
         {
-            auto& vec = mpark::get<std::vector<double>>(dv);
+            auto& vec = std::get<std::vector<double>>(dv);
             if (vec.size() == 1) {
                 val = std::complex<double>(vec[0], 0.0);
             } else if (vec.size() > 2) {
@@ -227,14 +227,14 @@ void valueExtract(const defV& dv, std::complex<double>& val)
             break;
         }
         case complex_vector_loc: {
-            auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             if (!vec.empty()) {
                 val = vec.front();
             }
             break;
         }
         case named_point_loc: {
-            auto& np = mpark::get<NamedPoint>(dv);
+            auto& np = std::get<NamedPoint>(dv);
             if (std::isnan(np.value)) {
                 val = getComplexFromString(np.name);
             } else {
@@ -249,27 +249,27 @@ void valueExtract(const defV& dv, std::vector<double>& val)
     val.resize(0);
     switch (dv.index()) {
         case double_loc:  // double
-            val.push_back(mpark::get<double>(dv));
+            val.push_back(std::get<double>(dv));
             break;
         case int_loc:  // int64_t
-            val.push_back(static_cast<double>(mpark::get<int64_t>(dv)));
+            val.push_back(static_cast<double>(std::get<int64_t>(dv)));
             break;
         case string_loc:  // string
         default:
-            helicsGetVector(mpark::get<std::string>(dv), val);
+            helicsGetVector(std::get<std::string>(dv), val);
             break;
         case complex_loc:  // complex
         {
-            auto cval = mpark::get<std::complex<double>>(dv);
+            auto cval = std::get<std::complex<double>>(dv);
             val.push_back(cval.real());
             val.push_back(cval.imag());
         } break;
         case vector_loc:  // vector
-            val = mpark::get<std::vector<double>>(dv);
+            val = std::get<std::vector<double>>(dv);
             break;
         case complex_vector_loc:  // complex
         {
-            auto& cv = mpark::get<std::vector<std::complex<double>>>(dv);
+            auto& cv = std::get<std::vector<std::complex<double>>>(dv);
             val.resize(2 * cv.size());
             for (auto& cval : cv) {
                 val.push_back(cval.real());
@@ -278,7 +278,7 @@ void valueExtract(const defV& dv, std::vector<double>& val)
         } break;
         case named_point_loc:  // named point
         {
-            auto& np = mpark::get<NamedPoint>(dv);
+            auto& np = std::get<NamedPoint>(dv);
             if (std::isnan(np.value)) {
                 val = helicsGetVector(np.name);
             } else {
@@ -295,22 +295,22 @@ void valueExtract(const defV& dv, std::vector<std::complex<double>>& val)
     val.resize(0);
     switch (dv.index()) {
         case double_loc:  // double
-            val.emplace_back(mpark::get<double>(dv), 0.0);
+            val.emplace_back(std::get<double>(dv), 0.0);
             break;
         case int_loc:  // int64_t
-            val.emplace_back(static_cast<double>(mpark::get<int64_t>(dv)), 0.0);
+            val.emplace_back(static_cast<double>(std::get<int64_t>(dv)), 0.0);
             break;
         case string_loc:  // string
         default:
-            helicsGetComplexVector(mpark::get<std::string>(dv), val);
+            helicsGetComplexVector(std::get<std::string>(dv), val);
             break;
         case complex_loc:  // complex
         {
-            val.push_back(mpark::get<std::complex<double>>(dv));
+            val.push_back(std::get<std::complex<double>>(dv));
         } break;
         case vector_loc:  // vector
         {
-            auto& v = mpark::get<std::vector<double>>(dv);
+            auto& v = std::get<std::vector<double>>(dv);
             val.resize(v.size() / 2);
             for (size_t ii = 0; ii < v.size() - 1; ii += 2) {
                 val.emplace_back(v[ii], v[ii + 1]);
@@ -318,11 +318,11 @@ void valueExtract(const defV& dv, std::vector<std::complex<double>>& val)
             break;
         }
         case complex_vector_loc:  // complex
-            val = mpark::get<std::vector<std::complex<double>>>(dv);
+            val = std::get<std::vector<std::complex<double>>>(dv);
             break;
         case named_point_loc:  // named point
         {
-            auto& np = mpark::get<NamedPoint>(dv);
+            auto& np = std::get<NamedPoint>(dv);
             if (std::isnan(np.value)) {
                 val = helicsGetComplexVector(np.name);
             } else {
@@ -339,23 +339,23 @@ void valueExtract(const defV& dv, NamedPoint& val)
     switch (dv.index()) {
         case double_loc:  // double
             val.name = "value";
-            val.value = mpark::get<double>(dv);
+            val.value = std::get<double>(dv);
             break;
         case int_loc:  // int64_t
             val.name = "value";
-            val.value = static_cast<double>(mpark::get<int64_t>(dv));
+            val.value = static_cast<double>(std::get<int64_t>(dv));
             break;
         case string_loc:  // string
         default:
-            val = helicsGetNamedPoint(mpark::get<std::string>(dv));
+            val = helicsGetNamedPoint(std::get<std::string>(dv));
             break;
         case complex_loc:  // complex
-            val.name = helicsComplexString(mpark::get<std::complex<double>>(dv));
+            val.name = helicsComplexString(std::get<std::complex<double>>(dv));
             val.value = std::nan("0");
             break;
         case vector_loc:  // vector
         {
-            auto& vec = mpark::get<std::vector<double>>(dv);
+            auto& vec = std::get<std::vector<double>>(dv);
             if (vec.size() == 1) {
                 val.name = "value";
                 val.value = vec[0];
@@ -368,7 +368,7 @@ void valueExtract(const defV& dv, NamedPoint& val)
         }
         case complex_vector_loc: {
             val.value = std::nan("0");
-            auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             if (vec.size() == 1) {
                 val.name = helicsComplexString(vec[0]);
             } else {
@@ -377,7 +377,7 @@ void valueExtract(const defV& dv, NamedPoint& val)
             break;
         }
         case named_point_loc:
-            val = mpark::get<NamedPoint>(dv);
+            val = std::get<NamedPoint>(dv);
             break;
     }
 }
@@ -386,23 +386,23 @@ void valueExtract(const defV& dv, Time& val)
 {
     switch (dv.index()) {
         case double_loc:  // double
-            val = mpark::get<double>(dv);
+            val = std::get<double>(dv);
             break;
         case int_loc:  // int64_t
         default:
-            val.setBaseTimeCode(mpark::get<int64_t>(dv));
+            val.setBaseTimeCode(std::get<int64_t>(dv));
             break;
         case string_loc:  // string
         {
             size_t index;
-            auto& str = mpark::get<std::string>(dv);
+            auto& str = std::get<std::string>(dv);
             try {
                 auto ul = std::stoll(str, &index);
                 if ((index == std::string::npos) || (index == str.size())) {
                     val.setBaseTimeCode(ul);
                 } else {
                     val = gmlc::utilities::loadTimeFromString<helics::Time>(
-                        mpark::get<std::string>(dv));
+                        std::get<std::string>(dv));
                 }
             }
             catch (...) {
@@ -411,21 +411,21 @@ void valueExtract(const defV& dv, Time& val)
             break;
         }
         case complex_loc:  // complex
-            val = mpark::get<std::complex<double>>(dv).real();
+            val = std::get<std::complex<double>>(dv).real();
             break;
         case vector_loc:  // vector
         {
-            auto& vec = mpark::get<std::vector<double>>(dv);
+            auto& vec = std::get<std::vector<double>>(dv);
             val = (!vec.empty()) ? Time(vec[0]) : timeZero;
             break;
         }
         case complex_vector_loc: {
-            auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             val = (!vec.empty()) ? Time(vec[0].real()) : timeZero;
             break;
         }
         case named_point_loc:
-            val = mpark::get<NamedPoint>(dv).value;
+            val = std::get<NamedPoint>(dv).value;
             break;
     }
 }
@@ -434,34 +434,34 @@ void valueExtract(const defV& dv, char& val)
 {
     switch (dv.index()) {
         case double_loc:  // double
-            val = static_cast<char>(mpark::get<double>(dv));
+            val = static_cast<char>(std::get<double>(dv));
             break;
         case int_loc:  // int64_t
         default:
-            val = static_cast<char>(mpark::get<int64_t>(dv));
+            val = static_cast<char>(std::get<int64_t>(dv));
             break;
         case string_loc:  // string
         {
-            auto& str = mpark::get<std::string>(dv);
+            auto& str = std::get<std::string>(dv);
             val = (str.empty()) ? '\0' : str[0];
             break;
         }
         case complex_loc:  // complex
-            val = static_cast<char>(mpark::get<std::complex<double>>(dv).real());
+            val = static_cast<char>(std::get<std::complex<double>>(dv).real());
             break;
         case vector_loc:  // vector
         {
-            auto& vec = mpark::get<std::vector<double>>(dv);
+            auto& vec = std::get<std::vector<double>>(dv);
             val = (!vec.empty()) ? static_cast<char>(vec[0]) : '\0';
             break;
         }
         case complex_vector_loc: {
-            auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             val = (!vec.empty()) ? static_cast<char>(vec[0].real()) : '\0';
             break;
         }
         case named_point_loc: {
-            auto& np = mpark::get<NamedPoint>(dv);
+            auto& np = std::get<NamedPoint>(dv);
             val = np.name.empty() ? (static_cast<char>(np.value)) : np.name[0];
         } break;
     }
@@ -471,34 +471,34 @@ void valueExtract(const defV& dv, bool& val)
 {
     switch (dv.index()) {
         case double_loc:  // double
-            val = std::abs(mpark::get<double>(dv)) > 0.0;
+            val = std::abs(std::get<double>(dv)) > 0.0;
             break;
         case int_loc:  // int64_t
         default:
-            val = (mpark::get<int64_t>(dv) != 0);
+            val = (std::get<int64_t>(dv) != 0);
             break;
         case string_loc:  // string
         {
-            auto& str = mpark::get<std::string>(dv);
+            auto& str = std::get<std::string>(dv);
             val = helicsBoolValue(str);
             break;
         }
         case complex_loc:  // complex
-            val = std::abs(mpark::get<std::complex<double>>(dv)) > 0.0;
+            val = std::abs(std::get<std::complex<double>>(dv)) > 0.0;
             break;
         case vector_loc:  // vector
         {
-            auto& vec = mpark::get<std::vector<double>>(dv);
+            auto& vec = std::get<std::vector<double>>(dv);
             val = vectorNorm(vec) != 0.0;
             break;
         }
         case complex_vector_loc: {
-            auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             val = vectorNorm(vec) != 0.0;
             break;
         }
         case named_point_loc: {
-            auto& np = mpark::get<NamedPoint>(dv);
+            auto& np = std::get<NamedPoint>(dv);
             auto& str = np.name;
             val = str.empty() || helicsBoolValue(str);
             if (val) {

@@ -398,7 +398,7 @@ void ValueFederate::publish(Publication& pub, double val)
     pub.publish(val);
 }
 
-using dvalue = mpark::variant<double, std::string>;
+using dvalue = std::variant<double, std::string>;
 
 static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          const std::string& prefix,
@@ -465,9 +465,9 @@ void ValueFederate::publishJSON(const std::string& jsonString)
         auto& pub = getPublication(vp.first);
         if (pub.isValid()) {
             if (vp.second.index() == 0) {
-                pub.publish(mpark::get<double>(vp.second));
+                pub.publish(std::get<double>(vp.second));
             } else {
-                pub.publish(mpark::get<std::string>(vp.second));
+                pub.publish(std::get<std::string>(vp.second));
             }
         }
     }
