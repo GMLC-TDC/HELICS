@@ -533,6 +533,10 @@
 .. doxygenfunction:: helicsBrokerWaitForDisconnect
     :project: helics
 
+
+.. doxygenfunction:: helicsBrokerSetLoggingCallback
+    :project: helics
+
 ```
 
 ### Core
@@ -612,6 +616,10 @@
 
 
 .. doxygenfunction:: helicsCoreWaitForDisconnect
+    :project: helics
+
+
+.. doxygenfunction:: helicsCoreSetLoggingCallback
     :project: helics
 
 ```
@@ -1113,6 +1121,14 @@
 .. doxygenfunction:: helicsFederateSetTimeProperty
     :project: helics
 
+
+.. doxygenfunction:: helicsFederateEnterInitializingModeCompleted
+    :project: helics
+
+
+.. doxygenfunction:: helicsFederateSetLoggingCallback
+    :project: helics
+
 ```
 
 ### Filter
@@ -1168,6 +1184,10 @@
 
 
 .. doxygenfunction:: helicsFilterSetString
+    :project: helics
+
+
+.. doxygenfunction:: helicsFilterSetCustomCallback
     :project: helics
 
 ```
@@ -1444,6 +1464,18 @@
 .. doxygenfunction:: helicsMessageSetTime
     :project: helics
 
+
+.. doxygenfunction:: helicsMessageGetRawDataPointer
+    :project: helics
+
+
+.. doxygenfunction:: helicsMessageSetOrginalSource
+    :project: helics
+
+
+.. doxygenfunction:: helicsMessageResize
+    :project: helics
+
 ```
 
 ### Publication
@@ -1562,6 +1594,18 @@
 .. doxygenfunction:: helicsQueryIsCompleted
     :project: helics
 
+
+.. doxygenfunction:: helicsQueryExecuteCompleted
+    :project: helics
+    
+
+.. doxygenfunction:: helicsQuerySetTarget
+    :project: helics
+
+
+.. doxygenfunction:: helicsQuerySetQueryString
+    :project: helics
+
 ```
 
 ### Others
@@ -1653,6 +1697,14 @@
 
 
 .. doxygenfunction:: helicsSubscriptionGetKey
+    :project: helics
+
+
+.. doxygenfunction:: helicsErrorInitialize
+    :project: helics
+
+
+.. doxygenfunction:: helicsErrorClear
     :project: helics
 
 ```
