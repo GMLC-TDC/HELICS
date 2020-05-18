@@ -1597,6 +1597,14 @@
 
 .. doxygenfunction:: helicsQueryExecuteCompleted
     :project: helics
+    
+
+.. doxygenfunction:: helicsQuerySetTarget
+    :project: helics
+
+
+.. doxygenfunction:: helicsQuerySetQueryString
+    :project: helics
 
 ```
 
