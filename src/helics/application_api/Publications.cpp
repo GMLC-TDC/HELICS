@@ -315,20 +315,20 @@ data_block typeConvert(data_type type, const defV& val)
 {
     switch (val.index()) {
         case double_loc:  // double
-            return typeConvert(type, mpark::get<double>(val));
+            return typeConvert(type, std::get<double>(val));
         case int_loc:  // int64_t
-            return typeConvert(type, mpark::get<int64_t>(val));
+            return typeConvert(type, std::get<int64_t>(val));
         case string_loc:  // string
         default:
-            return typeConvert(type, mpark::get<std::string>(val));
+            return typeConvert(type, std::get<std::string>(val));
         case complex_loc:  // complex
-            return typeConvert(type, mpark::get<std::complex<double>>(val));
+            return typeConvert(type, std::get<std::complex<double>>(val));
         case vector_loc:  // vector
-            return typeConvert(type, mpark::get<std::vector<double>>(val));
+            return typeConvert(type, std::get<std::vector<double>>(val));
         case complex_vector_loc:  // complex
-            return typeConvert(type, mpark::get<std::vector<std::complex<double>>>(val));
+            return typeConvert(type, std::get<std::vector<std::complex<double>>>(val));
         case named_point_loc:
-            return typeConvert(type, mpark::get<NamedPoint>(val));
+            return typeConvert(type, std::get<NamedPoint>(val));
     }
 }
 

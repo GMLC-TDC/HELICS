@@ -72,45 +72,45 @@ void Input::handleCallback(Time time)
     switch (value_callback.index()) {
         case double_loc: {
             auto val = getValue<double>();
-            mpark::get<std::function<void(const double&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const double&, Time)>>(value_callback)(val, time);
         } break;
         case int_loc: {
             auto val = getValue<int64_t>();
-            mpark::get<std::function<void(const int64_t&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const int64_t&, Time)>>(value_callback)(val, time);
         } break;
         case string_loc:
         default: {
             auto val = getValue<std::string>();
-            mpark::get<std::function<void(const std::string&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const std::string&, Time)>>(value_callback)(val, time);
         } break;
         case complex_loc: {
             auto val = getValue<std::complex<double>>();
-            mpark::get<std::function<void(const std::complex<double>&, Time)>>(
+            std::get<std::function<void(const std::complex<double>&, Time)>>(
                 value_callback)(val, time);
         } break;
         case vector_loc: {
             auto val = getValue<std::vector<double>>();
-            mpark::get<std::function<void(const std::vector<double>&, Time)>>(value_callback)(val,
+            std::get<std::function<void(const std::vector<double>&, Time)>>(value_callback)(val,
                                                                                               time);
         } break;
         case complex_vector_loc: {
             auto val = getValue<std::vector<std::complex<double>>>();
-            mpark::get<std::function<void(const std::vector<std::complex<double>>&, Time)>>(
+            std::get<std::function<void(const std::vector<std::complex<double>>&, Time)>>(
                 value_callback)(val, time);
         } break;
         case named_point_loc: {
             auto val = getValue<NamedPoint>();
-            mpark::get<std::function<void(const NamedPoint&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const NamedPoint&, Time)>>(value_callback)(val, time);
         } break;
         case 7:  // bool loc
         {
             auto val = getValue<bool>();
-            mpark::get<std::function<void(const bool&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const bool&, Time)>>(value_callback)(val, time);
         } break;
         case 8:  // Time loc
         {
             auto val = getValue<Time>();
-            mpark::get<std::function<void(const Time&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const Time&, Time)>>(value_callback)(val, time);
         } break;
     }
 }
@@ -142,7 +142,7 @@ bool Input::checkUpdate(bool assumeUpdate)
                     hasUpdate = true;
                 }
             };
-            mpark::visit(visitor, lastValue);
+            std::visit(visitor, lastValue);
         }
     } else {
         hasUpdate = (hasUpdate || assumeUpdate || fed->isUpdated(*this));
@@ -207,10 +207,10 @@ size_t Input::getStringSize()
     }
 
     if (lastValue.index() == string_loc) {
-        return mpark::get<std::string>(lastValue).size();
+        return std::get<std::string>(lastValue).size();
     }
     if (lastValue.index() == named_point_loc) {
-        const auto& np = mpark::get<NamedPoint>(lastValue);
+        const auto& np = std::get<NamedPoint>(lastValue);
 
         if (np.name.empty()) {
             return 30;  //"~length of #invalid" string +20
@@ -237,9 +237,9 @@ size_t Input::getVectorSize()
         case complex_loc:
             return 2;
         case vector_loc:
-            return mpark::get<std::vector<double>>(lastValue).size();
+            return std::get<std::vector<double>>(lastValue).size();
         case complex_vector_loc:
-            return mpark::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
+            return std::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
         default:
             break;
     }
