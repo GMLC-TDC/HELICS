@@ -1467,6 +1467,29 @@ HELICS_EXPORT const char* helicsQueryExecuteComplete(helics_query query, helics_
 HELICS_EXPORT helics_bool helicsQueryIsCompleted(helics_query query);
 
 /**
+ * Update the target of a query.
+ *
+ * @param query The query object to change the target of.
+ * @param target the name of the target to query
+ *
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsQuerySetTarget(helics_query query, const char* target, helics_error* err);
+
+/**
+ * Update the queryString of a query.
+ *
+ * @param query The query object to change the target of.
+ * @param queryString the new queryString
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsQuerySetQueryString(helics_query query, const char* queryString, helics_error* err);
+
+/**
  * Free the memory associated with a query object.
  */
 HELICS_EXPORT void helicsQueryFree(helics_query query);

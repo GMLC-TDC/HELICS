@@ -137,6 +137,26 @@ class Broker {
                                                    hThrowOnError());
     }
 
+    /** make a query of the broker
+  @details this call is blocking until the value is returned which may take some time depending
+  on the size of the federation and the specific string being queried
+  @param target  the target of the query can be "federation", "federate", "broker", "core", or a
+  specific name of a federate, core, or broker
+  @param queryStr a string with the query, see other documentation for specific properties to
+  query, can be defined by the federate
+  @return a string with the value requested.  this is either going to be a vector of strings value
+  or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
+  if the query was not valid
+  */
+    std::string query(const std::string& target, const std::string& queryStr) const
+    {
+        // returns helics_query
+        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        std::string result(helicsQueryBrokerExecute(q, broker, hThrowOnError()));
+        helicsQueryFree(q);
+        return result;
+    }
+
   protected:
     helics_broker broker;  //!< underlying broker information
 };
