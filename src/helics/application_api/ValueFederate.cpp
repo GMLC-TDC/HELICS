@@ -158,7 +158,7 @@ void ValueFederate::addAlias(const Publication& pub, const std::string& shortcut
     vfManager->addAlias(pub, shortcutName);
 }
 
-void ValueFederate::setDefaultValue(const Input& inp, data_view block)
+void ValueFederate::setDefaultValue(const Input& inp, data_view block) // NOLINT
 {
     vfManager->setDefaultValue(inp, block);
 }
@@ -246,7 +246,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
         auto subs = doc["subscriptions"];
         for (const auto& sub : subs) {
             auto key = getKey(sub);
-            auto subAct = &vfManager->getSubscription(key);
+            auto* subAct = &vfManager->getSubscription(key);
             if (!subAct->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "units", emptyStr);
@@ -398,7 +398,7 @@ void ValueFederate::publish(Publication& pub, double val)
     pub.publish(val);
 }
 
-using dvalue = mpark::variant<double, std::string>;
+using dvalue = std::variant<double, std::string>;
 
 static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          const std::string& prefix,
@@ -465,9 +465,9 @@ void ValueFederate::publishJSON(const std::string& jsonString)
         auto& pub = getPublication(vp.first);
         if (pub.isValid()) {
             if (vp.second.index() == 0) {
-                pub.publish(mpark::get<double>(vp.second));
+                pub.publish(std::get<double>(vp.second));
             } else {
-                pub.publish(mpark::get<std::string>(vp.second));
+                pub.publish(std::get<std::string>(vp.second));
             }
         }
     }

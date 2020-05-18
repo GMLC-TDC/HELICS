@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "ValueConverter.hpp"
-#include "helics/external/variant.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 #include "helics_cxx_export.h"
@@ -17,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdint>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application
@@ -25,13 +25,13 @@ API and core
 namespace helics {
 /** define a variant with the different types*/
 
-using defV = mpark::variant<double,
-                            int64_t,
-                            std::string,
-                            std::complex<double>,
-                            std::vector<double>,
-                            std::vector<std::complex<double>>,
-                            NamedPoint>;
+using defV = std::variant<double,
+                          int64_t,
+                          std::string,
+                          std::complex<double>,
+                          std::vector<double>,
+                          std::vector<std::complex<double>>,
+                          NamedPoint>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location {
@@ -167,32 +167,32 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
 {
     switch (dv.index()) {
         case double_loc:  // double
-            val = static_cast<X>(mpark::get<double>(dv));
+            val = static_cast<X>(std::get<double>(dv));
             break;
         case int_loc:  // int64_t
-            val = static_cast<X>(mpark::get<int64_t>(dv));
+            val = static_cast<X>(std::get<int64_t>(dv));
             break;
         case string_loc:  // string
         default:
-            val = static_cast<X>(getDoubleFromString(mpark::get<std::string>(dv)));
+            val = static_cast<X>(getDoubleFromString(std::get<std::string>(dv)));
             break;
         case complex_loc:  // complex
-            val = static_cast<X>(std::abs(mpark::get<std::complex<double>>(dv)));
+            val = static_cast<X>(std::abs(std::get<std::complex<double>>(dv)));
             break;
         case vector_loc:  // vector
         {
-            const auto& vec = mpark::get<std::vector<double>>(dv);
+            const auto& vec = std::get<std::vector<double>>(dv);
             val = static_cast<X>(vectorNorm(vec));
             break;
         }
         case complex_vector_loc:  // complex vector
         {
-            const auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
+            const auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             val = static_cast<X>(vectorNorm(vec));
             break;
         }
         case named_point_loc: {
-            const auto& np = mpark::get<NamedPoint>(dv);
+            const auto& np = std::get<NamedPoint>(dv);
             if (std::isnan(np.value)) {
                 val = static_cast<X>(getDoubleFromString(np.name));
             } else {

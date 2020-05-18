@@ -56,10 +56,10 @@ Input::Input(interface_visibility locality,
             operator=(valueFed->registerInput(key, defaultType, units));
         }
     }
-    catch (const RegistrationFailure& e) {
+    catch (const RegistrationFailure&) {
         operator=(valueFed->getInput(key));
         if (!isValid()) {
-            throw(e);
+            throw;
         }
     }
 }
@@ -72,45 +72,45 @@ void Input::handleCallback(Time time)
     switch (value_callback.index()) {
         case double_loc: {
             auto val = getValue<double>();
-            mpark::get<std::function<void(const double&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const double&, Time)>>(value_callback)(val, time);
         } break;
         case int_loc: {
             auto val = getValue<int64_t>();
-            mpark::get<std::function<void(const int64_t&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const int64_t&, Time)>>(value_callback)(val, time);
         } break;
         case string_loc:
         default: {
             auto val = getValue<std::string>();
-            mpark::get<std::function<void(const std::string&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const std::string&, Time)>>(value_callback)(val, time);
         } break;
         case complex_loc: {
             auto val = getValue<std::complex<double>>();
-            mpark::get<std::function<void(const std::complex<double>&, Time)>>(
-                value_callback)(val, time);
+            std::get<std::function<void(const std::complex<double>&, Time)>>(value_callback)(val,
+                                                                                             time);
         } break;
         case vector_loc: {
             auto val = getValue<std::vector<double>>();
-            mpark::get<std::function<void(const std::vector<double>&, Time)>>(value_callback)(val,
-                                                                                              time);
+            std::get<std::function<void(const std::vector<double>&, Time)>>(value_callback)(val,
+                                                                                            time);
         } break;
         case complex_vector_loc: {
             auto val = getValue<std::vector<std::complex<double>>>();
-            mpark::get<std::function<void(const std::vector<std::complex<double>>&, Time)>>(
+            std::get<std::function<void(const std::vector<std::complex<double>>&, Time)>>(
                 value_callback)(val, time);
         } break;
         case named_point_loc: {
             auto val = getValue<NamedPoint>();
-            mpark::get<std::function<void(const NamedPoint&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const NamedPoint&, Time)>>(value_callback)(val, time);
         } break;
         case 7:  // bool loc
         {
             auto val = getValue<bool>();
-            mpark::get<std::function<void(const bool&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const bool&, Time)>>(value_callback)(val, time);
         } break;
         case 8:  // Time loc
         {
             auto val = getValue<Time>();
-            mpark::get<std::function<void(const Time&, Time)>>(value_callback)(val, time);
+            std::get<std::function<void(const Time&, Time)>>(value_callback)(val, time);
         } break;
     }
 }
@@ -142,7 +142,7 @@ bool Input::checkUpdate(bool assumeUpdate)
                     hasUpdate = true;
                 }
             };
-            mpark::visit(visitor, lastValue);
+            std::visit(visitor, lastValue);
         }
     } else {
         hasUpdate = (hasUpdate || assumeUpdate || fed->isUpdated(*this));
@@ -177,7 +177,7 @@ size_t Input::getRawSize()
     isUpdated();
     auto dv = fed->getValueRaw(*this);
     if (dv.empty()) {
-        auto& out = getValueRef<std::string>();
+        const auto& out = getValueRef<std::string>();
         return out.size();
     }
     return dv.size();
@@ -194,7 +194,7 @@ size_t Input::getStringSize()
     isUpdated();
     if (hasUpdate && !changeDetectionEnabled) {
         if (lastValue.index() == named_point_loc) {
-            auto& np = getValueRef<NamedPoint>();
+            const auto& np = getValueRef<NamedPoint>();
             if (np.name.empty()) {
                 return 30;  //"#invalid" string +20
             }
@@ -202,15 +202,15 @@ size_t Input::getStringSize()
             // the +20 is for the string representation of a double
             return np.name.size() + 20;
         }
-        auto& out = getValueRef<std::string>();
+        const auto& out = getValueRef<std::string>();
         return out.size();
     }
 
     if (lastValue.index() == string_loc) {
-        return mpark::get<std::string>(lastValue).size();
+        return std::get<std::string>(lastValue).size();
     }
     if (lastValue.index() == named_point_loc) {
-        const auto& np = mpark::get<NamedPoint>(lastValue);
+        const auto& np = std::get<NamedPoint>(lastValue);
 
         if (np.name.empty()) {
             return 30;  //"~length of #invalid" string +20
@@ -219,7 +219,7 @@ size_t Input::getStringSize()
         // +20 accounts for the string representation of a double
         return np.name.size() + 20;
     }
-    auto& out = getValueRef<std::string>();
+    const auto& out = getValueRef<std::string>();
     return out.size();
 }
 
@@ -227,7 +227,7 @@ size_t Input::getVectorSize()
 {
     isUpdated();
     if (hasUpdate && !changeDetectionEnabled) {
-        auto& out = getValueRef<std::vector<double>>();
+        const auto& out = getValueRef<std::vector<double>>();
         return out.size();
     }
     switch (lastValue.index()) {
@@ -237,20 +237,20 @@ size_t Input::getVectorSize()
         case complex_loc:
             return 2;
         case vector_loc:
-            return mpark::get<std::vector<double>>(lastValue).size();
+            return std::get<std::vector<double>>(lastValue).size();
         case complex_vector_loc:
-            return mpark::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
+            return std::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
         default:
             break;
     }
-    auto& out = getValueRef<std::vector<double>>();
+    const auto& out = getValueRef<std::vector<double>>();
     return out.size();
 }
 
 void Input::loadSourceInformation()
 {
     type = getTypeFromString(fed->getInjectionType(*this));
-    auto& iunits = fed->getInjectionUnits(*this);
+    const auto& iunits = fed->getInjectionUnits(*this);
     if (!iunits.empty()) {
         inputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(iunits));
         if (!units::is_valid(*inputUnits)) {
@@ -339,7 +339,7 @@ int Input::getValue(double* data, int maxsize)
 
 int Input::getValue(char* str, int maxsize)
 {
-    auto& S = getValueRef<std::string>();
+    const auto& S = getValueRef<std::string>();
     int length = 0;
     if (str != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(S.size()), maxsize);
