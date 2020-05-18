@@ -944,6 +944,24 @@ helics_bool helicsQueryIsCompleted(helics_query query)
     return helics_false;
 }
 
+void helicsQuerySetTarget(helics_query query, const char* target, helics_error* err)
+{
+    auto* queryObj = getQueryObj(query, err);
+    if (queryObj == nullptr) {
+        return;
+    }
+    queryObj->target = AS_STRING(target);
+}
+
+void helicsQuerySetQueryString(helics_query query, const char* queryString, helics_error* err)
+{
+    auto* queryObj = getQueryObj(query, err);
+    if (queryObj == nullptr) {
+        return;
+    }
+    queryObj->query = AS_STRING(queryString);
+}
+
 void helicsQueryFree(helics_query query)
 {
     auto* queryObj = getQueryObj(query, nullptr);
