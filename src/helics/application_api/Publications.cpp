@@ -59,10 +59,10 @@ Publication::Publication(interface_visibility locality,
             operator=(valueFed->registerPublication(key, type, units));
         }
     }
-    catch (const RegistrationFailure& e) {
+    catch (const RegistrationFailure&) {
         operator=(valueFed->getPublication(key));
         if (!isValid()) {
-            throw(e);
+            throw;
         }
     }
 }

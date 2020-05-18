@@ -79,7 +79,7 @@ class HELICS_CXX_EXPORT Input {
 
     Input(interface_visibility locality,
           ValueFederate* valueFed,
-          const std::string& name,
+          const std::string& key,
           const std::string& defaultType = "def",
           const std::string& units = std::string{});
 
