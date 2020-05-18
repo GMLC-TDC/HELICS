@@ -158,7 +158,7 @@ void ValueFederate::addAlias(const Publication& pub, const std::string& shortcut
     vfManager->addAlias(pub, shortcutName);
 }
 
-void ValueFederate::setDefaultValue(const Input& inp, data_view block)
+void ValueFederate::setDefaultValue(const Input& inp, data_view block) // NOLINT
 {
     vfManager->setDefaultValue(inp, block);
 }
@@ -246,7 +246,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
         auto subs = doc["subscriptions"];
         for (const auto& sub : subs) {
             auto key = getKey(sub);
-            auto subAct = &vfManager->getSubscription(key);
+            auto* subAct = &vfManager->getSubscription(key);
             if (!subAct->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "units", emptyStr);
