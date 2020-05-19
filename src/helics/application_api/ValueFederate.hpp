@@ -430,9 +430,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     data_view getValueRaw(const Input& inp);
 
     /** get a double value*/
-    double getDouble(Input& inp);
+    static double getDouble(Input& inp);
     /** get a string value*/
-    const std::string& getString(Input& inp);
+    static const std::string& getString(Input& inp);
     /** publish a value
     @param pub the publication identifier
     @param block a data block containing the data
@@ -456,14 +456,14 @@ class HELICS_CXX_EXPORT ValueFederate:
    @param str a string to publish
    @throw invalid_argument if the publication id is invalid
    */
-    void publish(Publication& pub, const std::string& str);
+    static void publish(Publication& pub, const std::string& str);
 
     /** direct publish a double
  @param pub the publication identifier
  @param val the value to publish
  @throw invalid_argument if the publication is invalid
  */
-    void publish(Publication& pub, double val);
+    static void publish(Publication& pub, double val);
 
     /** register a set of publications based on a publication JSON
     @param jsonString a json string containing the data to publish and establish publications from
