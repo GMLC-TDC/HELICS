@@ -81,14 +81,20 @@ namespace apps {
 }  // namespace helics
 
 #else
+namespace helics {
+namespace apps {
 /** a virtual class to use as a base for broker servers of various types*/
 class AsioBrokerServer: public TypedBrokerServer {
   public:
     AsioBrokerServer() = default;
     explicit AsioBrokerServer(std::string /*server_name*/) {}
+    void enableTcpServer(bool /*enabled*/) {}
+    void enableUdpServer(bool /*enabled*/) {}
     /** start the server*/
     virtual void startServer(const Json::Value* /*val*/) override {}
     /** stop the server*/
     virtual void stopServer() override {}
-}
+};
+}  // namespace apps
+}  // namespace helics
 #endif
