@@ -26,7 +26,7 @@ install:
 before_build:
   - mkdir build
   - cd build
-  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -CMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_DISABLE_ASIO=ON"'
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_DISABLE_ASIO=ON"'
   - cd ..
 
 # Build and test, actually.
