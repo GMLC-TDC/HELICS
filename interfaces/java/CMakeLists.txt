@@ -250,14 +250,6 @@ install(TARGETS ${HELICS_JAVA_TARGET} DESTINATION java COMPONENT java)
 # Copy/install commands for shared libraries are only needed on Windows, which doesn't support
 # rpaths
 if(WIN32)
-    if(COMMAND copy_key_files_to_target_location)
-        copy_key_files_to_target_location(${HELICS_JAVA_TARGET})
-    endif()
-
-    if(COMMAND copy_shared_target)
-        copy_shared_target(${HELICS_JAVA_TARGET} helicsSharedLib)
-    endif()
-
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(java)
     else()
