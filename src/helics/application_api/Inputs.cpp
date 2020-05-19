@@ -56,10 +56,10 @@ Input::Input(interface_visibility locality,
             operator=(valueFed->registerInput(key, defaultType, units));
         }
     }
-    catch (const RegistrationFailure& e) {
+    catch (const RegistrationFailure&) {
         operator=(valueFed->getInput(key));
         if (!isValid()) {
-            throw(e);
+            throw;
         }
     }
 }
@@ -177,7 +177,7 @@ size_t Input::getRawSize()
     isUpdated();
     auto dv = fed->getValueRaw(*this);
     if (dv.empty()) {
-        auto& out = getValueRef<std::string>();
+        const auto& out = getValueRef<std::string>();
         return out.size();
     }
     return dv.size();
@@ -194,7 +194,7 @@ size_t Input::getStringSize()
     isUpdated();
     if (hasUpdate && !changeDetectionEnabled) {
         if (lastValue.index() == named_point_loc) {
-            auto& np = getValueRef<NamedPoint>();
+            const auto& np = getValueRef<NamedPoint>();
             if (np.name.empty()) {
                 return 30;  //"#invalid" string +20
             }
@@ -202,7 +202,7 @@ size_t Input::getStringSize()
             // the +20 is for the string representation of a double
             return np.name.size() + 20;
         }
-        auto& out = getValueRef<std::string>();
+        const auto& out = getValueRef<std::string>();
         return out.size();
     }
 
@@ -219,7 +219,7 @@ size_t Input::getStringSize()
         // +20 accounts for the string representation of a double
         return np.name.size() + 20;
     }
-    auto& out = getValueRef<std::string>();
+    const auto& out = getValueRef<std::string>();
     return out.size();
 }
 
@@ -227,7 +227,7 @@ size_t Input::getVectorSize()
 {
     isUpdated();
     if (hasUpdate && !changeDetectionEnabled) {
-        auto& out = getValueRef<std::vector<double>>();
+        const auto& out = getValueRef<std::vector<double>>();
         return out.size();
     }
     switch (lastValue.index()) {
@@ -243,14 +243,14 @@ size_t Input::getVectorSize()
         default:
             break;
     }
-    auto& out = getValueRef<std::vector<double>>();
+    const auto& out = getValueRef<std::vector<double>>();
     return out.size();
 }
 
 void Input::loadSourceInformation()
 {
     type = getTypeFromString(fed->getInjectionType(*this));
-    auto& iunits = fed->getInjectionUnits(*this);
+    const auto& iunits = fed->getInjectionUnits(*this);
     if (!iunits.empty()) {
         inputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(iunits));
         if (!units::is_valid(*inputUnits)) {
@@ -339,7 +339,7 @@ int Input::getValue(double* data, int maxsize)
 
 int Input::getValue(char* str, int maxsize)
 {
-    auto& S = getValueRef<std::string>();
+    const auto& S = getValueRef<std::string>();
     int length = 0;
     if (str != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(S.size()), maxsize);
