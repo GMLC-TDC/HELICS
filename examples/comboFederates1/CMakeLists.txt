@@ -31,5 +31,3 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/run.sh" # <--this is in- file
         "$<TARGET_FILE_DIR:comboFed>"
 ) # <--this is out-file path
-
-copy_key_files_to_target_location(comboFed)

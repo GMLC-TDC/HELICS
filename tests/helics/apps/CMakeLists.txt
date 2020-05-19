@@ -59,8 +59,6 @@ set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Coverage Daily)
 add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --gtest_filter=-*_exe*:*ci_skip*)
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS HelicsAppsCI Continuous)
 
-copy_key_files_to_target_location(helics_apps-tests)
-
 if(HELICS_BUILD_CXX_SHARED_LIB)
     set(helics_shared_apps_test_sources
         helics_apps_tests.cpp
@@ -89,6 +87,4 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
 
     target_compile_definitions(shared_cxx_app-tests PRIVATE DISABLE_SYSTEM_CALL_TESTS)
 
-    copy_shared_target(shared_cxx_app-tests helics-apps-shared)
-    copy_shared_target(shared_cxx_app-tests helics-shared)
 endif()
