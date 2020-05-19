@@ -1597,7 +1597,7 @@
 
 .. doxygenfunction:: helicsQueryExecuteCompleted
     :project: helics
-    
+
 
 .. doxygenfunction:: helicsQuerySetTarget
     :project: helics
