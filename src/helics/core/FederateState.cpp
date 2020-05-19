@@ -370,7 +370,7 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
 }
 
 stx::optional<ActionMessage>
-    FederateState::processPostTerminationAction(const ActionMessage& /*action*/) // NOLINT
+    FederateState::processPostTerminationAction(const ActionMessage& /*action*/)  // NOLINT
 {
     return stx::nullopt;
 }
