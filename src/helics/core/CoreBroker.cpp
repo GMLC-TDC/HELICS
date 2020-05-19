@@ -1156,7 +1156,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
             } else {
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
-                    auto M = stx::any_cast<
+                    auto M = std::any_cast<
                         std::function<void(int, const std::string&, const std::string&)>>(
                         std::move(*op));
                     M(0, identifier, "logging callback activated");
