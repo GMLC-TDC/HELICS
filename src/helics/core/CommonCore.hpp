@@ -20,10 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/MappedPointerVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 #include "helics-time.hpp"
-#include "helics/external/any.hpp"
 #include "helics/helics-config.h"
 
 #include "json/forwards.h"
+#include <any>
 #include <array>
 #include <atomic>
 #include <map>
@@ -411,7 +411,7 @@ class CommonCore: public Core, public BrokerBase {
         filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<gmlc::containers::AirLock<stx::any>, 4>
+    std::array<gmlc::containers::AirLock<std::any>, 4>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:

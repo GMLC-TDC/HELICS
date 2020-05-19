@@ -69,7 +69,7 @@ TEST(federateInfo, loadArgs1)
     f1.loadInfoFromArgs(7, argv);
     EXPECT_EQ(f1.coreType, helics::core_type::ZMQ);
     EXPECT_EQ(f1.defName, "f2");
-    EXPECT_EQ(f1.flagProps.size(), 3);
+    EXPECT_EQ(f1.flagProps.size(), 3U);
 }
 
 TEST(federateInfo, constructor3)
@@ -78,7 +78,7 @@ TEST(federateInfo, constructor3)
         "--name f3 --type ipc --flags realtime;source_only,-buffer_data --port=5000"};
     EXPECT_EQ(f1.coreType, helics::core_type::INTERPROCESS);
     EXPECT_EQ(f1.defName, "f3");
-    EXPECT_EQ(f1.flagProps.size(), 3);
+    EXPECT_EQ(f1.flagProps.size(), 3U);
     EXPECT_EQ(f1.brokerPort, 5000);
 }
 
@@ -122,8 +122,8 @@ TEST(federateInfo, constructor4)
         "--log_level=no_print --brokerport=5000 --port=5005 --offset=5 --time_delta=45ms --max_iterations 10"};
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
-    EXPECT_EQ(f1.intProps.size(), 2);
-    EXPECT_EQ(f1.timeProps.size(), 2);
+    EXPECT_EQ(f1.intProps.size(), 2U);
+    EXPECT_EQ(f1.timeProps.size(), 2U);
 }
 
 TEST(federateInfo, constructor5)
@@ -131,13 +131,13 @@ TEST(federateInfo, constructor5)
     helics::FederateInfo f1{"--input_delay 50ms --brokerinit='--loglevel 3 --type=zmq'"};
     ASSERT_FALSE(f1.brokerInitString.empty());
     EXPECT_EQ(f1.brokerInitString.front(), ' ');
-    EXPECT_EQ(f1.timeProps.size(), 1);
+    EXPECT_EQ(f1.timeProps.size(), 1U);
 }
 
 TEST(federateInfo, constructor6)
 {
     helics::FederateInfo f1{"--outputdelay=2 --separator=/ --rtlead=100ms --rtlag=50ms"};
-    EXPECT_EQ(f1.timeProps.size(), 3);
+    EXPECT_EQ(f1.timeProps.size(), 3U);
     EXPECT_EQ(f1.separator, '/');
 }
 

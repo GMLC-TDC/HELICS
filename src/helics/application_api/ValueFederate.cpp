@@ -158,7 +158,7 @@ void ValueFederate::addAlias(const Publication& pub, const std::string& shortcut
     vfManager->addAlias(pub, shortcutName);
 }
 
-void ValueFederate::setDefaultValue(const Input& inp, data_view block) // NOLINT
+void ValueFederate::setDefaultValue(const Input& inp, data_view block)  // NOLINT
 {
     vfManager->setDefaultValue(inp, block);
 }

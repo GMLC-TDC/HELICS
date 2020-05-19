@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
-#include "helics/external/any.hpp"
 
+#include <any>
 #include <array>
 #include <atomic>
 #include <functional>
@@ -127,7 +127,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::unique_ptr<TimeoutMonitor>
         timeoutMon;  //!< class to handle timeouts and disconnection notices
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<gmlc::containers::AirLock<stx::any>, 3>
+    std::array<gmlc::containers::AirLock<std::any>, 3>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
     /** function that processes all the messages
