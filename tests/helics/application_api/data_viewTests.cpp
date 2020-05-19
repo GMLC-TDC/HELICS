@@ -34,7 +34,7 @@ TEST(data_view_tests, constructor_tests)
     EXPECT_EQ(dv2.string(), str);
 
     data_view dv3(str, 7);
-    EXPECT_EQ(dv3.size(), 7u);
+    EXPECT_EQ(dv3.size(), 7U);
     EXPECT_EQ(dv3.string(), "this is");
 
     std::string_view stv(str, 10);
@@ -46,7 +46,7 @@ TEST(data_view_tests, constructor_tests)
     // build from a vector
     std::vector<char> cvector(23, 'd');
     data_view db7(cvector);
-    EXPECT_EQ(db7.size(), 23u);
+    EXPECT_EQ(db7.size(), 23U);
     EXPECT_EQ(db7[17], 'd');
 
     std::vector<double> dvector(10, 0.07);
@@ -60,7 +60,7 @@ TEST(data_view_tests, assignment_tests)
 
     data_view dv1(db);
     const char* str = "this is a test string";
-    EXPECT_EQ(dv1.size(), 3u);
+    EXPECT_EQ(dv1.size(), 3U);
     dv1 = str;
     EXPECT_EQ(dv1.size(), strlen(str));
 
@@ -72,7 +72,7 @@ TEST(data_view_tests, assignment_tests)
     data_view dv5;
     // test move constructor
     dv5 = std::move(dv4);
-    EXPECT_EQ(dv5.size(), 400u);
+    EXPECT_EQ(dv5.size(), 400U);
 }
 
 TEST(data_view_tests, range_for_ops)
@@ -95,11 +95,11 @@ TEST(data_view_tests, swap)
     data_view v1(test1);
     data_block test2(100, 45);
     data_view v2(test2);
-    EXPECT_EQ(v1.size(), 300u);
-    EXPECT_EQ(v2.size(), 100u);
+    EXPECT_EQ(v1.size(), 300U);
+    EXPECT_EQ(v2.size(), 100U);
     std::swap(v1, v2);
-    EXPECT_EQ(v1.size(), 100u);
-    EXPECT_EQ(v2.size(), 300u);
+    EXPECT_EQ(v1.size(), 100U);
+    EXPECT_EQ(v2.size(), 300U);
 }
 
 /** test the swap function*/

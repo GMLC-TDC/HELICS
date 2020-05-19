@@ -179,7 +179,7 @@ bool FederateState::checkAndSetValue(interface_handle pub_id, const char* data, 
     }
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
-    auto pub = interfaceInformation.getPublication(pub_id);
+    auto* pub = interfaceInformation.getPublication(pub_id);
     auto res = pub->CheckSetValue(data, len);
     return res;
 }
@@ -200,9 +200,9 @@ void FederateState::generateConfig(Json::Value& base) const
     }
 }
 
-uint64_t FederateState::getQueueSize(interface_handle handle_) const
+uint64_t FederateState::getQueueSize(interface_handle id) const
 {
-    auto epI = interfaceInformation.getEndpoint(handle_);
+    const auto* epI = interfaceInformation.getEndpoint(id);
     if (epI != nullptr) {
         return epI->queueSize(time_granted);
     }
@@ -218,9 +218,9 @@ uint64_t FederateState::getQueueSize() const
     return cnt;
 }
 
-std::unique_ptr<Message> FederateState::receive(interface_handle handle_)
+std::unique_ptr<Message> FederateState::receive(interface_handle id)
 {
-    auto epI = interfaceInformation.getEndpoint(handle_);
+    auto* epI = interfaceInformation.getEndpoint(id);
     if (epI != nullptr) {
         return epI->getMessage(time_granted);
     }
@@ -233,7 +233,7 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
     EndpointInfo* endpointI = nullptr;
     auto elock = interfaceInformation.getEndpoints();
     // Find the end point with the earliest message time
-    for (auto& end_point : elock) {
+    for (const auto& end_point : elock) {
         auto t = end_point->firstMessageTime();
         if (t < earliest_time) {
             earliest_time = t;
@@ -333,7 +333,7 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
 {
     switch (type) {
         case handle_type::publication: {
-            auto pub = interfaceInformation.getPublication(handle);
+            auto* pub = interfaceInformation.getPublication(handle);
             if (pub != nullptr) {
                 ActionMessage rem(CMD_REMOVE_PUBLICATION);
                 rem.setSource(pub->id);
@@ -346,13 +346,13 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
             }
         } break;
         case handle_type::endpoint: {
-            auto ept = interfaceInformation.getEndpoint(handle);
+            auto* ept = interfaceInformation.getEndpoint(handle);
             if (ept != nullptr) {
                 ept->clearQueue();
             }
         } break;
         case handle_type::input: {
-            auto ipt = interfaceInformation.getInput(handle);
+            auto* ipt = interfaceInformation.getInput(handle);
             if (ipt != nullptr) {
                 ActionMessage rem(CMD_REMOVE_SUBSCRIBER);
                 rem.setSource(ipt->id);
@@ -371,7 +371,7 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
 }
 
 std::optional<ActionMessage>
-    FederateState::processPostTerminationAction(const ActionMessage& /*action*/)
+    FederateState::processPostTerminationAction(const ActionMessage& /*action*/) // NOLINT
 {
     return {};
 }
@@ -504,7 +504,7 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate)
 std::vector<global_handle> FederateState::getSubscribers(interface_handle handle)
 {
     std::lock_guard<FederateState> fedlock(*this);
-    auto pubInfo = interfaceInformation.getPublication(handle);
+    auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
         return pubInfo->subscribers;
     }
@@ -623,7 +623,7 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
 void FederateState::fillEventVectorUpTo(Time currentTime)
 {
     events.clear();
-    for (auto& ipt : interfaceInformation.getInputs()) {
+    for (const auto& ipt : interfaceInformation.getInputs()) {
         bool updated = ipt->updateTimeUpTo(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
@@ -634,7 +634,7 @@ void FederateState::fillEventVectorUpTo(Time currentTime)
 void FederateState::fillEventVectorInclusive(Time currentTime)
 {
     events.clear();
-    for (auto& ipt : interfaceInformation.getInputs()) {
+    for (const auto& ipt : interfaceInformation.getInputs()) {
         bool updated = ipt->updateTimeInclusive(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
@@ -645,7 +645,7 @@ void FederateState::fillEventVectorInclusive(Time currentTime)
 void FederateState::fillEventVectorNextIteration(Time currentTime)
 {
     events.clear();
-    for (auto& ipt : interfaceInformation.getInputs()) {
+    for (const auto& ipt : interfaceInformation.getInputs()) {
         bool updated = ipt->updateTimeNextIteration(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
@@ -1042,7 +1042,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             return message_processing_result::next_step;
         }
         case CMD_SEND_MESSAGE: {
-            auto epi = interfaceInformation.getEndpoint(cmd.dest_handle);
+            auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr) {
                 timeCoord->updateMessageTime(cmd.actionTime);
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
@@ -1050,7 +1050,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             }
         } break;
         case CMD_PUB: {
-            auto subI = interfaceInformation.getInput(interface_handle(cmd.dest_handle));
+            auto* subI = interfaceInformation.getInput(interface_handle(cmd.dest_handle));
             if (subI == nullptr) {
                 break;
             }
@@ -1154,7 +1154,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
 
             break;
         case CMD_REMOVE_NAMED_PUBLICATION: {
-            auto subI = interfaceInformation.getInput(cmd.source_handle);
+            auto* subI = interfaceInformation.getInput(cmd.source_handle);
             if (subI != nullptr) {
                 subI->removeSource(cmd.name,
                                    (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
@@ -1162,7 +1162,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         }
         case CMD_REMOVE_PUBLICATION: {
-            auto subI = interfaceInformation.getInput(cmd.dest_handle);
+            auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
                 subI->removeSource(cmd.getSource(),
                                    (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
@@ -1170,7 +1170,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         }
         case CMD_REMOVE_SUBSCRIBER: {
-            auto pubI = interfaceInformation.getPublication(cmd.dest_handle);
+            auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 pubI->removeSubscriber(cmd.getSource());
             }
@@ -1273,7 +1273,7 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
                                                          cmd.messageID,
                                                          checkActionFlag(cmd, indicator_flag));
             if (!used) {
-                auto ipt = interfaceInformation.getInput(cmd.dest_handle);
+                auto* ipt = interfaceInformation.getInput(cmd.dest_handle);
                 if (ipt != nullptr) {
                     LOG_WARNING(
                         fmt::format("property {} not used on input {}", cmd.messageID, ipt->key));
@@ -1289,7 +1289,7 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
                                                             cmd.messageID,
                                                             checkActionFlag(cmd, indicator_flag));
             if (!used) {
-                auto pub = interfaceInformation.getPublication(cmd.dest_handle);
+                auto* pub = interfaceInformation.getPublication(cmd.dest_handle);
                 if (pub != nullptr) {
                     LOG_WARNING(fmt::format("property {} not used on Publication {}",
                                             cmd.messageID,
@@ -1305,7 +1305,7 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
                                                             cmd.messageID,
                                                             checkActionFlag(cmd, indicator_flag));
             if (!used) {
-                auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
+                auto* ept = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (ept != nullptr) {
                     LOG_WARNING(fmt::format("property {} not used on Endpoint {}",
                                             cmd.messageID,
@@ -1570,7 +1570,7 @@ int FederateState::checkInterfaces()
 Time FederateState::nextValueTime() const
 {
     auto firstValueTime = Time::maxVal();
-    for (auto& inp : interfaceInformation.getInputs()) {
+    for (const auto& inp : interfaceInformation.getInputs()) {
         auto nvt = inp->nextValueTime();
         if (nvt >= time_granted) {
             if (nvt < firstValueTime) {
@@ -1585,7 +1585,7 @@ Time FederateState::nextValueTime() const
 Time FederateState::nextMessageTime() const
 {
     auto firstMessageTime = Time::maxVal();
-    for (auto& ep : interfaceInformation.getEndpoints()) {
+    for (const auto& ep : interfaceInformation.getEndpoints()) {
         auto messageTime = ep->firstMessageTime();
         if (messageTime >= time_granted) {
             if (messageTime < firstMessageTime) {
