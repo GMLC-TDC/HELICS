@@ -252,7 +252,7 @@ TEST(player_tests, simple_player_mlinecomment)
     helics::apps::Player play1("player1", fi);
     play1.loadFile(std::string(TEST_DIR) + "/example_comments.player");
 
-    EXPECT_EQ(play1.pointCount(), 7u);
+    EXPECT_EQ(play1.pointCount(), 7U);
     helics::ValueFederate vfed("block1", fi);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
@@ -286,7 +286,7 @@ TEST(player_tests, simple_player_mlinecomment)
     EXPECT_EQ(retTime, 5.0);
     vfed.finalize();
     fut.get();
-    EXPECT_EQ(play1.publicationCount(), 2u);
+    EXPECT_EQ(play1.publicationCount(), 2U);
 }
 
 #ifdef ENABLE_IPC_CORE

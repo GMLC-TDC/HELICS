@@ -224,7 +224,7 @@ std::string MultiBroker::generateLocalAddressString() const
         default:
             break;
     }
-    auto netcomm = dynamic_cast<NetworkCommsInterface*>(masterComm.get());
+    auto* netcomm = dynamic_cast<NetworkCommsInterface*>(masterComm.get());
     if (netcomm != nullptr) {
         return netcomm->getAddress();
     }
