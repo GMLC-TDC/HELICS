@@ -371,7 +371,7 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
 }
 
 std::optional<ActionMessage>
-    FederateState::processPostTerminationAction(const ActionMessage& /*action*/) // NOLINT
+    FederateState::processPostTerminationAction(const ActionMessage& /*action*/)  // NOLINT
 {
     return {};
 }

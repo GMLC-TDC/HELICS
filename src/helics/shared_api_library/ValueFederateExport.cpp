@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.h"
 #include "internal/api_objects.h"
 
+#include <cstring>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <cstring>
 
 /** random integer for validation purposes of inputs */
 static const int InputValidationIdentifier = 0x3456'E052;
