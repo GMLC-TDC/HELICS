@@ -6,8 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "PublicationInfo.hpp"
-#include <string_view>
+
 #include <algorithm>
+#include <string_view>
 
 namespace helics {
 bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
