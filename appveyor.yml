@@ -18,7 +18,7 @@ cache:
 # Install needed build dependencies
 # 
 install:
-    - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,cygwin-devel,git,gcc-core,gcc-g++'
+    - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,cygwin-devel,git,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
     - '%CYG_ROOT%\bin\cygcheck -dc'
 
 before_build: 
