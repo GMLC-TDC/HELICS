@@ -631,7 +631,7 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
     std::string cmdArg("--name=tracer --coretype=zmq --stop=5s --print --skiplog " + exampleFile);
-    exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
+    exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_app");
     ASSERT_TRUE(tracerExe.isActive());
     auto out = tracerExe.runCaptureOutputAsync(std::string("tracer " + cmdArg));
     helics::FederateInfo fi(helics::core_type::ZMQ);
