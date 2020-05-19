@@ -1129,7 +1129,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
 
         case CMD_ADD_PUBLISHER: {
-            auto subI = interfaceInformation.getInput(cmd.dest_handle);
+            auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
                 subI->addSource(cmd.getSource(),
                                 cmd.name,
@@ -1139,7 +1139,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             }
         } break;
         case CMD_ADD_SUBSCRIBER: {
-            auto pubI = interfaceInformation.getPublication(cmd.dest_handle);
+            auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
                 addDependent(cmd.source_id);
@@ -1642,7 +1642,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
         std::ostringstream s;
         s << "[";
         auto ipts = interfaceInformation.getInputs();
-        for (auto& ipt : ipts) {
+        for (const auto& ipt : ipts) {
             for (auto& isrc : ipt->input_sources) {
                 s << isrc.fed_id << ':' << isrc.handle << ';';
             }
