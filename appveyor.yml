@@ -20,14 +20,17 @@ cache:
 install:
     - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,cygwin-devel,git,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
     - '%CYG_ROOT%\bin\cygcheck -dc'
+    - cd %APPVEYOR_BUILD_FOLDER%
+    - git submodule update --init --recursive
 
-before_build: 
-#   - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && ./appveyor.sh before_build"'
-
+before_build:
+  - mkdir build
+  - cd build
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER\build && cmake ..  -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_DISABLE_ASIO=ON"'
+  - cd ..
 
 # Build and test, actually.
 build_script:
     - 'echo Building...'
-#    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER && ./appveyor.sh build_script"'
 
 test: off
