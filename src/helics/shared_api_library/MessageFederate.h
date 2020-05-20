@@ -489,7 +489,7 @@ HELICS_EXPORT int helicsMessageGetMessageID(helics_message_object message);
  *
  * @return The flags associated with a message.
  */
-HELICS_EXPORT helics_bool helicsMessageCheckFlag(helics_message_object message, helics_federate_flags flag);
+HELICS_EXPORT helics_bool helicsMessageCheckFlag(helics_message_object message, int flag);
 
 /**
  * Get the size of the data payload in bytes.

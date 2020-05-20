@@ -640,7 +640,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(helics_federate_info fi
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, helics_core_type coretype, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, int coretype, helics_error* err);
 
 /**
  * Set the core type from a string.
@@ -731,7 +731,7 @@ HELICS_EXPORT int helicsGetOptionIndex(const char* val);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, helics_federate_flags flag, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, helics_bool value, helics_error* err);
 
 /**
  * Set the separator character in the info structure.
@@ -759,7 +759,6 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
 HELICS_EXPORT void
     helicsFederateInfoSetTimeProperty(helics_federate_info fi, helics_properties timeProperty, helics_time propertyValue, helics_error* err);
 
-// TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
  * Set an integer property for a federate.
  *
@@ -772,7 +771,7 @@ HELICS_EXPORT void
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, helics_properties intProperty, int propertyValue, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int intProperty, int propertyValue, helics_error* err);
 
 /**
  * Load interfaces from a file.
@@ -1174,7 +1173,7 @@ HELICS_EXPORT void helicsFederateSetSeparator(helics_federate fed, char separato
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetIntegerProperty(helics_federate fed, helics_properties intProperty, int propertyVal, helics_error* err);
+HELICS_EXPORT void helicsFederateSetIntegerProperty(helics_federate fed, int intProperty, int propertyVal, helics_error* err);
 
 /**
  * Get the current value of a time based property in a federate.
@@ -1211,7 +1210,7 @@ HELICS_EXPORT helics_bool helicsFederateGetFlagOption(helics_federate fed, helic
  *
  * @return The value of the property.
  */
-HELICS_EXPORT int helicsFederateGetIntegerProperty(helics_federate fed, helics_handle_options intProperty, helics_error* err);
+HELICS_EXPORT int helicsFederateGetIntegerProperty(helics_federate fed, int intProperty, helics_error* err);
 
 /**
  * Get the current time of the federate.
