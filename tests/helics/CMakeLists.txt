@@ -71,6 +71,7 @@ add_test(
     "-DHELICS_VERSION=${HELICS_VERSION}"
     "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     ${package_test_command}
 )
 set_property(TEST find-package-tests PROPERTY LABELS Packaging PackagingFast)
