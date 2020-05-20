@@ -178,7 +178,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     {
         // send initial messages
         std::string txstring(100, '1');
-        for (int i; i < initialMessageCount; i++) {
+        for (int i = 0; i < initialMessageCount; i++) {
             helics::Time evTime = fed->getCurrentTime() + deltaTime;
             ept->send(links[rand_transmit_link(rand_gen)], txstring, evTime);
         }
