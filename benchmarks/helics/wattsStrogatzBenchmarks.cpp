@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::core_type;
 
+static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
+
 // WattsStrogatzArguments sets up parameterized arguments for the multicore benchmark runs.
 // The degree argument has constraints based on the federate count so the Ranges function
 // in google benchmarks can't be used.
@@ -28,7 +30,7 @@ using helics::core_type;
 // p is the rewire probability (0-100) for links between federates.
 static void WattsStrogatzArguments(benchmark::internal::Benchmark* b)
 {
-    for (int f = 2; f <= 16; f *= 2) {
+    for (int f = 2; f <= maxscale; f *= 2) {
         for (int d = 2; d <= f; d *= 2) {
             for (int p = 0; p <= 100; p += 25) {
                 b->Args({f, d - 1, p});
