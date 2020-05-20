@@ -167,7 +167,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
         // Setup list of connected edges based on currentEdges set
         links.reserve(k);
         for (auto edgeIndex : currentEdges) {
-            links.push_back(getNameForIndex(currentEdges[i]) + "/ept");
+            links.push_back(getNameForIndex(edgeIndex) + "/ept");
         }
 
         // Create endpoint for our federate
