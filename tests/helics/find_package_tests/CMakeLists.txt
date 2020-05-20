@@ -20,7 +20,7 @@ find_package(HELICS 3.0 REQUIRED)
 if(NOT TARGET HELICS::helics_broker)
     message(FATAL_ERROR "unable to locate HELICS_BROKER target")
 endif()
-
+message(STATUS "Binary location is ${PROJECT_BINARY_DIR}")
 # Test the CXX shared library target
 if(HELICS_BUILD_CXX_SHARED_LIB)
     add_executable(shared-library-test-exe ../pkg_test_code/main.cpp)
