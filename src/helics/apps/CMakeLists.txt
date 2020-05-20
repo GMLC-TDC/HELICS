@@ -130,8 +130,6 @@ if(HELICS_BUILD_APP_LIBRARY)
                 COMPONENT applications
         )
 
-        copy_key_files_to_target_location(helics_app)
-
         add_test(NAME app_version_return COMMAND helics_app --version)
         add_test(NAME app_help_return COMMAND helics_app --help)
         set_property(TEST app_version_return app_help_return PROPERTY LABELS Continuous)

@@ -55,7 +55,7 @@ The header only bindings for the ZeroMQ library are used to interact with the Ze
 
 ### [JsonCpp](https://github.com/open-source-parsers/jsoncpp)
 
-JsonCpp is used for parsing json files. It is included as a submodule from a slightly modified [fork](https://github.com/phlptp/jsoncpp.git) to add support for object libraries and to clean up some warning issues. JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
+JsonCpp is used for parsing json files. It is included as a submodule JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 

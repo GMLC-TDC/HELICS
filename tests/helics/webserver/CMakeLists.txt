@@ -21,5 +21,3 @@ target_include_directories(helics_webserver-tests PRIVATE ${PROJECT_SOURCE_DIR}/
 add_test(NAME helics_webserver-tests COMMAND helics_webserver-tests)
 
 set_property(TEST helics_webserver-tests PROPERTY LABELS webserver Continuous Coverage)
-
-copy_key_files_to_target_location(helics_webserver-tests)
