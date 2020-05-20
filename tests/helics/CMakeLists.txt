@@ -99,7 +99,9 @@ add_test(NAME
 )
 set_property(TEST find-package-testsA PROPERTY LABELS Packaging PackagingFast)
 set_property(TEST find-package-testsB PROPERTY LABELS Packaging PackagingFast)
+set_property(TEST find-package-testsB PROPERTY DEPENDS find-package-testsA)
 set_property(TEST find-package-testsC PROPERTY LABELS Packaging PackagingFast)
+set_property(TEST find-package-testsC PROPERTY DEPENDS find-package-testsB)
 
 cmake_dependent_advanced_option(
     HELICS_ENABLE_SUBPROJECT_TESTS
