@@ -50,10 +50,10 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     WattsStrogatzFederate(): BenchmarkFederate("WattsStrogatzFederate") {}
 
     // functions for setting parameters
-    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; };
-    void setRandomSeed(unsigned int s) { seed = s; };
-    void setDegree(int val) { k = val; };
-    void setRewireProbability(double val) { b = val; };
+    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; }
+    void setRandomSeed(unsigned int s) { seed = s; }
+    void setDegree(int val) { k = val; }
+    void setRewireProbability(double val) { b = val; }
 
     std::string getName() override { return getNameForIndex(index); }
     std::string getNameForIndex(int i) { return "watts_" + std::to_string(i); }
@@ -113,8 +113,8 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
     void doFedInit() override
     {
-        // Construct the Watts-Strogatz graph,
-        // for benchmark setup reasons from within the Federates, it is a directed graph (typically
+        // Construct the Watts-Strogatz graph.
+        // For benchmark setup reasons from within the Federates, it is a directed graph (typically
         // it is undirected). The doParamInit check on k < maxIndex - 1 ensures that currentEdges
         // and availableEdges will not include our own index, avoiding self-loops.
         std::vector<unsigned int> currentEdges;
