@@ -96,6 +96,6 @@ jobs:
         workingDirectory: build
 
       # Packaging tests
-      - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
+      - bash: ctest --output-on-failure -V --timeout 200 -C Release -L "PackagingFast"
         displayName: 'Test HELICS packaging'
         workingDirectory: build
