@@ -19,6 +19,7 @@ set(HELICS_BENCHMARKS
     messageSendBenchmarks
     pholdBenchmarks
     timingBenchmarks
+    wattsStrogatzBenchmarks
 )
 
 set(HELICS_MULTINODE_BENCHMARKS
@@ -32,6 +33,7 @@ set(HELICS_MULTINODE_BENCHMARKS
     EchoMessageLeafFederate
     TimingHubFederate
     TimingLeafFederate
+    WattsStrogatzFederate
 )
 
 if(NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
