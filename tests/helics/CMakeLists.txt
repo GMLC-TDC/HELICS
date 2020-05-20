@@ -59,10 +59,13 @@ add_test(
     --build-and-test
     "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
     "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
+    --build-run-dir
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     --build-generator
     "${CMAKE_GENERATOR}"
     --build-generator-platform
     "${CMAKE_GENERATOR_PLATFORM}"
+    -V
     --build-options
     ${HELICS_PACKAGE_SEARCH_LOC}
     "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
