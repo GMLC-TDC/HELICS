@@ -19,7 +19,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::core_type;
 
-// This sets up parameterized arguments for the multicore benchmark runs.
+// WattsStrogatzArguments sets up parameterized arguments for the multicore benchmark runs.
+// The degree argument has constraints based on the federate count so the Ranges function
+// in google benchmarks can't be used.
+//
 // f is the number of federates, ranging from 2 to 16 using powers of two.
 // d is the degree (number of outgoing links) for each federate, with a range from 1 to f-1.
 // p is the rewire probability (0-100) for links between federates.
