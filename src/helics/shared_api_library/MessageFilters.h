@@ -295,7 +295,7 @@ HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char* info, hel
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, helics_handle_options option, helics_bool value, helics_error* err);
 
 /**
  * Get a handle option for the filter.
@@ -303,7 +303,7 @@ HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, helics_
  * @param filt The given filter to query.
  * @param option The option to query /ref helics_handle_options.
  */
-HELICS_EXPORT helics_bool helicsFilterGetOption(helics_filter filt, int option);
+HELICS_EXPORT helics_bool helicsFilterGetOption(helics_filter filt, helics_handle_options option);
 
 /**
  * @}
