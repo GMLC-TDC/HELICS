@@ -42,6 +42,7 @@ void addBM(helics::helicsCLI11App& app, std::string name, std::string descriptio
 
 int main(int argc, char* argv[])
 {
+    try {
         helics::helicsCLI11App app("HELICS benchmark federates for use in multinode benchmark setups",
                                    "helics_benchmarks");
         app.ignore_case()->prefix_command()->ignore_underscore();
@@ -100,6 +101,9 @@ int main(int argc, char* argv[])
         std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
     fed->addResult<decltype(elapsed)>("ELAPSED TIME (ns)", "real_time", elapsed);
     fed->printResults();
-
+    } catch (...) {
+        std::cerr << "Uncaught exception occurred\n";
+        exit(1);
+    }
         
 }
