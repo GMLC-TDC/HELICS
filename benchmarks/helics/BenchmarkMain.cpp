@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "RingTransmitMessageFederate.hpp"
 #include "TimingHubFederate.hpp"
 #include "TimingLeafFederate.hpp"
+#include "WattsStrogatzFederate.hpp"
 #include "helics/core/helicsCLI11.hpp"
 
 #include <chrono>
@@ -55,6 +56,7 @@ int main(int argc, char* argv[])
 
     addBM<TimingHub>(app, "timinghub", "Timing Hub benchmark federate");
     addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
+    addBM<WattsStrogatzFederate>(app, "watts-strogatz", "Watts-Strogatz benchmark federate");
 
     auto ret = app.helics_parse(argc, argv);
     if (ret != helics::helicsCLI11App::parse_output::ok) {
