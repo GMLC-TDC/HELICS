@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 class WattsStrogatzFederate: public BenchmarkFederate {
   public:
     int initialMessageCount{
-        20};  // number of messages the federate should send when it starts (too high results in
+        10};  // number of messages the federate should send when it starts (too high results in
               // lower degrees being slower than high, possibly queue or buffer related for a
               // socket, and can make the udp benchmark hang indefinitely)
 
@@ -30,10 +30,10 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     // Federates, this simplified version has each node setup the connectiosn on its right side only
     // (so k=K/2 in this benchmark)
     int k{1};  // degree
-    double b{0};  // re-wire probability for each of k rightmost neighbors
+    double b{0.6};  // re-wire probability for each of k rightmost neighbors
 
     // Classes related to the exponential and uniform distribution random number generator
-    bool generateRandomSeed{false};
+    bool generateRandomSeed{true};
     unsigned int seed{0xABad5eed};  // suggestions for seed choice were not having a majority of the
                                     // bits as 0 is better
     std::mt19937 rand_gen;
@@ -61,7 +61,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     void setupArgumentParsing() override
     {
         deltaTime = helics::Time(10, time_units::ns);
-        finalTime = helics::Time(2500, time_units::ns);
+        finalTime = helics::Time(5000, time_units::ns);
 
         app->add_flag("--gen_rand_seed", generateRandomSeed, "enable generating a random seed");
         app->add_option("--set_rand_seed", seed, "set the random seed");
@@ -160,7 +160,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
         }
 
         // Confirm one last time that the number of edges matches the degree
-        if (currentEdges.size() != static_cast<unsigned int>(k)) {
+        if (currentEdges.size() != static_cast<size_t>(k)) {
             std::cerr << "ERROR: The number of edges doesn't match the degree\n";
             exit(1);
         }
@@ -187,7 +187,6 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
     void doMainLoop() override
     {
-        std::string txstring(100, '1');
         auto nextTime = helics::timeZero;
 
         while (nextTime < finalTime) {

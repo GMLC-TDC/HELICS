@@ -19,11 +19,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::core_type;
 
+// This sets up parameterized arguments for the multicore benchmark runs.
+// f is the number of federates, ranging from 2 to 16 using powers of two.
+// d is the degree (number of outgoing links) for each federate, with a range from 1 to f-1.
+// p is the rewire probability (0-100) for links between federates.
 static void WattsStrogatzArguments(benchmark::internal::Benchmark* b)
 {
     for (int f = 2; f <= 16; f *= 2) {
         for (int d = 2; d <= f; d *= 2) {
-            b->Args({f, d - 1});
+            for (int p = 0; p <= 100; p += 25) {
+                b->Args({f, d - 1, p});
+            }
         }
     }
 }
@@ -34,6 +40,7 @@ static void BM_wattsStrogatz2_singleCore(benchmark::State& state)
         state.PauseTiming();
         int feds = 2;
         int degree = 1;
+
         gmlc::concurrency::Barrier brr(feds);
         auto wcore = helics::CoreFactory::create(
             core_type::INPROC,
@@ -78,6 +85,7 @@ static void BM_wattsStrogatz_multiCore(benchmark::State& state, core_type cType)
         // Interested in the effect for varying degrees of connectedness
         int feds = static_cast<int>(state.range(0));
         int degree = static_cast<int>(state.range(1));
+        double rewireP = static_cast<double>(state.range(2))/100.0;
 
         gmlc::concurrency::Barrier brr(feds);
         auto broker =
@@ -95,7 +103,8 @@ static void BM_wattsStrogatz_multiCore(benchmark::State& state, core_type cType)
                             broker->getIdentifier()));
             cores[ii]->connect();
             std::string bmInit = "--index=" + std::to_string(ii) +
-                " --max_index=" + std::to_string(feds) + " --degree=" + std::to_string(degree);
+                " --max_index=" + std::to_string(feds) + " --degree=" + std::to_string(degree) +
+                " --rewire_probability=" + std::to_string(rewireP);
             links[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         std::vector<std::thread> threadlist(feds - 1);
