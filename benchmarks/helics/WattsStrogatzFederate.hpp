@@ -138,8 +138,8 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
         // Re-wire links
         if (!availableEdges.empty()) {
-            for (unsigned int i = 0; i < currentEdges.size();
-                 i++) {  // NOLINT(modernize-loop-convert)
+            // NOLINTNEXTLINE(modernize-loop-convert)
+            for (unsigned int i = 0; i < currentEdges.size(); i++) {
                 // Decide if the link should be rewired or not
                 if (rand_rewire(rand_gen) < b) {
                     // Criteria for the new link:
