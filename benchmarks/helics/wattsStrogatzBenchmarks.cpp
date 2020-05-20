@@ -90,7 +90,7 @@ static void BM_wattsStrogatz_multiCore(benchmark::State& state, core_type cType)
         // Interested in the effect for varying degrees of connectedness
         int feds = static_cast<int>(state.range(0));
         int degree = static_cast<int>(state.range(1));
-        double rewireP = static_cast<double>(state.range(2))/100.0;
+        double rewireP = static_cast<double>(state.range(2)) / 100.0;
 
         gmlc::concurrency::Barrier brr(feds);
         auto broker =
