@@ -32,6 +32,6 @@ before_build:
 # Build and test, actually.
 build_script:
     - 'echo Building...'
-    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && make -j6 "'
+    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && make -j2 "'
 
 test: off

@@ -65,7 +65,9 @@ add_test(
     "${CMAKE_GENERATOR}"
     --build-generator-platform
     "${CMAKE_GENERATOR_PLATFORM}"
-    -V
+    -VV
+    --repeat until-pass:2
+    --build-noclean
     --build-options
     ${HELICS_PACKAGE_SEARCH_LOC}
     "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
