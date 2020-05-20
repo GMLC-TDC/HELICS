@@ -21,6 +21,11 @@ extern "C" {
 #ifndef HELICS_EXPORT
 #define HELICS_EXPORT
 #endif
+
+#ifndef HELICS_DEPRECATED_EXPORT
+#define HELICS_DEPRECATED_EXPORT
+#endif
+
 /**
  * @file
  * @brief Common functions for the HELICS C api.
