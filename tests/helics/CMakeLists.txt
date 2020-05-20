@@ -50,6 +50,12 @@ else() # don't try to run the tests on MSVC since that would require copying the
     set(package_test_command)
 endif()
 
+if (CMAKE_BUILD_TYPE)
+    set(HELICS_PACKAGE_TEST_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+else()
+    set(HELICS_PACKAGE_TEST_BUILD_TYPE Release)
+endif()
+
 # Tests for other CMake projects including and using HELICS using find_package
 add_test(NAME
     find-package-testsA
@@ -79,7 +85,7 @@ add_test(NAME
     --build 
     "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
     --config
-    ${CMAKE_BUILD_TYPE}
+    ${HELICS_PACKAGE_TEST_BUILD_TYPE}
 )
 
 add_test(NAME
@@ -87,7 +93,7 @@ add_test(NAME
     COMMAND
     ${CMAKE_CTEST_COMMAND}
     -C
-    ${CMAKE_BUILD_TYPE}
+    ${HELICS_PACKAGE_TEST_BUILD_TYPE}
     WORKING_DIRECTORY
     "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
 )
@@ -107,7 +113,7 @@ if(HELICS_ENABLE_SUBPROJECT_TESTS)
         add-subdirectory-tests
         ${CMAKE_CTEST_COMMAND}
         -C
-        ${CMAKE_BUILD_TYPE}
+        ${HELICS_PACKAGE_TEST_BUILD_TYPE}
         --build-and-test
         "${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory_tests"
         "${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_tests"
@@ -134,7 +140,7 @@ if(NOT MSVC AND HELICS_INSTALL_PACKAGE_TESTS)
         package-config-tests
         ${CMAKE_CTEST_COMMAND}
         -C
-        ${CMAKE_BUILD_TYPE}
+        ${HELICS_PACKAGE_TEST_BUILD_TYPE}
         --build-and-test
         "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests"
         "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
