@@ -61,6 +61,8 @@ add_test(
     "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
     --build-run-dir
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    --build-exec-dir
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     --build-generator
     "${CMAKE_GENERATOR}"
     --build-generator-platform
