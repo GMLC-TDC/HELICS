@@ -27,7 +27,7 @@ std::shared_ptr<BenchmarkFederate> fed;
 template<class T>
 void addBM(helics::helicsCLI11App& app, std::string name, std::string description)
 {
-    app.add_subcommand(name, description)
+    app.add_subcommand(std::move(name), std::move(description))
         ->callback([]() { fed = std::make_shared<T>(); })
         ->footer([] {
             T().initialize("", "--help");
@@ -37,26 +37,31 @@ void addBM(helics::helicsCLI11App& app, std::string name, std::string descriptio
 
 int main(int argc, char* argv[])
 {
-    helics::helicsCLI11App app("HELICS benchmark federates for use in multinode benchmark setups",
-                               "helics_benchmarks");
-    app.ignore_case()->prefix_command()->ignore_underscore();
-    addBM<EchoHub>(app, "echohub", "Echo Hub benchmark federate");
-    addBM<EchoLeaf>(app, "echoleaf", "Echo Leaf benchmark federate");
-    addBM<EchoMessageHub>(app, "echomessagehub", "Echo Message Hub benchmark federate");
-    addBM<EchoMessageLeaf>(app, "echomessageleaf", "Echo Message Leaf benchmark federate");
+    try {
+        helics::helicsCLI11App app("HELICS benchmark federates for use in multinode benchmark setups",
+                                   "helics_benchmarks");
+        app.ignore_case()->prefix_command()->ignore_underscore();
+        addBM<EchoHub>(app, "echohub", "Echo Hub benchmark federate");
+        addBM<EchoLeaf>(app, "echoleaf", "Echo Leaf benchmark federate");
+        addBM<EchoMessageHub>(app, "echomessagehub", "Echo Message Hub benchmark federate");
+        addBM<EchoMessageLeaf>(app, "echomessageleaf", "Echo Message Leaf benchmark federate");
 
-    addBM<MessageExchangeFederate>(app, "messageexchange", "Message Exchange benchmark federate");
+        addBM<MessageExchangeFederate>(app, "messageexchange", "Message Exchange benchmark federate");
 
-    addBM<PholdFederate>(app, "phold", "PHOLD benchmark federate");
+        addBM<PholdFederate>(app, "phold", "PHOLD benchmark federate");
 
-    addBM<RingTransmit>(app, "ringtransmit", "Ring Transmit benchmark federate");
-    addBM<RingTransmitMessage>(app,
-                               "ringtransmitmessage",
-                               "Ring Transmit Message benchmark federate");
+        addBM<RingTransmit>(app, "ringtransmit", "Ring Transmit benchmark federate");
+        addBM<RingTransmitMessage>(app,
+                                   "ringtransmitmessage",
+                                   "Ring Transmit Message benchmark federate");
 
-    addBM<TimingHub>(app, "timinghub", "Timing Hub benchmark federate");
-    addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
-    addBM<WattsStrogatzFederate>(app, "watts-strogatz", "Watts-Strogatz benchmark federate");
+        addBM<TimingHub>(app, "timinghub", "Timing Hub benchmark federate");
+        addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
+        addBM<WattsStrogatzFederate>(app, "watts-strogatz", "Watts-Strogatz benchmark federate");
+    } catch (...) {
+        std::cerr << "Exception setting up CLI11 parser\n";
+        exit(1);
+    }
 
     auto ret = app.helics_parse(argc, argv);
     if (ret != helics::helicsCLI11App::parse_output::ok) {
@@ -77,7 +82,8 @@ int main(int argc, char* argv[])
     }
 
     // setup benchmark timing
-    std::chrono::time_point<std::chrono::steady_clock> start_time, end_time;
+    std::chrono::time_point<std::chrono::steady_clock> start_time;
+    std::chrono::time_point<std::chrono::steady_clock> end_time;
     fed->setBeforeFinalizeCallback([&end_time]() { end_time = std::chrono::steady_clock::now(); });
 
     // run the benchmark

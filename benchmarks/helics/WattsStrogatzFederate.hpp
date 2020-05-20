@@ -56,7 +56,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     void setRewireProbability(double val) { b = val; }
 
     std::string getName() override { return getNameForIndex(index); }
-    std::string getNameForIndex(int i) { return "watts_" + std::to_string(i); }
+    static std::string getNameForIndex(int i) { return "watts_" + std::to_string(i); }
 
     void setupArgumentParsing() override
     {
@@ -138,7 +138,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
         // Re-wire links
         if (!availableEdges.empty()) {
-            for (unsigned int i = 0; i < currentEdges.size(); i++) {
+            for (unsigned int i = 0; i < currentEdges.size(); i++) { // NOLINT(modernize-loop-convert)
                 // Decide if the link should be rewired or not
                 if (rand_rewire(rand_gen) < b) {
                     // Criteria for the new link:
@@ -166,7 +166,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
         // Setup list of connected edges based on currentEdges set
         links.reserve(k);
-        for (unsigned int i = 0; i < currentEdges.size(); i++) {
+        for (auto edgeIndex : currentEdges) {
             links.push_back(getNameForIndex(currentEdges[i]) + "/ept");
         }
 
