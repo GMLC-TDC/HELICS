@@ -50,52 +50,35 @@ else() # don't try to run the tests on MSVC since that would require copying the
     set(package_test_command)
 endif()
 
-if (CMAKE_BUILD_TYPE)
+if(CMAKE_BUILD_TYPE)
     set(HELICS_PACKAGE_TEST_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 else()
     set(HELICS_PACKAGE_TEST_BUILD_TYPE Release)
 endif()
 
 # Tests for other CMake projects including and using HELICS using find_package
-add_test(NAME
-    find-package-testsA
+add_test(
+    NAME find-package-testsA
     COMMAND
-    ${CMAKE_COMMAND}
-    -S
-    "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
-    -B
-    "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
-    -G
-    "${CMAKE_GENERATOR}"
-    -A
-    "${CMAKE_GENERATOR_PLATFORM}"
-    ${HELICS_PACKAGE_SEARCH_LOC}
-    "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
-    "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
-    "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
-    "-DHELICS_VERSION=${HELICS_VERSION}"
-    "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-    "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        ${CMAKE_COMMAND} -S "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests" -B
+        "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests" -G "${CMAKE_GENERATOR}" -A
+        "${CMAKE_GENERATOR_PLATFORM}" ${HELICS_PACKAGE_SEARCH_LOC}
+        "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
+        "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+        "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
+        "-DHELICS_VERSION=${HELICS_VERSION}" "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+        "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
-add_test(NAME
-    find-package-testsB COMMAND
-    ${CMAKE_COMMAND}
-    --build 
-    "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
-    --config
-    ${HELICS_PACKAGE_TEST_BUILD_TYPE}
+add_test(NAME find-package-testsB
+         COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests" --config
+                 ${HELICS_PACKAGE_TEST_BUILD_TYPE}
 )
 
-add_test(NAME
-    find-package-testsC
-    COMMAND
-    ${CMAKE_CTEST_COMMAND}
-    -C
-    ${HELICS_PACKAGE_TEST_BUILD_TYPE}
-    WORKING_DIRECTORY
-    "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
+add_test(NAME find-package-testsC COMMAND ${CMAKE_CTEST_COMMAND} -C
+                                          ${HELICS_PACKAGE_TEST_BUILD_TYPE}
+         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
 )
 set_property(TEST find-package-testsA PROPERTY LABELS Packaging PackagingFast)
 set_property(TEST find-package-testsB PROPERTY LABELS Packaging PackagingFast)

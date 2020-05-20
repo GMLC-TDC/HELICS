@@ -259,7 +259,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT
 if(WIN32)
     # Realistically for bundling into a Python wheel, the dll should be given a unique name to avoid
     # conflicts with other packages using a different version of the dll with the same name
-    
+
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(python)
     else()
