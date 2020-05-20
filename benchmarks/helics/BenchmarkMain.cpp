@@ -27,17 +27,21 @@ std::shared_ptr<BenchmarkFederate> fed;
 template<class T>
 void addBM(helics::helicsCLI11App& app, std::string name, std::string description)
 {
+ try {
     app.add_subcommand(std::move(name), std::move(description))
         ->callback([]() { fed = std::make_shared<T>(); })
         ->footer([] {
             T().initialize("", "--help");
             return std::string{};
         });
+} catch (...) {
+        std::cerr << "Exception when adding CLI11 subcommand occurred\n";
+        exit(1);
+    }
 }
 
 int main(int argc, char* argv[])
 {
-    try {
         helics::helicsCLI11App app("HELICS benchmark federates for use in multinode benchmark setups",
                                    "helics_benchmarks");
         app.ignore_case()->prefix_command()->ignore_underscore();
@@ -58,10 +62,7 @@ int main(int argc, char* argv[])
         addBM<TimingHub>(app, "timinghub", "Timing Hub benchmark federate");
         addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
         addBM<WattsStrogatzFederate>(app, "watts-strogatz", "Watts-Strogatz benchmark federate");
-    } catch (...) {
-        std::cerr << "Exception setting up CLI11 parser\n";
-        exit(1);
-    }
+    
 
     auto ret = app.helics_parse(argc, argv);
     if (ret != helics::helicsCLI11App::parse_output::ok) {
@@ -94,4 +95,6 @@ int main(int argc, char* argv[])
         std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
     fed->addResult<decltype(elapsed)>("ELAPSED TIME (ns)", "real_time", elapsed);
     fed->printResults();
+
+        
 }
