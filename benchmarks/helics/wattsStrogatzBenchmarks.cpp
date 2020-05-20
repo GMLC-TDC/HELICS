@@ -19,10 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::core_type;
 
-static void WattsStrogatzArguments(benchmark::internal::Benchmark* b) {
+static void WattsStrogatzArguments(benchmark::internal::Benchmark* b)
+{
     for (int f = 2; f <= 16; f *= 2) {
         for (int d = 2; d <= f; d *= 2) {
-            b->Args({f, d-1});
+            b->Args({f, d - 1});
         }
     }
 }
@@ -41,13 +42,14 @@ static void BM_wattsStrogatz2_singleCore(benchmark::State& state)
 
         std::vector<WattsStrogatzFederate> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            std::string bmInit =
-                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds) + " --degree=" + std::to_string(degree);
+            std::string bmInit = "--index=" + std::to_string(ii) +
+                " --max_index=" + std::to_string(feds) + " --degree=" + std::to_string(degree);
             links[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
-        std::thread rthread([&](WattsStrogatzFederate& link) { link.run([&brr]() { brr.wait(); }); },
-                            std::ref(links[1]));
+        std::thread rthread(
+            [&](WattsStrogatzFederate& link) { link.run([&brr]() { brr.wait(); }); },
+            std::ref(links[1]));
 
         links[0].makeReady();
         brr.wait();
@@ -92,15 +94,15 @@ static void BM_wattsStrogatz_multiCore(benchmark::State& state, core_type cType)
                 std::string("--restrictive_time_policy --federates=1 --broker=" +
                             broker->getIdentifier()));
             cores[ii]->connect();
-            std::string bmInit =
-                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds) + " --degree=" + std::to_string(degree);
+            std::string bmInit = "--index=" + std::to_string(ii) +
+                " --max_index=" + std::to_string(feds) + " --degree=" + std::to_string(degree);
             links[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
-            threadlist[ii] =
-                std::thread([&](WattsStrogatzFederate& link) { link.run([&brr]() { brr.wait(); }); },
-                            std::ref(links[ii + 1]));
+            threadlist[ii] = std::thread(
+                [&](WattsStrogatzFederate& link) { link.run([&brr]() { brr.wait(); }); },
+                std::ref(links[ii + 1]));
         }
 
         links[0].makeReady();
