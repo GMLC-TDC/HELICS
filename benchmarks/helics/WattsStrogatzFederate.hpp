@@ -20,17 +20,22 @@ SPDX-License-Identifier: BSD-3-Clause
 /** class implementing a Watts-Strogatz-like communication pattern with messages*/
 class WattsStrogatzFederate: public BenchmarkFederate {
   public:
-    int initialMessageCount{20}; // number of messages the federate should send when it starts (too high results in lower degrees being slower than high, possibly queue or buffer related for a socket, and can make the udp benchmark hang indefinitely)
+    int initialMessageCount{
+        20};  // number of messages the federate should send when it starts (too high results in
+              // lower degrees being slower than high, possibly queue or buffer related for a
+              // socket, and can make the udp benchmark hang indefinitely)
 
-    // A typical Watts-Strogatz graph uses degree K for total connections to neighbors, K/2 on each side.
-    // Since this requires more coordination to setup than is easily done from within Federates, this
-    // simplified version has each node setup the connectiosn on its right side only (so k=K/2 in this benchmark)
-    int k{1}; // degree
-    double b{0}; // re-wire probability for each of k rightmost neighbors
+    // A typical Watts-Strogatz graph uses degree K for total connections to neighbors, K/2 on each
+    // side. Since this requires more coordination to setup than is easily done from within
+    // Federates, this simplified version has each node setup the connectiosn on its right side only
+    // (so k=K/2 in this benchmark)
+    int k{1};  // degree
+    double b{0};  // re-wire probability for each of k rightmost neighbors
 
     // Classes related to the exponential and uniform distribution random number generator
     bool generateRandomSeed{false};
-    unsigned int seed{0xABad5eed}; // suggestions for seed choice were not having a majority of the bits as 0 is better
+    unsigned int seed{0xABad5eed};  // suggestions for seed choice were not having a majority of the
+                                    // bits as 0 is better
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
     std::uniform_real_distribution<double> rand_rewire;
@@ -39,7 +44,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
   private:
     helics::Endpoint* ept{nullptr};
-    std::vector<std::string> links; // links to other federates
+    std::vector<std::string> links;  // links to other federates
 
   public:
     WattsStrogatzFederate(): BenchmarkFederate("WattsStrogatzFederate") {}
@@ -60,9 +65,13 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
         app->add_flag("--gen_rand_seed", generateRandomSeed, "enable generating a random seed");
         app->add_option("--set_rand_seed", seed, "set the random seed");
-        app->add_option("--degree", k, "set the degree (K/2), the number of edges to the right of each node");
+        app->add_option("--degree",
+                        k,
+                        "set the degree (K/2), the number of edges to the right of each node");
         app->add_option("--rewire_probability", b, "set the probability of rewiring an edge");
-        app->add_option("--initial_message_count", initialMessageCount, "the initial number of messages this federate should send");
+        app->add_option("--initial_message_count",
+                        initialMessageCount,
+                        "the initial number of messages this federate should send");
         opt_index->required();
         opt_max_index->required();
     }
@@ -70,7 +79,8 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     void doParamInit(helics::FederateInfo& /*fi*/) override
     {
         if (k < 1 || k > maxIndex - 1) {
-            std::cerr << "ERROR: Degree can't be less than 1 or more than the federate count - 1" << std::endl;
+            std::cerr << "ERROR: Degree can't be less than 1 or more than the federate count - 1"
+                      << std::endl;
             exit(1);
         }
 
@@ -92,20 +102,21 @@ class WattsStrogatzFederate: public BenchmarkFederate {
             rand_gen.seed(seed);
         }
         rand_rewire = std::uniform_real_distribution<double>(0.0, 1.0);
-        // create random number distribution for rewiring links (there are maxIndex-k-2 available links)
-        if (maxIndex-k > 1) {
+        // create random number distribution for rewiring links (there are maxIndex-k-2 available
+        // links)
+        if (maxIndex - k > 1) {
             rand_available_link = std::uniform_int_distribution<unsigned int>(0, maxIndex - k - 2);
         }
         // create random number distribution for picking a link to transmit on
-        rand_transmit_link = std::uniform_int_distribution<unsigned int>(0, k-1);
+        rand_transmit_link = std::uniform_int_distribution<unsigned int>(0, k - 1);
     }
 
     void doFedInit() override
     {
         // Construct the Watts-Strogatz graph,
-        // for benchmark setup reasons from within the Federates, it is a directed graph (typically it is undirected).
-        // The doParamInit check on k < maxIndex - 1 ensures that currentEdges and availableEdges will not include our own index,
-        // avoiding self-loops.
+        // for benchmark setup reasons from within the Federates, it is a directed graph (typically
+        // it is undirected). The doParamInit check on k < maxIndex - 1 ensures that currentEdges
+        // and availableEdges will not include our own index, avoiding self-loops.
         std::vector<unsigned int> currentEdges;
         std::vector<unsigned int> availableEdges;
         currentEdges.reserve(k);
@@ -113,11 +124,11 @@ class WattsStrogatzFederate: public BenchmarkFederate {
 
         // Construct half of a ring lattice
         for (int i = 1; i <= k; i++) {
-            currentEdges.push_back((index+i)%maxIndex);
+            currentEdges.push_back((index + i) % maxIndex);
         }
-        
+
         // Create the set of links available as rewiring choices
-        for (int i = 1; i <= maxIndex-k-1; i++) {
+        for (int i = 1; i <= maxIndex - k - 1; i++) {
             auto edge = index - i;
             if (edge < 0) {
                 edge += maxIndex;
@@ -133,7 +144,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
                     // Criteria for the new link:
                     // 1. Avoid self-loops
                     // 2. Avoid duplication with links that exist at this point in the algorithm
-                    
+
                     // Pick a new link from the available edges
                     auto newLink = rand_available_link(rand_gen);
 
