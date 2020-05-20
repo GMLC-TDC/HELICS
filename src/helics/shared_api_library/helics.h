@@ -18,6 +18,9 @@ extern "C" {
 
 #include <stdlib.h>
 
+#ifndef HELICS_EXPORT
+#define HELICS_EXPORT
+#endif
 /**
  * @file
  * @brief Common functions for the HELICS C api.
