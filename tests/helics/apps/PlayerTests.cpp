@@ -354,13 +354,9 @@ TEST_P(player_file_tests, test_files_cmd)
 TEST_P(player_file_tests, test_files_exe)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    exeTestRunner playerExe(HELICS_INSTALL_LOC,
-                            HELICS_BUILD_LOC,
-                            "helics_player");
+    exeTestRunner playerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_player");
 
-    exeTestRunner brokerExe(HELICS_INSTALL_LOC,
-                            HELICS_BUILD_LOC,
-                            "helics_broker");
+    exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_broker");
 
     ASSERT_TRUE(playerExe.isActive());
     ASSERT_TRUE(brokerExe.isActive());

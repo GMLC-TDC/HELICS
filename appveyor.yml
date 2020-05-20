@@ -5,23 +5,23 @@ version: 3.0.0.{build}
 image: Visual Studio 2019
 
 environment:
-    global:
-        CYG_ROOT: C:\cygwin64
-        CYG_MIRROR: http://cygwin.mirror.constant.com
-        CYG_CACHE: C:\cygwin64\var\cache\setup
-        CYG_BASH: C:\cygwin64\bin\bash
+  global:
+    CYG_ROOT: C:\cygwin64
+    CYG_MIRROR: http://cygwin.mirror.constant.com
+    CYG_CACHE: C:\cygwin64\var\cache\setup
+    CYG_BASH: C:\cygwin64\bin\bash
 
 cache:
   - '%CYG_CACHE%'
 
 #
 # Install needed build dependencies
-# 
+#
 install:
-    - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
-    - '%CYG_ROOT%\bin\cygcheck -dc'
-    - cd %APPVEYOR_BUILD_FOLDER%
-    - git submodule update --init --recursive
+  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
+  - '%CYG_ROOT%\bin\cygcheck -dc'
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - git submodule update --init --recursive
 
 before_build:
   - mkdir build
@@ -31,7 +31,7 @@ before_build:
 
 # Build and test, actually.
 build_script:
-    - 'echo Building...'
-    - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && make -j4 "'
+  - 'echo Building...'
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && make -j4 "'
 
 test: off
