@@ -88,7 +88,12 @@ int main(int argc, char* argv[])
     fed->setBeforeFinalizeCallback([&end_time]() { end_time = std::chrono::steady_clock::now(); });
 
     // run the benchmark
-    fed->run([&start_time]() { start_time = std::chrono::steady_clock::now(); });
+    try {
+        fed->run([&start_time]() { start_time = std::chrono::steady_clock::now(); });
+    } catch(...) {
+        std::cerr << "Exception occurred while running the benchmark\n";
+        exit(1);
+    }
 
     // print duration
     auto elapsed =
