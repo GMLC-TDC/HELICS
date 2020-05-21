@@ -128,17 +128,17 @@ class FederateInfo {
                                         HELICS_NULL_POINTER);
     }
     /** set a time federate or core property
-    @param timeProperty /ref helics_federate_properties an integer code with the property
+    @param timeProperty /ref helics_properties an integer code with the property
     @param timeValue the value to set the property to
     */
-    void setProperty(int timeProperty, helics_time timeValue)
+    void setProperty(helics_properties timeProperty, helics_time timeValue)
     {
         helicsFederateInfoSetTimeProperty(fi, timeProperty, timeValue, HELICS_NULL_POINTER);
     }
     /** set an integral federate or core property
-  @param integerProperty /ref helics_federate_properties an integer code with the property
-  @param propertyValue the value to set the property to
-  */
+    @param integerProperty /ref helics_properties an integer code with the property
+    @param propertyValue the value to set the property to
+    */
     void setProperty(int integerProperty, int propertyValue)
     {
         helicsFederateInfoSetIntegerProperty(fi,
@@ -235,7 +235,7 @@ class Federate {
     /** get the value of a flag option
     @param flag an index into the flag /ref flag-definitions.h
     */
-    bool getFlagOption(int flag) const
+    bool getFlagOption(helics_federate_flags flag) const
     {
         return (helicsFederateGetFlagOption(fed, flag, hThrowOnError()) != helics_false);
     }
@@ -585,7 +585,7 @@ class Federate {
         helicsFederateLogDebugMessage(fed, message.c_str(), hThrowOnError());
     }
     /** log a message with a specified log level*/
-    void logMessage(int level, const std::string& message)
+    void logMessage(helics_log_levels level, const std::string& message)
     {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }

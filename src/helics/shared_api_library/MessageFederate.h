@@ -402,7 +402,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char* info, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, helics_handle_options option, helics_bool value, helics_error* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -410,7 +410,7 @@ HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, heli
  * @param end The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
  */
-HELICS_EXPORT helics_bool helicsEndpointGetOption(helics_endpoint end, int option);
+HELICS_EXPORT helics_bool helicsEndpointGetOption(helics_endpoint end, helics_handle_options option);
 
 /**
  * \defgroup Message operation functions
@@ -648,7 +648,7 @@ HELICS_EXPORT void helicsMessageClearFlags(helics_message_object message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetFlagOption(helics_message_object message, int flag, helics_bool flagValue, helics_error* err);
+HELICS_EXPORT void helicsMessageSetFlagOption(helics_message_object message, helics_federate_flags flag, helics_bool flagValue, helics_error* err);
 
 /**
  * Set the data payload of a message as a string.

@@ -154,7 +154,7 @@ class Message {
         return *this;
     }
     /** set an indexed flag in the message*/
-    Message& setFlag(int flag, bool val)
+    Message& setFlag(helics_federate_flags flag, bool val)
     {
         helicsMessageSetFlagOption(mo, flag, val ? helics_true : helics_false, hThrowOnError());
         return *this;
