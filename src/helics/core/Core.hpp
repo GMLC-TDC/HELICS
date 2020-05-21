@@ -465,12 +465,13 @@ class Core {
      * Return the data for the specified handle or the latest input
      *
      */
-    virtual std::shared_ptr<const data_block> getValue(interface_handle handle) = 0;
+    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle) = 0;
+
     /**
-     * Return all the data for the specified handle or the latest input
+     * Return all the available data for the specified handle or the latest input
      *
      */
-    virtual std::vector<std::shared_ptr<const data_block>>
+    virtual const std::vector<std::shared_ptr<const data_block>>&
         getAllValues(interface_handle handle) = 0;
 
     /**

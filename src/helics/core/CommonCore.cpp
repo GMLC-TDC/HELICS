@@ -1267,7 +1267,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
     }
 }
 
-std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
+const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle handle)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1277,11 +1277,12 @@ std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    // TODO(PT): this is a long chain should be refactored
-    return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getData();
+    auto &fed = *getFederateAt(handleInfo->local_fed_id);
+    std::lock_guard<FederateState> lk(fed);
+    return fed.getValue(handle);
 }
 
-std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interface_handle handle)
+const std::vector<std::shared_ptr<const data_block>> &CommonCore::getAllValues(interface_handle handle)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1291,8 +1292,9 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interfac
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    // TODO(PT): this is a long chain should be refactored
-    return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getAllData();
+    auto& fed = *getFederateAt(handleInfo->local_fed_id);
+    std::lock_guard<FederateState> lk(fed);
+    return fed.getAllValues(handle);
 }
 
 const std::vector<interface_handle>& CommonCore::getValueUpdates(local_federate_id federateID)

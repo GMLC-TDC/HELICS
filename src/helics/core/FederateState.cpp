@@ -252,6 +252,17 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
     return nullptr;
 }
 
+const std::shared_ptr<const data_block>& FederateState::getValue(interface_handle handle)
+{
+    return interfaces().getInput(handle)->getData();
+}
+
+const std::vector<std::shared_ptr<const data_block>>&
+FederateState::getAllValues(interface_handle handle)
+{
+    return interfaces().getInput(handle)->getAllData();
+}
+
 void FederateState::routeMessage(const ActionMessage& msg)
 {
     if (parent_ != nullptr) {

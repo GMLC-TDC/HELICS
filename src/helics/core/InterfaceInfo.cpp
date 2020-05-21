@@ -282,23 +282,23 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             }
         }
         for (auto& source : ipt->source_info) {
-            if (!checkTypeMatch(ipt->type, std::get<1>(source), ipt->strict_type_matching)) {
+            if (!checkTypeMatch(ipt->type, source.type, ipt->strict_type_matching)) {
                 issues.emplace_back(
                     helics::defs::errors::connection_failure,
                     fmt::format(
                         "Input \"{}\" source has mismatched types: {} is not compatible with {}",
                         ipt->key,
                         ipt->type,
-                        std::get<1>(source)));
+                        source.type));
             }
             if ((!ipt->ignore_unit_mismatch) &&
-                (!checkUnitMatch(ipt->units, std::get<2>(source), false))) {
+                (!checkUnitMatch(ipt->units, source.units, false))) {
                 issues.emplace_back(
                     helics::defs::errors::connection_failure,
                     fmt::format(
                         "Input \"{}\" source has incompatible unit: {} is not convertible to {}",
                         ipt->key,
-                        std::get<2>(source),
+                        source.units,
                         ipt->units));
             }
         }

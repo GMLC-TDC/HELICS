@@ -20,8 +20,8 @@ class InputInfo {
   public:
     /** data structure containing a helics data value recorded from a publication*/
     struct dataRecord {
-        Time time = Time::minVal();  //!< the time of the data value
-        unsigned int iteration = 0;  //!< the iteration number of the data value
+        Time time{Time::minVal()};  //!< the time of the data value
+        unsigned int iteration{0};  //!< the iteration number of the data value
         std::shared_ptr<const data_block> data;  //!< the data value
         /** default constructor*/
         dataRecord() = default;
@@ -38,6 +38,18 @@ class InputInfo {
         }
     };
 
+    struct sourceInformation
+    {
+        std::string key;
+        std::string type;
+        std::string units;
+        int priority{0};
+        sourceInformation() = default;
+        sourceInformation(const std::string &key_, const std::string &type_,const std::string &units_):
+            key(key_), type(type_),units(units_)
+        {
+        }
+    };
     /** constructor with all the information*/
     InputInfo(global_handle handle,
                    const std::string& key_,
@@ -54,33 +66,30 @@ class InputInfo {
     std::string inputType;  //!< the type of data that its first matching input uses
     std::string inputUnits;  //!< the units of the data that its first matching input uses
     const std::string units;  //!< the units of the controlInput
-    bool required =
-        false;  //!< flag indicating that the subscription requires a matching publication
-    bool optional = false;  //!< flag indicating that any targets are optional
-    bool has_target = false;  //!< flag indicating that the input has a source
-    bool only_update_on_change =
-        false;  //!< flag indicating that the data should only be updated on change
-    bool not_interruptible =
-        false;  //!< indicator that this handle should not be used for interrupting
-    bool strict_type_matching =
-        false;  //!< indicator that the handle need to have strict type matching
-    bool single_source = false;  //!< allow only a single source to connect
-    bool ignore_unit_mismatch = false;  //!< ignore unit mismatches
-    std::vector<dataRecord> current_data;  //!< the most recent published data
+    bool required{false};  //!< flag indicating that the subscription requires a matching publication
+    bool optional{false};  //!< flag indicating that any targets are optional
+    bool has_target{false};  //!< flag indicating that the input has a source
+    bool only_update_on_change{false};  //!< flag indicating that the data should only be updated on change
+    bool not_interruptible{false};  //!< indicator that this handle should not be used for interrupting
+    bool strict_type_matching{false};  //!< indicator that the handle need to have strict type matching
+    bool single_source{false};  //!< allow only a single source to connect
+    bool ignore_unit_mismatch{false};  //!< ignore unit mismatches
+    std::vector<std::pair<helics::Time,unsigned int>> current_data_time;  //!< the most recent published data times
+    std::vector<std::shared_ptr<const data_block>>
+        current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;
-    std::vector<std::tuple<std::string, std::string, std::string>>
-        source_info;  //!< the name,type,units of the sources
+    std::vector<sourceInformation> source_info;  //!< the name,type,units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
   public:
     /** get all the current data*/
-    std::vector<std::shared_ptr<const data_block>> getAllData();
+    const std::vector<std::shared_ptr<const data_block>>& getAllData() const;
     /** get a particular data input*/
-    std::shared_ptr<const data_block> getData(int index);
+    const std::shared_ptr<const data_block>& getData(int index) const;
     /** get a the most recent data point*/
-    std::shared_ptr<const data_block> getData();
+    const std::shared_ptr<const data_block>& getData() const;
     /** add a data block into the queue*/
     void addData(global_handle source_id,
                  Time valueTime,

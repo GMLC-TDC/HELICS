@@ -163,6 +163,19 @@ class FederateState {
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny(interface_handle& id);
+    /**
+     * Return the data for the specified handle or the latest input
+     *
+     */
+    const std::shared_ptr<const data_block>& getValue(interface_handle handle);
+
+    /**
+     * Return all the available data for the specified handle or the latest input
+     *
+     */
+    const std::vector<std::shared_ptr<const data_block>>&
+        getAllValues(interface_handle handle);
+
     /** set the CommonCore object that is managing this Federate*/
     void setParent(CommonCore* coreObject) { parent_ = coreObject; }
     /** update the info structure

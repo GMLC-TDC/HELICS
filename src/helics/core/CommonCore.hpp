@@ -150,8 +150,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::string& getInjectionType(interface_handle handle) const override final;
     virtual const std::string& getExtractionType(interface_handle handle) const override final;
     virtual void setValue(interface_handle handle, const char* data, uint64_t len) override final;
-    virtual std::shared_ptr<const data_block> getValue(interface_handle handle) override final;
-    virtual std::vector<std::shared_ptr<const data_block>>
+    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle) override final;
+    virtual const std::vector<std::shared_ptr<const data_block>>&
         getAllValues(interface_handle handle) override final;
     virtual const std::vector<interface_handle>&
         getValueUpdates(local_federate_id federateID) override final;

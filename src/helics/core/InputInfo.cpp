@@ -15,40 +15,42 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-std::vector<std::shared_ptr<const data_block>> InputInfo::getAllData()
+const std::vector<std::shared_ptr<const data_block>>& InputInfo::getAllData() const
 {
-    std::vector<std::shared_ptr<const data_block>> out;
-    out.reserve(current_data.size());
-    for (auto& cd : current_data) {
-        out.push_back(cd.data);
-    }
-    return out;
+    return current_data;
 }
 
-std::shared_ptr<const data_block> InputInfo::getData(int index)
+static const std::shared_ptr<const data_block> NullData{nullptr};
+
+const std::shared_ptr<const data_block>& InputInfo::getData(int index) const
 {
     if (isValidIndex(index, current_data)) {
-        return current_data[index].data;
+        return current_data[index];
     }
-    return nullptr;
+    return NullData;
 }
 
-std::shared_ptr<const data_block> InputInfo::getData()
+const std::shared_ptr<const data_block>& InputInfo::getData() const
 {
-    int ind = 0;
-    int mxind = -1;
-    Time mxTime = Time::minVal();
-    for (auto& cd : current_data) {
-        if (cd.time > mxTime) {
-            mxTime = cd.time;
+    int ind{0};
+    int mxind{-1};
+    Time mxTime{Time::minVal()};
+    for (auto& cd : current_data_time) {
+        if (cd.first > mxTime) {
+            mxTime = cd.first;
             mxind = ind;
+        }
+        if (cd.first == mxTime) {
+            if (source_info[ind].priority > source_info[mxind].priority) {
+                mxind = ind;
+            }
         }
         ++ind;
     }
     if (mxind >= 0) {
-        return current_data[mxind].data;
+        return current_data[mxind];
     }
-    return nullptr;
+    return NullData;
 }
 
 static auto recordComparison = [](const InputInfo::dataRecord& rec1,
@@ -59,9 +61,9 @@ static auto recordComparison = [](const InputInfo::dataRecord& rec1,
 };
 
 void InputInfo::addData(global_handle source_id,
-                             Time valueTime,
-                             unsigned int iteration,
-                             std::shared_ptr<const data_block> data)
+                        Time valueTime,
+                        unsigned int iteration,
+                        std::shared_ptr<const data_block> data)
 {
     int index;
     bool found = false;
@@ -90,9 +92,9 @@ void InputInfo::addData(global_handle source_id,
 }
 
 void InputInfo::addSource(global_handle newSource,
-                               const std::string& sourceName,
-                               const std::string& stype,
-                               const std::string& sunits)
+                          const std::string& sourceName,
+                          const std::string& stype,
+                          const std::string& sunits)
 {
     if (input_sources.empty()) {
         inputType = stype;
@@ -124,7 +126,7 @@ void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
 void InputInfo::removeSource(const std::string& sourceName, Time minTime)
 {
     for (size_t ii = 0; ii < source_info.size(); ++ii) {
-        if (std::get<0>(source_info[ii]) == sourceName) {
+        if (source_info[ii].key == sourceName) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
                 data_queues[ii].pop_back();
             }
@@ -246,18 +248,20 @@ bool InputInfo::updateTimeInclusive(Time newTime)
 
 bool InputInfo::updateData(dataRecord&& update, int index)
 {
-    if (!only_update_on_change || !current_data[index].data) {
-        current_data[index] = std::move(update);
+    if (!only_update_on_change || !current_data[index]) {
+        current_data[index] = std::move(update.data);
+        current_data_time[index] = {update.time, update.iteration};
         return true;
     }
 
-    if (*current_data[index].data != *(update.data)) {
-        current_data[index] = std::move(update);
+    if (*current_data[index] != *(update.data)) {
+        current_data[index] = std::move(update.data);
+        current_data_time[index] = {update.time, update.iteration};
         return true;
     }
-    if (current_data[index].time ==
-        update.time) {  // this is for bookkeeping purposes should still return false
-        current_data[index].iteration = update.iteration;
+    if (current_data_time[index].first == update.time) {
+        // this is for bookkeeping purposes should still return false
+        current_data_time[index].second = update.iteration;
     }
     return false;
 }
