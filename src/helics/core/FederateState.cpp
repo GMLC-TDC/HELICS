@@ -96,18 +96,18 @@ static const std::string emptyStr;
 using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
-FederateState::FederateState(const std::string& name_, const CoreFederateInfo& info_):
-    name(name_),
+FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
+    name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
     global_id{global_federate_id()}
 {
-    for (const auto& prop : info_.timeProps) {
+    for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
     }
-    for (const auto& prop : info_.intProps) {
+    for (const auto& prop : fedInfo.intProps) {
         setProperty(prop.first, prop.second);
     }
-    for (const auto& prop : info_.flagProps) {
+    for (const auto& prop : fedInfo.flagProps) {
         setOptionFlag(prop.first, prop.second);
     }
 }

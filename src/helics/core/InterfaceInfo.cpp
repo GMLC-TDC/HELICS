@@ -46,7 +46,8 @@ void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
 {
     if (updateFlag != only_update_on_change) {
         only_update_on_change = updateFlag;
-        for (auto& ip : inputs.lock()) {
+        // ip is a reference to a unique_ptr
+        for (auto& ip : inputs.lock()) { //NOLINT(readability-qualified-auto)
             ip->only_update_on_change = updateFlag;
         }
     }
@@ -114,7 +115,7 @@ EndpointInfo* InterfaceInfo::getEndpoint(interface_handle handle)
 
 bool InterfaceInfo::setInputProperty(interface_handle id, int option, bool value)
 {
-    auto ipt = getInput(id);
+    auto* ipt = getInput(id);
     if (ipt == nullptr) {
         return false;
     }
@@ -152,7 +153,7 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int option, bool value
 
 bool InterfaceInfo::setPublicationProperty(interface_handle id, int option, bool value)
 {
-    auto pub = getPublication(id);
+    auto* pub = getPublication(id);
     if (pub == nullptr) {
         return false;
     }
@@ -182,8 +183,9 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int option, bool
     return true;
 }
 
-bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/, int /*option*/, bool /*value*/)
+bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/, int /*option*/, bool /*value*/) // NOLINT
 {
+    // there will likely be some future properties
     // auto ept = getEndpoint (id);
     // currently no properties on endpoints
     return false;
@@ -265,7 +267,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
 {
     std::vector<std::pair<int, std::string>> issues;
     auto ihandle = inputs.lock();
-    for (auto& ipt : ihandle) {
+    for (const auto& ipt : ihandle) {
         if (ipt->required) {
             if (!ipt->has_target) {
                 issues.emplace_back(helics::defs::errors::connection_failure,
@@ -305,7 +307,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     }
     ihandle.unlock();
     auto phandle = publications.lock();
-    for (auto& pub : phandle) {
+    for (const auto& pub : phandle) {
         if (pub->required) {
             if (pub->subscribers.empty()) {
                 issues.emplace_back(helics::defs::errors::connection_failure,
@@ -332,7 +334,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
         base["inputs"] = Json::arrayValue;
-        for (auto& ipt : ihandle) {
+        for (const auto& ipt : ihandle) {
             if (!ipt->key.empty()) {
                 Json::Value ibase;
                 ibase["key"] = ipt->key;
@@ -350,7 +352,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
         base["publications"] = Json::arrayValue;
-        for (auto& pub : phandle) {
+        for (const auto& pub : phandle) {
             if (!pub->key.empty()) {
                 Json::Value pbase;
                 pbase["key"] = pub->key;
@@ -369,7 +371,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
         base["endpoints"] = Json::arrayValue;
-        for (auto& ept : ehandle) {
+        for (const auto& ept : ehandle) {
             if (!ept->key.empty()) {
                 Json::Value ebase;
                 ebase["key"] = ept->key;
@@ -389,7 +391,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
         base["inputs"] = Json::arrayValue;
-        for (auto& ipt : ihandle) {
+        for (const auto& ipt : ihandle) {
             Json::Value ibase;
             if (!ipt->key.empty()) {
                 ibase["key"] = ipt->key;
@@ -412,7 +414,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
         base["publications"] = Json::arrayValue;
-        for (auto& pub : phandle) {
+        for (const auto& pub : phandle) {
             Json::Value pbase;
             if (!pub->key.empty()) {
                 pbase["key"] = pub->key;
@@ -436,7 +438,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
         base["endpoints"] = Json::arrayValue;
-        for (auto& ept : ehandle) {
+        for (const auto& ept : ehandle) {
             Json::Value ebase;
             ebase["federate"] = ept->id.fed_id.baseValue();
             ebase["handle"] = ept->id.handle.baseValue();

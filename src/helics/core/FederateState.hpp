@@ -42,7 +42,7 @@ constexpr Time initialTime{-1000000.0};
 class FederateState {
   public:
     /** constructor from name and information structure*/
-    FederateState(const std::string& name_, const CoreFederateInfo& info_);
+    FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo);
     // the destructor is defined so some classes linked with unique ptrs don't have to be defined in
     // the header
     /** DISABLE_COPY_AND_ASSIGN */

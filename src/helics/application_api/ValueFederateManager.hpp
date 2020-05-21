@@ -129,9 +129,9 @@ class ValueFederateManager {
     void publish(const Publication& pub, const data_view& block);
 
     /** check if a given subscription has and update*/
-    bool hasUpdate(const Input& inp) const;
+    static bool hasUpdate(const Input& inp);
     /** get the time of the last update*/
-    Time getLastUpdateTime(const Input& inp) const;
+    static Time getLastUpdateTime(const Input& inp);
 
     /** update the time from oldTime to newTime
     @param newTime the newTime of the federate
@@ -185,7 +185,7 @@ class ValueFederateManager {
     @param inp  the id to register the callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback(const Input& inp, std::function<void(Input&, Time)> callback);
+    static void setInputNotificationCallback(const Input& inp, std::function<void(Input&, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect();
@@ -200,7 +200,7 @@ class ValueFederateManager {
     /** clear an input value as updated without actually retrieving it
     @param inp the identifier for the subscription
     */
-    void clearUpdate(const Input& inp);
+    static void clearUpdate(const Input& inp);
 
   private:
     shared_guarded_m<

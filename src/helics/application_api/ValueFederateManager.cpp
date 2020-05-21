@@ -153,7 +153,7 @@ void ValueFederateManager::removeTarget(const Input& inp, const std::string& tar
 void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& block)
 {
     if (inp.isValid()) {
-        auto info = static_cast<input_info*>(inp.dataReference);
+        auto* info = static_cast<input_info*>(inp.dataReference);
 
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
         info->lastData = data_view(std::make_shared<data_block>(block.data(), block.size()));
@@ -172,7 +172,7 @@ void ValueFederateManager::getUpdateFromCore(interface_handle updatedHandle)
     auto fid = inpHandle->find(updatedHandle);
     if (fid != inpHandle->end()) {  // assign the data
 
-        auto info = static_cast<input_info*>(fid->dataReference);
+        auto* info = static_cast<input_info*>(fid->dataReference);
         info->lastData = data_view(std::move(data));
         info->lastUpdate = CurrentTime;
     }
@@ -180,7 +180,7 @@ void ValueFederateManager::getUpdateFromCore(interface_handle updatedHandle)
 
 data_view ValueFederateManager::getValue(const Input& inp)
 {
-    auto iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         iData->lastQuery = CurrentTime;
         iData->hasUpdate = false;
@@ -200,18 +200,18 @@ void ValueFederateManager::publish(const Publication& pub, const data_view& bloc
     coreObject->setValue(pub.handle, block.data(), block.size());
 }
 
-bool ValueFederateManager::hasUpdate(const Input& inp) const
+bool ValueFederateManager::hasUpdate(const Input& inp)
 {
-    auto iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         return iData->hasUpdate;
     }
     return false;
 }
 
-Time ValueFederateManager::getLastUpdateTime(const Input& inp) const
+Time ValueFederateManager::getLastUpdateTime(const Input& inp)
 {
-    auto iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         return iData->lastUpdate;
     }
@@ -232,9 +232,9 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         /** find the id*/
         auto fid = inpHandle->find(handle);
         if (fid != inpHandle->end()) {  // assign the data
-            auto data = coreObject->getValue(handle);
-            auto iData = static_cast<input_info*>(fid->dataReference);
-            iData->lastData = std::move(data);
+            const auto &data = coreObject->getValue(handle);
+            auto* iData = static_cast<input_info*>(fid->dataReference);
+            iData->lastData = data;
             iData->lastUpdate = CurrentTime;
             iData->hasUpdate = true;
             bool updated = fid->checkUpdate(true);
@@ -293,7 +293,7 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         ret = "[";
         auto hand = inputs.lock();
         int ii = 0;
-        for (auto& inp : *hand) {
+        for (const auto& inp : *hand) {
             if (inp.isUpdated()) {
                 ret.append(std::to_string(ii));
                 ret.push_back(';');
@@ -311,7 +311,7 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
             [](const auto& inp) { return (inp.isUpdated()); });
     } else if (queryStr == "updates") {
         JsonBuilder JB;
-        for (auto& inp : inputs.lock_shared()) {
+        for (const auto& inp : inputs.lock_shared()) {
             if (inp.isUpdated()) {
                 auto inpTemp = inp;
                 if (inpTemp.getHelicsType() == data_type::helics_double) {
@@ -324,7 +324,7 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         ret = JB.generate();
     } else if (queryStr == "values") {
         JsonBuilder JB;
-        for (auto& inp : inputs.lock_shared()) {
+        for (const auto& inp : inputs.lock_shared()) {
             auto inpTemp = inp;
             inpTemp.checkUpdate(true);
 
@@ -344,7 +344,7 @@ std::vector<int> ValueFederateManager::queryUpdates()
     std::vector<int> updates;
     auto inpHandle = inputs.lock_shared();
     int ii = 0;
-    for (auto& inp : *inpHandle) {
+    for (const auto& inp : *inpHandle) {
         if (inp.hasUpdate) {
             updates.push_back(ii);
         }
@@ -493,7 +493,7 @@ void ValueFederateManager::clearUpdates()
 
 void ValueFederateManager::clearUpdate(const Input& inp)
 {
-    auto iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         iData->hasUpdate = false;
     }
@@ -507,9 +507,9 @@ void ValueFederateManager::setInputNotificationCallback(std::function<void(Input
 void ValueFederateManager::setInputNotificationCallback(const Input& inp,
                                                         std::function<void(Input&, Time)> callback)
 {
-    auto data = static_cast<input_info*>(inp.dataReference);
-    if (data != nullptr) {
-        data->callback = std::move(callback);
+    auto* iData = static_cast<input_info*>(inp.dataReference);
+    if (iData != nullptr) {
+        iData->callback = std::move(callback);
     } else {
         throw(InvalidIdentifier("Input is not valid"));
     }
