@@ -648,7 +648,8 @@ HELICS_EXPORT void helicsMessageClearFlags(helics_message_object message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetFlagOption(helics_message_object message, helics_federate_flags flag, helics_bool flagValue, helics_error* err);
+HELICS_EXPORT void
+    helicsMessageSetFlagOption(helics_message_object message, helics_federate_flags flag, helics_bool flagValue, helics_error* err);
 
 /**
  * Set the data payload of a message as a string.

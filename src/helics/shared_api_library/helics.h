@@ -19,11 +19,11 @@ extern "C" {
 #include <stdlib.h>
 
 #ifndef HELICS_EXPORT
-#define HELICS_EXPORT
+#    define HELICS_EXPORT
 #endif
 
 #ifndef HELICS_DEPRECATED_EXPORT
-#define HELICS_DEPRECATED_EXPORT
+#    define HELICS_DEPRECATED_EXPORT
 #endif
 
 /**
@@ -756,8 +756,10 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void
-    helicsFederateInfoSetTimeProperty(helics_federate_info fi, helics_properties timeProperty, helics_time propertyValue, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetTimeProperty(helics_federate_info fi,
+                                                     helics_properties timeProperty,
+                                                     helics_time propertyValue,
+                                                     helics_error* err);
 
 /**
  * Set an integer property for a federate.
@@ -1313,7 +1315,8 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateLogLevelMessage(helics_federate fed, helics_log_levels loglevel, const char* logmessage, helics_error* err);
+HELICS_EXPORT void
+    helicsFederateLogLevelMessage(helics_federate fed, helics_log_levels loglevel, const char* logmessage, helics_error* err);
 
 /**
  * Set a global value in a core.
