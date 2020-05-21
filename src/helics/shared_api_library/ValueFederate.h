@@ -271,18 +271,31 @@ HELICS_EXPORT helics_input helicsFederateGetSubscription(helics_federate fed, co
 /**
  * Clear all the update flags from a federates inputs.
  *
+ * @param fed The value federate object for which to clear update flags.
  */
 HELICS_EXPORT void helicsFederateClearUpdates(helics_federate fed);
 
 /**
  * Register the publications via JSON publication string.
  *
+ * @param fed The value federate object to use to register the publications.
+ * @param json The JSON publication string.
+ * @forcpponly
+ * @param[in,out] err The error object to complete if there is an error.
+ * @endforcpponly
+ *
  * @details This would be the same JSON that would be used to publish data.
  */
 HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON(helics_federate fed, const char* json, helics_error* err);
 
 /**
- * Publish data contained in a json file or string.
+ * Publish data contained in a JSON file or string.
+ *
+ * @param fed The value federate object through which to publish the data.
+ * @param json The publication file name or literal JSON data string.
+ * @forcpponly
+ * @param[in,out] err The error object to complete if there is an error.
+ * @endforcpponly
  */
 HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* json, helics_error* err);
 
