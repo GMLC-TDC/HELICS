@@ -50,7 +50,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     WattsStrogatzFederate(): BenchmarkFederate("WattsStrogatzFederate") {}
 
     // functions for setting parameters
-    void setGenerateRandomSeed(bool genSeed) { generateRandomSeed = genSeed; }
+    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; }
     void setRandomSeed(unsigned int s) { seed = s; }
     void setDegree(int val) { k = val; }
     void setRewireProbability(double val) { b = val; }
@@ -88,8 +88,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
             std::mt19937 random_engine(0x600d5eed);
             std::uniform_int_distribution<unsigned int> rand_seed_uniform;
             for (int i = 0; i < index; i++) {
-                // to silence [[nodiscard]] warnings
-                static_cast<void>(rand_seed_uniform(random_engine));
+                rand_seed_uniform(random_engine);
             }
             setRandomSeed(rand_seed_uniform(random_engine));
         }
