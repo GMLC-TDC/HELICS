@@ -104,6 +104,7 @@ void InputInfo::addSource(global_handle newSource,
     source_info.emplace_back(sourceName, stype, sunits);
     data_queues.resize(input_sources.size());
     current_data.resize(input_sources.size());
+    current_data_time.resize(input_sources.size());
     deactivated.push_back(Time::maxVal());
     has_target = true;
 }

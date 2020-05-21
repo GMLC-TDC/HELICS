@@ -153,7 +153,7 @@ void ValueFederateManager::removeTarget(const Input& inp, const std::string& tar
 void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& block)
 {
     if (inp.isValid()) {
-        auto info = reinterpret_cast<input_info*>(inp.dataReference);
+        auto info = static_cast<input_info*>(inp.dataReference);
 
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
         info->lastData = data_view(std::make_shared<data_block>(block.data(), block.size()));
@@ -172,7 +172,7 @@ void ValueFederateManager::getUpdateFromCore(interface_handle updatedHandle)
     auto fid = inpHandle->find(updatedHandle);
     if (fid != inpHandle->end()) {  // assign the data
 
-        auto info = reinterpret_cast<input_info*>(fid->dataReference);
+        auto info = static_cast<input_info*>(fid->dataReference);
         info->lastData = data_view(std::move(data));
         info->lastUpdate = CurrentTime;
     }
@@ -180,7 +180,7 @@ void ValueFederateManager::getUpdateFromCore(interface_handle updatedHandle)
 
 data_view ValueFederateManager::getValue(const Input& inp)
 {
-    auto iData = reinterpret_cast<input_info*>(inp.dataReference);
+    auto iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         iData->lastQuery = CurrentTime;
         iData->hasUpdate = false;
@@ -202,7 +202,7 @@ void ValueFederateManager::publish(const Publication& pub, const data_view& bloc
 
 bool ValueFederateManager::hasUpdate(const Input& inp) const
 {
-    auto iData = reinterpret_cast<input_info*>(inp.dataReference);
+    auto iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         return iData->hasUpdate;
     }
@@ -211,7 +211,7 @@ bool ValueFederateManager::hasUpdate(const Input& inp) const
 
 Time ValueFederateManager::getLastUpdateTime(const Input& inp) const
 {
-    auto iData = reinterpret_cast<input_info*>(inp.dataReference);
+    auto iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         return iData->lastUpdate;
     }
@@ -233,7 +233,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         auto fid = inpHandle->find(handle);
         if (fid != inpHandle->end()) {  // assign the data
             auto data = coreObject->getValue(handle);
-            auto iData = reinterpret_cast<input_info*>(fid->dataReference);
+            auto iData = static_cast<input_info*>(fid->dataReference);
             iData->lastData = std::move(data);
             iData->lastUpdate = CurrentTime;
             iData->hasUpdate = true;
@@ -493,7 +493,7 @@ void ValueFederateManager::clearUpdates()
 
 void ValueFederateManager::clearUpdate(const Input& inp)
 {
-    auto iData = reinterpret_cast<input_info*>(inp.dataReference);
+    auto iData = static_cast<input_info*>(inp.dataReference);
     if (iData != nullptr) {
         iData->hasUpdate = false;
     }
@@ -507,7 +507,7 @@ void ValueFederateManager::setInputNotificationCallback(std::function<void(Input
 void ValueFederateManager::setInputNotificationCallback(const Input& inp,
                                                         std::function<void(Input&, Time)> callback)
 {
-    auto data = reinterpret_cast<input_info*>(inp.dataReference);
+    auto data = static_cast<input_info*>(inp.dataReference);
     if (data != nullptr) {
         data->callback = std::move(callback);
     } else {
