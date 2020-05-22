@@ -2179,19 +2179,37 @@ def helicsFederateGetSubscription(fed: "helics_federate", key: "char const *") -
     return _helics.helicsFederateGetSubscription(fed, key)
 
 def helicsFederateClearUpdates(fed: "helics_federate") -> "void":
-    r"""Clear all the update flags from a federates inputs."""
+    r"""
+    Clear all the update flags from a federates inputs.
+
+    :type fed: void
+    :param fed: The value federate object for which to clear update flags.
+    """
     return _helics.helicsFederateClearUpdates(fed)
 
 def helicsFederateRegisterFromPublicationJSON(fed: "helics_federate", json: "char const *") -> "void":
     r"""
     Register the publications via JSON publication string.
 
+    :type fed: void
+    :param fed: The value federate object to use to register the publications.
+    :type json: string
+    :param json: The JSON publication string.
+
+
     This would be the same JSON that would be used to publish data.
     """
     return _helics.helicsFederateRegisterFromPublicationJSON(fed, json)
 
 def helicsFederatePublishJSON(fed: "helics_federate", json: "char const *") -> "void":
-    r"""Publish data contained in a json file or string."""
+    r"""
+    Publish data contained in a JSON file or string.
+
+    :type fed: void
+    :param fed: The value federate object through which to publish the data.
+    :type json: string
+    :param json: The publication file name or literal JSON data string.
+    """
     return _helics.helicsFederatePublishJSON(fed, json)
 
 def helicsPublicationIsValid(pub: "helics_publication") -> "helics_bool":
