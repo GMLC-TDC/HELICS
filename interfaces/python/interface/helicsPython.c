@@ -17514,13 +17514,31 @@ static PyMethodDef SwigMethods[] = {
 		":return: A helics_input object, the object will not be valid and err will contain an error code if no input with the specified\n"
 		"    key exists.\n"
 		""},
-	 { "helicsFederateClearUpdates", _wrap_helicsFederateClearUpdates, METH_O, "Clear all the update flags from a federates inputs."},
+	 { "helicsFederateClearUpdates", _wrap_helicsFederateClearUpdates, METH_O, "\n"
+		"Clear all the update flags from a federates inputs.\n"
+		"\n"
+		":type fed: void\n"
+		":param fed: The value federate object for which to clear update flags.\n"
+		""},
 	 { "helicsFederateRegisterFromPublicationJSON", _wrap_helicsFederateRegisterFromPublicationJSON, METH_VARARGS, "\n"
 		"Register the publications via JSON publication string.\n"
 		"\n"
+		":type fed: void\n"
+		":param fed: The value federate object to use to register the publications.\n"
+		":type json: string\n"
+		":param json: The JSON publication string.\n"
+		"\n"
+		"\n"
 		"This would be the same JSON that would be used to publish data.\n"
 		""},
-	 { "helicsFederatePublishJSON", _wrap_helicsFederatePublishJSON, METH_VARARGS, "Publish data contained in a json file or string."},
+	 { "helicsFederatePublishJSON", _wrap_helicsFederatePublishJSON, METH_VARARGS, "\n"
+		"Publish data contained in a JSON file or string.\n"
+		"\n"
+		":type fed: void\n"
+		":param fed: The value federate object through which to publish the data.\n"
+		":type json: string\n"
+		":param json: The publication file name or literal JSON data string.\n"
+		""},
 	 { "helicsPublicationIsValid", _wrap_helicsPublicationIsValid, METH_O, "\n"
 		"Check if a publication is valid.\n"
 		"\n"
