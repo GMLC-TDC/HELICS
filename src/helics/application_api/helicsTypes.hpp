@@ -284,7 +284,9 @@ enum class data_type : int {
     helics_time = helics_data_type_time,
     helics_custom = helics_data_type_raw,
     helics_any = helics_data_type_any,
+    helics_multi = helics_data_type_multi, 
     helics_unknown = 262355,
+    
 };
 
 inline constexpr bool isRawType(data_type type)

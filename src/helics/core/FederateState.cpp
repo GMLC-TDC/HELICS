@@ -252,9 +252,10 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
     return nullptr;
 }
 
-const std::shared_ptr<const data_block>& FederateState::getValue(interface_handle handle)
+const std::shared_ptr<const data_block>& FederateState::getValue(interface_handle handle,
+                                                                 uint32_t* inputIndex)
 {
-    return interfaces().getInput(handle)->getData();
+    return interfaces().getInput(handle)->getData(inputIndex);
 }
 
 const std::vector<std::shared_ptr<const data_block>>&

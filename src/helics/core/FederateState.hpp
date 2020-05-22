@@ -167,7 +167,8 @@ class FederateState {
      * Return the data for the specified handle or the latest input
      *
      */
-    const std::shared_ptr<const data_block>& getValue(interface_handle handle);
+    const std::shared_ptr<const data_block>& getValue(interface_handle handle,
+                                                      uint32_t* inputIndex);
 
     /**
      * Return all the available data for the specified handle or the latest input

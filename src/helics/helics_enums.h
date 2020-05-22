@@ -69,6 +69,8 @@ typedef enum {
     helics_data_type_time = 8,
     /** raw data type*/
     helics_data_type_raw = 25,
+    /** the data type can change*/
+    helics_data_type_multi = 33,
     /** open type that can be anything*/
     helics_data_type_any = 25262
 } helics_data_type;

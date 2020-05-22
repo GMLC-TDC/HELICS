@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
     - name: set PY
       run: echo "::set-env name=PY::$(python --version --version | sha256sum | cut -d' ' -f1)"
     - name: install shfmt
@@ -26,8 +26,8 @@ jobs:
       with:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
-    - uses: pre-commit/action@v1.0.0
-    - name: Stage changed doc/script files
+    - uses: pre-commit/action@v1
+    - name: Stage changed files
       if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
       shell: bash --noprofile --norc {0}
       run: |
@@ -43,9 +43,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        COMMIT_MSG: "Automated formatting of doc/script files"
-        PR_TITLE: "Automated formatting of doc/script files"
-        PR_BODY: "Automated formatting of doc/script files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        COMMIT_MSG: "Automated formatting of repo files"
+        PR_TITLE: "Automated formatting of repo files"
+        PR_BODY: "Automated formatting of repo files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "pre-commit/"

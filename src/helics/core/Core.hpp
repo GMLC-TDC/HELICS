@@ -463,9 +463,10 @@ class Core {
 
     /**
      * Return the data for the specified handle or the latest input
-     *
+     * @param handle the input handle from which to get the data
+     * @param[out] inputIndex return the index of input (always 1 for inputs with only a single source)
      */
-    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle) = 0;
+    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle, uint32_t *inputIndex=nullptr) = 0;
 
     /**
      * Return all the available data for the specified handle or the latest input

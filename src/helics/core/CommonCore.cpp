@@ -1267,7 +1267,8 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
     }
 }
 
-const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle handle)
+const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle handle,
+                                                              uint32_t* inputIndex)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1279,7 +1280,7 @@ const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle h
     }
     auto &fed = *getFederateAt(handleInfo->local_fed_id);
     std::lock_guard<FederateState> lk(fed);
-    return fed.getValue(handle);
+    return fed.getValue(handle,inputIndex);
 }
 
 const std::vector<std::shared_ptr<const data_block>> &CommonCore::getAllValues(interface_handle handle)

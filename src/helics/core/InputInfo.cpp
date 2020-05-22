@@ -30,7 +30,7 @@ const std::shared_ptr<const data_block>& InputInfo::getData(int index) const
     return NullData;
 }
 
-const std::shared_ptr<const data_block>& InputInfo::getData() const
+const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex) const
 {
     int ind{0};
     int mxind{-1};
@@ -48,7 +48,14 @@ const std::shared_ptr<const data_block>& InputInfo::getData() const
         ++ind;
     }
     if (mxind >= 0) {
+        if (inputIndex != nullptr) {
+            *inputIndex = mxind;
+        }
         return current_data[mxind];
+    }
+    if (inputIndex != nullptr)
+    {
+        *inputIndex = 0;
     }
     return NullData;
 }

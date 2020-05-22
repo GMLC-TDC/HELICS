@@ -72,7 +72,6 @@ class InputInfo {
     bool only_update_on_change{false};  //!< flag indicating that the data should only be updated on change
     bool not_interruptible{false};  //!< indicator that this handle should not be used for interrupting
     bool strict_type_matching{false};  //!< indicator that the handle need to have strict type matching
-    bool single_source{false};  //!< allow only a single source to connect
     bool ignore_unit_mismatch{false};  //!< ignore unit mismatches
     int32_t required_connnections{0};  //!< an exact number of connections required
     std::vector<std::pair<helics::Time,unsigned int>> current_data_time;  //!< the most recent published data times
@@ -90,7 +89,7 @@ class InputInfo {
     /** get a particular data input*/
     const std::shared_ptr<const data_block>& getData(int index) const;
     /** get a the most recent data point*/
-    const std::shared_ptr<const data_block>& getData() const;
+    const std::shared_ptr<const data_block>& getData(uint32_t* inputIndex) const;
     /** add a data block into the queue*/
     void addData(global_handle source_id,
                  Time valueTime,

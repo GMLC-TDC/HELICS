@@ -134,10 +134,10 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_
             ipt->required = !bvalue;
             break;
         case defs::options::single_connection_only:
-            ipt->single_source = bvalue;
+            ipt->required_connnections = bvalue?1:0;
             break;
         case defs::options::multiple_connections_allowed:
-            ipt->single_source = bvalue;
+            ipt->required_connnections = bvalue ? 0 : 1;
             break;
         case defs::options::strict_type_checking:
             ipt->strict_type_matching = bvalue;
@@ -220,10 +220,10 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
             flagval = !ipt->required;
             break;
         case defs::options::single_connection_only:
-            flagval = ipt->single_source;
+            flagval = (ipt->required_connnections==1);
             break;
         case defs::options::multiple_connections_allowed:
-            flagval = !ipt->single_source;
+            flagval = (ipt->required_connnections != 1);
             break;
         case defs::options::strict_type_checking:
             flagval = ipt->strict_type_matching;
@@ -289,12 +289,24 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 ipt->key));
             }
         }
-        if (ipt->single_source) {
-            if (ipt->input_sources.size() > 1) {
-                issues.emplace_back(
-                    helics::defs::errors::connection_failure,
-                    fmt::format("Input {} is single source only but has more than one connection",
-                                ipt->key));
+        if (ipt->required_connnections>0) {
+            if (ipt->input_sources.size() !=static_cast<size_t>(ipt->required_connnections)) {
+                if (ipt->required_connnections == 1)
+                {
+                    issues.emplace_back(
+                        helics::defs::errors::connection_failure,
+                        fmt::format(
+                            "Input {} is single source only but has more than one connection",
+                            ipt->key));
+                }
+                else
+                {
+                    issues.emplace_back(
+                        helics::defs::errors::connection_failure,
+                        fmt::format(
+                            "Input {} requires {} connections but only {} were made",
+                            ipt->key,ipt->required_connnections,ipt->input_sources.size()));
+                }
             }
         }
         for (auto& source : ipt->source_info) {
