@@ -61,8 +61,6 @@ set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage 
 add_test(NAME application-api-ci-tests COMMAND application-api-tests --gtest_filter=-*ci_skip*)
 set_property(TEST application-api-ci-tests PROPERTY LABELS ApplicationApiCI Continuous)
 
-copy_key_files_to_target_location(application-api-tests)
-
 if(HELICS_BUILD_CXX_SHARED_LIB)
     set(shared_cxx_test_sources MessageFederateKeyTests.cpp ValueFederateKeyTests.cpp
                                 FilterTests.cpp testFixtures_shared.cpp testFixtures_shared.hpp
@@ -81,5 +79,4 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
         shared_cxx-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
     )
 
-    copy_shared_target(shared_cxx-tests helics-shared)
 endif()

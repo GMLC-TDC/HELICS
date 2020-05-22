@@ -1,31 +1,37 @@
 clone_depth: 1
 
-version: 2.5.0.{build}
+version: 3.0.0.{build}
 
-image: Visual Studio 2015
+image: Visual Studio 2019
 
-platform:
-  - x64
+environment:
+  global:
+    CYG_ROOT: C:\cygwin64
+    CYG_MIRROR: http://cygwin.mirror.constant.com
+    CYG_CACHE: C:\cygwin64\var\cache\setup
+    CYG_BASH: C:\cygwin64\bin\bash
 
-configuration:
-  - Release
+cache:
+  - '%CYG_CACHE%'
 
+#
+# Install needed build dependencies
+#
 install:
+  - '%CYG_ROOT%\setup-x86_64.exe --quiet-mode --no-shortcuts --upgrade-also --packages cmake,git,make,gcc-core,gcc-g++,libboost-devel,libzmq-devel'
+  - '%CYG_ROOT%\bin\cygcheck -dc'
   - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
 
 before_build:
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && cmake ..  -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_ASIO=ON -DENABLE_IPC_CORE=OFF"'
   - cd ..
 
-build:
-  project: build/HELICS.sln
-  parallel: true
-  verbosity: minimal
+# Build and test, actually.
+build_script:
+  - 'echo Building...'
+  - '%CYG_BASH% -lc "cd $APPVEYOR_BUILD_FOLDER/build && make -j4 "'
 
-test_script:
-  - cd build
-  - ctest --output-on-failure --timeout 480 -C Release -L "SystemCI"
-  - cd ..
+test: off
