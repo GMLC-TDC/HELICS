@@ -43,7 +43,6 @@ class InputInfo {
         std::string key;
         std::string type;
         std::string units;
-        int priority{0};
         sourceInformation() = default;
         sourceInformation(const std::string &key_, const std::string &type_,const std::string &units_):
             key(key_), type(type_),units(units_)
@@ -80,6 +79,7 @@ class InputInfo {
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;  //!< indicator that the source has been deactivated
     std::vector<sourceInformation> source_info;  //!< the name,type,units of the sources
+    std::vector<int32_t> priority_sources; //!< the list or priority inputs;
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 

@@ -30,6 +30,23 @@ const std::shared_ptr<const data_block>& InputInfo::getData(int index) const
     return NullData;
 }
 
+/** return true if index1 has higher priority than index2*/
+static bool priorityCheck(int32_t index1, int32_t index2, const std::vector<int32_t> &priorities)
+{
+    for (auto priority = priorities.rbegin(); priority != priorities.rend(); ++priority)
+    {
+        if (*priority == index1)
+        {
+            return true;
+        }
+        if (*priority == index2)
+        {
+            return false;
+        }
+    }
+    return false;
+}
+
 const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex) const
 {
     int ind{0};
@@ -40,8 +57,8 @@ const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex
             mxTime = cd.first;
             mxind = ind;
         }
-        if (cd.first == mxTime) {
-            if (source_info[ind].priority > source_info[mxind].priority) {
+        else if (cd.first == mxTime) {
+            if (priorityCheck(ind,mxind,priority_sources)) {
                 mxind = ind;
             }
         }
@@ -122,7 +139,7 @@ void InputInfo::addSource(global_handle newSource,
     source_info.emplace_back(sourceName, stype, sunits);
     data_queues.resize(input_sources.size());
     current_data.resize(input_sources.size());
-    current_data_time.resize(input_sources.size());
+    current_data_time.resize(input_sources.size(),{Time::minVal(),0});
     deactivated.push_back(Time::maxVal());
     has_target = true;
 }

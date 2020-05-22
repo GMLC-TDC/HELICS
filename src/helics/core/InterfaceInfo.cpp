@@ -149,10 +149,8 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_
             ipt->required_connnections = value;
             break;
         case defs::options::input_priority_location:
-            if (isValidIndex(value, ipt->input_sources))
-            {
-                ipt->source_info[value].priority = 1;
-            }
+            ipt->priority_sources.push_back(value);
+            break;
         default:
             return false;
             break;
@@ -235,6 +233,8 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
             break;
         case defs::options::connections:
             return static_cast<int32_t>(ipt->input_sources.size());
+        case defs::options::input_priority_location:
+            return ipt->priority_sources.empty()?-1:ipt->priority_sources.back();
         default:
             break;
     }
