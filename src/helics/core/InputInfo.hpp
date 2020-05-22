@@ -78,7 +78,7 @@ class InputInfo {
     std::vector<std::shared_ptr<const data_block>>
         current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
-    std::vector<Time> deactivated;
+    std::vector<Time> deactivated;  //!< indicator that the source has been deactivated
     std::vector<sourceInformation> source_info;  //!< the name,type,units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data

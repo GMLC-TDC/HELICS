@@ -148,6 +148,11 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_
         case defs::options::connections:
             ipt->required_connnections = value;
             break;
+        case defs::options::input_priority_location:
+            if (isValidIndex(value, ipt->input_sources))
+            {
+                ipt->source_info[value].priority = 1;
+            }
         default:
             return false;
             break;
