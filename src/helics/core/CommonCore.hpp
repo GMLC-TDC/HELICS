@@ -136,9 +136,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::string& getHandleName(interface_handle handle) const override final;
 
     virtual void
-        setHandleOption(interface_handle handle, int32_t option, bool option_value) override final;
+        setHandleOption(interface_handle handle, int32_t option, int32_t option_value) override final;
 
-    virtual bool getHandleOption(interface_handle handle, int32_t option) const override final;
+    virtual int32_t getHandleOption(interface_handle handle, int32_t option) const override final;
     virtual void closeHandle(interface_handle handle) override final;
     virtual void removeTarget(interface_handle handle,
                               const std::string& targetToRemove) override final;

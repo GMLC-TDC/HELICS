@@ -440,13 +440,13 @@ class Core {
      *@param option the option to set
      *@param option_value the value to set the option (mostly 0 or 1)
      */
-    virtual void setHandleOption(interface_handle handle, int32_t option, bool option_value) = 0;
+    virtual void setHandleOption(interface_handle handle, int32_t option, int32_t option_value) = 0;
 
     /** get a handle option
     @param handle the handle from the publication, input, endpoint or filter
     @param option the option to set see /ref defs::options
     */
-    virtual bool getHandleOption(interface_handle handle, int32_t option) const = 0;
+    virtual int32_t getHandleOption(interface_handle handle, int32_t option) const = 0;
 
     /** close a handle from further connections
     @param handle the handle from the publication, input, endpoint or filter

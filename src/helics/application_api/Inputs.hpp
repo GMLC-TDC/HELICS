@@ -217,13 +217,10 @@ class HELICS_CXX_EXPORT Input {
     /** set the interface information field of the input*/
     void setInfo(const std::string& info) { fed->setInfo(handle, info); }
     /** set a handle flag for the input*/
-    void setOption(int32_t option, bool value = true)
-    {
-        fed->setInterfaceOption(handle, option, value);
-    }
+    void setOption(int32_t option, int32_t value = 1);
 
     /** get the current value of a flag for the handle*/
-    bool getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
+    int32_t getOption(int32_t option) const;
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer
     @param assumeUpdate if set to true will assume there was a publication and not check it first,

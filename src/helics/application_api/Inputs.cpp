@@ -150,6 +150,31 @@ bool Input::checkUpdate(bool assumeUpdate)
     return hasUpdate;
 }
 
+void Input::setOption(int32_t option, int32_t value)
+{
+    if (option == helics_handle_option_multi_input_handling_method)
+    {
+
+    }
+    else
+    {
+        fed->setInterfaceOption(handle, option, value);
+    }
+    
+}
+
+/** get the current value of a flag for the handle*/
+int32_t Input::getOption(int32_t option) const
+{
+    if (option == helics_handle_option_multi_input_handling_method) {
+    }
+    else
+    {
+        return fed->getInterfaceOption(handle, option);
+    }
+    
+}
+
 bool Input::isUpdated()
 {
     if (hasUpdate) {

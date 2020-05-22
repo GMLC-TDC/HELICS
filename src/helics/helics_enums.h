@@ -214,7 +214,7 @@ typedef enum {
     helics_handle_option_single_connection_only = 407,
     /** specify that multiple connections are allowed for an interface*/
     helics_handle_option_multiple_connections_allowed = 409,
-    /** specify that the last data should be buffered and send on subscriptions after init*/
+    /** specify that the last data should be buffered and sent on subscriptions after init*/
     helics_handle_option_buffer_data = 411,
     /** specify that the types should be checked strictly for pub/sub and filters*/
     helics_handle_option_strict_type_checking = 414,
@@ -225,7 +225,13 @@ typedef enum {
     /** specify that an interface will only update if the value has actually changed*/
     helics_handle_option_only_update_on_change = 8,
     /** specify that an interface does not participate in determining time interrupts*/
-    helics_handle_option_ignore_interrupts = 475
+    helics_handle_option_ignore_interrupts = 475,
+    /** specify the multi-input processing method for inputs*/
+    helics_handle_option_multi_input_handling_method = 507,
+    /** specify the input with priority*/
+    helics_handle_option_input_priority_location = 510,
+    /** specify the required number of connections or get the actual number of connections*/
+    helics_handle_option_connections=522
 } helics_handle_options;
 
 /** enumeration of the predefined filter types*/

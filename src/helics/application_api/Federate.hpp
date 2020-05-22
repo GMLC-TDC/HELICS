@@ -532,10 +532,18 @@ class HELICS_CXX_EXPORT Federate {
     @return a string with the data for the information*/
     const std::string& getInfo(interface_handle handle);
 
-    /** set an interface option */
-    void setInterfaceOption(interface_handle handle, int32_t option, bool option_value = true);
-    /** get the current value for an interface option*/
-    bool getInterfaceOption(interface_handle handle, int32_t option);
+    /** set an interface option
+    @param handle the handle of an interface to modify
+    @param option the option field to modify
+    @param option_value the value to set(default to 1 or true most options are boolean but some allow for other values
+    */
+    void setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value = 1);
+    /** get the current value for an interface option
+    @param handle the handle of an interface to modify
+    @param option the option field to modify
+    @return the current value of the interface option will be 0 for false 1 for true for boolean options
+    */
+    int32_t getInterfaceOption(interface_handle handle, int32_t option);
 
     /** get the injection type for an interface,  this is the type for data coming into an interface
     @details for filters this is the input type, for publications this is type used to transmit

@@ -74,6 +74,7 @@ class InputInfo {
     bool strict_type_matching{false};  //!< indicator that the handle need to have strict type matching
     bool single_source{false};  //!< allow only a single source to connect
     bool ignore_unit_mismatch{false};  //!< ignore unit mismatches
+    int32_t required_connnections{0};  //!< an exact number of connections required
     std::vector<std::pair<helics::Time,unsigned int>> current_data_time;  //!< the most recent published data times
     std::vector<std::shared_ptr<const data_block>>
         current_data;  //!< the most recent published data

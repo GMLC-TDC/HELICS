@@ -196,7 +196,7 @@ class FederateState {
     /** get an option flag value*/
     bool getOptionFlag(int optionFlag) const;
     /** get the currently active option for a handle*/
-    bool getHandleOption(interface_handle handle, char iType, int32_t option) const;
+    int32_t getHandleOption(interface_handle handle, char iType, int32_t option) const;
     /** get the currently active interface flags*/
     uint16_t getInterfaceFlags() const { return interfaceFlags.load(); }
     /** get an option flag value*/

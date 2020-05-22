@@ -212,10 +212,10 @@ class HELICS_CXX_EXPORT Endpoint {
     const std::string& getInfo() const { return fed->getInfo(handle); }
     /** set the interface information field of the publication*/
     void setInfo(const std::string& info) { fed->setInfo(handle, info); }
-    void setOption(int32_t option, bool value) { fed->setInterfaceOption(handle, option, value); }
+    void setOption(int32_t option, int32_t value) { fed->setInterfaceOption(handle, option, value); }
 
     /** get the current value of a flag for the handle*/
-    bool getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
+    int32_t getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
     /** close the endpoint from receiving more messages*/
     void close() { fed->closeInterface(handle); }
 

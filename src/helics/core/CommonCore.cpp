@@ -1023,7 +1023,7 @@ const std::string& CommonCore::getExtractionType(interface_handle handle) const
     return emptyStr;
 }
 
-void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool option_value)
+void CommonCore::setHandleOption(interface_handle handle, int32_t option, int32_t option_value)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1052,11 +1052,11 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool o
     }
 }
 
-bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
+int32_t CommonCore::getHandleOption(interface_handle handle, int32_t option) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
-        return false;
+        return 0;
     }
     switch (option) {
         case defs::options::connection_required:
@@ -1074,7 +1074,7 @@ bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
     } else {
         // must be for filter
     }
-    return false;
+    return 0;
 }
 
 void CommonCore::closeHandle(interface_handle handle)

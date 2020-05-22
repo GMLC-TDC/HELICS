@@ -66,13 +66,13 @@ class InterfaceInfo {
     /** get the current value of the change update flag*/
     bool getChangeUpdateFlag() const { return only_update_on_change; }
     /** set a property on a specific interface*/
-    bool setInputProperty(interface_handle id, int option, bool value);
-    bool setPublicationProperty(interface_handle id, int option, bool value);
-    bool setEndpointProperty(interface_handle id, int option, bool value);
+    bool setInputProperty(interface_handle id, int32_t option, int32_t value);
+    bool setPublicationProperty(interface_handle id, int32_t option, int32_t value);
+    bool setEndpointProperty(interface_handle id, int32_t option, int32_t value);
     /** get properties for an interface*/
-    bool getInputProperty(interface_handle id, int option) const;
-    bool getPublicationProperty(interface_handle id, int option) const;
-    bool getEndpointProperty(interface_handle id, int option) const;
+    int32_t getInputProperty(interface_handle id, int32_t option) const;
+    int32_t getPublicationProperty(interface_handle id, int32_t option) const;
+    int32_t getEndpointProperty(interface_handle id, int32_t option) const;
 
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues();

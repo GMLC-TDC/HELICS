@@ -1498,7 +1498,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
     }
 }
 
-bool FederateState::getHandleOption(interface_handle handle, char iType, int32_t option) const
+int32_t FederateState::getHandleOption(interface_handle handle, char iType, int32_t option) const
 {
     switch (iType) {
         case 'i':
