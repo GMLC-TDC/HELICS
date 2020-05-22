@@ -43,5 +43,3 @@ set_property(TEST system-tests PROPERTY LABELS System Coverage Daily TSAN)
 # Tests for Continuous Integration builds
 add_test(NAME system-ci-tests COMMAND system-tests --gtest_filter=-*ci_skip*)
 set_property(TEST system-ci-tests PROPERTY LABELS SystemCI Continuous Valgrind)
-
-copy_key_files_to_target_location(system-tests)
