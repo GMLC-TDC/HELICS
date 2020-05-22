@@ -31,6 +31,7 @@ set(application_api_test_sources
     helicsTypeTests.cpp
     LoggingTests.cpp
     FederateInfoTests.cpp
+    MultiInputTests.cpp
 )
 
 if(ENABLE_ZMQ_CORE)

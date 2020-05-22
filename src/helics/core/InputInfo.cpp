@@ -107,6 +107,17 @@ void InputInfo::addSource(global_handle newSource,
         inputType = stype;
         inputUnits = sunits;
     }
+    else
+    {
+        if (inputType != stype)
+        {
+            inputType = "multi";
+        }
+        if (inputUnits != sunits)
+        {
+            inputUnits = "multi";
+        }
+    }
     input_sources.push_back(newSource);
     source_info.emplace_back(sourceName, stype, sunits);
     data_queues.resize(input_sources.size());
@@ -155,17 +166,17 @@ void InputInfo::clearFutureData()
 
 bool InputInfo::updateTimeUpTo(Time newTime)
 {
-    int index = 0;
-    bool updated = false;
+    int index{0};
+    bool updated{false};
     for (auto& data_queue : data_queues) {
         auto currentValue = data_queue.begin();
 
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-            return false;
+            continue;
         }
         if (currentValue->time > newTime) {
-            return false;
+            continue;
         }
         auto last = currentValue;
         ++currentValue;
@@ -186,16 +197,16 @@ bool InputInfo::updateTimeUpTo(Time newTime)
 
 bool InputInfo::updateTimeNextIteration(Time newTime)
 {
-    int index = 0;
-    bool updated = false;
+    int index{0};
+    bool updated{false};
     for (auto& data_queue : data_queues) {
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-            return false;
+            continue;
         }
         if (currentValue->time > newTime) {
-            return false;
+            continue;
         }
         auto last = currentValue;
         ++currentValue;
@@ -232,10 +243,10 @@ bool InputInfo::updateTimeInclusive(Time newTime)
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-            return false;
+           continue;
         }
         if (currentValue->time > newTime) {
-            return false;
+            continue;
         }
         auto last = currentValue;
         ++currentValue;
