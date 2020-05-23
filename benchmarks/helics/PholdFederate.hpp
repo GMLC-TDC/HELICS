@@ -46,8 +46,6 @@ class PholdFederate: public BenchmarkFederate {
     std::uniform_int_distribution<unsigned int> rand_uniform_int;
 
   public:
-    // TODO(@nightlark): output cluster name in a summary file, along with node count and feds per
-    // node
     PholdFederate(): BenchmarkFederate("PHOLD") {}
 
     // functions for setting parameters
@@ -57,16 +55,6 @@ class PholdFederate: public BenchmarkFederate {
     void setInitialEventCount(unsigned int count) { initEvCount_ = count; }
     void setLocalProbability(double p) { localProbability_ = p; }
     void setLookahead(double v) { lookahead_ = v; }
-
-    // functions for setting callbacks
-    void setBeforeFinalizeCallback(std::function<void()> cb = nullptr)
-    {
-        callBeforeFinalize = std::move(cb);
-    }
-    void setAfterFinalizeCallback(std::function<void()> cb = nullptr)
-    {
-        callAfterFinalize = std::move(cb);
-    }
 
     std::string getName() override { return "phold_" + std::to_string(index); }
 

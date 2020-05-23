@@ -1738,7 +1738,9 @@ public class helics {
   }
 
   /**
-   * Clear all the update flags from a federates inputs.
+   * Clear all the update flags from a federates inputs.<br>
+   * <br>
+   * @param fed The value federate object for which to clear update flags.
    */
   public static void helicsFederateClearUpdates(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateClearUpdates(SWIGTYPE_p_void.getCPtr(fed));
@@ -1747,6 +1749,10 @@ public class helics {
   /**
    * Register the publications via JSON publication string.<br>
    * <br>
+   * @param fed The value federate object to use to register the publications.<br>
+   * @param json The JSON publication string.<br>
+   * <br>
+   * <br>
    * This would be the same JSON that would be used to publish data.
    */
   public static void helicsFederateRegisterFromPublicationJSON(SWIGTYPE_p_void fed, String json) {
@@ -1754,7 +1760,10 @@ public class helics {
   }
 
   /**
-   * Publish data contained in a json file or string.
+   * Publish data contained in a JSON file or string.<br>
+   * <br>
+   * @param fed The value federate object through which to publish the data.<br>
+   * @param json The publication file name or literal JSON data string.
    */
   public static void helicsFederatePublishJSON(SWIGTYPE_p_void fed, String json) {
     helicsJNI.helicsFederatePublishJSON(SWIGTYPE_p_void.getCPtr(fed), json);
