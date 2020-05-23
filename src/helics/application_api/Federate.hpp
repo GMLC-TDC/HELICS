@@ -166,19 +166,6 @@ class HELICS_CXX_EXPORT Federate {
     /** disconnect a simulation from the core (will also call finalize before disconnecting if
      * necessary)*/
     virtual void disconnect();
-    /** specify the simulator had an unrecoverable error
-    @param errorcode an integral code for the error
-    @deprecated please use localError instead
-    */
-    [[deprecated("please use localError method")]] void error(int errorcode);
-
-    /** specify the simulator had an error with error code and message
-    @param errorcode an integral code for the error
-    @param message a string describing the error to display in a log
-    @deprecated please use localError instead
-     */
-    [[deprecated("please use localError method")]] void error(int errorcode,
-                                                              const std::string& message);
 
     /** specify the simulator had a local error with error code and message
     @param errorcode an integral code for the error

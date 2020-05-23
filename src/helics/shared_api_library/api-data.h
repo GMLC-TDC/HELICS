@@ -68,7 +68,7 @@ typedef void* helics_query;
 /**
  * opaque object representing a message
  */
-typedef void* helics_message_object;
+typedef void* helics_message;
 
 /**
  * time definition used in the C interface to helics
@@ -132,24 +132,6 @@ typedef struct helics_complex {
     double real;
     double imag;
 } helics_complex;
-
-/**
- *  Message_t mapped to a c compatible structure
- *
- * @details use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
- */
-typedef struct helics_message {
-    helics_time time; /*!< message time */
-    const char* data; /*!< message data */
-    int64_t length; /*!< message length */
-    int32_t messageID; /*!< message identification information */
-    int16_t flags; /*!< flags related to the message */
-    const char* original_source; /*!< original source */
-    const char* source; /*!< the most recent source */
-    const char* dest; /*!< the final destination */
-    const char* original_dest; /*!< the original destination of the message */
-
-} helics_message;
 
 /**
  * helics error object

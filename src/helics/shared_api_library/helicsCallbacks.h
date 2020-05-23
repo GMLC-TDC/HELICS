@@ -94,7 +94,7 @@ HELICS_EXPORT void
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSetCustomCallback(helics_filter filter,
-                                                 void (*filtCall)(helics_message_object message, void* userData),
+                                                 void (*filtCall)(helics_message message, void* userData),
                                                  void* userdata,
                                                  helics_error* err);
 

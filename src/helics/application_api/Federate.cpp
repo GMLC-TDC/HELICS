@@ -550,16 +550,6 @@ void Federate::completeOperation()
     }
 }
 
-void Federate::error(int errorcode)
-{
-    localError(errorcode);
-}
-
-void Federate::error(int errorcode, const std::string& message)
-{
-    localError(errorcode, message);
-}
-
 void Federate::localError(int errorcode)
 {
     std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + name;

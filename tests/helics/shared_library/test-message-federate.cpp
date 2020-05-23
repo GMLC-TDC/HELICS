@@ -105,7 +105,7 @@ TEST_P(mfed_simple_type_tests, send_receive)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = helicsEndpointGetMessageObject(epid2);
+    auto M = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE (M);
     ASSERT_EQ(helicsMessageGetRawDataSize(M), 500);
     char* dptr = reinterpret_cast<char*>(helicsMessageGetRawDataPointer(M));
@@ -148,7 +148,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = helicsEndpointGetMessageObject(epid2);
+    auto M = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE (M);
     ASSERT_EQ(helicsMessageGetRawDataSize(M), 500);
 
@@ -180,13 +180,13 @@ TEST_F(mfed_tests, message_object_tests)
     EXPECT_TRUE(mFed1State == helics_state_execution);
     std::string data(500, 'a');
 
-    auto M = helicsFederateCreateMessageObject(mFed1, nullptr);
+    auto M = helicsFederateCreateMessage(mFed1, nullptr);
     helicsMessageSetDestination(M, "ep2", nullptr);
     EXPECT_STREQ(helicsMessageGetDestination(M), "ep2");
     helicsMessageSetData(M, data.data(), 500, &err);
     helicsMessageSetTime(M, 0.0, &err);
 
-    CE(helicsEndpointSendMessageObject(epid, M, &err));
+    CE(helicsEndpointSendMessage(epid, M, &err));
     helics_time time;
     CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
     EXPECT_EQ(time, 1.0);
@@ -198,7 +198,7 @@ TEST_F(mfed_tests, message_object_tests)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    M = helicsEndpointGetMessageObject(epid2);
+    M = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE (M);
     ASSERT_EQ(helicsMessageGetRawDataSize(M), 500);
 
@@ -274,7 +274,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = helicsEndpointGetMessageObject(epid);
+    auto M1 = helicsEndpointGetMessage(epid);
     // ASSERT_TRUE(M1);
     EXPECT_EQ(helicsMessageGetRawDataSize(M1), 400);
     auto dptr = static_cast<char*>(helicsMessageGetRawDataPointer(M1));
@@ -283,7 +283,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
         EXPECT_EQ(dptr[245], 'b');
     }
 
-    auto M2 = helicsEndpointGetMessageObject(epid2);
+    auto M2 = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE(M2);
     EXPECT_EQ(helicsMessageGetRawDataSize(M2), 500);
     dptr = static_cast<char*>(helicsMessageGetRawDataPointer(M2));
@@ -376,10 +376,10 @@ TEST(message_object, test1)
 
     auto fed2 = helicsCreateCombinationFederate("fed2", fi, nullptr);
 
-    auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
+    auto m1 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 
-    auto m2 = helicsFederateCreateMessageObject(fed2, nullptr);
+    auto m2 = helicsFederateCreateMessage(fed2, nullptr);
     EXPECT_NE(m2, nullptr);
 
     helicsMessageSetOriginalDestination(m1, "a happy place", nullptr);
@@ -463,10 +463,10 @@ TEST(message_object, copy)
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
     helicsFederateInfoFree(fi);
-    auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
+    auto m1 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 
-    auto m2 = helicsFederateCreateMessageObject(fed, nullptr);
+    auto m2 = helicsFederateCreateMessage(fed, nullptr);
     EXPECT_NE(m2, nullptr);
 
     helicsMessageSetDestination(m1, "a small town", nullptr);

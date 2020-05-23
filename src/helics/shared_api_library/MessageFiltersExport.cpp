@@ -472,7 +472,7 @@ helics_bool helicsFilterGetOption(helics_filter filt, int option)
 }
 
 void helicsFilterSetCustomCallback(helics_filter filt,
-                                   void (*filtCall)(helics_message_object message, void* userData),
+                                   void (*filtCall)(helics_message message, void* userData),
                                    void* userdata,
                                    helics_error* err)
 {
@@ -488,7 +488,7 @@ void helicsFilterSetCustomCallback(helics_filter filt,
     }
     auto op = std::make_shared<helics::CustomMessageOperator>();
     op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
-        auto* ms = createMessageObject(message);
+        auto* ms = createAPIMessage(message);
         if (filtCall != nullptr) {
             filtCall(ms, userdata);
         }
