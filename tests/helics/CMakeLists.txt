@@ -56,6 +56,8 @@ else()
     set(HELICS_PACKAGE_TEST_BUILD_TYPE Release)
 endif()
 
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests")
+
 if (MSVC AND ${CMAKE_VERSION} VERSION_GREATER 3.12.9)
 # Tests for other CMake projects including and using HELICS using find_package
 add_test(
