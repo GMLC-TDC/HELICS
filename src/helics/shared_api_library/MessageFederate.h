@@ -173,7 +173,6 @@ HELICS_EXPORT void helicsEndpointSendEventRaw(helics_endpoint endpoint,
                                               helics_time time,
                                               helics_error* err);
 
-
 /**
  * Send a message object from a specific endpoint.
  *
@@ -240,7 +239,6 @@ HELICS_EXPORT int helicsFederatePendingMessages(helics_federate fed);
  */
 HELICS_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpoint);
 
-
 /**
  * Receive a packet from a particular endpoint.
  *
@@ -297,7 +295,6 @@ HELICS_EXPORT helics_message helicsFederateCreateMessage(helics_federate fed, he
  * @param fed The federate to clear the message for.
  */
 HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
-
 
 /**
  * Get the type specified for an endpoint.
@@ -469,8 +466,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message message);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void
-    helicsMessageGetRawData(helics_message message, void* data, int maxMessagelen, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsMessageGetRawData(helics_message message, void* data, int maxMessagelen, int* actualSize, helics_error* err);
 
 /**
  * Get a pointer to the raw data of a message.

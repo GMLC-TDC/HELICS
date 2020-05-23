@@ -223,10 +223,7 @@ class Endpoint {
     Message getMessage() { return Message(helicsEndpointGetMessage(ep)); }
 
     /** create a message object */
-    Message createMessage()
-    {
-        return Message(helicsEndpointCreateMessage(ep, hThrowOnError()));
-    }
+    Message createMessage() { return Message(helicsEndpointCreateMessage(ep, hThrowOnError())); }
 
     /** Methods for sending a message **/
     /** send a data block and length
@@ -376,8 +373,8 @@ class Endpoint {
     {
         // returns helicsStatus
         helicsEndpointSendMessageZeroCopy(ep,
-                                                static_cast<helics_message>(message),
-                                                hThrowOnError());
+                                          static_cast<helics_message>(message),
+                                          hThrowOnError());
         message.release();
     }
     /** get the name of the endpoint*/

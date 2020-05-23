@@ -100,10 +100,7 @@ class MessageFederate: public virtual Federate {
     Message getMessage() { return Message(helicsFederateGetMessage(fed)); }
 
     /** create a message object */
-    Message createMessage()
-    {
-        return Message(helicsFederateCreateMessage(fed, hThrowOnError()));
-    }
+    Message createMessage() { return Message(helicsFederateCreateMessage(fed, hThrowOnError())); }
     /**get the number of registered endpoints*/
     int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 
