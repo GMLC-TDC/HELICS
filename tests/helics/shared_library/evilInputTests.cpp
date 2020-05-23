@@ -3244,7 +3244,6 @@ TEST(evil_message_fed_test, helicsEndpointGetMessage)
     EXPECT_EQ(res2, nullptr);
     auto res3 = helicsEndpointGetMessage(evil_federate);
     EXPECT_EQ(res3, nullptr);
-    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_message_fed_test, helicsFederateClearMessages)
