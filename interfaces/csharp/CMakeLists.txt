@@ -32,6 +32,9 @@ endif() # SWIG_EXECUTABLE
 # Set the output library name to _helics
 set_target_properties(${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES DEBUG_POSTFIX "")
 
+copy_key_files_to_target_location(${SWIG_MODULE_CShelics_REAL_NAME})
+copy_shared_target(${SWIG_MODULE_CShelics_REAL_NAME} helicsSharedLib)
+
 install_key_files_with_comp(csharp)
 
 install(TARGETS ${SWIG_MODULE_CShelics_REAL_NAME} DESTINATION csharp COMPONENT csharp)
