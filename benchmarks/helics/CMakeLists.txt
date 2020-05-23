@@ -82,10 +82,7 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     target_include_directories(
         echoBenchmarks_c PUBLIC ${HELICS_BINARY_DIR}/helics_generated_includes/
     )
-    copy_shared_target(echoBenchmarks_c helicsSharedLib)
 endif()
-
-copy_key_files_to_target_location(ActionMessageBenchmarks)
 
 string(TIMESTAMP current_date "%Y-%m-%d")
 string(RANDOM rname)

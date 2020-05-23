@@ -41,7 +41,7 @@ target_compile_definitions(
     helics_apps-tests PRIVATE "-DGLOBAL_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 target_compile_definitions(
-    helics_apps-tests PRIVATE "-DHELICS_BUILD_LOC=\"${HELICS_BINARY_DIR}/src/helics/\""
+    helics_apps-tests PRIVATE "-DHELICS_BUILD_LOC=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\""
 )
 target_compile_definitions(
     helics_apps-tests
@@ -58,8 +58,6 @@ set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Coverage Daily)
 # Tests for Continuous Integration builds
 add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --gtest_filter=-*_exe*:*ci_skip*)
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS HelicsAppsCI Continuous)
-
-copy_key_files_to_target_location(helics_apps-tests)
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
     set(helics_shared_apps_test_sources
@@ -89,6 +87,4 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
 
     target_compile_definitions(shared_cxx_app-tests PRIVATE DISABLE_SYSTEM_CALL_TESTS)
 
-    copy_shared_target(shared_cxx_app-tests helics-apps-shared)
-    copy_shared_target(shared_cxx_app-tests helics-shared)
 endif()
