@@ -21,5 +21,3 @@ set_target_properties(common-tests PROPERTIES FOLDER tests)
 
 add_test(NAME common-tests COMMAND common-tests)
 set_property(TEST common-tests PROPERTY LABELS Common Daily Coverage Continuous)
-
-copy_key_files_to_target_location(common-tests)

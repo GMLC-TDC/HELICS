@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics.h"
 #include "internal/api_objects.h"
 
+#include <cstring>
 #include <memory>
 #include <mutex>
 #include <vector>

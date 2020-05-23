@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsCLI11JsonConfig.hpp"
 #include "../network/CommsInterface.hpp"
 #include "../network/NetworkBrokerData.hpp"
+#include "../network/NetworkCommsInterface.hpp"
 
 #include <atomic>
 #include <mutex>
@@ -224,7 +225,7 @@ std::string MultiBroker::generateLocalAddressString() const
         default:
             break;
     }
-    auto netcomm = dynamic_cast<NetworkCommsInterface*>(masterComm.get());
+    auto* netcomm = dynamic_cast<NetworkCommsInterface*>(masterComm.get());
     if (netcomm != nullptr) {
         return netcomm->getAddress();
     }

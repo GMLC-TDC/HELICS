@@ -231,7 +231,8 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     message(STATUS "swig target is ${SWIG_MODULE_helics_REAL_NAME}")
 
     set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces)
-
+    set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     install(TARGETS ${SWIG_MODULE_helics_REAL_NAME} DESTINATION python COMPONENT python)
 
     set(HELICS_PYTHON_TARGET_NAME ${SWIG_MODULE_helics_REAL_NAME})
@@ -253,6 +254,8 @@ else()
 
     target_link_libraries(helicsPYTHON PUBLIC HELICS::helicsSharedLib)
     set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
+    set_target_properties(helicsPYTHON PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+    set_target_properties(helicsPYTHON PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     if(NOT MSVC)
         target_compile_options(
             helicsPYTHON PRIVATE -Wno-long-long -Wno-strict-aliasing -Wno-deprecated-declarations
@@ -277,17 +280,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT
 if(WIN32)
     # Realistically for bundling into a Python wheel, the dll should be given a unique name to avoid
     # conflicts with other packages using a different version of the dll with the same name
-    add_custom_command(
-        TARGET ${HELICS_PYTHON_TARGET_NAME}
-        POST_BUILD
-        COMMAND
-            ${CMAKE_COMMAND} -E copy_if_different # which executes "cmake - E copy_if_different..."
-            "$<TARGET_FILE:HELICS::helicsSharedLib>" # <--this is in- file
-            "$<TARGET_FILE_DIR:${HELICS_PYTHON_TARGET_NAME}>/" # <--this is out- file path
-    )
-    if(COMMAND copy_key_files_to_target_location)
-        copy_key_files_to_target_location(${HELICS_PYTHON_TARGET_NAME})
-    endif()
+
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(python)
     else()
