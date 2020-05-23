@@ -138,7 +138,6 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
-        - CTEST_VERBOSE=true
         - ENABLE_CPACK=true
         - INSTALL_SYSTEM_LIBRARIES=true
         - TEST_TYPE=Packaging
