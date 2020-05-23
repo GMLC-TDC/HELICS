@@ -59,8 +59,7 @@ endif()
 # Tests for other CMake projects including and using HELICS using find_package
 add_test(
     NAME find-package-testsA
-    COMMAND
-        ${CMAKE_COMMAND} "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
+    COMMAND ${CMAKE_COMMAND}
          -G "${CMAKE_GENERATOR}" -A
         "${CMAKE_GENERATOR_PLATFORM}" ${HELICS_PACKAGE_SEARCH_LOC}
         "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
@@ -69,6 +68,7 @@ add_test(
         "-DHELICS_VERSION=${HELICS_VERSION}" "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
         "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
         "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
 )
 
