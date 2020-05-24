@@ -1,3 +1,3 @@
 function varargout = helicsCoreFree(varargin)
-  [varargout{1:nargout}] = helicsMEX(67, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(47, varargin{:});
 end
