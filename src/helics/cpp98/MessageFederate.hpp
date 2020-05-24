@@ -97,13 +97,10 @@ class MessageFederate: public virtual Federate {
     int pendingMessages() const { return helicsFederatePendingMessages(fed); }
 
     /** Get a packet for any endpoints in the federate **/
-    Message getMessage() { return Message(helicsFederateGetMessageObject(fed)); }
+    Message getMessage() { return Message(helicsFederateGetMessage(fed)); }
 
     /** create a message object */
-    Message createMessage()
-    {
-        return Message(helicsFederateCreateMessageObject(fed, hThrowOnError()));
-    }
+    Message createMessage() { return Message(helicsFederateCreateMessage(fed, hThrowOnError())); }
     /**get the number of registered endpoints*/
     int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 

@@ -22,7 +22,7 @@ class Message {
     Message() HELICS_NOTHROW: mo(HELICS_NULL_POINTER) {}
 
     /** construct from a helics_message object*/
-    explicit Message(helics_message_object hmo) HELICS_NOTHROW: mo(hmo) {}
+    explicit Message(helics_message hmo) HELICS_NOTHROW: mo(hmo) {}
 
     /** copy constructor*/
     Message(const Message& mess) HELICS_NOTHROW:
@@ -56,7 +56,7 @@ class Message {
         }
     }
     /** cast to a helics_message object*/
-    operator helics_message_object() const { return mo; }
+    operator helics_message() const { return mo; }
     /** check if a message_object is valid*/
     bool isValid() const { return (helicsMessageIsValid(mo) == helics_true); }
     /** get the message source endpoint name*/
@@ -171,15 +171,15 @@ class Message {
     }
     /** release a C message_object from the structure
     @details for use with the C shared library*/
-    helics_message_object release()
+    helics_message release()
     {
-        helics_message_object mreturn = mo;
+        helics_message mreturn = mo;
         mo = HELICS_NULL_POINTER;
         return mreturn;
     }
 
   private:
-    helics_message_object mo;  //!< C shared library message_object
+    helics_message mo;  //!< C shared library message_object
 };
 
 /** Class to manage helics endpoint operations*/
@@ -220,13 +220,10 @@ class Endpoint {
     uint64_t pendingMessages() const { return helicsEndpointPendingMessages(ep); }
 
     /** Get a packet from an endpoint **/
-    Message getMessage() { return Message(helicsEndpointGetMessageObject(ep)); }
+    Message getMessage() { return Message(helicsEndpointGetMessage(ep)); }
 
     /** create a message object */
-    Message createMessage()
-    {
-        return Message(helicsEndpointCreateMessageObject(ep, hThrowOnError()));
-    }
+    Message createMessage() { return Message(helicsEndpointCreateMessage(ep, hThrowOnError())); }
 
     /** Methods for sending a message **/
     /** send a data block and length
@@ -359,7 +356,7 @@ class Endpoint {
     void sendMessage(const Message& message)
     {
         // returns helicsStatus
-        helicsEndpointSendMessageObject(ep, message, hThrowOnError());
+        helicsEndpointSendMessage(ep, message, hThrowOnError());
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** send a message object
@@ -367,7 +364,7 @@ class Endpoint {
     void sendMessage(Message&& message)
     {
         // returns helicsStatus
-        helicsEndpointSendMessageObjectZeroCopy(ep, message.release(), hThrowOnError());
+        helicsEndpointSendMessageZeroCopy(ep, message.release(), hThrowOnError());
     }
 #endif
     /** send a message object
@@ -375,9 +372,9 @@ class Endpoint {
     void sendMessageZeroCopy(Message& message)
     {
         // returns helicsStatus
-        helicsEndpointSendMessageObjectZeroCopy(ep,
-                                                static_cast<helics_message_object>(message),
-                                                hThrowOnError());
+        helicsEndpointSendMessageZeroCopy(ep,
+                                          static_cast<helics_message>(message),
+                                          hThrowOnError());
         message.release();
     }
     /** get the name of the endpoint*/
