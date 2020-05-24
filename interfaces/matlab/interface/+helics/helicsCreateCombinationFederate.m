@@ -1,3 +1,3 @@
 function varargout = helicsCreateCombinationFederate(varargin)
-  [varargout{1:nargout}] = helicsMEX(73, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(53, varargin{:});
 end

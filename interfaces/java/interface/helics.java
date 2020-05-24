@@ -2568,22 +2568,12 @@ public class helics {
 
   /**
    * Send a message object from a specific endpoint.<br>
-   * @deprecated Use helicsEndpointSendMessageObject instead.<br>
-   * @param endpoint The endpoint to send the data from.<br>
-   * @param message The actual message to send.
-   */
-  public static void helicsEndpointSendMessage(SWIGTYPE_p_void endpoint, helics_message message) {
-    helicsJNI.helicsEndpointSendMessage(SWIGTYPE_p_void.getCPtr(endpoint), helics_message.getCPtr(message), message);
-  }
-
-  /**
-   * Send a message object from a specific endpoint.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
    * @param message The actual message to send which will be copied.
    */
-  public static void helicsEndpointSendMessageObject(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void message) {
-    helicsJNI.helicsEndpointSendMessageObject(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(message));
+  public static void helicsEndpointSendMessage(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void message) {
+    helicsJNI.helicsEndpointSendMessage(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(message));
   }
 
   /**
@@ -2593,8 +2583,8 @@ public class helics {
    * @param endpoint The endpoint to send the data from.<br>
    * @param message The actual message to send which will be copied.
    */
-  public static void helicsEndpointSendMessageObjectZeroCopy(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void message) {
-    helicsJNI.helicsEndpointSendMessageObjectZeroCopy(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(message));
+  public static void helicsEndpointSendMessageZeroCopy(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void message) {
+    helicsJNI.helicsEndpointSendMessageZeroCopy(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(message));
   }
 
   /**
@@ -2650,26 +2640,12 @@ public class helics {
   /**
    * Receive a packet from a particular endpoint.<br>
    * <br>
-   * @deprecated This function is deprecated and will be removed in Helics 3.0.<br>
-   *             Use helicsEndpointGetMessageObject instead.<br>
-   * <br>
    * endpoint The identifier for the endpoint.<br>
    * <br>
    * @return A message object.
    */
-  public static helics_message helicsEndpointGetMessage(SWIGTYPE_p_void endpoint) {
-    return new helics_message(helicsJNI.helicsEndpointGetMessage(SWIGTYPE_p_void.getCPtr(endpoint)), true);
-  }
-
-  /**
-   * Receive a packet from a particular endpoint.<br>
-   * <br>
-   * endpoint The identifier for the endpoint.<br>
-   * <br>
-   * @return A message object.
-   */
-  public static SWIGTYPE_p_void helicsEndpointGetMessageObject(SWIGTYPE_p_void endpoint) {
-    long cPtr = helicsJNI.helicsEndpointGetMessageObject(SWIGTYPE_p_void.getCPtr(endpoint));
+  public static SWIGTYPE_p_void helicsEndpointGetMessage(SWIGTYPE_p_void endpoint) {
+    long cPtr = helicsJNI.helicsEndpointGetMessage(SWIGTYPE_p_void.getCPtr(endpoint));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -2681,40 +2657,24 @@ public class helics {
    * <br>
    * <br>
    * <br>
-   * @return A new helics_message_object.
+   * @return A new helics_message.
    */
-  public static SWIGTYPE_p_void helicsEndpointCreateMessageObject(SWIGTYPE_p_void endpoint) {
-    long cPtr = helicsJNI.helicsEndpointCreateMessageObject(SWIGTYPE_p_void.getCPtr(endpoint));
+  public static SWIGTYPE_p_void helicsEndpointCreateMessage(SWIGTYPE_p_void endpoint) {
+    long cPtr = helicsJNI.helicsEndpointCreateMessage(SWIGTYPE_p_void.getCPtr(endpoint));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   /**
    * Receive a communication message for any endpoint in the federate.<br>
    * <br>
-   * @deprecated This function is deprecated and will be removed in Helics 3.0.<br>
-   *             Use helicsFederateGetMessageObject instead.<br>
-   * <br>
    * The return order will be in order of endpoint creation.<br>
    *          So all messages that are available for the first endpoint, then all for the second, and so on.<br>
    *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.<br>
    * <br>
-   * @return A unique_ptr to a Message object containing the message data.
+   * @return A helics_message which references the data in the message.
    */
-  public static helics_message helicsFederateGetMessage(SWIGTYPE_p_void fed) {
-    return new helics_message(helicsJNI.helicsFederateGetMessage(SWIGTYPE_p_void.getCPtr(fed)), true);
-  }
-
-  /**
-   * Receive a communication message for any endpoint in the federate.<br>
-   * <br>
-   * The return order will be in order of endpoint creation.<br>
-   *          So all messages that are available for the first endpoint, then all for the second, and so on.<br>
-   *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.<br>
-   * <br>
-   * @return A helics_message_object which references the data in the message.
-   */
-  public static SWIGTYPE_p_void helicsFederateGetMessageObject(SWIGTYPE_p_void fed) {
-    long cPtr = helicsJNI.helicsFederateGetMessageObject(SWIGTYPE_p_void.getCPtr(fed));
+  public static SWIGTYPE_p_void helicsFederateGetMessage(SWIGTYPE_p_void fed) {
+    long cPtr = helicsJNI.helicsFederateGetMessage(SWIGTYPE_p_void.getCPtr(fed));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -2726,35 +2686,22 @@ public class helics {
    * @param fed the federate object to associate the message with<br>
    * <br>
    * <br>
-   * @return A helics_message_object containing the message data.
+   * @return A helics_message containing the message data.
    */
-  public static SWIGTYPE_p_void helicsFederateCreateMessageObject(SWIGTYPE_p_void fed) {
-    long cPtr = helicsJNI.helicsFederateCreateMessageObject(SWIGTYPE_p_void.getCPtr(fed));
+  public static SWIGTYPE_p_void helicsFederateCreateMessage(SWIGTYPE_p_void fed) {
+    long cPtr = helicsJNI.helicsFederateCreateMessage(SWIGTYPE_p_void.getCPtr(fed));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   /**
    * Clear all stored messages from a federate.<br>
    * <br>
-   * This clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject<br>
+   * This clears messages retrieved through helicsEndpointGetMessage or helicsFederateGetMessage<br>
    * <br>
    * @param fed The federate to clear the message for.
    */
   public static void helicsFederateClearMessages(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateClearMessages(SWIGTYPE_p_void.getCPtr(fed));
-  }
-
-  /**
-   * Clear all message from an endpoint.<br>
-   * <br>
-   * @deprecated This function does nothing and will be removed.<br>
-   *             Use helicsFederateClearMessages to free all messages,<br>
-   *             or helicsMessageFree to clear an individual message.<br>
-   * <br>
-   * @param endpoint The endpoint object to operate on.
-   */
-  public static void helicsEndpointClearMessages(SWIGTYPE_p_void endpoint) {
-    helicsJNI.helicsEndpointClearMessages(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
   /**
