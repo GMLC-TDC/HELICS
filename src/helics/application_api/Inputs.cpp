@@ -115,6 +115,263 @@ void Input::handleCallback(Time time)
     }
 }
 
+template<class X>
+    X varMax(const std::vector<defV>& vals)
+    {
+    X dmax = mpark::get<X>(vals.front());
+    for (auto& dval : vals) {
+        if (mpark::get<X>(dval) > dmax) {
+            dmax = mpark::get<X>(dval);
+        }
+    }
+    return dmax;
+    }
+
+template<class X>
+    size_t varMaxIndex(const std::vector<defV>& vals,std::function<double(const X &)> op)
+    {
+        double dmax = invalidDouble;
+        size_t index{0};
+        size_t mxIndex{0};
+        for (auto& dval : vals) {
+            auto val = op(mpark::get<X>(dval));
+            if (val > dmax) {
+                dmax = val;
+                mxIndex = index;
+            }
+            ++index;
+        }
+        return mxIndex;
+    }
+
+    template<class X>
+    X varMin(const std::vector<defV>& vals)
+    {
+        X dmin = mpark::get<X>(vals.front());
+        for (auto& dval : vals) {
+            if (mpark::get<X>(dval) < dmin) {
+                dmin = mpark::get<X>(dval);
+            }
+        }
+        return dmin;
+    }
+
+    template<class X>
+    size_t varMinIndex(const std::vector<defV>& vals, std::function<double(const X&)> op)
+    {
+        double dmin = -invalidDouble;
+        size_t index{0};
+        size_t mnIndex{0};
+        for (auto& dval : vals) {
+            auto val = op(mpark::get<X>(dval));
+            if (val < dmin) {
+                dmin = val;
+                mnIndex = index;
+            }
+            ++index;
+        }
+        return mnIndex;
+    }
+
+static defV maxOperation(const std::vector<defV> & vals)
+{
+    if (vals.empty()) {
+        return invalidDouble;
+    }
+    switch (vals.front().index()) {
+        case double_loc:
+        default:
+            return varMax<double>(vals);
+        case int_loc:
+            return varMax<int64_t>(vals);
+        case string_loc:
+            return varMax<std::string>(vals);
+        case complex_loc: {
+            auto index = varMaxIndex<std::complex<double>>(vals, [](const auto &v){ return std::abs(v); });
+            return vals[index];
+        }
+        case vector_loc: {
+            auto index =
+                varMaxIndex<std::vector<double>>(vals, [](const auto& v) { return vectorNorm(v); });
+            return vals[index];
+        };
+        case complex_vector_loc: {
+            auto index =
+                varMaxIndex<std::vector<std::complex<double>>>(vals, [](const auto& v) { return vectorNorm(v); });
+            return vals[index];
+        } break;
+        case named_point_loc: {
+            auto index = varMaxIndex<NamedPoint>(vals, [](const auto& v) {
+                return v.value;
+            });
+            return vals[index];
+        } break;
+    }
+}
+
+static defV minOperation(const std::vector<defV>& vals)
+{
+    if (vals.empty()) {
+        return invalidDouble;
+    }
+    switch (vals.front().index()) {
+        case double_loc:
+        default:
+            return varMin<double>(vals);
+        case int_loc:
+            return varMin<int64_t>(vals);
+        case string_loc:
+            return varMin<std::string>(vals);
+        case complex_loc: {
+            auto index =
+                varMinIndex<std::complex<double>>(vals, [](const auto& v) { return std::abs(v); });
+            return vals[index];
+        }
+        case vector_loc: {
+            auto index =
+                varMinIndex<std::vector<double>>(vals, [](const auto& v) { return vectorNorm(v); });
+            return vals[index];
+        };
+        case complex_vector_loc: {
+            auto index = varMinIndex<std::vector<std::complex<double>>>(vals, [](const auto& v) {
+                return vectorNorm(v);
+            });
+            return vals[index];
+        } break;
+        case named_point_loc: {
+            auto index = varMinIndex<NamedPoint>(vals, [](const auto& v) { return v.value; });
+            return vals[index];
+        } break;
+    }
+}
+
+static defV vectorSum(const std::vector<defV>& vals)
+{
+    double result{0.0};
+    for (const auto &v : vals)
+    {
+        const auto& vect = mpark::get<std::vector<double>>(v);
+        for (auto &el : vect)
+        {
+            result += el;
+        }
+    }
+    return result;
+}
+
+static defV vectorAvg(const std::vector<defV>& vals)
+{
+    double result{0.0};
+    int N{0};
+    for (const auto& v : vals) {
+        const auto& vect = mpark::get<std::vector<double>>(v);
+        for (auto& el : vect) {
+            result += el;
+            ++N;
+        }
+    }
+    return result/static_cast<double>(N);
+}
+
+bool Input::vectorDataProcess(
+    const std::vector<std::shared_ptr<const data_block>>&
+    dataV)
+{
+    if (type == data_type::helics_unknown) {
+        loadSourceInformation();
+    }
+    std::vector<defV> res;
+    res.reserve(dataV.size());
+    
+    for (size_t ii = 0; ii < dataV.size(); ++ii)
+    {
+        if (dataV[ii])
+        {
+            if (type == helics::data_type::helics_double) {
+                res.push_back(doubleExtractAndConvert(*dataV[ii], inputUnits, outputUnits));
+            } else if (type == helics::data_type::helics_int) {
+                res.emplace_back();
+                integerExtractAndConvert(res.back(), *dataV[ii], inputUnits, outputUnits);
+            } else {
+                res.emplace_back();
+                valueExtract(*dataV[ii], type, res.back());
+            }
+        }
+    }
+    data_type targetType = data_type::helics_multi;
+    switch (inputVectorOp) {
+        case multi_input_mode::and_operation:
+        case multi_input_mode::or_operation:
+            targetType = data_type::helics_bool;
+            break;
+        case multi_input_mode::sum_operation:
+        case multi_input_mode::average_operation:
+        case multi_input_mode::diff_operation:
+            targetType = data_type::helics_vector;
+            break;
+        default:
+            break;
+    }
+    if (targetType == data_type::helics_multi)
+    {
+        targetType = data_type::helics_double;
+    }
+    for (auto &ival : res)
+    {
+        valueConvert(ival, targetType);
+    }
+    defV result;
+    switch (inputVectorOp)
+    {
+        case multi_input_mode::max_operation:
+            result = maxOperation(res);
+            break;
+        case multi_input_mode::min_operation:
+            result = minOperation(res);
+            break;
+        case multi_input_mode::and_operation:
+            result = std::all_of(res.begin(),res.end(),[](auto &val){
+                bool res;
+                valueExtract(val, res);
+                return res;
+                                 }) ?
+                "1" :
+                "0";
+            break;
+        case multi_input_mode::or_operation:
+            result = std::any_of(res.begin(),
+                                 res.end(),
+                                 [](auto& val) {
+                                     bool res;
+                                     valueExtract(val, res);
+                                     return res;
+                                 }) ?
+                "1" :
+                "0";
+            break;
+        case multi_input_mode::sum_operation:
+            result = vectorSum(res);
+            break;
+        case multi_input_mode::average_operation:
+            result = vectorAvg(res);
+            break;
+        default:
+            break;
+    }
+    if (changeDetectionEnabled) {
+  //  if (changeDetected(lastValue, result, delta)) {
+        lastValue = result;
+        hasUpdate = true;
+ //   }
+    }
+    else
+    {
+        lastValue = result;
+        hasUpdate = true;
+    }
+    return hasUpdate;
+}
+
 bool Input::checkUpdate(bool assumeUpdate)
 {
     if (changeDetectionEnabled) {
@@ -276,13 +533,21 @@ size_t Input::getVectorSize()
 void Input::loadSourceInformation()
 {
     type = getTypeFromString(fed->getInjectionType(*this));
-    const auto& iunits = fed->getInjectionUnits(*this);
-    if (!iunits.empty()) {
-        inputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(iunits));
-        if (!units::is_valid(*inputUnits)) {
-            inputUnits.reset();
+    if (type == data_type::helics_multi)
+    {
+
+    }
+    else
+    {
+        const auto& iunits = fed->getInjectionUnits(*this);
+        if (!iunits.empty()) {
+            inputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(iunits));
+            if (!units::is_valid(*inputUnits)) {
+                inputUnits.reset();
+            }
         }
     }
+    
 }
 
 double doubleExtractAndConvert(const data_view& dv,

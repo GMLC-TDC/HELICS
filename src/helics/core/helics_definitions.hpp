@@ -129,6 +129,7 @@ namespace defs {
         multi_input_handling_method =
                 helics_handle_option_multi_input_handling_method,
         input_priority_location=helics_handle_option_input_priority_location,
+        clear_priority_list = helics_handle_option_clear_priority_list,
         connections=helics_handle_option_connections
     };
 

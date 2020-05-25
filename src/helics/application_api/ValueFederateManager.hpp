@@ -43,15 +43,16 @@ struct publication_info {
 };
 /** structure used to contain information about a subscription*/
 struct input_info {
+    interface_handle coreID;  //!< Handle from the core
+    input_id_t id;  //!< the id used as the identifier
     data_view lastData;  //!< the last published data from a target
     Time lastUpdate{0.0};  //!< the time the subscription was last updated
     Time lastQuery{0.0};  //!< the time the query was made
-    std::string name;  //!< subscription name
-    std::string type;  //!< subscription type
-    std::string units;  //!< subscription units
+    int sourceIndex{0};  //!< the index of the data source for multi-source inputs
+    std::string name;  //!< input name
+    std::string type;  //!< input type
+    std::string units;  //!< input units
     std::string pubtype;  //!< the listed type of the corresponding publication
-    interface_handle coreID;  //!< Handle from the core
-    input_id_t id;  //!< the id used as the identifier
 
     std::function<void(Input&, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update

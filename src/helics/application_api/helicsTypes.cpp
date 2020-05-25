@@ -171,6 +171,8 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(Time).name(), data_type::helics_time},
     {gmlc::demangle(typeid(Time).name()), data_type::helics_time},
     {"tm", data_type::helics_time},
+    {"multi", data_type::helics_multi},
+    {"many", data_type::helics_multi},
     {"def", data_type::helics_any},
     {"any", data_type::helics_any},
     {"", data_type::helics_any},
@@ -178,6 +180,10 @@ static const std::unordered_map<std::string, data_type> typeMap{
 
 data_type getTypeFromString(const std::string& typeName)
 {
+    if (!typeName.empty() && typeName.front() == '[')
+    {
+        return data_type::helics_multi;
+    }
     auto res = typeMap.find(typeName);
     if (res == typeMap.end()) {
         auto lcStr = convertToLowerCase(typeName);

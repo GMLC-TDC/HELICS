@@ -21,7 +21,7 @@ class precise_unit;
 
 namespace helics {
 
-    enum class multi_input_mode : uint8_t {
+    enum multi_input_mode : int32_t {
     no_op = 0,
     and_operation = 1,
     or_operation = 2,
@@ -423,6 +423,9 @@ class HELICS_CXX_EXPORT Input {
     /** get the HELICS data type for the input*/
     data_type getHelicsType() const { return type; }
 
+    multi_input_mode getMultiInputMode() const { return inputVectorOp; }
+
+    bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);
   private:
     /** load some information about the data source such as type and units*/
     void loadSourceInformation();
@@ -520,7 +523,7 @@ class InputT: public Input {
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)
 {
-    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
+    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled && inputVectorOp==no_op)) {
         auto dv = fed->getValueRaw(*this);
         if (type == data_type::helics_unknown) {
             loadSourceInformation();

@@ -31,16 +31,13 @@ const std::shared_ptr<const data_block>& InputInfo::getData(int index) const
 }
 
 /** return true if index1 has higher priority than index2*/
-static bool priorityCheck(int32_t index1, int32_t index2, const std::vector<int32_t> &priorities)
+static bool priorityCheck(int32_t index1, int32_t index2, const std::vector<int32_t>& priorities)
 {
-    for (auto priority = priorities.rbegin(); priority != priorities.rend(); ++priority)
-    {
-        if (*priority == index1)
-        {
+    for (auto priority = priorities.rbegin(); priority != priorities.rend(); ++priority) {
+        if (*priority == index1) {
             return true;
         }
-        if (*priority == index2)
-        {
+        if (*priority == index2) {
             return false;
         }
     }
@@ -56,9 +53,8 @@ const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex
         if (cd.first > mxTime) {
             mxTime = cd.first;
             mxind = ind;
-        }
-        else if (cd.first == mxTime) {
-            if (priorityCheck(ind,mxind,priority_sources)) {
+        } else if (cd.first == mxTime) {
+            if (priorityCheck(ind, mxind, priority_sources)) {
                 mxind = ind;
             }
         }
@@ -70,8 +66,7 @@ const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex
         }
         return current_data[mxind];
     }
-    if (inputIndex != nullptr)
-    {
+    if (inputIndex != nullptr) {
         *inputIndex = 0;
     }
     return NullData;
@@ -120,32 +115,21 @@ void InputInfo::addSource(global_handle newSource,
                           const std::string& stype,
                           const std::string& sunits)
 {
-    if (input_sources.empty()) {
-        inputType = stype;
-        inputUnits = sunits;
-    }
-    else
-    {
-        if (inputType != stype)
-        {
-            inputType = "multi";
-        }
-        if (inputUnits != sunits)
-        {
-            inputUnits = "multi";
-        }
-    }
+    inputUnits.clear();
+    inputType.clear();
     input_sources.push_back(newSource);
     source_info.emplace_back(sourceName, stype, sunits);
     data_queues.resize(input_sources.size());
     current_data.resize(input_sources.size());
-    current_data_time.resize(input_sources.size(),{Time::minVal(),0});
+    current_data_time.resize(input_sources.size(), {Time::minVal(), 0});
     deactivated.push_back(Time::maxVal());
     has_target = true;
 }
 
 void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
 {
+    inputUnits.clear();
+    inputType.clear();
     for (size_t ii = 0; ii < input_sources.size(); ++ii) {
         if (input_sources[ii] == sourceToRemove) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
@@ -161,6 +145,8 @@ void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
 
 void InputInfo::removeSource(const std::string& sourceName, Time minTime)
 {
+    inputUnits.clear();
+    inputType.clear();
     for (size_t ii = 0; ii < source_info.size(); ++ii) {
         if (source_info[ii].key == sourceName) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
@@ -179,6 +165,65 @@ void InputInfo::clearFutureData()
     for (auto& vec : data_queues) {
         vec.clear();
     }
+}
+
+const std::string &InputInfo::getInjectionType() const
+{
+    if (inputType.empty())
+    {
+    if (!source_info.empty()) {
+        bool allTheSame{true};
+        for (const auto& src : source_info) {
+            if (src.type != source_info.front().type) {
+                allTheSame = false;
+                break;
+            }
+        }
+        if (allTheSame) {
+            inputType = source_info.front().type;
+        } else {
+            inputType.push_back('[');
+            for (const auto& src : source_info) {
+                inputType.push_back('"');
+                inputType.append(src.type);
+                inputType.push_back('"');
+                inputType.push_back(',');
+            }
+            inputType.back() = ']';
+        }
+    }
+    }
+    return inputType;
+    
+}
+
+const std::string &InputInfo::getInjectionUnits() const
+{
+    if (inputUnits.empty())
+        {
+    if (!source_info.empty()) {
+        bool allTheSame{true};
+        for (const auto& src : source_info) {
+            if (src.units != source_info.front().units) {
+                allTheSame = false;
+                break;
+            }
+        }
+        if (allTheSame) {
+            inputUnits = source_info.front().units;
+        } else {
+            inputUnits.push_back('[');
+            for (const auto& src : source_info) {
+                inputUnits.push_back('"');
+                inputUnits.append(src.units);
+                inputUnits.push_back('"');
+                inputUnits.push_back(',');
+            }
+            inputUnits.back() = ']';
+        }
+    }
+    }
+    return inputUnits;
 }
 
 bool InputInfo::updateTimeUpTo(Time newTime)
@@ -260,7 +305,7 @@ bool InputInfo::updateTimeInclusive(Time newTime)
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-           continue;
+            continue;
         }
         if (currentValue->time > newTime) {
             continue;

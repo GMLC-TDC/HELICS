@@ -62,8 +62,6 @@ class InputInfo {
     const global_handle id;  //!< identifier for the handle
     const std::string key;  //!< the identifier for the input
     const std::string type;  //! the nominal type of data for the input
-    std::string inputType;  //!< the type of data that its first matching input uses
-    std::string inputUnits;  //!< the units of the data that its first matching input uses
     const std::string units;  //!< the units of the controlInput
     bool required{false};  //!< flag indicating that the subscription requires a matching publication
     bool optional{false};  //!< flag indicating that any targets are optional
@@ -126,8 +124,13 @@ class InputInfo {
     /** clear all non-current data*/
     void clearFutureData();
 
+    const std::string &getInjectionType() const;
+    const std::string &getInjectionUnits() const;
+
   private:
     bool updateData(dataRecord&& update, int index);
+    mutable std::string inputUnits;
+    mutable std::string inputType;
 };
 
 bool checkTypeMatch(const std::string& type1, const std::string& type2, bool strict_match);

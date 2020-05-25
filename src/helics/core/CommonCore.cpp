@@ -949,9 +949,7 @@ const std::string& CommonCore::getInjectionUnits(interface_handle handle) const
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
-                    if (!inpInfo->inputUnits.empty()) {
-                        return inpInfo->inputUnits;
-                    }
+                    return inpInfo->getInjectionUnits();
                 }
                 break;
             }
@@ -988,9 +986,7 @@ const std::string& CommonCore::getInjectionType(interface_handle handle) const
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
-                    if (!inpInfo->inputType.empty()) {
-                        return inpInfo->inputType;
-                    }
+                    return inpInfo->getInjectionType();
                 }
                 break;
             }

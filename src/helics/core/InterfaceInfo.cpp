@@ -151,6 +151,9 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_
         case defs::options::input_priority_location:
             ipt->priority_sources.push_back(value);
             break;
+        case defs::options::clear_priority_list:
+            ipt->priority_sources.clear();
+            break;
         default:
             return false;
             break;
@@ -235,6 +238,9 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
             return static_cast<int32_t>(ipt->input_sources.size());
         case defs::options::input_priority_location:
             return ipt->priority_sources.empty()?-1:ipt->priority_sources.back();
+        case defs::options::clear_priority_list:
+            flagval=ipt->priority_sources.empty();
+            break;
         default:
             break;
     }
