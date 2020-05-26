@@ -17,14 +17,14 @@ else()
     cmake_policy(VERSION 3.17)
 endif()
 
-project(HELICS VERSION 2.5.0)
+project(HELICS VERSION 2.5.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-04-26")
+set(HELICS_DATE "2020-05-22")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -80,7 +80,7 @@ include(ucm)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
 # -----------------------------------------------------------------------------
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(WIN32)
         if(MSVC)
             set(CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
@@ -106,6 +106,18 @@ if(MSYS
    OR APPLE
 )
     set(UNIX_LIKE TRUE)
+endif()
+
+# Set the build output paths
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
+    set(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        CACHE PATH "PDB (MSVC debug symbol)output dir."
+    )
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH
+                                                                       "Executable/dll output dir."
+    )
 endif()
 
 # allow BOOST library inclusion to be turned off completely; this option will disable the IPC core

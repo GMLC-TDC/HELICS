@@ -62,6 +62,3 @@ add_test(NAME Java_Helics_Api_tests
 set_target_properties(Java_hello_world Java_Helics_Api PROPERTIES FOLDER tests)
 
 set_property(TEST Java_hello_world_test Java_Helics_Api_tests PROPERTY LABELS Java Continuous Daily)
-
-copy_key_files_to_target_located_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR})
-copy_shared_target_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR} helicsSharedLib)
