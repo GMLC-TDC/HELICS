@@ -93,6 +93,3 @@ add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS SharedLibraryCI Continuous)
 set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS SharedLibraryCppCI Continuous)
-
-copy_key_files_to_target_location(shared-library-tests)
-copy_shared_target(shared-library-tests helicsSharedLib)
