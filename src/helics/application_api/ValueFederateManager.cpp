@@ -234,19 +234,19 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         if (fid != inpHandle->end()) {  // assign the data
             auto* iData = static_cast<input_info*>(fid->dataReference);
             iData->lastUpdate = CurrentTime;
-            
+
             bool updated = false;
             if (fid->getMultiInputMode() == multi_input_mode::no_op) {
                 const auto& data = coreObject->getValue(handle);
                 iData->lastData = data;
                 iData->hasUpdate = true;
                 updated = fid->checkUpdate(true);
-            }else {
+            } else {
                 const auto& dataV = coreObject->getAllValues(handle);
-                    iData->hasUpdate = false;
-                    updated = fid->vectorDataProcess(dataV);
+                iData->hasUpdate = false;
+                updated = fid->vectorDataProcess(dataV);
             }
-            
+
             if (updated) {
                 if (iData->callback) {
                     Input& inp = *fid;

@@ -7,12 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Inputs.hpp"
+#include "helics/application_api/Publications.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/core/helics_definitions.hpp"
-
 #include "helics/common/JsonProcessingFunctions.hpp"
+#include "helics/core/helics_definitions.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -31,7 +30,7 @@ class multiInput: public ::testing::Test, public FederateTestFixture {
 TEST_F(multiInput, order)
 {
     using namespace helics;
-    SetupTest<ValueFederate>("test", 1,1.0);
+    SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
@@ -46,7 +45,7 @@ TEST_F(multiInput, order)
 
     pub1.publish(2.0);
     vFed1->requestNextStep();
-    double val=in1.getValue<double>();
+    double val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 2.0);
     pub2.publish(3.0);
     vFed1->requestNextStep();
@@ -95,7 +94,6 @@ TEST_F(multiInput, order2)
     vFed1->finalize();
 }
 
-
 TEST_F(multiInput, priority)
 {
     using namespace helics;
@@ -110,7 +108,6 @@ TEST_F(multiInput, priority)
     in1.addTarget("pub2");
     in1.setOption(defs::options::input_priority_location, 1);
     vFed1->enterExecutingMode();
-
 
     EXPECT_EQ(in1.getPublicationType(), "double");
 
@@ -129,7 +126,7 @@ TEST_F(multiInput, priority)
     vFed1->requestNextStep();
     val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 4.0);
-    auto fval=in1.getOption(defs::options::clear_priority_list);
+    auto fval = in1.getOption(defs::options::clear_priority_list);
     EXPECT_EQ(fval, 0);
     in1.setOption(defs::options::clear_priority_list);
 
@@ -144,7 +141,6 @@ TEST_F(multiInput, priority)
 
     vFed1->finalize();
 }
-
 
 TEST_F(multiInput, max)
 {
@@ -170,14 +166,14 @@ TEST_F(multiInput, max)
     EXPECT_DOUBLE_EQ(val, 2.0);
     pub3.publish(1.7);
     pub2.publish(3.0);
-   
+
     vFed1->requestNextStep();
     val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 3.0);
     pub3.publish(6.0);
     pub2.publish(4.0);
     pub1.publish(5.0);
-    
+
     vFed1->requestNextStep();
     val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 6.0);
@@ -222,7 +218,6 @@ TEST_F(multiInput, min)
     vFed1->finalize();
 }
 
-
 TEST_F(multiInput, and)
 {
     using namespace helics;
@@ -260,8 +255,6 @@ TEST_F(multiInput, and)
     EXPECT_TRUE(val);
     vFed1->finalize();
 }
-
-
 
 TEST_F(multiInput, or)
 {
@@ -309,8 +302,6 @@ TEST_F(multiInput, or)
     vFed1->finalize();
 }
 
-
-
 TEST_F(multiInput, sum)
 {
     using namespace helics;
@@ -318,7 +309,7 @@ TEST_F(multiInput, sum)
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& pub2 = vFed1->registerGlobalPublication("pub2","vector");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "vector");
     auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
     auto& in1 = vFed1->registerInput<double>("");
@@ -334,7 +325,7 @@ TEST_F(multiInput, sum)
     double val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 2.0);
     pub3.publish(1.0);
-    pub2.publish(std::vector<double>{3.0,4.0,5.0,2.0});
+    pub2.publish(std::vector<double>{3.0, 4.0, 5.0, 2.0});
 
     vFed1->requestNextStep();
     val = in1.getValue<double>();
@@ -348,8 +339,6 @@ TEST_F(multiInput, sum)
     EXPECT_DOUBLE_EQ(val, 18.0);
     vFed1->finalize();
 }
-
-
 
 TEST_F(multiInput, average)
 {
@@ -366,7 +355,7 @@ TEST_F(multiInput, average)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode:: average_operation);
+                  helics::multi_input_mode::average_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -388,8 +377,6 @@ TEST_F(multiInput, average)
     EXPECT_DOUBLE_EQ(val, 4.0);
     vFed1->finalize();
 }
-
-
 
 TEST_F(multiInput, diff)
 {
@@ -425,14 +412,13 @@ TEST_F(multiInput, diff)
     vFed1->finalize();
 }
 
-
 TEST_F(multiInput, vectorize)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& pub2 = vFed1->registerGlobalPublication("pub2", "vector");
     auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
 
@@ -453,7 +439,7 @@ TEST_F(multiInput, vectorize)
 
     vFed1->requestNextStep();
     val = in1.getValue<std::vector<double>>();
-    EXPECT_EQ(val.size(),6U);
+    EXPECT_EQ(val.size(), 6U);
     pub3.publish(4.0);
     pub2.publish(std::vector<double>{3.0, 4.0});
     pub1.publish(5.0);
@@ -464,7 +450,6 @@ TEST_F(multiInput, vectorize)
     vFed1->finalize();
 }
 
-
 TEST_F(multiInput, vectorize_string)
 {
     using namespace helics;
@@ -473,7 +458,7 @@ TEST_F(multiInput, vectorize_string)
 
     auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
     auto& pub2 = vFed1->registerGlobalPublication("pub2", "string");
-    auto& pub3 = vFed1->registerGlobalPublication < std::string> ("pub3");
+    auto& pub3 = vFed1->registerGlobalPublication<std::string>("pub3");
 
     auto& in1 = vFed1->registerInput<std::string>("");
     in1.addTarget("pub1");
@@ -502,7 +487,6 @@ TEST_F(multiInput, vectorize_string)
     vFed1->finalize();
 }
 
-
 TEST_F(multiInput, vectorizeComplex)
 {
     using namespace helics;
@@ -525,12 +509,12 @@ TEST_F(multiInput, vectorizeComplex)
     vFed1->requestNextStep();
     auto val = in1.getValue<std::vector<std::complex<double>>>();
     EXPECT_EQ(val.size(), 1U);
-    pub3.publish(std::complex<double>{3.0,-1.2});
+    pub3.publish(std::complex<double>{3.0, -1.2});
     pub2.publish(std::vector<double>{3.0, 5.0, 5.0, 2.0});
 
     vFed1->requestNextStep();
     val = in1.getValue<std::vector<std::complex<double>>>();
-    EXPECT_EQ(val.size(),4U);
+    EXPECT_EQ(val.size(), 4U);
     pub3.publish(4.0);
     pub2.publish(std::vector<double>{3.0, 4.0});
     pub1.publish(5.0);
@@ -541,19 +525,17 @@ TEST_F(multiInput, vectorizeComplex)
     vFed1->finalize();
 }
 
-
-
 TEST_F(multiInput, max_units)
 {
     using namespace helics;
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1","m");
-    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2","ft");
-    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3","in");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1", "m");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2", "ft");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3", "in");
 
-    auto& in1 = vFed1->registerInput<double>("","m");
+    auto& in1 = vFed1->registerInput<double>("", "m");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");

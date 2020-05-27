@@ -235,7 +235,7 @@ typedef enum {
     /** specify the input with priority*/
     helics_handle_option_clear_priority_list = 512,
     /** specify the required number of connections or get the actual number of connections*/
-    helics_handle_option_connections=522
+    helics_handle_option_connections = 522
 } helics_handle_options;
 
 /** enumeration of the predefined filter types*/

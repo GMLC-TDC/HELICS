@@ -167,61 +167,58 @@ void InputInfo::clearFutureData()
     }
 }
 
-const std::string &InputInfo::getInjectionType() const
+const std::string& InputInfo::getInjectionType() const
 {
-    if (inputType.empty())
-    {
-    if (!source_info.empty()) {
-        bool allTheSame{true};
-        for (const auto& src : source_info) {
-            if (src.type != source_info.front().type) {
-                allTheSame = false;
-                break;
-            }
-        }
-        if (allTheSame) {
-            inputType = source_info.front().type;
-        } else {
-            inputType.push_back('[');
+    if (inputType.empty()) {
+        if (!source_info.empty()) {
+            bool allTheSame{true};
             for (const auto& src : source_info) {
-                inputType.push_back('"');
-                inputType.append(src.type);
-                inputType.push_back('"');
-                inputType.push_back(',');
+                if (src.type != source_info.front().type) {
+                    allTheSame = false;
+                    break;
+                }
             }
-            inputType.back() = ']';
+            if (allTheSame) {
+                inputType = source_info.front().type;
+            } else {
+                inputType.push_back('[');
+                for (const auto& src : source_info) {
+                    inputType.push_back('"');
+                    inputType.append(src.type);
+                    inputType.push_back('"');
+                    inputType.push_back(',');
+                }
+                inputType.back() = ']';
+            }
         }
-    }
     }
     return inputType;
-    
 }
 
-const std::string &InputInfo::getInjectionUnits() const
+const std::string& InputInfo::getInjectionUnits() const
 {
-    if (inputUnits.empty())
-        {
-    if (!source_info.empty()) {
-        bool allTheSame{true};
-        for (const auto& src : source_info) {
-            if (src.units != source_info.front().units) {
-                allTheSame = false;
-                break;
-            }
-        }
-        if (allTheSame) {
-            inputUnits = source_info.front().units;
-        } else {
-            inputUnits.push_back('[');
+    if (inputUnits.empty()) {
+        if (!source_info.empty()) {
+            bool allTheSame{true};
             for (const auto& src : source_info) {
-                inputUnits.push_back('"');
-                inputUnits.append(src.units);
-                inputUnits.push_back('"');
-                inputUnits.push_back(',');
+                if (src.units != source_info.front().units) {
+                    allTheSame = false;
+                    break;
+                }
             }
-            inputUnits.back() = ']';
+            if (allTheSame) {
+                inputUnits = source_info.front().units;
+            } else {
+                inputUnits.push_back('[');
+                for (const auto& src : source_info) {
+                    inputUnits.push_back('"');
+                    inputUnits.append(src.units);
+                    inputUnits.push_back('"');
+                    inputUnits.push_back(',');
+                }
+                inputUnits.back() = ']';
+            }
         }
-    }
     }
     return inputUnits;
 }

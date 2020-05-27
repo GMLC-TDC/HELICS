@@ -152,7 +152,7 @@ void HandleManager::setHandleOption(interface_handle handle, int32_t option, int
     if (isValidIndex(index, handles)) {
         switch (option) {
             case helics_handle_option_connection_required:
-                if (val!=0) {
+                if (val != 0) {
                     clearActionFlag(handles[index], optional_flag);
                     setActionFlag(handles[index], required_flag);
                 } else {
@@ -160,7 +160,7 @@ void HandleManager::setHandleOption(interface_handle handle, int32_t option, int
                 }
                 break;
             case helics_handle_option_connection_optional:
-                if (val!=0) {
+                if (val != 0) {
                     clearActionFlag(handles[index], required_flag);
                     setActionFlag(handles[index], optional_flag);
                 } else {
@@ -180,7 +180,7 @@ int32_t HandleManager::getHandleOption(interface_handle handle, int32_t option) 
     if (isValidIndex(index, handles)) {
         switch (option) {
             case helics_handle_option_only_update_on_change:
-                rvalue=checkActionFlag(handles[index], extra_flag1);
+                rvalue = checkActionFlag(handles[index], extra_flag1);
                 break;
             case helics_handle_option_only_transmit_on_change:
                 rvalue = checkActionFlag(handles[index], extra_flag2);

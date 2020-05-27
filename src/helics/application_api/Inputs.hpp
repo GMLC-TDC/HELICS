@@ -21,17 +21,17 @@ class precise_unit;
 
 namespace helics {
 
-    enum multi_input_mode : int32_t {
+enum multi_input_mode : int32_t {
     no_op = 0,
     and_operation = 1,
     or_operation = 2,
     sum_operation = 3,
     diff_operation = 4,
     max_operation = 5,
-    min_operation=6,
-    average_operation=7,
-    vectorize_operation=8
-    };
+    min_operation = 6,
+    average_operation = 7,
+    vectorize_operation = 8
+};
 
 /** base class for a input object*/
 class HELICS_CXX_EXPORT Input {
@@ -42,21 +42,24 @@ class HELICS_CXX_EXPORT Input {
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
 
-    data_type targetType{data_type::helics_unknown};  //!< the underlying type the publication is using
-    data_type injectionType{data_type::helics_unknown}; //!< the type of data coming from the publication
+    data_type targetType{
+        data_type::helics_unknown};  //!< the underlying type the publication is using
+    data_type injectionType{
+        data_type::helics_unknown};  //!< the type of data coming from the publication
     bool changeDetectionEnabled{false};  //!< the change detection is enabled
     bool hasUpdate{false};  //!< the value has been updated
     bool disableAssign{false};  //!< disable assignment for the object
     bool useThreshold{false};  //!< flag to indicate use a threshold for binary output
-    multi_input_mode inputVectorOp{multi_input_mode::no_op}; //!< the vector processing method to use
+    multi_input_mode inputVectorOp{
+        multi_input_mode::no_op};  //!< the vector processing method to use
     int32_t prevInputCount{0};  //!< the previous number of inputs
     size_t customTypeHash{0U};  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
     std::shared_ptr<units::precise_unit> outputUnits;
     std::shared_ptr<units::precise_unit> inputUnits;
-    std::vector < std::pair<data_type, std::shared_ptr<units::precise_unit>>> sourceTypes;
+    std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>> sourceTypes;
     double delta{-1.0};  //!< the minimum difference
-    double threshhold{0.0};//!< the threshold to use for binary decisions
+    double threshold{0.0};  //!< the threshold to use for binary decisions
     std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
     mpark::variant<std::function<void(const double&, Time)>,
@@ -211,7 +214,8 @@ class HELICS_CXX_EXPORT Input {
     /** get the targetType of the data coming from the publication*/
     const std::string& getPublicationType() const
     {
-        return ((targetType == data_type::helics_unknown) || (targetType == data_type::helics_custom)) ?
+        return ((targetType == data_type::helics_unknown) ||
+                (targetType == data_type::helics_custom)) ?
             fed->getInjectionType(*this) :
             typeNameStringRef(targetType);
     }
@@ -430,6 +434,7 @@ class HELICS_CXX_EXPORT Input {
     multi_input_mode getMultiInputMode() const { return inputVectorOp; }
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);
+
   private:
     /** load some information about the data source such as targetType and units*/
     void loadSourceInformation();
@@ -527,7 +532,7 @@ class InputT: public Input {
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)
 {
-    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled && inputVectorOp==no_op)) {
+    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled && inputVectorOp == no_op)) {
         auto dv = fed->getValueRaw(*this);
         if (targetType == data_type::helics_unknown) {
             loadSourceInformation();

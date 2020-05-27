@@ -47,7 +47,7 @@ void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
     if (updateFlag != only_update_on_change) {
         only_update_on_change = updateFlag;
         // ip is a reference to a unique_ptr
-        for (auto& ip : inputs.lock()) { //NOLINT(readability-qualified-auto)
+        for (auto& ip : inputs.lock()) {  // NOLINT(readability-qualified-auto)
             ip->only_update_on_change = updateFlag;
         }
     }
@@ -134,7 +134,7 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_
             ipt->required = !bvalue;
             break;
         case defs::options::single_connection_only:
-            ipt->required_connnections = bvalue?1:0;
+            ipt->required_connnections = bvalue ? 1 : 0;
             break;
         case defs::options::multiple_connections_allowed:
             ipt->required_connnections = bvalue ? 0 : 1;
@@ -179,10 +179,10 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
             pub->required = !bvalue;
             break;
         case defs::options::single_connection_only:
-            pub->required_connections = bvalue?1:0;
+            pub->required_connections = bvalue ? 1 : 0;
             break;
         case defs::options::multiple_connections_allowed:
-            pub->required_connections = !bvalue?0:1;
+            pub->required_connections = !bvalue ? 0 : 1;
             break;
         case defs::options::buffer_data:
             pub->buffer_data = bvalue;
@@ -197,7 +197,9 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
     return true;
 }
 
-bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/, int32_t /*option*/, int32_t /*value*/) // NOLINT
+bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
+                                        int32_t /*option*/,
+                                        int32_t /*value*/)  // NOLINT
 {
     // there will likely be some future properties
     // auto ept = getEndpoint (id);
@@ -226,7 +228,7 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
             flagval = !ipt->required;
             break;
         case defs::options::single_connection_only:
-            flagval = (ipt->required_connnections==1);
+            flagval = (ipt->required_connnections == 1);
             break;
         case defs::options::multiple_connections_allowed:
             flagval = (ipt->required_connnections != 1);
@@ -237,9 +239,9 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
         case defs::options::connections:
             return static_cast<int32_t>(ipt->input_sources.size());
         case defs::options::input_priority_location:
-            return ipt->priority_sources.empty()?-1:ipt->priority_sources.back();
+            return ipt->priority_sources.empty() ? -1 : ipt->priority_sources.back();
         case defs::options::clear_priority_list:
-            flagval=ipt->priority_sources.empty();
+            flagval = ipt->priority_sources.empty();
             break;
         default:
             break;
@@ -265,7 +267,7 @@ int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t optio
             flagval = !pub->required;
             break;
         case defs::options::single_connection_only:
-            flagval = (pub->required_connections==1);
+            flagval = (pub->required_connections == 1);
             break;
         case defs::options::multiple_connections_allowed:
             flagval = pub->required_connections != 1;
@@ -300,23 +302,21 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 ipt->key));
             }
         }
-        if (ipt->required_connnections>0) {
-            if (ipt->input_sources.size() !=static_cast<size_t>(ipt->required_connnections)) {
-                if (ipt->required_connnections == 1)
-                {
+        if (ipt->required_connnections > 0) {
+            if (ipt->input_sources.size() != static_cast<size_t>(ipt->required_connnections)) {
+                if (ipt->required_connnections == 1) {
                     issues.emplace_back(
                         helics::defs::errors::connection_failure,
                         fmt::format(
                             "Input {} is single source only but has more than one connection",
                             ipt->key));
-                }
-                else
-                {
+                } else {
                     issues.emplace_back(
                         helics::defs::errors::connection_failure,
-                        fmt::format(
-                            "Input {} requires {} connections but only {} were made",
-                            ipt->key,ipt->required_connnections,ipt->input_sources.size()));
+                        fmt::format("Input {} requires {} connections but only {} were made",
+                                    ipt->key,
+                                    ipt->required_connnections,
+                                    ipt->input_sources.size()));
                 }
             }
         }
@@ -352,23 +352,21 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 pub->key));
             }
         }
-        if (pub->required_connections>0) {
-            if (pub->subscribers.size()!=static_cast<size_t>(pub->required_connections)) {
-                if (pub->required_connections == 1)
-                {
+        if (pub->required_connections > 0) {
+            if (pub->subscribers.size() != static_cast<size_t>(pub->required_connections)) {
+                if (pub->required_connections == 1) {
                     issues.emplace_back(
                         helics::defs::errors::connection_failure,
                         fmt::format(
                             "Publication {} is single source only but has more than one connection",
                             pub->key));
-                }
-                else
-                {
+                } else {
                     issues.emplace_back(
                         helics::defs::errors::connection_failure,
-                        fmt::format(
-                            "Publication {} requires {} connections but only {} are made",
-                            pub->key,pub->required_connections,pub->subscribers.size()));
+                        fmt::format("Publication {} requires {} connections but only {} are made",
+                                    pub->key,
+                                    pub->required_connections,
+                                    pub->subscribers.size()));
                 }
             }
         }

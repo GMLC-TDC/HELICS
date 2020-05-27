@@ -259,7 +259,7 @@ const std::shared_ptr<const data_block>& FederateState::getValue(interface_handl
 }
 
 const std::vector<std::shared_ptr<const data_block>>&
-FederateState::getAllValues(interface_handle handle)
+    FederateState::getAllValues(interface_handle handle)
 {
     return interfaces().getInput(handle)->getAllData();
 }
