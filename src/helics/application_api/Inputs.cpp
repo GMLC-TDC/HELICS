@@ -674,7 +674,7 @@ void Input::loadSourceInformation()
                 sourceTypes.emplace_back(getTypeFromString(res.asCString()), nullptr);
             }
         } else {
-            auto iValue = loadJsonStr(iType);
+            auto iValue = loadJsonStr(iUnits);
             sourceTypes.resize(iValue.size(), {injectionType, nullptr});
         }
         if (!iUnits.empty()) {
