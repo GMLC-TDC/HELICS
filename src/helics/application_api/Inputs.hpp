@@ -43,7 +43,7 @@ class HELICS_CXX_EXPORT Input {
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
 
     data_type targetType{
-        data_type::helics_unknown};  //!< the underlying type the publication is using
+        data_type::helics_unknown};  //!< the underlying type the input targets
     data_type injectionType{
         data_type::helics_unknown};  //!< the type of data coming from the publication
     bool changeDetectionEnabled{false};  //!< the change detection is enabled
@@ -211,15 +211,15 @@ class HELICS_CXX_EXPORT Input {
         return (actualName.empty() ? getTarget() : actualName);
     }
 
-    /** get the targetType of the data coming from the publication*/
+    /** get the type of the data coming from the publication*/
     const std::string& getPublicationType() const
     {
-        return ((targetType == data_type::helics_unknown) ||
-                (targetType == data_type::helics_custom)) ?
+        return ((injectionType == data_type::helics_unknown) ||
+                (injectionType == data_type::helics_custom)) ?
             fed->getInjectionType(*this) :
-            typeNameStringRef(targetType);
+            typeNameStringRef(injectionType);
     }
-    /** get the targetType of the input*/
+    /** get the type of the input*/
     const std::string& getType() const { return fed->getExtractionType(*this); }
     /** get the units associated with a input*/
     const std::string& getUnits() const { return fed->getExtractionUnits(*this); }
@@ -428,7 +428,7 @@ class HELICS_CXX_EXPORT Input {
     @details it is not necessary to call this function unless you are continuing the simulation
     after the close*/
     void close() { fed->closeInterface(handle); }
-    /** get the HELICS data targetType for the input*/
+    /** get the HELICS data type for the input*/
     data_type getHelicsType() const { return targetType; }
 
     multi_input_mode getMultiInputMode() const { return inputVectorOp; }
@@ -436,7 +436,7 @@ class HELICS_CXX_EXPORT Input {
     bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);
 
   private:
-    /** load some information about the data source such as targetType and units*/
+    /** load some information about the data source such as type and units*/
     void loadSourceInformation();
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar();
@@ -456,7 +456,7 @@ HELICS_CXX_EXPORT void
                              const std::shared_ptr<units::precise_unit>& inputUnits,
                              const std::shared_ptr<units::precise_unit>& outputUnits);
 
-/** class to handle an input and extract a specific targetType
+/** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/
 template<class X>
 class InputT: public Input {
@@ -464,7 +464,7 @@ class InputT: public Input {
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
     std::function<double(const X& v1, const X& v2)>
         changeDetectionOperator;  //!< callback function for change detection
-    // determine if we can convert to a primary targetType
+    // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
         std::conditional_t<((helicsType<X>() != data_type::helics_custom) ||
                             (isConvertableType<X>())),
@@ -473,7 +473,7 @@ class InputT: public Input {
 
   public:
     InputT() = default;
-    /**constructor to build an input with a defined object targetType
+    /**constructor to build an input with a defined object type
     @param valueFed  the ValueFederate to use
     @param name the name of the input
     @param units the units associated with a Federate
@@ -484,7 +484,7 @@ class InputT: public Input {
         Input(valueFed, name, ValueConverter<X>::type(), units)
     {
     }
-    /**constructor to build an input with a defined targetType
+    /**constructor to build an input with a defined type
     @param valueFed  the ValueFederate to use
     @param name the name of the input
     @param units the units associated with a Federate
@@ -534,19 +534,19 @@ void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out
 {
     if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled && inputVectorOp == no_op)) {
         auto dv = fed->getValueRaw(*this);
-        if (targetType == data_type::helics_unknown) {
+        if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
 
-        if (targetType == helics::data_type::helics_double) {
+        if (injectionType == helics::data_type::helics_double) {
             defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
             valueExtract(val, out);
-        } else if (targetType == helics::data_type::helics_int) {
+        } else if (injectionType == helics::data_type::helics_int) {
             defV val;
             integerExtractAndConvert(val, dv, inputUnits, outputUnits);
             valueExtract(val, out);
         } else {
-            valueExtract(dv, targetType, out);
+            valueExtract(dv, injectionType, out);
         }
         if (changeDetectionEnabled) {
             if (changeDetected(lastValue, out, delta)) {
@@ -588,27 +588,27 @@ const X& Input::getValueRef()
                   "calling getValue By ref must be with a primary type");
     if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
         auto dv = fed->getValueRaw(*this);
-        if (targetType == data_type::helics_unknown) {
+        if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
 
         if (changeDetectionEnabled) {
             X out;
-            if (targetType == helics::data_type::helics_double) {
+            if (injectionType == helics::data_type::helics_double) {
                 defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                 valueExtract(val, out);
-            } else if (targetType == helics::data_type::helics_int) {
+            } else if (injectionType == helics::data_type::helics_int) {
                 defV val;
                 integerExtractAndConvert(val, dv, inputUnits, outputUnits);
                 valueExtract(val, out);
             } else {
-                valueExtract(dv, targetType, out);
+                valueExtract(dv, injectionType, out);
             }
             if (changeDetected(lastValue, out, delta)) {
                 lastValue = make_valid(std::move(out));
             }
         } else {
-            valueExtract(dv, targetType, lastValue);
+            valueExtract(dv, injectionType, lastValue);
         }
     } else {
         // TODO(PT): make some logic that it can get the raw data from the core again if it was
