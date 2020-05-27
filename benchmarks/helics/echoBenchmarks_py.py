@@ -22,25 +22,26 @@ import pytest_benchmark as bench
 logger = logging.getLogger(__name__)
 
 class EchoHub_c:
-    # finalTime = h.helics_data_type_time
-    finalTime = 0.1
-    # vFed = ''
-    pubs = []
-    subs = []
-    cnt_ = 10
-    initialized = False
-    readyToRun = False
+    
     def __init__(self):
         print('Created the EchoHub class')
+        # finalTime = h.helics_data_type_time
+        self.finalTime = 0.1
+        self.vFed = None
+        self.pubs = []
+        self.subs = []
+        self.cnt_ = 10
+        self.initialized = False
+        self.readyToRun = False
     
     def callOnReady(self, parties):
-        print('created the barrier object')
+        print('####### created the barrier object')
         brr = Barrier(parties)
         return brr
     
     def create_value_federate(self, coreName):
-        name = 'echohub Test--T'
-        print('Creating the Federate info...')
+        name = 'echohub Test--AA'
+        print('####### creating the Federate info...')
         fi = h.helicsCreateFederateInfo()
         print('Setting the core name')
         h.helicsFederateInfoSetCoreName(fi, coreName)
@@ -50,20 +51,10 @@ class EchoHub_c:
         return vFed
     
     def initialize(self, vFed, cnt):
+        print('####### initialized the EchoHub test')
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
-        print('Initialized the EchoHub test')
         self.cnt_ = cnt
-        # Moving these commented lines to another function.
-        # name = 'echohub Test-B'
-        # print('Creating the Federate info...')
-        # fi = h.helicsCreateFederateInfo()
-        # print('Setting the core name')
-        # h.helicsFederateInfoSetCoreName(fi, coreName)
-        # print('Creating the value federate...')
-        # global vFed
-        # vFed = h.helicsCreateValueFederate(name, fi)
         i = 0
         while i < self.cnt_:
             leafname = 'leafrx_{}'.format(i)
@@ -77,23 +68,25 @@ class EchoHub_c:
                 self.vFed, leafname2, ""))
             i += 1
         self.initialized = True
-        # print(self.vFed)
         
     def makeReady(self, vFed):
         self.vFed = vFed
-        if self.initialized != False:
+        if self.initialized is False:
             print('must initialize first')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
-        print('starting the HELICS execution')
+        print('####### starting the HELICS execution')
+        print('hub - before enter execution async')
+        h.helicsFederateEnterExecutingModeAsync(self.vFed)
         h.helicsFederateEnterExecutingMode(self.vFed)
+        h.helicsFederateEnterExecutingModeComplete(self.vFed)
+        print('hub - after enter execution complete')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
         self.readyToRun = True
     
     def mainLoop(self, vFed):
+        print('###### starting the main loop')
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         buffer = chr(256)
         cTime = h.helics_data_type_time_zero()
         while cTime <= self.finalTime:
@@ -109,52 +102,56 @@ class EchoHub_c:
                     h.helicsPublicationPublishRaw(self.pub[i], buffer, 
                                                   actLen)
             print('getting the federate time')
+            print('hub - before request time async')
+            h.helicsFederateRequestTimeAsync(self.vFed, self.finalTime + 0.05)
             cTime = h.helicsFederateRequestTime(
                 self.vFed, self.finalTime + 0.05)
+            h.helicsFederateRequestTimeComplete(self.vFed)
+            print('hub - after request time complete')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         print('finalizing the federate stuff')
+        print('hub - before finalize async')
+        h.helicsFederateFinalizeAsync(self.vFed)
         h.helicsFederateFinalize(self.vFed)
+        h.helicsFederateFinalizeComplete(self.vFed)
+        print('hub - after finalize complete')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
     
     def run(self, parties, vFed):
+        print('###### starting the run function')
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         self.parties = parties
-        if self.readyToRun != False:
+        if self.readyToRun is False:
             self.makeReady(self.vFed)
-        # if self.callOnReady():
         self.callOnReady(self.parties)
         self.mainLoop(self.vFed)
     
     def __del__(self):
         print('Inside the __del__ method of EchoHub_c class.')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         h.helicsFederateFree(self.vFed)
         
             
 class EchoLeaf_c:
-    # vFed = ''
-    pub = ''
-    sub = ''
-    index_ = 0
-    initialized = False
-    readyToRun = False
     
     def __init__(self):
         print('Created the EchoLeaf class')
+        self.vFed = None
+        self.pub = None
+        self.sub = None
+        self.index_ = 0
+        self.initialized = False
+        self.readyToRun = False
         
     def callOnReady(self, parties):
-        print('created the barrier object')
+        print('####### created the barrier object')
         brr = Barrier(parties)
         return brr
     
     def create_value_federate(self, coreName, index):
-        name = 'echoleaf_{} Test--T'.format(index)
-        print('creating federate info')
+        print('####### creating federate info')
+        name = 'echoleaf_{} Test--AA'.format(index)
         fi = h.helicsCreateFederateInfo()
         print('setting core name')
         h.helicsFederateInfoSetCoreName(fi, coreName)
@@ -164,20 +161,10 @@ class EchoLeaf_c:
         return vFed
     
     def initialize(self, vFed, index):
+        print('####### initialized the EchoLeaf test')
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
-        print('Initialized the EchoLeaf test')
-        # name = 'echoleaf_{} Test-B'.format(index)
         self.index_ = index
-        # Moving these commented lines to another function.
-        # print('creating federate info')
-        # fi = h.helicsCreateFederateInfo()
-        # print('setting core name')
-        # h.helicsFederateInfoSetCoreName(fi, coreName)
-        # print('creating value federate info')
-        # global vFed
-        # vFed = h.helicsCreateValueFederate(name, fi)
         leafname = 'leafsend_{}'.format(index)
         print('creating publication info')
         self.pub = h.helicsFederateRegisterGlobalPublication(
@@ -194,34 +181,36 @@ class EchoLeaf_c:
     def makeReady(self, vFed):
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
-        if self.initialized != False:
+        if self.initialized is False:
             print('must initizialize first')
+        print('federate valid:', h.helicsFederateIsValid(self.vFed))
         print('starting the HELICS execution')
-        print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
+        print('leaf - before enter execution async')
+        h.helicsFederateEnterExecutingModeAsync(self.vFed)
         h.helicsFederateEnterExecutingMode(self.vFed)
+        h.helicsFederateEnterExecutingModeComplete(self.vFed)
+        print('leaf - after enter execution complete')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         self.readyToRun = True
     
     def mainLoop(self, vFed):
+        print('######## starting the main loop')
         cnt = 0
         txstring = '{:<100000}{:<100}'.format(self.index_, '1')
         tbuffer = chr(256)
         itr = 5000
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         while cnt <= itr + 1:
-            # print('current cnt =', cnt)
             print('requesting the next time')
             print('federate valid:', h.helicsFederateIsValid(self.vFed))
-            # print('federate state:', h.helicsFederateGetState(self.vFed))
+            print('leaf - before request time async')
+            h.helicsFederateRequestTimeAsync(self.vFed, 1.0)
             h.helicsFederateRequestTime(self.vFed, 1.0)
+            h.helicsFederateRequestTimeComplete(self.vFed)
+            print('leaf - after request time complete')
             # h.helicsFederateRequestNextStep(self.vFed)
             print('federate valid:', h.helicsFederateIsValid(self.vFed))
-            # print('federate state:', h.helicsFederateGetState(self.vFed))
             if cnt <= itr:
                 print('getting the publication string')
                 h.helicsPublicationPublishString(
@@ -238,26 +227,26 @@ class EchoLeaf_c:
             cnt += 1
         print('finalizing the federate stuff')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
+        print('leaf - before finalize async')
+        h.helicsFederateFinalizeAsync(self.vFed)
         h.helicsFederateFinalize(self.vFed)
+        h.helicsFederateFinalizeComplete(self.vFed)
+        print('leaf - after finalize complete')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         
     def run(self, parties, vFed):
+        print('####### starting the run function')
         self.vFed = vFed
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         self.parties = parties
-        if self.readyToRun != False:
+        if self.readyToRun is False:
            self.makeReady(self.vFed)
-        # if self.callOnReady():
         self.callOnReady(self.parties)
         self.mainLoop(self.vFed)
     
     def __del__(self):
         print('Inside the __del__ method of the EchoLeaf_c class')
         print('federate valid:', h.helicsFederateIsValid(self.vFed))
-        # print('federate state:', h.helicsFederateGetState(self.vFed))
         h.helicsFederateFree(self.vFed)
         
 
@@ -321,11 +310,10 @@ def BMecho_singleCore(federates):
     threads = []
     i = 0
     for l, f in zip(leaf_vFeds, feds):
-        lf = EchoLeaf_c()
         x = Thread(
-            target=lf.run(len(feds)+1, l), 
+            target=leafs[f].run, 
             name=leafs[i], 
-            args=(1,))
+            args=(len(feds)+1, l))
         threads.append(x)
         x.start()
         i += 1
@@ -368,24 +356,23 @@ def BMecho_multiCore(cTypeString, federates):
     leaf_vFeds = []
     for f in feds:
         print('creating the core')
-        cores[i] = h.helicsCreateCore(
+        cores[f] = h.helicsCreateCore(
             cTypeString, None, "-f 1 --log_level=no_print")
         print('connecting the cores')
-        h.helicsCoreConnect(cores[i], None)
-        leaf_vFed = leafs[i].create_value_federate(
+        h.helicsCoreConnect(cores[f], None)
+        leaf_vFed = leafs[f].create_value_federate(
             h.helicsCoreGetIdentifier(cores[i]))
-        leafs[i].initialize(leaf_vFed, i)
+        leafs[f].initialize(leaf_vFed, i)
         leaf_vFeds.append(leaf_vFed)
         i += 1
     print('creating the thread list')
     threads = []
     i = 0
     for l, f in zip(leaf_vFeds, feds):
-        lf = EchoLeaf_c()
         x = Thread(
-            target=lf.run(len(feds)+1, l), 
+            target=leafs[f].run, 
             name=leafs[i], 
-            args=(1,))
+            args=(len(feds)+1, l))
         threads.append(x)
         x.start()
         i += 1
@@ -412,37 +399,37 @@ def BMecho_multiCore(cTypeString, federates):
 def _auto_run(args):
     """This function runs this script as a stand-alone executable."""
     print('Starting this code and performing benchmarks')
-    bench(BMecho_singleCore(1), iterations=1, rounds=1)
-    bench.json(BMecho_singleCore(1), 
-               os.path.join(args.output_path, 'test1.json'))
+    bench(BMecho_singleCore(1))
+    # bench.json(BMecho_singleCore(1), 
+    #            os.path.join(args.output_path, 'test1.json'))
     
-    bench(BMecho_multiCore('inproc', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('inproc', 1), 
-               os.path.join(args.output_path, 'test2.json'))
+    # bench(BMecho_multiCore('inproc', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('inproc', 1), 
+    #            os.path.join(args.output_path, 'test2.json'))
     
-    bench(BMecho_multiCore('zmq', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('zmq', 1), 
-               os.path.join(args.output_path, 'test3.json'))
+    # bench(BMecho_multiCore('zmq', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('zmq', 1), 
+    #            os.path.join(args.output_path, 'test3.json'))
     
-    bench(BMecho_multiCore('zmqss', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('zmqss', 1), 
-               os.path.join(args.output_path, 'test4.json'))        
+    # bench(BMecho_multiCore('zmqss', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('zmqss', 1), 
+    #            os.path.join(args.output_path, 'test4.json'))        
     
-    bench(BMecho_multiCore('ipc', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('ipc', 1), 
-               os.path.join(args.output_path, 'test5.json'))
+    # bench(BMecho_multiCore('ipc', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('ipc', 1), 
+    #            os.path.join(args.output_path, 'test5.json'))
     
-    bench(BMecho_multiCore('tcp', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('tcp', 1), 
-               os.path.join(args.output_path, 'test6.json'))
+    # bench(BMecho_multiCore('tcp', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('tcp', 1), 
+    #            os.path.join(args.output_path, 'test6.json'))
     
-    bench(BMecho_multiCore('tcpss', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('tcpss', 1), 
-               os.path.join(args.output_path, 'test7.json'))
+    # bench(BMecho_multiCore('tcpss', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('tcpss', 1), 
+    #            os.path.join(args.output_path, 'test7.json'))
     
-    bench(BMecho_multiCore('udp', 1), iterations=1, rounds=1)
-    bench.json(BMecho_multiCore('udp', 1), 
-               os.path.join(args.output_path, 'test8.json'))
+    # bench(BMecho_multiCore('udp', 1), iterations=1, rounds=1)
+    # bench.json(BMecho_multiCore('udp', 1), 
+    #            os.path.join(args.output_path, 'test8.json'))
     
     # print('saving the data')
     # for root, dirs, files in os.walk(os.path.join(args.output_path)):
