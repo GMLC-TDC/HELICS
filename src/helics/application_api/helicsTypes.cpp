@@ -746,7 +746,7 @@ data_block typeConvert(data_type type, const std::vector<double>& val)
         case data_type::helics_complex_vector: {
             std::vector<std::complex<double>> CD;
             CD.reserve(val.size() / 2);
-            for (size_t ii = 0; ii < val.size() - 1; ++ii) {
+            for (size_t ii = 0; ii < val.size() - 1; ii+=2) {
                 CD.emplace_back(val[ii], val[ii + 1]);
             }
             return ValueConverter<std::vector<std::complex<double>>>::convert(CD);

@@ -235,9 +235,11 @@ bool InputInfo::updateTimeUpTo(Time newTime)
 
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
+            ++index;
             continue;
         }
         if (currentValue->time > newTime) {
+            ++index;
             continue;
         }
         auto last = currentValue;
@@ -265,9 +267,11 @@ bool InputInfo::updateTimeNextIteration(Time newTime)
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
+            ++index;
             continue;
         }
         if (currentValue->time > newTime) {
+            ++index;
             continue;
         }
         auto last = currentValue;
@@ -305,9 +309,11 @@ bool InputInfo::updateTimeInclusive(Time newTime)
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
+            ++index;
             continue;
         }
         if (currentValue->time > newTime) {
+            ++index;
             continue;
         }
         auto last = currentValue;

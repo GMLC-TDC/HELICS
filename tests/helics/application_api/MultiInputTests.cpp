@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/helics_definitions.hpp"
 
+#include "helics/common/JsonProcessingFunctions.hpp"
+
 #include <future>
 #include <gtest/gtest.h>
 #ifndef HELICS_SHARED_LIBRARY
@@ -336,7 +338,7 @@ TEST_F(multiInput, sum)
 
     vFed1->requestNextStep();
     val = in1.getValue<double>();
-    EXPECT_DOUBLE_EQ(val, 15.0);
+    EXPECT_DOUBLE_EQ(val, 17.0);
     pub3.publish(6.0);
     pub2.publish(std::vector<double>{3.0, 4.0});
     pub1.publish(5.0);
@@ -344,5 +346,237 @@ TEST_F(multiInput, sum)
     vFed1->requestNextStep();
     val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 18.0);
+    vFed1->finalize();
+}
+
+
+
+TEST_F(multiInput, average)
+{
+    using namespace helics;
+    SetupTest<ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<ValueFederate>(0);
+
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "vector");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
+
+    auto& in1 = vFed1->registerInput<double>("");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.addTarget("pub3");
+    in1.setOption(helics::defs::multi_input_handling_method,
+                  helics::multi_input_mode:: average_operation);
+    vFed1->enterExecutingMode();
+
+    pub1.publish(2.0);
+    vFed1->requestNextStep();
+    double val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 2.0);
+    pub3.publish(1.0);
+    pub2.publish(std::vector<double>{3.0, 5.0, 5.0, 2.0});
+
+    vFed1->requestNextStep();
+    val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 3.0);
+    pub3.publish(4.0);
+    pub2.publish(std::vector<double>{3.0, 4.0});
+    pub1.publish(5.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 4.0);
+    vFed1->finalize();
+}
+
+
+
+TEST_F(multiInput, diff)
+{
+    using namespace helics;
+    SetupTest<ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<ValueFederate>(0);
+
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+
+    auto& in1 = vFed1->registerInput<double>("");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.setOption(helics::defs::multi_input_handling_method,
+                  helics::multi_input_mode::diff_operation);
+    vFed1->enterExecutingMode();
+
+    pub1.publish(2.0);
+    vFed1->requestNextStep();
+    double val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 2.0);
+    pub2.publish(1.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 1.0);
+    pub1.publish(4.0);
+    pub2.publish(5.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, -1.0);
+    vFed1->finalize();
+}
+
+
+TEST_F(multiInput, vectorize)
+{
+    using namespace helics;
+    SetupTest<ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<ValueFederate>(0);
+
+     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "vector");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3");
+
+    auto& in1 = vFed1->registerInput<double>("");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.addTarget("pub3");
+    in1.setOption(helics::defs::multi_input_handling_method,
+                  helics::multi_input_mode::vectorize_operation);
+    vFed1->enterExecutingMode();
+
+    pub1.publish(2.0);
+    vFed1->requestNextStep();
+    auto val = in1.getValue<std::vector<double>>();
+    EXPECT_EQ(val.size(), 1U);
+    pub3.publish(1.0);
+    pub2.publish(std::vector<double>{3.0, 5.0, 5.0, 2.0});
+
+    vFed1->requestNextStep();
+    val = in1.getValue<std::vector<double>>();
+    EXPECT_EQ(val.size(),6U);
+    pub3.publish(4.0);
+    pub2.publish(std::vector<double>{3.0, 4.0});
+    pub1.publish(5.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<std::vector<double>>();
+    EXPECT_EQ(val.size(), 4U);
+    vFed1->finalize();
+}
+
+
+TEST_F(multiInput, vectorize_string)
+{
+    using namespace helics;
+    SetupTest<ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<ValueFederate>(0);
+
+    auto& pub1 = vFed1->registerGlobalPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "string");
+    auto& pub3 = vFed1->registerGlobalPublication < std::string> ("pub3");
+
+    auto& in1 = vFed1->registerInput<std::string>("");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.addTarget("pub3");
+    in1.setOption(helics::defs::multi_input_handling_method,
+                  helics::multi_input_mode::vectorize_operation);
+    vFed1->enterExecutingMode();
+
+    pub1.publish("test1");
+    vFed1->requestNextStep();
+    auto val = in1.getValue<std::string>();
+    EXPECT_EQ(val, "[\"test1\"]");
+    pub3.publish("test3");
+    pub2.publish("test2");
+
+    vFed1->requestNextStep();
+    val = in1.getValue<std::string>();
+    auto jv = loadJsonStr(val);
+
+    EXPECT_EQ(jv.size(), 3U);
+    EXPECT_STREQ(jv[0].asCString(), "test1");
+    EXPECT_STREQ(jv[1].asCString(), "test2");
+    EXPECT_STREQ(jv[2].asCString(), "test3");
+
+    vFed1->finalize();
+}
+
+
+TEST_F(multiInput, vectorizeComplex)
+{
+    using namespace helics;
+    SetupTest<ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<ValueFederate>(0);
+
+    auto& pub1 = vFed1->registerGlobalPublication<std::complex<double>>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication("pub2", "complex_vector");
+    auto& pub3 = vFed1->registerGlobalPublication<std::complex<double>>("pub3");
+
+    auto& in1 = vFed1->registerInput<std::vector<std::complex<double>>>("");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.addTarget("pub3");
+    in1.setOption(helics::defs::multi_input_handling_method,
+                  helics::multi_input_mode::vectorize_operation);
+    vFed1->enterExecutingMode();
+
+    pub1.publish(2.0);
+    vFed1->requestNextStep();
+    auto val = in1.getValue<std::vector<std::complex<double>>>();
+    EXPECT_EQ(val.size(), 1U);
+    pub3.publish(std::complex<double>{3.0,-1.2});
+    pub2.publish(std::vector<double>{3.0, 5.0, 5.0, 2.0});
+
+    vFed1->requestNextStep();
+    val = in1.getValue<std::vector<std::complex<double>>>();
+    EXPECT_EQ(val.size(),4U);
+    pub3.publish(4.0);
+    pub2.publish(std::vector<double>{3.0, 4.0});
+    pub1.publish(5.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<std::vector<std::complex<double>>>();
+    EXPECT_EQ(val.size(), 3U);
+    vFed1->finalize();
+}
+
+
+
+TEST_F(multiInput, max_units)
+{
+    using namespace helics;
+    SetupTest<ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<ValueFederate>(0);
+
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1","m");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2","ft");
+    auto& pub3 = vFed1->registerGlobalPublication<double>("pub3","in");
+
+    auto& in1 = vFed1->registerInput<double>("","m");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.addTarget("pub3");
+    in1.setOption(helics::defs::multi_input_handling_method,
+                  helics::multi_input_mode::max_operation);
+    vFed1->enterExecutingMode();
+
+    pub1.publish(1.0);
+    vFed1->requestNextStep();
+    double val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 1.0);
+    pub3.publish(32.0);
+    pub2.publish(3.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 1.0);
+    pub3.publish(60.0);
+    pub2.publish(4.0);
+    pub1.publish(2.0);
+
+    vFed1->requestNextStep();
+    val = in1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 2.0);
     vFed1->finalize();
 }
