@@ -124,13 +124,11 @@ namespace defs {
         buffer_data = helics_handle_option_buffer_data,
         ignore_interrupts = helics_handle_option_ignore_interrupts,
         strict_type_checking = helics_handle_option_strict_type_checking,
-        ignore_unit_mismatch =
-            helics_handle_option_ignore_unit_mismatch,
-        multi_input_handling_method =
-                helics_handle_option_multi_input_handling_method,
-        input_priority_location=helics_handle_option_input_priority_location,
+        ignore_unit_mismatch = helics_handle_option_ignore_unit_mismatch,
+        multi_input_handling_method = helics_handle_option_multi_input_handling_method,
+        input_priority_location = helics_handle_option_input_priority_location,
         clear_priority_list = helics_handle_option_clear_priority_list,
-        connections=helics_handle_option_connections
+        connections = helics_handle_option_connections
     };
 
 }  // namespace defs

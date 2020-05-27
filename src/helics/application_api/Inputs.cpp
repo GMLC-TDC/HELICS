@@ -260,40 +260,35 @@ static defV diffOperation(const std::vector<defV>& vals)
 static defV vectorizeOperation(const std::vector<defV>& vals)
 {
     switch (vals.front().index()) {
-        case vector_loc:
-            {
-            if (vals.empty())
-            {
+        case vector_loc: {
+            if (vals.empty()) {
                 return std::vector<double>();
             }
             std::vector<double> res;
-            for (const auto &val:vals) {
+            for (const auto& val : vals) {
                 const auto& v = mpark::get<std::vector<double>>(val);
                 res.insert(res.end(), v.begin(), v.end());
-                }
-            return res;
             }
+            return res;
+        }
         case string_loc: {
-                if (vals.empty()) {
-                    return std::string{};
-                }
-                std::string res = "[";
-                for (const auto& val : vals) {
-                    const auto& v = mpark::get <std::string> (val);
-                    res.push_back('"');
-                    res.append(v);
-                    res.push_back('"');
-                    res.push_back(',');
-                }
-                if (res.back() == ',')
-                {
-                    res.back() = ']';
-                }
-                else
-                {
-                    res.push_back(']');
-                }
-                return res;
+            if (vals.empty()) {
+                return std::string{};
+            }
+            std::string res = "[";
+            for (const auto& val : vals) {
+                const auto& v = mpark::get<std::string>(val);
+                res.push_back('"');
+                res.append(v);
+                res.push_back('"');
+                res.push_back(',');
+            }
+            if (res.back() == ',') {
+                res.back() = ']';
+            } else {
+                res.push_back(']');
+            }
+            return res;
         }
         case complex_vector_loc: {
             if (vals.empty()) {
@@ -673,15 +668,12 @@ void Input::loadSourceInformation()
     injectionType = getTypeFromString(iType);
     if ((injectionType == data_type::helics_multi) || (!iUnits.empty() && iUnits.front() == '[')) {
         sourceTypes.clear();
-        if (injectionType == data_type::helics_multi)
-        {
+        if (injectionType == data_type::helics_multi) {
             auto jvalue = loadJsonStr(iType);
             for (auto& res : jvalue) {
                 sourceTypes.emplace_back(getTypeFromString(res.asCString()), nullptr);
             }
-        }
-        else
-        {
+        } else {
             auto iValue = loadJsonStr(iType);
             sourceTypes.resize(iValue.size(), {injectionType, nullptr});
         }

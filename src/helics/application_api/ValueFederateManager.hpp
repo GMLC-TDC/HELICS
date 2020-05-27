@@ -186,7 +186,8 @@ class ValueFederateManager {
     @param inp  the id to register the callback for
     @param callback the function to call
     */
-    static void setInputNotificationCallback(const Input& inp, std::function<void(Input&, Time)> callback);
+    static void setInputNotificationCallback(const Input& inp,
+                                             std::function<void(Input&, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect();
