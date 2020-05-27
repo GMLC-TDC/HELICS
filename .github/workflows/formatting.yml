@@ -26,7 +26,7 @@ jobs:
       with:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
-    - uses: pre-commit/action@v1
+    - uses: pre-commit/action@v1.1.0
     - name: Stage changed files
       if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
       shell: bash --noprofile --norc {0}
