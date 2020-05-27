@@ -431,6 +431,9 @@ class HELICS_CXX_EXPORT Input {
     /** get the HELICS data type for the input*/
     data_type getHelicsType() const { return targetType; }
 
+    /** get the HELICS data type for the publication*/
+    data_type getHelicsInjectionType() const { return injectionType; }
+
     multi_input_mode getMultiInputMode() const { return inputVectorOp; }
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);

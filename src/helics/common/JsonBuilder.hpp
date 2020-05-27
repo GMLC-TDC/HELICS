@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace Json {
 class Value;
@@ -60,6 +61,8 @@ class JsonBuilder {
     void addElement(const std::string& path, const std::string& value);
     /** add a double element on a specific path*/
     void addElement(const std::string& path, double value);
+    /** add a vector element on a specific path*/
+    void addElement(const std::string& path, const std::vector<double>& value);
     /** generate the JSON value*/
     std::string generate();
     /** reset the builder*/

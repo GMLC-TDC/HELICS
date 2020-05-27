@@ -323,8 +323,15 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         for (const auto& inp : inputs.lock_shared()) {
             if (inp.isUpdated()) {
                 auto inpTemp = inp;
-                if (inpTemp.getHelicsType() == data_type::helics_double) {
+                auto iType = inpTemp.getHelicsType();
+                if (iType == data_type::helics_any || iType == data_type::helics_unknown)
+                {
+                    iType = inp.getHelicsInjectionType();
+                }
+                if (iType == data_type::helics_double) {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<double>());
+                } else if (iType == data_type::helics_vector) {
+                        JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::vector<double>>());
                 } else {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::string>());
                 }
@@ -336,9 +343,14 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         for (const auto& inp : inputs.lock_shared()) {
             auto inpTemp = inp;
             inpTemp.checkUpdate(true);
-
-            if (inpTemp.getHelicsType() == data_type::helics_double) {
+            auto iType = inpTemp.getHelicsType();
+            if (iType == data_type::helics_any || iType == data_type::helics_unknown) {
+                iType = inp.getHelicsInjectionType();
+            }
+            if (iType == data_type::helics_double) {
                 JB.addElement(inp.getDisplayName(), inpTemp.getValue<double>());
+            } else if (iType == data_type::helics_vector) {
+                JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::vector<double>>());
             } else {
                 JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::string>());
             }

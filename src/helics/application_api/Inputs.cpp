@@ -459,9 +459,9 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
             result = std::all_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
-                                     bool res;
-                                     valueExtract(val, res);
-                                     return res;
+                                     bool result;
+                                     valueExtract(val, result);
+                                     return result;
                                  }) ?
                 "1" :
                 "0";
@@ -470,9 +470,9 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
             result = std::any_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
-                                     bool res;
-                                     valueExtract(val, res);
-                                     return res;
+                                     bool result;
+                                     valueExtract(val, result);
+                                     return result;
                                  }) ?
                 "1" :
                 "0";
