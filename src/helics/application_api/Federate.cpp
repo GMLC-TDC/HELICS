@@ -1232,7 +1232,7 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
     }
 }
 
-void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool option_value)
+void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value)
 {
     if (coreObject) {
         coreObject->setHandleOption(handle, option, option_value);
@@ -1243,7 +1243,7 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool 
 }
 
 /** get the current value for an interface option*/
-bool Federate::getInterfaceOption(interface_handle handle, int32_t option)
+int Federate::getInterfaceOption(interface_handle handle, int32_t option)
 {
     return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
 }

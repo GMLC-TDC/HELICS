@@ -240,7 +240,7 @@ void Filter::removeTarget(const std::string& sourceName)
     corePtr->removeTarget(handle, sourceName);
 }
 
-void Filter::setOption(int32_t option, bool value)
+void Filter::setOption(int32_t option, int32_t value)
 {
     corePtr->setHandleOption(handle, option, value);
 }
@@ -253,7 +253,7 @@ void Filter::close()
 }
 
 /** get the current value of a flag for the handle*/
-bool Filter::getOption(int32_t option) const
+int32_t Filter::getOption(int32_t option) const
 {
     return corePtr->getHandleOption(handle, option);
 }

@@ -43,15 +43,16 @@ struct publication_info {
 };
 /** structure used to contain information about a subscription*/
 struct input_info {
+    interface_handle coreID;  //!< Handle from the core
+    input_id_t id;  //!< the id used as the identifier
     data_view lastData;  //!< the last published data from a target
     Time lastUpdate{0.0};  //!< the time the subscription was last updated
     Time lastQuery{0.0};  //!< the time the query was made
-    std::string name;  //!< subscription name
-    std::string type;  //!< subscription type
-    std::string units;  //!< subscription units
+    int sourceIndex{0};  //!< the index of the data source for multi-source inputs
+    std::string name;  //!< input name
+    std::string type;  //!< input type
+    std::string units;  //!< input units
     std::string pubtype;  //!< the listed type of the corresponding publication
-    interface_handle coreID;  //!< Handle from the core
-    input_id_t id;  //!< the id used as the identifier
 
     std::function<void(Input&, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
@@ -129,9 +130,9 @@ class ValueFederateManager {
     void publish(const Publication& pub, const data_view& block);
 
     /** check if a given subscription has and update*/
-    bool hasUpdate(const Input& inp) const;
+    static bool hasUpdate(const Input& inp);
     /** get the time of the last update*/
-    Time getLastUpdateTime(const Input& inp) const;
+    static Time getLastUpdateTime(const Input& inp);
 
     /** update the time from oldTime to newTime
     @param newTime the newTime of the federate
@@ -185,7 +186,7 @@ class ValueFederateManager {
     @param inp  the id to register the callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback(const Input& inp, std::function<void(Input&, Time)> callback);
+    static void setInputNotificationCallback(const Input& inp, std::function<void(Input&, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect();
@@ -200,7 +201,7 @@ class ValueFederateManager {
     /** clear an input value as updated without actually retrieving it
     @param inp the identifier for the subscription
     */
-    void clearUpdate(const Input& inp);
+    static void clearUpdate(const Input& inp);
 
   private:
     shared_guarded_m<

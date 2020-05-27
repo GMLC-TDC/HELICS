@@ -136,9 +136,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::string& getHandleName(interface_handle handle) const override final;
 
     virtual void
-        setHandleOption(interface_handle handle, int32_t option, bool option_value) override final;
+        setHandleOption(interface_handle handle, int32_t option, int32_t option_value) override final;
 
-    virtual bool getHandleOption(interface_handle handle, int32_t option) const override final;
+    virtual int32_t getHandleOption(interface_handle handle, int32_t option) const override final;
     virtual void closeHandle(interface_handle handle) override final;
     virtual void removeTarget(interface_handle handle,
                               const std::string& targetToRemove) override final;
@@ -150,8 +150,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::string& getInjectionType(interface_handle handle) const override final;
     virtual const std::string& getExtractionType(interface_handle handle) const override final;
     virtual void setValue(interface_handle handle, const char* data, uint64_t len) override final;
-    virtual std::shared_ptr<const data_block> getValue(interface_handle handle) override final;
-    virtual std::vector<std::shared_ptr<const data_block>>
+    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle,
+                                                              uint32_t* inputIndex) override final;
+    virtual const std::vector<std::shared_ptr<const data_block>>&
         getAllValues(interface_handle handle) override final;
     virtual const std::vector<interface_handle>&
         getValueUpdates(local_federate_id federateID) override final;

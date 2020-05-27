@@ -146,13 +146,13 @@ const BasicHandleInfo* HandleManager::findHandle(global_handle fed_id) const
     }
     return nullptr;
 }
-void HandleManager::setHandleOption(interface_handle handle, int option, bool val)
+void HandleManager::setHandleOption(interface_handle handle, int32_t option, int32_t val)
 {
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         switch (option) {
             case helics_handle_option_connection_required:
-                if (val) {
+                if (val!=0) {
                     clearActionFlag(handles[index], optional_flag);
                     setActionFlag(handles[index], required_flag);
                 } else {
@@ -160,7 +160,7 @@ void HandleManager::setHandleOption(interface_handle handle, int option, bool va
                 }
                 break;
             case helics_handle_option_connection_optional:
-                if (val) {
+                if (val!=0) {
                     clearActionFlag(handles[index], required_flag);
                     setActionFlag(handles[index], optional_flag);
                 } else {
@@ -173,26 +173,32 @@ void HandleManager::setHandleOption(interface_handle handle, int option, bool va
     }
 }
 
-bool HandleManager::getHandleOption(interface_handle handle, int option) const
+int32_t HandleManager::getHandleOption(interface_handle handle, int32_t option) const
 {
     auto index = handle.baseValue();
+    bool rvalue{false};
     if (isValidIndex(index, handles)) {
         switch (option) {
             case helics_handle_option_only_update_on_change:
-                return checkActionFlag(handles[index], extra_flag1);
+                rvalue=checkActionFlag(handles[index], extra_flag1);
+                break;
             case helics_handle_option_only_transmit_on_change:
-                return checkActionFlag(handles[index], extra_flag2);
+                rvalue = checkActionFlag(handles[index], extra_flag2);
+                break;
             case helics_handle_option_connection_required:
-                return checkActionFlag(handles[index], required_flag);
+                rvalue = checkActionFlag(handles[index], required_flag);
+                break;
             case helics_handle_option_connection_optional:
-                return checkActionFlag(handles[index], optional_flag);
+                rvalue = checkActionFlag(handles[index], optional_flag);
+                break;
             case helics_handle_option_single_connection_only:
-                return checkActionFlag(handles[index], extra_flag4);
+                rvalue = checkActionFlag(handles[index], extra_flag4);
+                break;
             default:
-                return false;
+                break;
         }
     }
-    return false;
+    return rvalue;
 }
 
 BasicHandleInfo* HandleManager::getEndpoint(const std::string& name)

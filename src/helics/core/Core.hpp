@@ -440,13 +440,13 @@ class Core {
      *@param option the option to set
      *@param option_value the value to set the option (mostly 0 or 1)
      */
-    virtual void setHandleOption(interface_handle handle, int32_t option, bool option_value) = 0;
+    virtual void setHandleOption(interface_handle handle, int32_t option, int32_t option_value) = 0;
 
     /** get a handle option
     @param handle the handle from the publication, input, endpoint or filter
     @param option the option to set see /ref defs::options
     */
-    virtual bool getHandleOption(interface_handle handle, int32_t option) const = 0;
+    virtual int32_t getHandleOption(interface_handle handle, int32_t option) const = 0;
 
     /** close a handle from further connections
     @param handle the handle from the publication, input, endpoint or filter
@@ -463,14 +463,16 @@ class Core {
 
     /**
      * Return the data for the specified handle or the latest input
-     *
+     * @param handle the input handle from which to get the data
+     * @param[out] inputIndex return the index of input (always 1 for inputs with only a single source)
      */
-    virtual std::shared_ptr<const data_block> getValue(interface_handle handle) = 0;
+    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle, uint32_t *inputIndex=nullptr) = 0;
+
     /**
-     * Return all the data for the specified handle or the latest input
+     * Return all the available data for the specified handle or the latest input
      *
      */
-    virtual std::vector<std::shared_ptr<const data_block>>
+    virtual const std::vector<std::shared_ptr<const data_block>>&
         getAllValues(interface_handle handle) = 0;
 
     /**

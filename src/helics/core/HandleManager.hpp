@@ -68,9 +68,9 @@ class HandleManager {
     /** find a const handle from both the federate and local id*/
     const BasicHandleInfo* findHandle(global_handle id) const;
 
-    void setHandleOption(interface_handle handle, int option, bool val);
+    void setHandleOption(interface_handle handle, int32_t option, int32_t val);
 
-    bool getHandleOption(interface_handle handle, int option) const;
+    int32_t getHandleOption(interface_handle handle, int32_t option) const;
     /** get an endpoint from its name*/
     BasicHandleInfo* getEndpoint(const std::string& name);
     /** get an endpoint from its name*/

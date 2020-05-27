@@ -115,14 +115,14 @@ class HELICS_CXX_EXPORT Filter {
     /** remove a sourceEndpoint to the list of endpoint to clone*/
     virtual void removeTarget(const std::string& sourceName);
     /** set an interface option for a filter*/
-    void setOption(int32_t option, bool value);
+    void setOption(int32_t option, int32_t value);
     /** close a filter during an active simulation
     @details it is not necessary to call this function unless you are continuing the simulation
     after the close*/
     void close();
 
     /** get the current value of a flag for the handle*/
-    bool getOption(int32_t option) const;
+    int32_t getOption(int32_t option) const;
 
   protected:
     /** set a filter operations object */

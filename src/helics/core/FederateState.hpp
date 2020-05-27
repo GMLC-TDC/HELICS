@@ -42,7 +42,7 @@ constexpr Time initialTime{-1000000.0};
 class FederateState {
   public:
     /** constructor from name and information structure*/
-    FederateState(const std::string& name_, const CoreFederateInfo& info_);
+    FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo);
     // the destructor is defined so some classes linked with unique ptrs don't have to be defined in
     // the header
     /** DISABLE_COPY_AND_ASSIGN */
@@ -163,6 +163,20 @@ class FederateState {
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
     std::unique_ptr<Message> receiveAny(interface_handle& id);
+    /**
+     * Return the data for the specified handle or the latest input
+     *
+     */
+    const std::shared_ptr<const data_block>& getValue(interface_handle handle,
+                                                      uint32_t* inputIndex);
+
+    /**
+     * Return all the available data for the specified handle or the latest input
+     *
+     */
+    const std::vector<std::shared_ptr<const data_block>>&
+        getAllValues(interface_handle handle);
+
     /** set the CommonCore object that is managing this Federate*/
     void setParent(CommonCore* coreObject) { parent_ = coreObject; }
     /** update the info structure
@@ -183,7 +197,7 @@ class FederateState {
     /** get an option flag value*/
     bool getOptionFlag(int optionFlag) const;
     /** get the currently active option for a handle*/
-    bool getHandleOption(interface_handle handle, char iType, int32_t option) const;
+    int32_t getHandleOption(interface_handle handle, char iType, int32_t option) const;
     /** get the currently active interface flags*/
     uint16_t getInterfaceFlags() const { return interfaceFlags.load(); }
     /** get an option flag value*/
