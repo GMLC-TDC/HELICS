@@ -84,7 +84,7 @@ class InputInfo {
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;  //!< indicator that the source has been deactivated
     std::vector<sourceInformation> source_info;  //!< the name,type,units of the sources
-    std::vector<int32_t> priority_sources;  //!< the list or priority inputs;
+    std::vector<int32_t> priority_sources;  //!< the list of priority inputs;
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 

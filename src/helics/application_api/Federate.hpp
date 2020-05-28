@@ -535,7 +535,7 @@ class HELICS_CXX_EXPORT Federate {
     /** set an interface option
     @param handle the handle of an interface to modify
     @param option the option field to modify
-    @param option_value the value to set(default to 1 or true most options are boolean but some
+    @param option_value the value to set (defaults to 1 or true), most options are boolean but some
     allow for other values
     */
     void setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value = 1);
