@@ -21,7 +21,7 @@ class precise_unit;
 
 namespace helics {
 
-enum multi_input_mode : int32_t {
+enum multi_input_mode : uint16_t {
     no_op = 0,
     and_operation = 1,
     or_operation = 2,
@@ -50,14 +50,15 @@ class HELICS_CXX_EXPORT Input {
     bool hasUpdate{false};  //!< the value has been updated
     bool disableAssign{false};  //!< disable assignment for the object
     bool useThreshold{false};  //!< flag to indicate use a threshold for binary output
+    bool multiUnits{false};  //!< flag indicating there are multiple Input Units
     multi_input_mode inputVectorOp{
         multi_input_mode::no_op};  //!< the vector processing method to use
     int32_t prevInputCount{0};  //!< the previous number of inputs
     size_t customTypeHash{0U};  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
-    std::shared_ptr<units::precise_unit> outputUnits;
-    std::shared_ptr<units::precise_unit> inputUnits;
-    std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>> sourceTypes;
+    std::shared_ptr<units::precise_unit> outputUnits;  //!< the target output units
+    std::shared_ptr<units::precise_unit> inputUnits;  //!< the units of the linked publications
+    std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>> sourceTypes;  //!< source information for input sources
     double delta{-1.0};  //!< the minimum difference
     double threshold{0.0};  //!< the threshold to use for binary decisions
     std::string actualName;  //!< the name of the Input

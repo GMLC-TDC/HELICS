@@ -141,7 +141,7 @@ Y varDiff(const std::vector<defV>& vals, const OP& op)
 template<class X>
 size_t varMaxIndex(const std::vector<defV>& vals, std::function<double(const X&)> op)
 {
-    double dmax = invalidDouble;
+    double dmax = -std::numeric_limits<double>::max();
     size_t index{0};
     size_t mxIndex{0};
     for (auto& dval : vals) {
@@ -170,7 +170,7 @@ X varMin(const std::vector<defV>& vals)
 template<class X>
 size_t varMinIndex(const std::vector<defV>& vals, std::function<double(const X&)> op)
 {
-    double dmin = -invalidDouble;
+    double dmin = std::numeric_limits<double>::max();
     size_t index{0};
     size_t mnIndex{0};
     for (auto& dval : vals) {
@@ -400,7 +400,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
                 sourceTypes[ii].first :
                 injectionType;
 
-            const auto& localUnits = (injectionType == helics::data_type::helics_multi) ?
+            const auto& localUnits = (multiUnits) ?
                 sourceTypes[ii].second :
                 inputUnits;
             if (localTargetType == helics::data_type::helics_double) {
@@ -663,6 +663,7 @@ void Input::loadSourceInformation()
     if (targetType == data_type::helics_unknown) {
         targetType = getTypeFromString(fed->getExtractionType(*this));
     }
+    multiUnits = false;
     const auto& iType = fed->getInjectionType(*this);
     const auto& iUnits = fed->getInjectionUnits(*this);
     injectionType = getTypeFromString(iType);
@@ -679,7 +680,8 @@ void Input::loadSourceInformation()
         }
         if (!iUnits.empty()) {
             if (iUnits.front() == '[') {
-                auto iValue = loadJsonStr(iType);
+                multiUnits = true;
+                auto iValue = loadJsonStr(iUnits);
                 int ii{0};
                 for (auto& res : iValue) {
                     auto str = res.asString();
