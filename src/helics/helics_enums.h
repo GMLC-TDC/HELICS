@@ -230,9 +230,9 @@ typedef enum {
     helics_handle_option_ignore_interrupts = 475,
     /** specify the multi-input processing method for inputs*/
     helics_handle_option_multi_input_handling_method = 507,
-    /** specify the input with highest priority*/
+    /** specify the source index with the highest priority*/
     helics_handle_option_input_priority_location = 510,
-    /** specify the input with priority*/
+    /** specify that the priority list should be cleared or question if it is cleared*/
     helics_handle_option_clear_priority_list = 512,
     /** specify the required number of connections or get the actual number of connections*/
     helics_handle_option_connections = 522

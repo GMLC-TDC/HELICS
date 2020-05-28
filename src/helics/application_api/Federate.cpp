@@ -1243,7 +1243,7 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32
 }
 
 /** get the current value for an interface option*/
-int Federate::getInterfaceOption(interface_handle handle, int32_t option)
+int32_t Federate::getInterfaceOption(interface_handle handle, int32_t option)
 {
     return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
 }

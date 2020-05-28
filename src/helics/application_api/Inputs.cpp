@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units/units.hpp"
 
 #include <algorithm>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -275,20 +276,12 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
             if (vals.empty()) {
                 return std::string{};
             }
-            std::string res = "[";
+            Json::Value svect = Json::arrayValue;
             for (const auto& val : vals) {
-                const auto& v = mpark::get<std::string>(val);
-                res.push_back('"');
-                res.append(v);
-                res.push_back('"');
-                res.push_back(',');
+                svect.append(mpark::get<std::string>(val));
             }
-            if (res.back() == ',') {
-                res.back() = ']';
-            } else {
-                res.push_back(']');
-            }
-            return res;
+            
+            return generateJsonString(svect);
         }
         case complex_vector_loc: {
             if (vals.empty()) {

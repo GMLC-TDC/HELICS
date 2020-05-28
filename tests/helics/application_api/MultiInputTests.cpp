@@ -471,7 +471,7 @@ TEST_F(multiInput, vectorize_string)
     pub1.publish("test1");
     vFed1->requestNextStep();
     auto val = in1.getValue<std::string>();
-    EXPECT_EQ(val, "[\"test1\"]");
+    EXPECT_EQ(val, "[ \"test1\" ]");
     pub3.publish("test3");
     pub2.publish("test2");
 
