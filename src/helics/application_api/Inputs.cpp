@@ -400,9 +400,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
                 sourceTypes[ii].first :
                 injectionType;
 
-            const auto& localUnits = (multiUnits) ?
-                sourceTypes[ii].second :
-                inputUnits;
+            const auto& localUnits = (multiUnits) ? sourceTypes[ii].second : inputUnits;
             if (localTargetType == helics::data_type::helics_double) {
                 res.push_back(doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
             } else if (localTargetType == helics::data_type::helics_int) {

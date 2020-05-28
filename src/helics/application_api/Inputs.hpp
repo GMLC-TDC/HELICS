@@ -42,8 +42,7 @@ class HELICS_CXX_EXPORT Input {
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
 
-    data_type targetType{
-        data_type::helics_unknown};  //!< the underlying type the input targets
+    data_type targetType{data_type::helics_unknown};  //!< the underlying type the input targets
     data_type injectionType{
         data_type::helics_unknown};  //!< the type of data coming from the publication
     bool changeDetectionEnabled{false};  //!< the change detection is enabled
@@ -58,7 +57,8 @@ class HELICS_CXX_EXPORT Input {
     defV lastValue;  //!< the last value updated
     std::shared_ptr<units::precise_unit> outputUnits;  //!< the target output units
     std::shared_ptr<units::precise_unit> inputUnits;  //!< the units of the linked publications
-    std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>> sourceTypes;  //!< source information for input sources
+    std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>>
+        sourceTypes;  //!< source information for input sources
     double delta{-1.0};  //!< the minimum difference
     double threshold{0.0};  //!< the threshold to use for binary decisions
     std::string actualName;  //!< the name of the Input

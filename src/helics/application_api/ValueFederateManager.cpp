@@ -324,14 +324,13 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
             if (inp.isUpdated()) {
                 auto inpTemp = inp;
                 auto iType = inpTemp.getHelicsType();
-                if (iType == data_type::helics_any || iType == data_type::helics_unknown)
-                {
+                if (iType == data_type::helics_any || iType == data_type::helics_unknown) {
                     iType = inp.getHelicsInjectionType();
                 }
                 if (iType == data_type::helics_double) {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<double>());
                 } else if (iType == data_type::helics_vector) {
-                        JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::vector<double>>());
+                    JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::vector<double>>());
                 } else {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::string>());
                 }
