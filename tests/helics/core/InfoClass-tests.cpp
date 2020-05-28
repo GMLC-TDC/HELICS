@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BasicHandleInfo.hpp"
 #include "helics/core/EndpointInfo.hpp"
 #include "helics/core/FilterInfo.hpp"
-#include "helics/core/NamedInputInfo.hpp"
+#include "helics/core/InputInfo.hpp"
 
 #include "gtest/gtest.h"
 
@@ -284,11 +284,11 @@ TEST(InfoClass_tests, inputinfo_test)
 
     std::shared_ptr<const helics::data_block> ret_data;
 
-    helics::NamedInputInfo subI(helics::global_handle(helics::global_federate_id(5),
-                                                      helics::interface_handle(13)),
-                                "key",
-                                "type",
-                                "units");
+    helics::InputInfo subI(helics::global_handle(helics::global_federate_id(5),
+                                                 helics::interface_handle(13)),
+                           "key",
+                           "type",
+                           "units");
     EXPECT_EQ(subI.id.handle.baseValue(), 13);
     EXPECT_EQ(subI.id.fed_id.baseValue(), 5);
     EXPECT_EQ(subI.key, "key");
