@@ -280,7 +280,7 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
             for (const auto& val : vals) {
                 svect.append(mpark::get<std::string>(val));
             }
-            
+
             return generateJsonString(svect);
         }
         case complex_vector_loc: {
