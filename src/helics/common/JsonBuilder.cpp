@@ -112,8 +112,7 @@ void JsonBuilder::addElement(const std::string& path, double value)
     (*jv)[res.back()] = value;
 }
 
-
-void JsonBuilder::addElement(const std::string& path, const std::vector<double> &value)
+void JsonBuilder::addElement(const std::string& path, const std::vector<double>& value)
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
@@ -127,8 +126,7 @@ void JsonBuilder::addElement(const std::string& path, const std::vector<double> 
         jv = &(*jv)[res[ii]];
     }
     (*jv)[res.back()] = Json::arrayValue;
-    for (auto &v : value)
-    {
+    for (auto& v : value) {
         (*jv)[res.back()].append(v);
     }
 }
