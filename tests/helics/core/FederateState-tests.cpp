@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/EndpointInfo.hpp"
 #include "helics/core/FederateState.hpp"
 #include "helics/core/FilterInfo.hpp"
-#include "helics/core/NamedInputInfo.hpp"
+#include "helics/core/InputInfo.hpp"
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/helics_definitions.hpp"
 
@@ -40,12 +40,12 @@ TEST_F(federateStateTests, constructor_test)
     EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::source_only), false);
 
     // Check other default state values
-    EXPECT_EQ(fs->getQueueSize(), 0u);
-    EXPECT_EQ(fs->getEvents().size(), 0u);
+    EXPECT_EQ(fs->getQueueSize(), 0U);
+    EXPECT_EQ(fs->getEvents().size(), 0U);
 
     // EXPECT_EQ(fs->message_queue.size(), 0);
     // EXPECT_EQ(fs->dependencies.size(), 0);
-    EXPECT_EQ(fs->getDependents().size(), 0u);
+    EXPECT_EQ(fs->getDependents().size(), 0U);
     EXPECT_TRUE(fs->local_id == helics::local_federate_id{});
     EXPECT_TRUE(fs->global_id.load() == helics::global_federate_id{});
     EXPECT_EQ(fs->init_requested, false);
@@ -68,7 +68,7 @@ TEST_F(federateStateTests, create_input_test)
     fs->interfaces().createInput(interface_handle(3), "last", "type", "units");
     fs->interfaces().createInput(interface_handle(2), "cut-in-line", "type", "units");
 
-    helics::NamedInputInfo* info;
+    helics::InputInfo* info;
 
     // Check first subscription
     info = fs->interfaces().getInput("first!");

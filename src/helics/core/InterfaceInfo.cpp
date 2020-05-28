@@ -46,7 +46,8 @@ void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
 {
     if (updateFlag != only_update_on_change) {
         only_update_on_change = updateFlag;
-        for (auto& ip : inputs.lock()) {
+        // ip is a reference to a unique_ptr
+        for (auto& ip : inputs.lock()) {  // NOLINT(readability-qualified-auto)
             ip->only_update_on_change = updateFlag;
         }
     }
@@ -72,22 +73,22 @@ PublicationInfo* InterfaceInfo::getPublication(interface_handle handle)
     return publications.lock()->find(handle);
 }
 
-const NamedInputInfo* InterfaceInfo::getInput(const std::string& inputName) const
+const InputInfo* InterfaceInfo::getInput(const std::string& inputName) const
 {
     return inputs.lock_shared()->find(inputName);
 }
 
-const NamedInputInfo* InterfaceInfo::getInput(interface_handle handle) const
+const InputInfo* InterfaceInfo::getInput(interface_handle handle) const
 {
     return inputs.lock()->find(handle);
 }
 
-NamedInputInfo* InterfaceInfo::getInput(const std::string& inputName)
+InputInfo* InterfaceInfo::getInput(const std::string& inputName)
 {
     return inputs.lock()->find(inputName);
 }
 
-NamedInputInfo* InterfaceInfo::getInput(interface_handle handle)
+InputInfo* InterfaceInfo::getInput(interface_handle handle)
 {
     return inputs.lock()->find(handle);
 }
@@ -112,36 +113,46 @@ EndpointInfo* InterfaceInfo::getEndpoint(interface_handle handle)
     return endpoints.lock()->find(handle);
 }
 
-bool InterfaceInfo::setInputProperty(interface_handle id, int option, bool value)
+bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_t value)
 {
-    auto ipt = getInput(id);
+    auto* ipt = getInput(id);
     if (ipt == nullptr) {
         return false;
     }
+    bool bvalue = (value != 0);
     switch (option) {
         case defs::options::ignore_interrupts:
-            ipt->not_interruptible = value;
+            ipt->not_interruptible = bvalue;
             break;
         case defs::options::handle_only_update_on_change:
-            ipt->only_update_on_change = value;
+            ipt->only_update_on_change = bvalue;
             break;
         case defs::options::connection_required:
-            ipt->required = value;
+            ipt->required = bvalue;
             break;
         case defs::options::connection_optional:
-            ipt->required = !value;
+            ipt->required = !bvalue;
             break;
         case defs::options::single_connection_only:
-            ipt->single_source = value;
+            ipt->required_connnections = bvalue ? 1 : 0;
             break;
         case defs::options::multiple_connections_allowed:
-            ipt->single_source = !value;
+            ipt->required_connnections = bvalue ? 0 : 1;
             break;
         case defs::options::strict_type_checking:
-            ipt->strict_type_matching = value;
+            ipt->strict_type_matching = bvalue;
             break;
         case defs::options::ignore_unit_mismatch:
-            ipt->ignore_unit_mismatch = value;
+            ipt->ignore_unit_mismatch = bvalue;
+            break;
+        case defs::options::connections:
+            ipt->required_connnections = value;
+            break;
+        case defs::options::input_priority_location:
+            ipt->priority_sources.push_back(value);
+            break;
+        case defs::options::clear_priority_list:
+            ipt->priority_sources.clear();
             break;
         default:
             return false;
@@ -150,30 +161,34 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int option, bool value
     return true;
 }
 
-bool InterfaceInfo::setPublicationProperty(interface_handle id, int option, bool value)
+bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, int32_t value)
 {
-    auto pub = getPublication(id);
+    auto* pub = getPublication(id);
     if (pub == nullptr) {
         return false;
     }
+    bool bvalue = (value != 0);
     switch (option) {
         case defs::options::handle_only_transmit_on_change:
-            pub->only_update_on_change = value;
+            pub->only_update_on_change = bvalue;
             break;
         case defs::options::connection_required:
-            pub->required = value;
+            pub->required = bvalue;
             break;
         case defs::options::connection_optional:
-            pub->required = !value;
+            pub->required = !bvalue;
             break;
         case defs::options::single_connection_only:
-            pub->single_destination = value;
+            pub->required_connections = bvalue ? 1 : 0;
             break;
         case defs::options::multiple_connections_allowed:
-            pub->single_destination = !value;
+            pub->required_connections = !bvalue ? 0 : 1;
             break;
         case defs::options::buffer_data:
-            pub->buffer_data = value;
+            pub->buffer_data = bvalue;
+            break;
+        case defs::options::connections:
+            pub->required_connections = value;
             break;
         default:
             return false;
@@ -182,90 +197,104 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int option, bool
     return true;
 }
 
-bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/, int /*option*/, bool /*value*/)
+bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
+                                        int32_t /*option*/,
+                                        int32_t /*value*/)  // NOLINT
 {
+    // there will likely be some future properties
     // auto ept = getEndpoint (id);
     // currently no properties on endpoints
     return false;
 }
 
-bool InterfaceInfo::getInputProperty(interface_handle id, int option) const
+int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) const
 {
     auto ipt = getInput(id);
     if (ipt == nullptr) {
-        return false;
+        return 0;
     }
+    bool flagval = false;
     switch (option) {
         case defs::options::ignore_interrupts:
-            return ipt->not_interruptible;
+            flagval = ipt->not_interruptible;
             break;
         case defs::options::handle_only_update_on_change:
-            return ipt->only_update_on_change;
+            flagval = ipt->only_update_on_change;
             break;
         case defs::options::connection_required:
-            return ipt->required;
+            flagval = ipt->required;
             break;
         case defs::options::connection_optional:
-            return !ipt->required;
+            flagval = !ipt->required;
             break;
         case defs::options::single_connection_only:
-            return ipt->single_source;
+            flagval = (ipt->required_connnections == 1);
             break;
         case defs::options::multiple_connections_allowed:
-            return !ipt->single_source;
+            flagval = (ipt->required_connnections != 1);
             break;
         case defs::options::strict_type_checking:
-            return ipt->strict_type_matching;
+            flagval = ipt->strict_type_matching;
+            break;
+        case defs::options::connections:
+            return static_cast<int32_t>(ipt->input_sources.size());
+        case defs::options::input_priority_location:
+            return ipt->priority_sources.empty() ? -1 : ipt->priority_sources.back();
+        case defs::options::clear_priority_list:
+            flagval = ipt->priority_sources.empty();
             break;
         default:
-            return false;
             break;
     }
+    return flagval ? 1 : 0;
 }
 
-bool InterfaceInfo::getPublicationProperty(interface_handle id, int option) const
+int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t option) const
 {
     auto pub = getPublication(id);
     if (pub == nullptr) {
-        return false;
+        return 0;
     }
+    bool flagval = false;
     switch (option) {
         case defs::options::handle_only_transmit_on_change:
-            return pub->only_update_on_change;
+            flagval = pub->only_update_on_change;
             break;
         case defs::options::connection_required:
-            return pub->required;
+            flagval = pub->required;
             break;
         case defs::options::connection_optional:
-            return !pub->required;
+            flagval = !pub->required;
             break;
         case defs::options::single_connection_only:
-            return pub->single_destination;
+            flagval = (pub->required_connections == 1);
             break;
         case defs::options::multiple_connections_allowed:
-            return !pub->single_destination;
+            flagval = pub->required_connections != 1;
             break;
         case defs::options::buffer_data:
-            return pub->buffer_data;
+            flagval = pub->buffer_data;
             break;
+        case defs::options::connections:
+            return static_cast<int32_t>(pub->subscribers.size());
         default:
-            return false;
             break;
     }
+    return flagval ? 1 : 0;
 }
 
-bool InterfaceInfo::getEndpointProperty(interface_handle /*id*/, int /*option*/) const
+int32_t InterfaceInfo::getEndpointProperty(interface_handle /*id*/, int32_t /*option*/) const
 {
     // auto ept = getEndpoint (id);
     // currently no properties on endpoints
-    return false;
+    return 0;
 }
 
 std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues()
 {
     std::vector<std::pair<int, std::string>> issues;
     auto ihandle = inputs.lock();
-    for (auto& ipt : ihandle) {
+    for (const auto& ipt : ihandle) {
         if (ipt->required) {
             if (!ipt->has_target) {
                 issues.emplace_back(helics::defs::errors::connection_failure,
@@ -273,39 +302,49 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 ipt->key));
             }
         }
-        if (ipt->single_source) {
-            if (ipt->input_sources.size() > 1) {
-                issues.emplace_back(
-                    helics::defs::errors::connection_failure,
-                    fmt::format("Input {} is single source only but has more than one connection",
-                                ipt->key));
+        if (ipt->required_connnections > 0) {
+            if (ipt->input_sources.size() != static_cast<size_t>(ipt->required_connnections)) {
+                if (ipt->required_connnections == 1) {
+                    issues.emplace_back(
+                        helics::defs::errors::connection_failure,
+                        fmt::format(
+                            "Input {} is single source only but has more than one connection",
+                            ipt->key));
+                } else {
+                    issues.emplace_back(
+                        helics::defs::errors::connection_failure,
+                        fmt::format("Input {} requires {} connections but only {} were made",
+                                    ipt->key,
+                                    ipt->required_connnections,
+                                    ipt->input_sources.size()));
+                }
             }
         }
         for (auto& source : ipt->source_info) {
-            if (!checkTypeMatch(ipt->type, std::get<1>(source), ipt->strict_type_matching)) {
+            if (!checkTypeMatch(ipt->type, source.type, ipt->strict_type_matching)) {
                 issues.emplace_back(
                     helics::defs::errors::connection_failure,
                     fmt::format(
                         "Input \"{}\" source has mismatched types: {} is not compatible with {}",
                         ipt->key,
                         ipt->type,
-                        std::get<1>(source)));
+                        source.type));
             }
             if ((!ipt->ignore_unit_mismatch) &&
-                (!checkUnitMatch(ipt->units, std::get<2>(source), false))) {
+                (!checkUnitMatch(ipt->units, source.units, false))) {
                 issues.emplace_back(
                     helics::defs::errors::connection_failure,
                     fmt::format(
                         "Input \"{}\" source has incompatible unit: {} is not convertible to {}",
                         ipt->key,
-                        std::get<2>(source),
+                        source.units,
                         ipt->units));
             }
         }
     }
     ihandle.unlock();
     auto phandle = publications.lock();
-    for (auto& pub : phandle) {
+    for (const auto& pub : phandle) {
         if (pub->required) {
             if (pub->subscribers.empty()) {
                 issues.emplace_back(helics::defs::errors::connection_failure,
@@ -313,13 +352,22 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 pub->key));
             }
         }
-        if (pub->single_destination) {
-            if (pub->subscribers.size() > 1) {
-                issues.emplace_back(
-                    helics::defs::errors::connection_failure,
-                    fmt::format(
-                        "Publication {} is single source only but has more than one connection",
-                        pub->key));
+        if (pub->required_connections > 0) {
+            if (pub->subscribers.size() != static_cast<size_t>(pub->required_connections)) {
+                if (pub->required_connections == 1) {
+                    issues.emplace_back(
+                        helics::defs::errors::connection_failure,
+                        fmt::format(
+                            "Publication {} is single source only but has more than one connection",
+                            pub->key));
+                } else {
+                    issues.emplace_back(
+                        helics::defs::errors::connection_failure,
+                        fmt::format("Publication {} requires {} connections but only {} are made",
+                                    pub->key,
+                                    pub->required_connections,
+                                    pub->subscribers.size()));
+                }
             }
         }
     }
@@ -332,7 +380,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
         base["inputs"] = Json::arrayValue;
-        for (auto& ipt : ihandle) {
+        for (const auto& ipt : ihandle) {
             if (!ipt->key.empty()) {
                 Json::Value ibase;
                 ibase["key"] = ipt->key;
@@ -350,7 +398,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
         base["publications"] = Json::arrayValue;
-        for (auto& pub : phandle) {
+        for (const auto& pub : phandle) {
             if (!pub->key.empty()) {
                 Json::Value pbase;
                 pbase["key"] = pub->key;
@@ -369,7 +417,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
         base["endpoints"] = Json::arrayValue;
-        for (auto& ept : ehandle) {
+        for (const auto& ept : ehandle) {
             if (!ept->key.empty()) {
                 Json::Value ebase;
                 ebase["key"] = ept->key;
@@ -389,7 +437,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
         base["inputs"] = Json::arrayValue;
-        for (auto& ipt : ihandle) {
+        for (const auto& ipt : ihandle) {
             Json::Value ibase;
             if (!ipt->key.empty()) {
                 ibase["key"] = ipt->key;
@@ -412,7 +460,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
         base["publications"] = Json::arrayValue;
-        for (auto& pub : phandle) {
+        for (const auto& pub : phandle) {
             Json::Value pbase;
             if (!pub->key.empty()) {
                 pbase["key"] = pub->key;
@@ -436,7 +484,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
         base["endpoints"] = Json::arrayValue;
-        for (auto& ept : ehandle) {
+        for (const auto& ept : ehandle) {
             Json::Value ebase;
             ebase["federate"] = ept->id.fed_id.baseValue();
             ebase["handle"] = ept->id.handle.baseValue();
