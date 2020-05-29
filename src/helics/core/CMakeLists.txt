@@ -14,7 +14,7 @@ set(SRC_FILES
     CommonCore.cpp
     FederateState.cpp
     PublicationInfo.cpp
-    NamedInputInfo.cpp
+    InputInfo.cpp
     InterfaceInfo.cpp
     FilterInfo.cpp
     EndpointInfo.cpp
@@ -65,7 +65,7 @@ set(INCLUDE_FILES
     CommonCore.hpp
     FederateState.hpp
     PublicationInfo.hpp
-    NamedInputInfo.hpp
+    InputInfo.hpp
     EndpointInfo.hpp
     flagOperations.hpp
     BasicHandleInfo.hpp

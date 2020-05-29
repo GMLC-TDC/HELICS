@@ -311,7 +311,8 @@ void valueExtract(const defV& dv, std::vector<std::complex<double>>& val)
         case vector_loc:  // vector
         {
             const auto& v = std::get<std::vector<double>>(dv);
-            val.resize(v.size() / 2);
+            val.reserve(v.size() / 2);
+            val.clear();
             for (size_t ii = 0; ii < v.size() - 1; ii += 2) {
                 val.emplace_back(v[ii], v[ii + 1]);
             }
