@@ -1,7 +1,7 @@
-function v = helics_filter_type_clone()
+function v = helics_data_type_multi()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 99);
+    vInitialized = helicsMEX(0, 25);
   end
   v = vInitialized;
 end
