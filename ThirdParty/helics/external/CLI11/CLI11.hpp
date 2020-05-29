@@ -2501,14 +2501,20 @@ class ConfigBase : public Config {
     /// get the section
     const std::string& section() const { return configSection; }
     /// specify a particular section of the configuration file to use
-    void section(const std::string &sectionName) { configSection = sectionName; }
+    ConfigBase *section(const std::string &sectionName) {
+        configSection = sectionName;
+        return this;
+    }
 
     /// get a reference to the configuration index
     uint16_t& indexRef() { return configIndex; }
     /// get the section index
     uint16_t index() const { return configIndex; }
     /// specify a particular index in the section to use
-    void index(uint16_t sectionIndex) { configIndex = sectionIndex; }
+    ConfigBase *index(uint16_t sectionIndex) {
+        configIndex = sectionIndex;
+        return this;
+    }
 };
 
 /// the default Config is the TOML file format
@@ -4121,8 +4127,8 @@ class Option : public OptionBase<Option> {
     /// True if the option was not passed
     bool empty() const { return results_.empty(); }
 
-    /// This class is true if option is passed.
-    explicit operator bool() const { return !empty(); }
+    /// This bool operator returns true if any arguments were passed or the option callback is forced
+    explicit operator bool() const { return !empty() || force_callback_; }
 
     /// Clear the parsed results (mostly for testing)
     void clear() {
