@@ -124,6 +124,8 @@ helics_data_type_time = _helics.helics_data_type_time
 r""" time data type"""
 helics_data_type_raw = _helics.helics_data_type_raw
 r""" raw data type"""
+helics_data_type_multi = _helics.helics_data_type_multi
+r""" the data type can change"""
 helics_data_type_any = _helics.helics_data_type_any
 r""" open type that can be anything"""
 helics_flag_observer = _helics.helics_flag_observer
@@ -276,7 +278,7 @@ r""" specify that only a single connection is allowed for an interface"""
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 r""" specify that multiple connections are allowed for an interface"""
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
-r""" specify that the last data should be buffered and send on subscriptions after init"""
+r""" specify that the last data should be buffered and sent on subscriptions after init"""
 helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
 r""" specify that the types should be checked strictly for pub/sub and filters"""
 helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
@@ -287,6 +289,14 @@ helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_u
 r""" specify that an interface will only update if the value has actually changed"""
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
 r""" specify that an interface does not participate in determining time interrupts"""
+helics_handle_option_multi_input_handling_method = _helics.helics_handle_option_multi_input_handling_method
+r""" specify the multi-input processing method for inputs"""
+helics_handle_option_input_priority_location = _helics.helics_handle_option_input_priority_location
+r""" specify the source index with the highest priority"""
+helics_handle_option_clear_priority_list = _helics.helics_handle_option_clear_priority_list
+r""" specify that the priority list should be cleared or question if it is cleared"""
+helics_handle_option_connections = _helics.helics_handle_option_connections
+r""" specify the required number of connections or get the actual number of connections"""
 helics_filter_type_custom = _helics.helics_filter_type_custom
 r""" a custom filter type that executes a user defined callback"""
 helics_filter_type_delay = _helics.helics_filter_type_delay

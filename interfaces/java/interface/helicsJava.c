@@ -521,6 +521,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1raw_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1multi_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_data_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_data_type)helics_data_type_multi;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1any_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_data_type result;
@@ -1284,6 +1296,54 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1i
   (void)jenv;
   (void)jcls;
   result = (helics_handle_options)helics_handle_option_ignore_interrupts;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1multi_1input_1handling_1method_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_multi_input_handling_method;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1input_1priority_1location_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_input_priority_location;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1clear_1priority_1list_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_clear_priority_list;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1connections_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_connections;
   jresult = (jint)result; 
   return jresult;
 }
