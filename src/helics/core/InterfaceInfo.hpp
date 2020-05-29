@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "../common/GuardedTypes.hpp"
 #include "EndpointInfo.hpp"
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "federate_id_extra.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
@@ -29,10 +29,10 @@ class InterfaceInfo {
     const PublicationInfo* getPublication(interface_handle handle) const;
     PublicationInfo* getPublication(const std::string& pubName);
     PublicationInfo* getPublication(interface_handle handle);
-    const NamedInputInfo* getInput(const std::string& inputName) const;
-    const NamedInputInfo* getInput(interface_handle handle) const;
-    NamedInputInfo* getInput(const std::string& inputName);
-    NamedInputInfo* getInput(interface_handle handle);
+    const InputInfo* getInput(const std::string& inputName) const;
+    const InputInfo* getInput(interface_handle handle) const;
+    InputInfo* getInput(const std::string& inputName);
+    InputInfo* getInput(interface_handle handle);
     const EndpointInfo* getEndpoint(const std::string& endpointName) const;
     const EndpointInfo* getEndpoint(interface_handle handle) const;
     EndpointInfo* getEndpoint(const std::string& endpointName);
@@ -66,13 +66,13 @@ class InterfaceInfo {
     /** get the current value of the change update flag*/
     bool getChangeUpdateFlag() const { return only_update_on_change; }
     /** set a property on a specific interface*/
-    bool setInputProperty(interface_handle id, int option, bool value);
-    bool setPublicationProperty(interface_handle id, int option, bool value);
-    bool setEndpointProperty(interface_handle id, int option, bool value);
+    bool setInputProperty(interface_handle id, int32_t option, int32_t value);
+    bool setPublicationProperty(interface_handle id, int32_t option, int32_t value);
+    bool setEndpointProperty(interface_handle id, int32_t option, int32_t value);
     /** get properties for an interface*/
-    bool getInputProperty(interface_handle id, int option) const;
-    bool getPublicationProperty(interface_handle id, int option) const;
-    bool getEndpointProperty(interface_handle id, int option) const;
+    int32_t getInputProperty(interface_handle id, int32_t option) const;
+    int32_t getPublicationProperty(interface_handle id, int32_t option) const;
+    int32_t getEndpointProperty(interface_handle id, int32_t option) const;
 
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues();
@@ -92,7 +92,7 @@ class InterfaceInfo {
         gmlc::containers::DualMappedPointerVector<EndpointInfo, std::string, interface_handle>>
         endpoints;  //!< storage for all the endpoints
     shared_guarded<
-        gmlc::containers::DualMappedPointerVector<NamedInputInfo, std::string, interface_handle>>
+        gmlc::containers::DualMappedPointerVector<InputInfo, std::string, interface_handle>>
         inputs;  //!< storage for all the endpoints
 };
 }  // namespace helics
