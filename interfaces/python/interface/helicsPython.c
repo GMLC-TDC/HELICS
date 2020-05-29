@@ -19739,6 +19739,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_data_type_boolean",SWIG_From_int((int)(helics_data_type_boolean)));
   SWIG_Python_SetConstant(d, "helics_data_type_time",SWIG_From_int((int)(helics_data_type_time)));
   SWIG_Python_SetConstant(d, "helics_data_type_raw",SWIG_From_int((int)(helics_data_type_raw)));
+  SWIG_Python_SetConstant(d, "helics_data_type_multi",SWIG_From_int((int)(helics_data_type_multi)));
   SWIG_Python_SetConstant(d, "helics_data_type_any",SWIG_From_int((int)(helics_data_type_any)));
   SWIG_Python_SetConstant(d, "helics_flag_observer",SWIG_From_int((int)(helics_flag_observer)));
   SWIG_Python_SetConstant(d, "helics_flag_uninterruptible",SWIG_From_int((int)(helics_flag_uninterruptible)));
@@ -19803,6 +19804,10 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_handle_option_only_transmit_on_change",SWIG_From_int((int)(helics_handle_option_only_transmit_on_change)));
   SWIG_Python_SetConstant(d, "helics_handle_option_only_update_on_change",SWIG_From_int((int)(helics_handle_option_only_update_on_change)));
   SWIG_Python_SetConstant(d, "helics_handle_option_ignore_interrupts",SWIG_From_int((int)(helics_handle_option_ignore_interrupts)));
+  SWIG_Python_SetConstant(d, "helics_handle_option_multi_input_handling_method",SWIG_From_int((int)(helics_handle_option_multi_input_handling_method)));
+  SWIG_Python_SetConstant(d, "helics_handle_option_input_priority_location",SWIG_From_int((int)(helics_handle_option_input_priority_location)));
+  SWIG_Python_SetConstant(d, "helics_handle_option_clear_priority_list",SWIG_From_int((int)(helics_handle_option_clear_priority_list)));
+  SWIG_Python_SetConstant(d, "helics_handle_option_connections",SWIG_From_int((int)(helics_handle_option_connections)));
   SWIG_Python_SetConstant(d, "helics_filter_type_custom",SWIG_From_int((int)(helics_filter_type_custom)));
   SWIG_Python_SetConstant(d, "helics_filter_type_delay",SWIG_From_int((int)(helics_filter_type_delay)));
   SWIG_Python_SetConstant(d, "helics_filter_type_random_delay",SWIG_From_int((int)(helics_filter_type_random_delay)));
