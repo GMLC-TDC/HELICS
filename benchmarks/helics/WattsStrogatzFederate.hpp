@@ -50,7 +50,7 @@ class WattsStrogatzFederate: public BenchmarkFederate {
     WattsStrogatzFederate(): BenchmarkFederate("WattsStrogatzFederate") {}
 
     // functions for setting parameters
-    void setGenerateRandomSeed(bool b) { generateRandomSeed = b; }
+    void setGenerateRandomSeed(bool genSeed) { generateRandomSeed = genSeed; }
     void setRandomSeed(unsigned int s) { seed = s; }
     void setDegree(int val) { k = val; }
     void setRewireProbability(double val) { b = val; }
