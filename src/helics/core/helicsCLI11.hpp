@@ -47,7 +47,7 @@ class helicsCLI11App: public CLI::App {
         set_config("--config-file,--config",
                    "helics_config.toml",
                    "specify base configuration file");
-        set_version_flag("--version",helics::versionString);
+        set_version_flag("--version", helics::versionString);
         add_option_group("quiet")->immediate_callback()->add_flag("--quiet",
                                                                   quiet,
                                                                   "silence most print output");
