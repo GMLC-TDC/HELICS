@@ -236,7 +236,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             iData->lastUpdate = CurrentTime;
 
             bool updated = false;
-            if (fid->getMultiInputMode() == multi_input_handling_method::no_op) {
+            if (fid->getMultiInputMode() == multi_input_mode::no_op) {
                 const auto& data = coreObject->getValue(handle);
                 iData->lastData = data;
                 iData->hasUpdate = true;
@@ -305,11 +305,11 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         for (const auto& inp : *hand) {
             if (inp.isUpdated()) {
                 ret.append(std::to_string(ii));
-                ret.push_back(',');
+                ret.push_back(';');
             }
             ++ii;
         }
-        if (ret.back() == ',') {
+        if (ret.back() == ';') {
             ret.pop_back();
         }
         ret.push_back(']');

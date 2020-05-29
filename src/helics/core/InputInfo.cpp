@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InputInfo.hpp"
 
-#include "../common/JsonGeneration.hpp"
 #include "units/units/units.hpp"
 
 #include <algorithm>
@@ -184,7 +183,9 @@ const std::string& InputInfo::getInjectionType() const
             } else {
                 inputType.push_back('[');
                 for (const auto& src : source_info) {
-                    inputType.append(generateJsonQuotedString(src.type));
+                    inputType.push_back('"');
+                    inputType.append(src.type);
+                    inputType.push_back('"');
                     inputType.push_back(',');
                 }
                 inputType.back() = ']';
@@ -210,7 +211,9 @@ const std::string& InputInfo::getInjectionUnits() const
             } else {
                 inputUnits.push_back('[');
                 for (const auto& src : source_info) {
-                    inputUnits.append(generateJsonQuotedString(src.units));
+                    inputUnits.push_back('"');
+                    inputUnits.append(src.units);
+                    inputUnits.push_back('"');
                     inputUnits.push_back(',');
                 }
                 inputUnits.back() = ']';
@@ -232,7 +235,7 @@ bool InputInfo::updateTimeUpTo(Time newTime)
             ++index;
             continue;
         }
-        if (currentValue->time >= newTime) {
+        if (currentValue->time > newTime) {
             ++index;
             continue;
         }

@@ -21,16 +21,16 @@ class precise_unit;
 
 namespace helics {
 
-enum multi_input_handling_method : uint16_t {
-    no_op = helics_multi_input_no_op,
-    vectorize_operation = helics_multi_input_vectorize_operation,
-    and_operation = helics_multi_input_and_operation,
-    or_operation = helics_multi_input_or_operation,
-    sum_operation = helics_multi_input_sum_operation,
-    diff_operation = helics_multi_input_diff_operation,
-    max_operation = helics_multi_input_max_operation,
-    min_operation = helics_multi_input_min_operation,
-    average_operation = helics_multi_input_average_operation
+enum multi_input_mode : uint16_t {
+    no_op = 0,
+    and_operation = 1,
+    or_operation = 2,
+    sum_operation = 3,
+    diff_operation = 4,
+    max_operation = 5,
+    min_operation = 6,
+    average_operation = 7,
+    vectorize_operation = 8
 };
 
 /** base class for a input object*/
@@ -50,8 +50,8 @@ class HELICS_CXX_EXPORT Input {
     bool disableAssign{false};  //!< disable assignment for the object
     bool useThreshold{false};  //!< flag to indicate use a threshold for binary output
     bool multiUnits{false};  //!< flag indicating there are multiple Input Units
-    multi_input_handling_method inputVectorOp{
-        multi_input_handling_method::no_op};  //!< the vector processing method to use
+    multi_input_mode inputVectorOp{
+        multi_input_mode::no_op};  //!< the vector processing method to use
     int32_t prevInputCount{0};  //!< the previous number of inputs
     size_t customTypeHash{0U};  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
@@ -63,15 +63,15 @@ class HELICS_CXX_EXPORT Input {
     double threshold{0.0};  //!< the threshold to use for binary decisions
     std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
-    std::variant<std::function<void(const double&, Time)>,
-                 std::function<void(const int64_t&, Time)>,
-                 std::function<void(const std::string&, Time)>,
-                 std::function<void(const std::complex<double>&, Time)>,
-                 std::function<void(const std::vector<double>&, Time)>,
-                 std::function<void(const std::vector<std::complex<double>>&, Time)>,
-                 std::function<void(const NamedPoint&, Time)>,
-                 std::function<void(const bool&, Time)>,
-                 std::function<void(const Time&, Time)>>
+    mpark::variant<std::function<void(const double&, Time)>,
+                   std::function<void(const int64_t&, Time)>,
+                   std::function<void(const std::string&, Time)>,
+                   std::function<void(const std::complex<double>&, Time)>,
+                   std::function<void(const std::vector<double>&, Time)>,
+                   std::function<void(const std::vector<std::complex<double>>&, Time)>,
+                   std::function<void(const NamedPoint&, Time)>,
+                   std::function<void(const bool&, Time)>,
+                   std::function<void(const Time&, Time)>>
         value_callback;  //!< callback function for the federate
   public:
     /** Default constructor*/
@@ -416,10 +416,6 @@ class HELICS_CXX_EXPORT Input {
 
     template<class X>
     const X& getValueRef();
-    /** get the current value as a Double*/
-    double getDouble() { return getValue_impl<double>(std::integral_constant<int, primaryType>()); }
-    /** get the current value as a string*/
-    const std::string& getString() { return getValueRef<std::string>(); }
 
     /** get the raw binary data*/
     data_view getRawValue();
@@ -439,7 +435,7 @@ class HELICS_CXX_EXPORT Input {
     /** get the HELICS data type for the publication*/
     data_type getHelicsInjectionType() const { return injectionType; }
 
-    multi_input_handling_method getMultiInputMode() const { return inputVectorOp; }
+    multi_input_mode getMultiInputMode() const { return inputVectorOp; }
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);
 
@@ -448,12 +444,7 @@ class HELICS_CXX_EXPORT Input {
     void loadSourceInformation();
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar();
-    /** check if updates from the federate are allowed*/
-    bool allowDirectFederateUpdate() const
-    {
-        return hasUpdate && !changeDetectionEnabled &&
-            inputVectorOp == multi_input_handling_method::no_op;
-    }
+    /** helper function to do the extraction and any necessary conversions for doubles*/
     friend class ValueFederateManager;
 };
 
@@ -469,10 +460,83 @@ HELICS_CXX_EXPORT void
                              const std::shared_ptr<units::precise_unit>& inputUnits,
                              const std::shared_ptr<units::precise_unit>& outputUnits);
 
+/** class to handle an input and extract a specific type
+@tparam X the class of the value associated with a input*/
+template<class X>
+class InputT: public Input {
+  private:
+    std::function<void(X, Time)> value_callback;  //!< callback function for the federate
+    std::function<double(const X& v1, const X& v2)>
+        changeDetectionOperator;  //!< callback function for change detection
+    // determine if we can convert to a primary type
+    using is_convertible_to_primary_type =
+        std::conditional_t<((helicsType<X>() != data_type::helics_custom) ||
+                            (isConvertableType<X>())),
+                           std::true_type,
+                           std::false_type>;
+
+  public:
+    InputT() = default;
+    /**constructor to build an input with a defined object type
+    @param valueFed  the ValueFederate to use
+    @param name the name of the input
+    @param units the units associated with a Federate
+    */
+    InputT(ValueFederate* valueFed,
+           const std::string& name,
+           const std::string& units = std::string()):
+        Input(valueFed, name, ValueConverter<X>::type(), units)
+    {
+    }
+    /**constructor to build an input with a defined type
+    @param valueFed  the ValueFederate to use
+    @param name the name of the input
+    @param units the units associated with a Federate
+    */
+    template<class FedPtr>
+    InputT(FedPtr& valueFed, const std::string& name, const std::string& units = std::string()):
+        Input(valueFed, name, ValueConverter<X>::type(), units)
+    {
+    }
+
+    /** get the most recent value
+    @return the value*/
+    X getValue() { return Input::getValue<X>(); }
+    /** store the value in the given variable
+    @param[out] out the location to store the value
+    */
+    void getValue(X& out) { Input::getValue<X>(out); }
+
+    /** register a callback for the update
+    @details the callback is called in the just before the time request function returns
+    @param callback a function with signature void(X val, Time time)
+    val is the new value and time is the time the value was updated
+    */
+    void setInputNotificationCallback(std::function<void(X, Time)> callback)
+    {
+        value_callback = callback;
+        fed->setInputNotificationCallback(*this, [=](Input& /*unused*/, Time time) {
+            handleCallback(time);
+        });
+    }
+    /** set a default value
+    @param val the value to set as the default
+    */
+    void setDefault(const X& val) { Input::setDefault(val); }
+
+  private:
+    void handleCallback(Time time)
+    {
+        X out;
+        Input::getValue(out);
+        value_callback(out, time);
+    }
+};
+
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)
 {
-    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
+    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled && inputVectorOp == no_op)) {
         auto dv = fed->getValueRaw(*this);
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
@@ -507,7 +571,7 @@ template<class X>
 inline const X& getValueRefImpl(defV& val)
 {
     valueConvert(val, helicsType<X>());
-    return std::get<X>(val);
+    return mpark::get<X>(val);
 }
 
 template<>
@@ -515,10 +579,10 @@ inline const std::string& getValueRefImpl(defV& val)
 {
     // don't convert a named point to a string
     if ((val.index() == named_point_loc)) {
-        return std::get<NamedPoint>(val).name;
+        return mpark::get<NamedPoint>(val).name;
     }
     valueConvert(val, data_type::helics_string);
-    return std::get<std::string>(val);
+    return mpark::get<std::string>(val);
 }
 
 template<class X>
@@ -526,7 +590,7 @@ const X& Input::getValueRef()
 {
     static_assert(std::is_same<typeCategory<X>, std::integral_constant<int, primaryType>>::value,
                   "calling getValue By ref must be with a primary type");
-    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
+    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
         auto dv = fed->getValueRaw(*this);
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
