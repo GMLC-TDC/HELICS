@@ -594,7 +594,7 @@ data_view Input::getRawValue()
 size_t Input::getStringSize()
 {
     isUpdated();
-    if (hasUpdate && !changeDetectionEnabled) {
+    if (allowDirectFederateUpdate()) {
         if (lastValue.index() == named_point_loc) {
             const auto& np = getValueRef<NamedPoint>();
             if (np.name.empty()) {
@@ -628,7 +628,7 @@ size_t Input::getStringSize()
 size_t Input::getVectorSize()
 {
     isUpdated();
-    if (hasUpdate && !changeDetectionEnabled) {
+    if (allowDirectFederateUpdate()) {
         const auto& out = getValueRef<std::vector<double>>();
         return out.size();
     }
@@ -733,7 +733,7 @@ void integerExtractAndConvert(defV& store,
 
 char Input::getValueChar()
 {
-    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
+    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
         auto dv = fed->getValueRaw(*this);
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
