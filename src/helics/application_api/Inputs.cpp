@@ -383,7 +383,6 @@ static bool changeDetected(const defV& prevValue, const defV& newVal, double del
     return mpark::visit(visitor, newVal);
 }
 
-
 bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV)
 {
     if (injectionType == data_type::helics_unknown ||
@@ -495,11 +494,9 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
     }
     if (changeDetectionEnabled) {
         if (changeDetected(lastValue, result, delta)) {
-             lastValue = result;
-             hasUpdate = true;
-        }
-        else
-        {
+            lastValue = result;
+            hasUpdate = true;
+        } else {
             hasUpdate = false;
         }
     } else {
