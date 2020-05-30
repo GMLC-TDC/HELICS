@@ -493,12 +493,16 @@ TEST_F(multiInput, vectorizeComplex)
     std::vector<double> val;
     in1.getVector(val);
     EXPECT_EQ(val.size(), 2U);
+    EXPECT_DOUBLE_EQ(val[0], 2.0);
+    EXPECT_DOUBLE_EQ(val[1], 0.0);
     pub3.publish(std::complex<double>{3.0, -1.2});
     pub2.publish(std::vector<double>{3.0, 5.0, 5.0, 2.0});
 
     vFed1->requestNextStep();
     in1.getVector(val);
     EXPECT_EQ(val.size(), 8U);
+    EXPECT_DOUBLE_EQ(val[2], 3.0);
+    EXPECT_DOUBLE_EQ(val[3], 5.0);
     pub3.publish(4.0);
     pub2.publish(std::vector<double>{3.0, 4.0});
     pub1.publish(5.0);
@@ -506,6 +510,10 @@ TEST_F(multiInput, vectorizeComplex)
     vFed1->requestNextStep();
     in1.getVector(val);
     EXPECT_EQ(val.size(), 6U);
+    EXPECT_DOUBLE_EQ(val[0], 5.0);
+    EXPECT_DOUBLE_EQ(val[1], 0.0);
+    EXPECT_DOUBLE_EQ(val[4], 4.0);
+    EXPECT_DOUBLE_EQ(val[5], 0.0);
     vFed1->finalize();
 }
 
