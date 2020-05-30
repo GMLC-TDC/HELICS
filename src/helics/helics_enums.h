@@ -206,7 +206,7 @@ typedef enum {
 
 /** enumeration of the multi_input operations*/
 typedef enum {
-    /** Time and priority order the inputs from the core library*/
+    /** time and priority order the inputs from the core library*/
     helics_multi_input_no_op = 0,
     /** all inputs are assumed to be boolean and all must be true to return true*/
     helics_multi_input_and_operation = 1,

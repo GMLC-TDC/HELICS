@@ -921,7 +921,7 @@ HELICS_EXPORT void helicsPublicationSetInfo(helics_publication pub, const char* 
  * @param inp The input to query.
  * @param option Integer representation of the option in question see /ref helics_handle_options.
  *
- * @return an integer value with the current value of the given option.
+ * @return An integer value with the current value of the given option.
  */
 HELICS_EXPORT int helicsInputGetOption(helics_input inp, int option);
 

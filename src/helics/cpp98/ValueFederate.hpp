@@ -333,7 +333,7 @@ class ValueFederate: public virtual Federate {
     @param name the name of the input
     @param type a string defining the type of the input
     @param units a string defining the units of the input [optional]
-    @return a input id object for use as an identifier
+    @return an input id object for use as an identifier
     */
     Input registerInput(const std::string& name,
                                     const std::string& type,
@@ -349,7 +349,7 @@ class ValueFederate: public virtual Federate {
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param name the name of the input
     @param type the type of input to register
-    @param units  the optional units of the input
+    @param units the optional units of the input
     @return an identifier for use with this input
     */
     Input registerInput(const std::string& name,
@@ -362,12 +362,12 @@ class ValueFederate: public virtual Federate {
         return Input(ipt);
     }
 
-    /** register a input
+    /** register an input
     @details call is only valid in startup mode
     @param name the name of the input
     @param type a string defining the type of the input
     @param units a string defining the units of the input [optional]
-    @return a input object for use as an identifier
+    @return an input object for use as an identifier
     */
     Input registerGlobalInput(const std::string& name,
                                           const std::string& type,
@@ -379,12 +379,12 @@ class ValueFederate: public virtual Federate {
         return Input(ipt);
     }
 
-    /** register a input
+    /** register an input
     @details call is only valid in startup mode
     @param key the name of the input
     @param type an enumeration value describing the type of the input
     @param units a string defining the units of the input [optional]
-    @return a input object for use as an identifier
+    @return an input object for use as an identifier
     */
     Input registerGlobalInput(const std::string& key,
                                           helics_data_type type,
@@ -396,13 +396,13 @@ class ValueFederate: public virtual Federate {
         return Input(inp);
     }
 
-    /** register a input as part of an indexed structure
+    /** register an input as part of an indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the index appended
     @param key the name of the input to register
     @param index1 an index associated with the input
     @param type an enumeration value describing the type of the input
-    @param units  the optional units of the input
+    @param units the optional units of the input
     @return an identifier for use with this input
     */
     Input registerIndexedInput(const std::string& key,
@@ -414,14 +414,14 @@ class ValueFederate: public virtual Federate {
         return registerGlobalInput(indexed_name, type, units);
     }
 
-    /** register a input as part of a 2 dimensional indexed structure
+    /** register an input as part of a 2 dimensional indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the indices appended
     @param key the base name of the input
     @param index1 an index associated with the input
     @param index2 a second index
     @param type an enumeration value describing the type of the input
-    @param units  the optional units of the input
+    @param units the optional units of the input
     @return an identifier for use with this input
     */
     Input registerIndexedInput(const std::string& key,
