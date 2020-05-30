@@ -204,6 +204,28 @@ typedef enum {
     helics_property_int_console_log_level = 274
 } helics_properties;
 
+/** enumeration of the multi_input operations*/
+typedef enum {
+    /** time and priority order the inputs from the core library*/
+    helics_multi_input_no_op = 0,
+    /** all inputs are assumed to be boolean and all must be true to return true*/
+    helics_multi_input_and_operation = 1,
+    /** all inputs are assumed to be boolean and at least one must be true to return true*/
+    helics_multi_input_or_operation = 2,
+    /** sum all the inputs*/
+    helics_multi_input_sum_operation = 3,
+    /** sum all the inputs*/
+    helics_multi_input_diff_operation = 4,
+    /** find the max of the inputs*/
+    helics_multi_input_max_operation = 5,
+    /** find the min of the inputs*/
+    helics_multi_input_min_operation = 6,
+    /** take the average of the inputs*/
+    helics_multi_input_average_operation = 7,
+    /** vectorize the inputs either double vector or string vector*/
+    helics_multi_input_vectorize_operation = 8
+} helics_multi_input_mode;
+
 /** enumeration of options that apply to handles*/
 typedef enum {
     /** specify that a connection is required for an interface and will generate an error if not

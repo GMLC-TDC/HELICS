@@ -328,6 +328,112 @@ class ValueFederate: public virtual Federate {
         return registerIndexedSubscription(name, index1, index2, units);
     }
 
+    /** register an input
+    @details call is only valid in startup mode
+    @param name the name of the input
+    @param type a string defining the type of the input
+    @param units a string defining the units of the input [optional]
+    @return an input id object for use as an identifier
+    */
+    Input registerInput(const std::string& name,
+                                    const std::string& type,
+                                    const std::string& units = "")
+    {
+        helics_input ipt = helicsFederateRegisterTypeInput(
+            fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
+        ipts.push_back(ipt);
+        return Input(ipt);
+    }
+
+    /** register an input
+    @details call is only valid in startup mode by default prepends the name with the federate name
+    @param name the name of the input
+    @param type the type of input to register
+    @param units the optional units of the input
+    @return an identifier for use with this input
+    */
+    Input registerInput(const std::string& name,
+                                    helics_data_type type,
+                                    const std::string& units = "")
+    {
+        helics_input ipt = helicsFederateRegisterPublication(
+            fed, name.c_str(), type, units.c_str(), hThrowOnError());
+        pubs.push_back(ipt);
+        return Input(ipt);
+    }
+
+    /** register an input
+    @details call is only valid in startup mode
+    @param name the name of the input
+    @param type a string defining the type of the input
+    @param units a string defining the units of the input [optional]
+    @return an input object for use as an identifier
+    */
+    Input registerGlobalInput(const std::string& name,
+                                          const std::string& type,
+                                          const std::string& units = "")
+    {
+        helics_input ipt = helicsFederateRegisterGlobalTypeInput(
+            fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
+        ipts.push_back(ipt);
+        return Input(ipt);
+    }
+
+    /** register an input
+    @details call is only valid in startup mode
+    @param key the name of the input
+    @param type an enumeration value describing the type of the input
+    @param units a string defining the units of the input [optional]
+    @return an input object for use as an identifier
+    */
+    Input registerGlobalInput(const std::string& key,
+                                          helics_data_type type,
+                                          const std::string& units = "")
+    {
+        helics_input inp = helicsFederateRegisterGlobalInput(
+            fed, key.c_str(), type, units.c_str(), hThrowOnError());
+        ipts.push_back(inp);
+        return Input(inp);
+    }
+
+    /** register an input as part of an indexed structure
+    @details call is only valid in startup mode by default prepends the name with the federate name
+    the name is registered as a global structure with the index appended
+    @param key the name of the input to register
+    @param index1 an index associated with the input
+    @param type an enumeration value describing the type of the input
+    @param units the optional units of the input
+    @return an identifier for use with this input
+    */
+    Input registerIndexedInput(const std::string& key,
+                                           int index1,
+                                           helics_data_type type,
+                                           const std::string& units = "")
+    {
+        std::string indexed_name = key + '_' + toStr(index1);
+        return registerGlobalInput(indexed_name, type, units);
+    }
+
+    /** register an input as part of a 2 dimensional indexed structure
+    @details call is only valid in startup mode by default prepends the name with the federate name
+    the name is registered as a global structure with the indices appended
+    @param key the base name of the input
+    @param index1 an index associated with the input
+    @param index2 a second index
+    @param type an enumeration value describing the type of the input
+    @param units the optional units of the input
+    @return an identifier for use with this input
+    */
+    Input registerIndexedInput(const std::string& key,
+                                           int index1,
+                                           int index2,
+                                           helics_data_type type,
+                                           const std::string& units = std::string())
+    {
+        std::string indexed_name = key + '_' + toStr(index1) + '_' + toStr(index2);
+        return registerGlobalInput(indexed_name, type, units);
+    }
+
     /** get an input by index*/
     Input getInput(const std::string& name)
     {
