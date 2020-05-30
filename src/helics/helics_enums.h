@@ -214,7 +214,8 @@ typedef enum {
     helics_multi_input_or_operation = 2,
     /** sum all the inputs*/
     helics_multi_input_sum_operation = 3,
-    /** sum all the inputs*/
+    /** do a difference operation on the inputs (first -sum(rest)
+    for double input, vector diff for vector input*/
     helics_multi_input_diff_operation = 4,
     /** find the max of the inputs*/
     helics_multi_input_max_operation = 5,

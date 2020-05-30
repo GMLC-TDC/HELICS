@@ -443,7 +443,7 @@ class CommonCore: public Core, public BrokerBase {
     @return parent_route if unknown, otherwise returns the route_id*/
     route_id getRoute(global_federate_id global_fedid) const;
     /** process a message for potential additions to the filter ordering
-    @param cmd the message to process
+    @param command the message to process
     */
     void processFilterInfo(ActionMessage& command);
     /** function to check for a named interface*/
