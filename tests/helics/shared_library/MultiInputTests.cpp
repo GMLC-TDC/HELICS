@@ -20,14 +20,13 @@ class multiInput: public ::testing::Test, public FederateTestFixture_cpp {
 using namespace helicscpp;
 TEST_F(multiInput, order)
 {
-    
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto pub1 = vFed1->registerGlobalPublication("pub1","double");
-    auto pub2 = vFed1->registerGlobalPublication("pub2","double");
+    auto pub1 = vFed1->registerGlobalPublication("pub1", "double");
+    auto pub2 = vFed1->registerGlobalPublication("pub2", "double");
 
-    auto in1 = vFed1->registerInput("","double");
+    auto in1 = vFed1->registerInput("", "double");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     vFed1->enterExecutingMode();
@@ -55,7 +54,6 @@ TEST_F(multiInput, order)
 /** swap the order from previous test to make sure it works fine in this context*/
 TEST_F(multiInput, order2)
 {
-
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
@@ -178,7 +176,7 @@ TEST_F(multiInput, min)
     auto pub2 = vFed1->registerGlobalPublication("pub2", "double");
     auto pub3 = vFed1->registerGlobalPublication("pub3", "double");
 
-    auto in1 = vFed1->registerInput("","double");
+    auto in1 = vFed1->registerInput("", "double");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
@@ -245,11 +243,10 @@ TEST_F(multiInput, and)
 
 TEST_F(multiInput, or)
 {
-
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto pub1 = vFed1->registerGlobalPublication("pub1","boolean");
+    auto pub1 = vFed1->registerGlobalPublication("pub1", "boolean");
     auto pub2 = vFed1->registerGlobalPublication("pub2", "boolean");
     auto pub3 = vFed1->registerGlobalPublication("pub3", "boolean");
 
@@ -291,7 +288,6 @@ TEST_F(multiInput, or)
 
 TEST_F(multiInput, sum)
 {
-
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
@@ -404,7 +400,7 @@ TEST_F(multiInput, vectorize)
 
     auto pub1 = vFed1->registerGlobalPublication("pub1", "double");
     auto pub2 = vFed1->registerGlobalPublication("pub2", "vector");
-    auto pub3 = vFed1->registerGlobalPublication("pub3","double");
+    auto pub3 = vFed1->registerGlobalPublication("pub3", "double");
 
     auto in1 = vFed1->registerInput("", "double");
     in1.addTarget("pub1");
@@ -440,11 +436,11 @@ TEST_F(multiInput, vectorize_string)
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto pub1 = vFed1->registerGlobalPublication("pub1","string");
+    auto pub1 = vFed1->registerGlobalPublication("pub1", "string");
     auto pub2 = vFed1->registerGlobalPublication("pub2", "string");
-    auto pub3 = vFed1->registerGlobalPublication("pub3","string");
+    auto pub3 = vFed1->registerGlobalPublication("pub3", "string");
 
-    auto in1 = vFed1->registerInput("","string");
+    auto in1 = vFed1->registerInput("", "string");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
@@ -465,7 +461,7 @@ TEST_F(multiInput, vectorize_string)
     auto aloc2 = val.find("test2");
     auto aloc3 = val.find("test3");
 
-EXPECT_GT(aloc2, aloc1);
+    EXPECT_GT(aloc2, aloc1);
     EXPECT_GT(aloc3, aloc2);
 
     vFed1->finalize();
@@ -522,7 +518,7 @@ TEST_F(multiInput, max_units)
     SetupTest<ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    auto pub1 = vFed1->registerGlobalPublication("pub1","double", "m");
+    auto pub1 = vFed1->registerGlobalPublication("pub1", "double", "m");
     auto pub2 = vFed1->registerGlobalPublication("pub2", "double", "ft");
     auto pub3 = vFed1->registerGlobalPublication("pub3", "double", "in");
 
@@ -530,7 +526,8 @@ TEST_F(multiInput, max_units)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics_handle_option_multi_input_handling_method, helics_multi_input_max_operation);
+    in1.setOption(helics_handle_option_multi_input_handling_method,
+                  helics_multi_input_max_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(1.0);

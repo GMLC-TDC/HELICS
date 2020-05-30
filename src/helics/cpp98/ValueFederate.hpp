@@ -336,8 +336,8 @@ class ValueFederate: public virtual Federate {
     @return an input id object for use as an identifier
     */
     Input registerInput(const std::string& name,
-                                    const std::string& type,
-                                    const std::string& units = "")
+                        const std::string& type,
+                        const std::string& units = "")
     {
         helics_input ipt = helicsFederateRegisterTypeInput(
             fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
@@ -352,9 +352,8 @@ class ValueFederate: public virtual Federate {
     @param units the optional units of the input
     @return an identifier for use with this input
     */
-    Input registerInput(const std::string& name,
-                                    helics_data_type type,
-                                    const std::string& units = "")
+    Input
+        registerInput(const std::string& name, helics_data_type type, const std::string& units = "")
     {
         helics_input ipt = helicsFederateRegisterPublication(
             fed, name.c_str(), type, units.c_str(), hThrowOnError());
@@ -370,8 +369,8 @@ class ValueFederate: public virtual Federate {
     @return an input object for use as an identifier
     */
     Input registerGlobalInput(const std::string& name,
-                                          const std::string& type,
-                                          const std::string& units = "")
+                              const std::string& type,
+                              const std::string& units = "")
     {
         helics_input ipt = helicsFederateRegisterGlobalTypeInput(
             fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
@@ -387,8 +386,8 @@ class ValueFederate: public virtual Federate {
     @return an input object for use as an identifier
     */
     Input registerGlobalInput(const std::string& key,
-                                          helics_data_type type,
-                                          const std::string& units = "")
+                              helics_data_type type,
+                              const std::string& units = "")
     {
         helics_input inp = helicsFederateRegisterGlobalInput(
             fed, key.c_str(), type, units.c_str(), hThrowOnError());
@@ -406,9 +405,9 @@ class ValueFederate: public virtual Federate {
     @return an identifier for use with this input
     */
     Input registerIndexedInput(const std::string& key,
-                                           int index1,
-                                           helics_data_type type,
-                                           const std::string& units = "")
+                               int index1,
+                               helics_data_type type,
+                               const std::string& units = "")
     {
         std::string indexed_name = key + '_' + toStr(index1);
         return registerGlobalInput(indexed_name, type, units);
@@ -425,10 +424,10 @@ class ValueFederate: public virtual Federate {
     @return an identifier for use with this input
     */
     Input registerIndexedInput(const std::string& key,
-                                           int index1,
-                                           int index2,
-                                           helics_data_type type,
-                                           const std::string& units = std::string())
+                               int index1,
+                               int index2,
+                               helics_data_type type,
+                               const std::string& units = std::string())
     {
         std::string indexed_name = key + '_' + toStr(index1) + '_' + toStr(index2);
         return registerGlobalInput(indexed_name, type, units);

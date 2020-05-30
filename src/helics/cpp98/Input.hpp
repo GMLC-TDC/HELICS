@@ -41,11 +41,11 @@ class Input {
     {
         helicsInputAddTarget(inp, target.c_str(), HELICS_IGNORE_ERROR);
     }
-        /** Methods to set default values for inputs **/
-        /** set the default value as a raw data with length*/
-        void setDefault(const char* data, int len)
+    /** Methods to set default values for inputs **/
+    /** set the default value as a raw data with length*/
+    void setDefault(const char* data, int len)
     {
-            helicsInputSetDefaultRaw(inp, data, len, HELICS_IGNORE_ERROR);
+        helicsInputSetDefaultRaw(inp, data, len, HELICS_IGNORE_ERROR);
     }
     /** set the default value as a string*/
     void setDefault(const std::string& str)
@@ -182,10 +182,8 @@ class Input {
     {
         helicsInputSetOption(inp, option, value, HELICS_IGNORE_ERROR);
     }
-    int32_t getOption(int32_t option)
-    {
-        return helicsInputGetOption(inp, option);
-    }
+    int32_t getOption(int32_t option) { return helicsInputGetOption(inp, option); }
+
   private:
     helics_input inp;  //!< the reference to the underlying publication
 };

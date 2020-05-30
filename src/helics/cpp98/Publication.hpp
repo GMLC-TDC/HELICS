@@ -79,12 +79,9 @@ class Publication {
                                        HELICS_IGNORE_ERROR);
     }
     /** publish a vector of doubles*/
-    void publish(const double *data, int length)
+    void publish(const double* data, int length)
     {
-        helicsPublicationPublishVector(pub,
-                                       data,
-                                       length,
-                                       HELICS_IGNORE_ERROR);
+        helicsPublicationPublishVector(pub, data, length, HELICS_IGNORE_ERROR);
     }
     /** publish a named point with a string and double*/
     void publish(const std::string& name, double val)
