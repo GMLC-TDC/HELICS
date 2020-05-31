@@ -677,14 +677,14 @@ void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* 
     // LCOV_EXCL_STOP
 }
 
-helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
+int helicsEndpointGetOption(helics_endpoint end, int option)
 {
     auto* endObj = verifyEndpoint(end, nullptr);
     if (endObj == nullptr) {
         return helics_false;
     }
     try {
-        return (endObj->endPtr->getOption(option)) ? helics_true : helics_false;
+        return endObj->endPtr->getOption(option);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -693,14 +693,14 @@ helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
     // LCOV_EXCL_STOP
 }
 
-void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value, helics_error* err)
+void helicsEndpointSetOption(helics_endpoint end, int option, int value, helics_error* err)
 {
     auto* endObj = verifyEndpoint(end, err);
     if (endObj == nullptr) {
         return;
     }
     try {
-        endObj->endPtr->setOption(option, (value == helics_true));
+        endObj->endPtr->setOption(option, value);
     }
     // LCOV_EXCL_START
     catch (...) {
