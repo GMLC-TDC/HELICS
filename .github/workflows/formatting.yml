@@ -31,7 +31,7 @@ jobs:
     - uses: pre-commit/action@v1.1.0
     - name: Create/update a file update PR with changed files
       if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
-      uses: gmlc-tdc/create-pr-action
+      uses: gmlc-tdc/create-pr-action@v0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
