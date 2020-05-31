@@ -89,6 +89,15 @@ public class helicsJNI {
   public final static native int helics_property_int_log_level_get();
   public final static native int helics_property_int_file_log_level_get();
   public final static native int helics_property_int_console_log_level_get();
+  public final static native int helics_multi_input_no_op_get();
+  public final static native int helics_multi_input_and_operation_get();
+  public final static native int helics_multi_input_or_operation_get();
+  public final static native int helics_multi_input_sum_operation_get();
+  public final static native int helics_multi_input_diff_operation_get();
+  public final static native int helics_multi_input_max_operation_get();
+  public final static native int helics_multi_input_min_operation_get();
+  public final static native int helics_multi_input_average_operation_get();
+  public final static native int helics_multi_input_vectorize_operation_get();
   public final static native int helics_handle_option_connection_required_get();
   public final static native int helics_handle_option_connection_optional_get();
   public final static native int helics_handle_option_single_connection_only_get();

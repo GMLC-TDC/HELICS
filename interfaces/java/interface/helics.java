@@ -2339,19 +2339,19 @@ public class helics {
   }
 
   /**
-   * Get the data in the info field of an input.<br>
+   * Get the current value of an input handle option<br>
    * <br>
    * @param inp The input to query.<br>
    * @param option Integer representation of the option in question see /ref helics_handle_options.<br>
    * <br>
-   * @return A string with the info field string.
+   * @return An integer value with the current value of the given option.
    */
   public static int helicsInputGetOption(SWIGTYPE_p_void inp, int option) {
     return helicsJNI.helicsInputGetOption(SWIGTYPE_p_void.getCPtr(inp), option);
   }
 
   /**
-   * Set the data in the info field for an input.<br>
+   * Set an option on an input<br>
    * <br>
    * @param inp The input to query.<br>
    * @param option The option to set for the input /ref helics_handle_options.<br>
@@ -2362,7 +2362,7 @@ public class helics {
   }
 
   /**
-   * Get the data in the info field of a publication.<br>
+   * Get the value of an option for a publication<br>
    * <br>
    * @param pub The publication to query.<br>
    * @param option The value to query see /ref helics_handle_options.<br>
@@ -2374,7 +2374,7 @@ public class helics {
   }
 
   /**
-   * Set the data in the info field for a publication.<br>
+   * Set the value of an option for a publication<br>
    * <br>
    * @param pub The publication to query.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
@@ -2835,7 +2835,8 @@ public class helics {
    * Set a handle option on an endpoint.<br>
    * <br>
    * @param end The endpoint to modify.<br>
-   * @param option Integer code for the option to set /ref helics_handle_options.
+   * @param option Integer code for the option to set /ref helics_handle_options.<br>
+   * @return the value of the option, for boolean options will be 0 or 1
    */
   public static int helicsEndpointGetOption(SWIGTYPE_p_void end, int option) {
     return helicsJNI.helicsEndpointGetOption(SWIGTYPE_p_void.getCPtr(end), option);
@@ -3391,7 +3392,7 @@ public class helics {
    * <br>
    * @param filt The given filter.<br>
    * @param option The option to set /ref helics_handle_options.<br>
-   * @param value The value of the option (helics_true or helics_false).
+   * @param value The value of the option commonly 0 for false 1 for true.
    */
   public static void helicsFilterSetOption(SWIGTYPE_p_void filt, int option, int value) {
     helicsJNI.helicsFilterSetOption(SWIGTYPE_p_void.getCPtr(filt), option, value);
