@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - helics3
+      - switch-pr-action
 
 jobs:
   build:
