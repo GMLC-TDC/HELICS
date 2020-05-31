@@ -17,10 +17,6 @@ public final class helics_multi_input_mode {
    */
   public final static helics_multi_input_mode helics_multi_input_no_op = new helics_multi_input_mode("helics_multi_input_no_op", helicsJNI.helics_multi_input_no_op_get());
   /**
-   *  vectorize the inputs either double vector or string vector
-   */
-  public final static helics_multi_input_mode helics_multi_input_vectorize_operation = new helics_multi_input_mode("helics_multi_input_vectorize_operation", helicsJNI.helics_multi_input_vectorize_operation_get());
-  /**
    *  all inputs are assumed to be boolean and all must be true to return true
    */
   public final static helics_multi_input_mode helics_multi_input_and_operation = new helics_multi_input_mode("helics_multi_input_and_operation", helicsJNI.helics_multi_input_and_operation_get());
@@ -49,6 +45,10 @@ public final class helics_multi_input_mode {
    *  take the average of the inputs
    */
   public final static helics_multi_input_mode helics_multi_input_average_operation = new helics_multi_input_mode("helics_multi_input_average_operation", helicsJNI.helics_multi_input_average_operation_get());
+  /**
+   *  vectorize the inputs either double vector or string vector
+   */
+  public final static helics_multi_input_mode helics_multi_input_vectorize_operation = new helics_multi_input_mode("helics_multi_input_vectorize_operation", helicsJNI.helics_multi_input_vectorize_operation_get());
 
   public final int swigValue() {
     return swigValue;
@@ -84,7 +84,7 @@ public final class helics_multi_input_mode {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_multi_input_mode[] swigValues = { helics_multi_input_no_op, helics_multi_input_vectorize_operation, helics_multi_input_and_operation, helics_multi_input_or_operation, helics_multi_input_sum_operation, helics_multi_input_diff_operation, helics_multi_input_max_operation, helics_multi_input_min_operation, helics_multi_input_average_operation };
+  private static helics_multi_input_mode[] swigValues = { helics_multi_input_no_op, helics_multi_input_and_operation, helics_multi_input_or_operation, helics_multi_input_sum_operation, helics_multi_input_diff_operation, helics_multi_input_max_operation, helics_multi_input_min_operation, helics_multi_input_average_operation, helics_multi_input_vectorize_operation };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
