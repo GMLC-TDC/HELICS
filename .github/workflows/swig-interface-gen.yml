@@ -33,7 +33,7 @@ jobs:
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: git add interfaces/
-    - uses: ./.github/actions/create-file-update-pr
+    - uses: gmlc-tdc/create-pr-action
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -43,3 +43,4 @@ jobs:
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "swig-gen/"
+        DISABLE_STAGING: true
