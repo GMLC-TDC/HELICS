@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-    cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.4)
 # Make sure users don't get warnings on a tested (3.4 to 3.17) version of CMake. For most of the
 # policies, the new version is better (hence the change). We don't use the 3.0...3.16 syntax because
 # of a bug in MSVC 15.7 built-in and modified CMake 3.11
@@ -17,7 +17,7 @@ else()
     cmake_policy(VERSION 3.17)
 endif()
 
-     project(HELICS VERSION 2.5.1)
+project(HELICS VERSION 2.5.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
