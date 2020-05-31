@@ -5,11 +5,13 @@ on:
       - develop
       - master
       - helics3
+      - switch-pr-action
   pull_request:
     branches:
       - develop
       - master
       - helics3
+      - switch-pr-action
 
 jobs:
   pre-commit:
@@ -27,19 +29,9 @@ jobs:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - uses: pre-commit/action@v1.1.0
-    - name: Stage changed files
+    - name: Create/update a file update PR with changed files
       if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
-      shell: bash --noprofile --norc {0}
-      run: |
-        git diff --name-only
-        if [[ "$?" == "0" ]];
-        then
-          git add --all
-        fi
-        exit 0
-    - name: Create/update a file update PR with no hash
-      if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
-      uses: ./.github/actions/create-file-update-pr
+      uses: gmlc-tdc/create-pr-action@v0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
