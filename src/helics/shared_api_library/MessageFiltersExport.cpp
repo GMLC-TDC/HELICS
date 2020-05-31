@@ -439,14 +439,14 @@ void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err
     // LCOV_EXCL_STOP
 }
 
-void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, helics_error* err)
+void helicsFilterSetOption(helics_filter filt, int option, int value, helics_error* err)
 {
     auto* filtObj = getFilterObj(filt, err);
     if (filtObj == nullptr) {
         return;
     }
     try {
-        filtObj->filtPtr->setOption(option, (value == helics_true));
+        filtObj->filtPtr->setOption(option, value);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -455,14 +455,14 @@ void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, he
     // LCOV_EXCL_STOP
 }
 
-helics_bool helicsFilterGetOption(helics_filter filt, int option)
+int helicsFilterGetOption(helics_filter filt, int option)
 {
     auto* filtObj = getFilterObj(filt, nullptr);
     if (filtObj == nullptr) {
         return helics_false;
     }
     try {
-        return (filtObj->filtPtr->getOption(option)) ? helics_true : helics_false;
+        return filtObj->filtPtr->getOption(option);
     }
     // LCOV_EXCL_START
     catch (...) {

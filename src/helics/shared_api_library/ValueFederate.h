@@ -903,17 +903,17 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(helics_publication pub);
 HELICS_EXPORT void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_error* err);
 
 /**
- * Get the data in the info field of an input.
+ * Get the current value of an input handle option
  *
  * @param inp The input to query.
  * @param option Integer representation of the option in question see /ref helics_handle_options.
  *
- * @return A string with the info field string.
+ * @return An integer value with the current value of the given option.
  */
-HELICS_EXPORT helics_bool helicsInputGetOption(helics_input inp, int option);
+HELICS_EXPORT int helicsInputGetOption(helics_input inp, int option);
 
 /**
- * Set the data in the info field for an input.
+ * Set an option on an input
  *
  * @param inp The input to query.
  * @param option The option to set for the input /ref helics_handle_options.
@@ -922,20 +922,20 @@ HELICS_EXPORT helics_bool helicsInputGetOption(helics_input inp, int option);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, int value, helics_error* err);
 
 /**
- * Get the data in the info field of a publication.
+ * Get the value of an option for a publication
  *
  * @param pub The publication to query.
  * @param option The value to query see /ref helics_handle_options.
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT helics_bool helicsPublicationGetOption(helics_publication pub, int option);
+HELICS_EXPORT int helicsPublicationGetOption(helics_publication pub, int option);
 
 /**
- * Set the data in the info field for a publication.
+ * Set the value of an option for a publication
  *
  * @param pub The publication to query.
  * @param option Integer code for the option to set /ref helics_handle_options.
@@ -944,7 +944,7 @@ HELICS_EXPORT helics_bool helicsPublicationGetOption(helics_publication pub, int
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option, helics_bool val, helics_error* err);
+HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option, int val, helics_error* err);
 
 /**
  * Set the minimum change detection tolerance.

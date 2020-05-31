@@ -270,7 +270,8 @@ void valueExtract(const defV& dv, std::vector<double>& val)
         case complex_vector_loc:  // complex
         {
             const auto& cv = std::get<std::vector<std::complex<double>>>(dv);
-            val.resize(2 * cv.size());
+            val.reserve(2 * cv.size());
+            val.clear();
             for (const auto& cval : cv) {
                 val.push_back(cval.real());
                 val.push_back(cval.imag());

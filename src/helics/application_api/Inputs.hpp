@@ -444,7 +444,11 @@ class HELICS_CXX_EXPORT Input {
     void loadSourceInformation();
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar();
-    /** helper function to do the extraction and any necessary conversions for doubles*/
+    /** check if updates from the federate are allowed*/
+    bool allowDirectFederateUpdate() const
+    {
+        return hasUpdate && !changeDetectionEnabled && inputVectorOp == no_op;
+    }
     friend class ValueFederateManager;
 };
 
@@ -536,7 +540,7 @@ class InputT: public Input {
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)
 {
-    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled && inputVectorOp == no_op)) {
+    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
         auto dv = fed->getValueRaw(*this);
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
@@ -590,7 +594,7 @@ const X& Input::getValueRef()
 {
     static_assert(std::is_same<typeCategory<X>, std::integral_constant<int, primaryType>>::value,
                   "calling getValue By ref must be with a primary type");
-    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
+    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
         auto dv = fed->getValueRaw(*this);
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();

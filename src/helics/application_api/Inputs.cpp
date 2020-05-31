@@ -121,7 +121,7 @@ template<class X>
 X varMax(const std::vector<defV>& vals)
 {
     X dmax = mpark::get<X>(vals.front());
-    for (auto& dval : vals) {
+    for (const auto& dval : vals) {
         if (mpark::get<X>(dval) > dmax) {
             dmax = mpark::get<X>(dval);
         }
@@ -145,7 +145,7 @@ size_t varMaxIndex(const std::vector<defV>& vals, std::function<double(const X&)
     double dmax = -std::numeric_limits<double>::max();
     size_t index{0};
     size_t mxIndex{0};
-    for (auto& dval : vals) {
+    for (const auto& dval : vals) {
         auto val = op(mpark::get<X>(dval));
         if (val > dmax) {
             dmax = val;
@@ -160,7 +160,7 @@ template<class X>
 X varMin(const std::vector<defV>& vals)
 {
     X dmin = mpark::get<X>(vals.front());
-    for (auto& dval : vals) {
+    for (const auto& dval : vals) {
         if (mpark::get<X>(dval) < dmin) {
             dmin = mpark::get<X>(dval);
         }
@@ -174,7 +174,7 @@ size_t varMinIndex(const std::vector<defV>& vals, std::function<double(const X&)
     double dmin = std::numeric_limits<double>::max();
     size_t index{0};
     size_t mnIndex{0};
-    for (auto& dval : vals) {
+    for (const auto& dval : vals) {
         auto val = op(mpark::get<X>(dval));
         if (val < dmin) {
             dmin = val;
@@ -340,7 +340,7 @@ static defV vectorSum(const std::vector<defV>& vals)
     double result{0.0};
     for (const auto& v : vals) {
         const auto& vect = mpark::get<std::vector<double>>(v);
-        for (auto& el : vect) {
+        for (const auto& el : vect) {
             result += el;
         }
     }
@@ -353,7 +353,7 @@ static defV vectorAvg(const std::vector<defV>& vals)
     int N{0};
     for (const auto& v : vals) {
         const auto& vect = mpark::get<std::vector<double>>(v);
-        for (auto& el : vect) {
+        for (const auto& el : vect) {
             result += el;
             ++N;
         }
@@ -367,7 +367,7 @@ static defV vectorDiff(const std::vector<defV>& vals)
     double start{invalidDouble};
     for (const auto& v : vals) {
         const auto& vect = mpark::get<std::vector<double>>(v);
-        for (auto& el : vect) {
+        for (const auto& el : vect) {
             if (start != invalidDouble) {
                 X.push_back(start - el);
             }
@@ -375,6 +375,12 @@ static defV vectorDiff(const std::vector<defV>& vals)
         }
     }
     return X;
+}
+
+static bool changeDetected(const defV& prevValue, const defV& newVal, double deltaV)
+{
+    auto visitor = [&](const auto& arg) { return changeDetected(prevValue, arg, deltaV); };
+    return mpark::visit(visitor, newVal);
 }
 
 bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV)
@@ -386,7 +392,6 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
     }
     std::vector<defV> res;
     res.reserve(dataV.size());
-
     for (size_t ii = 0; ii < dataV.size(); ++ii) {
         if (dataV[ii]) {
             auto localTargetType = (injectionType == helics::data_type::helics_multi) ?
@@ -395,7 +400,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
 
             const auto& localUnits = (multiUnits) ? sourceTypes[ii].second : inputUnits;
             if (localTargetType == helics::data_type::helics_double) {
-                res.push_back(doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
+                res.emplace_back(doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
             } else if (localTargetType == helics::data_type::helics_int) {
                 res.emplace_back();
                 integerExtractAndConvert(res.back(), *dataV[ii], localUnits, outputUnits);
@@ -450,9 +455,9 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
             result = std::all_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
-                                     bool result;
-                                     valueExtract(val, result);
-                                     return result;
+                                     bool boolResult;
+                                     valueExtract(val, boolResult);
+                                     return boolResult;
                                  }) ?
                 "1" :
                 "0";
@@ -461,9 +466,9 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
             result = std::any_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
-                                     bool result;
-                                     valueExtract(val, result);
-                                     return result;
+                                     bool boolResult;
+                                     valueExtract(val, boolResult);
+                                     return boolResult;
                                  }) ?
                 "1" :
                 "0";
@@ -483,14 +488,17 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
             break;
         case multi_input_mode::vectorize_operation:
             result = vectorizeOperation(res);
+            break;
         default:
             break;
     }
     if (changeDetectionEnabled) {
-        //  if (changeDetected(lastValue, result, delta)) {
-        lastValue = result;
-        hasUpdate = true;
-        //   }
+        if (changeDetected(lastValue, result, delta)) {
+            lastValue = result;
+            hasUpdate = true;
+        } else {
+            hasUpdate = false;
+        }
     } else {
         lastValue = result;
         hasUpdate = true;
@@ -547,9 +555,8 @@ int32_t Input::getOption(int32_t option) const
 {
     if (option == helics_handle_option_multi_input_handling_method) {
         return static_cast<int32_t>(inputVectorOp);
-    } else {
-        return fed->getInterfaceOption(handle, option);
     }
+    return fed->getInterfaceOption(handle, option);
 }
 
 bool Input::isUpdated()
@@ -594,7 +601,7 @@ data_view Input::getRawValue()
 size_t Input::getStringSize()
 {
     isUpdated();
-    if (hasUpdate && !changeDetectionEnabled) {
+    if (allowDirectFederateUpdate()) {
         if (lastValue.index() == named_point_loc) {
             const auto& np = getValueRef<NamedPoint>();
             if (np.name.empty()) {
@@ -628,7 +635,7 @@ size_t Input::getStringSize()
 size_t Input::getVectorSize()
 {
     isUpdated();
-    if (hasUpdate && !changeDetectionEnabled) {
+    if (allowDirectFederateUpdate()) {
         const auto& out = getValueRef<std::vector<double>>();
         return out.size();
     }
@@ -733,7 +740,7 @@ void integerExtractAndConvert(defV& store,
 
 char Input::getValueChar()
 {
-    if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
+    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
         auto dv = fed->getValueRaw(*this);
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
