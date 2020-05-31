@@ -187,7 +187,43 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"strictinputtypematching", helics_handle_option_strict_type_checking},
     {"stricttypechecking", helics_handle_option_strict_type_checking},
     {"stricttypematching", helics_handle_option_strict_type_checking},
-    {"strict", helics_handle_option_strict_type_checking}};
+    {"strict", helics_handle_option_strict_type_checking},
+    {"connections", helics_handle_option_connections},
+    {"clear_priority_list", helics_handle_option_clear_priority_list},
+    {"clear_priority", helics_handle_option_clear_priority_list},
+    {"input_priority", helics_handle_option_input_priority_location},
+    {"priority", helics_handle_option_input_priority_location},
+    {"input_priority_location", helics_handle_option_input_priority_location},
+    {"priority_location", helics_handle_option_input_priority_location},
+    {"multi_input_handling_method", helics_handle_option_multi_input_handling_method},
+    {"multi_input_handling", helics_handle_option_multi_input_handling_method}
+};
+
+static const std::map<std::string, int> option_value_map{{"0", 0},
+                                                      {"1", 1},
+                                                      {"false", 0},
+                                                      {"true", 1},
+                                                      {"on", 1},
+                                                      {"off", 0},
+                                                      {"disable", 0},
+                                                      {"enable", 1},
+                                                      {"disabled", 0},
+                                                      {"enabled", 1},
+                                                      {"2", 2},
+    {"3", 3},
+    {"4", 4},
+    // vector operation values
+    {"none", helics_multi_input_no_op},
+    {"no_op", helics_multi_input_no_op},
+    {"and", helics_multi_input_and_operation},
+    {"or", helics_multi_input_or_operation},
+    {"sum", helics_multi_input_sum_operation},
+    {"max", helics_multi_input_max_operation},
+    {"min", helics_multi_input_min_operation},
+    {"average", helics_multi_input_average_operation},
+    {"mean", helics_multi_input_average_operation},
+    {"vectorize", helics_multi_input_vectorize_operation},
+    {"diff", helics_multi_input_diff_operation}};
 
 static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
                                                       {"no_print", helics_log_level_no_print},
@@ -205,6 +241,7 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
                                                       {"debug", helics_log_level_data},
                                                       /** all internal messages*/
                                                       {"trace", helics_log_level_trace}};
+
 
 static void loadFlags(FederateInfo& fi, const std::string& flags)
 {
@@ -259,6 +296,25 @@ int getPropertyIndex(std::string val)
 }
 
 int getOptionIndex(std::string val)
+{
+    auto fnd = log_level_map.find(val);
+    if (fnd != log_level_map.end()) {
+        return fnd->second;
+    }
+
+    auto fnd2 = option_value_map.find(val);
+    if (fnd2 != option_value_map.end()) {
+        return fnd2->second;
+    }
+    gmlc::utilities::makeLowerCase(val);
+    fnd2 = option_value_map.find(val);
+    if (fnd2 != option_value_map.end()) {
+        return fnd2->second;
+    }
+    return -1;
+}
+
+int getOptionValue(std::string val)
 {
     auto fnd = optionStringsTranslations.find(val);
     if (fnd != optionStringsTranslations.end()) {
