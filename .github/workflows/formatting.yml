@@ -5,11 +5,13 @@ on:
       - develop
       - master
       - helics3
+      - switch-pr-action
   pull_request:
     branches:
       - develop
       - master
       - helics3
+      - switch-pr-action
 
 jobs:
   pre-commit:
