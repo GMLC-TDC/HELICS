@@ -17,7 +17,7 @@
     {
       "key": "pub2", // the name of the publication
       "type": "double", // the type associated with a publication (optional)
-      "global":true
+      "global": true
     }
   ],
 
@@ -25,10 +25,9 @@
     {
       "key": "ipt2",
       "type": "double",
-      "connections":2,
-      "multi_input_handling_method":"average",
-      "targets": ["pub1","pub2"]
+      "connections": 2,
+      "multi_input_handling_method": "average",
+      "targets": ["pub1", "pub2"]
     }
   ]
-
 }

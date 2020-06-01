@@ -1286,7 +1286,9 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
         case 'i':
             used = interfaceInformation.setInputProperty(cmd.dest_handle,
                                                          cmd.messageID,
-                                                         checkActionFlag(cmd, indicator_flag)?cmd.getExtraDestData():0);
+                                                         checkActionFlag(cmd, indicator_flag) ?
+                                                             cmd.getExtraDestData() :
+                                                             0);
             if (!used) {
                 auto* ipt = interfaceInformation.getInput(cmd.dest_handle);
                 if (ipt != nullptr) {

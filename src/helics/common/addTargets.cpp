@@ -12,51 +12,49 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
-
-    void processOptions(const toml::value& section,
-        const std::function<int(const std::string&)>& optionConversion,
-        const std::function<int(const std::string&)>& valueConversion,
-        const std::function<void(int, int)>& optionAction)
-    {
-        const auto& t = section.as_table();
-        for (const auto &telement:t) {
-            int32_t index = optionConversion(telement.first);
-            if (index >= 0) {
-                int32_t val = -1;
-                if (telement.second.is_boolean()) {
-                    val = telement.second.as_boolean() ? 1 : 0;
-                } else if (telement.second.is_integer()) {
-                    val = telement.second.as_integer();
-                } else {
-                    val = valueConversion(telement.second.as_string());
-                }
-                optionAction(index, val);
+void processOptions(const toml::value& section,
+                    const std::function<int(const std::string&)>& optionConversion,
+                    const std::function<int(const std::string&)>& valueConversion,
+                    const std::function<void(int, int)>& optionAction)
+{
+    const auto& t = section.as_table();
+    for (const auto& telement : t) {
+        int32_t index = optionConversion(telement.first);
+        if (index >= 0) {
+            int32_t val = -1;
+            if (telement.second.is_boolean()) {
+                val = telement.second.as_boolean() ? 1 : 0;
+            } else if (telement.second.is_integer()) {
+                val = telement.second.as_integer();
+            } else {
+                val = valueConversion(telement.second.as_string());
             }
+            optionAction(index, val);
         }
     }
+}
 
-    void processOptions(const Json::Value& section,
-        const std::function<int(const std::string&)>& optionConversion,
-        const std::function<int(const std::string&)>& valueConversion,
-        const std::function<void(int, int)>& optionAction)
-    {
-        auto sIterator = section.begin();
-        auto stop = section.end();
-        while (sIterator!=stop) {
-            int32_t index = optionConversion(sIterator.name());
-            if (index>=0) {
-                int32_t val = -1;
-                if (sIterator->isBool()) {
-                    val = sIterator->asBool() ? 1 : 0;
-                } else if (sIterator->isInt64()) {
-                    val = sIterator->asInt64();
-                } else {
-                    val = valueConversion(sIterator->asString());
-                }
-                optionAction(index, val);
+void processOptions(const Json::Value& section,
+                    const std::function<int(const std::string&)>& optionConversion,
+                    const std::function<int(const std::string&)>& valueConversion,
+                    const std::function<void(int, int)>& optionAction)
+{
+    auto sIterator = section.begin();
+    auto stop = section.end();
+    while (sIterator != stop) {
+        int32_t index = optionConversion(sIterator.name());
+        if (index >= 0) {
+            int32_t val = -1;
+            if (sIterator->isBool()) {
+                val = sIterator->asBool() ? 1 : 0;
+            } else if (sIterator->isInt64()) {
+                val = sIterator->asInt64();
+            } else {
+                val = valueConversion(sIterator->asString());
             }
-            ++sIterator;
+            optionAction(index, val);
         }
+        ++sIterator;
+    }
 }
 }  // namespace helics

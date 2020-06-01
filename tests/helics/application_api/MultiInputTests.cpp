@@ -563,7 +563,8 @@ TEST_F(multiInput, max_units)
     vFed1->finalize();
 }
 
-TEST_F(multiInput, file_config_json) {
+TEST_F(multiInput, file_config_json)
+{
     helics::ValueFederate vFed(std::string(TEST_DIR) + "multi_input_config.json");
 
     auto& p1 = vFed.getPublication(0);
@@ -581,14 +582,11 @@ TEST_F(multiInput, file_config_json) {
 
     vFed.requestNextStep();
 
-    double val=i1.getValue<double>();
+    double val = i1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 13.0);
 
     vFed.finalize();
-
 }
-
-
 
 TEST_F(multiInput, file_config_toml)
 {

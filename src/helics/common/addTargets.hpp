@@ -60,7 +60,6 @@ void addTargets(const Json::Value& section, std::string targetName, Callable cal
     }
 }
 
-
 void processOptions(const toml::value& section,
                     const std::function<int(const std::string&)>& optionConversion,
                     const std::function<int(const std::string&)>& valueConversion,

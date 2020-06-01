@@ -225,7 +225,7 @@ typedef enum {
     helics_multi_input_min_operation = 7,
     /** take the average of the inputs*/
     helics_multi_input_average_operation = 8
-   
+
 } helics_multi_input_mode;
 
 /** enumeration of options that apply to handles*/

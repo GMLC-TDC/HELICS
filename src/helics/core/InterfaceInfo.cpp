@@ -200,7 +200,7 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
 // NOLINTNEXTLINE
 bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
                                         int32_t /*option*/,
-                                        int32_t /*value*/)  
+                                        int32_t /*value*/)
 {
     // there will likely be some future properties
     // auto ept = getEndpoint (id);
