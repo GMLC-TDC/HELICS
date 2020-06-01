@@ -210,7 +210,7 @@ bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
 
 int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) const
 {
-    auto* ipt = getInput(id);
+    const auto* ipt = getInput(id);
     if (ipt == nullptr) {
         return 0;
     }
@@ -252,7 +252,7 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
 
 int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t option) const
 {
-    auto* pub = getPublication(id);
+    const auto* pub = getPublication(id);
     if (pub == nullptr) {
         return 0;
     }
