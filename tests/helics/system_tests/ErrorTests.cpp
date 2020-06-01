@@ -406,7 +406,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::options::connection_required, true);
+    i2.setOption(helics::defs::options::connection_required, 1);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
