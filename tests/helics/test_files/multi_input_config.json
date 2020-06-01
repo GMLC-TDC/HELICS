@@ -26,7 +26,7 @@
       "key": "ipt2",
       "type": "double",
       "connections":2,
-      "multi_input_mode":"average",
+      "multi_input_handling_method":"average",
       "targets": ["pub1","pub2"]
     }
   ]

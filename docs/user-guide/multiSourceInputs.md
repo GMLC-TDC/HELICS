@@ -53,3 +53,52 @@ The handling method specifies how the reduction operation occurs the value can t
 
 
 ## Configuration
+Multi Input handling can be configured through the programming API or through a file based configuration.  
+
+```cpp
+auto& in1 = vFed1->registerInput<double>("");
+    in1.addTarget("pub1");
+    in1.addTarget("pub2");
+    in1.addTarget("pub3");
+    in1.setOption(helics::defs::options::multi_input_handling_method,
+                  helics::multi_input_handling_method::average);
+```
+
+```c
+/*errors are ignored here*/
+helics_input in1 = helicsFederateRegisterInput("",helics_data_type_double,"",nullptr);
+helicsInputAddTarget(in1,"pub1",nullptr);
+helicsInputAddTarget(in1,"pub2",nullptr);
+helicsInputAddTarget(in1,"pub2",nullptr);
+helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation, nullptr);
+
+```
+
+```python
+in1 = h.helicsFederateRegisterInput("",h.helics_data_type_double,"");
+h.helicsInputAddTarget(in1,"pub1");
+h.helicsInputAddTarget(in1,"pub2");
+h.helicsInputAddTarget(in1,"pub2");
+h.helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation);
+
+```
+
+The handling can also be configured in the configuration file for the federate
+
+```toml
+inputs=[
+{key="ipt2",  type="double", targets=["pub1","pub2"], connections=2, multi_input_handling_method="average"}
+]
+```
+
+```JSON
+"inputs": [
+    {
+      "key": "ipt2",
+      "type": "double",
+      "connections":2,
+      "multi_input_handling_method":"average",
+      "targets": ["pub1","pub2"]
+    }
+  ]
+```

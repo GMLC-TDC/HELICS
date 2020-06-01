@@ -9,7 +9,7 @@ coreinit="--autobroker" # the initialization string for the core in the form of 
 
 
 inputs=[
-{key="ipt2",  type="double", targets=["pub1","pub2"], connections=2, multi_input_mode="average"}
+{key="ipt2",  type="double", targets=["pub1","pub2"], connections=2, multi_input_handling_method="average"}
 ]  #specify an input with a target
 
 #Publications used in the federate

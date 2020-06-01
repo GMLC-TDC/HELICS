@@ -157,7 +157,7 @@ TEST_F(multiInput, max)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::max_operation);
+                  helics::multi_input_handling_method::max_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -195,7 +195,7 @@ TEST_F(multiInput, min)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::min_operation);
+                  helics::multi_input_handling_method::min_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -233,7 +233,7 @@ TEST_F(multiInput, and)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::and_operation);
+                  helics::multi_input_handling_method::and_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(true);
@@ -271,7 +271,7 @@ TEST_F(multiInput, or)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::or_operation);
+                  helics::multi_input_handling_method::or_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(true);
@@ -317,7 +317,7 @@ TEST_F(multiInput, sum)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::sum_operation);
+                  helics::multi_input_handling_method::sum_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -354,8 +354,8 @@ TEST_F(multiInput, average)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::average_operation);
+    in1.setOption(helics::defs::options::multi_input_handling_method,
+                  helics::multi_input_handling_method::average_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -391,7 +391,7 @@ TEST_F(multiInput, diff)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::diff_operation);
+                  helics::multi_input_handling_method::diff_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -427,7 +427,7 @@ TEST_F(multiInput, vectorize)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::vectorize_operation);
+                  helics::multi_input_handling_method::vectorize_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -465,7 +465,7 @@ TEST_F(multiInput, vectorize_string)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::vectorize_operation);
+                  helics::multi_input_handling_method::vectorize_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish("test1");
@@ -502,7 +502,7 @@ TEST_F(multiInput, vectorizeComplex)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::vectorize_operation);
+                  helics::multi_input_handling_method::vectorize_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -540,7 +540,7 @@ TEST_F(multiInput, max_units)
     in1.addTarget("pub2");
     in1.addTarget("pub3");
     in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_mode::max_operation);
+                  helics::multi_input_handling_method::max_operation);
     vFed1->enterExecutingMode();
 
     pub1.publish(1.0);

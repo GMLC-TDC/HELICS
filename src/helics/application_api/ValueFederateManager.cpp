@@ -236,7 +236,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             iData->lastUpdate = CurrentTime;
 
             bool updated = false;
-            if (fid->getMultiInputMode() == multi_input_mode::no_op) {
+            if (fid->getMultiInputMode() == multi_input_handling_method::no_op) {
                 const auto& data = coreObject->getValue(handle);
                 iData->lastData = data;
                 iData->hasUpdate = true;
