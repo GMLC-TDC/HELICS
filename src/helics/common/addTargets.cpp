@@ -56,6 +56,7 @@ namespace helics {
                 }
                 optionAction(index, val);
             }
+            ++sIterator;
         }
 }
 }  // namespace helics
