@@ -12,7 +12,7 @@ This disables the asynchronous functions in the federate and turns off a number 
 
 ## ignore_time_mismatch_warnings
 
-if certain timing options are used this can cause the granted time to be greater than the requested time. For example with the `period`, or `minTimeDelta` specified. This situation would normally generate a warning message, but if this option is enabled those warnings are silenced.
+If certain timing options are used this can cause the granted time to be greater than the requested time. For example with the `period`, or `minTimeDelta` specified. This situation would normally generate a warning message, but if this option is enabled those warnings are silenced.
 
 ## connections_required
 
