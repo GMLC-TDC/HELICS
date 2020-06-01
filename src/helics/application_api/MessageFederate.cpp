@@ -146,14 +146,11 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
             ept.setOption(getOptionIndex(target.substr(2)), false);
         }
     });
-    bool optional = getOrDefault(data, "optional", false);
-    if (optional) {
-        ept.setOption(defs::options::connection_optional, optional);
-    }
-    bool required = getOrDefault(data, "required", false);
-    if (required) {
-        ept.setOption(defs::options::connection_required, required);
-    }
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&ept](int32_t option, int32_t value) { ept.setOption(option, value); });
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {

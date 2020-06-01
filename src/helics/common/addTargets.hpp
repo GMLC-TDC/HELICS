@@ -60,4 +60,15 @@ void addTargets(const Json::Value& section, std::string targetName, Callable cal
     }
 }
 
+
+void processOptions(const toml::value& section,
+                    const std::function<int(const std::string&)>& optionConversion,
+                    const std::function<int(const std::string&)>& valueConversion,
+                    const std::function<void(int, int)>& optionAction);
+
+void processOptions(const Json::Value& section,
+                    const std::function<int(const std::string&)>& optionConversion,
+                    const std::function<int(const std::string&)>& valueConversion,
+                    const std::function<void(int, int)>& optionAction);
+
 }  // namespace helics
