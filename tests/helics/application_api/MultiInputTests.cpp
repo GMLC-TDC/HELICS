@@ -562,3 +562,55 @@ TEST_F(multiInput, max_units)
     EXPECT_DOUBLE_EQ(val, 2.0);
     vFed1->finalize();
 }
+
+TEST_F(multiInput, file_config_json) {
+    helics::ValueFederate vFed(std::string(TEST_DIR) + "multi_input_config.json");
+
+    auto& p1 = vFed.getPublication(0);
+    auto& p2 = vFed.getPublication(1);
+    auto& i1 = vFed.getInput(0);
+    vFed.enterExecutingMode();
+    auto res = i1.getOption(helics::defs::options::connections);
+    EXPECT_EQ(res, 2);
+    res = i1.getOption(helics::defs::options::multi_input_handling_method);
+
+    EXPECT_EQ(res, helics_multi_input_average_operation);
+
+    p1.publish(11.3);
+    p2.publish(14.7);
+
+    vFed.requestNextStep();
+
+    double val=i1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 13.0);
+
+    vFed.finalize();
+
+}
+
+
+
+TEST_F(multiInput, file_config_toml)
+{
+    helics::ValueFederate vFed(std::string(TEST_DIR) + "multi_input_config.toml");
+
+    auto& p1 = vFed.getPublication(0);
+    auto& p2 = vFed.getPublication(1);
+    auto& i1 = vFed.getInput(0);
+    vFed.enterExecutingMode();
+    auto res = i1.getOption(helics::defs::options::connections);
+    EXPECT_EQ(res, 2);
+    res = i1.getOption(helics::defs::options::multi_input_handling_method);
+
+    EXPECT_EQ(res, helics_multi_input_average_operation);
+
+    p1.publish(11.3);
+    p2.publish(14.7);
+
+    vFed.requestNextStep();
+
+    double val = i1.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 13.0);
+
+    vFed.finalize();
+}
