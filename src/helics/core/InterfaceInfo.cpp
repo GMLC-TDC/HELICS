@@ -313,9 +313,13 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                 } else {
                     issues.emplace_back(
                         helics::defs::errors::connection_failure,
-                        fmt::format("Input {} requires {} connections but only {} were made",
+                        fmt::format("Input {} requires {} connections but{} {} were made",
                                     ipt->key,
                                     ipt->required_connnections,
+                                    (ipt->input_sources.size() <
+                                     static_cast<size_t>(ipt->required_connnections)) ?
+                                        " only" :
+                                        "",
                                     ipt->input_sources.size()));
                 }
             }
