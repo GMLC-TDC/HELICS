@@ -22,15 +22,15 @@ class precise_unit;
 namespace helics {
 
 enum multi_input_mode : uint16_t {
-    no_op = 0,
-    and_operation = 1,
-    or_operation = 2,
-    sum_operation = 3,
-    diff_operation = 4,
-    max_operation = 5,
-    min_operation = 6,
-    average_operation = 7,
-    vectorize_operation = 8
+    no_op = helics_multi_input_no_op,
+    vectorize_operation = helics_multi_input_vectorize_operation,
+    and_operation = helics_multi_input_and_operation,
+    or_operation = helics_multi_input_or_operation,
+    sum_operation = helics_multi_input_sum_operation,
+    diff_operation = helics_multi_input_diff_operation,
+    max_operation = helics_multi_input_max_operation,
+    min_operation = helics_multi_input_min_operation,
+    average_operation = helics_multi_input_average_operation
 };
 
 /** base class for a input object*/
