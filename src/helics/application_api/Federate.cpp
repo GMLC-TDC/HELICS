@@ -1085,7 +1085,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     return {"#invalid"};
 }
 
-bool Federate::isQueryCompleted(query_id_t queryIndex) const
+bool Federate::isQueryCompleted(query_id_t queryIndex) const // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
@@ -1242,7 +1242,7 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32
 /** get the current value for an interface option*/
 int32_t Federate::getInterfaceOption(interface_handle handle, int32_t option)
 {
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
+    return (coreObject) ? coreObject->getHandleOption(handle, option) : 0;
 }
 
 void Federate::closeInterface(interface_handle handle)

@@ -297,25 +297,6 @@ int getPropertyIndex(std::string val)
 
 int getOptionIndex(std::string val)
 {
-    auto fnd = log_level_map.find(val);
-    if (fnd != log_level_map.end()) {
-        return fnd->second;
-    }
-
-    auto fnd2 = option_value_map.find(val);
-    if (fnd2 != option_value_map.end()) {
-        return fnd2->second;
-    }
-    gmlc::utilities::makeLowerCase(val);
-    fnd2 = option_value_map.find(val);
-    if (fnd2 != option_value_map.end()) {
-        return fnd2->second;
-    }
-    return -1;
-}
-
-int getOptionValue(std::string val)
-{
     auto fnd = optionStringsTranslations.find(val);
     if (fnd != optionStringsTranslations.end()) {
         return fnd->second;
@@ -328,6 +309,28 @@ int getOptionValue(std::string val)
     val.erase(std::remove(val.begin(), val.end(), '_'), val.end());
     fnd = optionStringsTranslations.find(val);
     if (fnd != optionStringsTranslations.end()) {
+        return fnd->second;
+    }
+    return -1;
+}
+
+int getOptionValue(std::string val)
+{
+    auto fnd2 = option_value_map.find(val);
+    if (fnd2 != option_value_map.end()) {
+        return fnd2->second;
+    }
+    auto fnd = log_level_map.find(val);
+    if (fnd != log_level_map.end()) {
+        return fnd->second;
+    }
+    gmlc::utilities::makeLowerCase(val);
+    fnd2 = option_value_map.find(val);
+    if (fnd2 != option_value_map.end()) {
+        return fnd2->second;
+    }
+    fnd = log_level_map.find(val);
+    if (fnd != log_level_map.end()) {
         return fnd->second;
     }
     return -1;

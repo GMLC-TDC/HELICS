@@ -15,12 +15,12 @@ namespace helics {
 
 
     void processOptions(const toml::value& section,
-        std::function<int(const std::string&)> optionConversion,
-        std::function<int(const std::string&)> valueConversion,
-        std::function<void(int, int)> optionAction)
+        const std::function<int(const std::string&)>& optionConversion,
+        const std::function<int(const std::string&)>& valueConversion,
+        const std::function<void(int, int)>& optionAction)
     {
         const auto& t = section.as_table();
-        for (auto &telement:t) {
+        for (const auto &telement:t) {
             int32_t index = optionConversion(telement.first);
             if (index >= 0) {
                 int32_t val = -1;
@@ -37,9 +37,9 @@ namespace helics {
     }
 
     void processOptions(const Json::Value& section,
-        std::function<int(const std::string&)> optionConversion,
-        std::function<int(const std::string&)> valueConversion,
-        std::function<void(int, int)> optionAction)
+        const std::function<int(const std::string&)>& optionConversion,
+        const std::function<int(const std::string&)>& valueConversion,
+        const std::function<void(int, int)>& optionAction)
     {
         auto sIterator = section.begin();
         auto stop = section.end();

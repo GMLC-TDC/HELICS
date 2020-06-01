@@ -377,7 +377,7 @@ const std::string& ValueFederate::getString(Input& inp)
     return inp.getValueRef<std::string>();
 }
 
-void ValueFederate::publishRaw(const Publication& pub, data_view block)
+void ValueFederate::publishRaw(const Publication& pub, data_view block) // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         vfManager->publish(pub, block);
