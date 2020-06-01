@@ -1384,9 +1384,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
 {
     switch (optionFlag) {
         case defs::flags::only_transmit_on_change:
+        case defs::options::handle_only_transmit_on_change:
             only_transmit_on_change = value;
             break;
         case defs::flags::only_update_on_change:
+        case defs::options::handle_only_update_on_change:
             interfaceInformation.setChangeUpdateFlag(value);
             break;
         case defs::flags::strict_input_type_checking:
@@ -1471,8 +1473,10 @@ bool FederateState::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {
         case defs::flags::only_transmit_on_change:
+        case defs::options::handle_only_transmit_on_change:
             return only_transmit_on_change;
         case defs::flags::only_update_on_change:
+        case defs::options::handle_only_update_on_change:
             return interfaceInformation.getChangeUpdateFlag();
         case defs::flags::realtime:
             return realtime;
