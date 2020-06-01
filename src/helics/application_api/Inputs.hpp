@@ -447,7 +447,8 @@ class HELICS_CXX_EXPORT Input {
     /** check if updates from the federate are allowed*/
     bool allowDirectFederateUpdate() const
     {
-        return hasUpdate && !changeDetectionEnabled && inputVectorOp == multi_input_handling_method::no_op;
+        return hasUpdate && !changeDetectionEnabled &&
+            inputVectorOp == multi_input_handling_method::no_op;
     }
     friend class ValueFederateManager;
 };

@@ -1085,7 +1085,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     return {"#invalid"};
 }
 
-bool Federate::isQueryCompleted(query_id_t queryIndex) const // NOLINT
+bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());

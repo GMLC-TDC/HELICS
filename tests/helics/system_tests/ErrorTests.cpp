@@ -495,7 +495,6 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
-
 TEST_F(error_tests, too_many_connections)
 {
     auto broker = AddBroker("test", 2);
@@ -508,20 +507,19 @@ TEST_F(error_tests, too_many_connections)
     fed1->registerGlobalPublication("t1", "double");
     fed1->registerGlobalPublication("t2", "double");
     fed1->registerGlobalPublication("t3", "double");
-    auto &inp1=fed2->registerGlobalInput("c1","double");
+    auto& inp1 = fed2->registerGlobalInput("c1", "double");
     inp1.setOption(helics::defs::connections, 2);
     inp1.addTarget("t1");
     inp1.addTarget("t2");
     inp1.addTarget("t3");
     fed1->enterExecutingModeAsync();
-    
+
     EXPECT_THROW(fed2->enterExecutingMode(), helics::ConnectionFailure);
     fed1->enterExecutingModeComplete();
     fed1->finalize();
     fed2->finalize();
     broker->disconnect();
 }
-
 
 TEST_F(error_tests, not_enough_connections)
 {

@@ -189,13 +189,12 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
             objUpdate.setOption(getOptionIndex(target.substr(2)), 0);
         }
     });
-    processOptions(data,[](const std::string &option){
-        return getOptionIndex(option);}, [](const std::string &value){
-        return getOptionValue(value);},
-            [&objUpdate](int32_t option, int32_t value) {
-            objUpdate.setOption(option, value);
-    });
-   
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
+
     callIfMember(data, "shortcut", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
     });
@@ -377,7 +376,7 @@ const std::string& ValueFederate::getString(Input& inp)
     return inp.getValueRef<std::string>();
 }
 
-void ValueFederate::publishRaw(const Publication& pub, data_view block) // NOLINT
+void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         vfManager->publish(pub, block);

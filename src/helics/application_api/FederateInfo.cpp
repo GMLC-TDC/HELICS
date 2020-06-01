@@ -196,20 +196,20 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"input_priority_location", helics_handle_option_input_priority_location},
     {"priority_location", helics_handle_option_input_priority_location},
     {"multi_input_handling_method", helics_handle_option_multi_input_handling_method},
-    {"multi_input_handling", helics_handle_option_multi_input_handling_method}
-};
+    {"multi_input_handling", helics_handle_option_multi_input_handling_method}};
 
-static const std::map<std::string, int> option_value_map{{"0", 0},
-                                                      {"1", 1},
-                                                      {"false", 0},
-                                                      {"true", 1},
-                                                      {"on", 1},
-                                                      {"off", 0},
-                                                      {"disable", 0},
-                                                      {"enable", 1},
-                                                      {"disabled", 0},
-                                                      {"enabled", 1},
-                                                      {"2", 2},
+static const std::map<std::string, int> option_value_map{
+    {"0", 0},
+    {"1", 1},
+    {"false", 0},
+    {"true", 1},
+    {"on", 1},
+    {"off", 0},
+    {"disable", 0},
+    {"enable", 1},
+    {"disabled", 0},
+    {"enabled", 1},
+    {"2", 2},
     {"3", 3},
     {"4", 4},
     // vector operation values
@@ -241,7 +241,6 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
                                                       {"debug", helics_log_level_data},
                                                       /** all internal messages*/
                                                       {"trace", helics_log_level_trace}};
-
 
 static void loadFlags(FederateInfo& fi, const std::string& flags)
 {
