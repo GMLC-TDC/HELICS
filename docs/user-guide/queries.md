@@ -198,7 +198,7 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``current_state``    | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``status``           | a structure with the current known status(true if connected) of the broker [JSON]   |
+| ``status``           | a structure with the current known status (true if connected) of the broker [JSON]  |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]|
 +----------------------+-------------------------------------------------------------------------------------+
