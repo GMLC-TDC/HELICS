@@ -315,7 +315,7 @@ std::pair<return_val, std::string>
             // return send(bad_request("unable to create broker"));
         }
         if (useUuid) {
-            return {return_val::ok, std::string("{\"broker_uuid\":\"") + brokerName + "\"}"};
+            return {return_val::ok, std::string(R"({"broker_uuid":")") + brokerName + "\"}"};
         }
         return {return_val::ok, emptyString};
     }
