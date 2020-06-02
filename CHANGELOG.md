@@ -8,12 +8,13 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.5.1][] ~ 2020-05-25
+## [2.5.1][] ~ 2020-06-04
 
 ### Changed
 
 - All ZeroMQ related files are now located in the network library and under a single namespace
 - Use Python 3.8 instead of 3.6 for any release build installers that include a copy of the Python interface (`pip` or `anaconda` are the recommended ways to install the Python interface)
+- Update units library to include some typical natural gas units and conversions
 
 ### Fixed
 
