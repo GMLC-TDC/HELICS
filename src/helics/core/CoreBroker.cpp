@@ -2423,7 +2423,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_time;version;version_all;exists]";
+               "current_time;current_state;status;global_time;version;version_all;exists]";
     }
     if (request == "address") {
         return getAddress();
@@ -2431,9 +2431,22 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "version") {
         return versionString;
     }
+    if (request == "status") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
+        base["state"] = brokerStateName(brokerState.load());
+        base["status"] = isConnected();
+        return generateJsonString(base);
+    }
     if (request == "counts") {
         Json::Value base;
         base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
         base["id"] = global_broker_id_local.baseValue();
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
@@ -2455,11 +2468,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "current_state") {
         Json::Value base;
         base["name"] = getIdentifier();
+        if (uuid_like)
+        {
+            base["uuid"] = getIdentifier();
+        }
         base["id"] = global_broker_id_local.baseValue();
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
         }
         base["state"] = brokerStateName(brokerState.load());
+        base["status"] = isConnected();
         base["federates"] = Json::arrayValue;
         for (const auto& fed : _federates) {
             Json::Value fedstate;
@@ -2546,6 +2564,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "dependencies") {
         Json::Value base;
         base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
         base["id"] = global_broker_id_local.baseValue();
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
@@ -2601,6 +2622,9 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
     builder.reset();
     Json::Value& base = builder.getJValue();
     base["name"] = getIdentifier();
+    if (uuid_like) {
+        base["uuid"] = getIdentifier();
+    }
     base["id"] = global_broker_id_local.baseValue();
     if (!isRootc) {
         base["parent"] = higher_broker_id.baseValue();

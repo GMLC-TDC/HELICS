@@ -324,6 +324,43 @@ TEST_F(webTest, deleteBroker)
     EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
+
+TEST_F(webTest, createBrokerUUID)
+{
+    Json::Value v1;
+    v1["command"] = "create";
+    v1["core_type"] = "ZMQ";
+    v1["num_feds"] = 3;
+    auto result = sendText(generateJsonString(v1));
+    auto val = loadJson(result);
+    EXPECT_TRUE(val["broker_uuid"].isString());
+    auto uuid = val["broker_uuid"].asString();
+
+    Json::Value v2;
+    v2["command"] = "get";
+    v2["uuid"]=uuid;
+
+    result = sendText(generateJsonString(v2));
+    val = loadJson(result);
+    EXPECT_TRUE(val["status"].asBool());
+
+    Json::Value v3;
+    v3["command"] = "delete";
+    v3["broker_uuid"] = uuid;
+
+   sendText(generateJsonString(v3));
+
+   Json::Value v4;
+   v4["command"] = "query";
+   v4["query"] = "brokers";
+
+     result = sendText(generateJsonString(v4));
+   EXPECT_FALSE(result.empty());
+   val = loadJson(result);
+   EXPECT_TRUE(val["brokers"].isArray());
+   EXPECT_EQ(val["brokers"].size(), 1U);
+}
+
 TEST_F(webTest, deleteJson)
 {
     Json::Value v1;
