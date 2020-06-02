@@ -56,7 +56,6 @@ BrokerBase::BrokerBase(bool DisableQueue) noexcept: queueDisabled(DisableQueue) 
 BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
     identifier(broker_name), queueDisabled(DisableQueue)
 {
-    
 }
 
 BrokerBase::~BrokerBase()

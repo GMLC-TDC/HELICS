@@ -2468,8 +2468,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "current_state") {
         Json::Value base;
         base["name"] = getIdentifier();
-        if (uuid_like)
-        {
+        if (uuid_like) {
             base["uuid"] = getIdentifier();
         }
         base["id"] = global_broker_id_local.baseValue();
