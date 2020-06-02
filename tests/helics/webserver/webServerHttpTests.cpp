@@ -371,6 +371,25 @@ TEST_F(httpTest, deleteBroker)
     EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
+TEST_F(httpTest, createBrokerUUID)
+{
+    auto result=sendCommand(http::verb::post, "/", "core_type=zmq&num_feds=2");
+    auto val = loadJson(result);
+    EXPECT_TRUE(val["broker_uuid"].isString());
+    auto uuid = val["broker_uuid"].asString();
+    result = sendGet(std::string("/?uuid=") + uuid);
+    val = loadJson(result);
+    EXPECT_TRUE(val["status"].asBool());
+
+    sendCommand(http::verb::delete_, "/", std::string("broker_uuid=")+uuid);
+
+    result = sendGet("brokers");
+    EXPECT_FALSE(result.empty());
+    val = loadJson(result);
+    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_EQ(val["brokers"].size(), 1U);
+}
+
 TEST_F(httpTest, coreJson)
 {
     auto result = sendGet("brk2/cr1");
