@@ -2431,6 +2431,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "version") {
         return versionString;
     }
+    if (request == "status") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
+        base["state"] = brokerStateName(brokerState.load());
+        base["status"] = isConnected();
+        return generateJsonString(base);
+    }
     if (request == "counts") {
         Json::Value base;
         base["name"] = getIdentifier();
