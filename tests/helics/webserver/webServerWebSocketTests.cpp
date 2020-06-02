@@ -324,7 +324,6 @@ TEST_F(webTest, deleteBroker)
     EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
-
 TEST_F(webTest, createBrokerUUID)
 {
     Json::Value v1;
@@ -338,7 +337,7 @@ TEST_F(webTest, createBrokerUUID)
 
     Json::Value v2;
     v2["command"] = "get";
-    v2["uuid"]=uuid;
+    v2["uuid"] = uuid;
 
     result = sendText(generateJsonString(v2));
     val = loadJson(result);
@@ -348,17 +347,17 @@ TEST_F(webTest, createBrokerUUID)
     v3["command"] = "delete";
     v3["broker_uuid"] = uuid;
 
-   sendText(generateJsonString(v3));
+    sendText(generateJsonString(v3));
 
-   Json::Value v4;
-   v4["command"] = "query";
-   v4["query"] = "brokers";
+    Json::Value v4;
+    v4["command"] = "query";
+    v4["query"] = "brokers";
 
-     result = sendText(generateJsonString(v4));
-   EXPECT_FALSE(result.empty());
-   val = loadJson(result);
-   EXPECT_TRUE(val["brokers"].isArray());
-   EXPECT_EQ(val["brokers"].size(), 1U);
+    result = sendText(generateJsonString(v4));
+    EXPECT_FALSE(result.empty());
+    val = loadJson(result);
+    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
 TEST_F(webTest, deleteJson)
