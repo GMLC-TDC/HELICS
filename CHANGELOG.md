@@ -15,10 +15,26 @@ Everything within a major version number should be code compatible (with the exc
 - All ZeroMQ related files are now located in the network library and under a single namespace
 - Use Python 3.8 instead of 3.6 for any release build installers that include a copy of the Python interface (`pip` or `anaconda` are the recommended ways to install the Python interface)
 - Update units library to include some typical natural gas units and conversions
+- Use a separate action for automated pr generation
+- update the CLI11 library
+- the setOption/getOption functions now take an int32_t as a value instead of a boolean.  This does not change the API since in the C library the `helics_bool` was already an int.  
+- In the case of multiple sources, `getInjectionType`, and `getInjectionUnits` now will return a json string vector.
+- the CMake build generation now uses a central location for all build artifacts instead of individual directories.  
+- Updated the ASIO library to 1-16
+- Minor updates to the clang-format to allow better alignment and comment reflow
+- Numerous code refactorings to simplify and clean up code
+- Move all ZMQ related items to the network library
 
 ### Fixed
 
 - Sporadic failures in the Webserver and websocket tests
+- a bug in the translation of vectors to complex vectors
+- a bug in the copying of vectors into the C shared library
+- numerous clang-tidy identified issues mostly for code readability
+- Some issues with the exists query not working in certain circumstances and for cores and brokers
+- The nonlings test would fail if the branch name had `error` in it.  A check was put into eliminate this false negative test failure.
+- a few sporadic failure cases in the http and websocket tests
+- A build generation issue with disabling the ZMQ core
 
 ### Added
 
@@ -27,6 +43,18 @@ Everything within a major version number should be code compatible (with the exc
 - "version" and "version_all" queries to get the local version string and the version strings of all the cores/brokers in the federation
 - A few missing operations to the C++98 interface for Message objects, add `helicsMessageClone` and `helicsEndpointCreateMessage` functions in the C interface. Add a test case for some of the C++98 message operations.
 - `helicsQuerySetTarget` and `helicsQuerySetQueryString` operations to modify an existing query in the C interface
+- a set of reduction operations for multi-input handling on inputs,  options for setting input source priority and the number of expected connections. 
+- A Watts-Strogatz like benchmark
+- A few more parameters that can be handled in the Webserver and support for use of uuid instead of name
+- A few missing message operators to the C++98 API, such as `data`, `append`, `setFlag`, `checkFlag`, `sendMessageZeroCopy`
+- Made the Message class return a self Reference for the setters
+- A test to run the helics-broker executable as part of the CI tests
+- A bug in the helics_broker that no longer ran correct defaults
+- A "version_all" query, to retreive the version of HELICS in use for all cores/brokers, and a "version" query to retrieve the version of a specific target.
+- A series of checks for markdown, spelling, shellcheck, python formatting, cpplint, end-of-line and automated generation of PR scripts for the formatting updates.
+- Some level of automated scaling for benchmarks for small systems
+- API functions for retrieving the build flags used to generate the library
+- Some additional message interpreters to aid in debugging
 
 ### Deprecated
 
