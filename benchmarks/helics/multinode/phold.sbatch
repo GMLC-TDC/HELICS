@@ -32,7 +32,7 @@ if [[ "$BUILD_PATH" == "" ]]; then
 fi
 
 if [[ "${helics_broker_exe}" == "" ]]; then
-    helics_broker_exe="${BUILD_PATH}/src/helics/apps/helics_broker"
+    helics_broker_exe="${BUILD_PATH}/bin/helics_broker"
 fi
 command -v "${helics_broker_exe}" || {
     echo >&2 "unable to find helics broker at ${helics_broker_exe}; check for working build and set BUILD_PATH if needed"
@@ -40,7 +40,7 @@ command -v "${helics_broker_exe}" || {
 }
 
 if [[ "${helics_bm_fed_exe}" == "" ]]; then
-    helics_bm_fed_exe="${BUILD_PATH}/benchmarks/helics/${BM_FED}"
+    helics_bm_fed_exe="${BUILD_PATH}/bin/${BM_FED}"
 fi
 command -v "${helics_bm_fed_exe}" || {
     echo >&2 "unable to find benchmark federate at ${helics_bm_fed_exe}; check for working build and set BUILD_PATH if needed"
@@ -53,7 +53,7 @@ mkdir -p "${output_folder}"
 
 # Run info and srun job launch
 echo "Running broker on $HOSTNAME"
-"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --coretype "${CORE_TYPE}" --loglevel=5 >"${output_folder}/helics-broker-out.txt" 2>&1 &
+"${BUILD_PATH}/bin/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --coretype "${CORE_TYPE}" --loglevel=5 >"${output_folder}/helics-broker-out.txt" 2>&1 &
 
 # give some time for the broker to start up
 sleep 5
