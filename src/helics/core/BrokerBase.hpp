@@ -107,6 +107,7 @@ class BrokerBase {
     bool forwardTick{
         false};  //!< indicator that ticks should be forwarded to the command processor regardless
     bool no_ping{false};  //!< indicator that the broker is not very responsive to ping requests
+    bool uuid_like{false};  //!< will be set to true if the name looks like a uuid
     decltype(std::chrono::steady_clock::now())
         errorTimeStart;  //!< time when the error condition started related to the errorDelay
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code

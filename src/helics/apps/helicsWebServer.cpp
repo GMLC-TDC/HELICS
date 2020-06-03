@@ -35,6 +35,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <boost/beast/websocket.hpp>
 #include <boost/config.hpp>
 #include <boost/container/flat_map.hpp>
+#include <boost/uuid/uuid.hpp>  // uuid class
+#include <boost/uuid/uuid_generators.hpp>  // generators
+#include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 #include <cstdlib>
 #include <fstream>
 #include <functional>
@@ -218,7 +221,7 @@ std::pair<return_val, std::string>
     if (command == cmd::unknown) {
         if (fields.find("command") != fields.end()) {
             auto cmdstr = fields.at("command");
-            if (cmdstr == "query" || cmdstr == "search") {
+            if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
                 command = cmd::query;
             }
             if (cmdstr == "create") {
@@ -254,6 +257,10 @@ std::pair<return_val, std::string>
     if (brokerName.empty()) {
         if (fields.find("broker") != fields.end()) {
             brokerName = fields.at("broker");
+        } else if (fields.find("broker_uuid") != fields.end()) {
+            brokerName = fields.at("broker_uuid");
+        } else if (fields.find("uuid") != fields.end()) {
+            brokerName = fields.at("uuid");
         }
     }
     if (brokerName.empty() && target == "brokers") {
@@ -275,6 +282,8 @@ std::pair<return_val, std::string>
         }
         if (fields.find("type") != fields.end()) {
             type = fields.at("type");
+        } else if (fields.find("core_type") != fields.end()) {
+            type = fields.at("core_type");
         }
         helics::core_type ctype{helics::core_type::DEFAULT};
         if (!type.empty()) {
@@ -284,10 +293,29 @@ std::pair<return_val, std::string>
                 return {return_val::bad_request, type + " is not available"};
             }
         }
+        if (fields.find("num_feds") != fields.end()) {
+            start_args += " -f " + fields.at("num_feds");
+        }
+        if (fields.find("num_brokers") != fields.end()) {
+            start_args += " --minbrokers=" + fields.at("num_brokers");
+        }
+        bool useUuid{false};
+        if (brokerName.empty()) {
+            boost::uuids::random_generator generator;
+
+            boost::uuids::uuid uuid1 = generator();
+            std::ostringstream ss1;
+            ss1 << uuid1;
+            brokerName = ss1.str();
+            useUuid = true;
+        }
         brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
         if (!brkr) {
             return {return_val::bad_request, "unable to create broker"};
             // return send(bad_request("unable to create broker"));
+        }
+        if (useUuid) {
+            return {return_val::ok, std::string(R"({"broker_uuid":")") + brokerName + "\"}"};
         }
         return {return_val::ok, emptyString};
     }
