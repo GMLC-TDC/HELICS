@@ -760,7 +760,7 @@ TEST_F(query, queries_query)
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query("root", qstr);
-        EXPECT_NE(qres, "#invalid") << qstr << " produced #invalid in core";
+        EXPECT_NE(qres, "#invalid") << qstr << " produced #invalid in root";
     }
 
     vFed1->finalize();
