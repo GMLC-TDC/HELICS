@@ -12,6 +12,6 @@ fi
 
 for ct in "${coretypes_arr[@]}"; do
     for numnodes in "${numnodes_arr[@]}"; do
-        sbatch --export="CORE_TYPE=${ct}" -N "${numnodes}" phold.sbatch
+        batch --export="CORE_TYPE=${ct},BM_FED=PholdFederate" -N "${numnodes}" index-maxindex-bm.sbatch
     done
 done
