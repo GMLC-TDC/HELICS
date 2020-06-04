@@ -37,4 +37,4 @@ A list of known PRs that made breaking changes is also provided.
 
 - Removed the `helics_message` struct, and renamed `helics_message_object` to `helics_message`. Direct setting of struct fields should be done through API functions instead. This affects a few functions in the `Message` class in `Endpoint.hpp`; the explicit constructor and `release()` methods now take `helics_message` arguments, and `operator helics_message_object()` becomes `operator helics_message()`. Changed in [#1363][1].
 
-[1]: <https://github.com/GMLC-TDC/HELICS/pull/1363> "PR #1363"
+[1]: https://github.com/GMLC-TDC/HELICS/pull/1363 "PR #1363"
