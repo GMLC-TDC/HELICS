@@ -20,7 +20,7 @@ A list of known PRs that made breaking changes is also provided.
 
 ### PRs with breaking changes
 
-- https://github.com/GMLC-TDC/HELICS/pull/1363
+- [PR #1363](https://github.com/GMLC-TDC/HELICS/pull/1363)
 
 ### Application API (C++17)
 
