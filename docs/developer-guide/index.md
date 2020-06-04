@@ -10,5 +10,6 @@
    docs
    benchmarks
    continuous-integration
+   porting-2-to-3
    ../Public_API
 ```
