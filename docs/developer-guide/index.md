@@ -10,5 +10,6 @@
    docs
    benchmarks
    continuous-integration
+   infrastructure
    ../Public_API
 ```
