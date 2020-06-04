@@ -20,20 +20,22 @@ A list of known PRs that made breaking changes is also provided.
 
 ### PRs with breaking changes
 
-- [PR #1363](https://github.com/GMLC-TDC/HELICS/pull/1363)
+- [PR #1363][1]
 
 ### Application API (C++17)
 
-- `Federate::error(int errorcode)` and `Federate::error(int errorcode, const std::string& message)` were removed, use `localError` instead (or `globalError` to stop the entire simulation). Changed in [PR #1363](https://github.com/GMLC-TDC/HELICS/pull/1363).
+- `Federate::error(int errorcode)` and `Federate::error(int errorcode, const std::string& message)` were removed, use `localError` instead (or `globalError` to stop the entire simulation). Changed in [PR #1363][1].
 
 ### C Shared API
 
-- Removed `helics_message` struct -- call functions to set fields instead. `helicsEndpointGetMessage` and `helicsFederateGetMessage` returning this struct were removed -- call functions to get field values instead. Changed in [PR #1363](https://github.com/GMLC-TDC/HELICS/pull/1363).
-- `helics_message_object` typedef was renamed to `helics_message` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `helics_message`. Changed in [PR #1363](https://github.com/GMLC-TDC/HELICS/pull/1363).
+- Removed `helics_message` struct -- call functions to set fields instead. `helicsEndpointGetMessage` and `helicsFederateGetMessage` returning this struct were removed -- call functions to get field values instead. Changed in [PR #1363][1].
+- `helics_message_object` typedef was renamed to `helics_message` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `helics_message`. Changed in [PR #1363][1].
 - Renamed `helicsEndpointSendMessageObject` to `helicsEndpointSendMessage`, `helicsSendMessageObjectZeroCopy` to `helicsSendMessageZeroCopy`, `helicsEndpointGetMessageObject` to `helicsEndpointGetMessage`, `helicsEndpointCreateMessageObject` to `helicsEndpointCreateMessage`, `helicsFederateGetMessageObject` to `helicsFederateGetMessage`, and `helicsFederateCreateMessageObject` to `helicsFederateCreateMessage`. Changed in [PR
-  #1363](https://github.com/GMLC-TDC/HELICS/pull/1363).
-- Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [PR #1363](https://github.com/GMLC-TDC/HELICS/pull/1363).
+  #1363][1].
+- Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [PR #1363][1].
 
 ### C++98 API (wrapper around the C Shared API)
 
-- Removed the `helics_message` struct, and renamed `helics_message_object` to `helics_message`. Direct setting of struct fields should be done through API functions instead. This affects a few functions in the `Message` class in `Endpoint.hpp`; the explicit constructor and `release()` methods now take `helics_message` arguments, and `operator helics_message_object()` becomes `operator helics_message()`. Changed in [PR #1364](https://github.com/GMLC-TDC/HELICS/pull/1363).
+- Removed the `helics_message` struct, and renamed `helics_message_object` to `helics_message`. Direct setting of struct fields should be done through API functions instead. This affects a few functions in the `Message` class in `Endpoint.hpp`; the explicit constructor and `release()` methods now take `helics_message` arguments, and `operator helics_message_object()` becomes `operator helics_message()`. Changed in [PR #1363][1].
+
+[1]: <https://github.com/GMLC-TDC/HELICS/pull/1363> "PR #1363"
