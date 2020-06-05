@@ -24,6 +24,7 @@ Everything within a major version number should be code compatible (with the exc
 - Minor updates to the clang-format to allow better alignment and comment reflow
 - Numerous code refactorings to simplify and clean up code
 - Move all ZMQ related items to the network library
+- Updated Python packages DLL load failed error to suggest installing the latest Visual C++ Runtime
 
 ### Fixed
 
@@ -33,7 +34,7 @@ Everything within a major version number should be code compatible (with the exc
 - Numerous clang-tidy identified issues mostly for code readability
 - Some issues with the exists query not working in certain circumstances and for cores and brokers
 - The nonlings test would fail if the branch name had `error` in it. A check was put into eliminate this false negative test failure.
-- a few sporadic failure cases in the http and websocket tests
+- A few sporadic failure cases in the http and websocket tests
 - A build generation issue with disabling the ZMQ core
 - An error from the config interpreter where some flags were not getting correctly propagated to the Federate configuration.
 
@@ -44,7 +45,7 @@ Everything within a major version number should be code compatible (with the exc
 - "version" and "version_all" queries to get the local version string and the version strings of all the cores/brokers in the federation
 - A few missing operations to the C++98 interface for Message objects, add `helicsMessageClone` and `helicsEndpointCreateMessage` functions in the C interface. Add a test case for some of the C++98 message operations.
 - `helicsQuerySetTarget` and `helicsQuerySetQueryString` operations to modify an existing query in the C interface
-- a set of reduction operations for multi-input handling on inputs, options for setting input source priority and the number of expected connections.
+- A set of reduction operations for multi-input handling on inputs, options for setting input source priority and the number of expected connections
 - A Watts-Strogatz like benchmark
 - A few more parameters that can be handled in the Webserver and support for use of uuid instead of name
 - A few missing message operators to the C++98 API, such as `data`, `append`, `setFlag`, `checkFlag`, `sendMessageZeroCopy`
