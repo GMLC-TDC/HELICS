@@ -106,12 +106,19 @@ HELICS_CXX_EXPORT FederateInfo loadFederateInfo(const std::string& configString)
 /** generate string for passing arguments to the core*/
 HELICS_CXX_EXPORT std::string generateFullCoreInitString(const FederateInfo& fi);
 
-/** get an integer property/flag from a string name of the property or flag
+/** get an integer/time property/flag from a string name of the property or flag
 @param val a name of property to get an integer index code for used in /ref
 CoreFederateInfo::setProperty
 @return the integer code for a given property
 */
 HELICS_CXX_EXPORT int getPropertyIndex(std::string val);
+
+/** get a flag index from a string name of the flag
+@param val a name of flag option to get an integer index code for used in /ref
+CoreFederateInfo::setFlagOption
+@return the integer code for a given flag
+*/
+HELICS_CXX_EXPORT int getFlagIndex(std::string val);
 
 /** get an integer option index for a binary flag option
 @param val a name of flag option to get an integer index code for used in /ref

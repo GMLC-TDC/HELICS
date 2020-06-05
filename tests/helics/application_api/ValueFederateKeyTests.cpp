@@ -6,11 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueFederateTestTemplates.hpp"
+#include "helics/helics_enums.h"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/helics_definitions.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -19,6 +21,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+
+#include <fstream>
+#include <streambuf>
 
 /** these test cases test out the value federates
  */
@@ -290,6 +295,40 @@ TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
     bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
     EXPECT_TRUE(res);
 }
+
+static constexpr const char* config_files[] = {"bes_config.json",
+                                               "bes_config.toml",
+                                               "bes_config2.json",
+                                               "bes_config2.toml"};
+
+class valuefed_flagfile_tests:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {
+};
+
+TEST_P(valuefed_flagfile_tests, configure_test)
+{
+    std::ifstream t(std::string(TEST_DIR) + GetParam());
+
+    std::string config((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+
+    AddBroker("zmq", 1);
+    helics::ValueFederate V2("", config);
+    V2.enterExecutingMode();
+    auto val = V2.getIntegerProperty(helics::defs::log_level);
+    EXPECT_EQ(val, -1);
+    EXPECT_EQ(V2.getName(), "test_bes");
+    bool result = V2.getFlagOption(helics_flag_only_transmit_on_change);
+    EXPECT_TRUE(result);
+    result = V2.getFlagOption(helics_flag_wait_for_current_time_update);
+    EXPECT_TRUE(result);
+    V2.finalize();
+}
+
+INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+                         valuefed_flagfile_tests,
+                         ::testing::ValuesIn(config_files));
+
 
 TEST_F(valuefed_tests, dual_transfer_coreApp_link)
 {
