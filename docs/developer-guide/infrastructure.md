@@ -1,4 +1,4 @@
-# (Planned) Infrastructure
+# (Planned) CI/CD Infrastructure
 
 This section documents the services used by HELICS.
 
@@ -41,6 +41,7 @@ build all supported core types, and use a fairly recent version of dependencies.
 - GCC 10 [commit]
 - Clang 10 [commit]
 - GCC 10 with ZeroMQ as a subproject [daily]
+- CentOS 5 or 6 (same image as for releases)
 
 For auto-generated swig PRs, there is a special build that will run to test a build using the
 pre-generated swig interface files.
@@ -67,7 +68,7 @@ released in about the past 3 years that's supported by Apple (or is available on
 images). Apple tends to be pretty good at getting people to upgrade and dropping support for older
 releases.
 
-- XCode 10
+- XCode 10.1
 - XCode 11
 
 ### ARM
