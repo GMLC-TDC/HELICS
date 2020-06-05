@@ -208,23 +208,24 @@ typedef enum {
 typedef enum {
     /** time and priority order the inputs from the core library*/
     helics_multi_input_no_op = 0,
+    /** vectorize the inputs either double vector or string vector*/
+    helics_multi_input_vectorize_operation = 1,
     /** all inputs are assumed to be boolean and all must be true to return true*/
-    helics_multi_input_and_operation = 1,
+    helics_multi_input_and_operation = 2,
     /** all inputs are assumed to be boolean and at least one must be true to return true*/
-    helics_multi_input_or_operation = 2,
+    helics_multi_input_or_operation = 3,
     /** sum all the inputs*/
-    helics_multi_input_sum_operation = 3,
+    helics_multi_input_sum_operation = 4,
     /** do a difference operation on the inputs, first-sum(rest)
     for double input, vector diff for vector input*/
-    helics_multi_input_diff_operation = 4,
+    helics_multi_input_diff_operation = 5,
     /** find the max of the inputs*/
-    helics_multi_input_max_operation = 5,
+    helics_multi_input_max_operation = 6,
     /** find the min of the inputs*/
-    helics_multi_input_min_operation = 6,
+    helics_multi_input_min_operation = 7,
     /** take the average of the inputs*/
-    helics_multi_input_average_operation = 7,
-    /** vectorize the inputs either double vector or string vector*/
-    helics_multi_input_vectorize_operation = 8
+    helics_multi_input_average_operation = 8
+
 } helics_multi_input_mode;
 
 /** enumeration of options that apply to handles*/
@@ -246,9 +247,9 @@ typedef enum {
     /** specify that the mismatching units should be ignored*/
     helics_handle_option_ignore_unit_mismatch = 447,
     /** specify that an interface will only transmit on change(only applicable to publications)*/
-    helics_handle_option_only_transmit_on_change = 6,
+    helics_handle_option_only_transmit_on_change = 452,
     /** specify that an interface will only update if the value has actually changed*/
-    helics_handle_option_only_update_on_change = 8,
+    helics_handle_option_only_update_on_change = 454,
     /** specify that an interface does not participate in determining time interrupts*/
     helics_handle_option_ignore_interrupts = 475,
     /** specify the multi-input processing method for inputs*/

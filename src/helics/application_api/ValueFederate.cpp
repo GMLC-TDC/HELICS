@@ -366,6 +366,16 @@ data_view ValueFederate::getValueRaw(const Input& inp)
     return vfManager->getValue(inp);
 }
 
+double ValueFederate::getDouble(Input& inp)
+{
+    return inp.getValue<double>();
+}
+/** get a string value*/
+const std::string& ValueFederate::getString(Input& inp)
+{
+    return inp.getValueRef<std::string>();
+}
+
 void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
@@ -376,7 +386,17 @@ void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLI
     }
 }
 
-using dvalue = std::variant<double, std::string>;
+void ValueFederate::publish(Publication& pub, const std::string& str)
+{
+    pub.publish(str);
+}
+
+void ValueFederate::publish(Publication& pub, double val)
+{
+    pub.publish(val);
+}
+
+using dvalue = mpark::variant<double, std::string>;
 
 static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          const std::string& prefix,
@@ -443,9 +463,9 @@ void ValueFederate::publishJSON(const std::string& jsonString)
         auto& pub = getPublication(vp.first);
         if (pub.isValid()) {
             if (vp.second.index() == 0) {
-                pub.publish(std::get<double>(vp.second));
+                pub.publish(mpark::get<double>(vp.second));
             } else {
-                pub.publish(std::get<std::string>(vp.second));
+                pub.publish(mpark::get<std::string>(vp.second));
             }
         }
     }

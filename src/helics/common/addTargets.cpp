@@ -19,9 +19,6 @@ void processOptions(const toml::value& section,
 {
     const auto& t = section.as_table();
     for (const auto& telement : t) {
-        if (telement.second.is_array() || telement.second.is_table()) {
-            continue;
-        }
         int32_t index = optionConversion(telement.first);
         if (index >= 0) {
             int32_t val = -1;
@@ -42,11 +39,9 @@ void processOptions(const Json::Value& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
+    auto sIterator = section.begin();
     auto stop = section.end();
-    for (auto sIterator = section.begin(); sIterator != stop; ++sIterator) {
-        if (sIterator->isArray() || sIterator->isObject()) {
-            continue;
-        }
+    while (sIterator != stop) {
         int32_t index = optionConversion(sIterator.name());
         if (index >= 0) {
             int32_t val = -1;
@@ -59,6 +54,7 @@ void processOptions(const Json::Value& section,
             }
             optionAction(index, val);
         }
+        ++sIterator;
     }
 }
 }  // namespace helics
