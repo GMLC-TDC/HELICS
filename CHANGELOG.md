@@ -8,16 +8,35 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.5.1][] ~ 2020-05-25
+## [2.5.1][] ~ 2020-06-05
 
 ### Changed
 
 - All ZeroMQ related files are now located in the network library and under a single namespace
 - Use Python 3.8 instead of 3.6 for any release build installers that include a copy of the Python interface (`pip` or `anaconda` are the recommended ways to install the Python interface)
+- Update units library to include some typical natural gas units and conversions
+- Use a separate action for automated pr generation
+- Update the CLI11 library
+- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `helics_bool` was already an int.
+- In the case of multiple sources, `getInjectionType`, and `getInjectionUnits` now will return a json string vector.
+- The CMake build generation now uses a central location for all build artifacts instead of individual directories.
+- Updated the ASIO library to 1-16
+- Minor updates to the clang-format to allow better alignment and comment reflow
+- Numerous code refactorings to simplify and clean up code
+- Move all ZMQ related items to the network library
+- Updated Python packages DLL load failed error to suggest installing the latest Visual C++ Runtime
 
 ### Fixed
 
 - Sporadic failures in the Webserver and websocket tests
+- A bug in the translation of vectors to complex vectors
+- A bug in the copying of vectors into the C shared library
+- Numerous clang-tidy identified issues mostly for code readability
+- Some issues with the exists query not working in certain circumstances and for cores and brokers
+- The nonlings test would fail if the branch name had `error` in it. A check was put into eliminate this false negative test failure.
+- A few sporadic failure cases in the http and websocket tests
+- A build generation issue with disabling the ZMQ core
+- An error from the config interpreter where some flags were not getting correctly propagated to the Federate configuration.
 
 ### Added
 
@@ -26,10 +45,19 @@ Everything within a major version number should be code compatible (with the exc
 - "version" and "version_all" queries to get the local version string and the version strings of all the cores/brokers in the federation
 - A few missing operations to the C++98 interface for Message objects, add `helicsMessageClone` and `helicsEndpointCreateMessage` functions in the C interface. Add a test case for some of the C++98 message operations.
 - `helicsQuerySetTarget` and `helicsQuerySetQueryString` operations to modify an existing query in the C interface
-
-### Deprecated
-
-### Removed
+- A set of reduction operations for multi-input handling on inputs, options for setting input source priority and the number of expected connections
+- A Watts-Strogatz like benchmark
+- A few more parameters that can be handled in the Webserver and support for use of uuid instead of name
+- A few missing message operators to the C++98 API, such as `data`, `append`, `setFlag`, `checkFlag`, `sendMessageZeroCopy`
+- Made the Message class return a self Reference for the setters
+- A test to run the helics-broker executable as part of the CI tests
+- A bug in the helics_broker that no longer ran correct defaults
+- A "version_all" query, to retrieve the version of HELICS in use for all cores/brokers, and a "version" query to retrieve the version of a specific target.
+- A series of checks for markdown, spelling, shellcheck, python formatting, cpplint, end-of-line and automated generation of PR scripts for the formatting updates.
+- Some level of automated scaling for benchmarks for small systems
+- API functions for retrieving the build flags used to generate the library
+- Some additional message interpreters to aid in debugging
+- A test using the standalone `helics_broker` to run an example
 
 ## [2.5.0][] - 2020-04-26
 
