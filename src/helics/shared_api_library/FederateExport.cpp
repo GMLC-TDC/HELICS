@@ -318,12 +318,28 @@ int helicsGetPropertyIndex(const char* val)
     return helics::getPropertyIndex(val);
 }
 
+int helicsGetFlagIndex(const char* val)
+{
+    if (val == nullptr) {
+        return -1;
+    }
+    return helics::getFlagIndex(val);
+}
+
 int helicsGetOptionIndex(const char* val)
 {
     if (val == nullptr) {
         return -1;
     }
     return helics::getOptionIndex(val);
+}
+
+int helicsGetOptionValue(const char* val)
+{
+    if (val == nullptr) {
+        return -1;
+    }
+    return helics::getOptionValue(val);
 }
 
 void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, helics_bool value, helics_error* err)

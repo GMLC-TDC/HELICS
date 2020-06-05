@@ -703,6 +703,13 @@ HELICS_EXPORT void helicsFederateInfoSetLocalPort(helics_federate_info fi, const
 HELICS_EXPORT int helicsGetPropertyIndex(const char* val);
 
 /**
+ * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,
+ * @param val A string with the option name.
+ * @return An int with the property code or (-1) if not a valid property.
+ */
+HELICS_EXPORT int helicsGetFlagIndex(const char* val);
+
+/**
  * Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
  * /ref helicsFilterSetOption, and the corresponding get functions.
  *
@@ -711,6 +718,16 @@ HELICS_EXPORT int helicsGetPropertyIndex(const char* val);
  * @return An int with the option index or (-1) if not a valid property.
  */
 HELICS_EXPORT int helicsGetOptionIndex(const char* val);
+
+/**
+ * Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
+ * /ref helicsFilterSetOption.
+ *
+ * @param val A string representing the value.
+ *
+ * @return An int with the option value or (-1) if not a valid value.
+ */
+HELICS_EXPORT int helicsGetOptionValue(const char* val);
 
 /**
  * Set a flag in the info structure.
