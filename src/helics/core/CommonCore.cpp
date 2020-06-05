@@ -1033,8 +1033,8 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, int32_
     fcn.dest_handle = handle;
     fcn.messageID = option;
     fcn.counter = static_cast<uint16_t>(handleInfo->handleType);
-
-    if (option_value) {
+    fcn.setExtraDestData(option_value);
+    if (option_value != 0) {
         setActionFlag(fcn, indicator_flag);
     }
     if (handleInfo->handleType != handle_type::filter) {

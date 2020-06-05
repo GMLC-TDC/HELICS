@@ -1,0 +1,24 @@
+#this is a toml configuration file for HELICS value federate
+#example toml configuration file for a value federate all arguments are optional
+
+name="valueFed_multi_toml" # the name of the federate
+
+coretype="test" #the type of the core "test","zmq","udp","ipc","tcp","mpi"
+corename="multi_core2"  #this matters most for ipc and test cores, can be empty
+coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
+
+
+inputs=[
+{key="ipt2",  type="double", targets=["pub1","pub2"], connections=2, multi_input_handling_method="average"}
+]  #specify an input with a target
+
+#Publications used in the federate
+[[publications]]
+key="pub1" # the name of the publication
+ type="double" # the type associated with a publication
+ global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+
+[[publications]]
+key="pub2" # the name of the publication
+ type="double" # the type associated with a publication
+ global=true

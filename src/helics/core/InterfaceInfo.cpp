@@ -197,9 +197,10 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
     return true;
 }
 
+// NOLINTNEXTLINE
 bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
                                         int32_t /*option*/,
-                                        int32_t /*value*/)  // NOLINT
+                                        int32_t /*value*/)
 {
     // there will likely be some future properties
     // auto ept = getEndpoint (id);
@@ -209,7 +210,7 @@ bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
 
 int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) const
 {
-    auto ipt = getInput(id);
+    const auto* ipt = getInput(id);
     if (ipt == nullptr) {
         return 0;
     }
@@ -251,7 +252,7 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
 
 int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t option) const
 {
-    auto pub = getPublication(id);
+    const auto* pub = getPublication(id);
     if (pub == nullptr) {
         return 0;
     }
@@ -283,6 +284,7 @@ int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t optio
     return flagval ? 1 : 0;
 }
 
+// NOLINTNEXTLINE
 int32_t InterfaceInfo::getEndpointProperty(interface_handle /*id*/, int32_t /*option*/) const
 {
     // auto ept = getEndpoint (id);
@@ -313,9 +315,13 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                 } else {
                     issues.emplace_back(
                         helics::defs::errors::connection_failure,
-                        fmt::format("Input {} requires {} connections but only {} were made",
+                        fmt::format("Input {} requires {} connections but{} {} were made",
                                     ipt->key,
                                     ipt->required_connnections,
+                                    (ipt->input_sources.size() <
+                                     static_cast<size_t>(ipt->required_connnections)) ?
+                                        " only" :
+                                        "",
                                     ipt->input_sources.size()));
                 }
             }
