@@ -13,3 +13,4 @@ curl \
     --upload-file "${FILE}" \
     "${UPLOAD_URL%\{*}?name=${FILE}"
 popd || exit
+

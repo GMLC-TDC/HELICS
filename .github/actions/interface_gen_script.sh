@@ -14,3 +14,4 @@ cmake -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DHELICS_SWIG_GENERA
 make -j2 pyfile_overwrite
 make -j2 javafile_overwrite
 popd || exit
+

@@ -38,3 +38,4 @@ rm "$ZIP_FILE"
 7z a "$ZIP_FILE" -r *
 mkdir ../artifact
 mv "$ZIP_FILE" "../artifact/${ZIP_FILE/-win/-${MSVC_VER}-win}"
+
