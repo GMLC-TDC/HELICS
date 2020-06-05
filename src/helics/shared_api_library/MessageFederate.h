@@ -253,7 +253,7 @@ HELICS_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
  *
  * @details The message is empty and isValid will return false since there is no data associated with the message yet.
  *
- * @param fed the endpoint object to associate the message with
+ * @param endpoint The endpoint object to associate the message with.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
