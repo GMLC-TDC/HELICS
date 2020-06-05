@@ -3258,7 +3258,8 @@ def helicsEndpointCreateMessageObject(endpoint: "helics_endpoint") -> "helics_me
 
     The message is empty and isValid will return false since there is no data associated with the message yet.
 
-    :param fed: the endpoint object to associate the message with
+    :type endpoint: void
+    :param endpoint: The endpoint object to associate the message with.
 
 
     :rtype: void
