@@ -5,7 +5,7 @@ This section documents the services used by HELICS.
 ## Continuous Integration
 
 The `GMLC-TDC/HELICS` repository uses Azure Pipelines to test the main platforms and compilers we support,
-with Drone Cloud and Cirrus CI for testing some less common platforms, and CircleCI for running tests using sanitizers. 
+with Drone Cloud and Cirrus CI for testing some less common platforms, and CircleCI for running tests using sanitizers.
 Nightly release builds are run on GitHub Actions.
 
 All of the builds on Linux use Docker containers. This has a number of advantages:
@@ -40,7 +40,7 @@ build all supported core types, and use a fairly recent version of dependencies.
 - Clang 5.0 using minimum supported version of all dependencies
 - GCC 10 [commit]
 - Clang 10 [commit]
-- GCC 10 with ZeroMQ as a subproject [daily] 
+- GCC 10 with ZeroMQ as a subproject [daily]
 
 For auto-generated swig PRs, there is a special build that will run to test a build using the
 pre-generated swig interface files.
@@ -135,4 +135,3 @@ a benchmark performance regression test.
 A small AWS instance is used to perform various orchestration tasks related to releases, and controlling
 the cluster used for multinode regression tests. It also runs bots that use GitHub events for providing
 some services such as repository maintenance tasks and monitoring the automated release process.
-
