@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+
 #include <fstream>
 #include <streambuf>
 
@@ -50,17 +51,16 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // register the publications
     Publication pubid(vFed1.get(), "pub1", helicsType<std::string>());
-    Publication pubid2(GLOBAL, vFed1, "pub2", helicsType<double>());
+    PublicationT<int> pubid2(GLOBAL, vFed1, "pub2");
 
     Publication pubid3(vFed1, "pub3", helicsType<double>(), "V");
 
     // these aren't meant to match the publications
-    auto& subid1 = vFed1->registerSubscription("sub1");
+    auto& subid1 = make_subscription(*vFed1, "sub1");
 
-    auto subid2 = vFed1->registerGlobalInput<int>("inpA");
-    subid2.addTarget("sub2");
+    auto subid2 = make_subscription<int>(*vFed1, "sub2");
 
-    auto& subid3 = vFed1->registerSubscription("sub3", "V");
+    auto& subid3 = make_subscription(*vFed1, "sub3", "V");
     // enter execution
     vFed1->enterExecutingMode();
 
@@ -73,7 +73,6 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     const auto& sub3name = subid3.getTarget();
     EXPECT_EQ(sub3name, "sub3");
 
-    EXPECT_EQ(subid2.getName(), "inpA");
     EXPECT_TRUE(subid1.getType().empty());  // def is the default type
     EXPECT_EQ(subid2.getType(), "int32");
     EXPECT_TRUE(subid3.getType().empty());
@@ -149,7 +148,7 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -163,7 +162,7 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
         correct = false;
     }
     // get the value
-    std::string s = subid.getValue<std::string>();
+    std::string s = vFed2->getString(subid);
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
@@ -171,7 +170,7 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
         correct = false;
     }
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     // make sure the value is still what we expect
     subid.getValue(s);
     EXPECT_EQ(s, "string1");
@@ -297,7 +296,6 @@ TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
     EXPECT_TRUE(res);
 }
 
-#ifdef ENABLE_ZMQ_CORE
 static constexpr const char* config_files[] = {"bes_config.json",
                                                "bes_config.toml",
                                                "bes_config2.json",
@@ -310,8 +308,7 @@ class valuefed_flagfile_tests:
 
 TEST_P(valuefed_flagfile_tests, configure_test)
 {
-    std::string file = std::string(TEST_DIR) + GetParam();
-    std::ifstream t(file);
+    std::ifstream t(std::string(TEST_DIR) + GetParam());
 
     std::string config((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 
@@ -331,7 +328,6 @@ TEST_P(valuefed_flagfile_tests, configure_test)
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_flagfile_tests,
                          ::testing::ValuesIn(config_files));
-#endif
 
 TEST_F(valuefed_tests, dual_transfer_coreApp_link)
 {
@@ -573,15 +569,15 @@ TEST_P(valuefed_single_type, init_publish)
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode();
-    pubid.publish(1.0);
+    vFed1->publish(pubid, 1.0);
 
     vFed1->enterExecutingMode();
     // get the value set at initialization
-    double val = subid.getDouble();
+    double val = vFed1->getDouble(subid);
 
     EXPECT_EQ(val, 1.0);
     // publish string1 at time=0.0;
-    pubid.publish(2.0);
+    vFed1->publish(pubid, 2.0);
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -591,9 +587,9 @@ TEST_P(valuefed_single_type, init_publish)
     // make sure the string is what we expect
     EXPECT_EQ(val, 2.0);
     // publish a second string
-    pubid.publish(3.0);
+    vFed1->publish(pubid, 3.0);
     // make sure the value is still what we expect
-    val = subid.getDouble();
+    val = vFed1->getDouble(subid);
 
     EXPECT_EQ(val, 2.0);
     // advance time
@@ -663,12 +659,12 @@ TEST_P(valuefed_single_type, all_callback)
         EXPECT_TRUE(false) << " missed callback\n";
     }
 
-    pubid2.publish(4);
+    vFed1->publish(pubid2, 4);
     vFed1->requestTime(2.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub2.getHandle());
     EXPECT_EQ(lastTime, 2.0);
-    pubid1.publish("this is a test");
+    vFed1->publish(pubid1, "this is a test");
     vFed1->requestTime(3.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub1.getHandle());
@@ -679,14 +675,14 @@ TEST_P(valuefed_single_type, all_callback)
         [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
     vFed1->publishRaw(pubid3, db);
-    pubid2.publish(4);
+    vFed1->publish(pubid2, 4);
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 2);
     ccnt = 0;  // reset the counter
     vFed1->publishRaw(pubid3, db);
-    pubid2.publish(4);
-    pubid1.publish("test string2");
+    vFed1->publish(pubid2, 4);
+    vFed1->publish(pubid1, "test string2");
     vFed1->requestTime(5.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 3);
@@ -705,18 +701,18 @@ TEST_P(valuefed_single_type, transfer_close)
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    std::string s = subid.getString();
+    std::string s = vFed1->getString(subid);
     // get the value
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     // make sure the value is still what we expect
-    s = subid.getString();
+    s = vFed1->getString(subid);
     EXPECT_EQ(s, "string1");
 
     vFed1->closeInterface(pubid.getHandle());
@@ -724,15 +720,15 @@ TEST_P(valuefed_single_type, transfer_close)
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = subid.getString();
+    s = vFed1->getString(subid);
 
     EXPECT_EQ(s, "string2");
-    pubid.publish("string3");
+    vFed1->publish(pubid, "string3");
     // make sure the value is still what we expect
 
     // advance time
     gtime = vFed1->requestTime(3.0);
-    s = subid.getString();
+    s = vFed1->getString(subid);
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -750,19 +746,18 @@ TEST_P(valuefed_single_type, transfer_remove_target)
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    std::string s = subid.getString();
+    std::string s = vFed1->getString(subid);
     // get the value
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     // make sure the value is still what we expect
-    s = subid.getString();
-    subid.getString();
+    s = vFed1->getString(subid);
     EXPECT_EQ(s, "string1");
 
     subid.removeTarget("pub1");
@@ -770,15 +765,15 @@ TEST_P(valuefed_single_type, transfer_remove_target)
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = subid.getString();
+    s = vFed1->getString(subid);
 
     EXPECT_EQ(s, "string2");
-    pubid.publish("string3");
+    vFed1->publish(pubid, "string3");
     // make sure the value is still what we expect
 
     // advance time
     gtime = vFed1->requestTime(3.0);
-    s = subid.getString();
+    s = vFed1->getString(subid);
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -801,7 +796,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -809,12 +804,12 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     gtime = f1time.get();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = vFed2->getString(subid);
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     // make sure the value is still what we expect
     subid.getValue(s);
     EXPECT_EQ(s, "string1");
@@ -832,13 +827,13 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
 
     EXPECT_EQ(s, "string2");
 
-    pubid.publish("string3");
+    vFed1->publish(pubid, "string3");
     // make sure the value is still what we expect
 
     // advance time
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
     gtime = vFed2->requestTime(3.0);
-    s = subid.getString();
+    s = vFed2->getString(subid);
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -862,7 +857,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -870,12 +865,12 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     gtime = f1time.get();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = vFed2->getString(subid);
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     // make sure the value is still what we expect
     subid.getValue(s);
     EXPECT_EQ(s, "string1");
@@ -893,7 +888,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     subid.getValue(s);
 
     EXPECT_EQ(s, "string2");
-    pubid.publish("string3");
+    vFed1->publish(pubid, "string3");
     // so in theory the remove target could take a little while since it needs to route through the
     // core on occasion
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
@@ -903,7 +898,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     EXPECT_EQ(gtime, 3.0);
 
     // make sure the value is still what we expect
-    s = subid.getString();
+    s = vFed2->getString(subid);
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
@@ -928,13 +923,13 @@ TEST_F(valuefed_tests, rem_target_single_test)
     f1finish.wait();
     // both at executionMode
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto gtime = vFed1->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     gtime = vFed1->requestTime(2.0);
-    pubid.publish("string3");
+    vFed1->publish(pubid, "string3");
     gtime = vFed1->requestTime(3.0);
     EXPECT_EQ(gtime, 3.0);
     vFed1->finalize();
@@ -943,7 +938,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     gtime = vFed2->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = vFed2->getString(subid);
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
@@ -970,7 +965,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     EXPECT_EQ(gtime, 3.0);
 
     // make sure the value is still what we expect
-    s = subid.getString();
+    s = vFed2->getString(subid);
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
 
@@ -995,7 +990,7 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    pubid.publish("string1");
+    vFed1->publish(pubid, "string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -1003,12 +998,12 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     gtime = f1time.get();
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = subid.getString();
+    std::string s = vFed2->getString(subid);
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish("string2");
+    vFed1->publish(pubid, "string2");
     // make sure the value is still what we expect
     subid.getValue(s);
     EXPECT_EQ(s, "string1");
@@ -1026,13 +1021,13 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 
     EXPECT_EQ(s, "string2");
 
-    pubid.publish("string3");
+    vFed1->publish(pubid, "string3");
     // make sure the value is still what we expect
 
     // advance time
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
     gtime = vFed2->requestTime(3.0);
-    s = subid.getString();
+    s = vFed2->getString(subid);
     // make sure we didn't get the last publish
     EXPECT_EQ(s, "string2");
     vFed1->finalize();
