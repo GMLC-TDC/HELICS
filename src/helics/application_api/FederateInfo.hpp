@@ -114,7 +114,7 @@ CoreFederateInfo::setProperty
 HELICS_CXX_EXPORT int getPropertyIndex(std::string val);
 
 /** get a flag index from a string name of the flag
-@param val a name of flag option to get an integer index code for used in /ref
+@param val a name of a flag option to get an integer index code for use in /ref
 CoreFederateInfo::setFlagOption
 @return the integer code for a given flag
 */
