@@ -2708,7 +2708,7 @@ public class helics {
    * <br>
    * The message is empty and isValid will return false since there is no data associated with the message yet.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint object to associate the message with.<br>
    * <br>
    * <br>
    * @return A new helics_message_object.
