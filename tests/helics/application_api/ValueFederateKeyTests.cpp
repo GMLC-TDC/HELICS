@@ -6,13 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueFederateTestTemplates.hpp"
-#include "helics/helics_enums.h"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/helics_definitions.hpp"
+#include "helics/helics_enums.h"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -328,7 +328,6 @@ TEST_P(valuefed_flagfile_tests, configure_test)
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_flagfile_tests,
                          ::testing::ValuesIn(config_files));
-
 
 TEST_F(valuefed_tests, dual_transfer_coreApp_link)
 {

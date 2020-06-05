@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
 #include "../core/helicsVersion.hpp"
 #include "gmlc/utilities/stringOps.h"
-#include "../common/addTargets.hpp"
 
 #include <iostream>
 #include <map>
@@ -245,8 +245,7 @@ int getPropertyIndex(std::string val)
         return fnd->second;
     }
     auto res = getFlagIndex(val);
-    if (res >= 0)
-    {
+    if (res >= 0) {
         return res;
     }
     val.erase(std::remove(val.begin(), val.end(), '_'), val.end());
@@ -578,8 +577,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     };
 
     for (const auto& prop : propStringsTranslations) {
-        if (prop.second > 200)
-        {
+        if (prop.second > 200) {
             continue;
         }
         callIfMember(doc, prop.first, timeCall);
@@ -589,7 +587,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         doc,
         [](const std::string& option) { return getFlagIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
-        [this](int32_t option, int32_t value) { setFlagOption(option, value!=0); });
+        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
 
     if (runArgParser) {
         auto app = makeCLIApp();
@@ -631,7 +629,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         callIfMember(doc, prop.first, timeCall);
     }
 
-     processOptions(
+    processOptions(
         doc,
         [](const std::string& option) { return getFlagIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
