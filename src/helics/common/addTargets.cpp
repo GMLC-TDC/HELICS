@@ -42,11 +42,9 @@ void processOptions(const Json::Value& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction)
 {
-    
     auto stop = section.end();
-    for (auto sIterator = section.begin(); sIterator != stop;++sIterator) {
-        if (sIterator->isArray() || sIterator->isObject())
-        {
+    for (auto sIterator = section.begin(); sIterator != stop; ++sIterator) {
+        if (sIterator->isArray() || sIterator->isObject()) {
             continue;
         }
         int32_t index = optionConversion(sIterator.name());
