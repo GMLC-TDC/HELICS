@@ -56,7 +56,7 @@ branch name.
 - MSVC2019 64bit Build and test with Java and Python [commit]
 - MinGW [daily]
 - MSYS [daily]
-- Cygwin [daily]
+- Cygwin 32-bit [daily]
 
 ### macOS
 
