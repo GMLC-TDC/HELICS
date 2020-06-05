@@ -671,7 +671,8 @@ TEST_P(valuefed_single_type, all_callback)
     EXPECT_EQ(lastTime, 3.0);
 
     int ccnt = 0;
-    vFed1->setInputNotificationCallback([&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
+    vFed1->setInputNotificationCallback(
+        [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
     vFed1->publishRaw(pubid3, db);
     vFed1->publish(pubid2, 4);
