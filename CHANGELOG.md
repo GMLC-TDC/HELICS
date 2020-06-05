@@ -57,6 +57,7 @@ Everything within a major version number should be code compatible (with the exc
 - Some level of automated scaling for benchmarks for small systems
 - API functions for retrieving the build flags used to generate the library
 - Some additional message interpreters to aid in debugging
+- A test using the standalone `helics_broker` to run an example
 
 ## [2.5.0][] - 2020-04-26
 
