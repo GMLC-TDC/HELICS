@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
@@ -64,10 +65,9 @@ static const std::map<std::string, int> propStringsTranslations{
     {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
     {"maxIterations", helics_property_int_max_iterations},
-    {"iterations", helics_property_int_max_iterations},
-    {"interruptible", helics_flag_interruptible},
-    {"uninterruptible", helics_flag_uninterruptible},
-    {"observer", helics_flag_observer},
+    {"iterations", helics_property_int_max_iterations}};
+
+static const std::map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
@@ -99,54 +99,12 @@ static const std::map<std::string, int> propStringsTranslations{
     {"required", helics_handle_option_connection_required},
     {"optional", helics_handle_option_connection_optional},
     {"wait_for_current_time", helics_flag_wait_for_current_time_update},
+    {"wait_for_current_time_update", helics_flag_wait_for_current_time_update},
+    {"waitforcurrenttimeupdate", helics_flag_wait_for_current_time_update},
+    {"waitforcurrenttime", helics_flag_wait_for_current_time_update},
     {"terminate_on_error", helics_flag_terminate_on_error},
     {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
-
-static const std::set<std::string> validTimeProperties{"period",      "timedelta",    "time_delta",
-                                                       "timeDelta",   "offset",       "rtlead",
-                                                       "rtLead",      "rtlag",        "rtLag",
-                                                       "rttolerance", "rtTolerance",  "rt_lead",
-                                                       "rt_lag",      "rt_tolerance", "inputdelay",
-                                                       "inputDelay",  "outputdelay",  "outputDelay",
-                                                       "input_delay", "output_delay"};
-
-static const std::set<std::string> validIntProperties{"max_iterations",
-                                                      "loglevel",
-                                                      "log_level",
-                                                      "logLevel",
-                                                      "maxIterations",
-                                                      "maxiterations"};
-
-static const std::set<std::string> validFlagOptions{"interruptible",
-                                                    "uninterruptible",
-                                                    "observer",
-                                                    "source_only",
-                                                    "sourceonly",
-                                                    "sourceOnly",
-                                                    "only_update_on_change",
-                                                    "only_transmit_on_change",
-                                                    "forward_compute",
-                                                    "realtime",
-                                                    "realTime",
-                                                    "delayed_update",
-                                                    "wait_for_current_time",
-                                                    "strict_input_type_checking",
-                                                    "ignore_unit_mismatch",
-                                                    "restrictive_time_policy",
-                                                    "conservative_time_policy",
-                                                    "restrictive_time",
-                                                    "conservative_time",
-                                                    "buffer_data",
-                                                    "slow_response",
-                                                    "slow_responding",
-                                                    "disable_ping",
-                                                    "no_ping",
-                                                    "slow",
-                                                    "required",
-                                                    "optional",
-                                                    "terminate_on_error",
-                                                    "terminateonerror"};
 
 static const std::map<std::string, int> optionStringsTranslations{
     {"buffer", helics_handle_option_buffer_data},
@@ -217,14 +175,14 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
         }
-        auto loc = validFlagOptions.find(flg);
-        if (loc != validFlagOptions.end()) {
-            fi.setFlagOption(propStringsTranslations.at(flg), true);
+        auto loc = flagStringsTranslations.find(flg);
+        if (loc != flagStringsTranslations.end()) {
+            fi.setFlagOption(loc->second, true);
         } else {
             if (flg.front() == '-') {
-                loc = validFlagOptions.find(flg.substr(1));
-                if (loc != validFlagOptions.end()) {
-                    fi.setFlagOption(propStringsTranslations.at(flg.substr(1)), false);
+                loc = flagStringsTranslations.find(flg.substr(1));
+                if (loc != flagStringsTranslations.end()) {
+                    fi.setFlagOption(loc->second, false);
                 }
                 continue;
             }
@@ -250,9 +208,32 @@ int getPropertyIndex(std::string val)
     if (fnd != propStringsTranslations.end()) {
         return fnd->second;
     }
+    auto res = getFlagIndex(val);
+    if (res >= 0) {
+        return res;
+    }
     val.erase(std::remove(val.begin(), val.end(), '_'), val.end());
     fnd = propStringsTranslations.find(val);
     if (fnd != propStringsTranslations.end()) {
+        return fnd->second;
+    }
+    return getFlagIndex(val);
+}
+
+int getFlagIndex(std::string val)
+{
+    auto fnd = flagStringsTranslations.find(val);
+    if (fnd != flagStringsTranslations.end()) {
+        return fnd->second;
+    }
+    gmlc::utilities::makeLowerCase(val);
+    fnd = flagStringsTranslations.find(val);
+    if (fnd != flagStringsTranslations.end()) {
+        return fnd->second;
+    }
+    val.erase(std::remove(val.begin(), val.end(), '_'), val.end());
+    fnd = flagStringsTranslations.find(val);
+    if (fnd != flagStringsTranslations.end()) {
         return fnd->second;
     }
     return -1;
@@ -537,9 +518,19 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         setProperty(propStringsTranslations.at(fname), arg);
     };
 
-    for (const auto& prop : validTimeProperties) {
-        callIfMember(doc, prop, timeCall);
+    for (const auto& prop : propStringsTranslations) {
+        if (prop.second > 200) {
+            continue;
+        }
+        callIfMember(doc, prop.first, timeCall);
     }
+
+    processOptions(
+        doc,
+        [](const std::string& option) { return getFlagIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
+
     if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();
@@ -573,9 +564,19 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         setProperty(propStringsTranslations.at(fname), arg);
     };
 
-    for (const auto& prop : validTimeProperties) {
-        callIfMember(doc, prop, timeCall);
+    for (const auto& prop : propStringsTranslations) {
+        if (prop.second > 200) {
+            continue;
+        }
+        callIfMember(doc, prop.first, timeCall);
     }
+
+    processOptions(
+        doc,
+        [](const std::string& option) { return getFlagIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
+
     if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();

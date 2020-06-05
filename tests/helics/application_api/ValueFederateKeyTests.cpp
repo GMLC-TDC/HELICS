@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/helics_definitions.hpp"
+#include "helics/helics_enums.h"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -21,6 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 #include <fstream>
+
+#include <fstream>
+#include <streambuf>
 
 /** these test cases test out the value federates
  */
@@ -77,11 +81,11 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // check publications
 
-    auto pk = pubid.getKey();
-    auto pk2 = pubid2.getKey();
+    const auto& pk = pubid.getKey();
+    const auto& pk2 = pubid2.getKey();
     EXPECT_EQ(pk, "fed0/pub1");
     EXPECT_EQ(pk2, "pub2");
-    auto pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");
@@ -417,7 +421,7 @@ TEST_F(valuefed_tests, dual_transfer_broker_link_json_string)
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    broker->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    broker->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
 
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
@@ -549,7 +553,7 @@ TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    core->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    core->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
     core = nullptr;
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
@@ -670,7 +674,8 @@ TEST_P(valuefed_single_type, all_callback)
     EXPECT_EQ(lastTime, 3.0);
 
     int ccnt = 0;
-    vFed1->setInputNotificationCallback([&](const helics::Input&, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback(
+        [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
     vFed1->publishRaw(pubid3, db);
     vFed1->publish(pubid2, 4);
