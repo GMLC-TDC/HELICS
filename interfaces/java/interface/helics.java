@@ -737,6 +737,15 @@ public class helics {
   }
 
   /**
+   * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,<br>
+   * @param val A string with the option name.<br>
+   * @return An int with the property code or (-1) if not a valid property.
+   */
+  public static int helicsGetFlagIndex(String val) {
+    return helicsJNI.helicsGetFlagIndex(val);
+  }
+
+  /**
    * Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,<br>
    * /ref helicsFilterSetOption, and the corresponding get functions.<br>
    * <br>
@@ -746,6 +755,18 @@ public class helics {
    */
   public static int helicsGetOptionIndex(String val) {
     return helicsJNI.helicsGetOptionIndex(val);
+  }
+
+  /**
+   * Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,<br>
+   * /ref helicsFilterSetOption.<br>
+   * <br>
+   * @param val A string representing the value.<br>
+   * <br>
+   * @return An int with the option value or (-1) if not a valid value.
+   */
+  public static int helicsGetOptionValue(String val) {
+    return helicsJNI.helicsGetOptionValue(val);
   }
 
   /**
