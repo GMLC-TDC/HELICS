@@ -296,6 +296,7 @@ TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
     EXPECT_TRUE(res);
 }
 
+#ifdef ENABLE_ZMQ_CORE
 static constexpr const char* config_files[] = {"bes_config.json",
                                                "bes_config.toml",
                                                "bes_config2.json",
@@ -328,6 +329,7 @@ TEST_P(valuefed_flagfile_tests, configure_test)
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_flagfile_tests,
                          ::testing::ValuesIn(config_files));
+#endif
 
 TEST_F(valuefed_tests, dual_transfer_coreApp_link)
 {
