@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -17,8 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace apps {
 
-    static ActionMessage
-        generatePortRequestReply(const ActionMessage& /*cmd*/, std::shared_ptr<Broker>& brk)
+    static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
+                                                  std::shared_ptr<Broker>& brk)
     {
         ActionMessage rep(CMD_PROTOCOL);
         rep.messageID = NEW_BROKER_INFORMATION;
@@ -35,7 +35,7 @@ namespace apps {
         std::string brkname;
         std::string brkinit;
         bool newbrk{false};
-        auto& strs = rx.getStringData();
+        const auto& strs = rx.getStringData();
         if (!strs.empty()) {
             brkname = strs[0];
         }
@@ -63,10 +63,9 @@ namespace apps {
         return {brk, newbrk};
     }
 
-    ActionMessage TypedBrokerServer::generateMessageResponse(
-        const ActionMessage& rxcmd,
-        portData& pdata,
-        core_type ctype)
+    ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rxcmd,
+                                                             portData& pdata,
+                                                             core_type ctype)
     {
         //   std::cout << "received data length " << msg.size () << std::endl;
         switch (rxcmd.action()) {
@@ -83,11 +82,10 @@ namespace apps {
                                 assignPort(pdata, pt, nbrk.first);
                             }
                             return generatePortRequestReply(rxcmd, nbrk.first);
-                        } else {
-                            ActionMessage rep(CMD_PROTOCOL);
-                            rep.messageID = DELAY;
-                            return rep;
                         }
+                        ActionMessage rep(CMD_PROTOCOL);
+                        rep.messageID = DELAY_CONNECTION;
+                        return rep;
                     } break;
                 }
                 break;
@@ -131,5 +129,5 @@ namespace apps {
     {
         LoggerManager::logMessage(std::move(message));
     }
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

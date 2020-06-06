@@ -1,16 +1,17 @@
 # Queries
 
 Queries are asynchronous means within HELICS of asking for and receiving information from other federate components.
-Brokers, Federates, and Cores all have query functions.  Federates are also able to define a callback for answering custom queries.
+Brokers, Federates, and Cores all have query functions. Federates are also able to define a callback for answering custom queries.
 
 The general function appears like
-```
+
+```cpp
 std::string query(const std::string& target, const std::string& queryStr)
 ```
 
 ## Targets
 
-A target is specified, and can be one of the following.  A federate named one of the key words is valid for the federation, but cannot be queried using the name.
+A target is specified, and can be one of the following. A federate named one of the key words is valid for the federation, but cannot be queried using the name.
 
 ```eval_rst
 +------------------------------------------+---------------------------------------------------------------------------------------+
@@ -32,18 +33,20 @@ A target is specified, and can be one of the following.  A federate named one of
 +------------------------------------------+---------------------------------------------------------------------------------------+
 ```
 
-## Queries
+## Query String
 
-The queryStr is a specific data to request, there are a number of different things that can be queried from the system.
+The `queryStr` is a specific data to request, there are a number of different things that can be queried from the system.
 Unrecognized queries or targets return `#invalid`
 Answers to queries can be
--   "true"/"false" \[T/F\]
--   a single string  `"answer"` \[string\]
--   a vector of strings delimited by ``';'`` `[answer1;answer2;answer3]` \[sv\]
--   a JSON string \[JSON\]
+
+- "true"/"false" \[T/F\]
+- a single string `"answer"` \[string\]
+- a vector of strings delimited by `';'` `[answer1;answer2;answer3]` \[sv\]
+- a JSON string \[JSON\]
 
 ### Federate Queries
-The following queries are defined for federates.  Federates may specify a callback function which allows arbitrary user defined Queries.  The queries defined here are available inside of HELICS.
+
+The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
 ```eval_rst
 +--------------------+------------------------------------------------------------+
@@ -79,10 +82,13 @@ The following queries are defined for federates.  Federates may specify a callba
 +--------------------+------------------------------------------------------------+
 | ``queries``        | list of available queries [sv]                             |
 +--------------------+------------------------------------------------------------+
+| ``version``        | the version string of the helics library [string]          |
++--------------------+------------------------------------------------------------+
 ```
 
 ### Local Federate Queries
-The following queries are defined for federates but can only be queried on the local federate.  Federates may specify a callback function which allows arbitrary user defined Queries.  The queries defined here are available inside of HELICS.
+
+The following queries are defined for federates but can only be queried on the local federate. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
 ```eval_rst
 +---------------------------+------------------------------------------------------------+
@@ -103,6 +109,7 @@ The following queries are defined for federates but can only be queried on the l
 Other strings may be defined for specific federates.
 
 ### Core queries
+
 The following queries will be answered by a core.
 
 ```eval_rst
@@ -149,6 +156,10 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``queries``          | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
+|``version_all``       | data structure with the version string and the federates[JSON]                      |
++----------------------+-------------------------------------------------------------------------------------+
+| ``version``          | the version string for the helics library [string]                                  |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
 The last two are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.
@@ -156,6 +167,7 @@ The last two are valid but are not usually queried directly, but instead the sam
 ### Broker Queries
 
 The Following queries will be answered by a broker.
+
 ```eval_rst
 +----------------------+-------------------------------------------------------------------------------------+
 | queryString          | Description                                                                         |
@@ -184,7 +196,9 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``counts``           | a simple count of the number of brokers, federates, and handles [JSON]              |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
+| ``current_state``    | a structure with the current known status of the brokers and federates [JSON]       |
++----------------------+-------------------------------------------------------------------------------------+
+| ``status``           | a structure with the current known status (true if connected) of the broker [JSON]  |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]|
 +----------------------+-------------------------------------------------------------------------------------+
@@ -198,37 +212,44 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``queries``          | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
+|``version_all``       | data structure with the version strings of all broker components [JSON]             |
++----------------------+-------------------------------------------------------------------------------------+
+| ``version``          | the version string for the helics library [string]                                  |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
+`federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
 
 ## Usage Notes
-Queries that must traverse the network travel along priority paths.  The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular communication.
+
+Queries that must traverse the network travel along priority paths. The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular communication.
 
 ### Application API
+
 There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version without the target
-```
-std::string 	query(const std::string& queryStr)
+
+```cpp
+std::string     query(const std::string& queryStr)
 ```
 
 make the query of the current federate.
 an asynchronous version is also available.
 
-```
-query_id_t 	queryAsync(const std::string& target, const std::string& queryStr)
+```cpp
+query_id_t     queryAsync(const std::string& target, const std::string& queryStr)
 ```
 
 This call returns a `query_id_t` that can be use in `queryComplete` and `isQueryComplet` functions.
 
 In the header [`<helics\queryFunctions.hpp>`](../doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
-### C-api and interface API's.
+### C-api and interface API's
 
 Queries in the C api work similarly but the mechanics are different.
 The basic operation is to create a query using [`helicsQueryCreate(target,query)`](../doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
 
 This function returns a query object that can be used in one of the execute functions to generate results.
-It can be called asynchronously on a federate.  The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.  
+It can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use.
 The interface api's (python, matlab, octave, Java, etc) will work similarly.

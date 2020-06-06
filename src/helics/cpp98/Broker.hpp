@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_BROKER_HPP_
@@ -20,11 +20,11 @@ class Broker {
   public:
     /** Default constructor */
     Broker() HELICS_NOTHROW: broker(HELICS_NULL_POINTER) {}
-    /** construct broker 
-	@param type string with the type of the broker to create
-	@param name the name of the broker
-	@param initString command line argument for starting the broker
-	*/
+    /** construct broker
+    @param type string with the type of the broker to create
+    @param name the name of the broker
+    @param initString command line argument for starting the broker
+    */
     Broker(std::string type, std::string name, std::string initString)
     {
         broker =
@@ -37,7 +37,7 @@ class Broker {
     @param type string with the type of the broker to create
     @param name the name of the broker
     @param argc the number of command line arguments
-	@param argv command line argument strings
+    @param argv command line argument strings
     */
     Broker(std::string type, std::string name, int argc, char** argv)
     {
@@ -77,7 +77,7 @@ class Broker {
     /** cast to the underlying broker*/
     operator helics_broker() { return broker; }
     /** get the underlying helics_broker object
-	@return a helics_broker object*/
+    @return a helics_broker object*/
     helics_broker baseObject() const { return broker; }
     /** check if the broker is connected*/
     bool isConnected() const { return (helicsBrokerIsConnected(broker) != helics_false); }
@@ -114,27 +114,52 @@ class Broker {
     {
         helicsBrokerDataLink(broker, source.c_str(), target.c_str(), hThrowOnError());
     }
-    /** create a filter connection between a named filter and a named endpoint for messages coming from that
-    endpoint
+    /** create a filter connection between a named filter and a named endpoint for messages coming
+    from that endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
     void addSourceFilterToEndpoint(const std::string& filter, const std::string& target)
     {
-        helicsBrokerAddSourceFilterToEndpoint(
-            broker, filter.c_str(), target.c_str(), hThrowOnError());
+        helicsBrokerAddSourceFilterToEndpoint(broker,
+                                              filter.c_str(),
+                                              target.c_str(),
+                                              hThrowOnError());
     }
-    /** create a filter connection between a named filter and a named endpoint for destination processing
+    /** create a filter connection between a named filter and a named endpoint for destination
+    processing
     @param filter the name of the filter
     @param target the name of the source target*/
     void addDestinationFilterToEndpoint(const std::string& filter, const std::string& target)
     {
-        helicsBrokerAddDestinationFilterToEndpoint(
-            broker, filter.c_str(), target.c_str(), hThrowOnError());
+        helicsBrokerAddDestinationFilterToEndpoint(broker,
+                                                   filter.c_str(),
+                                                   target.c_str(),
+                                                   hThrowOnError());
+    }
+
+    /** make a query of the broker
+  @details this call is blocking until the value is returned which may take some time depending
+  on the size of the federation and the specific string being queried
+  @param target  the target of the query can be "federation", "federate", "broker", "core", or a
+  specific name of a federate, core, or broker
+  @param queryStr a string with the query, see other documentation for specific properties to
+  query, can be defined by the federate
+  @return a string with the value requested.  this is either going to be a vector of strings value
+  or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
+  if the query was not valid
+  */
+    std::string query(const std::string& target, const std::string& queryStr) const
+    {
+        // returns helics_query
+        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        std::string result(helicsQueryBrokerExecute(q, broker, hThrowOnError()));
+        helicsQueryFree(q);
+        return result;
     }
 
   protected:
-    helics_broker broker; //!< underlying broker information
+    helics_broker broker;  //!< underlying broker information
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

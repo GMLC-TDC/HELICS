@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/core/ActionMessage.hpp"
@@ -21,8 +21,9 @@ TEST(ActionMessage_tests, action_test_to_string_conversion)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-        printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-        printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+        printf("sizeof(extraInfo)=%d\n",
+    static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>))); printf("payload
+    %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */
@@ -55,8 +56,9 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-    printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+    printf("sizeof(extraInfo)=%d\n",
+    static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>))); printf("payload
+    %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */
@@ -87,7 +89,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     EXPECT_TRUE(m.getStringData() == fr.getStringData());
 }
 
-TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
+TEST(ActionMessage_tests, action_test_to_string_time_request)
 {
     helics::ActionMessage m(CMD_TIME_REQUEST);
     /*
@@ -95,21 +97,20 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
     BOOST_CHECK_LT(b, 64);
     if (b > 64)
     {
-    printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
-    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+    printf("sizeof(extraInfo)=%d\n",
+    static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>))); printf("payload
+    %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
     *>(&m)));
     }
     */
-    m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
+    m.actionTime = 47.2342;
     m.source_handle = interface_handle{4};
     m.source_id = global_federate_id{232324};
     m.dest_id = global_federate_id{22552215};
     m.dest_handle = interface_handle{2322342};
-
     m.setString(sourceStringLoc, "this is a long source string to test");
-    m.setString(origSourceStringLoc, "this is a longer alternate source string to test");
-    m.setString(targetStringLoc, "this is a target");
+    // this is a time request and the payload and strings don't get copied
     m.Tdemin = 2342532.2342;
     m.Tso = 54.7814;
     m.Te = Time::epsilon();
@@ -120,14 +121,14 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
     ActionMessage fr;
     fr.from_string(data);
     EXPECT_TRUE(m.action() == fr.action());
-    EXPECT_EQ(m.payload, fr.payload);
+    EXPECT_TRUE(fr.payload.empty());
     EXPECT_EQ(m.source_handle, fr.source_handle);
     EXPECT_EQ(m.source_id, fr.source_id);
     EXPECT_EQ(m.dest_handle, fr.dest_handle);
     EXPECT_EQ(m.dest_id, fr.dest_id);
     EXPECT_TRUE(m.actionTime == fr.actionTime);
 
-    EXPECT_TRUE(m.getStringData() == fr.getStringData());
+    EXPECT_TRUE(fr.getStringData().empty());
     EXPECT_TRUE(m.Tso == fr.Tso);
     EXPECT_TRUE(m.Te == fr.Te);
     EXPECT_TRUE(m.Tdemin == fr.Tdemin);
@@ -164,7 +165,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     cmd.source_handle = interface_handle{2};
     cmd.dest_id = global_federate_id{3};
     cmd.dest_handle = interface_handle{4};
-    cmd.flags = 0x1a2F; // this has no significance
+    cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal();
     cmd.payload = "hello world";
 
@@ -182,7 +183,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     EXPECT_EQ(cmd_copy.flags, 0x1a2F);
     EXPECT_EQ(cmd_copy.actionTime, helics::Time::maxVal());
     EXPECT_EQ(cmd_copy.payload, "hello world");
-    EXPECT_EQ(cmd_copy.name, "hello world"); // aliased to payload
+    EXPECT_EQ(cmd_copy.name, "hello world");  // aliased to payload
 
     EXPECT_EQ(cmd_copy.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_copy.Tdemin, helics::Time::minVal());
@@ -220,7 +221,7 @@ TEST(ActionMessage_tests, assignment_test)
     EXPECT_TRUE(checkActionFlag(cmd_assign, error_flag));
     EXPECT_EQ(cmd_assign.actionTime, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.payload, "hello world");
-    EXPECT_EQ(cmd_assign.name, "hello world"); // aliased to payload
+    EXPECT_EQ(cmd_assign.name, "hello world");  // aliased to payload
 
     EXPECT_EQ(cmd_assign.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.Tdemin, helics::Time::minVal());
@@ -342,7 +343,7 @@ TEST(ActionMessage_tests, message_message_conversion_test)
     EXPECT_EQ(cmd.payload, msg->data.to_string());
 
     ActionMessage cmd2;
-    cmd2.moveInfo(std::move(msg));
+    cmd2 = std::move(msg);
     EXPECT_TRUE(cmd.action() == CMD_SEND_MESSAGE);
     EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
     EXPECT_EQ(cmd.getString(0), cmd2.getString(0));
@@ -364,14 +365,14 @@ TEST(ActionMessage_tests, check_conversions)
     EXPECT_EQ(cmdStr, std::string(cmdVec.data(), cmdVec.size()));
 
     auto testBuffer1 = std::make_unique<char[]>(cmdStr.size() + 20);
-    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2u); // make a too small buffer
+    auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2U);  // make a too small buffer
 
     auto res = cmd.toByteArray(testBuffer1.get(), static_cast<int>(cmdStr.size() + 20));
     EXPECT_EQ(res, static_cast<int>(cmdStr.size()));
     // just check to make sure the same string was written
     EXPECT_EQ(cmdStr, std::string(testBuffer1.get(), res));
     // this should return -1
-    res = cmd.toByteArray(testBuffer2.get(), static_cast<int>(cmdStr.size() >> 2u));
+    res = cmd.toByteArray(testBuffer2.get(), static_cast<int>(cmdStr.size() >> 2U));
     EXPECT_EQ(res, -1);
 }
 

@@ -1,12 +1,12 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helics/helics-config.h"
+#include "helics/core/helicsVersion.hpp"
 
 #include <iostream>
 #include <string>
@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include <intrin.h>
 // code modified from https://weseetips.wordpress.com/tag/c-get-cpu-name/
 inline std::string getCPUModel()
-{ // Get extended ids.
+{  // Get extended ids.
     int CPUInfo[4] = {-1};
     __cpuid(CPUInfo, 0x80000000);
     unsigned int nExIds = CPUInfo[0];
@@ -47,16 +47,16 @@ inline std::string getCPUModel()
 #    include <cstdlib>
 #    include <cstring>
 inline std::string getCPUModel()
-{ // Get the cpu from /proc/cpuinfo
+{  // Get the cpu from /proc/cpuinfo
     FILE* fp = fopen("/proc/cpuinfo", "r");
     if (fp == nullptr) {
         return std::string{};
     }
-    size_t n = 0;
-    char* line = NULL;
+    size_t n{0};
+    char* line{nullptr};
     std::string info;
     while (getline(&line, &n, fp) > 0) {
-        if (strstr(line, "model name")) {
+        if (strstr(line, "model name") != nullptr) {
             info.append(line);
             break;
         }
@@ -95,17 +95,18 @@ inline std::string getCPUModel()
     return std::string{};
 }
 #endif
-/// Generate a report of the compilers used and zmq version linked as well as the version info for HELICS
-/// for use with the benchmarks
+/** Generate a report of the compilers used and zmq version linked as well as the version info for
+ * HELICS for use with the benchmarks
+ */
 inline void printHELICSsystemInfo()
 {
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: "
               << HELICS_VERSION_STRING << '\n';
 #if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
-    std::cout << "ZMQ VERSION: " << helics::hzmq::getZMQVersion() << '\n';
+    std::cout << "ZMQ VERSION: " << helics::zeromq::getZMQVersion() << '\n';
 #endif
-    std::cout << "COMPILER INFO: " << HELICS_COMPILER_VERSION << '\n';
-    std::cout << "BUILD FLAGS: " << HELICS_BUILD_FLAGS << '\n';
+    std::cout << "COMPILER INFO: " << helics::compiler << '\n';
+    std::cout << "BUILD FLAGS: " << helics::buildFlags << '\n';
     std::cout << "------------PROCESSOR INFO ----------------\n";
     std::cout << "HOST PROCESSOR TYPE: " << HELICS_BUILD_PROCESSOR << '\n';
     auto cpumodel = getCPUModel();

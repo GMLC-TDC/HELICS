@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -17,10 +17,9 @@ MessageTimer::MessageTimer(std::function<void(ActionMessage&&)> sFunction):
 {
 }
 
-static void processTimerCallback(
-    std::shared_ptr<MessageTimer> mtimer,
-    int32_t index,
-    const std::error_code& ec)
+static void processTimerCallback(std::shared_ptr<MessageTimer> mtimer,
+                                 int32_t index,
+                                 const std::error_code& ec)
 {
     if (ec != asio::error::operation_aborted) {
         try {
@@ -147,12 +146,12 @@ void MessageTimer::sendMessage(int32_t timerIndex)
         if (std::chrono::steady_clock::now() >= expirationTimes[timerIndex]) {
             if (buffers[timerIndex].action() != CMD_IGNORE) {
                 ActionMessage buf = std::move(buffers[timerIndex]);
-                buffers[timerIndex].setAction(CMD_IGNORE); // clear out the action
-                lock.unlock(); // don't keep a lock while calling a callback
+                buffers[timerIndex].setAction(CMD_IGNORE);  // clear out the action
+                lock.unlock();  // don't keep a lock while calling a callback
                 sendFunction(std::move(buf));
             }
         }
     }
 }
 
-} // namespace helics
+}  // namespace helics

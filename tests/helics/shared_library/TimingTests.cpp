@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -79,7 +79,7 @@ TEST_F(timing_tests, simple_timing_test2)
     CE(gtime = helicsFederateRequestTime(vFed1, 1.85, &err));
     EXPECT_EQ(gtime, 2.0);
     CE(gtime = helicsFederateRequestTime(vFed2, 1.79, &err));
-    EXPECT_EQ(gtime, 0.5); // the result should show up at the next available time point
+    EXPECT_EQ(gtime, 0.5);  // the result should show up at the next available time point
     CE(gtime = helicsFederateRequestTime(vFed2, 2.0, &err));
     EXPECT_EQ(gtime, 2.0);
     CE(helicsFederateFinalize(vFed1, &err));
@@ -123,10 +123,10 @@ TEST_F(timing_tests, simple_timing_test_message)
 
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
 
-    EXPECT_EQ(gtime, 0.9); // the message should show up at the next available time point
+    EXPECT_EQ(gtime, 0.9);  // the message should show up at the next available time point
     CE(helicsFederateRequestTimeAsync(vFed2, 2.0, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
-    EXPECT_EQ(gtime, 2.25); // the message should show up at the next available time point
+    EXPECT_EQ(gtime, 2.25);  // the message should show up at the next available time point
     CE(helicsFederateRequestTimeAsync(vFed2, 3.0, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed1, &err));
     EXPECT_EQ(gtime, 2.4);
@@ -164,9 +164,9 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(helicsEndpointSendMessageRaw(ept1, "e2", "test1", 5, &err));
     CE(helicsFederateRequestTimeAsync(vFed1, 1.9, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
-    EXPECT_EQ(
-        gtime,
-        1.1); // the message should show up at the next available time point after the impact window
+    EXPECT_EQ(gtime,
+              1.1);  // the message should show up at the next available time point after the impact
+                     // window
     CE(helicsFederateRequestTimeAsync(vFed2, 2.0, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed1, &err));
     EXPECT_EQ(gtime, 1.9);

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -20,36 +20,30 @@ namespace helics {
 template<class COMMS, class BrokerT>
 CommsBroker<COMMS, BrokerT>::CommsBroker() noexcept
 {
-    static_assert(
-        std::is_base_of<CommsInterface, COMMS>::value,
-        "COMMS object must be a CommsInterface Object");
-    static_assert(
-        std::is_base_of<BrokerBase, BrokerT>::value,
-        "Broker must be an object  with a base of BrokerBase");
+    static_assert(std::is_base_of<CommsInterface, COMMS>::value,
+                  "COMMS object must be a CommsInterface Object");
+    static_assert(std::is_base_of<BrokerBase, BrokerT>::value,
+                  "Broker must be an object  with a base of BrokerBase");
     loadComms();
 }
 
 template<class COMMS, class BrokerT>
 CommsBroker<COMMS, BrokerT>::CommsBroker(bool arg) noexcept: BrokerT(arg)
 {
-    static_assert(
-        std::is_base_of<CommsInterface, COMMS>::value,
-        "COMMS object must be a CommsInterface Object");
-    static_assert(
-        std::is_base_of<BrokerBase, BrokerT>::value,
-        "Broker must be an object  with a base of BrokerBase");
+    static_assert(std::is_base_of<CommsInterface, COMMS>::value,
+                  "COMMS object must be a CommsInterface Object");
+    static_assert(std::is_base_of<BrokerBase, BrokerT>::value,
+                  "Broker must be an object  with a base of BrokerBase");
     loadComms();
 }
 
 template<class COMMS, class BrokerT>
 CommsBroker<COMMS, BrokerT>::CommsBroker(const std::string& obj_name): BrokerT(obj_name)
 {
-    static_assert(
-        std::is_base_of<CommsInterface, COMMS>::value,
-        "COMMS object must be a CommsInterface Object");
-    static_assert(
-        std::is_base_of<BrokerBase, BrokerT>::value,
-        "Broker must be an object  with a base of BrokerBase");
+    static_assert(std::is_base_of<CommsInterface, COMMS>::value,
+                  "COMMS object must be a CommsInterface Object");
+    static_assert(std::is_base_of<BrokerBase, BrokerT>::value,
+                  "Broker must be an object  with a base of BrokerBase");
     loadComms();
 }
 template<class COMMS, class BrokerT>
@@ -73,7 +67,7 @@ CommsBroker<COMMS, BrokerT>::~CommsBroker()
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
-    comms = nullptr; // need to ensure the comms are deleted before the callbacks become invalid
+    comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
     BrokerBase::joinAllThreads();
 }
 
@@ -112,10 +106,9 @@ void CommsBroker<COMMS, BrokerT>::transmit(route_id rid, ActionMessage&& cmd)
 }
 
 template<class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::addRoute(
-    route_id rid,
-    int /*interfaceId*/,
-    const std::string& routeInfo)
+void CommsBroker<COMMS, BrokerT>::addRoute(route_id rid,
+                                           int /*interfaceId*/,
+                                           const std::string& routeInfo)
 {
     comms->addRoute(rid, routeInfo);
 }
@@ -132,4 +125,4 @@ COMMS* CommsBroker<COMMS, BrokerT>::getCommsObjectPointer()
     return comms.get();
 }
 
-} // namespace helics
+}  // namespace helics

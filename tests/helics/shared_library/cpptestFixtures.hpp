@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -23,15 +23,14 @@ struct FederateTestFixture_cpp {
     ~FederateTestFixture_cpp();
 
     std::shared_ptr<helicscpp::Broker> AddBroker(const std::string& core_type_name, int count);
-    std::shared_ptr<helicscpp::Broker>
-        AddBroker(const std::string& core_type_name, const std::string& initialization_string);
+    std::shared_ptr<helicscpp::Broker> AddBroker(const std::string& core_type_name,
+                                                 const std::string& initialization_string);
 
     template<class FedType>
-    void SetupTest(
-        const std::string& core_type_name,
-        int count,
-        helics_time time_delta = helics_time_zero,
-        const std::string& name_prefix = "fed")
+    void SetupTest(const std::string& core_type_name,
+                   int count,
+                   helics_time time_delta = helics_time_zero,
+                   const std::string& name_prefix = "fed")
     {
         ctype = core_type_name;
         auto broker = AddBroker(core_type_name, count);
@@ -48,12 +47,11 @@ struct FederateTestFixture_cpp {
     }
 
     template<class FedType>
-    void AddFederates(
-        std::string core_type_name,
-        int count,
-        helicscpp::Broker& broker,
-        helics_time time_delta = helics_time_zero,
-        const std::string& name_prefix = "fed")
+    void AddFederates(std::string core_type_name,
+                      int count,
+                      helicscpp::Broker& broker,
+                      helics_time time_delta = helics_time_zero,
+                      const std::string& name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode(core_type_name);
         int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
@@ -90,7 +88,7 @@ struct FederateTestFixture_cpp {
                     federates[ii + offset] = fed;
                 }
             } break;
-            case 2: { // each federate has its own core
+            case 2: {  // each federate has its own core
                 size_t offset = federates.size();
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ++ii) {

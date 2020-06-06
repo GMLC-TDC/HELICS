@@ -1,0 +1,69 @@
+exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
+repos:
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.1
+    hooks:
+      - id: dockerfile_lint
+        args: [--rulefile, ./config/Docker/docker_rules.yml, --dockerfile]
+  - repo: https://github.com/psf/black
+    rev: 19.10b0
+    hooks:
+      - id: black
+        args: ["--line-length=100"]
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.1.7
+    hooks:
+      - id: remove-tabs
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.5.0
+    hooks:
+      - id: check-added-large-files
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-yaml
+        args: ["--allow-multiple-documents"]
+      - id: check-toml
+      - id: end-of-file-fixer
+  - repo: https://github.com/prettier/prettier
+    rev: 2.0.5
+    hooks:
+      - id: prettier
+        exclude: ^(examples/user_guide_examples/)
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 2.0.2
+    hooks:
+      - id: markdownlint
+        args: [-s, ./config/.markdownlintrc]
+        exclude: "mac.md"
+      - id: shellcheck
+      - id: shfmt
+        args: [-w]
+      - id: script-must-have-extension
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.10
+    hooks:
+      - id: cmake-format
+        exclude: "cmake+"
+  - repo: https://github.com/codespell-project/codespell
+    rev: v1.16.0
+    hooks:
+      - id: codespell
+        args:
+          [
+            "-w",
+            '--skip="*.csv"',
+            "--ignore-words=./config/spelling_whitelist.txt",
+          ]
+  - repo: local
+    hooks:
+      - id: docker-clang-format
+        name: Docker Clang Format
+        language: docker_image
+        types:
+          - c++
+        entry: unibeautify/clang-format:latest
+        args:
+          - -style=file
+          - -i

@@ -1,0 +1,44 @@
+name: Formatting
+on:
+  push:
+    branches:
+      - develop
+      - master
+      - helics3
+  pull_request:
+    branches:
+      - develop
+      - master
+      - helics3
+
+jobs:
+  pre-commit:
+    name: Formatting-check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+    - name: set PY
+      run: echo "::set-env name=PY::$(python --version --version | sha256sum | cut -d' ' -f1)"
+    - name: install shfmt
+      run: sudo snap install shfmt
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+    - uses: pre-commit/action@v1.1.0
+    - name: Create/update a file update PR with changed files
+      if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
+      uses: gmlc-tdc/create-pr-action@v0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated formatting of repo files"
+        PR_TITLE: "Automated formatting of repo files"
+        PR_BODY: "Automated formatting of repo files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "pre-commit/"
+        NO_HASH: "true"
+        REPLACE_BRANCH: "true"
+

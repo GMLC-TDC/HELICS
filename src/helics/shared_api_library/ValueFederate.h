@@ -96,12 +96,11 @@ HELICS_EXPORT helics_publication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(
-    helics_federate fed,
-    const char* key,
-    helics_data_type type,
-    const char* units,
-    helics_error* err);
+HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
+                                                                         const char* key,
+                                                                         helics_data_type type,
+                                                                         const char* units,
+                                                                         helics_error* err);
 
 /**
  * Register a global publication with a defined type.
@@ -119,12 +118,11 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(
-    helics_federate fed,
-    const char* key,
-    const char* type,
-    const char* units,
-    helics_error* err);
+HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(helics_federate fed,
+                                                                             const char* key,
+                                                                             const char* type,
+                                                                             const char* units,
+                                                                             helics_error* err);
 
 /**
  * Register a named input.
@@ -273,18 +271,31 @@ HELICS_EXPORT helics_input helicsFederateGetSubscription(helics_federate fed, co
 /**
  * Clear all the update flags from a federates inputs.
  *
+ * @param fed The value federate object for which to clear update flags.
  */
 HELICS_EXPORT void helicsFederateClearUpdates(helics_federate fed);
 
 /**
  * Register the publications via JSON publication string.
  *
+ * @param fed The value federate object to use to register the publications.
+ * @param json The JSON publication string.
+ * @forcpponly
+ * @param[in,out] err The error object to complete if there is an error.
+ * @endforcpponly
+ *
  * @details This would be the same JSON that would be used to publish data.
  */
 HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON(helics_federate fed, const char* json, helics_error* err);
 
 /**
- * Publish data contained in a json file or string.
+ * Publish data contained in a JSON file or string.
+ *
+ * @param fed The value federate object through which to publish the data.
+ * @param json The publication file name or literal JSON data string.
+ * @forcpponly
+ * @param[in,out] err The error object to complete if there is an error.
+ * @endforcpponly
  */
 HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* json, helics_error* err);
 
@@ -297,12 +308,12 @@ HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* js
  */
 
 /**
-  * Check if a publication is valid.
-  *
-  * @param pub The publication to check.
-  *
-  * @return helics_true if the publication is a valid publication.
-  */
+ * Check if a publication is valid.
+ *
+ * @param pub The publication to check.
+ *
+ * @return helics_true if the publication is a valid publication.
+ */
 HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
 
 /**
@@ -575,7 +586,8 @@ HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
  *
  * @param ipt The input to get the data for.
  * @forcpponly
- * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an error.
+ * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
+ * error.
  * @endforcpponly
  *
  * @return A helics_complex structure with the value.
@@ -904,17 +916,17 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(helics_publication pub);
 HELICS_EXPORT void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_error* err);
 
 /**
- * Get the data in the info field of an input.
+ * Get the current value of an input handle option
  *
  * @param inp The input to query.
  * @param option Integer representation of the option in question see /ref helics_handle_options.
  *
- * @return A string with the info field string.
+ * @return An integer value with the current value of the given option.
  */
-HELICS_EXPORT helics_bool helicsInputGetOption(helics_input inp, int option);
+HELICS_EXPORT int helicsInputGetOption(helics_input inp, int option);
 
 /**
- * Set the data in the info field for an input.
+ * Set an option on an input
  *
  * @param inp The input to query.
  * @param option The option to set for the input /ref helics_handle_options.
@@ -923,20 +935,20 @@ HELICS_EXPORT helics_bool helicsInputGetOption(helics_input inp, int option);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, int value, helics_error* err);
 
 /**
- * Get the data in the info field of a publication.
+ * Get the value of an option for a publication
  *
  * @param pub The publication to query.
  * @param option The value to query see /ref helics_handle_options.
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT helics_bool helicsPublicationGetOption(helics_publication pub, int option);
+HELICS_EXPORT int helicsPublicationGetOption(helics_publication pub, int option);
 
 /**
- * Set the data in the info field for a publication.
+ * Set the value of an option for a publication
  *
  * @param pub The publication to query.
  * @param option Integer code for the option to set /ref helics_handle_options.
@@ -945,7 +957,7 @@ HELICS_EXPORT helics_bool helicsPublicationGetOption(helics_publication pub, int
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option, helics_bool val, helics_error* err);
+HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option, int val, helics_error* err);
 
 /**
  * Set the minimum change detection tolerance.

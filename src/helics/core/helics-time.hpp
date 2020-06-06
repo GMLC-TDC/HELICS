@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -37,15 +37,15 @@ constexpr Time negEpsilon = -Time::epsilon();
 constexpr Time operator"" _t(long double val)
 {
     return {static_cast<double>(val)};
-} // NOLINT
+}  // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time {
-    Time grantedTime; //!< the time of the granted step
-    iteration_result state; //!< the convergence state
+    Time grantedTime;  //!< the time of the granted step
+    iteration_result state;  //!< the convergence state
 };
 
-} // namespace helics
+}  // namespace helics
 
 // #TOBEDEPRECTATED The use of the the core-types header for the functions contained in
 // ../application_api/timeOperations.hpp is deprectaced and will be removed in HELICS 3.0
@@ -54,4 +54,4 @@ struct iteration_time {
 #    if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #        include "../application_api/timeOperations.hpp"
 #    endif
-#endif //_HELICS_TIME_HEADER_
+#endif  //_HELICS_TIME_HEADER_

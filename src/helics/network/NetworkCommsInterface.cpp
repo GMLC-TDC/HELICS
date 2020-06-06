@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "NetworkCommsInterface.hpp"
@@ -14,9 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-NetworkCommsInterface::NetworkCommsInterface(
-    interface_type type,
-    CommsInterface::thread_generation threads) noexcept:
+NetworkCommsInterface::NetworkCommsInterface(interface_type type,
+                                             CommsInterface::thread_generation threads) noexcept:
     CommsInterface(threads),
     networkType(type)
 {
@@ -251,17 +250,16 @@ void NetworkCommsInterface::loadPortDefinitions(const ActionMessage& cmd)
             PortNumber = cmd.getExtraData();
             if ((openPorts.getDefaultStartingPort() < 0)) {
                 if (PortNumber < getDefaultBrokerPort() + 100) {
-                    openPorts.setStartingPortNumber(
-                        getDefaultBrokerPort() + 100 +
-                        (PortNumber - getDefaultBrokerPort() - 2) * 6);
+                    openPorts.setStartingPortNumber(getDefaultBrokerPort() + 100 +
+                                                    (PortNumber - getDefaultBrokerPort() - 2) * 6);
                 } else {
-                    openPorts.setStartingPortNumber(
-                        getDefaultBrokerPort() + 110 +
-                        (PortNumber - getDefaultBrokerPort() - 100) * 6);
+                    openPorts.setStartingPortNumber(getDefaultBrokerPort() + 110 +
+                                                    (PortNumber - getDefaultBrokerPort() - 100) *
+                                                        6);
                 }
             }
         }
     }
 }
 
-} // namespace helics
+}  // namespace helics

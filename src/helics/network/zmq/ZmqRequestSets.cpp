@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -81,9 +81,8 @@ namespace zeromq {
             if ((active_routes[ii].revents & ZMQ_POLLIN) > 0) {
                 routes[active_messages[ii].route]->recv(msg);
                 active_routes[ii].events = 0;
-                Responses.emplace_back(
-                    static_cast<char*>(msg.data()),
-                    msg.size()); // convert to an ActionMessage here
+                Responses.emplace_back(static_cast<char*>(msg.data()),
+                                       msg.size());  // convert to an ActionMessage here
                 routes_waiting[active_messages[ii].route] = false;
                 active_messages[ii].waiting = false;
             }
@@ -94,10 +93,9 @@ namespace zeromq {
         if (res != active_routes.end()) {
             active_routes.erase(res, active_routes.end());
         }
-        auto res2 =
-            std::remove_if(active_messages.begin(), active_messages.end(), [](const auto& am) {
-                return (!am.waiting);
-            });
+        auto res2 = std::remove_if(active_messages.begin(),
+                                   active_messages.end(),
+                                   [](const auto& am) { return (!am.waiting); });
         if (res2 != active_messages.end()) {
             active_messages.erase(res2, active_messages.end());
         }
@@ -119,10 +117,9 @@ namespace zeromq {
             }
         }
         if (still_waiting) {
-            auto rem = std::remove_if(
-                waiting_messages.begin(), waiting_messages.end(), [](const auto& wm) {
-                    return (wm.first == 0);
-                });
+            auto rem = std::remove_if(waiting_messages.begin(),
+                                      waiting_messages.end(),
+                                      [](const auto& wm) { return (wm.first == 0); });
             if (rem != waiting_messages.end()) {
                 waiting_messages.erase(rem, waiting_messages.end());
             }
@@ -160,5 +157,5 @@ private:
     std::queue<std::pair<int, ActionMessage>> waiting_messages;
     std::queue<ActionMessage> Responses;
     */
-} // namespace zeromq
-} // namespace helics
+}  // namespace zeromq
+}  // namespace helics

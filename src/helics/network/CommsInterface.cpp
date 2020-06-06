@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommsInterface.hpp"
@@ -21,8 +21,8 @@ namespace helics {
 
 namespace CommFactory {
     /*** class to hold the set of builders for comm interfaces
-       @details this doesn't work as a global since it tends to get initialized after some of the things that call it
-       so it needs to be a static member of function call*/
+       @details this doesn't work as a global since it tends to get initialized after some of the
+       things that call it so it needs to be a static member of function call*/
     class MasterCommBuilder {
       public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
@@ -68,7 +68,7 @@ namespace CommFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCommBuilder() = default;
-        std::vector<BuildT> builders; //!< container for the different builders
+        std::vector<BuildT> builders;  //!< container for the different builders
     };
 
     void defineCommBuilder(std::shared_ptr<CommBuilder> cb, const std::string& name, int code)
@@ -88,7 +88,7 @@ namespace CommFactory {
         return builder->build();
     }
 
-} // namespace CommFactory
+}  // namespace CommFactory
 
 CommsInterface::CommsInterface(thread_generation threads):
     singleThread(threads == thread_generation::single)
@@ -128,10 +128,9 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     }
 }
 
-void CommsInterface::loadTargetInfo(
-    const std::string& localTarget,
-    const std::string& brokerTarget,
-    interface_networks targetNetwork)
+void CommsInterface::loadTargetInfo(const std::string& localTarget,
+                                    const std::string& brokerTarget,
+                                    interface_networks targetNetwork)
 {
     if (propertyLock()) {
         localTargetAddress = localTarget;
@@ -389,12 +388,12 @@ void CommsInterface::disconnect()
             continue;
         }
         ++cnt;
-        if ((cnt % 4) == 0) // call this every 2400 milliseconds
+        if ((cnt % 4) == 0)  // call this every 2400 milliseconds
         {
             // try calling closeReceiver again
             closeReceiver();
         }
-        if (cnt == 14) // Eventually give up
+        if (cnt == 14)  // Eventually give up
         {
             logError("unable to terminate receiver connection");
             break;
@@ -412,12 +411,12 @@ void CommsInterface::disconnect()
             continue;
         }
         ++cnt;
-        if ((cnt % 4) == 0) // call this every 2400 milliseconds
+        if ((cnt % 4) == 0)  // call this every 2400 milliseconds
         {
             // try calling closeTransmitter again
             closeTransmitter();
         }
-        if (cnt == 14) // Eventually give up
+        if (cnt == 14)  // Eventually give up
         {
             logError("unable to terminate transmit connection");
             break;
@@ -455,7 +454,7 @@ bool CommsInterface::reconnect()
     while (rx_status.load() == connection_status::reconnecting) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         ++cnt;
-        if (cnt == 400) // Eventually give up
+        if (cnt == 400)  // Eventually give up
         {
             logError("unable to reconnect");
             break;
@@ -471,9 +470,8 @@ bool CommsInterface::reconnect()
         }
     }
 
-    return (
-        (rx_status.load() == connection_status::connected) &&
-        (tx_status.load() == connection_status::connected));
+    return ((rx_status.load() == connection_status::connected) &&
+            (tx_status.load() == connection_status::connected));
 }
 
 void CommsInterface::setCallback(std::function<void(ActionMessage&&)> callback)
@@ -533,8 +531,8 @@ void CommsInterface::setServerMode(bool serverActive)
 
 bool CommsInterface::isConnected() const
 {
-    return (
-        (tx_status == connection_status::connected) && (rx_status == connection_status::connected));
+    return ((tx_status == connection_status::connected) &&
+            (rx_status == connection_status::connected));
 }
 
 void CommsInterface::logMessage(const std::string& message) const
@@ -592,4 +590,4 @@ void CommsInterface::reconnectReceiver()
     transmit(control_route, cmd);
 }
 
-} // namespace helics
+}  // namespace helics

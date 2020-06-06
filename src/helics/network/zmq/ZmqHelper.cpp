@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 /*
@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
-#include "zmqHelper.h"
+#include "ZmqHelper.h"
 
 #include "cppzmq/zmq.hpp"
 
@@ -75,6 +75,6 @@ socket_type socketTypeFromString(const std::string& socketType)
     if (fnd != socketMap.end()) {
         return fnd->second;
     }
-    assert(false); // NEED to make this a throw operation instead once exceptions are integrated
+    assert(false);  // NEED to make this a throw operation instead once exceptions are integrated
     return socket_type::req;
 }

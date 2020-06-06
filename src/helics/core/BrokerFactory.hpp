@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -31,9 +31,8 @@ namespace BrokerFactory {
     template<class BrokerTYPE>
     class BrokerTypeBuilder final: public BrokerBuilder {
       public:
-        static_assert(
-            std::is_base_of<Broker, BrokerTYPE>::value,
-            "Type does not inherit from helics::Core");
+        static_assert(std::is_base_of<Broker, BrokerTYPE>::value,
+                      "Type does not inherit from helics::Core");
 
         using broker_build_type = BrokerTYPE;
         virtual std::shared_ptr<Broker> build(const std::string& name) override
@@ -55,10 +54,10 @@ namespace BrokerFactory {
         return bbld;
     }
     /**
- * Creates a Broker object of the specified type.
- *
- * Invokes initialize() on the instantiated Core object.
- */
+     * Creates a Broker object of the specified type.
+     *
+     * Invokes initialize() on the instantiated Core object.
+     */
     std::shared_ptr<Broker> create(core_type type, const std::string& configureString);
     /** Create a broker from command line arguments*/
     std::shared_ptr<Broker> create(core_type type, int argc, char* argv[]);
@@ -90,8 +89,8 @@ namespace BrokerFactory {
     bool brokersActive();
 
     /** register a coreBroker so it can be found by others
-@details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling
-cleanUpBrokers earlier if desired
+@details also cleans up any leftover brokers that were previously unregistered this can be
+controlled by calling cleanUpBrokers earlier if desired
 @param broker a pointer to a Broker object that should be able to be found globally
 @param type the core type associated with a broker
 @return true if the registration was successful false otherwise*/
@@ -105,15 +104,17 @@ cleanUpBrokers earlier if desired
     void addAssociatedBrokerType(const std::string& name, core_type type);
 
     /** clean up unused brokers
-@details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when brokers are unregistered they get put in a holding area that gets cleaned up when a
+new broker is registered or when the clean up function is called this prevents some odd threading
+issues
 @return the number of brokers still operating
 */
     size_t cleanUpBrokers();
 
     /** clean up unused brokers
-@details when brokers are unregistered they get put in a holding area that gets cleaned up when a new broker is
-registered or when the clean up function is called this prevents some odd threading issues
+@details when brokers are unregistered they get put in a holding area that gets cleaned up when a
+new broker is registered or when the clean up function is called this prevents some odd threading
+issues
 @param delay the number of milliseconds to wait to ensure stuff is cleaned up
 @return the number of brokers still operating
 */
@@ -129,5 +130,5 @@ registered or when the clean up function is called this prevents some odd thread
 
     /** terminate all running Brokers*/
     void terminateAllBrokers();
-} // namespace BrokerFactory
-} // namespace helics
+}  // namespace BrokerFactory
+}  // namespace helics

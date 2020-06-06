@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_FILTER_HPP_
@@ -83,11 +83,11 @@ class Filter {
     }
 
   protected:
-    helics_filter filt; //!< the reference to the underlying publication
+    helics_filter filt;  //!< the reference to the underlying publication
 };
 
 /** cloning filter extends some operations on filters
-*/
+ */
 class CloningFilter: public Filter {
   public:
     /** construct from underlying filter object*/
@@ -118,5 +118,5 @@ class CloningFilter: public Filter {
     }
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

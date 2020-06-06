@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InprocComms.h"
@@ -214,14 +214,13 @@ namespace inproc {
                         tbroker->addActionMessage(std::move(cmd));
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(
-                                std::string("unknown route, message dropped ") +
-                                prettyPrintString(cmd));
+                            logWarning(std::string("unknown route, message dropped ") +
+                                       prettyPrintString(cmd));
                         }
                     }
                 }
             }
-        } // while (!haltLoop)
+        }  // while (!haltLoop)
 
         routes.clear();
         tbroker = nullptr;
@@ -231,6 +230,6 @@ namespace inproc {
 
     std::string InprocComms::getAddress() const { return localTargetAddress; }
 
-} // namespace inproc
+}  // namespace inproc
 
-} // namespace helics
+}  // namespace helics

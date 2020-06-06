@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -22,19 +22,19 @@ class UnknownHandleManager {
 
   private:
     std::unordered_multimap<std::string, targetInfo>
-        unknown_publications; //!< map of all unknown publications
+        unknown_publications;  //!< map of all unknown publications
     std::unordered_multimap<std::string, targetInfo>
-        unknown_endpoints; //!< map of all unknown endpoints
+        unknown_endpoints;  //!< map of all unknown endpoints
     std::unordered_multimap<std::string, targetInfo>
-        unknown_inputs; //!< map of all unknown endpoints
+        unknown_inputs;  //!< map of all unknown endpoints
     std::unordered_multimap<std::string, targetInfo>
-        unknown_filters; //!< map of all unknown filters
+        unknown_filters;  //!< map of all unknown filters
     std::unordered_multimap<std::string, std::string>
-        unknown_links; //!< map where links on either side is not known
+        unknown_links;  //!< map where links on either side is not known
     std::unordered_multimap<std::string, std::string>
-        unknown_src_filters; //!< map connecting source filters to endpoints
+        unknown_src_filters;  //!< map connecting source filters to endpoints
     std::unordered_multimap<std::string, std::string>
-        unknown_dest_filters; //!< map connecting destination filters to endpoints
+        unknown_dest_filters;  //!< map connecting destination filters to endpoints
   public:
     /** default constructor*/
     UnknownHandleManager() = default;
@@ -86,18 +86,20 @@ class UnknownHandleManager {
     /** check if there are any unknowns remaining that specify they are required*/
     bool hasRequiredUnknowns() const;
     /** run a callback for each requiredUnknown
-    @param cfunc a callback function with the signature of the name of the required interface a character with the
-    type 'p' for publication, 'i' for input, 'f' for filter, 'e' for endpoint and the global handle.
+    @param cfunc a callback function with the signature of the name of the required interface a
+    character with the type 'p' for publication, 'i' for input, 'f' for filter, 'e' for endpoint and
+    the global handle.
     */
     void processRequiredUnknowns(
         std::function<void(const std::string& name, char type, global_handle)> cfunc) const;
 
     /** run a callback for each non optional Unknown
-    @param cfunc a callback function with the signature of the name of the required interface a character with the
-    type 'p' for publication, 'i' for input, 'f' for filter, 'e' for endpoint and the global handle.
+    @param cfunc a callback function with the signature of the name of the required interface a
+    character with the type 'p' for publication, 'i' for input, 'f' for filter, 'e' for endpoint and
+    the global handle.
     */
     void processNonOptionalUnknowns(
         std::function<void(const std::string& name, char type, global_handle)> cfunc) const;
 };
 
-} // namespace helics
+}  // namespace helics

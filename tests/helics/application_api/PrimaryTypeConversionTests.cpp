@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -43,9 +43,9 @@ TEST(type_conversion_tests, vectorNorm_tests)
     EXPECT_EQ(vectorNorm(cv{c(4.0, 0)}), 4.0);
     EXPECT_EQ(vectorNorm(cv{c(3.0, 4.0)}), 5.0);
     EXPECT_EQ(vectorNorm(cv{c(-3.0, -4.0)}), 5.0);
-    EXPECT_EQ(
-        vectorNorm(cv{c(-3.0, -4.0), c(-3.0, -4.0), c(-3.0, -4.0), c(-3.0, -4.0), c(-3.0, -4.0)}),
-        std::sqrt(25.0 * 5.0));
+    EXPECT_EQ(vectorNorm(
+                  cv{c(-3.0, -4.0), c(-3.0, -4.0), c(-3.0, -4.0), c(-3.0, -4.0), c(-3.0, -4.0)}),
+              std::sqrt(25.0 * 5.0));
 }
 
 TEST(type_conversion_tests, string_type_tests)
@@ -64,8 +64,9 @@ TEST(type_conversion_tests, string_converstion_tests)
     EXPECT_TRUE(checkTypeConversion1(vstr, static_cast<float>(val)));
     EXPECT_TRUE(checkTypeConversion1(vstr, std::complex<double>(val, 0)));
     EXPECT_TRUE(checkTypeConversion1(vstr, std::vector<double>{val}));
-    EXPECT_TRUE(checkTypeConversion1(
-        vstr, std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
+    EXPECT_TRUE(
+        checkTypeConversion1(vstr,
+                             std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
     EXPECT_TRUE(checkTypeConversion1(vstr, true));
     EXPECT_TRUE(checkTypeConversion1(vstr, NamedPoint{"value", val}));
     std::string test1("test1");
@@ -89,8 +90,9 @@ TEST(type_conversion_tests, double_conversion_tests)
     EXPECT_TRUE(checkTypeConversion1(val, static_cast<float>(val)));
     EXPECT_TRUE(checkTypeConversion1(val, std::complex<double>(val, 0)));
     EXPECT_TRUE(checkTypeConversion1(val, std::vector<double>{val}));
-    EXPECT_TRUE(checkTypeConversion1(
-        val, std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
+    EXPECT_TRUE(
+        checkTypeConversion1(val,
+                             std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
     EXPECT_TRUE(checkTypeConversion1(val, true));
     EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", val}));
 }
@@ -125,15 +127,14 @@ TEST(type_conversion_tests, namedType_tests)
     EXPECT_TRUE(getTypeFromString(typeid(bool).name()) == data_type::helics_bool);
     EXPECT_TRUE(getTypeFromString(typeid(int64_t).name()) == data_type::helics_int);
     EXPECT_TRUE(getTypeFromString(typeid(char).name()) == data_type::helics_string);
-    EXPECT_TRUE(
-        getTypeFromString(typeid(std::complex<double>).name()) == data_type::helics_complex);
+    EXPECT_TRUE(getTypeFromString(typeid(std::complex<double>).name()) ==
+                data_type::helics_complex);
     EXPECT_TRUE(getTypeFromString("COMPLEX") == data_type::helics_complex);
     EXPECT_TRUE(getTypeFromString("map") == data_type::helics_custom);
     EXPECT_TRUE(getTypeFromString("any") == data_type::helics_any);
     EXPECT_TRUE(getTypeFromString("") == data_type::helics_any);
-    EXPECT_TRUE(
-        getTypeFromString(typeid(std::vector<std::complex<double>>).name()) ==
-        data_type::helics_complex_vector);
+    EXPECT_TRUE(getTypeFromString(typeid(std::vector<std::complex<double>>).name()) ==
+                data_type::helics_complex_vector);
     EXPECT_TRUE(getTypeFromString(typeid(Time).name()) == data_type::helics_time);
 }
 
@@ -148,9 +149,9 @@ TEST(type_conversion_tests, integer_conversion_tests)
     EXPECT_TRUE(checkTypeConversion1(val, static_cast<int>(val)));
     EXPECT_TRUE(checkTypeConversion1(val, std::complex<double>(static_cast<double>(val), 0)));
     EXPECT_TRUE(checkTypeConversion1(val, std::vector<double>{static_cast<double>(val)}));
-    EXPECT_TRUE(checkTypeConversion1(
-        val,
-        std::vector<std::complex<double>>{std::complex<double>(static_cast<double>(val), 0.0)}));
+    EXPECT_TRUE(checkTypeConversion1(val,
+                                     std::vector<std::complex<double>>{
+                                         std::complex<double>(static_cast<double>(val), 0.0)}));
     EXPECT_TRUE(checkTypeConversion1(val, true));
     EXPECT_TRUE(checkTypeConversion1(static_cast<int64_t>(0), false));
     EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", static_cast<double>(val)}));
@@ -172,8 +173,9 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
     EXPECT_TRUE(checkTypeConversion1(vp, static_cast<float>(val)));
     EXPECT_TRUE(checkTypeConversion1(vp, std::complex<double>(val, 0)));
     EXPECT_TRUE(checkTypeConversion1(vp, std::vector<double>{val}));
-    EXPECT_TRUE(checkTypeConversion1(
-        vp, std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
+    EXPECT_TRUE(
+        checkTypeConversion1(vp,
+                             std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
     EXPECT_TRUE(checkTypeConversion1(vp, true));
     EXPECT_TRUE(checkTypeConversion1(vp, std::string("{\"point\":" + std::to_string(val) + "}")));
 
@@ -185,8 +187,9 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
     EXPECT_TRUE(checkTypeConversion1(vp2, static_cast<float>(v2)));
     EXPECT_TRUE(checkTypeConversion1(vp2, std::complex<double>(3.0, -4.0)));
     EXPECT_TRUE(checkTypeConversion1(vp2, std::vector<double>{3.0, -4.0}));
-    EXPECT_TRUE(checkTypeConversion1(
-        vp2, std::vector<std::complex<double>>{std::complex<double>(3.0, -4.0)}));
+    EXPECT_TRUE(
+        checkTypeConversion1(vp2,
+                             std::vector<std::complex<double>>{std::complex<double>(3.0, -4.0)}));
     EXPECT_TRUE(checkTypeConversion1(vp2, true));
     EXPECT_TRUE(checkTypeConversion1(vp2, vp2.name));
 

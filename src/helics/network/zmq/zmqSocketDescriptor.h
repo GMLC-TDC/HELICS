@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 /*
  * LLNS Copyright Start
@@ -36,17 +36,17 @@ enum class socket_ops {
 };
 
 using socketOperation =
-    std::pair<socket_ops, std::string>; //!< easy definition for operation instruction
+    std::pair<socket_ops, std::string>;  //!< easy definition for operation instruction
 
 /** data class describing a socket and some operations on it*/
 class ZmqSocketDescriptor {
   public:
-    std::string name; //!< name of the socket for later reference
-    zmq::socket_type type = zmq::socket_type::sub; //!< the socket type
-    std::vector<socketOperation> ops; //!< a list of connections of make through bind
-    std::function<void(const zmq::multipart_t& res)> callback; //!< the message handler
+    std::string name;  //!< name of the socket for later reference
+    zmq::socket_type type = zmq::socket_type::sub;  //!< the socket type
+    std::vector<socketOperation> ops;  //!< a list of connections of make through bind
+    std::function<void(const zmq::multipart_t& res)> callback;  //!< the message handler
     ZmqSocketDescriptor(std::string socketName = ""):
-        name(std::move(socketName)) {} // purposefully implicit
+        name(std::move(socketName)) {}  // purposefully implicit
     ZmqSocketDescriptor(std::string socketName, zmq::socket_type stype):
         name(std::move(socketName)), type(stype)
     {

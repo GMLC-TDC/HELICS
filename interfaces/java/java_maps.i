@@ -70,17 +70,17 @@
 %typemap(javain) (int argc, char **argv) "$javainput"
 
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
-	etemp=helicsErrorInitialize();
-	$1=&etemp;
+    etemp=helicsErrorInitialize();
+    $1=&etemp;
 }
 
 %typemap(freearg) helics_error *
 {
-	if ($1->error_code!=helics_ok)
-	{
-		jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+    if ($1->error_code!=helics_ok)
+    {
+        jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
         (*jenv)->ThrowNew(jenv, clazz, $1->message);
-	}
+    }
 }
 
 
@@ -99,10 +99,10 @@
 //    PyObject *o = PyList_GetItem($input,i);
 //    if (PyFloat_Check(o)) {
 //      $1[i] = PyFloat_AsDouble(o);
-//	}else if (PyInt_Check(o))
-//	{
-//		$1[i] = (double)(PyInt_AsLong(o));
-//	} else {
+//    }else if (PyInt_Check(o))
+//    {
+//        $1[i] = (double)(PyInt_AsLong(o));
+//    } else {
 //      PyErr_SetString(PyExc_ValueError,"List elements must be numbers");
 //      free($1);
 //      return NULL;
@@ -142,7 +142,7 @@
 //  int i;
 //  PyObject *o2=PyList_New(*$3);
 //  for (i = 0; i < *$3; i++) {
-//	PyObject *o_item=PyFloat_FromDouble($1[i]);
+//    PyObject *o_item=PyFloat_FromDouble($1[i]);
 //      PyList_SetItem(o2, i, o_item);
 //      }
 //
@@ -154,30 +154,30 @@
 //// typemap for raw data input
 //%typemap(in) (const void *data, int inputDataLength) {
 //  if (PyUnicode_Check($input)) {
-//	int kind=PyUnicode_KIND($input);
+//    int kind=PyUnicode_KIND($input);
 //    $1=PyUnicode_DATA($input);
-//	switch(kind)
-//	{
-//	case PyUnicode_1BYTE_KIND:
-//	default:
-//		$2=PyUnicode_GetLength($input);
-//	break;
-//	case PyUnicode_2BYTE_KIND:
-//	case PyUnicode_WCHAR_KIND:
-//		$2=PyUnicode_GetLength($input)*2;
-//	break;
-//	case PyUnicode_4BYTE_KIND:
-//		$2=PyUnicode_GetLength($input)*4;
-//	break;
-//	}
+//    switch(kind)
+//    {
+//    case PyUnicode_1BYTE_KIND:
+//    default:
+//        $2=PyUnicode_GetLength($input);
+//    break;
+//    case PyUnicode_2BYTE_KIND:
+//    case PyUnicode_WCHAR_KIND:
+//        $2=PyUnicode_GetLength($input)*2;
+//    break;
+//    case PyUnicode_4BYTE_KIND:
+//        $2=PyUnicode_GetLength($input)*4;
+//    break;
+//    }
 //  }
 //  else if (PyBytes_Check($input)) {
 //    $1=PyBytes_AsString($input);
-//	$2=PyBytes_Size($input);
+//    $2=PyBytes_Size($input);
 //  }
-//  else 
+//  else
 //  {
-//	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
+//    PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
 //    return NULL;
 //  }
 //}

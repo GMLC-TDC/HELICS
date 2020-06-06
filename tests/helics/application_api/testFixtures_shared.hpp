@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -28,15 +28,14 @@ struct FederateTestFixture {
     ~FederateTestFixture();
 
     helics::BrokerApp AddBroker(const std::string& core_type_name, int count);
-    helics::BrokerApp
-        AddBroker(const std::string& core_type_name, const std::string& initialization_string);
+    helics::BrokerApp AddBroker(const std::string& core_type_name,
+                                const std::string& initialization_string);
 
     template<class FedType>
-    void SetupTest(
-        const std::string& core_type_name,
-        int count,
-        helics::Time time_delta = helics::timeZero,
-        const std::string& name_prefix = defaultNamePrefix)
+    void SetupTest(const std::string& core_type_name,
+                   int count,
+                   helics::Time time_delta = helics::timeZero,
+                   const std::string& name_prefix = defaultNamePrefix)
     {
         ctype = core_type_name;
         auto broker = AddBroker(core_type_name, count);
@@ -53,12 +52,11 @@ struct FederateTestFixture {
     }
 
     template<class FedType>
-    void AddFederates(
-        std::string core_type_name,
-        int count,
-        helics::BrokerApp& broker,
-        helics::Time time_delta = helics::timeZero,
-        const std::string& name_prefix = defaultNamePrefix)
+    void AddFederates(std::string core_type_name,
+                      int count,
+                      helics::BrokerApp& broker,
+                      helics::Time time_delta = helics::timeZero,
+                      const std::string& name_prefix = defaultNamePrefix)
     {
         bool hasIndex = hasIndexCode(core_type_name);
         int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
@@ -85,11 +83,12 @@ struct FederateTestFixture {
             default: {
                 size_t offset = federates.size();
                 auto core_type = helics::coreTypeFromString(core_type_name);
-                //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string
-                //  (offset),
-                //                                          initString + " --federates " + std::to_string (count));
-                helics::CoreApp core(
-                    core_type, initString + " --federates " + std::to_string(count));
+                //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" +
+                //  std::to_string (offset),
+                //                                          initString + " --federates " +
+                //                                          std::to_string (count));
+                helics::CoreApp core(core_type,
+                                     initString + " --federates " + std::to_string(count));
                 fi.coreName = core.getIdentifier();
 
                 federates.resize(count + offset);
@@ -99,14 +98,14 @@ struct FederateTestFixture {
                     federates[ii + offset] = fed;
                 }
             } break;
-            case 2: { // each federate has its own core
+            case 2: {  // each federate has its own core
                 auto core_type = helics::coreTypeFromString(core_type_name);
                 size_t offset = federates.size();
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ++ii) {
                     //     auto core =
-                    //     helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string (ii +
-                    //     offset),
+                    //     helics::CoreFactory::create (core_type, name_prefix + "_core_" +
+                    //     std::to_string (ii + offset),
                     //                                    initString + " --federates 1");
                     helics::CoreApp core(core_type, initString + " --federates 1");
                     fi.coreName = core.getIdentifier();
@@ -119,8 +118,9 @@ struct FederateTestFixture {
             case 3: {
                 auto subbroker =
                     AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
-                //	auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count) +
-                //		" --name=subbroker_" + name_prefix);
+                //    auto subbroker = AddBroker(core_type_name, initString + " --federates " +
+                //    std::to_string(count) +
+                //        " --name=subbroker_" + name_prefix);
                 if (!subbroker.isConnected()) {
                     throw(std::runtime_error("Unable to connect subbroker"));
                 }
@@ -137,23 +137,24 @@ struct FederateTestFixture {
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
                     auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
-                    //	auto subbroker = AddBroker(core_type_name, initString + " --federates 1 --name=subbroker_" +
-                    //		name_prefix + std::to_string(ii));
+                    //    auto subbroker = AddBroker(core_type_name, initString + " --federates 1
+                    //    --name=subbroker_" +
+                    //        name_prefix + std::to_string(ii));
                     if (!subbroker->isConnected()) {
                         throw(std::runtime_error("Unable to connect subbroker(mode 4)"));
                     }
                     AddFederates<FedType>(newTypeString, 1, subbroker, time_delta, name_prefix);
                 }
             } break;
-            case 5: // pairs of federates per core
+            case 5:  // pairs of federates per core
             {
                 auto core_type = helics::coreTypeFromString(core_type_name);
                 size_t offset = federates.size();
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ii += 2) {
-                    helics::CoreApp core(
-                        core_type,
-                        initString + " --federates " + std::to_string((ii < count - 1) ? 2 : 1));
+                    helics::CoreApp core(core_type,
+                                         initString + " --federates " +
+                                             std::to_string((ii < count - 1) ? 2 : 1));
                     fi.coreName = core.getIdentifier();
 
                     auto fedname = name_prefix + std::to_string(ii + offset);
@@ -166,15 +167,16 @@ struct FederateTestFixture {
                     }
                 }
             } break;
-            case 6: // pairs of cores per subbroker
+            case 6:  // pairs of cores per subbroker
             {
                 auto newTypeString = core_type_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('5');
                 for (int ii = 0; ii < count; ii += 4) {
                     int fedcnt = (ii > count - 3) ? 4 : (count - ii);
-                    auto subbroker = AddBroker(
-                        core_type_name, initString + " --federates " + std::to_string(fedcnt));
+                    auto subbroker =
+                        AddBroker(core_type_name,
+                                  initString + " --federates " + std::to_string(fedcnt));
                     if (!subbroker->isConnected()) {
                         throw(std::runtime_error("Unable to connect subbroker(mode 4)"));
                     }
@@ -182,7 +184,7 @@ struct FederateTestFixture {
                         newTypeString, fedcnt, subbroker, time_delta, name_prefix);
                 }
             } break;
-            case 7: // two layers of subbrokers
+            case 7:  // two layers of subbrokers
             {
                 auto newTypeString = core_type_name;
                 newTypeString.push_back('_');

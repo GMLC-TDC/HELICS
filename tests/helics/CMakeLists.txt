@@ -23,10 +23,12 @@ add_subdirectory(system_tests)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)
-    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
+    if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
+                                               OR HELICS_DISABLE_ASIO)
+    )
         add_subdirectory(webserver)
     endif()
-        
+
 endif()
 
 add_subdirectory(application_api)
@@ -43,35 +45,65 @@ endif()
 
 if(NOT MSVC)
     set(package_test_command --test-command "${CMAKE_CTEST_COMMAND}")
-else() # don't try to run the tests on MSVC since that would require copying the dll's
-       # and doing some other setup that isn't that important to run on all OS
+else() # don't try to run the tests on MSVC since that would require copying the dll's and doing
+       # some other setup that isn't that important to run on all OS
     set(package_test_command)
 endif()
 
-# Tests for other CMake projects including and using HELICS using find_package
-add_test(
-    find-package-tests
-    ${CMAKE_CTEST_COMMAND}
-    -C
-    ${CMAKE_BUILD_TYPE}
-    --build-and-test
-    "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
-    "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
-    --build-generator
-    "${CMAKE_GENERATOR}"
-    --build-generator-platform
-    "${CMAKE_GENERATOR_PLATFORM}"
-    --build-options
-    ${HELICS_PACKAGE_SEARCH_LOC}
-    "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
-    "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
-    "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
-    "-DHELICS_VERSION=${HELICS_VERSION}"
-    "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-    "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-    ${package_test_command}
+if(CMAKE_BUILD_TYPE)
+    set(HELICS_PACKAGE_TEST_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+else()
+    set(HELICS_PACKAGE_TEST_BUILD_TYPE Release)
+endif()
+
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests")
+
+if(MSVC AND ${CMAKE_VERSION} VERSION_GREATER 3.12.9)
+    # Tests for other CMake projects including and using HELICS using find_package
+    add_test(
+        NAME find-package-testsA
+        COMMAND
+            ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -A "${CMAKE_GENERATOR_PLATFORM}"
+            ${HELICS_PACKAGE_SEARCH_LOC}
+            "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
+            "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+            "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
+            "-DHELICS_VERSION=${HELICS_VERSION}" "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+            "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+            "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
+    )
+else()
+    add_test(
+        NAME find-package-testsA
+        COMMAND
+            ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" ${HELICS_PACKAGE_SEARCH_LOC}
+            "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
+            "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+            "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
+            "-DHELICS_VERSION=${HELICS_VERSION}" "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+            "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+            "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
+    )
+endif()
+
+add_test(NAME find-package-testsB
+         COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests" --config
+                 ${HELICS_PACKAGE_TEST_BUILD_TYPE}
 )
-set_property(TEST find-package-tests PROPERTY LABELS Packaging PackagingFast)
+
+add_test(NAME find-package-testsC COMMAND ${CMAKE_CTEST_COMMAND} -C
+                                          ${HELICS_PACKAGE_TEST_BUILD_TYPE}
+         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
+)
+set_property(TEST find-package-testsA PROPERTY LABELS Packaging PackagingFast)
+set_property(TEST find-package-testsB PROPERTY LABELS Packaging PackagingFast)
+set_property(TEST find-package-testsB PROPERTY DEPENDS find-package-testsA)
+set_property(TEST find-package-testsC PROPERTY LABELS Packaging PackagingFast)
+set_property(TEST find-package-testsC PROPERTY DEPENDS find-package-testsB)
 
 cmake_dependent_advanced_option(
     HELICS_ENABLE_SUBPROJECT_TESTS
@@ -85,7 +117,7 @@ if(HELICS_ENABLE_SUBPROJECT_TESTS)
         add-subdirectory-tests
         ${CMAKE_CTEST_COMMAND}
         -C
-        ${CMAKE_BUILD_TYPE}
+        ${HELICS_PACKAGE_TEST_BUILD_TYPE}
         --build-and-test
         "${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory_tests"
         "${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_tests"
@@ -107,29 +139,27 @@ if(HELICS_ENABLE_SUBPROJECT_TESTS)
 endif()
 
 if(NOT MSVC AND HELICS_INSTALL_PACKAGE_TESTS)
-    if(NOT CMAKE_VERSION VERSION_LESS 3.6.0)
-        # Tests for other CMake projects using the package_config files
-        add_test(
-            package-config-tests
-            ${CMAKE_CTEST_COMMAND}
-            -C
-            ${CMAKE_BUILD_TYPE}
-            --build-and-test
-            "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests"
-            "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
-            --build-generator
-            "${CMAKE_GENERATOR}"
-            --build-generator-platform
-            "${CMAKE_GENERATOR_PLATFORM}"
-            --build-options
-            "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
-            "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
-            "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
-            "-DHELICS_VERSION=${HELICS_VERSION}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-            "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-            ${package_test_command}
-        )
-        set_property(TEST package-config-tests PROPERTY LABELS Packaging)
-    endif()
+    # Tests for other CMake projects using the package_config files
+    add_test(
+        package-config-tests
+        ${CMAKE_CTEST_COMMAND}
+        -C
+        ${HELICS_PACKAGE_TEST_BUILD_TYPE}
+        --build-and-test
+        "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests"
+        "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
+        --build-generator
+        "${CMAKE_GENERATOR}"
+        --build-generator-platform
+        "${CMAKE_GENERATOR_PLATFORM}"
+        --build-options
+        "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
+        "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+        "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
+        "-DHELICS_VERSION=${HELICS_VERSION}"
+        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+        "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+        ${package_test_command}
+    )
+    set_property(TEST package-config-tests PROPERTY LABELS Packaging)
 endif()

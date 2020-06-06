@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -29,8 +29,8 @@ namespace CoreFactory {
     static const std::string emptyString;
 
     /*** class to hold the set of builders
-   @details this doesn't work as a global since it tends to get initialized after some of the things that call it
-   so it needs to be a static member of function call*/
+   @details this doesn't work as a global since it tends to get initialized after some of the things
+   that call it so it needs to be a static member of function call*/
     class MasterCoreBuilder {
       public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
@@ -66,7 +66,7 @@ namespace CoreFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCoreBuilder() = default;
-        std::vector<BuildT> builders; //!< container for the different builders
+        std::vector<BuildT> builders;  //!< container for the different builders
     };
 
     void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
@@ -186,10 +186,9 @@ namespace CoreFactory {
         return core;
     }
 
-    std::shared_ptr<Core> FindOrCreate(
-        core_type type,
-        const std::string& coreName,
-        const std::string& configureString)
+    std::shared_ptr<Core> FindOrCreate(core_type type,
+                                       const std::string& coreName,
+                                       const std::string& configureString)
     {
         std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
@@ -230,8 +229,8 @@ namespace CoreFactory {
         return core;
     }
 
-    /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
- * loops*/
+    /** lambda function to join cores before the destruction happens to avoid potential problematic
+     * calls in the loops*/
     static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
         auto* ccore = dynamic_cast<CommonCore*>(core.get());
         if (ccore != nullptr) {
@@ -240,17 +239,16 @@ namespace CoreFactory {
         }
     };
 
-    /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
-that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
-can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
-what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
-need be
-without issue*/
+    /** so the problem this is addressing is that unregister can potentially cause a destructor to
+fire that destructor can delete a thread variable, unfortunately it is possible that a thread stored
+in this variable can do the unregister operation and destroy itself meaning it is unable to join and
+thus will call std::terminate what we do is delay the destruction until it is called in a different
+thread which allows the destructor to fire if need be without issue*/
     static gmlc::concurrency::DelayedDestructor<Core>
-        delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
+        delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<Core, core_type>
-        searchableCores; //!< the object managing the searchable cores
+        searchableCores;  //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
@@ -262,8 +260,8 @@ without issue*/
 
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
-        return searchableCores.findObject(
-            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+        return searchableCores.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); },
+                                          type);
     }
 
     static void addExtraTypes(const std::string& name, core_type type)
@@ -354,5 +352,5 @@ without issue*/
         }
     }
 
-} // namespace CoreFactory
-} // namespace helics
+}  // namespace CoreFactory
+}  // namespace helics

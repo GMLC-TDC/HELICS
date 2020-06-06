@@ -1,13 +1,12 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "cppzmq/zmq.hpp"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -15,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-types.hpp"
 #include "helics/network/zmq/ZmqBroker.h"
 #include "helics/network/zmq/ZmqComms.h"
+#include "helics/network/zmq/ZmqContextManager.h"
 #include "helics/network/zmq/ZmqCore.h"
 #include "helics/network/zmq/ZmqRequestSets.h"
 
@@ -175,7 +175,8 @@ TEST(ZMQCore, zmqRequestSet2)
     if (reqset.waiting()) {
         reqset.checkForMessages(50ms);
     }
-    // since we have 3 sockets we might have to do this twice since it returns immediately if it has a message
+    // since we have 3 sockets we might have to do this twice since it returns immediately if it has
+    // a message
     if (reqset.waiting()) {
         reqset.checkForMessages(50ms);
     }

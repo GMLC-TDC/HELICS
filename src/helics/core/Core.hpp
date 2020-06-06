@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -32,7 +32,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** @namespace  helics
 @brief the main namespace for the helics co-simulation library
-User functions will be in the helics namespace with internal functions possible in a lower level namespace
+User functions will be in the helics namespace with internal functions possible in a lower level
+namespace
 */
 namespace helics {
 class CoreFederateInfo;
@@ -64,8 +65,8 @@ class Core {
      * Should be invoked a single time to initialize the co-simulation core for operation
      *
      */
-    [[deprecated("please use configureFromArgs instead")]] void
-        initializeFromArgs(int argc, char* argv[])
+    [[deprecated("please use configureFromArgs instead")]] void initializeFromArgs(int argc,
+                                                                                   char* argv[])
     {
         configureFromArgs(argc, argv);
     }
@@ -134,18 +135,16 @@ class Core {
     * Federate has encountered a global error and the federation should halt.
     @param federateID the federate
     */
-    virtual void globalError(
-        local_federate_id federateID,
-        int32_t errorCode,
-        const std::string& error_string) = 0;
+    virtual void globalError(local_federate_id federateID,
+                             int32_t errorCode,
+                             const std::string& error_string) = 0;
 
     /**
-    * Federate has encountered a local error and should be disconnected.
-    */
-    virtual void localError(
-        local_federate_id federateID,
-        int32_t errorCode,
-        const std::string& error_string) = 0;
+     * Federate has encountered a local error and should be disconnected.
+     */
+    virtual void localError(local_federate_id federateID,
+                            int32_t errorCode,
+                            const std::string& error_string) = 0;
 
     /**
      * Federate has encountered an unrecoverable error.
@@ -167,11 +166,12 @@ class Core {
      * Federates may be in five Modes.
      *    -# Startup
      *       Configuration of the federate.
-     *       State begins when registerFederate() is invoked and ends when enterInitializingMode() is invoked.
+     *       State begins when registerFederate() is invoked and ends when enterInitializingMode()
+     * is invoked.
      *    -# Initializing
      *       Configure of the simulation state prior to the start of time stepping.
-     *       State begins when enterInitializingMode() is invoked and ends when enterExecutingMode(true) is
-     *       invoked.
+     *       State begins when enterInitializingMode() is invoked and ends when
+     * enterExecutingMode(true) is invoked.
      *    -# Executing
      *       State begins when enterExecutingMode() is invoked and ends when finalize() is invoked.
      *    -# Finalized
@@ -196,14 +196,14 @@ class Core {
      * Change the federate state to the Executing state.
      *
      * May only be invoked in Initializing state.
-     @param federateID  the identifier of the federate
-     @param iterate  the requested iteration mode
-     if nonconverged the federate requests an iterative update
-     @return an iteration result enumeration value indicating the current state of iterations
+     *@param federateID  the identifier of the federate
+     *@param iterate  the requested iteration mode
+     *if nonconverged the federate requests an iterative update
+     *
+     *@return an iteration result enumeration value indicating the current state of iterations
      */
-    virtual iteration_result enterExecutingMode(
-        local_federate_id federateID,
-        iteration_request iterate = NO_ITERATION) = 0;
+    virtual iteration_result enterExecutingMode(local_federate_id federateID,
+                                                iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -213,8 +213,8 @@ class Core {
      *
      * May only be invoked in initialize state otherwise throws an error
      */
-    virtual local_federate_id
-        registerFederate(const std::string& name, const CoreFederateInfo& info) = 0;
+    virtual local_federate_id registerFederate(const std::string& name,
+                                               const CoreFederateInfo& info) = 0;
 
     /**
      * Returns the federate name.
@@ -229,8 +229,8 @@ class Core {
     virtual local_federate_id getFederateId(const std::string& name) const = 0;
 
     /**
-     * Returns the global number of federates that are registered only return accurately after the initialization
-     * state has been entered
+     * Returns the global number of federates that are registered only return accurately after the
+     * initialization state has been entered
      */
     virtual int32_t getFederationSize() = 0;
 
@@ -281,13 +281,12 @@ class Core {
      *@param federateID the identifier for the federate to process
      * @param next the requested time
      * @param iterate the requested iteration mode /ref iteration_request
-     @return an /ref iteration_time object with two field grantedTime and a enumeration indicating the state of the
-     iteration
+     * @return an /ref iteration_time object with two field grantedTime and a enumeration indicating
+     the state of the iteration
      */
-    virtual iteration_time requestTimeIterative(
-        local_federate_id federateID,
-        Time next,
-        iteration_request iterate) = 0;
+    virtual iteration_time requestTimeIterative(local_federate_id federateID,
+                                                Time next,
+                                                iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -355,58 +354,60 @@ class Core {
      @param units the units associated with the publication
      @return a handle to identify the publication
      */
-    virtual interface_handle registerPublication(
-        local_federate_id federateID,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units) = 0;
+    virtual interface_handle registerPublication(local_federate_id federateID,
+                                                 const std::string& key,
+                                                 const std::string& type,
+                                                 const std::string& units) = 0;
 
     /** get a publication Handle from its key
     @param federateID the identifier for the federate
     @param key the name of the publication
      @return a handle to identify the publication*/
-    virtual interface_handle
-        getPublication(local_federate_id federateID, const std::string& key) const = 0;
+    virtual interface_handle getPublication(local_federate_id federateID,
+                                            const std::string& key) const = 0;
 
     /**
      * Register a control input for the specified federate.
      *
      * May only be invoked in the initialize state.
-     * @param federateID the indentifier for the federate to register an input interface on
+     * @param federateID the identifier for the federate to register an input interface on
      * @param key the name of the control input
      * @param type a string describing the type of the federate
      * @param units a string naming the units of the federate
      */
-    virtual interface_handle registerInput(
-        local_federate_id federateID,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units) = 0;
+    virtual interface_handle registerInput(local_federate_id federateID,
+                                           const std::string& key,
+                                           const std::string& type,
+                                           const std::string& units) = 0;
     /** get a subscription Handle from its key
     @param federateID the identifier for the federate
     @param key the tag of the named input
     @return a handle to identify the input*/
-    virtual interface_handle
-        getInput(local_federate_id federateID, const std::string& key) const = 0;
+    virtual interface_handle getInput(local_federate_id federateID,
+                                      const std::string& key) const = 0;
 
     /**
      * Returns the name or identifier for a specified handle
      */
     virtual const std::string& getHandleName(interface_handle handle) const = 0;
     /** remove a target from a handles operation
-    @param handle the handle from the publication, input, endpoint or filter
-    @param targetToRemove the name of the target to remove*/
+     *@param handle the handle from the publication, input, endpoint or filter
+     *@param targetToRemove the name of the target to remove
+     */
     virtual void removeTarget(interface_handle handle, const std::string& targetToRemove) = 0;
 
     /**
-     * Returns units for specified handle.
+     * @return the unit string for the specified handle.
      */
     virtual const std::string& getExtractionUnits(interface_handle handle) const = 0;
-    /** get the injection units for an interface,  this is the type for data coming into an interface
-   @details for publications this is the units associated with the transmitted data,  for inputs this is the units
-   of the transmitting publication
-   @param handle the interface handle to get the injection type for
-   @return a const ref to  std::string  */
+    /** get the injection units for an interface,  this is the type for data coming into an
+     *interface
+     *@details for publications this is the units associated with the transmitted data,  for inputs
+     *this is the units of the transmitting publication
+     *@param handle the interface handle to get the injection type for
+     *
+     *@return a const ref to  std::string
+     */
     virtual const std::string& getInjectionUnits(interface_handle handle) const = 0;
 
     /**
@@ -418,31 +419,34 @@ class Core {
         return getExtractionUnits(handle);
     }
     /** get the injection type for an interface,  this is the type for data coming into an interface
-    @details for filters this is the input type, for publications this is type used to transmit data, for endpoints
-    this is the specified type and for inputs this is the type of the transmitting publication
-    @param handle the interface handle to get the injection type for
-    @return a const ref to  std::string  */
+     *@details for filters this is the input type, for publications this is type used to transmit
+     *data, for endpoints this is the specified type and for inputs this is the type of the
+     *transmitting publication
+     *@param handle the interface handle to get the injection type for
+     *@return a const ref to  std::string
+     */
     virtual const std::string& getInjectionType(interface_handle handle) const = 0;
 
-    /** get the type for which data comes out of an interface,  this is the type for data coming into an interface
-    @details for filters this is the output type, for publications this is the specified type, for endpoints this
-    is the specified type and for inputs this is the specified type
+    /** get the type for which data comes out of an interface,  this is the type for data coming
+    into an interface
+    @details for filters this is the output type, for publications this is the specified type, for
+    endpoints this is the specified type and for inputs this is the specified type
     @param handle the interface handle to get the injection type for
     @return a const ref to  std::string  */
     virtual const std::string& getExtractionType(interface_handle handle) const = 0;
 
     /** set a handle option
-    @param handle the handle from the publication, input, endpoint or filter
-    @param option the option to set
-    @param option_value the value to set the option (mostly 0 or 1)
-    */
-    virtual void setHandleOption(interface_handle handle, int32_t option, bool option_value) = 0;
+     *@param handle the handle from the publication, input, endpoint or filter
+     *@param option the option to set
+     *@param option_value the value to set the option (mostly 0 or 1)
+     */
+    virtual void setHandleOption(interface_handle handle, int32_t option, int32_t option_value) = 0;
 
     /** get a handle option
     @param handle the handle from the publication, input, endpoint or filter
     @param option the option to set see /ref defs::options
     */
-    virtual bool getHandleOption(interface_handle handle, int32_t option) const = 0;
+    virtual int32_t getHandleOption(interface_handle handle, int32_t option) const = 0;
 
     /** close a handle from further connections
     @param handle the handle from the publication, input, endpoint or filter
@@ -459,20 +463,26 @@ class Core {
 
     /**
      * Return the data for the specified handle or the latest input
-     *
+     * @param handle the input handle from which to get the data
+     * @param[out] inputIndex return the index of input (always 1 for inputs with only a single
+     * source)
      */
-    virtual std::shared_ptr<const data_block> getValue(interface_handle handle) = 0;
+    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle,
+                                                              uint32_t* inputIndex = nullptr) = 0;
+
     /**
-     * Return all the data for the specified handle or the latest input
+     * Return all the available data for the specified handle or the latest input
      *
      */
-    virtual std::vector<std::shared_ptr<const data_block>>
+    virtual const std::vector<std::shared_ptr<const data_block>>&
         getAllValues(interface_handle handle) = 0;
 
     /**
      * Returns vector of input handles that received an update during the last
-     * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
-     *@param federateID the identification code of the federate to get which interfaces have been updated
+     * time request.  The data remains valid until the next call to getValueUpdates for the given
+     federateID
+     *@param federateID the identification code of the federate to get which interfaces have been
+     updated
      @return a reference to the location of an array of handles that have been updated
      */
     virtual const std::vector<interface_handle>& getValueUpdates(local_federate_id federateID) = 0;
@@ -487,49 +497,51 @@ class Core {
      *
      * May only be invoked in the Initialization state.
      */
-    virtual interface_handle registerEndpoint(
-        local_federate_id federateID,
-        const std::string& name,
-        const std::string& type) = 0;
+    virtual interface_handle registerEndpoint(local_federate_id federateID,
+                                              const std::string& name,
+                                              const std::string& type) = 0;
 
     /** get an endpoint Handle from its name
     @param federateID the identifier for the federate
     @param name the name of the endpoint
     @return a handle to identify the endpoint*/
-    virtual interface_handle
-        getEndpoint(local_federate_id federateID, const std::string& name) const = 0;
+    virtual interface_handle getEndpoint(local_federate_id federateID,
+                                         const std::string& name) const = 0;
 
     /**
-    * Register a cloning filter, a cloning filter operates on a copy of the message vs the actual message
+    * Register a cloning filter, a cloning filter operates on a copy of the message vs the actual
+    message
     *
-    @param filterName the name of the filter (may be left blank and one will be automatically assigned)
+    @param filterName the name of the filter (may be left blank and one will be automatically
+    assigned)
     @param type_in the input type of the filter
-    @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
+    @param type_out the output type of the filter (may be left blank if the filter doesn't change
+    type)
     @return the handle for the new filter
     */
-    virtual interface_handle registerCloningFilter(
-        const std::string& filterName,
-        const std::string& type_in,
-        const std::string& type_out) = 0;
+    virtual interface_handle registerCloningFilter(const std::string& filterName,
+                                                   const std::string& type_in,
+                                                   const std::string& type_out) = 0;
 
     /**
      * Register source filter.
      *
      * May only be invoked in the Initialization state.
-     @param filterName the name of the filter (may be left blank and one will be automatically assigned)
+     @param filterName the name of the filter (may be left blank and one will be automatically
+     assigned)
      @param type_in the input type of the filter
-     @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
-     this is important for ordering in filters with operators
+     @param type_out the output type of the filter (may be left blank if the filter doesn't change
+     type) this is important for ordering in filters with operators
      @return the handle for the new filter
      */
-    virtual interface_handle registerFilter(
-        const std::string& filterName,
-        const std::string& type_in,
-        const std::string& type_out) = 0;
+    virtual interface_handle registerFilter(const std::string& filterName,
+                                            const std::string& type_in,
+                                            const std::string& type_out) = 0;
     /**
     * add a destination target,  the handle can be for a filter or a publication
     @details a filter will create an additional processing step for messages before they get to a
-    destination endpoint, for publications this will establish a linkage from the publication to the named input
+    destination endpoint, for publications this will establish a linkage from the publication to the
+    named input
     *
     @param handle an interface to add the target to
     @param dest the target endpoint for the filter
@@ -537,25 +549,26 @@ class Core {
     virtual void addDestinationTarget(interface_handle handle, const std::string& dest) = 0;
 
     /** add a source target,  the handle can be a subscription, input, filter or endpoint
-    @details for subscriptions and inputs this establishes a link from a publication, for endpoints this creates a
-    linkage to a particular publication, for filters it add a source endpoint to filter
+    @details for subscriptions and inputs this establishes a link from a publication, for endpoints
+    this creates a linkage to a particular publication, for filters it add a source endpoint to
+    filter
     @param handle the identifier of the interface
     @param name the name of the filter or its target
     */
     virtual void addSourceTarget(interface_handle handle, const std::string& name) = 0;
 
-    /** get a destination filter Handle from its name or target(this may not be unique so it will only find the
-    first one)
+    /** get a destination filter Handle from its name or target(this may not be unique so it will
+    only find the first one)
     @param name the name of the filter or its target
     @return a handle to identify the filter*/
     virtual interface_handle getFilter(const std::string& name) const = 0;
 
     /**
     * add a time dependency between federates
-    * @details this function is primarily useful for Message federates which do not otherwise restrict the
-    dependencies
-    * adding a dependency gives additional information to the core that the specified federate(given by id) will be
-    sending Messages to the named Federate(by federateName)
+    * @details this function is primarily useful for Message federates which do not otherwise
+    restrict the dependencies
+    * adding a dependency gives additional information to the core that the specified federate(given
+    by id) will be sending Messages to the named Federate(by federateName)
     @param federateID  the identifier for the federate
     @param federateName the name of the dependent federate
     */
@@ -566,8 +579,8 @@ class Core {
      * May be used for error checking for compatible types and possible optimization by
      * pre-registering the intent for these endpoints to communicate.
      */
-    virtual void
-        registerFrequentCommunicationsPair(const std::string& source, const std::string& dest) = 0;
+    virtual void registerFrequentCommunicationsPair(const std::string& source,
+                                                    const std::string& dest) = 0;
 
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/
@@ -577,17 +590,18 @@ class Core {
     @param source the name of the publication
     @param target the name of the input*/
     virtual void dataLink(const std::string& source, const std::string& target) = 0;
-    /** create a filter connection between a named filter and a named endpoint for messages coming from that
-    endpoint
+    /** create a filter connection between a named filter and a named endpoint for messages coming
+    from that endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void
-        addSourceFilterToEndpoint(const std::string& filter, const std::string& target) = 0;
-    /** create a filter connection between a named filter and a named endpoint for destination processing
+    virtual void addSourceFilterToEndpoint(const std::string& filter,
+                                           const std::string& target) = 0;
+    /** create a filter connection between a named filter and a named endpoint for destination
+    processing
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void
-        addDestinationFilterToEndpoint(const std::string& filter, const std::string& target) = 0;
+    virtual void addDestinationFilterToEndpoint(const std::string& filter,
+                                                const std::string& target) = 0;
     /**
      * Send data from source to destination.
      *
@@ -600,11 +614,10 @@ class Core {
      * communication network.  This enables simulations to be run with/without
      * a communications model present.
      */
-    virtual void send(
-        interface_handle sourceHandle,
-        const std::string& destination,
-        const char* data,
-        uint64_t length) = 0;
+    virtual void send(interface_handle sourceHandle,
+                      const std::string& destination,
+                      const char* data,
+                      uint64_t length) = 0;
 
     /**
      * Send data from source to destination with explicit expected delivery time.
@@ -622,12 +635,11 @@ class Core {
      @param data the raw data for the event
      @param length the record length of the event
      */
-    virtual void sendEvent(
-        Time time,
-        interface_handle sourceHandle,
-        const std::string& destination,
-        const char* data,
-        uint64_t length) = 0;
+    virtual void sendEvent(Time time,
+                           interface_handle sourceHandle,
+                           const std::string& destination,
+                           const char* data,
+                           uint64_t length) = 0;
 
     /**
      * Send for filters.
@@ -654,8 +666,8 @@ class Core {
      @param federateID the identifier for the federate
      @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
-    virtual std::unique_ptr<Message>
-        receiveAny(local_federate_id federateID, interface_handle& endpoint_id) = 0;
+    virtual std::unique_ptr<Message> receiveAny(local_federate_id federateID,
+                                                interface_handle& endpoint_id) = 0;
 
     /**
      * Returns number of messages for all destinations.
@@ -674,11 +686,11 @@ class Core {
     @param filter  the handle of the filter
     @param callback pointer to the operator class executing the filter
     */
-    virtual void
-        setFilterOperator(interface_handle filter, std::shared_ptr<FilterOperator> callback) = 0;
+    virtual void setFilterOperator(interface_handle filter,
+                                   std::shared_ptr<FilterOperator> callback) = 0;
 
-    /** define a logging function to use for logging message and notices from the federation and individual
-    federate
+    /** define a logging function to use for logging message and notices from the federation and
+    individual federate
     @param federateID  the identifier for the individual federate or 0 for the Core Logger
     @param logFunction the callback function for doing something with a log message
     it takes 3 inputs an integer for logLevel /ref helics_log_levels
@@ -706,22 +718,21 @@ class Core {
     target can also be "global" to query a global value stored in the broker
     @param target the specific target of the query
     @param queryStr the actual query
-    @return a string containing the response to the query.  Query is a blocking call and will not return until the
-    query is answered so use with caution
+    @return a string containing the response to the query.  Query is a blocking call and will not
+    return until the query is answered so use with caution
     */
     virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
     /** supply a query callback function
-    @details the intention of the query callback is to allow federates to answer particular requests through the
-    query interface this allows other federates to make requests or queries of other federates in an asynchronous
-    fashion.
+    @details the intention of the query callback is to allow federates to answer particular requests
+    through the query interface this allows other federates to make requests or queries of other
+    federates in an asynchronous fashion.
     @param federateID the identifier for the federate
-    @param queryFunction  a function object that returns a string as a result of a query in the form of const
-    string ref. This callback will be called when a federate received a query that cannot be answered that directed
-    at a particular federate
+    @param queryFunction  a function object that returns a string as a result of a query in the form
+    of const string ref. This callback will be called when a federate received a query that cannot
+    be answered that directed at a particular federate
     */
-    virtual void setQueryCallback(
-        local_federate_id federateID,
-        std::function<std::string(const std::string&)> queryFunction) = 0;
+    virtual void setQueryCallback(local_federate_id federateID,
+                                  std::function<std::string(const std::string&)> queryFunction) = 0;
     /**
      * setter for the interface information
      * @param handle the identifiers for the interface to set the info data on
@@ -736,4 +747,4 @@ class Core {
     virtual const std::string& getInterfaceInfo(interface_handle handle) const = 0;
 };
 
-} // namespace helics
+}  // namespace helics

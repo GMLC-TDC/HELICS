@@ -1,8 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
-See the top-level NOTICE for additional details.
-All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC. See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -32,12 +31,12 @@ namespace mpi {
         virtual std::string generateLocalAddressString() const override;
 
       private:
-        mutable std::mutex dataMutex; //!< mutex protecting the configuration information
-        std::string brokerAddress; //!< the mpi rank:tag of the broker
+        mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+        std::string brokerAddress;  //!< the mpi rank:tag of the broker
         int brokerRank{0};
         int brokerTag{0};
         virtual bool brokerConnect() override;
     };
 
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

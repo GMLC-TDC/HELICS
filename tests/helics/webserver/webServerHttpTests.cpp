@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -32,10 +32,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
-namespace beast = boost::beast; // from <boost/beast.hpp>
-namespace http = beast::http; // from <boost/beast/http.hpp>
-namespace net = boost::asio; // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast;  // from <boost/beast.hpp>
+namespace http = beast::http;  // from <boost/beast/http.hpp>
+namespace net = boost::asio;  // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 const constexpr char localhost[] = "localhost";
 
@@ -56,7 +56,7 @@ class httpTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<beast::tcp_stream>(ioc); //NOLINT
+        stream = std::make_unique<beast::tcp_stream>(ioc);  // NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26242");
@@ -135,8 +135,8 @@ class httpTest: public ::testing::Test {
         return res.body();
     }
 
-    static std::shared_ptr<helics::Broker>
-        addBroker(helics::core_type ctype, const std::string& init)
+    static std::shared_ptr<helics::Broker> addBroker(helics::core_type ctype,
+                                                     const std::string& init)
     {
         auto brk = helics::BrokerFactory::create(ctype, init);
         if (brk) {
@@ -270,7 +270,15 @@ TEST_F(httpTest, core)
     auto result = sendGet("brk2");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_EQ(val["cores"].size(), 1U);
+    if (val["cores"].empty()) {
+        // on occasion the core might not be registered with the broker in low CPU count systems
+        // so we need to wait.
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        result = sendGet("brk2");
+        EXPECT_FALSE(result.empty());
+        val = loadJson(result);
+    }
+    ASSERT_EQ(val["cores"].size(), 1U);
     EXPECT_STREQ(val["cores"][0]["name"].asCString(), "cr1");
 
     auto result2 = sendCommand(http::verb::search, "/search/brk2", "query=current_state");
@@ -356,6 +364,25 @@ TEST_F(httpTest, deleteBroker)
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 2U);
     sendCommand(http::verb::delete_, "/delete", "broker=brk1");
+    result = sendGet("brokers");
+    EXPECT_FALSE(result.empty());
+    val = loadJson(result);
+    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_EQ(val["brokers"].size(), 1U);
+}
+
+TEST_F(httpTest, createBrokerUUID)
+{
+    auto result = sendCommand(http::verb::post, "/", "core_type=zmq&num_feds=2");
+    auto val = loadJson(result);
+    EXPECT_TRUE(val["broker_uuid"].isString());
+    auto uuid = val["broker_uuid"].asString();
+    result = sendGet(std::string("/?uuid=") + uuid);
+    val = loadJson(result);
+    EXPECT_TRUE(val["status"].asBool());
+
+    sendCommand(http::verb::delete_, "/", std::string("broker_uuid=") + uuid);
+
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);

@@ -8,8 +8,6 @@ google-*,
 -google-runtime-references,
 -google-build-using-namespace,
 -google-default-arguments,
-llvm-include-order,
-llvm-namespace-comment,
 hicpp-*,
 -hicpp-use-equals-default,
 -hicpp-explicit-conversions,
@@ -39,8 +37,6 @@ google-*,
 -google-build-using-namespace,
 -google-default-arguments,
 -google-explicit-constructor,
-llvm-include-order,
-llvm-namespace-comment,
 hicpp-*,
 -hicpp-use-equals-default,
 -hicpp-explicit-conversions,
@@ -426,4 +422,3 @@ CheckOptions:
     value:           '0'
   - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
     value:           '0'
-

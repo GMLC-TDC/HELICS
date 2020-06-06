@@ -521,6 +521,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1raw_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1multi_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_data_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_data_type)helics_data_type_multi;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1any_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_data_type result;
@@ -1169,6 +1181,114 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1property_1int_1co
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1no_1op_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_no_op;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1vectorize_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_vectorize_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1and_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_and_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1or_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_or_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1sum_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_sum_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1diff_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_diff_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1max_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_max_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1min_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_min_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1multi_1input_1average_1operation_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_multi_input_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_multi_input_mode)helics_multi_input_average_operation;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1connection_1required_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_handle_options result;
@@ -1284,6 +1404,54 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1i
   (void)jenv;
   (void)jcls;
   result = (helics_handle_options)helics_handle_option_ignore_interrupts;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1multi_1input_1handling_1method_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_multi_input_handling_method;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1input_1priority_1location_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_input_priority_location;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1clear_1priority_1list_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_clear_priority_list;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1handle_1option_1connections_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_handle_options result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_handle_options)helics_handle_option_connections;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1896,6 +2064,30 @@ SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetVersion(JNIEn
   (void)jenv;
   (void)jcls;
   result = (char *)helicsGetVersion();
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetBuildFlags(JNIEnv *jenv, jclass jcls) {
+  jstring jresult = 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char *)helicsGetBuildFlags();
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetCompilerVersion(JNIEnv *jenv, jclass jcls) {
+  jstring jresult = 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char *)helicsGetCompilerVersion();
   if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   return jresult;
 }
@@ -3433,6 +3625,25 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsGetPropertyIndex(JN
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsGetFlagIndex(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (int)helicsGetFlagIndex((char const *)arg1);
+  jresult = (jint)result; 
+  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsGetOptionIndex(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -3446,6 +3657,25 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsGetOptionIndex(JNIE
     if (!arg1) return 0;
   }
   result = (int)helicsGetOptionIndex((char const *)arg1);
+  jresult = (jint)result; 
+  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsGetOptionValue(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (int)helicsGetOptionValue((char const *)arg1);
   jresult = (jint)result; 
   if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   return jresult;
@@ -5065,6 +5295,66 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsQueryIsCompleted(JN
   result = (helics_bool)helicsQueryIsCompleted(arg1);
   jresult = (jint)result; 
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsQuerySetTarget(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  helics_query arg1 = (helics_query) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_query *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  helicsQuerySetTarget(arg1,(char const *)arg2,arg3);
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsQuerySetQueryString(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  helics_query arg1 = (helics_query) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_query *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  helicsQuerySetQueryString(arg1,(char const *)arg2,arg3);
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
 }
 
 
@@ -7093,13 +7383,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputGetOption(JNIE
   jint jresult = 0 ;
   helics_input arg1 = (helics_input) 0 ;
   int arg2 ;
-  helics_bool result;
+  int result;
   
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_input *)&jarg1; 
   arg2 = (int)jarg2; 
-  result = (helics_bool)helicsInputGetOption(arg1,arg2);
+  result = (int)helicsInputGetOption(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
 }
@@ -7108,7 +7398,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputGetOption(JNIE
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputSetOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jint jarg3) {
   helics_input arg1 = (helics_input) 0 ;
   int arg2 ;
-  helics_bool arg3 ;
+  int arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   helics_error etemp4 ;
   
@@ -7120,7 +7410,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputSetOption(JNIE
   }
   arg1 = *(helics_input *)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (helics_bool)jarg3; 
+  arg3 = (int)jarg3; 
   helicsInputSetOption(arg1,arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
@@ -7136,13 +7426,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationGetOptio
   jint jresult = 0 ;
   helics_publication arg1 = (helics_publication) 0 ;
   int arg2 ;
-  helics_bool result;
+  int result;
   
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_publication *)&jarg1; 
   arg2 = (int)jarg2; 
-  result = (helics_bool)helicsPublicationGetOption(arg1,arg2);
+  result = (int)helicsPublicationGetOption(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
 }
@@ -7151,7 +7441,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationGetOptio
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationSetOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jint jarg3) {
   helics_publication arg1 = (helics_publication) 0 ;
   int arg2 ;
-  helics_bool arg3 ;
+  int arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   helics_error etemp4 ;
   
@@ -7163,7 +7453,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationSetOptio
   }
   arg1 = *(helics_publication *)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (helics_bool)jarg3; 
+  arg3 = (int)jarg3; 
   helicsPublicationSetOption(arg1,arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
@@ -7758,6 +8048,33 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsEndpointGetMessage
 }
 
 
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsEndpointCreateMessageObject(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  helics_message_object result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_endpoint *)&jarg1; 
+  result = (helics_message_object)helicsEndpointCreateMessageObject(arg1,arg2);
+  *(helics_message_object *)&jresult = result; 
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetMessage(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jlong jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -7926,7 +8243,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetInfo(JNI
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jint jarg3) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int arg2 ;
-  helics_bool arg3 ;
+  int arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   helics_error etemp4 ;
   
@@ -7938,7 +8255,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetOption(J
   }
   arg1 = *(helics_endpoint *)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (helics_bool)jarg3; 
+  arg3 = (int)jarg3; 
   helicsEndpointSetOption(arg1,arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
@@ -7954,13 +8271,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointGetOption(J
   jint jresult = 0 ;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int arg2 ;
-  helics_bool result;
+  int result;
   
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_endpoint *)&jarg1; 
   arg2 = (int)jarg2; 
-  result = (helics_bool)helicsEndpointGetOption(arg1,arg2);
+  result = (int)helicsEndpointGetOption(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
 }
@@ -8498,6 +8815,43 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageCopy(JNIEnv 
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsMessageClone(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  helics_message_object result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_message_object *)&jarg1; 
+  result = (helics_message_object)helicsMessageClone(arg1,arg2);
+  *(helics_message_object *)&jresult = result; 
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageFree(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_message_object *)&jarg1; 
+  helicsMessageFree(arg1);
 }
 
 
@@ -9082,7 +9436,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFilterSetInfo(JNIEn
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFilterSetOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jint jarg3) {
   helics_filter arg1 = (helics_filter) 0 ;
   int arg2 ;
-  helics_bool arg3 ;
+  int arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   helics_error etemp4 ;
   
@@ -9094,7 +9448,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFilterSetOption(JNI
   }
   arg1 = *(helics_filter *)&jarg1; 
   arg2 = (int)jarg2; 
-  arg3 = (helics_bool)jarg3; 
+  arg3 = (int)jarg3; 
   helicsFilterSetOption(arg1,arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
@@ -9110,13 +9464,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFilterGetOption(JNI
   jint jresult = 0 ;
   helics_filter arg1 = (helics_filter) 0 ;
   int arg2 ;
-  helics_bool result;
+  int result;
   
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_filter *)&jarg1; 
   arg2 = (int)jarg2; 
-  result = (helics_bool)helicsFilterGetOption(arg1,arg2);
+  result = (int)helicsFilterGetOption(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
 }

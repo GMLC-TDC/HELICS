@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -48,7 +48,7 @@ class MessageFederate: public virtual Federate {
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     @return an Endpoint Object
-	*/
+    */
     Endpoint registerEndpoint(const std::string& name, const std::string& type = std::string())
     {
         helics_endpoint ep =
@@ -61,9 +61,9 @@ class MessageFederate: public virtual Federate {
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
      @return an Endpoint Object
-	*/
-    Endpoint
-        registerGlobalEndpoint(const std::string& name, const std::string& type = std::string())
+    */
+    Endpoint registerGlobalEndpoint(const std::string& name,
+                                    const std::string& type = std::string())
     {
         helics_endpoint ep =
             helicsFederateRegisterGlobalEndpoint(fed, name.c_str(), type.c_str(), hThrowOnError());
@@ -71,7 +71,7 @@ class MessageFederate: public virtual Federate {
         return Endpoint(ep);
     }
 
-    /** get an Endpoint from its name 
+    /** get an Endpoint from its name
     @param name the name of the endpoint to retrieve
     @return an Endpoint*/
     Endpoint getEndpoint(const std::string& name)
@@ -97,13 +97,18 @@ class MessageFederate: public virtual Federate {
     int pendingMessages() const { return helicsFederatePendingMessages(fed); }
 
     /** Get a packet for any endpoints in the federate **/
-    helics_message_object getMessage() { return helicsFederateGetMessageObject(fed); }
+    Message getMessage() { return Message(helicsFederateGetMessageObject(fed)); }
 
+    /** create a message object */
+    Message createMessage()
+    {
+        return Message(helicsFederateCreateMessageObject(fed, hThrowOnError()));
+    }
     /**get the number of registered endpoints*/
     int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 
   private:
     std::vector<helics_endpoint> local_endpoints;
 };
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

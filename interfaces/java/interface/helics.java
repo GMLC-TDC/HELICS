@@ -60,6 +60,20 @@ public class helics {
   }
 
   /**
+   * Get the build flags used to compile HELICS.
+   */
+  public static String helicsGetBuildFlags() {
+    return helicsJNI.helicsGetBuildFlags();
+  }
+
+  /**
+   * Get the compiler version used to compile HELICS.
+   */
+  public static String helicsGetCompilerVersion() {
+    return helicsJNI.helicsGetCompilerVersion();
+  }
+
+  /**
    * Returns true if core/broker type specified is available in current compilation.<br>
    * <br>
    * @param type A string representing a core type.<br>
@@ -132,7 +146,8 @@ public class helics {
    * @param type The type of the broker to create.<br>
    * @param name The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.<br>
    * @param initString An initialization string to send to the core-the format is similar to command line arguments.<br>
-   *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates, or the address.<br>
+   *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,<br>
+   * or the address.<br>
    * <br>
    * <br>
    * @return A helics_broker object.
@@ -487,7 +502,8 @@ public class helics {
   /**
    * Create a message federate from a federate info object.<br>
    * <br>
-   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.<br>
+   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an<br>
+   * argument.<br>
    * <br>
    * @param fedName The name of the federate to create.<br>
    * @param fi The federate info object that contains details on the federate.<br>
@@ -503,7 +519,8 @@ public class helics {
   /**
    * Create a message federate from a JSON file or JSON string or TOML file.<br>
    * <br>
-   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.<br>
+   * helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an<br>
+   * argument.<br>
    * <br>
    * @param configFile A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.<br>
    * <br>
@@ -720,6 +737,15 @@ public class helics {
   }
 
   /**
+   * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,<br>
+   * @param val A string with the option name.<br>
+   * @return An int with the property code or (-1) if not a valid property.
+   */
+  public static int helicsGetFlagIndex(String val) {
+    return helicsJNI.helicsGetFlagIndex(val);
+  }
+
+  /**
    * Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,<br>
    * /ref helicsFilterSetOption, and the corresponding get functions.<br>
    * <br>
@@ -729,6 +755,18 @@ public class helics {
    */
   public static int helicsGetOptionIndex(String val) {
     return helicsJNI.helicsGetOptionIndex(val);
+  }
+
+  /**
+   * Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,<br>
+   * /ref helicsFilterSetOption.<br>
+   * <br>
+   * @param val A string representing the value.<br>
+   * <br>
+   * @return An int with the option value or (-1) if not a valid value.
+   */
+  public static int helicsGetOptionValue(String val) {
+    return helicsJNI.helicsGetOptionValue(val);
   }
 
   /**
@@ -805,8 +843,8 @@ public class helics {
   /**
    * Generate a local error in a federate.<br>
    * <br>
-   * This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does<br>
-   *          allow some interaction with a core for a brief time.<br>
+   * This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize<br>
+   * but does allow some interaction with a core for a brief time.<br>
    * @param fed The federate to create an error in.<br>
    * @param error_code The integer code for the error.<br>
    * @param error_string A string describing the error.
@@ -837,7 +875,7 @@ public class helics {
   }
 
   /**
-   * Release the memory associated withe a federate.
+   * Release the memory associated with a federate.
    */
   public static void helicsFederateFree(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateFree(SWIGTYPE_p_void.getCPtr(fed));
@@ -854,8 +892,8 @@ public class helics {
   /**
    * Enter the initialization state of a federate.<br>
    * <br>
-   * The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution state.<br>
-   *          This is a blocking call and will block until the core allows it to proceed.<br>
+   * The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution<br>
+   * state. This is a blocking call and will block until the core allows it to proceed.<br>
    * <br>
    * @param fed The federate to operate on.
    */
@@ -910,7 +948,8 @@ public class helics {
   /**
    * Request that the federate enter the Execution mode.<br>
    * <br>
-   * This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call sequence.<br>
+   * This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call<br>
+   * sequence.<br>
    * <br>
    * @param fed The federate object to complete the call.
    */
@@ -1411,7 +1450,8 @@ public class helics {
   /**
    * Complete the return from a query called with /ref helicsExecuteQueryAsync.<br>
    * <br>
-   * The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not.<br>
+   * The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or<br>
+   * not.<br>
    * <br>
    * @param query The query object to complete execution of.<br>
    * <br>
@@ -1434,6 +1474,26 @@ public class helics {
    */
   public static int helicsQueryIsCompleted(SWIGTYPE_p_void query) {
     return helicsJNI.helicsQueryIsCompleted(SWIGTYPE_p_void.getCPtr(query));
+  }
+
+  /**
+   * Update the target of a query.<br>
+   * <br>
+   * @param query The query object to change the target of.<br>
+   * @param target the name of the target to query
+   */
+  public static void helicsQuerySetTarget(SWIGTYPE_p_void query, String target) {
+    helicsJNI.helicsQuerySetTarget(SWIGTYPE_p_void.getCPtr(query), target);
+  }
+
+  /**
+   * Update the queryString of a query.<br>
+   * <br>
+   * @param query The query object to change the target of.<br>
+   * @param queryString the new queryString
+   */
+  public static void helicsQuerySetQueryString(SWIGTYPE_p_void query, String queryString) {
+    helicsJNI.helicsQuerySetQueryString(SWIGTYPE_p_void.getCPtr(query), queryString);
   }
 
   /**
@@ -1699,7 +1759,9 @@ public class helics {
   }
 
   /**
-   * Clear all the update flags from a federates inputs.
+   * Clear all the update flags from a federates inputs.<br>
+   * <br>
+   * @param fed The value federate object for which to clear update flags.
    */
   public static void helicsFederateClearUpdates(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateClearUpdates(SWIGTYPE_p_void.getCPtr(fed));
@@ -1708,6 +1770,10 @@ public class helics {
   /**
    * Register the publications via JSON publication string.<br>
    * <br>
+   * @param fed The value federate object to use to register the publications.<br>
+   * @param json The JSON publication string.<br>
+   * <br>
+   * <br>
    * This would be the same JSON that would be used to publish data.
    */
   public static void helicsFederateRegisterFromPublicationJSON(SWIGTYPE_p_void fed, String json) {
@@ -1715,7 +1781,10 @@ public class helics {
   }
 
   /**
-   * Publish data contained in a json file or string.
+   * Publish data contained in a JSON file or string.<br>
+   * <br>
+   * @param fed The value federate object through which to publish the data.<br>
+   * @param json The publication file name or literal JSON data string.
    */
   public static void helicsFederatePublishJSON(SWIGTYPE_p_void fed, String json) {
     helicsJNI.helicsFederatePublishJSON(SWIGTYPE_p_void.getCPtr(fed), json);
@@ -2291,19 +2360,19 @@ public class helics {
   }
 
   /**
-   * Get the data in the info field of an input.<br>
+   * Get the current value of an input handle option<br>
    * <br>
    * @param inp The input to query.<br>
    * @param option Integer representation of the option in question see /ref helics_handle_options.<br>
    * <br>
-   * @return A string with the info field string.
+   * @return An integer value with the current value of the given option.
    */
   public static int helicsInputGetOption(SWIGTYPE_p_void inp, int option) {
     return helicsJNI.helicsInputGetOption(SWIGTYPE_p_void.getCPtr(inp), option);
   }
 
   /**
-   * Set the data in the info field for an input.<br>
+   * Set an option on an input<br>
    * <br>
    * @param inp The input to query.<br>
    * @param option The option to set for the input /ref helics_handle_options.<br>
@@ -2314,7 +2383,7 @@ public class helics {
   }
 
   /**
-   * Get the data in the info field of a publication.<br>
+   * Get the value of an option for a publication<br>
    * <br>
    * @param pub The publication to query.<br>
    * @param option The value to query see /ref helics_handle_options.<br>
@@ -2326,7 +2395,7 @@ public class helics {
   }
 
   /**
-   * Set the data in the info field for a publication.<br>
+   * Set the value of an option for a publication<br>
    * <br>
    * @param pub The publication to query.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
@@ -2635,6 +2704,21 @@ public class helics {
   }
 
   /**
+   * Create a new empty message object.<br>
+   * <br>
+   * The message is empty and isValid will return false since there is no data associated with the message yet.<br>
+   * <br>
+   * @param endpoint The endpoint object to associate the message with.<br>
+   * <br>
+   * <br>
+   * @return A new helics_message_object.
+   */
+  public static SWIGTYPE_p_void helicsEndpointCreateMessageObject(SWIGTYPE_p_void endpoint) {
+    long cPtr = helicsJNI.helicsEndpointCreateMessageObject(SWIGTYPE_p_void.getCPtr(endpoint));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
    * Receive a communication message for any endpoint in the federate.<br>
    * <br>
    * @deprecated This function is deprecated and will be removed in Helics 3.0.<br>
@@ -2669,6 +2753,9 @@ public class helics {
    * <br>
    * The message is empty and isValid will return false since there is no data associated with the message yet.<br>
    * <br>
+   * @param fed the federate object to associate the message with<br>
+   * <br>
+   * <br>
    * @return A helics_message_object containing the message data.
    */
   public static SWIGTYPE_p_void helicsFederateCreateMessageObject(SWIGTYPE_p_void fed) {
@@ -2690,7 +2777,7 @@ public class helics {
   /**
    * Clear all message from an endpoint.<br>
    * <br>
-   * @deprecated This function does nothing and will be removed. <br>
+   * @deprecated This function does nothing and will be removed.<br>
    *             Use helicsFederateClearMessages to free all messages,<br>
    *             or helicsMessageFree to clear an individual message.<br>
    * <br>
@@ -2769,7 +2856,8 @@ public class helics {
    * Set a handle option on an endpoint.<br>
    * <br>
    * @param end The endpoint to modify.<br>
-   * @param option Integer code for the option to set /ref helics_handle_options.
+   * @param option Integer code for the option to set /ref helics_handle_options.<br>
+   * @return the value of the option, for boolean options will be 0 or 1
    */
   public static int helicsEndpointGetOption(SWIGTYPE_p_void end, int option) {
     return helicsJNI.helicsEndpointGetOption(SWIGTYPE_p_void.getCPtr(end), option);
@@ -3036,6 +3124,26 @@ public class helics {
   }
 
   /**
+   * Clone a message object.<br>
+   * <br>
+   * @param message The message object to copy from.
+   */
+  public static SWIGTYPE_p_void helicsMessageClone(SWIGTYPE_p_void message) {
+    long cPtr = helicsJNI.helicsMessageClone(SWIGTYPE_p_void.getCPtr(message));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   * Free a message object from memory<br>
+   * memory for message is managed so not using this function does not create memory leaks, this is an indication<br>
+   * to the system that the memory for this message is done being used and can be reused for a new message.<br>
+   * helicsFederateClearMessages() can also be used to clear up all stored messages at once
+   */
+  public static void helicsMessageFree(SWIGTYPE_p_void message) {
+    helicsJNI.helicsMessageFree(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  /**
    * Create a source Filter on the specified federate.<br>
    * <br>
    * Filters can be created through a federate or a core, linking through a federate allows<br>
@@ -3158,7 +3266,8 @@ public class helics {
    * @param name The name of the filter.<br>
    * <br>
    * <br>
-   * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
+   * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name<br>
+   * exists.
    */
   public static SWIGTYPE_p_void helicsFederateGetFilter(SWIGTYPE_p_void fed, String name) {
     long cPtr = helicsJNI.helicsFederateGetFilter(SWIGTYPE_p_void.getCPtr(fed), name);
@@ -3304,7 +3413,7 @@ public class helics {
    * <br>
    * @param filt The given filter.<br>
    * @param option The option to set /ref helics_handle_options.<br>
-   * @param value The value of the option (helics_true or helics_false).
+   * @param value The value of the option commonly 0 for false 1 for true.
    */
   public static void helicsFilterSetOption(SWIGTYPE_p_void filt, int option, int value) {
     helicsJNI.helicsFilterSetOption(SWIGTYPE_p_void.getCPtr(filt), option, value);

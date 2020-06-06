@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/common/AsioContextManager.h"
@@ -43,10 +43,9 @@ TEST(TcpSSCore, tcpSSComms_broker)
     auto server = helics::tcp::TcpServer::create(srv->getBaseContext(), DEFAULT_TCPSS_PORT);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall([&counter](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* /*unused*/,
-                            size_t data_avail) {
+    server->setDataCall([&counter](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                   const char* /*unused*/,
+                                   size_t data_avail) {
         ++counter;
         return data_avail;
     });
@@ -90,15 +89,15 @@ TEST(TcpSSCore, tcpSSComms_broker_test_transmit)
     auto server = helics::tcp::TcpServer::create(srv->getBaseContext(), host, DEFAULT_TCPSS_PORT);
 
     std::vector<char> data(1024);
-    server->setDataCall([&data, &counter, &len](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* data_rec,
-                            size_t data_Size) {
-        std::copy(data_rec, data_rec + data_Size, data.begin());
-        len = data_Size;
-        ++counter;
-        return data_Size;
-    });
+    server->setDataCall(
+        [&data, &counter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                const char* data_rec,
+                                size_t data_Size) {
+            std::copy(data_rec, data_rec + data_Size, data.begin());
+            len = data_Size;
+            ++counter;
+            return data_Size;
+        });
     ASSERT_TRUE(server->isReady());
     auto res = server->start();
     EXPECT_TRUE(res);
@@ -162,8 +161,10 @@ TEST(TcpSSCore, tcpSSComms_rx)
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
 
-    auto txconn = helics::tcp::TcpConnection::create(
-        srv->getBaseContext(), host, TCP_BROKER_PORT_STRING, 1024);
+    auto txconn = helics::tcp::TcpConnection::create(srv->getBaseContext(),
+                                                     host,
+                                                     TCP_BROKER_PORT_STRING,
+                                                     1024);
     auto res = txconn->waitUntilConnected(1000ms);
     ASSERT_EQ(res, true);
 
@@ -215,12 +216,13 @@ TEST(TcpSSCore, tcpSSComm_transmit_through)
         ++counter2;
         act2 = m;
     });
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
     auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
     bool connected1 = comm2.connect();
     ASSERT_TRUE(connected1);
     bool connected2 = connected_fut.get();
-    if (!connected2) { // lets just try again if it is not connected
+    if (!connected2) {  // lets just try again if it is not connected
         connected2 = comm.connect();
     }
     ASSERT_TRUE(connected2);
@@ -286,8 +288,9 @@ TEST(TcpSSCore, tcpSSComm_transmit_add_route)
         act3 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on eachother in this case
-    // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect();
+    // });
 
     bool connected = comm2.connect();
     ASSERT_TRUE(connected);
@@ -349,15 +352,15 @@ TEST(TcpSSCore, tcpSSCore_initialization)
         helics::tcp::TcpServer::create(srv->getBaseContext(), "localhost", DEFAULT_TCPSS_PORT);
     std::vector<char> data(1024);
     std::atomic<size_t> len{0};
-    server->setDataCall([&data, &counter, &len](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* data_rec,
-                            size_t data_Size) {
-        std::copy(data_rec, data_rec + data_Size, data.begin() + len);
-        len += data_Size;
-        ++counter;
-        return len.load();
-    });
+    server->setDataCall(
+        [&data, &counter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                const char* data_rec,
+                                size_t data_Size) {
+            std::copy(data_rec, data_rec + data_Size, data.begin() + len);
+            len += data_Size;
+            ++counter;
+            return len.load();
+        });
     auto started = server->start();
 
     EXPECT_TRUE(started);

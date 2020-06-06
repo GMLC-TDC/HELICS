@@ -9,7 +9,7 @@ static octave_value Helics_ErrorType(helics_error *err) {
 switch (err->error_code)
   {
   case helics_error_registration_failure:
-	return "helics:registration_failure";
+    return "helics:registration_failure";
   case   helics_error_connection_failure:
     return "helics:connection_failure";
   case   helics_error_invalid_object:
@@ -19,15 +19,15 @@ switch (err->error_code)
   case   helics_error_discard:
     return "helics:discard";
   case helics_error_system_failure:
-	return "helics:system_failure";
+    return "helics:system_failure";
   case   helics_error_invalid_state_transition:
     return "helics:invalid_state_transition";
   case   helics_error_invalid_function_call:
     return "helics:invalid_function_call";
   case   helics_error_execution_failure:
-	return "helics:execution_failure";
+    return "helics:execution_failure";
   case   helics_error_insufficient_space:
-	return "helics:insufficient_space";
+    return "helics:insufficient_space";
   case   helics_error_other:
   case   helics_error_external_type:
   default:
@@ -46,16 +46,16 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
-	etemp=helicsErrorInitialize();
-	$1=&etemp;
+    etemp=helicsErrorInitialize();
+    $1=&etemp;
 }
 
 %typemap(freearg) helics_error *
 {
-	if ($1->error_code!=helics_ok)
-	{
-		throwHelicsOctaveError($1);
-	}
+    if ($1->error_code!=helics_ok)
+    {
+        throwHelicsOctaveError($1);
+    }
 }
 
 //typemap for large string output with a length return in C
@@ -73,71 +73,71 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 %typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
-	_outv = SWIG_FromCharPtrAndSize($1,*$3-1);
+    _outv = SWIG_FromCharPtrAndSize($1,*$3-1);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
 
 %typemap(in, numinputs=0)(double *real, double *imag)(double vals[2])
 {
-	$1=&(vals[0]);
-	$2=&(vals[1]);
+    $1=&(vals[0]);
+    $2=&(vals[1]);
 }
 
 %typemap(argout)(double *real, double *imag)
 {
-	Complex c(*$1,*$2);
-	//octave_complex cv(c);
-	octave_value v(c);
-	_outp = SWIG_Octave_AppendOutput(_outp, v);
+    Complex c(*$1,*$2);
+    //octave_complex cv(c);
+    octave_value v(c);
+    _outp = SWIG_Octave_AppendOutput(_outp, v);
 }
 
 
 %typemap(in) (double real, double imag)
 {
-	if($input.is_complex_scalar())
-	{
-		Complex arg=$input.complex_value();
-		$1=arg.real();
-		$2=arg.imag();
-	}  
+    if($input.is_complex_scalar())
+    {
+        Complex arg=$input.complex_value();
+        $1=arg.real();
+        $2=arg.imag();
+    }
     else if ($input.is_float_type())
-	{
-		$2=0.0;
-		$1=$input.double_value();
-	}
-	else
-	{
-		$1=0.0;
-		$2 = 0.0;
-	}
+    {
+        $2=0.0;
+        $1=$input.double_value();
+    }
+    else
+    {
+        $1=0.0;
+        $2 = 0.0;
+    }
 }
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */
   if ($input.is_cellstr()) {
-	Cell cellargs=octave_value_extract<Cell>($input);
-	$2 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
-	for (int ii=0;ii<cellargs.numel();++ii)
-	{
+    Cell cellargs=octave_value_extract<Cell>($input);
+    $2 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
+    for (int ii=0;ii<cellargs.numel();++ii)
+    {
         octave_value arg=cellargs(ii);
         int alloc;
-		SWIG_AsCharPtrAndSize(arg, &$2[ii+1], NULL, &alloc);
-	}
-    
-  } 
+        SWIG_AsCharPtrAndSize(arg, &$2[ii+1], NULL, &alloc);
+    }
+
+  }
   else if ($input.is_string())
   {
   int retval=0;
   char *buffer=NULL;
   int allocation=0;
-	$1=2;
-	$2 = (char **) malloc(2*sizeof(char *));
-	retval = SWIG_AsCharPtrAndSize($input, &buffer, NULL, &allocation);
+    $1=2;
+    $2 = (char **) malloc(2*sizeof(char *));
+    retval = SWIG_AsCharPtrAndSize($input, &buffer, NULL, &allocation);
   if (!SWIG_IsOK(retval)) {
     SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
   }
-	$2[0]=buffer;
-	$2[1]=buffer;
+    $2[0]=buffer;
+    $2[1]=buffer;
   }
   else
   {
@@ -186,13 +186,13 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
 
-	Matrix a(*$3,1);
-	double *dat=a.fortran_vec();
-	for (int ii=0;ii<*$3;++ii)
-	{
+    Matrix a(*$3,1);
+    double *dat=a.fortran_vec();
+    for (int ii=0;ii<*$3;++ii)
+    {
         dat[ii]=$1[ii];
-	}
-	
+    }
+
   _outp = SWIG_Octave_AppendOutput(_outp, a);
 }
 

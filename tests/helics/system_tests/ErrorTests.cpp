@@ -1,7 +1,8 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
@@ -24,8 +25,8 @@ TEST_F(error_tests, duplicate_federate_names)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    EXPECT_THROW(
-        auto fed2 = std::make_shared<helics::Federate>("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("test1", fi),
+                 helics::RegistrationFailure);
     Fed->finalize();
 }
 
@@ -39,9 +40,8 @@ TEST_F(error_tests, duplicate_federate_names2)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
     helics::FederateInfo fi;
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    EXPECT_THROW(
-        helics::ValueFederate fed3(fed1->getName(), fed2->getCorePointer(), fi),
-        helics::RegistrationFailure);
+    EXPECT_THROW(helics::ValueFederate fed3(fed1->getName(), fed2->getCorePointer(), fi),
+                 helics::RegistrationFailure);
     broker->disconnect();
 }
 
@@ -122,9 +122,8 @@ TEST_F(error_tests, already_init_core)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     fed1->enterExecutingMode();
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    EXPECT_THROW(
-        helics::ValueFederate fed2("fed2", fed1->getCorePointer(), helics::FederateInfo()),
-        helics::RegistrationFailure);
+    EXPECT_THROW(helics::ValueFederate fed2("fed2", fed1->getCorePointer(), helics::FederateInfo()),
+                 helics::RegistrationFailure);
     broker->disconnect();
 }
 
@@ -163,7 +162,7 @@ TEST_F(error_tests, duplicate_publication_names2)
     catch (const helics::RegistrationFailure&) {
         gotException = true;
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
-        //this should do nothing
+        // this should do nothing
         EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
     }
@@ -174,7 +173,7 @@ TEST_F(error_tests, duplicate_publication_names2)
     catch (const helics::RegistrationFailure&) {
         gotException = true;
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
-        //this should do nothing
+        // this should do nothing
         EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
     }
@@ -231,10 +230,12 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->getCorePointer()->setFlagOption(
-        helics::local_core_id, helics_flag_terminate_on_error, true);
-    fed2->getCorePointer()->setFlagOption(
-        helics::local_core_id, helics_flag_terminate_on_error, true);
+    fed1->getCorePointer()->setFlagOption(helics::local_core_id,
+                                          helics_flag_terminate_on_error,
+                                          true);
+    fed2->getCorePointer()->setFlagOption(helics::local_core_id,
+                                          helics_flag_terminate_on_error,
+                                          true);
 
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
@@ -405,7 +406,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::options::connection_required, true);
+    i2.setOption(helics::defs::options::connection_required, 1);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -431,8 +432,9 @@ TEST_F(error_tests, missing_required_pub_with_default)
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
     // this is definitely not how you would normally do this,
-    // we are calling finalize while an async call is active, this should result in finalize throwing since it was
-    // a global connection failure,  depending on how things go this will be a registration failure or a connection failure
+    // we are calling finalize while an async call is active, this should result in finalize
+    // throwing since it was a global connection failure,  depending on how things go this will be a
+    // registration failure or a connection failure
     EXPECT_THROW(fed1->finalize(), helics::HelicsException);
     fed2->finalize();
     broker->disconnect();
@@ -493,6 +495,57 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
+TEST_F(error_tests, too_many_connections)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::ValueFederate>("test", 2, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("t1", "double");
+    fed1->registerGlobalPublication("t2", "double");
+    fed1->registerGlobalPublication("t3", "double");
+    auto& inp1 = fed2->registerGlobalInput("c1", "double");
+    inp1.setOption(helics::defs::connections, 2);
+    inp1.addTarget("t1");
+    inp1.addTarget("t2");
+    inp1.addTarget("t3");
+    fed1->enterExecutingModeAsync();
+
+    EXPECT_THROW(fed2->enterExecutingMode(), helics::ConnectionFailure);
+    fed1->enterExecutingModeComplete();
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+TEST_F(error_tests, not_enough_connections)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::ValueFederate>("test", 2, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("t1", "double");
+    fed1->registerGlobalPublication("t2", "double");
+    fed1->registerGlobalPublication("t3", "double");
+    auto& inp1 = fed2->registerGlobalInput("c1", "double");
+    inp1.setOption(helics::defs::connections, 3);
+    inp1.addTarget("t1");
+    inp1.addTarget("t2");
+    fed1->enterExecutingModeAsync();
+
+    EXPECT_THROW(fed2->enterExecutingMode(), helics::ConnectionFailure);
+    fed1->enterExecutingModeComplete();
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
 
@@ -512,7 +565,8 @@ INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(core
 
 constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 
-// TCP core is odd for this test and doesn't work on all platforms due to the way TCP handles ports duplication
+// TCP core is odd for this test and doesn't work on all platforms due to the way TCP handles ports
+// duplication
 class network_error_tests:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {

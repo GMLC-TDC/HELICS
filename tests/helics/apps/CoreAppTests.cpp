@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
@@ -40,8 +40,8 @@ TEST(CoreAppTests, constructor1)
 
 TEST(CoreAppTests, constructor2)
 {
-    helics::CoreApp App(
-        helics::core_type::TEST, std::vector<std::string>{"--autobroker", "core2", "--name"});
+    helics::CoreApp App(helics::core_type::TEST,
+                        std::vector<std::string>{"--autobroker", "core2", "--name"});
 
     EXPECT_FALSE(App.isConnected());
 
@@ -173,8 +173,9 @@ TEST(CoreAppTests, constructor9)
 
 TEST(CoreAppTests, constructor10)
 {
-    helics::CoreApp App(
-        helics::core_type::TEST, "core10", std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::core_type::TEST,
+                        "core10",
+                        std::vector<std::string>{"--autobroker"});
 
     helics::CoreApp App2(App.getCopyofCorePointer());
 

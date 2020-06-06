@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -19,6 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
+using helics::core_type;
+
 static void BMecho_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -26,8 +28,9 @@ static void BMecho_singleCore(benchmark::State& state)
 
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
-        auto wcore = helics::CoreFactory::create(
-            core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
+        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+                                                 std::string("--autobroker --federates=") +
+                                                     std::to_string(feds + 1));
         EchoHub hub;
         hub.initialize(wcore->getIdentifier(), "--num_leafs=" + std::to_string(feds));
         std::vector<EchoLeaf> leafs(feds);
@@ -38,8 +41,8 @@ static void BMecho_singleCore(benchmark::State& state)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoLeaf& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+            threadlist[ii] = std::thread([&](EchoLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
+                                         std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -57,7 +60,7 @@ static void BMecho_singleCore(benchmark::State& state)
 // Register the function as a benchmark
 BENCHMARK(BMecho_singleCore)
     ->RangeMultiplier(2)
-    ->Range(1, 1 << 8)
+    ->Range(1, 1U << 8)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
@@ -70,8 +73,10 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
 
-        auto broker = helics::BrokerFactory::create(
-            cType, "brokerb", std::string("--federates=") + std::to_string(feds + 1));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          "brokerb",
+                                          std::string("--federates=") + std::to_string(feds + 1));
         broker->setLoggingLevel(helics_log_level_no_print);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
@@ -89,8 +94,8 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoLeaf& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+            threadlist[ii] = std::thread([&](EchoLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
+                                         std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -110,7 +115,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
     }
 }
 
-static constexpr int64_t maxscale{1 << 4};
+static constexpr int64_t maxscale{1U << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)
@@ -171,7 +176,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, tcpssCore, core_type::TCP_SS)
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, udpCore, core_type::UDP)
     ->RangeMultiplier(2)
-    ->Range(1, 1 << 4)
+    ->Range(1, maxscale)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();

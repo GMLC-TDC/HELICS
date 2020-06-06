@@ -26,14 +26,9 @@ endif()
 set_target_properties(nonlings_fed1_cpp nonlings_fed2_cpp PROPERTIES FOLDER examples)
 
 if(HELICS_BUILD_TESTS AND NOT MSVC)
-    add_test(
-        NAME nonlings_example
-        COMMAND
-            ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10
-            $<TARGET_FILE:nonlings_fed1_cpp> $<TARGET_FILE:nonlings_fed2_cpp>
+    add_test(NAME nonlings_example
+             COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10
+                     $<TARGET_FILE:nonlings_fed1_cpp> $<TARGET_FILE:nonlings_fed2_cpp>
     )
     set_property(TEST nonlings_example PROPERTY LABELS Continuous)
 endif()
-
-copy_key_files_to_target_location(nonlings_fed1_cpp)
-copy_shared_target(nonlings_fed1_cpp helicsSharedLib)

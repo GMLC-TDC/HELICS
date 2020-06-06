@@ -1,98 +1,98 @@
 jobs:
-- job: Windows
-  strategy:
-    matrix:
-      VS2017-32bit:
-        imageName: "vs2017-win2016"
-        langArch: "x86"
-        vsArch: "Win32"
-      VS2017-64bit:
-        imageName: "vs2017-win2016"
-        langArch: "x64"
-        vsArch: "x64"
-      VS2019-64bit:
-        imageName: "windows-2019"
-        langArch: "x64"
-        vsArch: "x64"
-  pool:
-    vmImage: $(imageName)
+  - job: Windows
+    strategy:
+      matrix:
+        VS2017-32bit:
+          imageName: 'vs2017-win2016'
+          langArch: 'x86'
+          vsArch: 'Win32'
+        VS2017-64bit:
+          imageName: 'vs2017-win2016'
+          langArch: 'x64'
+          vsArch: 'x64'
+        VS2019-64bit:
+          imageName: 'windows-2019'
+          langArch: 'x64'
+          vsArch: 'x64'
+    pool:
+      vmImage: $(imageName)
 
-  steps:
-  # -----------------------
-  # Install dependencies
-  # -----------------------
-  - bash: choco install swig --yes --limit-output
-    condition: eq( variables['Agent.OS'], 'Windows_NT' )
-    displayName: Install swig
-    
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.5'
-      addToPath: true
-      architecture: $(langArch)
-    
-  - bash: pip3 install pytest
-    displayName: Install pytest
+    steps:
+      # -----------------------
+      # Install dependencies
+      # -----------------------
+      - bash: choco install swig --yes --limit-output
+        condition: eq( variables['Agent.OS'], 'Windows_NT' )
+        displayName: Install swig
 
-  # -----------------------
-  # Configure HELICS
-  # -----------------------
-  - bash: |
-      echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT_1_72_0"
-  - task: CMake@1
-    inputs:
-      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
-    displayName: 'Configure HELICS'
-    condition: eq( variables['Agent.OS'], 'Windows_NT' )
-    
-#  - task: CMake@1
-#    inputs:
-#      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON .
-#    displayName: 'Configure Python interface'
-#    condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
-    
-#  - task: CMake@1
-#    inputs:
-#      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
-#    displayName: 'Configure Java interface'
-#    condition: eq( variables['langArch'], 'x64' )
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.5'
+          addToPath: true
+          architecture: $(langArch)
 
-  # -----------------------
-  # Build HELICS
-  # -----------------------
-  - bash: cmake --build . --config Release
-    displayName: 'Build HELICS'
-    workingDirectory: build
-    
-  # -----------------------
-  # Package HELICS
-  # -----------------------
-  - bash: |
-      cpack_dir="$(which cmake)"
-      cpack_dir="${cpack_dir%/cmake}"
-      "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
-    displayName: 'Package HELICS'
-    workingDirectory: build
-    
-  - task: CopyFiles@2
-    inputs:
-      sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
-      contents: '*.exe'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: installer
-    
-  # -----------------------
-  # Test HELICS
-  # -----------------------
-  - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
-    displayName: 'Test HELICS'
-    workingDirectory: build
-    
-  # Packaging tests
-  - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
-    displayName: 'Test HELICS packaging'
-    workingDirectory: build
+      - bash: pip3 install pytest
+        displayName: Install pytest
+
+      # -----------------------
+      # Configure HELICS
+      # -----------------------
+      - bash: |
+          echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT_1_72_0"
+      - task: CMake@1
+        inputs:
+          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+        displayName: 'Configure HELICS'
+        condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+      #  - task: CMake@1
+      #    inputs:
+      #      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON .
+      #    displayName: 'Configure Python interface'
+      #    condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
+
+      #  - task: CMake@1
+      #    inputs:
+      #      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
+      #    displayName: 'Configure Java interface'
+      #    condition: eq( variables['langArch'], 'x64' )
+
+      # -----------------------
+      # Build HELICS
+      # -----------------------
+      - bash: cmake --build . --config Release
+        displayName: 'Build HELICS'
+        workingDirectory: build
+
+      # -----------------------
+      # Package HELICS
+      # -----------------------
+      - bash: |
+          cpack_dir="$(which cmake)"
+          cpack_dir="${cpack_dir%/cmake}"
+          "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
+        displayName: 'Package HELICS'
+        workingDirectory: build
+
+      - task: CopyFiles@2
+        inputs:
+          sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
+          contents: '*.exe'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: installer
+
+      # -----------------------
+      # Test HELICS
+      # -----------------------
+      - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
+        displayName: 'Test HELICS'
+        workingDirectory: build
+
+      # Packaging tests
+      - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
+        displayName: 'Test HELICS packaging'
+        workingDirectory: build

@@ -1,5 +1,6 @@
 //this should be a valid json file (except comments are not recognized in standard JSON)
-{ //example json configuration file for a value federate all arguments are optional
+{
+  //example json configuration file for a value federate all arguments are optional
   "name": "valueFed2", // the name of the federate
   //possible flags
   "observer": false, // indicator that the federate does not send anything
@@ -17,23 +18,23 @@
   "time_delta": 0.0, // the minimum time between subsequent return times
   "output_delay": 0, //the propagation delay for federates to send data
   "input_delay": 0, //the input delay for external data to propagate to federates
-  "log_level": 1,  //specify the log level
+  "log_level": 1, //specify the log level
 
   //Publications used in the federate
   "publications": [
     {
       "key": "pub1", // the name of the publication
-      "type": "double", // the type assocaited with a publication (optional)
+      "type": "double", // the type associated with a publication (optional)
       "unit": "m", // the units associated with a publication (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
       "info": "this is an information string for use by the application",
-	  "flags":["required","-optional"]
+      "flags": ["required", "-optional"]
     },
     {
       "key": "pub2", // the name of the publication
-      "type": "double", // the type assocaited with a publication (optional)
+      "type": "double", // the type associated with a publication (optional)
       //no global:true implies this will have the federate name prepended like valueFed/pub2
-	  "alias": "primary"
+      "alias": "primary"
     }
   ],
   //subscriptions used in the federate
@@ -41,13 +42,13 @@
     {
       "key": "pub1", // the key of the publication
       "required": true, //set to true to make helics issue a warning if the publication is not found
-	  "tolerance":0.3
+      "tolerance": 0.3
     },
     {
       "key": "fedName/pub2", // the name of the publication to subscribe to
       "shortcut": "pubshortcut", //a naming shortcut for the publication for later retrieval
       "info": "this is an information string for use by the application",
-	  "optional":true   //the subscription is optional
+      "optional": true //the subscription is optional
     }
   ],
 
@@ -57,15 +58,13 @@
       "type": "double",
       "required": true,
       "target": "pub1",
-	  "global":true
+      "global": true
     }
     //specify an input with a target multiple targets could be specified like "targets":["pub1","pub2","pub3"]
   ],
 
-
   "globals": [
-    [ "global1", "this is a global1 value" ],
-    [ "global2", "this is another global value" ]
+    ["global1", "this is a global1 value"],
+    ["global2", "this is another global value"]
   ]
 }
-

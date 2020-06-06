@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -19,8 +19,8 @@ using namespace std::literals::chrono_literals;
 
 class FedTest {
   public:
-    helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
-    helics::Time finalTime = helics::Time(100, time_units::ns); // final time
+    helics::Time deltaTime = helics::Time(10, time_units::ns);  // sampling rate
+    helics::Time finalTime = helics::Time(100, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;
@@ -86,8 +86,9 @@ class FedTest {
 TEST(ZMQSSCore_tests, zmqSSMultiCoreInitialization_test)
 {
     int feds = 20;
-    auto broker = helics::BrokerFactory::create(
-        helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::string("-f ") + std::to_string(feds));
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ_SS,
+                                                "ZMQ_SS_broker",
+                                                std::string("-f ") + std::to_string(feds));
     std::vector<std::shared_ptr<helics::Core>> cores(feds);
     std::vector<FedTest> leafs(feds);
     SCOPED_TRACE("created broker");

@@ -13,12 +13,13 @@ package com.java.helics;
  */
 public final class helics_handle_options {
   /**
-   *  specify that a connection is required for an interface and will generate an error if not available
+   *  specify that a connection is required for an interface and will generate an error if not<br>
+   *        available
    */
   public final static helics_handle_options helics_handle_option_connection_required = new helics_handle_options("helics_handle_option_connection_required", helicsJNI.helics_handle_option_connection_required_get());
   /**
-   *  specify that a connection is NOT required for an interface and will only be made if available<br>
-   *         no warning will be issues if not available
+   *  specify that a connection is NOT required for an interface and will only be made if<br>
+   *        available no warning will be issues if not available
    */
   public final static helics_handle_options helics_handle_option_connection_optional = new helics_handle_options("helics_handle_option_connection_optional", helicsJNI.helics_handle_option_connection_optional_get());
   /**
@@ -30,7 +31,7 @@ public final class helics_handle_options {
    */
   public final static helics_handle_options helics_handle_option_multiple_connections_allowed = new helics_handle_options("helics_handle_option_multiple_connections_allowed", helicsJNI.helics_handle_option_multiple_connections_allowed_get());
   /**
-   *  specify that the last data should be buffered and send on subscriptions after init
+   *  specify that the last data should be buffered and sent on subscriptions after init
    */
   public final static helics_handle_options helics_handle_option_buffer_data = new helics_handle_options("helics_handle_option_buffer_data", helicsJNI.helics_handle_option_buffer_data_get());
   /**
@@ -53,6 +54,22 @@ public final class helics_handle_options {
    *  specify that an interface does not participate in determining time interrupts
    */
   public final static helics_handle_options helics_handle_option_ignore_interrupts = new helics_handle_options("helics_handle_option_ignore_interrupts", helicsJNI.helics_handle_option_ignore_interrupts_get());
+  /**
+   *  specify the multi-input processing method for inputs
+   */
+  public final static helics_handle_options helics_handle_option_multi_input_handling_method = new helics_handle_options("helics_handle_option_multi_input_handling_method", helicsJNI.helics_handle_option_multi_input_handling_method_get());
+  /**
+   *  specify the source index with the highest priority
+   */
+  public final static helics_handle_options helics_handle_option_input_priority_location = new helics_handle_options("helics_handle_option_input_priority_location", helicsJNI.helics_handle_option_input_priority_location_get());
+  /**
+   *  specify that the priority list should be cleared or question if it is cleared
+   */
+  public final static helics_handle_options helics_handle_option_clear_priority_list = new helics_handle_options("helics_handle_option_clear_priority_list", helicsJNI.helics_handle_option_clear_priority_list_get());
+  /**
+   *  specify the required number of connections or get the actual number of connections
+   */
+  public final static helics_handle_options helics_handle_option_connections = new helics_handle_options("helics_handle_option_connections", helicsJNI.helics_handle_option_connections_get());
 
   public final int swigValue() {
     return swigValue;
@@ -88,7 +105,7 @@ public final class helics_handle_options {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_handle_options[] swigValues = { helics_handle_option_connection_required, helics_handle_option_connection_optional, helics_handle_option_single_connection_only, helics_handle_option_multiple_connections_allowed, helics_handle_option_buffer_data, helics_handle_option_strict_type_checking, helics_handle_option_ignore_unit_mismatch, helics_handle_option_only_transmit_on_change, helics_handle_option_only_update_on_change, helics_handle_option_ignore_interrupts };
+  private static helics_handle_options[] swigValues = { helics_handle_option_connection_required, helics_handle_option_connection_optional, helics_handle_option_single_connection_only, helics_handle_option_multiple_connections_allowed, helics_handle_option_buffer_data, helics_handle_option_strict_type_checking, helics_handle_option_ignore_unit_mismatch, helics_handle_option_only_transmit_on_change, helics_handle_option_only_update_on_change, helics_handle_option_ignore_interrupts, helics_handle_option_multi_input_handling_method, helics_handle_option_input_priority_location, helics_handle_option_clear_priority_list, helics_handle_option_connections };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

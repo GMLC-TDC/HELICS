@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -126,10 +126,9 @@ namespace apps {
             "broker_server");
 #ifdef ENABLE_ZMQ_CORE
         app->add_flag("--zmq,-z", zmq_server, "start a broker-server for the zmq comms in helics");
-        app->add_flag(
-            "--zmqss",
-            zmq_ss_server,
-            "start a broker-server for the zmq single socket comms in helics");
+        app->add_flag("--zmqss",
+                      zmq_ss_server,
+                      "start a broker-server for the zmq single socket comms in helics");
 #endif
 #ifdef ENABLE_TCP_CORE
         app->add_flag("--tcp,-t", tcp_server, "start a broker-server for the tcp comms in helics");
@@ -138,21 +137,22 @@ namespace apps {
         app->add_flag("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
 #endif
 #ifdef ENABLE_MPI_CORE
-        //app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
+        // app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
 #endif
 #ifdef HELICS_ENABLE_WEBSERVER
-        app->add_flag(
-            "--http,--web", http_server, "start a webserver to respond to http rest api requests");
-        app->add_flag(
-            "--websocket", websocket_server, "start a websocket to respond to api requests");
+        app->add_flag("--http,--web",
+                      http_server,
+                      "start a webserver to respond to http rest api requests");
+        app->add_flag("--websocket",
+                      websocket_server,
+                      "start a websocket to respond to api requests");
 #endif
         app->set_config();
-        app->add_option(
-            "config,--config,--server-config",
-            configFile_,
-            "load a config file for the broker server");
+        app->add_option("config,--config,--server-config",
+                        configFile_,
+                        "load a config file for the broker server");
         return app;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

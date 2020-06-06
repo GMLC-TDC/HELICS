@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -25,7 +25,8 @@ namespace apps {
     class HELICS_CXX_EXPORT Recorder: public App {
       public:
         /** construct from a FederateInfo structure
-    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param name the name of the Recorder, can be left empty for the default or to pull from the
+    federateInfo object
     @param fi  a federate information structure
     */
         Recorder(const std::string& name, FederateInfo& fi);
@@ -37,14 +38,14 @@ namespace apps {
         Recorder(int argc, char* argv[]);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param name the name of the Recorder, can be left empty for the default or to pull from the
+    federateInfo object
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Recorder(
-            const std::string& name,
-            const std::shared_ptr<Core>& core,
-            const FederateInfo& fi);
+        Recorder(const std::string& name,
+                 const std::shared_ptr<Core>& core,
+                 const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
@@ -141,25 +142,25 @@ namespace apps {
             int cnt{0};
         };
 
-        bool allow_iteration{false}; //!< trigger to allow Iteration
-        bool verbose{false}; //!< print all captured values to the screen
+        bool allow_iteration{false};  //!< trigger to allow Iteration
+        bool verbose{false};  //!< print all captured values to the screen
         Time nextPrintTimeStep{
-            helics::timeZero}; //!< the time advancement period for printing markers
-        std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
-        std::vector<ValueCapture> points; //!< lists of points that were captured
-        std::vector<Input> subscriptions; //!< the actual subscription objects
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
-        std::vector<std::unique_ptr<Message>> messages; //!< list of messages
-        std::map<helics::interface_handle, int> subids; //!< map of the subscription ids
-        std::map<std::string, int> subkeys; //!< translate subscription names to an index
-        std::map<helics::interface_handle, int> eptids; // translate subscription id to index
-        std::map<std::string, int> eptNames; //!< translate endpoint name to index
-        std::vector<ValueStats> vStat; //!< storage for statistics capture
-        std::vector<std::string> captureInterfaces; //!< storage for the interfaces to capture
-        std::string mapfile; //!< file name for the on-line file updater
-        std::string outFileName{"out.txt"}; //!< the final output file
+            helics::timeZero};  //!< the time advancement period for printing markers
+        std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
+        std::vector<ValueCapture> points;  //!< lists of points that were captured
+        std::vector<Input> subscriptions;  //!< the actual subscription objects
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
+        std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
+        std::map<helics::interface_handle, int> subids;  //!< map of the subscription ids
+        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+        std::map<helics::interface_handle, int> eptids;  // translate subscription id to index
+        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::vector<ValueStats> vStat;  //!< storage for statistics capture
+        std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
+        std::string mapfile;  //!< file name for the on-line file updater
+        std::string outFileName{"out.txt"};  //!< the final output file
     };
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

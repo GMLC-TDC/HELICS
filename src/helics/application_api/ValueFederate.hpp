@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -23,45 +23,46 @@ class Input;
 class ValueFederateManager;
 /** class defining the value based interface */
 class HELICS_CXX_EXPORT ValueFederate:
-    public virtual Federate // using virtual inheritance to allow combination federate
+    public virtual Federate  // using virtual inheritance to allow combination federate
 {
   public:
     /**constructor taking a federate information structure and using the default core
-    @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+    @param fedName the name of the federate, can be empty to use the name from fi or an auto
+    generated one
     @param fi  a federate information structure
     */
     ValueFederate(const std::string& fedName, const FederateInfo& fi);
 
-    /**constructor taking a core and a federate information structure, core information in fi is ignored
-    @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+    /**constructor taking a core and a federate information structure, core information in fi is
+    ignored
+    @param fedName the name of the federate, can be empty to use the name from fi or an auto
+    generated one
     @param core a shared ptr to a core to join
     @param fi  a federate information structure
     */
-    ValueFederate(
-        const std::string& fedName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi = FederateInfo{});
+    ValueFederate(const std::string& fedName,
+                  const std::shared_ptr<Core>& core,
+                  const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedName the name of the federate can be empty to use a name from the federateInfo
     @param core a CoreApp with the core to connect to.
     @param fi  a federate information structure
     */
-    ValueFederate(
-        const std::string& fedName,
-        CoreApp& core,
-        const FederateInfo& fi = FederateInfo{});
+    ValueFederate(const std::string& fedName,
+                  CoreApp& core,
+                  const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a string with the required information
-    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string
+    containing JSON code
     */
     explicit ValueFederate(const std::string& configString);
 
     /**constructor taking a name and a string with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
-    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code or a string with command line arguments
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string
+    containing JSON code or a string with command line arguments
     */
     ValueFederate(const std::string& fedName, const std::string& configString);
 
@@ -72,7 +73,7 @@ class HELICS_CXX_EXPORT ValueFederate:
      */
     explicit ValueFederate(bool res);
 
-    /** this is an overload for the string operation top deconflict with the bool version 
+    /** this is an overload for the string operation top deconflict with the bool version
      */
     explicit ValueFederate(const char* configString);
 
@@ -94,10 +95,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
-    Publication& registerPublication(
-        const std::string& key,
-        const std::string& type,
-        const std::string& units = std::string());
+    Publication& registerPublication(const std::string& key,
+                                     const std::string& type,
+                                     const std::string& units = std::string());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param key the name of the publication
@@ -105,8 +105,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication&
-        registerPublication(const std::string& key, const std::string& units = std::string())
+    Publication& registerPublication(const std::string& key,
+                                     const std::string& units = std::string())
     {
         return registerPublication(key, ValueConverter<X>::type(), units);
     }
@@ -118,10 +118,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param units a string defining the units of the publication [optional]
     @return a publication object reference for use as an identifier
     */
-    Publication& registerGlobalPublication(
-        const std::string& key,
-        const std::string& type,
-        const std::string& units = std::string());
+    Publication& registerGlobalPublication(const std::string& key,
+                                           const std::string& type,
+                                           const std::string& units = std::string());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param key the name of the publication
@@ -129,8 +128,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication&
-        registerGlobalPublication(const std::string& key, const std::string& units = std::string())
+    Publication& registerGlobalPublication(const std::string& key,
+                                           const std::string& units = std::string())
     {
         return registerGlobalPublication(key, ValueConverter<X>::type(), units);
     }
@@ -144,10 +143,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication& registerIndexedPublication(
-        const std::string& key,
-        int index1,
-        const std::string& units = std::string())
+    Publication& registerIndexedPublication(const std::string& key,
+                                            int index1,
+                                            const std::string& units = std::string())
     {
         return registerGlobalPublication<X>(key + '_' + std::to_string(index1), units);
     }
@@ -161,14 +159,14 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication& registerIndexedPublication(
-        const std::string& key,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Publication& registerIndexedPublication(const std::string& key,
+                                            int index1,
+                                            int index2,
+                                            const std::string& units = std::string())
     {
-        return registerGlobalPublication<X>(
-            key + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        return registerGlobalPublication<X>(key + '_' + std::to_string(index1) + '_' +
+                                                std::to_string(index2),
+                                            units);
     }
 
     /** register a publication as part of an indexed structure
@@ -180,10 +178,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication& registerPublicationIndexed(
-        const std::string& key,
-        int index1,
-        const std::string& units = std::string())
+    Publication& registerPublicationIndexed(const std::string& key,
+                                            int index1,
+                                            const std::string& units = std::string())
     {
         return registerGlobalPublication<X>(key + '_' + std::to_string(index1), units);
     }
@@ -197,14 +194,14 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication& registerPublicationIndexed(
-        const std::string& key,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Publication& registerPublicationIndexed(const std::string& key,
+                                            int index1,
+                                            int index2,
+                                            const std::string& units = std::string())
     {
-        return registerGlobalPublication<X>(
-            key + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        return registerGlobalPublication<X>(key + '_' + std::to_string(index1) + '_' +
+                                                std::to_string(index2),
+                                            units);
     }
 
     /** register an input
@@ -213,10 +210,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param type a string describing the type of the publication
     @param units a string describing the units on the publication
     */
-    Input& registerInput(
-        const std::string& key,
-        const std::string& type,
-        const std::string& units = std::string());
+    Input& registerInput(const std::string& key,
+                         const std::string& type,
+                         const std::string& units = std::string());
 
     /** register a globally named input
     @details call is only valid in startup mode
@@ -225,10 +221,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param units a string defining the units of the input [optional]
     @return a input id object for use as an identifier
     */
-    Input& registerGlobalInput(
-        const std::string& key,
-        const std::string& type,
-        const std::string& units = std::string());
+    Input& registerGlobalInput(const std::string& key,
+                               const std::string& type,
+                               const std::string& units = std::string());
     /** register a named input
      */
     template<typename X>
@@ -245,16 +240,16 @@ class HELICS_CXX_EXPORT ValueFederate:
     }
 
     /** register a required subscription
-    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+    @details call is only valid in startup mode, register an optional subscription for a 1D array of
+    values
     @param key the name of the subscription
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
     */
     template<typename X>
-    Input& registerIndexedInput(
-        const std::string& key,
-        int index1,
-        const std::string& units = std::string())
+    Input& registerIndexedInput(const std::string& key,
+                                int index1,
+                                const std::string& units = std::string())
     {
         return registerGlobalInput<X>(key + '_' + std::to_string(index1), units);
     }
@@ -269,27 +264,27 @@ class HELICS_CXX_EXPORT ValueFederate:
   @return an identifier for use with this publication
   */
     template<typename X>
-    Input& registerIndexedInput(
-        const std::string& key,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Input& registerIndexedInput(const std::string& key,
+                                int index1,
+                                int index2,
+                                const std::string& units = std::string())
     {
-        return registerGlobalInput<X>(
-            key + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        return registerGlobalInput<X>(key + '_' + std::to_string(index1) + '_' +
+                                          std::to_string(index2),
+                                      units);
     }
 
     /** register a required subscription
-    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+    @details call is only valid in startup mode, register an optional subscription for a 1D array of
+    values
     @param key the name of the subscription
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
     */
     template<typename X>
-    Input& registerInputIndexed(
-        const std::string& key,
-        int index1,
-        const std::string& units = std::string())
+    Input& registerInputIndexed(const std::string& key,
+                                int index1,
+                                const std::string& units = std::string())
     {
         return registerGlobalInput<X>(key + '_' + std::to_string(index1), units);
     }
@@ -304,22 +299,22 @@ class HELICS_CXX_EXPORT ValueFederate:
   @return an identifier for use with this publication
   */
     template<typename X>
-    Input& registerInputIndexed(
-        const std::string& key,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Input& registerInputIndexed(const std::string& key,
+                                int index1,
+                                int index2,
+                                const std::string& units = std::string())
     {
-        return registerGlobalInput<X>(
-            key + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        return registerGlobalInput<X>(key + '_' + std::to_string(index1) + '_' +
+                                          std::to_string(index2),
+                                      units);
     }
 
     /** register a subscription
     @param target the name of the publication to subscribe to
     @param units the units associated with the desired output
     */
-    Input&
-        registerSubscription(const std::string& target, const std::string& units = std::string());
+    Input& registerSubscription(const std::string& target,
+                                const std::string& units = std::string());
 
     /** register a subscription
     @details register a subscription for a 1D array of values
@@ -327,10 +322,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
     */
-    Input& registerIndexedSubscription(
-        const std::string& target,
-        int index1,
-        const std::string& units = std::string())
+    Input& registerIndexedSubscription(const std::string& target,
+                                       int index1,
+                                       const std::string& units = std::string())
     {
         return registerSubscription(target + '_' + std::to_string(index1), units);
     }
@@ -342,14 +336,14 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index2 the 2nd index of a 2-D value structure
     @param units the optional units on the subscription
     */
-    Input& registerIndexedSubscription(
-        const std::string& target,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Input& registerIndexedSubscription(const std::string& target,
+                                       int index1,
+                                       int index2,
+                                       const std::string& units = std::string())
     {
-        return registerSubscription(
-            target + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        return registerSubscription(target + '_' + std::to_string(index1) + '_' +
+                                        std::to_string(index2),
+                                    units);
     }
 
     /** register a subscription
@@ -358,10 +352,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
     */
-    Input& registerSubscriptionIndexed(
-        const std::string& target,
-        int index1,
-        const std::string& units = std::string())
+    Input& registerSubscriptionIndexed(const std::string& target,
+                                       int index1,
+                                       const std::string& units = std::string())
     {
         return registerSubscription(target + '_' + std::to_string(index1), units);
     }
@@ -373,14 +366,14 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index2 the 2nd index of a 2-D value structure
     @param units the optional units on the subscription
     */
-    Input& registerSubscriptionIndexed(
-        const std::string& target,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Input& registerSubscriptionIndexed(const std::string& target,
+                                       int index1,
+                                       int index2,
+                                       const std::string& units = std::string())
     {
-        return registerSubscription(
-            target + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        return registerSubscription(target + '_' + std::to_string(index1) + '_' +
+                                        std::to_string(index2),
+                                    units);
     }
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
@@ -407,17 +400,18 @@ class HELICS_CXX_EXPORT ValueFederate:
     void setDefaultValue(const Input& inp, data_view block);
 
     /** register a set of interfaces defined in a file
-    @details call is only valid in startup mode to add an TOML files must have extension .toml or .TOML
-    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate the
-    interfaces
+    @details call is only valid in startup mode to add an TOML files must have extension .toml or
+    .TOML
+    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate
+    the interfaces
     */
     virtual void registerInterfaces(const std::string& configString) override;
 
     /** register a set of value interfaces (publications and subscriptions)
-    @details call is only valid in startup mode it is a protected call to add an TOML files must have extension
-    .toml or .TOML
-    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate the
-    interfaces
+    @details call is only valid in startup mode it is a protected call to add an TOML files must
+    have extension .toml or .TOML
+    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate
+    the interfaces
     */
     void registerValueInterfaces(const std::string& configString);
 
@@ -436,9 +430,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     data_view getValueRaw(const Input& inp);
 
     /** get a double value*/
-    double getDouble(Input& inp);
+    static double getDouble(Input& inp);
     /** get a string value*/
-    const std::string& getString(Input& inp);
+    static const std::string& getString(Input& inp);
     /** publish a value
     @param pub the publication identifier
     @param block a data block containing the data
@@ -462,14 +456,14 @@ class HELICS_CXX_EXPORT ValueFederate:
    @param str a string to publish
    @throw invalid_argument if the publication id is invalid
    */
-    void publish(Publication& pub, const std::string& str);
+    static void publish(Publication& pub, const std::string& str);
 
     /** direct publish a double
  @param pub the publication identifier
  @param val the value to publish
  @throw invalid_argument if the publication is invalid
  */
-    void publish(Publication& pub, double val);
+    static void publish(Publication& pub, double val);
 
     /** register a set of publications based on a publication JSON
     @param jsonString a json string containing the data to publish and establish publications from
@@ -503,7 +497,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     void removeTarget(const Input& inp, const std::string& target);
 
     /** add a 1-d Indexed target to an interface
-   @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+   @details call is only valid in startup mode, register an optional subscription for a 1D array of
+   values
    @param iObject an interface object to add the target to
    @param target the name of the target
    @param index1 the index into a 1 dimensional array of values
@@ -557,44 +552,55 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return empty string if an invalid input is passed or it has no target*/
     const std::string& getTarget(const Input& inp) const;
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(const std::string& key) const;
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     Input& getInput(const std::string& key);
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(int index) const;
     /** get the id of a subscription
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     Input& getInput(int index);
     /** get the id of a subscription from a vector of subscriptions
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(const std::string& key, int index1) const;
     /** get an input object from a 2-d vector of inputs
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getInput(const std::string& key, int index1, int index2) const;
 
     /** get the input id based on target
-    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    @return an invalid input object if the target is valid otherwise a reference to the
+    corresponding input*/
     const Input& getSubscription(const std::string& target) const;
 
     /** get an input based on target
     @details this will only get the first subscription with a specific target
-   @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+   @return an invalid input object if the target is valid otherwise a reference to the corresponding
+   input*/
     Input& getSubscription(const std::string& target);
 
     /** get a publication from its name
     @param key the name of the publication
-    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding
+    publication*/
     Publication& getPublication(const std::string& key);
     /** get a publication from its key
     @param key the name of the publication
-    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding
+    publication*/
     const Publication& getPublication(const std::string& key) const;
     /** get a publication from its index
     @param index the 0 based index of the publication to retrieve
-    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding
+    publication*/
     Publication& getPublication(int index);
     /** get a publication from its index
     @param index the 0 based index of the publication to retrieve
@@ -634,4 +640,4 @@ class HELICS_CXX_EXPORT ValueFederate:
     std::unique_ptr<ValueFederateManager> vfManager;
 };
 
-} // namespace helics
+}  // namespace helics

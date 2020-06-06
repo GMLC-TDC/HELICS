@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -113,8 +113,8 @@ namespace tcp {
         // this function does nothing since everything is handled in the other thread
     }
 
-    static TcpConnection::pointer
-        generateConnection(std::shared_ptr<AsioContextManager>& ioctx, const std::string& address)
+    static TcpConnection::pointer generateConnection(std::shared_ptr<AsioContextManager>& ioctx,
+                                                     const std::string& address)
     {
         try {
             std::string interface;
@@ -147,18 +147,17 @@ namespace tcp {
                 return dataReceive(connection.get(), data, datasize);
             };
         CommsInterface* ci = this;
-        auto errorCall =
-            [ci](const TcpConnection::pointer& connection, const std::error_code& error) {
-                return commErrorHandler(ci, connection.get(), error);
-            };
+        auto errorCall = [ci](const TcpConnection::pointer& connection,
+                              const std::error_code& error) {
+            return commErrorHandler(ci, connection.get(), error);
+        };
 
         if (serverMode) {
-            server = TcpServer::create(
-                ioctx->getBaseContext(),
-                localTargetAddress,
-                static_cast<uint16_t>(PortNumber.load()),
-                true,
-                maxMessageSize);
+            server = TcpServer::create(ioctx->getBaseContext(),
+                                       localTargetAddress,
+                                       static_cast<uint16_t>(PortNumber.load()),
+                                       true,
+                                       maxMessageSize);
             while (!server->isReady()) {
                 logWarning("retrying tcp bind");
                 std::this_thread::sleep_for(std::chrono::milliseconds(150));
@@ -203,7 +202,7 @@ namespace tcp {
 
         TcpConnection::pointer brokerConnection;
 
-        std::map<route_id, TcpConnection::pointer> routes; // for all the other possible routes
+        std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
         if (!brokerTargetAddress.empty()) {
             hasBroker = true;
         }
@@ -213,12 +212,11 @@ namespace tcp {
             }
             if (outgoingConnectionsAllowed) {
                 try {
-                    brokerConnection = makeConnection(
-                        ioctx->getBaseContext(),
-                        brokerTargetAddress,
-                        std::to_string(brokerPort),
-                        maxMessageSize,
-                        std::chrono::milliseconds(connectionTimeout));
+                    brokerConnection = makeConnection(ioctx->getBaseContext(),
+                                                      brokerTargetAddress,
+                                                      std::to_string(brokerPort),
+                                                      maxMessageSize,
+                                                      std::chrono::milliseconds(connectionTimeout));
                     if (!brokerConnection) {
                         logError("initial connection to broker timed out");
 
@@ -265,7 +263,8 @@ namespace tcp {
                             if (server) {
                                 auto conn = server->findSocket(cmd.getExtraData());
                                 if (conn) {
-                                    if (!brokerConnection) { // check if the connection matches the broker
+                                    if (!brokerConnection) {  // check if the connection matches the
+                                                              // broker
                                         if ((cmd.payload == brokerName) ||
                                             (cmd.payload ==
                                              makePortAddress(brokerTargetAddress, brokerPort))) {
@@ -285,8 +284,8 @@ namespace tcp {
 
                             for (auto& mc : made_connections) {
                                 if ((mc.second) && (cmd.payload == mc.first)) {
-                                    routes.emplace(
-                                        route_id{cmd.getExtraData()}, std::move(mc.second));
+                                    routes.emplace(route_id{cmd.getExtraData()},
+                                                   std::move(mc.second));
                                     established = true;
                                     established_routes[mc.first] = route_id{cmd.getExtraData()};
                                 }
@@ -296,11 +295,11 @@ namespace tcp {
                                 if (efind != established_routes.end()) {
                                     established = true;
                                     if (efind->second == parent_route_id) {
-                                        routes.emplace(
-                                            route_id{cmd.getExtraData()}, brokerConnection);
+                                        routes.emplace(route_id{cmd.getExtraData()},
+                                                       brokerConnection);
                                     } else {
-                                        routes.emplace(
-                                            route_id{cmd.getExtraData()}, routes[efind->second]);
+                                        routes.emplace(route_id{cmd.getExtraData()},
+                                                       routes[efind->second]);
                                     }
                                 }
                             }
@@ -313,14 +312,14 @@ namespace tcp {
                                         new_connect->setErrorCall(errorCall);
                                         new_connect->send(cstring);
                                         new_connect->startReceive();
-                                        routes.emplace(
-                                            route_id{cmd.getExtraData()}, std::move(new_connect));
+                                        routes.emplace(route_id{cmd.getExtraData()},
+                                                       std::move(new_connect));
                                         established_routes[cmd.payload] =
                                             route_id{cmd.getExtraData()};
                                     }
                                 } else {
-                                    logWarning(
-                                        std::string("unable to make connection ") + cmd.payload);
+                                    logWarning(std::string("unable to make connection ") +
+                                               cmd.payload);
                                 }
                             }
                         } break;
@@ -352,9 +351,8 @@ namespace tcp {
                     catch (const std::system_error& se) {
                         if (se.code() != asio::error::connection_aborted) {
                             if (!isDisconnectCommand(cmd)) {
-                                logError(
-                                    std::string("broker send 0 ") +
-                                    actionMessageType(cmd.action()) + ':' + se.what());
+                                logError(std::string("broker send 0 ") +
+                                         actionMessageType(cmd.action()) + ':' + se.what());
                             }
                         }
                     }
@@ -373,9 +371,8 @@ namespace tcp {
                     catch (const std::system_error& se) {
                         if (se.code() != asio::error::connection_aborted) {
                             if (!isDisconnectCommand(cmd)) {
-                                logError(
-                                    std::string("rt send ") + std::to_string(rid.baseValue()) +
-                                    "::" + se.what());
+                                logError(std::string("rt send ") + std::to_string(rid.baseValue()) +
+                                         "::" + se.what());
                             }
                         }
                     }
@@ -387,23 +384,21 @@ namespace tcp {
                         catch (const std::system_error& se) {
                             if (se.code() != asio::error::connection_aborted) {
                                 if (!isDisconnectCommand(cmd)) {
-                                    logError(
-                                        std::string("broker send ") +
-                                        std::to_string(rid.baseValue()) + " ::" + se.what());
+                                    logError(std::string("broker send ") +
+                                             std::to_string(rid.baseValue()) + " ::" + se.what());
                                 }
                             }
                         }
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(
-                                std::string(
-                                    "(tcpss) unknown message destination message dropped ") +
-                                prettyPrintString(cmd));
+                            logWarning(std::string(
+                                           "(tcpss) unknown message destination message dropped ") +
+                                       prettyPrintString(cmd));
                         }
                     }
                 }
             }
-        } // while (!haltLoop)
+        }  // while (!haltLoop)
 
         for (auto& rt : made_connections) {
             if (rt.second) {
@@ -432,5 +427,5 @@ namespace tcp {
         }
     }
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

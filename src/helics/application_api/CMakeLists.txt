@@ -26,14 +26,14 @@ set(application_api_headers
     FederateInfo.hpp
     Inputs.hpp
     BrokerApp.hpp
-	CoreApp.hpp
+    CoreApp.hpp
 )
 
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
 
 set(private_application_api_headers
-    MessageFederateManager.hpp ValueFederateManager.hpp AsyncFedCallInfo.hpp
-    FilterOperations.hpp FilterFederateManager.hpp
+    MessageFederateManager.hpp ValueFederateManager.hpp AsyncFedCallInfo.hpp FilterOperations.hpp
+    FilterFederateManager.hpp
 )
 
 set(application_api_sources
@@ -56,13 +56,12 @@ set(application_api_sources
     FederateInfo.cpp
     Inputs.cpp
     BrokerApp.cpp
-	CoreApp.cpp
+    CoreApp.cpp
 )
 
 add_library(
-    helics_application_api STATIC
-    ${application_api_sources} ${conv_headers} ${application_api_headers}
-    ${private_application_api_headers}
+    helics_application_api STATIC ${application_api_sources} ${conv_headers}
+                                  ${application_api_headers} ${private_application_api_headers}
 )
 
 target_link_libraries(helics_application_api PUBLIC helics_network)

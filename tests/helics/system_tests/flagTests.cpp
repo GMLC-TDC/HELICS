@@ -1,7 +1,8 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
@@ -166,7 +167,8 @@ TEST_F(flag_tests, type_mismatch_error2)
 
 TEST_F(flag_tests, slow_federate)
 {
-    //this flag doesn't do anything yet for federates, this is just to verify it is acknowledged and captured
+    // this flag doesn't do anything yet for federates, this is just to verify it is acknowledged
+    // and captured
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     vFed1->setFlagOption(helics_flag_slow_responding);

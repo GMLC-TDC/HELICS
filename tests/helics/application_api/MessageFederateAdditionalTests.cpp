@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -257,12 +257,10 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     auto& epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
-    mFed1->setMessageNotificationCallback(epid, [&](const helics::Endpoint&, helics::Time) {
-        ++e1cnt;
-    });
-    mFed2->setMessageNotificationCallback(epid2, [&](const helics::Endpoint&, helics::Time) {
-        ++e2cnt;
-    });
+    mFed1->setMessageNotificationCallback(epid,
+                                          [&](const helics::Endpoint&, helics::Time) { ++e1cnt; });
+    mFed2->setMessageNotificationCallback(epid2,
+                                          [&](const helics::Endpoint&, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(helics_property_time_delta, 1.0);
     mFed2->setProperty(helics_property_time_delta, 1.0);
@@ -336,16 +334,16 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 class PingPongFed {
   private:
     std::unique_ptr<helics::MessageFederate> mFed;
-    helics::Time delta; // the minimum time delta for the federate
-    std::string name; //!< the name of the federate
+    helics::Time delta;  // the minimum time delta for the federate
+    std::string name;  //!< the name of the federate
     helics::core_type coreType;
     std::vector<std::pair<helics::Time, std::string>> triggers;
     helics::Endpoint* ep{nullptr};
     int index{0};
 
   public:
-    int pings{0}; //!< the number of pings received
-    int pongs{0}; //!< the number of pongs received
+    int pings{0};  //!< the number of pings received
+    int pongs{0};  //!< the number of pongs received
   public:
     PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
         delta(tDelta), name(fname), coreType(ctype)
@@ -473,15 +471,13 @@ TEST_P(mfed_add_type_tests, threefedPingPong)
     EXPECT_EQ(p3.pongs, 2);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    mfed_add_tests,
-    mfed_add_single_type_tests,
-    ::testing::ValuesIn(core_types_single));
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
+                         mfed_add_single_type_tests,
+                         ::testing::ValuesIn(core_types_single));
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(core_types));
-INSTANTIATE_TEST_SUITE_P(
-    mfed_add_tests,
-    mfed_add_all_type_tests,
-    ::testing::ValuesIn(core_types_all));
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
+                         mfed_add_all_type_tests,
+                         ::testing::ValuesIn(core_types_all));
 
 static constexpr const char* config_files[] = {"example_message_fed.json",
                                                "example_message_fed.toml"};
@@ -534,15 +530,14 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
     auto cloneFilt = dynamic_cast<helics::CloningFilter*>(filt);
     EXPECT_TRUE(cloneFilt != nullptr);
 
-    EXPECT_EQ(
-        mFed.getFilter(0).getInfo(), "this is an information string for use by the application");
+    EXPECT_EQ(mFed.getFilter(0).getInfo(),
+              "this is an information string for use by the application");
     mFed.disconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    mfed_add_tests,
-    mfed_file_filter_config_files,
-    ::testing::ValuesIn(filter_config_files));
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
+                         mfed_file_filter_config_files,
+                         ::testing::ValuesIn(filter_config_files));
 
 TEST_F(mfed_tests, send_message1)
 {
@@ -575,11 +570,11 @@ TEST_F(mfed_tests, send_message1)
 TEST(messageFederate, constructor1)
 {
     helics::MessageFederate mf1("fed1", "--type=test --autobroker --corename=mfc");
-    //try out loading a file
-    EXPECT_THROW(
-        helics::MessageFederate mf2(std::string("not_available.json")), helics::HelicsException);
+    // try out loading a file
+    EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")),
+                 helics::HelicsException);
     helics::MessageFederate mf2;
-    //test move assignment
+    // test move assignment
     mf2 = std::move(mf1);
 
     EXPECT_FALSE(mf2.hasMessage());
@@ -647,9 +642,8 @@ TEST(messageFederate, constructor4)
     mf1.registerGlobalFilter("filt1");
     mf1.registerGlobalFilter("filt2");
 
-    EXPECT_THROW(
-        mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_bad.toml"),
-        helics::HelicsException);
+    EXPECT_THROW(mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_bad.toml"),
+                 helics::HelicsException);
     EXPECT_NO_THROW(mf1.enterExecutingMode());
     mf1.finalize();
 }
@@ -657,7 +651,7 @@ TEST(messageFederate, constructor4)
 TEST(messageFederate, constructor5)
 {
     helics::MessageFederate mf1("--type=test --autobroker --corename=mfc5 --name=fedmd");
-    //try out loading a file
+    // try out loading a file
 
     EXPECT_EQ(mf1.getName(), "fedmd");
     EXPECT_EQ(mf1.getCorePointer()->getIdentifier(), "mfc5");

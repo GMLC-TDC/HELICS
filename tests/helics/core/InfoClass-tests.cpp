@@ -1,13 +1,13 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/core/BasicHandleInfo.hpp"
 #include "helics/core/EndpointInfo.hpp"
 #include "helics/core/FilterInfo.hpp"
-#include "helics/core/NamedInputInfo.hpp"
+#include "helics/core/InputInfo.hpp"
 
 #include "gtest/gtest.h"
 
@@ -24,13 +24,12 @@ TEST(InfoClass_tests, basichandleinfo_test)
     EXPECT_TRUE(defHnd.units.empty());
 
     // Constructor with last parameter default value
-    helics::BasicHandleInfo hnd1(
-        helics::global_federate_id(15),
-        helics::interface_handle(10),
-        helics::handle_type::endpoint,
-        "key",
-        "type",
-        "units");
+    helics::BasicHandleInfo hnd1(helics::global_federate_id(15),
+                                 helics::interface_handle(10),
+                                 helics::handle_type::endpoint,
+                                 "key",
+                                 "type",
+                                 "units");
     EXPECT_EQ(hnd1.getInterfaceHandle().baseValue(), 10);
     EXPECT_EQ(hnd1.getFederateId().baseValue(), 15);
     EXPECT_TRUE(!hnd1.local_fed_id.isValid());
@@ -41,13 +40,12 @@ TEST(InfoClass_tests, basichandleinfo_test)
     EXPECT_EQ(hnd1.units, "units");
 
     // Constructor overriding last parameter default value
-    helics::BasicHandleInfo hnd2(
-        helics::global_federate_id(1500),
-        helics::interface_handle(100),
-        helics::handle_type::endpoint,
-        "key",
-        "type",
-        "units");
+    helics::BasicHandleInfo hnd2(helics::global_federate_id(1500),
+                                 helics::interface_handle(100),
+                                 helics::handle_type::endpoint,
+                                 "key",
+                                 "type",
+                                 "units");
     EXPECT_EQ(hnd2.getInterfaceHandle().baseValue(), 100);
     EXPECT_EQ(hnd2.getFederateId().baseValue(), 1500);
     EXPECT_TRUE(!hnd2.local_fed_id.isValid());
@@ -61,13 +59,12 @@ TEST(InfoClass_tests, basichandleinfo_test)
 
     // Source filter handle
     // destFilter should be false, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo srcFiltHnd(
-        helics::global_federate_id(2),
-        helics::interface_handle(1),
-        helics::handle_type::filter,
-        "key",
-        "type_in",
-        "type_out");
+    helics::BasicHandleInfo srcFiltHnd(helics::global_federate_id(2),
+                                       helics::interface_handle(1),
+                                       helics::handle_type::filter,
+                                       "key",
+                                       "type_in",
+                                       "type_out");
     EXPECT_EQ(srcFiltHnd.getInterfaceHandle().baseValue(), 1);
     EXPECT_EQ(srcFiltHnd.getFederateId().baseValue(), 2);
     EXPECT_TRUE(!srcFiltHnd.local_fed_id.isValid());
@@ -79,13 +76,12 @@ TEST(InfoClass_tests, basichandleinfo_test)
 
     // Destination filter handle
     // destFilter should be true, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo dstFiltHnd(
-        helics::global_federate_id(3),
-        helics::interface_handle(7),
-        helics::handle_type::filter,
-        "key",
-        "type_in",
-        "type_out");
+    helics::BasicHandleInfo dstFiltHnd(helics::global_federate_id(3),
+                                       helics::interface_handle(7),
+                                       helics::handle_type::filter,
+                                       "key",
+                                       "type_in",
+                                       "type_out");
     EXPECT_EQ(dstFiltHnd.getInterfaceHandle().baseValue(), 7);
     EXPECT_EQ(dstFiltHnd.getFederateId().baseValue(), 3);
     EXPECT_TRUE(!dstFiltHnd.local_fed_id.isValid());
@@ -129,8 +125,9 @@ TEST(InfoClass_tests, endpointinfo_test)
     msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time(1);
 
-    helics::EndpointInfo endPI(
-        {helics::global_federate_id(5), helics::interface_handle(13)}, "name", "type");
+    helics::EndpointInfo endPI({helics::global_federate_id(5), helics::interface_handle(13)},
+                               "name",
+                               "type");
     EXPECT_EQ(endPI.id.handle.baseValue(), 13);
     EXPECT_EQ(endPI.id.fed_id.baseValue(), 5);
     EXPECT_EQ(endPI.key, "name");
@@ -267,13 +264,12 @@ TEST(InfoClass_tests, filterinfo_test)
     msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time(1);
 
-    helics::FilterInfo filtI(
-        helics::global_broker_id(5),
-        helics::interface_handle(13),
-        "name",
-        "type_in",
-        "type_out",
-        true);
+    helics::FilterInfo filtI(helics::global_broker_id(5),
+                             helics::interface_handle(13),
+                             "name",
+                             "type_in",
+                             "type_out",
+                             true);
     EXPECT_EQ(filtI.handle.baseValue(), 13);
     EXPECT_EQ(filtI.core_id.baseValue(), 5);
     EXPECT_EQ(filtI.key, "name");
@@ -288,11 +284,11 @@ TEST(InfoClass_tests, inputinfo_test)
 
     std::shared_ptr<const helics::data_block> ret_data;
 
-    helics::NamedInputInfo subI(
-        helics::global_handle(helics::global_federate_id(5), helics::interface_handle(13)),
-        "key",
-        "type",
-        "units");
+    helics::InputInfo subI(helics::global_handle(helics::global_federate_id(5),
+                                                 helics::interface_handle(13)),
+                           "key",
+                           "type",
+                           "units");
     EXPECT_EQ(subI.id.handle.baseValue(), 13);
     EXPECT_EQ(subI.id.fed_id.baseValue(), 5);
     EXPECT_EQ(subI.key, "key");

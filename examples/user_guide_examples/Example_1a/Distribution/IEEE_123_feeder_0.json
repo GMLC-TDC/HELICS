@@ -1,8 +1,8 @@
 {
     "name" : "DistributionSim",
-	"loglevel": 5,
-	"coreType": "zmq",
-	"period" : 1.0,
+    "loglevel": 5,
+    "coreType": "zmq",
+    "period" : 1.0,
      "publications" : [
           {
                "global" : true,
@@ -18,13 +18,13 @@
      "subscriptions" : [
           {
                "required": true,
-			   "key" : "TransmissionSim/transmission_voltage",
+               "key" : "TransmissionSim/transmission_voltage",
                "type" : "complex",
                "unit" : "V",
                "info" : "{
                     \"object\" : \"network_node\",
-                    \"property\" : \"positive_sequence_voltage\" 
-					}"
+                    \"property\" : \"positive_sequence_voltage\"
+                    }"
           }
      ]
 }

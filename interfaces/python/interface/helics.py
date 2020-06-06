@@ -95,11 +95,15 @@ helics_core_type_websocket = _helics.helics_core_type_websocket
 r""" a core using websockets for communication"""
 helics_core_type_inproc = _helics.helics_core_type_inproc
 r"""
-    an in process core type for handling communications in shared memory
-                                      it is pretty similar to the test core but stripped from the "test" components
+    an in process core type for handling communications in shared
+                                        memory it is pretty similar to the test core but stripped from
+                                        the "test" components
     """
 helics_core_type_null = _helics.helics_core_type_null
-r""" an explicit core type that is recognized but explicitly doesn't exist, for testing and a few other assorted reasons"""
+r"""
+    an explicit core type that is recognized but explicitly doesn't
+                                     exist, for testing and a few other assorted reasons
+    """
 helics_data_type_string = _helics.helics_data_type_string
 r""" a sequence of characters"""
 helics_data_type_double = _helics.helics_data_type_double
@@ -120,6 +124,8 @@ helics_data_type_time = _helics.helics_data_type_time
 r""" time data type"""
 helics_data_type_raw = _helics.helics_data_type_raw
 r""" raw data type"""
+helics_data_type_multi = _helics.helics_data_type_multi
+r""" the data type can change"""
 helics_data_type_any = _helics.helics_data_type_any
 r""" open type that can be anything"""
 helics_flag_observer = _helics.helics_flag_observer
@@ -137,19 +143,20 @@ r"""
     """
 helics_flag_only_update_on_change = _helics.helics_flag_only_update_on_change
 r"""
-     flag indicating a federate/interface should only trigger an update if a value has changed (binary
-    equivalence)
+     flag indicating a federate/interface should only trigger an update if a value has changed
+    (binary equivalence)
     """
 helics_flag_wait_for_current_time_update = _helics.helics_flag_wait_for_current_time_update
 r"""
-     flag indicating a federate should only grant time if all other federates have already passed the
-    requested time
+     flag indicating a federate should only grant time if all other federates have already passed
+    the requested time
     """
 helics_flag_restrictive_time_policy = _helics.helics_flag_restrictive_time_policy
 r"""
-    flag indicating a federate should operate on a restrictive time policy, which disallows some 2nd order
-           time evaluation and can be useful for certain types of dependency cycles
-           and update patterns, but generally shouldn't be used as it can lead to some very slow update conditions
+    flag indicating a federate should operate on a restrictive time policy, which disallows some
+          2nd order time evaluation and can be useful for certain types of dependency cycles
+           and update patterns, but generally shouldn't be used as it can lead to some very slow update
+          conditions
     """
 helics_flag_rollback = _helics.helics_flag_rollback
 r""" flag indicating that a federate has rollback capability"""
@@ -162,7 +169,7 @@ r""" flag indicating that the federate will only interact on a single thread"""
 helics_flag_slow_responding = _helics.helics_flag_slow_responding
 r"""
     flag specifying that a federate, core, or broker may be slow to respond to pings
-    	If the federate goes offline there is no good way to detect it so use with caution
+           If the federate goes offline there is no good way to detect it so use with caution
     """
 helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
 r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
@@ -227,11 +234,14 @@ r""" the property controlling the period for a federate"""
 helics_property_time_offset = _helics.helics_property_time_offset
 r""" the property controlling time offset for the period of federate"""
 helics_property_time_rt_lag = _helics.helics_property_time_rt_lag
-r""" the property controlling real time lag for a federate the max time a federate can lag real time"""
+r"""
+    the property controlling real time lag for a federate the max time a federate can lag real
+          time
+    """
 helics_property_time_rt_lead = _helics.helics_property_time_rt_lead
 r"""
-    the property controlling real time lead for a federate the max time a federate can be ahead of real
-              time
+    the property controlling real time lead for a federate the max time a federate can be ahead
+          of real time
     """
 helics_property_time_rt_tolerance = _helics.helics_property_time_rt_tolerance
 r""" the property controlling real time tolerance for a federate sets both rt_lag and rt_lead"""
@@ -244,22 +254,52 @@ r""" integer property controlling the maximum number of iterations in a federate
 helics_property_int_log_level = _helics.helics_property_int_log_level
 r""" integer property controlling the log level in a federate see 'helics_log_levels'"""
 helics_property_int_file_log_level = _helics.helics_property_int_file_log_level
-r""" integer property controlling the log level for file logging in a federate see 'helics_log_levels'"""
+r"""
+    integer property controlling the log level for file logging in a federate see
+          helics_log_levels
+    """
 helics_property_int_console_log_level = _helics.helics_property_int_console_log_level
-r""" integer property controlling the log level for file logging in a federate see 'helics_log_levels'"""
+r"""
+    integer property controlling the log level for file logging in a federate see
+          helics_log_levels
+    """
+helics_multi_input_no_op = _helics.helics_multi_input_no_op
+r""" time and priority order the inputs from the core library"""
+helics_multi_input_vectorize_operation = _helics.helics_multi_input_vectorize_operation
+r""" vectorize the inputs either double vector or string vector"""
+helics_multi_input_and_operation = _helics.helics_multi_input_and_operation
+r""" all inputs are assumed to be boolean and all must be true to return true"""
+helics_multi_input_or_operation = _helics.helics_multi_input_or_operation
+r""" all inputs are assumed to be boolean and at least one must be true to return true"""
+helics_multi_input_sum_operation = _helics.helics_multi_input_sum_operation
+r""" sum all the inputs"""
+helics_multi_input_diff_operation = _helics.helics_multi_input_diff_operation
+r"""
+    do a difference operation on the inputs, first-sum(rest)
+       for double input, vector diff for vector input
+    """
+helics_multi_input_max_operation = _helics.helics_multi_input_max_operation
+r""" find the max of the inputs"""
+helics_multi_input_min_operation = _helics.helics_multi_input_min_operation
+r""" find the min of the inputs"""
+helics_multi_input_average_operation = _helics.helics_multi_input_average_operation
+r""" take the average of the inputs"""
 helics_handle_option_connection_required = _helics.helics_handle_option_connection_required
-r""" specify that a connection is required for an interface and will generate an error if not available"""
+r"""
+    specify that a connection is required for an interface and will generate an error if not
+          available
+    """
 helics_handle_option_connection_optional = _helics.helics_handle_option_connection_optional
 r"""
-    specify that a connection is NOT required for an interface and will only be made if available
-           no warning will be issues if not available
+    specify that a connection is NOT required for an interface and will only be made if
+          available no warning will be issues if not available
     """
 helics_handle_option_single_connection_only = _helics.helics_handle_option_single_connection_only
 r""" specify that only a single connection is allowed for an interface"""
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 r""" specify that multiple connections are allowed for an interface"""
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
-r""" specify that the last data should be buffered and send on subscriptions after init"""
+r""" specify that the last data should be buffered and sent on subscriptions after init"""
 helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
 r""" specify that the types should be checked strictly for pub/sub and filters"""
 helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
@@ -270,6 +310,14 @@ helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_u
 r""" specify that an interface will only update if the value has actually changed"""
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
 r""" specify that an interface does not participate in determining time interrupts"""
+helics_handle_option_multi_input_handling_method = _helics.helics_handle_option_multi_input_handling_method
+r""" specify the multi-input processing method for inputs"""
+helics_handle_option_input_priority_location = _helics.helics_handle_option_input_priority_location
+r""" specify the source index with the highest priority"""
+helics_handle_option_clear_priority_list = _helics.helics_handle_option_clear_priority_list
+r""" specify that the priority list should be cleared or question if it is cleared"""
+helics_handle_option_connections = _helics.helics_handle_option_connections
+r""" specify the required number of connections or get the actual number of connections"""
 helics_filter_type_custom = _helics.helics_filter_type_custom
 r""" a custom filter type that executes a user defined callback"""
 helics_filter_type_delay = _helics.helics_filter_type_delay
@@ -284,8 +332,8 @@ helics_filter_type_clone = _helics.helics_filter_type_clone
 r""" a filter type that duplicates a message and sends the copy to a different destination"""
 helics_filter_type_firewall = _helics.helics_filter_type_firewall
 r"""
-    a customizable filter type that can perform different actions on a message based on firewall like
-              rules
+    a customizable filter type that can perform different actions on a message based on firewall
+          like rules
     """
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
@@ -374,6 +422,14 @@ def helicsGetVersion() -> "char const *":
     r"""Get a version string for HELICS."""
     return _helics.helicsGetVersion()
 
+def helicsGetBuildFlags() -> "char const *":
+    r"""Get the build flags used to compile HELICS."""
+    return _helics.helicsGetBuildFlags()
+
+def helicsGetCompilerVersion() -> "char const *":
+    r"""Get the compiler version used to compile HELICS."""
+    return _helics.helicsGetCompilerVersion()
+
 def helicsIsCoreTypeAvailable(type: "char const *") -> "helics_bool":
     r"""
     Returns true if core/broker type specified is available in current compilation.
@@ -455,7 +511,8 @@ def helicsCreateBroker(type: "char const *", name: "char const *", initString: "
     :param name: The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.
     :type initString: string
     :param initString: An initialization string to send to the core-the format is similar to command line arguments.
-                          Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates, or the address.
+                          Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,
+        or the address.
 
 
     :rtype: void
@@ -820,7 +877,8 @@ def helicsCreateMessageFederate(fedName: "char const *", fi: "helics_federate_in
     r"""
     Create a message federate from a federate info object.
 
-    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.
+    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
+    argument.
 
     :type fedName: string
     :param fedName: The name of the federate to create.
@@ -837,7 +895,8 @@ def helicsCreateMessageFederateFromConfig(configFile: "char const *") -> "helics
     r"""
     Create a message federate from a JSON file or JSON string or TOML file.
 
-    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.
+    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
+    argument.
 
     :type configFile: string
     :param configFile: A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.
@@ -1061,6 +1120,16 @@ def helicsGetPropertyIndex(val: "char const *") -> "int":
     """
     return _helics.helicsGetPropertyIndex(val)
 
+def helicsGetFlagIndex(val: "char const *") -> "int":
+    r"""
+    Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,
+    :type val: string
+    :param val: A string with the option name.
+    :rtype: int
+    :return: An int with the property code or (-1) if not a valid property.
+    """
+    return _helics.helicsGetFlagIndex(val)
+
 def helicsGetOptionIndex(val: "char const *") -> "int":
     r"""
     Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
@@ -1073,6 +1142,19 @@ def helicsGetOptionIndex(val: "char const *") -> "int":
     :return: An int with the option index or (-1) if not a valid property.
     """
     return _helics.helicsGetOptionIndex(val)
+
+def helicsGetOptionValue(val: "char const *") -> "int":
+    r"""
+    Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
+    /ref helicsFilterSetOption.
+
+    :type val: string
+    :param val: A string representing the value.
+
+    :rtype: int
+    :return: An int with the option value or (-1) if not a valid value.
+    """
+    return _helics.helicsGetOptionValue(val)
 
 def helicsFederateInfoSetFlagOption(fi: "helics_federate_info", flag: "int", value: "helics_bool") -> "void":
     r"""
@@ -1159,8 +1241,8 @@ def helicsFederateLocalError(fed: "helics_federate", error_code: "int", error_st
     r"""
     Generate a local error in a federate.
 
-    This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
-             allow some interaction with a core for a brief time.
+    This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize
+    but does allow some interaction with a core for a brief time.
     :type fed: void
     :param fed: The federate to create an error in.
     :type error_code: int
@@ -1183,7 +1265,7 @@ def helicsFederateFinalizeComplete(fed: "helics_federate") -> "void":
     return _helics.helicsFederateFinalizeComplete(fed)
 
 def helicsFederateFree(fed: "helics_federate") -> "void":
-    r"""Release the memory associated withe a federate."""
+    r"""Release the memory associated with a federate."""
     return _helics.helicsFederateFree(fed)
 
 def helicsCloseLibrary() -> "void":
@@ -1197,8 +1279,8 @@ def helicsFederateEnterInitializingMode(fed: "helics_federate") -> "void":
     r"""
     Enter the initialization state of a federate.
 
-    The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution state.
-             This is a blocking call and will block until the core allows it to proceed.
+    The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution
+    state. This is a blocking call and will block until the core allows it to proceed.
 
     :type fed: void
     :param fed: The federate to operate on.
@@ -1254,7 +1336,8 @@ def helicsFederateEnterExecutingModeAsync(fed: "helics_federate") -> "void":
     r"""
     Request that the federate enter the Execution mode.
 
-    This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call sequence.
+    This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call
+    sequence.
 
     :type fed: void
     :param fed: The federate object to complete the call.
@@ -1810,7 +1893,8 @@ def helicsQueryExecuteComplete(query: "helics_query") -> "char const *":
     r"""
     Complete the return from a query called with /ref helicsExecuteQueryAsync.
 
-    The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not.
+    The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or
+    not.
 
     :type query: void
     :param query: The query object to complete execution of.
@@ -1835,6 +1919,29 @@ def helicsQueryIsCompleted(query: "helics_query") -> "helics_bool":
                 and false if an asynchronous query has not completed or is invalid
     """
     return _helics.helicsQueryIsCompleted(query)
+
+def helicsQuerySetTarget(query: "helics_query", target: "char const *") -> "void":
+    r"""
+    Update the target of a query.
+
+    :type query: void
+    :param query: The query object to change the target of.
+    :type target: string
+    :param target: the name of the target to query
+
+    """
+    return _helics.helicsQuerySetTarget(query, target)
+
+def helicsQuerySetQueryString(query: "helics_query", queryString: "char const *") -> "void":
+    r"""
+    Update the queryString of a query.
+
+    :type query: void
+    :param query: The query object to change the target of.
+    :type queryString: string
+    :param queryString: the new queryString
+    """
+    return _helics.helicsQuerySetQueryString(query, queryString)
 
 def helicsQueryFree(query: "helics_query") -> "void":
     r"""Free the memory associated with a query object."""
@@ -2126,19 +2233,37 @@ def helicsFederateGetSubscription(fed: "helics_federate", key: "char const *") -
     return _helics.helicsFederateGetSubscription(fed, key)
 
 def helicsFederateClearUpdates(fed: "helics_federate") -> "void":
-    r"""Clear all the update flags from a federates inputs."""
+    r"""
+    Clear all the update flags from a federates inputs.
+
+    :type fed: void
+    :param fed: The value federate object for which to clear update flags.
+    """
     return _helics.helicsFederateClearUpdates(fed)
 
 def helicsFederateRegisterFromPublicationJSON(fed: "helics_federate", json: "char const *") -> "void":
     r"""
     Register the publications via JSON publication string.
 
+    :type fed: void
+    :param fed: The value federate object to use to register the publications.
+    :type json: string
+    :param json: The JSON publication string.
+
+
     This would be the same JSON that would be used to publish data.
     """
     return _helics.helicsFederateRegisterFromPublicationJSON(fed, json)
 
 def helicsFederatePublishJSON(fed: "helics_federate", json: "char const *") -> "void":
-    r"""Publish data contained in a json file or string."""
+    r"""
+    Publish data contained in a JSON file or string.
+
+    :type fed: void
+    :param fed: The value federate object through which to publish the data.
+    :type json: string
+    :param json: The publication file name or literal JSON data string.
+    """
     return _helics.helicsFederatePublishJSON(fed, json)
 
 def helicsPublicationIsValid(pub: "helics_publication") -> "helics_bool":
@@ -2761,9 +2886,9 @@ def helicsPublicationSetInfo(pub: "helics_publication", info: "char const *") ->
     """
     return _helics.helicsPublicationSetInfo(pub, info)
 
-def helicsInputGetOption(inp: "helics_input", option: "int") -> "helics_bool":
+def helicsInputGetOption(inp: "helics_input", option: "int") -> "int":
     r"""
-    Get the data in the info field of an input.
+    Get the current value of an input handle option
 
     :type inp: void
     :param inp: The input to query.
@@ -2771,13 +2896,13 @@ def helicsInputGetOption(inp: "helics_input", option: "int") -> "helics_bool":
     :param option: Integer representation of the option in question see /ref helics_handle_options.
 
     :rtype: int
-    :return: A string with the info field string.
+    :return: An integer value with the current value of the given option.
     """
     return _helics.helicsInputGetOption(inp, option)
 
-def helicsInputSetOption(inp: "helics_input", option: "int", value: "helics_bool") -> "void":
+def helicsInputSetOption(inp: "helics_input", option: "int", value: "int") -> "void":
     r"""
-    Set the data in the info field for an input.
+    Set an option on an input
 
     :type inp: void
     :param inp: The input to query.
@@ -2788,9 +2913,9 @@ def helicsInputSetOption(inp: "helics_input", option: "int", value: "helics_bool
     """
     return _helics.helicsInputSetOption(inp, option, value)
 
-def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "helics_bool":
+def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "int":
     r"""
-    Get the data in the info field of a publication.
+    Get the value of an option for a publication
 
     :type pub: void
     :param pub: The publication to query.
@@ -2802,9 +2927,9 @@ def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "hel
     """
     return _helics.helicsPublicationGetOption(pub, option)
 
-def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "helics_bool") -> "void":
+def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "int") -> "void":
     r"""
-    Set the data in the info field for a publication.
+    Set the value of an option for a publication
 
     :type pub: void
     :param pub: The publication to query.
@@ -3127,6 +3252,21 @@ def helicsEndpointGetMessageObject(endpoint: "helics_endpoint") -> "helics_messa
     """
     return _helics.helicsEndpointGetMessageObject(endpoint)
 
+def helicsEndpointCreateMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
+    r"""
+    Create a new empty message object.
+
+    The message is empty and isValid will return false since there is no data associated with the message yet.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object to associate the message with.
+
+
+    :rtype: void
+    :return: A new helics_message_object.
+    """
+    return _helics.helicsEndpointCreateMessageObject(endpoint)
+
 def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
     r"""
     Receive a communication message for any endpoint in the federate.
@@ -3161,6 +3301,10 @@ def helicsFederateCreateMessageObject(fed: "helics_federate") -> "helics_message
     Create a new empty message object.
 
     The message is empty and isValid will return false since there is no data associated with the message yet.
+
+    :type fed: void
+    :param fed: the federate object to associate the message with
+
 
     :rtype: void
     :return: A helics_message_object containing the message data.
@@ -3250,7 +3394,7 @@ def helicsEndpointSetInfo(end: "helics_endpoint", info: "char const *") -> "void
     """
     return _helics.helicsEndpointSetInfo(end, info)
 
-def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "helics_bool") -> "void":
+def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "int") -> "void":
     r"""
     Set a handle option on an endpoint.
 
@@ -3263,7 +3407,7 @@ def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "helic
     """
     return _helics.helicsEndpointSetOption(end, option, value)
 
-def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "helics_bool":
+def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "int":
     r"""
     Set a handle option on an endpoint.
 
@@ -3271,6 +3415,8 @@ def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "helics_bo
     :param end: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
+    :rtype: int
+    :return: the value of the option, for boolean options will be 0 or 1
     """
     return _helics.helicsEndpointGetOption(end, option)
 
@@ -3561,6 +3707,24 @@ def helicsMessageCopy(source_message: "helics_message_object", dest_message: "he
     """
     return _helics.helicsMessageCopy(source_message, dest_message)
 
+def helicsMessageClone(message: "helics_message_object") -> "helics_message_object":
+    r"""
+    Clone a message object.
+
+    :type message: void
+    :param message: The message object to copy from.
+    """
+    return _helics.helicsMessageClone(message)
+
+def helicsMessageFree(message: "helics_message_object") -> "void":
+    r"""
+    Free a message object from memory
+    memory for message is managed so not using this function does not create memory leaks, this is an indication
+    to the system that the memory for this message is done being used and can be reused for a new message.
+    helicsFederateClearMessages() can also be used to clear up all stored messages at once
+    """
+    return _helics.helicsMessageFree(message)
+
 def helicsFederateRegisterFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""
     Create a source Filter on the specified federate.
@@ -3698,7 +3862,8 @@ def helicsFederateGetFilter(fed: "helics_federate", name: "char const *") -> "he
 
 
     :rtype: void
-    :return: A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
+    :return: A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name
+        exists.
     """
     return _helics.helicsFederateGetFilter(fed, name)
 
@@ -3850,7 +4015,7 @@ def helicsFilterSetInfo(filt: "helics_filter", info: "char const *") -> "void":
     """
     return _helics.helicsFilterSetInfo(filt, info)
 
-def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "helics_bool") -> "void":
+def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "int") -> "void":
     r"""
     Set the data in the info field for a filter.
 
@@ -3859,11 +4024,11 @@ def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "helics_b
     :type option: int
     :param option: The option to set /ref helics_handle_options.
     :type value: int
-    :param value: The value of the option (helics_true or helics_false).
+    :param value: The value of the option commonly 0 for false 1 for true.
     """
     return _helics.helicsFilterSetOption(filt, option, value)
 
-def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "helics_bool":
+def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "int":
     r"""
     Get a handle option for the filter.
 

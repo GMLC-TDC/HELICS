@@ -1,26 +1,26 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ZmqCommsCommon.h"
 
 #include "../NetworkBrokerData.hpp"
+#include "cppzmq/zmq.hpp"
 
 #include <string>
 #include <thread>
 
 namespace helics {
-namespace hzmq {
+namespace zeromq {
     using std::chrono::milliseconds;
     /** bind a zmq socket, with a timeout and timeout period*/
-    bool bindzmqSocket(
-        zmq::socket_t& socket,
-        const std::string& address,
-        int port,
-        milliseconds timeout,
-        milliseconds period)
+    bool bindzmqSocket(zmq::socket_t& socket,
+                       const std::string& address,
+                       int port,
+                       milliseconds timeout,
+                       milliseconds period)
     {
         bool bindsuccess = false;
         milliseconds tcount{0};
@@ -50,5 +50,5 @@ namespace hzmq {
             std::to_string(std::get<1>(vers)) + '.' + std::to_string(std::get<2>(vers));
     }
 
-} // namespace hzmq
-} // namespace helics
+}  // namespace zeromq
+}  // namespace helics

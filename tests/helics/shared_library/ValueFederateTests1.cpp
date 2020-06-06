@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ctestFixtures.hpp"
 #include "test_configuration.h"
@@ -21,11 +21,10 @@ BOOST_FIXTURE_TEST_SUITE(value_federate_tests, FederateTestFixture)
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE(
-    value_federate_initialize_tests,
-    bdata::make(core_types_single),
-    core_type,
-    *utf::label("ci"))
+BOOST_DATA_TEST_CASE(value_federate_initialize_tests,
+                     bdata::make(core_types_single),
+                     core_type,
+                     *utf::label("ci"))
 {
     SetupTest(helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt(0);
@@ -42,11 +41,10 @@ BOOST_DATA_TEST_CASE(
     BOOST_CHECK(state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE(
-    value_federate_publication_registration,
-    bdata::make(core_types_single),
-    core_type,
-    *utf::label("ci"))
+BOOST_DATA_TEST_CASE(value_federate_publication_registration,
+                     bdata::make(core_types_single),
+                     core_type,
+                     *utf::label("ci"))
 {
     SetupTest(helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt(0);
@@ -86,11 +84,10 @@ BOOST_DATA_TEST_CASE(
     BOOST_CHECK(state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE(
-    value_federate_publisher_registration,
-    bdata::make(core_types_single),
-    core_type,
-    *utf::label("ci"))
+BOOST_DATA_TEST_CASE(value_federate_publisher_registration,
+                     bdata::make(core_types_single),
+                     core_type,
+                     *utf::label("ci"))
 {
     SetupTest(helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt(0);
@@ -129,11 +126,10 @@ BOOST_DATA_TEST_CASE(
     BOOST_CHECK(state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE(
-    value_federate_subscription_registration,
-    bdata::make(core_types_single),
-    core_type,
-    *utf::label("ci"))
+BOOST_DATA_TEST_CASE(value_federate_subscription_registration,
+                     bdata::make(core_types_single),
+                     core_type,
+                     *utf::label("ci"))
 {
     SetupTest(helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt(0);
@@ -178,11 +174,10 @@ BOOST_DATA_TEST_CASE(
     helicsCleanupHelicsLibrary();
 }
 
-BOOST_DATA_TEST_CASE(
-    value_federate_subscription_and_publication_registration,
-    bdata::make(core_types_single),
-    core_type,
-    *utf::label("ci"))
+BOOST_DATA_TEST_CASE(value_federate_subscription_and_publication_registration,
+                     bdata::make(core_types_single),
+                     core_type,
+                     *utf::label("ci"))
 {
     SetupTest(helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt(0);

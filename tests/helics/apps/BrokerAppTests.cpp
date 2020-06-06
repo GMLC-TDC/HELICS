@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
@@ -168,14 +168,15 @@ TEST(BrokerAppTests, constructor11)
 
 TEST(BrokerAppTests, constructor12)
 {
-    EXPECT_THROW(
-        helics::BrokerApp(helics::core_type::NULLCORE, "brk12", std::vector<std::string>{}),
-        helics::HelicsException);
+    EXPECT_THROW(helics::BrokerApp(helics::core_type::NULLCORE,
+                                   "brk12",
+                                   std::vector<std::string>{}),
+                 helics::HelicsException);
 #ifdef ENABLE_ZMQ_CORE
-    EXPECT_THROW(
-        helics::BrokerApp(
-            helics::core_type::ZMQ, "brk12", std::vector<std::string>{"10.7.5.5", "--interface"}),
-        helics::ConnectionFailure);
+    EXPECT_THROW(helics::BrokerApp(helics::core_type::ZMQ,
+                                   "brk12",
+                                   std::vector<std::string>{"10.7.5.5", "--interface"}),
+                 helics::ConnectionFailure);
 #endif
 }
 

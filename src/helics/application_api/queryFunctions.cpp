@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "queryFunctions.hpp"
@@ -21,8 +21,8 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
     }
     if (queryres.front() == '[') {
         std::vector<std::string> strs = gmlc::utilities::stringOps::splitline(queryres, ';');
-        strs.front() = strs.front().substr(1); // get rid of the leading '['
-        strs.back().pop_back(); // get rid of the trailing ']';
+        strs.front() = strs.front().substr(1);  // get rid of the leading '['
+        strs.back().pop_back();  // get rid of the trailing ']';
         return strs;
     }
     std::vector<std::string> res;
@@ -37,8 +37,8 @@ std::vector<std::string> vectorizeQueryResult(const std::string& queryres)
     }
     if (queryres.front() == '[') {
         std::vector<std::string> strs = gmlc::utilities::stringOps::splitline(queryres, ';');
-        strs.front() = strs.front().substr(1); // get rid of the leading '['
-        strs.back().pop_back(); // get rid of the trailing ']';
+        strs.front() = strs.front().substr(1);  // get rid of the leading '['
+        strs.back().pop_back();  // get rid of the trailing ']';
         return strs;
     }
     std::vector<std::string> res;
@@ -87,10 +87,9 @@ std::vector<std::string> vectorizeAndSortQueryResult(std::string&& queryres)
     return vec;
 }
 
-bool waitForInit(
-    helics::Federate* fed,
-    const std::string& fedName,
-    std::chrono::milliseconds timeout)
+bool waitForInit(helics::Federate* fed,
+                 const std::string& fedName,
+                 std::chrono::milliseconds timeout)
 {
     auto res = fed->query(fedName, "isinit");
     std::chrono::milliseconds waitTime{0};
@@ -109,10 +108,9 @@ bool waitForInit(
     return true;
 }
 
-bool waitForFed(
-    helics::Federate* fed,
-    const std::string& fedName,
-    std::chrono::milliseconds timeout)
+bool waitForFed(helics::Federate* fed,
+                const std::string& fedName,
+                std::chrono::milliseconds timeout)
 {
     auto res = fed->query(fedName, "exists");
     std::chrono::milliseconds waitTime{0};
@@ -137,4 +135,4 @@ std::string queryFederateSubscriptions(helics::Federate* fed, const std::string&
     return res;
 }
 
-} // namespace helics
+}  // namespace helics

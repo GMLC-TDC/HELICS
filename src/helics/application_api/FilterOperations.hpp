@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -71,13 +71,14 @@ class randomDelayGenerator;
 /** filter for generating a random delay time for a message*/
 class RandomDelayFilterOperation: public FilterOperations {
   private:
-    std::shared_ptr<MessageTimeOperator> td; //!< pointer to the time operator
-    std::unique_ptr<randomDelayGenerator> rdelayGen; //!< pointer to the random number generator
+    std::shared_ptr<MessageTimeOperator> td;  //!< pointer to the time operator
+    std::unique_ptr<randomDelayGenerator> rdelayGen;  //!< pointer to the random number generator
 
   public:
     /** default constructor*/
     RandomDelayFilterOperation();
-    // the destructor is defined mainly to prevent the need to define the randomDelayGenerator object here
+    // the destructor is defined mainly to prevent the need to define the randomDelayGenerator
+    // object here
     /** destructor*/
     ~RandomDelayFilterOperation();
     virtual void set(const std::string& property, double val) override;
@@ -102,10 +103,10 @@ class RandomDropFilterOperation: public FilterOperations {
 /** filter for rerouting a packet to a particular endpoint*/
 class RerouteFilterOperation: public FilterOperations {
   private:
-    std::shared_ptr<MessageDestOperator> op; //!< the actual operator
-    atomic_guarded<std::string> newDest; //!< the target destination
+    std::shared_ptr<MessageDestOperator> op;  //!< the actual operator
+    atomic_guarded<std::string> newDest;  //!< the target destination
     shared_guarded<std::set<std::string>>
-        conditions; //!< the conditions on which the rerouting will occur
+        conditions;  //!< the conditions on which the rerouting will occur
 
   public:
     RerouteFilterOperation();
@@ -122,11 +123,11 @@ class RerouteFilterOperation: public FilterOperations {
 /** filter for rerouting a packet to a particular endpoint*/
 class FirewallFilterOperation: public FilterOperations {
   private:
-    std::shared_ptr<FirewallOperator> op; //!< the actual operator
+    std::shared_ptr<FirewallOperator> op;  //!< the actual operator
     gmlc::libguarded::cow_guarded<std::vector<std::string>>
-        allowed; //!< the conditions on which the rerouting will occur
+        allowed;  //!< the conditions on which the rerouting will occur
     gmlc::libguarded::cow_guarded<std::vector<std::string>>
-        blocked; //!< the conditions that block a message
+        blocked;  //!< the conditions that block a message
   public:
     FirewallFilterOperation();
     ~FirewallFilterOperation();
@@ -142,9 +143,9 @@ class FirewallFilterOperation: public FilterOperations {
 /** filter for rerouting a packet to a particular endpoint*/
 class CloneFilterOperation: public FilterOperations {
   private:
-    std::shared_ptr<CloneOperator> op; //!< the actual operator
+    std::shared_ptr<CloneOperator> op;  //!< the actual operator
     shared_guarded<std::vector<std::string>>
-        deliveryAddresses; //!< the endpoints to deliver the cloned data to
+        deliveryAddresses;  //!< the endpoints to deliver the cloned data to
 
   public:
     explicit CloneFilterOperation();
@@ -160,4 +161,4 @@ class CloneFilterOperation: public FilterOperations {
     std::vector<std::unique_ptr<Message>> sendMessage(const Message* mess) const;
 };
 
-} // namespace helics
+}  // namespace helics

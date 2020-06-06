@@ -1,6 +1,6 @@
---- 
+---
 AccessModifierOffset: '-2'
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'false'
 AlignConsecutiveDeclarations: 'false'
 #AlignConsecutiveMacros: 'true'
@@ -58,7 +58,7 @@ PenaltyBreakString: '1000'
 PenaltyExcessCharacter: '1000000'
 PenaltyReturnTypeOnItsOwnLine: '40'
 PointerAlignment: Left
-ReflowComments: 'false'
+ReflowComments: 'true'
 SortIncludes: 'true'
 SortUsingDeclarations: 'true'
 SpaceAfterCStyleCast: 'false'
@@ -71,7 +71,7 @@ SpaceBeforeInheritanceColon: 'false'
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: 'true'
 SpaceInEmptyParentheses: 'false'
-SpacesBeforeTrailingComments: '1'
+SpacesBeforeTrailingComments: '2'
 SpacesInAngles: 'false'
 SpacesInCStyleCastParentheses: 'false'
 SpacesInContainerLiterals: 'false'

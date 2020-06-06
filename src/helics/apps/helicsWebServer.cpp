@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -35,6 +35,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <boost/beast/websocket.hpp>
 #include <boost/config.hpp>
 #include <boost/container/flat_map.hpp>
+#include <boost/uuid/uuid.hpp>  // uuid class
+#include <boost/uuid/uuid_generators.hpp>  // generators
+#include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
 #include <cstdlib>
 #include <fstream>
 #include <functional>
@@ -47,11 +50,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace beast = boost::beast; // from <boost/beast.hpp>
-namespace http = beast::http; // from <boost/beast/http.hpp>
-namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
-namespace net = boost::asio; // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast;  // from <boost/beast.hpp>
+namespace http = beast::http;  // from <boost/beast/http.hpp>
+namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
+namespace net = boost::asio;  // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 namespace helics {
 namespace apps {
@@ -59,15 +62,15 @@ namespace apps {
       public:
         net::io_context ioc{1};
     };
-} // namespace apps
-} //namespace helics
+}  // namespace apps
+}  // namespace helics
 
 static std::string loadFile(const std::string& fileName)
 {
     std::ifstream t(fileName);
     return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
-//decode a URI to clean up a string, convert character codes in a URI to the original character
+// decode a URI to clean up a string, convert character codes in a URI to the original character
 static std::string uriDecode(beast::string_view str)
 {
     std::string ret;
@@ -153,11 +156,10 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
     return results;
 }
 
-void partitionTarget(
-    beast::string_view target,
-    std::string& brokerName,
-    std::string& query,
-    std::string& targetObj)
+void partitionTarget(beast::string_view target,
+                     std::string& brokerName,
+                     std::string& query,
+                     std::string& targetObj)
 {
     if (target.back() == '/') {
         target.remove_suffix(1);
@@ -208,18 +210,18 @@ enum class return_val : std::int32_t {
 
 enum class cmd { query, create, remove, unknown };
 
-std::pair<return_val, std::string> generateResults(
-    cmd command,
-    std::string brokerName,
-    beast::string_view target,
-    beast::string_view query,
-    const boost::container::flat_map<std::string, std::string>& fields)
+std::pair<return_val, std::string>
+    generateResults(cmd command,
+                    std::string brokerName,
+                    beast::string_view target,
+                    beast::string_view query,
+                    const boost::container::flat_map<std::string, std::string>& fields)
 {
     static const std::string emptyString;
     if (command == cmd::unknown) {
         if (fields.find("command") != fields.end()) {
             auto cmdstr = fields.at("command");
-            if (cmdstr == "query" || cmdstr == "search") {
+            if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
                 command = cmd::query;
             }
             if (cmdstr == "create") {
@@ -255,6 +257,10 @@ std::pair<return_val, std::string> generateResults(
     if (brokerName.empty()) {
         if (fields.find("broker") != fields.end()) {
             brokerName = fields.at("broker");
+        } else if (fields.find("broker_uuid") != fields.end()) {
+            brokerName = fields.at("broker_uuid");
+        } else if (fields.find("uuid") != fields.end()) {
+            brokerName = fields.at("uuid");
         }
     }
     if (brokerName.empty() && target == "brokers") {
@@ -276,19 +282,40 @@ std::pair<return_val, std::string> generateResults(
         }
         if (fields.find("type") != fields.end()) {
             type = fields.at("type");
+        } else if (fields.find("core_type") != fields.end()) {
+            type = fields.at("core_type");
         }
         helics::core_type ctype{helics::core_type::DEFAULT};
         if (!type.empty()) {
             ctype = helics::core::coreTypeFromString(type);
             if (!helics::core::isCoreTypeAvailable(ctype)) {
-                //return send(bad_request(type + " is not available"));
+                // return send(bad_request(type + " is not available"));
                 return {return_val::bad_request, type + " is not available"};
             }
+        }
+        if (fields.find("num_feds") != fields.end()) {
+            start_args += " -f " + fields.at("num_feds");
+        }
+        if (fields.find("num_brokers") != fields.end()) {
+            start_args += " --minbrokers=" + fields.at("num_brokers");
+        }
+        bool useUuid{false};
+        if (brokerName.empty()) {
+            boost::uuids::random_generator generator;
+
+            boost::uuids::uuid uuid1 = generator();
+            std::ostringstream ss1;
+            ss1 << uuid1;
+            brokerName = ss1.str();
+            useUuid = true;
         }
         brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
         if (!brkr) {
             return {return_val::bad_request, "unable to create broker"};
-            //return send(bad_request("unable to create broker"));
+            // return send(bad_request("unable to create broker"));
+        }
+        if (useUuid) {
+            return {return_val::ok, std::string(R"({"broker_uuid":")") + brokerName + "\"}"};
         }
         return {return_val::ok, emptyString};
     }
@@ -364,9 +391,8 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         // on the I/O objects in this session. Although not strictly necessary
         // for single-threaded contexts, this example code is written to be
         // thread-safe by default.
-        net::dispatch(
-            ws.get_executor(),
-            beast::bind_front_handler(&WebSocketsession::on_run, shared_from_this()));
+        net::dispatch(ws.get_executor(),
+                      beast::bind_front_handler(&WebSocketsession::on_run, shared_from_this()));
     }
 
     // Start the asynchronous operation
@@ -397,8 +423,8 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     void do_read()
     {
         // Read a message into our buffer
-        ws.async_read(
-            buffer, beast::bind_front_handler(&WebSocketsession::on_read, shared_from_this()));
+        ws.async_read(buffer,
+                      beast::bind_front_handler(&WebSocketsession::on_read, shared_from_this()));
     }
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -427,10 +453,10 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 
         ws.text(true);
         if (res.first == return_val::ok && !res.second.empty() && res.second.front() == '{') {
-            boost::beast::ostream(buffer) << res.second; //NOLINT
-            ws.async_write(
-                buffer.data(),
-                beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
+            boost::beast::ostream(buffer) << res.second;  // NOLINT
+            ws.async_write(buffer.data(),
+                           beast::bind_front_handler(&WebSocketsession::on_write,
+                                                     shared_from_this()));
             return;
         }
         Json::Value response;
@@ -453,10 +479,9 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer) << generateJsonString(response); //NOLINT
-        ws.async_write(
-            buffer.data(),
-            beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
+        boost::beast::ostream(buffer) << generateJsonString(response);  // NOLINT
+        ws.async_write(buffer.data(),
+                       beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
     }
 
     void on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -636,11 +661,11 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
             self_ref.res = sp;
 
             // Write the response
-            http::async_write(
-                self_ref.stream,
-                *sp,
-                beast::bind_front_handler(
-                    &HttpSession::on_write, self_ref.shared_from_this(), sp->need_eof()));
+            http::async_write(self_ref.stream,
+                              *sp,
+                              beast::bind_front_handler(&HttpSession::on_write,
+                                                        self_ref.shared_from_this(),
+                                                        sp->need_eof()));
         }
     };
 
@@ -667,11 +692,10 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         stream.expires_after(std::chrono::seconds(30));
 
         // Read a request
-        http::async_read(
-            stream,
-            buffer,
-            req,
-            beast::bind_front_handler(&HttpSession::on_read, shared_from_this()));
+        http::async_read(stream,
+                         buffer,
+                         req,
+                         beast::bind_front_handler(&HttpSession::on_read, shared_from_this()));
     }
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -775,9 +799,8 @@ class Listener: public std::enable_shared_from_this<Listener> {
     void do_accept()
     {
         // The new connection gets its own strand
-        acceptor.async_accept(
-            net::make_strand(ioc),
-            beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
+        acceptor.async_accept(net::make_strand(ioc),
+                              beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
     }
 
     void on_accept(beast::error_code ec, tcp::socket socket)
@@ -846,8 +869,9 @@ namespace apps {
             }
             auto const address = net::ip::make_address(httpAddress_);
             // Create and launch a listening port
-            std::make_shared<Listener>(
-                context->ioc, tcp::endpoint{address, static_cast<std::uint16_t>(httpPort_)})
+            std::make_shared<Listener>(context->ioc,
+                                       tcp::endpoint{address,
+                                                     static_cast<std::uint16_t>(httpPort_)})
                 ->run();
         }
 
@@ -859,10 +883,10 @@ namespace apps {
             }
             auto const address = net::ip::make_address(websocketAddress_);
             // Create and launch a listening port
-            std::make_shared<Listener>(
-                context->ioc,
-                tcp::endpoint{address, static_cast<std::uint16_t>(websocketPort_)},
-                true)
+            std::make_shared<Listener>(context->ioc,
+                                       tcp::endpoint{address,
+                                                     static_cast<std::uint16_t>(websocketPort_)},
+                                       true)
                 ->run();
         }
         executing.store(true);
@@ -873,5 +897,5 @@ namespace apps {
         executing.store(false);
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

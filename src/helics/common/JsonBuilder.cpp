@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -112,6 +112,25 @@ void JsonBuilder::addElement(const std::string& path, double value)
     (*jv)[res.back()] = value;
 }
 
+void JsonBuilder::addElement(const std::string& path, const std::vector<double>& value)
+{
+    stringVector res = gmlc::utilities::stringOps::splitline(
+        path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
+    auto jv = &getJValue();
+    size_t ii = 0;
+    for (ii = 0; ii < res.size() - 1; ++ii) {
+        auto& sub = (*jv)[res[ii]];
+        if (sub.isNull()) {
+            (*jv)[res[ii]] = Json::Value();
+        }
+        jv = &(*jv)[res[ii]];
+    }
+    (*jv)[res.back()] = Json::arrayValue;
+    for (auto& v : value) {
+        (*jv)[res.back()].append(v);
+    }
+}
+
 Json::Value& JsonBuilder::getJValue()
 {
     if (!jMap) {
@@ -132,4 +151,4 @@ void JsonBuilder::reset()
 {
     jMap = nullptr;
 }
-} // namespace helics
+}  // namespace helics

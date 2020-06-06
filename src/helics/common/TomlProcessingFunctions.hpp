@@ -1,14 +1,14 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 /** @file
-@details functions related to loading and evaluating TOML files and helper functions for reading them
-using the toml library
+@details functions related to loading and evaluating TOML files and helper functions for reading
+them using the toml library
 */
 
 #include "../core/helics-time.hpp"
@@ -38,8 +38,8 @@ toml::value loadTomlStr(const std::string& tomlString);
 std::string tomlAsString(const toml::value& element);
 
 /** read a time from a TOML value element*/
-helics::Time
-    loadTomlTime(const toml::value& timeElement, time_units defaultUnits = time_units::sec);
+helics::Time loadTomlTime(const toml::value& timeElement,
+                          time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
 std::string getKey(const toml::value& element);
@@ -69,10 +69,9 @@ inline int64_t getOrDefault(const toml::value& element, const std::string& key, 
 }
 
 /** call a function if a member element exists and pass the string to the invoked object*/
-inline bool callIfMember(
-    const toml::value& element,
-    const std::string& key,
-    const std::function<void(const std::string&)>& call)
+inline bool callIfMember(const toml::value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&)>& call)
 {
     const std::string empty;
     auto& val = toml::find_or<std::string>(element, key, empty);
@@ -84,10 +83,9 @@ inline bool callIfMember(
 }
 
 /** call a function if a member element exists and pass a time to the invoked object*/
-inline bool callIfMember(
-    const toml::value& element,
-    const std::string& key,
-    const std::function<void(const std::string&, helics::Time)>& call)
+inline bool callIfMember(const toml::value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&, helics::Time)>& call)
 {
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
@@ -101,10 +99,9 @@ inline bool callIfMember(
 
 /** call a function if a member element exists and pass a specific type to the invoked object*/
 template<class X>
-inline bool callIfMember(
-    const toml::value& element,
-    const std::string& key,
-    const std::function<void(const std::string&, X)>& call)
+inline bool callIfMember(const toml::value& element,
+                         const std::string& key,
+                         const std::function<void(const std::string&, X)>& call)
 {
     toml::value uval;
     auto val = toml::find_or(element, key, uval);

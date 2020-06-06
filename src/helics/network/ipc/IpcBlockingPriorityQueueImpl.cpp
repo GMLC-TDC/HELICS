@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
@@ -29,23 +29,22 @@ namespace ipc {
         /** reverse the order in which the data will be extracted*/
         void dataBlock::reverse() {}
 
-        using namespace boost::interprocess; //NOLINT
+        using namespace boost::interprocess;  // NOLINT
 
         /** default constructor*/
-        IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(
-            void* dataBlock,
-            size_t blockSize)
+        IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(void* dataBlock,
+                                                                   size_t blockSize)
         {
         }
 
         /** clear the queue*/
         void IpcBlockingPriorityQueueImpl::clear()
         {
-            scoped_lock<interprocess_mutex> pullLock(m_pullLock); // first pullLock
-            scoped_lock<interprocess_mutex> pushLock(m_pushLock); // second pushLock
+            scoped_lock<interprocess_mutex> pullLock(m_pullLock);  // first pullLock
+            scoped_lock<interprocess_mutex> pushLock(m_pushLock);  // second pushLock
             pullData.clear();
             pushData.clear();
-            //TODO(PT): add the priority block
+            // TODO(PT): add the priority block
             queueEmptyFlag = true;
         }
 
@@ -53,11 +52,10 @@ namespace ipc {
 val the value to push on the queue
 */
 
-        void IpcBlockingPriorityQueueImpl::push(
-            const unsigned char* data,
-            size_t size) // forwarding reference
+        void IpcBlockingPriorityQueueImpl::push(const unsigned char* data,
+                                                size_t size)  // forwarding reference
         {
-            scoped_lock<interprocess_mutex> pushLock(m_pushLock); // only one lock on this branch
+            scoped_lock<interprocess_mutex> pushLock(m_pushLock);  // only one lock on this branch
             if (!pushData.empty()) {
                 pushData.push(data, size);
             } else {
@@ -67,11 +65,11 @@ val the value to push on the queue
                     conditionLock.unlock();
                     // release the push lock so we don't get a potential deadlock condition
                     pushLock.unlock();
-                    //all locks released
-                    //no lock the pulllock
+                    // all locks released
+                    // no lock the pulllock
                     scoped_lock<interprocess_mutex> pullLock(m_pullLock);
                     conditionLock.lock();
-                    queueEmptyFlag = false; //reset the queueEmptyflag
+                    queueEmptyFlag = false;  // reset the queueEmptyflag
                     conditionLock.unlock();
                     if (pullData.empty()) {
                         pullData.push(data, size);
@@ -91,13 +89,13 @@ val the value to push on the queue
 val the value to push on the queue
 */
         template<class Z>
-        void pushPriority(Z&& val) // forwarding reference
+        void pushPriority(Z&& val)  // forwarding reference
         {
             bool expEmpty = true;
             if (queueEmptyFlag.compare_exchange_strong(expEmpty, false)) {
-                std::unique_lock<std::mutex> pullLock(m_pullLock); // first pullLock
+                std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
                 queueEmptyFlag =
-                    false; // need to set the flag again just in case after we get the lock
+                    false;  // need to set the flag again just in case after we get the lock
                 priorityQueue.push(std::forward<Z>(val));
                 // pullLock.unlock ();
                 condition.notify_all();
@@ -115,7 +113,7 @@ val the value to push on the queue
         template<class... Args>
         void emplace(Args&&... args)
         {
-            std::unique_lock<std::mutex> pushLock(m_pushLock); // only one lock on this branch
+            std::unique_lock<std::mutex> pushLock(m_pushLock);  // only one lock on this branch
             if (!pushElements.empty()) {
                 pushElements.emplace_back(std::forward<Args>(args)...);
             } else {
@@ -123,8 +121,8 @@ val the value to push on the queue
                 if (queueEmptyFlag.compare_exchange_strong(expEmpty, false)) {
                     // release the push lock so we don't get a potential deadlock condition
                     pushLock.unlock();
-                    std::unique_lock<std::mutex> pullLock(m_pullLock); // first pullLock
-                    queueEmptyFlag = false; // need to set the flag again after we get the lock
+                    std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
+                    queueEmptyFlag = false;  // need to set the flag again after we get the lock
                     if (pullElements.empty()) {
                         pullElements.emplace_back(std::forward<Args>(args)...);
                         //  pullLock.unlock ();
@@ -151,9 +149,9 @@ val the value to push on the queue
         {
             bool expEmpty = true;
             if (queueEmptyFlag.compare_exchange_strong(expEmpty, false)) {
-                std::unique_lock<std::mutex> pullLock(m_pullLock); // first pullLock
+                std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
                 queueEmptyFlag =
-                    false; // need to set the flag again just in case after we get the lock
+                    false;  // need to set the flag again just in case after we get the lock
                 priorityQueue.emplace(std::forward<Args>(args)...);
                 // pullLock.unlock ();
                 condition.notify_all();
@@ -197,25 +195,25 @@ element in the queue
             T actval;
             auto val = try_pop();
             while (!val) {
-                std::unique_lock<std::mutex> pullLock(m_pullLock); // get the lock then wait
+                std::unique_lock<std::mutex> pullLock(m_pullLock);  // get the lock then wait
                 if (!priorityQueue.empty()) {
                     actval = std::move(priorityQueue.front());
                     priorityQueue.pop();
                     return actval;
                 }
-                if (!pullElements.empty()) // make sure we are actually empty;
+                if (!pullElements.empty())  // make sure we are actually empty;
                 {
                     actval = std::move(pullElements.back());
                     pullElements.pop_back();
                     return actval;
                 }
-                condition.wait(pullLock); // now wait
+                condition.wait(pullLock);  // now wait
                 if (!priorityQueue.empty()) {
                     actval = std::move(priorityQueue.front());
                     priorityQueue.pop();
                     return actval;
                 }
-                if (!pullElements.empty()) // check for spurious wake-ups
+                if (!pullElements.empty())  // check for spurious wake-ups
                 {
                     actval = std::move(pullElements.back());
                     pullElements.pop_back();
@@ -234,26 +232,26 @@ element in the queue
         {
             auto val = try_pop();
             while (!val) {
-                std::unique_lock<std::mutex> pullLock(m_pullLock); // get the lock then wait
+                std::unique_lock<std::mutex> pullLock(m_pullLock);  // get the lock then wait
                 if (!priorityQueue.empty()) {
                     val = std::move(priorityQueue.front());
                     priorityQueue.pop();
                     break;
                 }
-                if (!pullElements.empty()) // make sure we are actually empty;
+                if (!pullElements.empty())  // make sure we are actually empty;
                 {
                     val = std::move(pullElements.back());
                     pullElements.pop_back();
                     break;
                 }
-                auto res = condition.wait_for(pullLock, timeout); // now wait
+                auto res = condition.wait_for(pullLock, timeout);  // now wait
 
                 if (!priorityQueue.empty()) {
                     val = std::move(priorityQueue.front());
                     priorityQueue.pop();
                     break;
                 }
-                if (!pullElements.empty()) // check for spurious wake-ups
+                if (!pullElements.empty())  // check for spurious wake-ups
                 {
                     val = std::move(pullElements.back());
                     pullElements.pop_back();
@@ -271,7 +269,8 @@ element in the queue
 
         /** blocking call that will call the specified functor
 if the queue is empty
-@param callOnWaitFunction an nullary functor that will be called if the initial query does not return a value
+@param callOnWaitFunction an nullary functor that will be called if the initial query does not
+return a value
 @details  after calling the function the call will check again and if still empty
 will block and wait.
 */
@@ -282,7 +281,7 @@ will block and wait.
             while (!val) {
                 // may be spurious so make sure actually have a value
                 callOnWaitFunction();
-                std::unique_lock<std::mutex> pullLock(m_pullLock); // first pullLock
+                std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
                 if (!priorityQueue.empty()) {
                     auto actval = std::move(priorityQueue.front());
                     priorityQueue.pop();
@@ -317,33 +316,34 @@ because this is meant for multi-threaded applications this may or may not have a
 depending on the number of consumers
 */
         bool empty() const;
-    }; // namespace detail
+    };  // namespace detail
 
     template<typename T>
     stx::optional<T> BlockingPriorityQueue<T>::try_pop()
     {
-        std::lock_guard<std::mutex> pullLock(m_pullLock); // first pullLock
+        std::lock_guard<std::mutex> pullLock(m_pullLock);  // first pullLock
         if (!priorityQueue.empty()) {
             stx::optional<T> val(std::move(priorityQueue.front()));
             priorityQueue.pop();
             return val;
         }
         if (pullElements.empty()) {
-            std::unique_lock<std::mutex> pushLock(m_pushLock); // second pushLock
-            if (!pushElements.empty()) { // on the off chance the queue got out of sync
+            std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
+            if (!pushElements.empty()) {  // on the off chance the queue got out of sync
                 std::swap(pushElements, pullElements);
-                pushLock
-                    .unlock(); // we can free the push function to accept more elements after the swap call;
+                pushLock.unlock();  // we can free the push function to accept more elements after
+                                    // the swap call;
                 std::reverse(pullElements.begin(), pullElements.end());
                 stx::optional<T> val(
-                    std::move(pullElements.back())); // do it this way to allow movable only types
+                    std::move(pullElements.back()));  // do it this way to allow movable only types
                 pullElements.pop_back();
                 if (pullElements.empty()) {
-                    pushLock.lock(); // second pushLock
-                    if (!pushElements.empty()) // more elements could have been added
-                    { // this is the potential for slow operations
+                    pushLock.lock();  // second pushLock
+                    if (!pushElements.empty())  // more elements could have been added
+                    {  // this is the potential for slow operations
                         std::swap(pushElements, pullElements);
-                        // we can free the push function to accept more elements after the swap call;
+                        // we can free the push function to accept more elements after the swap
+                        // call;
                         pushLock.unlock();
                         std::reverse(pullElements.begin(), pullElements.end());
                     } else {
@@ -353,14 +353,14 @@ depending on the number of consumers
                 return val;
             }
             queueEmptyFlag = true;
-            return {}; // return the empty optional
+            return {};  // return the empty optional
         }
         stx::optional<T> val(
-            std::move(pullElements.back())); // do it this way to allow movable only types
+            std::move(pullElements.back()));  // do it this way to allow movable only types
         pullElements.pop_back();
         if (pullElements.empty()) {
-            std::unique_lock<std::mutex> pushLock(m_pushLock); // second pushLock
-            if (!pushElements.empty()) { // this is the potential for slow operations
+            std::unique_lock<std::mutex> pushLock(m_pushLock);  // second pushLock
+            if (!pushElements.empty()) {  // this is the potential for slow operations
                 std::swap(pushElements, pullElements);
                 // we can free the push function to accept more elements after the swap call;
                 pushLock.unlock();
@@ -378,6 +378,6 @@ depending on the number of consumers
         return queueEmptyFlag;
     }
 
-} // namespace ipc
-} // namespace helics
-} // namespace helics
+}  // namespace ipc
+}  // namespace helics
+}  // namespace helics

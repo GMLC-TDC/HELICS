@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_CORE_HPP_
@@ -31,6 +31,9 @@ class Core {
     {
         core = helicsCreateCoreFromArgs(type.c_str(), name.c_str(), argc, argv, hThrowOnError());
     }
+    /** construct a core from a core pointer */
+    explicit Core(helics_core cr) HELICS_NOTHROW: core(cr) {}
+
     /** destructor*/
     ~Core() { helicsCoreFree(core); }
     /** implicit operator so the object can be used with the c api functions natively*/
@@ -86,7 +89,8 @@ class Core {
     const char* getAddress() const { return helicsCoreGetAddress(core); }
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
-    a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+    a few extra features of name matching to function on the federate interface but otherwise
+    equivalent behavior
     @param type the type of filter to create
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
@@ -97,8 +101,8 @@ class Core {
     }
 
     /** create a cloning Filter on the specified federate
-    @details cloning filters copy a message and send it to multiple locations source and destination can be added
-    through other functions
+    @details cloning filters copy a message and send it to multiple locations source and destination
+    can be added through other functions
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
@@ -117,9 +121,29 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** make a query of the core
+@details this call is blocking until the value is returned which may take some time depending
+on the size of the federation and the specific string being queried
+@param target  the target of the query can be "federation", "federate", "broker", "core", or a
+specific name of a federate, core, or broker
+@param queryStr a string with the query, see other documentation for specific properties to
+query, can be defined by the federate
+@return a string with the value requested.  this is either going to be a vector of strings value
+or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
+if the query was not valid
+*/
+    std::string query(const std::string& target, const std::string& queryStr) const
+    {
+        // returns helics_query
+        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        std::string result(helicsQueryCoreExecute(q, core, hThrowOnError()));
+        helicsQueryFree(q);
+        return result;
+    }
+
   protected:
-    helics_core core; //!< reference to the underlying core object
+    helics_core core;  //!< reference to the underlying core object
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

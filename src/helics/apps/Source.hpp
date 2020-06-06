@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -31,7 +31,8 @@ namespace apps {
         // source type
     };
 
-    /** parent class for a signal generator which generates values to feed into a helics federation*/
+    /** parent class for a signal generator which generates values to feed into a helics
+     * federation*/
     class HELICS_CXX_EXPORT SignalGenerator {
       protected:
         Time lastTime{timeZero};
@@ -51,10 +52,10 @@ namespace apps {
         void setTime(Time indexTime) { keyTime = indexTime; }
     };
 
-    /** class implementing a source federate, which is capable of generating signals of various kinds
-and sending signals at the appropriate times
-@details  the source class is NOT threadsafe,  don't try to use it from multiple threads without external
-protection, that will result in undefined behavior
+    /** class implementing a source federate, which is capable of generating signals of various
+kinds and sending signals at the appropriate times
+@details  the source class is NOT threadsafe,  don't try to use it from multiple threads without
+external protection, that will result in undefined behavior
 */
     class HELICS_CXX_EXPORT Source: public App {
       public:
@@ -116,12 +117,11 @@ protection, that will result in undefined behavior
     @param period the period of the publication
     @param units the units associated with the publication
     */
-        void addPublication(
-            const std::string& key,
-            const std::string& generator,
-            data_type type,
-            Time period,
-            const std::string& units = std::string());
+        void addPublication(const std::string& key,
+                            const std::string& generator,
+                            data_type type,
+                            Time period,
+                            const std::string& units = std::string());
 
         /** add a publication to a source
     @param key the key of the publication to add
@@ -129,11 +129,10 @@ protection, that will result in undefined behavior
     @param period the period of the publication
     @param units the units associated with the publication
     */
-        void addPublication(
-            const std::string& key,
-            data_type type,
-            Time period,
-            const std::string& units = std::string())
+        void addPublication(const std::string& key,
+                            data_type type,
+                            Time period,
+                            const std::string& units = std::string())
         {
             addPublication(key, std::string(), type, period, units);
         }
@@ -165,12 +164,12 @@ protection, that will result in undefined behavior
         Time runSourceLoop(Time currentTime);
 
       private:
-        std::vector<SourceObject> sources; //!< the actual publication objects
-        std::vector<std::shared_ptr<SignalGenerator>> generators; //!< the signal generators
-        std::map<std::string, int> generatorLookup; //!< map of generator names to indices
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        std::map<std::string, int> pubids; //!< publication id map
-        Time defaultPeriod = 1.0; //!< the default period of publication
+        std::vector<SourceObject> sources;  //!< the actual publication objects
+        std::vector<std::shared_ptr<SignalGenerator>> generators;  //!< the signal generators
+        std::map<std::string, int> generatorLookup;  //!< map of generator names to indices
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::map<std::string, int> pubids;  //!< publication id map
+        Time defaultPeriod = 1.0;  //!< the default period of publication
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

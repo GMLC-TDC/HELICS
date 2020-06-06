@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -81,8 +81,8 @@ namespace apps {
             clonedMessageCallback = std::move(callback);
         }
         /** set the callback for a message received through endpoints
-    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a
-    unique_ptr to the message
+    @details the function signature will take the time in the Tracer, the endpoint name as a string,
+    and a unique_ptr to the message
     */
         void setEndpointMessageCallback(
             std::function<void(Time, const std::string&, std::unique_ptr<Message>)> callback)
@@ -90,8 +90,8 @@ namespace apps {
             endpointMessageCallback = std::move(callback);
         }
         /** set the callback for a value published
-    @details the function signature will take the time in the Tracer, the publication key as a string, and the
-    value as a string
+    @details the function signature will take the time in the Tracer, the publication key as a
+    string, and the value as a string
     */
         void setValueCallback(
             std::function<void(Time, const std::string&, const std::string&)> callback)
@@ -123,17 +123,18 @@ namespace apps {
 
       protected:
         bool printMessage = false;
-        bool allow_iteration = false; //!< flag to allow iteration of the federate for time requests
-        bool skiplog = false; //!< skip the log function and print directly to cout
-        std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
+        bool allow_iteration =
+            false;  //!< flag to allow iteration of the federate for time requests
+        bool skiplog = false;  //!< skip the log function and print directly to cout
+        std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
-        std::vector<Input> subscriptions; //!< the actual subscription objects
-        std::map<std::string, int> subkeys; //!< translate subscription names to an index
+        std::vector<Input> subscriptions;  //!< the actual subscription objects
+        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
 
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        std::map<std::string, int> eptNames; //!< translate endpoint name to index
-        std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
-        std::vector<std::string> captureInterfaces; //!< storage for the interfaces to capture
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
+        std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
         std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
         std::function<void(Time, const std::string&, std::unique_ptr<Message>)>
@@ -141,5 +142,5 @@ namespace apps {
         std::function<void(Time, const std::string&, const std::string&)> valueCallback;
     };
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

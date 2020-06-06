@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/helics_definitions.hpp"
+#include "helics/helics_enums.h"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -19,6 +21,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+
+#include <fstream>
+#include <streambuf>
 
 /** these test cases test out the value federates
  */
@@ -68,18 +73,18 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     const auto& sub3name = subid3.getTarget();
     EXPECT_EQ(sub3name, "sub3");
 
-    EXPECT_TRUE(subid1.getType().empty()); // def is the default type
+    EXPECT_TRUE(subid1.getType().empty());  // def is the default type
     EXPECT_EQ(subid2.getType(), "int32");
     EXPECT_TRUE(subid3.getType().empty());
     EXPECT_EQ(subid3.getUnits(), "V");
 
     // check publications
 
-    auto pk = pubid.getKey();
-    auto pk2 = pubid2.getKey();
+    const auto& pk = pubid.getKey();
+    const auto& pk2 = pubid2.getKey();
     EXPECT_EQ(pk, "fed0/pub1");
     EXPECT_EQ(pk2, "pub2");
-    auto pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");
@@ -95,8 +100,10 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     ASSERT_TRUE(vFed1);
     // register the publications
-    helics::Publication pubid(
-        helics::GLOBAL, vFed1.get(), "pub1", helics::data_type::helics_string);
+    helics::Publication pubid(helics::GLOBAL,
+                              vFed1.get(),
+                              "pub1",
+                              helics::data_type::helics_string);
 
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(helics_property_time_delta, 1.0);
@@ -127,11 +134,10 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     vFed1->finalize();
 }
 
-static bool dual_transfer_test(
-    std::shared_ptr<helics::ValueFederate>& vFed1,
-    std::shared_ptr<helics::ValueFederate>& vFed2,
-    helics::Publication& pubid,
-    helics::Input& subid)
+static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
+                               std::shared_ptr<helics::ValueFederate>& vFed2,
+                               helics::Publication& pubid,
+                               helics::Input& subid)
 {
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed2->setProperty(helics_property_time_delta, 1.0);
@@ -290,6 +296,41 @@ TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
     EXPECT_TRUE(res);
 }
 
+#ifdef ENABLE_ZMQ_CORE
+static constexpr const char* config_files[] = {"bes_config.json",
+                                               "bes_config.toml",
+                                               "bes_config2.json",
+                                               "bes_config2.toml"};
+
+class valuefed_flagfile_tests:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {
+};
+
+TEST_P(valuefed_flagfile_tests, configure_test)
+{
+    std::ifstream t(std::string(TEST_DIR) + GetParam());
+
+    std::string config((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+
+    AddBroker("zmq", 1);
+    helics::ValueFederate V2("", config);
+    V2.enterExecutingMode();
+    auto val = V2.getIntegerProperty(helics::defs::log_level);
+    EXPECT_EQ(val, -1);
+    EXPECT_EQ(V2.getName(), "test_bes");
+    bool result = V2.getFlagOption(helics_flag_only_transmit_on_change);
+    EXPECT_TRUE(result);
+    result = V2.getFlagOption(helics_flag_wait_for_current_time_update);
+    EXPECT_TRUE(result);
+    V2.finalize();
+}
+
+INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+                         valuefed_flagfile_tests,
+                         ::testing::ValuesIn(config_files));
+#endif
+
 TEST_F(valuefed_tests, dual_transfer_coreApp_link)
 {
     SetupTest<helics::ValueFederate>("test", 2);
@@ -379,7 +420,7 @@ TEST_F(valuefed_tests, dual_transfer_broker_link_json_string)
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    broker->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    broker->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
 
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
@@ -497,10 +538,9 @@ TEST_P(valuefed_link_file, dual_transfer_core_link_file)
     EXPECT_TRUE(res);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_tests,
-    valuefed_link_file,
-    ::testing::ValuesIn(simple_connection_files));
+INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+                         valuefed_link_file,
+                         ::testing::ValuesIn(simple_connection_files));
 
 TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
 {
@@ -512,7 +552,7 @@ TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    core->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    core->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
     core = nullptr;
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
@@ -633,14 +673,15 @@ TEST_P(valuefed_single_type, all_callback)
     EXPECT_EQ(lastTime, 3.0);
 
     int ccnt = 0;
-    vFed1->setInputNotificationCallback([&](const helics::Input&, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback(
+        [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
     vFed1->publishRaw(pubid3, db);
     vFed1->publish(pubid2, 4);
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 2);
-    ccnt = 0; // reset the counter
+    ccnt = 0;  // reset the counter
     vFed1->publishRaw(pubid3, db);
     vFed1->publish(pubid2, 4);
     vFed1->publish(pubid1, "test string2");
@@ -850,8 +891,8 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
 
     EXPECT_EQ(s, "string2");
     vFed1->publish(pubid, "string3");
-    // so in theory the remove target could take a little while since it needs to route through the core on
-    // occasion
+    // so in theory the remove target could take a little while since it needs to route through the
+    // core on occasion
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(3.0); });
     gtime = vFed2->requestTime(3.0);
     EXPECT_EQ(gtime, 3.0);
@@ -882,7 +923,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
     vFed2->enterExecutingMode();
     f1finish.wait();
-    //both at executionMode
+    // both at executionMode
     // publish string1 at time=0.0;
     vFed1->publish(pubid, "string1");
     auto gtime = vFed1->requestTime(1.0);
@@ -895,7 +936,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     EXPECT_EQ(gtime, 3.0);
     vFed1->finalize();
 
-    //now start on vFed2
+    // now start on vFed2
     gtime = vFed2->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // get the value
@@ -920,8 +961,8 @@ TEST_F(valuefed_tests, rem_target_single_test)
 
     EXPECT_EQ(s, "string2");
 
-    // so in theory the remove target could take a little while since it needs to route through the core on
-    // occasion
+    // so in theory the remove target could take a little while since it needs to route through the
+    // core on occasion
     gtime = vFed2->requestTime(3.0);
     EXPECT_EQ(gtime, 3.0);
 
@@ -995,11 +1036,9 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
     vFed2->finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_key_tests,
-    valuefed_single_type,
-    ::testing::ValuesIn(core_types_single));
-INSTANTIATE_TEST_SUITE_P(
-    valuefed_key_tests,
-    valuefed_all_type_tests,
-    ::testing::ValuesIn(core_types_all));
+INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
+                         valuefed_single_type,
+                         ::testing::ValuesIn(core_types_single));
+INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
+                         valuefed_all_type_tests,
+                         ::testing::ValuesIn(core_types_all));

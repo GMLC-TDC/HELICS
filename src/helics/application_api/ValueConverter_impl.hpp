@@ -1,12 +1,13 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-/** the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
+/** the purpose of these objects are to convert a specific type into a data block for use in the
+ * core algorithms
  */
 
 #include "../core/core-data.hpp"
@@ -129,7 +130,7 @@ namespace detail {
         ostringbuf()
         {
             char* base = abuf_.data();
-            setp(base, base + bufsize - 1); // one less than the buffer size
+            setp(base, base + bufsize - 1);  // one less than the buffer size
         }
         /** reserve a size of the buffer*/
         void reserve(size_t size) { sbuf_.reserve(size); }
@@ -154,7 +155,7 @@ namespace detail {
         {
             if (ch != traits_type::eof()) {
                 *pptr() = static_cast<char>(ch);
-                pbump(1); // always safe due to buffer at 1 space reserved
+                pbump(1);  // always safe due to buffer at 1 space reserved
                 move_to_string_and_flush();
                 return ch;
             }
@@ -185,7 +186,7 @@ namespace detail {
     struct ostreambuf: public std::streambuf {
         ostreambuf(char* buf, size_t size) { this->setg(buf, buf, buf + size); }
     };
-} // namespace detail
+}  // namespace detail
 
 template<class X>
 void ValueConverter<X>::convert(const X& val, data_block& store)
@@ -205,7 +206,7 @@ void ValueConverter<X>::convert(const X* vals, size_t size, data_block& store)
 {
     detail::ostringbufstream s;
     archiver oa(s);
-    oa(cereal::make_size_tag(static_cast<cereal::size_type>(size))); // number of elements
+    oa(cereal::make_size_tag(static_cast<cereal::size_type>(size)));  // number of elements
     for (size_t ii = 0; ii < size; ++ii) {
         oa(vals[ii]);
     }
@@ -235,23 +236,21 @@ struct is_iterable {
 };
 
 template<typename T>
-struct is_iterable<
-    T,
-    typename std::enable_if_t<std::is_same<
-        decltype(
-            std::begin(T()) != std::end(T()), // begin/end and operator != and
-            // has default constructor
-            void(),
-            void(*std::begin(T())), // dereference operator
-            std::true_type{}),
-        std::true_type>::value>> {
+struct is_iterable<T,
+                   typename std::enable_if_t<std::is_same<
+                       decltype(std::begin(T()) != std::end(T()),  // begin/end and operator != and
+                                                                   // has default constructor
+                                void(),
+                                void(*std::begin(T())),  // dereference operator
+                                std::true_type{}),
+                       std::true_type>::value>> {
     static constexpr bool value = true;
 };
 
 /** for non iterable classes and not strings*/
 template<class X>
-constexpr std::
-    enable_if_t<!is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t>
+constexpr std::enable_if_t<!is_iterable<X>::value && !std::is_convertible<X, std::string>::value,
+                           size_t>
     getMinSize()
 {
     return sizeof(X) + 1;
@@ -259,8 +258,8 @@ constexpr std::
 
 /** for class that are iterable and not strings like vector*/
 template<class X>
-constexpr std::
-    enable_if_t<is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t>
+constexpr std::enable_if_t<is_iterable<X>::value && !std::is_convertible<X, std::string>::value,
+                           size_t>
     getMinSize()
 {
     return 9;
@@ -319,4 +318,4 @@ X ValueConverter<X>::interpret(const data_view& block)
     interpret(block, val);
     return val;
 }
-} // namespace helics
+}  // namespace helics

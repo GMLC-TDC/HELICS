@@ -10,7 +10,6 @@ google-*,
 -google-runtime-references,
 -google-build-using-namespace,
 -google-readability-avoid-underscore-in-googletest-name,
-llvm-namespace-comment,
 modernize*,
 -modernize-pass-by-value,
 -modernize-use-trailing-return-type,
@@ -34,7 +33,6 @@ google-*,
 -google-runtime-references,
 -google-build-using-namespace,
 -google-readability-avoid-underscore-in-googletest-name,
-llvm-namespace-comment,
 modernize*,
 -modernize-pass-by-value,
 -modernize-use-trailing-return-type,
@@ -54,4 +52,3 @@ HeaderFilterRegex: '*test.*cpp'
 CheckOptions:
 - key:             google-readability-braces-around-statements.ShortStatementLines
   value:           '3'
-

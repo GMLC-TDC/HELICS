@@ -1,11 +1,12 @@
 {
-	"subscriptions": [{
-			"key": "pub1",
-			"type": "double"
-		}, {
-			"key": "pub2",
-			"type": "double"
-		}
-	]
+  "subscriptions": [
+    {
+      "key": "pub1",
+      "type": "double"
+    },
+    {
+      "key": "pub2",
+      "type": "double"
+    }
+  ]
 }
-

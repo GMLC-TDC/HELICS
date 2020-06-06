@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -30,10 +30,10 @@ namespace tcp {
         virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
       private:
-        std::vector<std::string> connections; //!< defined connections
-        bool no_outgoing_connections = false; //!< disable outgoing connections if true;
+        std::vector<std::string> connections;  //!< defined connections
+        bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
         virtual bool brokerConnect() override;
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

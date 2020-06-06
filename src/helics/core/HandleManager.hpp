@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -22,36 +22,33 @@ class HandleManager {
     /** use deque here as there are several use cases which use two properties of a deque vs vector
     namely that references are not invalidated by emplace back, which is unlike a vector
     and that the memory growth is a stable and not subject to large copy operations
-    this allows much more stable growth to bigger sizes if need be since we don't need contiguous memory,
-    just iterators, so these properties outweigh the slight decrease in overall performance, otherwise we would
-    need two classes that do basically
-    the same thing just with different container types so using deque reduce the amount of the code to maintain as
-    well*/
-    std::deque<BasicHandleInfo> handles; //!< local handle information
+    this allows much more stable growth to bigger sizes if need be since we don't need contiguous
+    memory, just iterators, so these properties outweigh the slight decrease in overall performance,
+    otherwise we would need two classes that do basically the same thing just with different
+    container types so using deque reduce the amount of the code to maintain as well*/
+    std::deque<BasicHandleInfo> handles;  //!< local handle information
     std::unordered_map<std::string, interface_handle>
-        publications; //!< map of all local publications
-    std::unordered_map<std::string, interface_handle> endpoints; //!< map of all local endpoints
-    std::unordered_map<std::string, interface_handle> inputs; //!< map of all local endpoints
-    std::unordered_map<std::string, interface_handle> filters; //!< map of all local endpoints
-    std::unordered_map<std::uint64_t, int32_t> unique_ids; //!< map of identifiers
+        publications;  //!< map of all local publications
+    std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
+    std::unordered_map<std::string, interface_handle> inputs;  //!< map of all local endpoints
+    std::unordered_map<std::string, interface_handle> filters;  //!< map of all local endpoints
+    std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
     HandleManager() = default;
     /** add a handle to manage*/
-    BasicHandleInfo& addHandle(
-        global_federate_id fed_id,
-        handle_type what,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
+    BasicHandleInfo& addHandle(global_federate_id fed_id,
+                               handle_type what,
+                               const std::string& key,
+                               const std::string& type,
+                               const std::string& units);
     /** add a handle to manage*/
-    BasicHandleInfo& addHandle(
-        global_federate_id fed_id,
-        interface_handle local_id,
-        handle_type what,
-        const std::string& key,
-        const std::string& type,
-        const std::string& units);
+    BasicHandleInfo& addHandle(global_federate_id fed_id,
+                               interface_handle local_id,
+                               handle_type what,
+                               const std::string& key,
+                               const std::string& type,
+                               const std::string& units);
 
     void addHandle(const BasicHandleInfo& otherHandle);
     /** add a handle at the specified index*/
@@ -71,9 +68,9 @@ class HandleManager {
     /** find a const handle from both the federate and local id*/
     const BasicHandleInfo* findHandle(global_handle id) const;
 
-    void setHandleOption(interface_handle handle, int option, bool val);
+    void setHandleOption(interface_handle handle, int32_t option, int32_t val);
 
-    bool getHandleOption(interface_handle handle, int option) const;
+    int32_t getHandleOption(interface_handle handle, int32_t option) const;
     /** get an endpoint from its name*/
     BasicHandleInfo* getEndpoint(const std::string& name);
     /** get an endpoint from its name*/
@@ -113,4 +110,4 @@ class HandleManager {
     std::string generateName(handle_type what) const;
 };
 
-} // namespace helics
+}  // namespace helics

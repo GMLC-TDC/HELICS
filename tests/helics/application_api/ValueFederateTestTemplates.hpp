@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -19,11 +19,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 template<class X>
-void runFederateTest(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runFederateTest(const std::string& core_type_str,
+                     const X& defaultValue,
+                     const X& testValue1,
+                     const X& testValue2)
 {
     FederateTestFixture fixture;
 
@@ -69,11 +68,10 @@ void runFederateTest(
 }
 
 template<class X>
-void runFederateTestObj(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runFederateTestObj(const std::string& core_type_str,
+                        const X& defaultValue,
+                        const X& testValue1,
+                        const X& testValue2)
 {
     FederateTestFixture fixture;
 
@@ -117,11 +115,10 @@ void runFederateTestObj(
 }
 
 template<class X>
-void runFederateTestv2(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runFederateTestv2(const std::string& core_type_str,
+                       const X& defaultValue,
+                       const X& testValue1,
+                       const X& testValue2)
 {
     FederateTestFixture fixture;
 
@@ -165,11 +162,10 @@ void runFederateTestv2(
 }
 
 template<class X>
-void runFederateTestObjv2(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runFederateTestObjv2(const std::string& core_type_str,
+                          const X& defaultValue,
+                          const X& testValue1,
+                          const X& testValue2)
 {
     FederateTestFixture fixture;
 
@@ -211,11 +207,10 @@ void runFederateTestObjv2(
 }
 
 template<class X>
-void runDualFederateTest(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runDualFederateTest(const std::string& core_type_str,
+                         const X& defaultValue,
+                         const X& testValue1,
+                         const X& testValue2)
 {
     FederateTestFixture fixture;
 
@@ -276,11 +271,10 @@ void runDualFederateTest(
 }
 
 template<class X>
-void runDualFederateTestv2(
-    const std::string& core_type_str,
-    X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runDualFederateTestv2(const std::string& core_type_str,
+                           X& defaultValue,
+                           const X& testValue1,
+                           const X& testValue2)
 {
     FederateTestFixture fixture;
 
@@ -334,11 +328,10 @@ void runDualFederateTestv2(
 }
 
 template<class X>
-void runDualFederateTestObj(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runDualFederateTestObj(const std::string& core_type_str,
+                            const X& defaultValue,
+                            const X& testValue1,
+                            const X& testValue2)
 {
     FederateTestFixture fixture;
     using namespace helics;
@@ -399,11 +392,10 @@ void runDualFederateTestObj(
 }
 
 template<class X>
-void runDualFederateTestObjv2(
-    const std::string& core_type_str,
-    const X& defaultValue,
-    const X& testValue1,
-    const X& testValue2)
+void runDualFederateTestObjv2(const std::string& core_type_str,
+                              const X& defaultValue,
+                              const X& testValue1,
+                              const X& testValue2)
 {
     FederateTestFixture fixture;
     using namespace helics;

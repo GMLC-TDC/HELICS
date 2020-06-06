@@ -1,6 +1,5 @@
 version: 2
 aliases:
-
   - &setup_helics
     name: setup_helics
     environment:
@@ -13,54 +12,54 @@ aliases:
   - &run_octave_tests
     name: run_octave_tests
     command: |
-       cd build
-       make install
-       cd ${OCTAVETEST}
-       # this return the write error code in RESULT
-       octave -W -V --eval "source('runTestsCIRCLECI.m');"
-       RESULT=$?
-       echo "*** Octave test result: "${RESULT}
-       exit $RESULT
+      cd build
+      make install
+      cd ${OCTAVETEST}
+      # this return the write error code in RESULT
+      octave -W -V --eval "source('runTestsCIRCLECI.m');"
+      RESULT=$?
+      echo "*** Octave test result: "${RESULT}
+      exit $RESULT
 
   - &run_helics_tests
     name: run_helics_tests
     command: |
-       /root/project/scripts/run-circleci-tests.sh
-       RESULT=$?
-       exit $RESULT
+      /root/project/scripts/run-circleci-tests.sh
+      RESULT=$?
+      exit $RESULT
 
   - &run_installer_tests
     name: run_installer_tests
     command: |
-       cd build
-       make install
-       ctest -V -R find-package-tests
-       ctest -V -R package-config-tests
-       
+      cd build
+      make install
+      ctest -V -R find-package-tests
+      ctest -V -R package-config-tests
+
   - &run_benchmarks
     name: run_benchmarks
     command: |
-       mkdir /tmp/bm_results
-       cd build
-       make RUN_KEY_BENCHMARKS
+      mkdir /tmp/bm_results
+      cd build
+      make RUN_KEY_BENCHMARKS
 
 jobs:
   helicsoctave:
     docker:
       - image: helics/buildenv:octave
     environment:
-      OCTAVETEST: "/root/project/tests/octave"
-      CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
+      OCTAVETEST: '/root/project/tests/octave'
+      CMAKE_FLAGS: '-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON'
     steps:
       - checkout
       - run: *setup_helics
       - run: *run_octave_tests
 
-  helicsTSan:
+  helicsgccTSan:
     docker:
-      - image: helics/clang-tsan:latest
+      - image: helics/buildenv:builder
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-fsanitize=thread -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
       TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4'
 
     steps:
@@ -101,7 +100,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_installer_tests
-      
+
   helicsNoZmq:
     docker:
       - image: helics/buildenv:gcc8-builder
@@ -111,7 +110,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
-      
+
   helicsTumbleweed:
     docker:
       - image: helics/buildenv:tumbleweed-builder
@@ -130,7 +129,16 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_installer_tests
-      
+
+  gcc10:
+    docker:
+      - image: helics/buildenv:gcc10-builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags'
+    steps:
+      - checkout
+      - run: *setup_helics
+
   benchmarkjob:
     docker:
       - image: helics/buildenv:builder
@@ -148,35 +156,37 @@ workflows:
   version: 2
   helics_test:
     jobs:
-      - helicsoctave
       - helicsMSan
       - helicsASan
-      - helicsTSan
       - helicsInstall1
       - helicsInstall2
+      - helicsgccTSan
+
   nightly:
     triggers:
       - schedule:
-          cron: "0 8 * * *"
+          cron: '0 8 * * *'
           filters:
             branches:
               only:
                 - develop
+                - helics3
     jobs:
       - helicsoctave
       - helicsMSan
       - helicsASan
-      - helicsTSan
       - helicsTumbleweed
       - helicsNoZmq
+      - helicsgccTSan
+      - gcc10
   benchmark:
     triggers:
       - schedule:
-          cron: "17 9 * * 0,2,5"
+          cron: '17 9 * * 0,2,5'
           filters:
             branches:
               only:
                 - develop
+                - helics3
     jobs:
       - benchmarkjob
-

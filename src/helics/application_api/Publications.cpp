@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -16,12 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-Publication::Publication(
-    ValueFederate* valueFed,
-    interface_handle id,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units):
+Publication::Publication(ValueFederate* valueFed,
+                         interface_handle id,
+                         const std::string& key,
+                         const std::string& type,
+                         const std::string& units):
     fed(valueFed),
     handle(id), pubKey(key), pubUnits(units)
 {
@@ -34,11 +33,10 @@ Publication::Publication(
     }
 }
 
-Publication::Publication(
-    ValueFederate* valueFed,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Publication::Publication(ValueFederate* valueFed,
+                         const std::string& key,
+                         const std::string& type,
+                         const std::string& units)
 {
     auto& pub = valueFed->getPublication(key);
     if (pub.isValid()) {
@@ -48,12 +46,11 @@ Publication::Publication(
     }
 }
 
-Publication::Publication(
-    interface_visibility locality,
-    ValueFederate* valueFed,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Publication::Publication(interface_visibility locality,
+                         ValueFederate* valueFed,
+                         const std::string& key,
+                         const std::string& type,
+                         const std::string& units)
 {
     try {
         if (locality == interface_visibility::global) {
@@ -62,10 +59,10 @@ Publication::Publication(
             operator=(valueFed->registerPublication(key, type, units));
         }
     }
-    catch (const RegistrationFailure& e) {
+    catch (const RegistrationFailure&) {
         operator=(valueFed->getPublication(key));
         if (!isValid()) {
-            throw(e);
+            throw;
         }
     }
 }
@@ -317,18 +314,18 @@ void Publication::publish(double val, const units::precise_unit& units)
 data_block typeConvert(data_type type, const defV& val)
 {
     switch (val.index()) {
-        case double_loc: // double
+        case double_loc:  // double
             return typeConvert(type, mpark::get<double>(val));
-        case int_loc: // int64_t
+        case int_loc:  // int64_t
             return typeConvert(type, mpark::get<int64_t>(val));
-        case string_loc: // string
+        case string_loc:  // string
         default:
             return typeConvert(type, mpark::get<std::string>(val));
-        case complex_loc: // complex
+        case complex_loc:  // complex
             return typeConvert(type, mpark::get<std::complex<double>>(val));
-        case vector_loc: // vector
+        case vector_loc:  // vector
             return typeConvert(type, mpark::get<std::vector<double>>(val));
-        case complex_vector_loc: // complex
+        case complex_vector_loc:  // complex
             return typeConvert(type, mpark::get<std::vector<std::complex<double>>>(val));
         case named_point_loc:
             return typeConvert(type, mpark::get<NamedPoint>(val));
@@ -350,4 +347,4 @@ void Publication::publish(const defV& val)
         fed->publishRaw(*this, db);
     }
 }
-} // namespace helics
+}  // namespace helics

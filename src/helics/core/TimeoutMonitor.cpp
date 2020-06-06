@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -23,21 +23,22 @@ void TimeoutMonitor::tick(CommonCore* core)
             // try to reset the connection to the broker
             // brokerReconnect()
             const std::string message{"core lost connection with broker"};
-            core->sendToLogger(
-                core->global_broker_id_local, log_level::error, core->getIdentifier(), message);
+            core->sendToLogger(core->global_broker_id_local,
+                               log_level::error,
+                               core->getIdentifier(),
+                               message);
             core->sendErrorToFederates(-5, message);
             core->processDisconnect();
             core->brokerState = BrokerBase::broker_state_t::errored;
             core->addActionMessage(CMD_STOP);
-        } else { // ping again
+        } else {  // ping again
             ActionMessage png(CMD_PING_PRIORITY);
             png.source_id = core->global_broker_id_local;
             png.dest_id = core->higher_broker_id;
             core->transmit(parent_route_id, png);
         }
-    } else if (
-        (core->isConnected()) && (core->global_broker_id_local.isValid()) &&
-        (core->global_broker_id_local != parent_broker_id)) {
+    } else if ((core->isConnected()) && (core->global_broker_id_local.isValid()) &&
+               (core->global_broker_id_local != parent_broker_id)) {
         // if (allFedWaiting())
         //{
         if (core->higher_broker_id.isValid()) {
@@ -49,16 +50,14 @@ void TimeoutMonitor::tick(CommonCore* core)
             parentConnection.waitingForPingReply = true;
         }
         //}
-    } else if (
-        (core->isConnected()) &&
-        ((!core->global_broker_id_local.isValid()) ||
-         (core->global_broker_id_local == parent_broker_id))) {
+    } else if ((core->isConnected()) &&
+               ((!core->global_broker_id_local.isValid()) ||
+                (core->global_broker_id_local == parent_broker_id))) {
         ActionMessage rsend(CMD_RESEND);
         rsend.messageID = static_cast<int32_t>(CMD_REG_BROKER);
         core->processCommand(std::move(rsend));
-    } else if (
-        (core->brokerState == BrokerBase::broker_state_t::terminated) ||
-        (core->brokerState == BrokerBase::broker_state_t::errored)) {
+    } else if ((core->brokerState == BrokerBase::broker_state_t::terminated) ||
+               (core->brokerState == BrokerBase::broker_state_t::errored)) {
         if (waitingForConnection) {
             auto now = std::chrono::steady_clock::now();
             if (now - startWaiting > timeout) {
@@ -96,16 +95,15 @@ void TimeoutMonitor::tick(CoreBroker* brk)
         if (now - parentConnection.lastPing > timeout) {
             // try to reset the connection to the broker
             // brokerReconnect()
-            brk->sendToLogger(
-                brk->global_broker_id_local,
-                log_level::error,
-                brk->getIdentifier(),
-                "broker lost connection with parent");
+            brk->sendToLogger(brk->global_broker_id_local,
+                              log_level::error,
+                              brk->getIdentifier(),
+                              "broker lost connection with parent");
             brk->sendErrorToImmediateBrokers(-5);
             brk->processDisconnect();
             brk->brokerState = BrokerBase::broker_state_t::errored;
             brk->addActionMessage(CMD_STOP);
-        } else { // ping again
+        } else {  // ping again
             ActionMessage png(CMD_PING_PRIORITY);
             png.source_id = brk->global_broker_id_local;
             png.dest_id = brk->higher_broker_id;
@@ -121,7 +119,7 @@ void TimeoutMonitor::tick(CoreBroker* brk)
                 cerror.dest_id = brk->global_broker_id_local;
                 cerror.source_id = conn.connection;
                 brk->addActionMessage(cerror);
-            } else { // ping again
+            } else {  // ping again
                 ActionMessage png(CMD_PING);
                 png.source_id = brk->global_broker_id_local;
                 png.dest_id = conn.connection;
@@ -144,9 +142,8 @@ void TimeoutMonitor::tick(CoreBroker* brk)
                     parentConnection.waitingForPingReply = true;
                 }
                 //}
-            } else if (
-                (brk->brokerState == BrokerBase::broker_state_t::terminated) ||
-                (brk->brokerState == BrokerBase::broker_state_t::errored)) {
+            } else if ((brk->brokerState == BrokerBase::broker_state_t::terminated) ||
+                       (brk->brokerState == BrokerBase::broker_state_t::errored)) {
                 if (waitingForConnection) {
                     if (now - startWaiting > timeout) {
                         ActionMessage png(CMD_CHECK_CONNECTIONS);
@@ -169,7 +166,7 @@ void TimeoutMonitor::tick(CoreBroker* brk)
                     startWaiting = now;
                 }
             }
-        } else { // brk is a root broker
+        } else {  // brk is a root broker
             pingSub(brk);
         }
     }
@@ -258,4 +255,4 @@ void TimeoutMonitor::pingReply(const ActionMessage& cmd, CoreBroker* brk)
     }
 }
 
-} // namespace helics
+}  // namespace helics

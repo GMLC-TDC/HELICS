@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederate.hpp"
@@ -31,10 +31,9 @@ ValueFederate::ValueFederate(const std::string& fedName, const FederateInfo& fi)
     // the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
 }
-ValueFederate::ValueFederate(
-    const std::string& fedName,
-    const std::shared_ptr<Core>& core,
-    const FederateInfo& fi):
+ValueFederate::ValueFederate(const std::string& fedName,
+                             const std::shared_ptr<Core>& core,
+                             const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
@@ -85,43 +84,40 @@ void ValueFederate::disconnect()
 ValueFederate& ValueFederate::operator=(ValueFederate&& fed) noexcept
 {
     vfManager = std::move(fed.vfManager);
-    if (getID() !=
-        fed.getID()) { // the id won't be moved, as it is copied so use it as a test if it has moved already
+    if (getID() != fed.getID()) {  // the id won't be moved, as it is copied so use it as a test if
+                                   // it has moved already
         Federate::operator=(std::move(fed));
     }
     return *this;
 }
 
-Publication& ValueFederate::registerPublication(
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Publication& ValueFederate::registerPublication(const std::string& key,
+                                                const std::string& type,
+                                                const std::string& units)
 {
     return vfManager->registerPublication(
         (!key.empty()) ? (getName() + nameSegmentSeparator + key) : key, type, units);
 }
 
-Publication& ValueFederate::registerGlobalPublication(
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Publication& ValueFederate::registerGlobalPublication(const std::string& key,
+                                                      const std::string& type,
+                                                      const std::string& units)
 {
     return vfManager->registerPublication(key, type, units);
 }
 
-Input& ValueFederate::registerInput(
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Input& ValueFederate::registerInput(const std::string& key,
+                                    const std::string& type,
+                                    const std::string& units)
 {
-    return vfManager->registerInput(
-        (!key.empty()) ? (getName() + nameSegmentSeparator + key) : key, type, units);
+    return vfManager->registerInput((!key.empty()) ? (getName() + nameSegmentSeparator + key) : key,
+                                    type,
+                                    units);
 }
 
-Input& ValueFederate::registerGlobalInput(
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+Input& ValueFederate::registerGlobalInput(const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units)
 {
     return vfManager->registerInput(key, type, units);
 }
@@ -162,7 +158,7 @@ void ValueFederate::addAlias(const Publication& pub, const std::string& shortcut
     vfManager->addAlias(pub, shortcutName);
 }
 
-void ValueFederate::setDefaultValue(const Input& inp, data_view block)
+void ValueFederate::setDefaultValue(const Input& inp, data_view block)  // NOLINT
 {
     vfManager->setDefaultValue(inp, block);
 }
@@ -188,19 +184,17 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 {
     addTargets(data, "flags", [&objUpdate](const std::string& target) {
         if (target.front() != '-') {
-            objUpdate.setOption(getOptionIndex(target), true);
+            objUpdate.setOption(getOptionIndex(target), 1);
         } else {
-            objUpdate.setOption(getOptionIndex(target.substr(2)), false);
+            objUpdate.setOption(getOptionIndex(target.substr(2)), 0);
         }
     });
-    bool optional = getOrDefault(data, "optional", false);
-    if (optional) {
-        objUpdate.setOption(defs::options::connection_optional, optional);
-    }
-    bool required = getOrDefault(data, "required", false);
-    if (required) {
-        objUpdate.setOption(defs::options::connection_required, required);
-    }
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
+
     callIfMember(data, "shortcut", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
     });
@@ -250,7 +244,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
         auto subs = doc["subscriptions"];
         for (const auto& sub : subs) {
             auto key = getKey(sub);
-            auto subAct = &vfManager->getSubscription(key);
+            auto* subAct = &vfManager->getSubscription(key);
             if (!subAct->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "units", emptyStr);
@@ -320,9 +314,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "subscriptions")) {
         auto subs = toml::find(doc, "subscriptions");
         if (!subs.is_array()) {
-            //this line is tested in the publications section so not really necessary to check again since it is an expensive test
+            // this line is tested in the publications section so not really necessary to check
+            // again since it is an expensive test
             throw(helics::InvalidParameter(
-                "subscriptions section in toml file must be an array")); // LCOV_EXCL_LINE
+                "subscriptions section in toml file must be an array"));  // LCOV_EXCL_LINE
         }
         auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
@@ -343,7 +338,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         auto ipts = toml::find(doc, "inputs");
         if (!ipts.is_array()) {
             throw(helics::InvalidParameter(
-                "inputs section in toml file must be an array")); // LCOV_EXCL_LINE
+                "inputs section in toml file must be an array"));  // LCOV_EXCL_LINE
         }
         auto& iptArray = ipts.as_array();
         for (const auto& ipt : iptArray) {
@@ -381,7 +376,7 @@ const std::string& ValueFederate::getString(Input& inp)
     return inp.getValueRef<std::string>();
 }
 
-void ValueFederate::publishRaw(const Publication& pub, data_view block)
+void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         vfManager->publish(pub, block);
@@ -403,11 +398,10 @@ void ValueFederate::publish(Publication& pub, double val)
 
 using dvalue = mpark::variant<double, std::string>;
 
-static void generateData(
-    std::vector<std::pair<std::string, dvalue>>& vpairs,
-    const std::string& prefix,
-    char separator,
-    Json::Value val)
+static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
+                         const std::string& prefix,
+                         char separator,
+                         Json::Value val)
 {
     auto mn = val.getMemberNames();
     for (auto& name : mn) {
@@ -600,8 +594,8 @@ const Publication& ValueFederate::getPublication(const std::string& key, int ind
 const Publication&
     ValueFederate::getPublication(const std::string& key, int index1, int index2) const
 {
-    return vfManager->getPublication(
-        key + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+    return vfManager->getPublication(key + '_' + std::to_string(index1) + '_' +
+                                     std::to_string(index2));
 }
 
 void ValueFederate::setInputNotificationCallback(std::function<void(Input&, Time)> callback)
@@ -609,9 +603,8 @@ void ValueFederate::setInputNotificationCallback(std::function<void(Input&, Time
     vfManager->setInputNotificationCallback(std::move(callback));
 }
 
-void ValueFederate::setInputNotificationCallback(
-    Input& inp,
-    std::function<void(Input&, Time)> callback)
+void ValueFederate::setInputNotificationCallback(Input& inp,
+                                                 std::function<void(Input&, Time)> callback)
 {
     vfManager->setInputNotificationCallback(inp, std::move(callback));
 }
@@ -635,4 +628,4 @@ void ValueFederate::clearUpdate(const Input& inp)
 {
     vfManager->clearUpdate(inp);
 }
-} // namespace helics
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager;
 namespace asio {
 class io_context;
-} // namespace asio
+}  // namespace asio
 
 namespace helics {
 namespace tcp {
@@ -39,12 +39,12 @@ namespace tcp {
 
       private:
         bool outgoingConnectionsAllowed{
-            true}; //!< disable all outgoing connections- allow only incoming connections
+            true};  //!< disable all outgoing connections- allow only incoming connections
         bool reuse_address{false};
-        std::vector<std::string> connections; //!< list of connections to make
+        std::vector<std::string> connections;  //!< list of connections to make
         virtual int getDefaultBrokerPort() const override;
-        virtual void queue_rx_function() override; //!< the functional loop for the receive queue
-        virtual void queue_tx_function() override; //!< the loop for transmitting data
+        virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
+        virtual void queue_tx_function() override;  //!< the loop for transmitting data
 
         /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
@@ -60,5 +60,5 @@ namespace tcp {
         //  bool errorHandle()
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

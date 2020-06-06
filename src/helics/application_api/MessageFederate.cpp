@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MessageFederate.hpp"
@@ -23,10 +23,9 @@ MessageFederate::MessageFederate(const std::string& fedName, const FederateInfo&
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
-MessageFederate::MessageFederate(
-    const std::string& fedName,
-    const std::shared_ptr<Core>& core,
-    const FederateInfo& fi):
+MessageFederate::MessageFederate(const std::string& fedName,
+                                 const std::shared_ptr<Core>& core,
+                                 const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
@@ -63,7 +62,8 @@ MessageFederate::MessageFederate()
 }
 
 MessageFederate::MessageFederate(bool /*unused*/)
-{ // this constructor should only be called by child class that has already constructed the underlying federate in
+{  // this constructor should only be called by child class that has already constructed the
+   // underlying federate in
     // a virtual inheritance
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
@@ -72,8 +72,8 @@ MessageFederate::MessageFederate(MessageFederate&&) noexcept = default;
 MessageFederate& MessageFederate::operator=(MessageFederate&& mFed) noexcept
 {
     mfManager = std::move(mFed.mfManager);
-    if (getID() !=
-        mFed.getID()) { // the id won't be moved, as it is copied so use it as a test if it has moved already
+    if (getID() != mFed.getID()) {  // the id won't be moved, as it is copied so use it as a test if
+                                    // it has moved already
         Federate::operator=(std::move(mFed));
     }
     return *this;
@@ -108,12 +108,14 @@ std::string MessageFederate::localQuery(const std::string& queryStr) const
 
 Endpoint& MessageFederate::registerEndpoint(const std::string& eptName, const std::string& type)
 {
-    return mfManager->registerEndpoint(
-        (!eptName.empty()) ? (getName() + nameSegmentSeparator + eptName) : eptName, type);
+    return mfManager->registerEndpoint((!eptName.empty()) ?
+                                           (getName() + nameSegmentSeparator + eptName) :
+                                           eptName,
+                                       type);
 }
 
-Endpoint&
-    MessageFederate::registerGlobalEndpoint(const std::string& eptName, const std::string& type)
+Endpoint& MessageFederate::registerGlobalEndpoint(const std::string& eptName,
+                                                  const std::string& type)
 {
     return mfManager->registerEndpoint(eptName, type);
 }
@@ -144,14 +146,11 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
             ept.setOption(getOptionIndex(target.substr(2)), false);
         }
     });
-    bool optional = getOrDefault(data, "optional", false);
-    if (optional) {
-        ept.setOption(defs::options::connection_optional, optional);
-    }
-    bool required = getOrDefault(data, "required", false);
-    if (required) {
-        ept.setOption(defs::options::connection_required, required);
-    }
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&ept](int32_t option, int32_t value) { ept.setOption(option, value); });
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
@@ -231,9 +230,8 @@ void MessageFederate::subscribe(const Endpoint& ept, const std::string& key)
     mfManager->subscribe(ept, key);
 }
 
-void MessageFederate::registerKnownCommunicationPath(
-    const Endpoint& localEndpoint,
-    const std::string& remoteEndpoint)
+void MessageFederate::registerKnownCommunicationPath(const Endpoint& localEndpoint,
+                                                     const std::string& remoteEndpoint)
 {
     mfManager->registerKnownCommunicationPath(localEndpoint, remoteEndpoint);
 }
@@ -286,10 +284,9 @@ std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
     return nullptr;
 }
 
-void MessageFederate::sendMessage(
-    const Endpoint& source,
-    const std::string& dest,
-    const data_view& message)
+void MessageFederate::sendMessage(const Endpoint& source,
+                                  const std::string& dest,
+                                  const data_view& message)
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         mfManager->sendMessage(source, dest, message);
@@ -299,11 +296,10 @@ void MessageFederate::sendMessage(
     }
 }
 
-void MessageFederate::sendMessage(
-    const Endpoint& source,
-    const std::string& dest,
-    const data_view& message,
-    Time sendTime)
+void MessageFederate::sendMessage(const Endpoint& source,
+                                  const std::string& dest,
+                                  const data_view& message,
+                                  Time sendTime)
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         mfManager->sendMessage(source, dest, message, sendTime);
@@ -375,4 +371,4 @@ void MessageFederate::addDestinationFilter(const Endpoint& ept, const std::strin
     mfManager->addDestinationFilter(ept, filterName);
 }
 
-} // namespace helics
+}  // namespace helics

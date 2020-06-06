@@ -1,13 +1,12 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "cppzmq/zmq.hpp"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -16,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/networkDefaults.hpp"
 #include "helics/network/zmq/ZmqBroker.h"
 #include "helics/network/zmq/ZmqCommsSS.h"
+#include "helics/network/zmq/ZmqContextManager.h"
 #include "helics/network/zmq/ZmqCore.h"
 
 #include "gtest/gtest.h"
@@ -57,12 +57,13 @@ TEST(ZMQSSCore, transmit)
         ++counter2;
         act2 = m;
     });
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
     auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
     bool connected2 = comm2.connect();
     ASSERT_TRUE(connected2);
     bool connected1 = connected_fut.get();
-    if (!connected1) { // lets just try again if it is not connected
+    if (!connected1) {  // lets just try again if it is not connected
         connected1 = comm.connect();
     }
     ASSERT_TRUE(connected1);
@@ -125,18 +126,19 @@ TEST(ZMQSSCore, addroute)
         ++counter3;
         act3 = m;
     });
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
     auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
     auto connected_fut2 = std::async(std::launch::async, [&comm2] { return comm2.connect(); });
     bool connected1 = comm3.connect();
     ASSERT_TRUE(connected1);
     bool connected2 = connected_fut.get();
-    if (!connected2) { // lets just try again if it is not connected
+    if (!connected2) {  // lets just try again if it is not connected
         connected2 = comm.connect();
     }
     ASSERT_TRUE(connected2);
     connected2 = connected_fut2.get();
-    if (!connected2) { // lets just try again if it is not connected
+    if (!connected2) {  // lets just try again if it is not connected
         connected2 = comm2.connect();
     }
     ASSERT_TRUE(connected2);

@@ -21,13 +21,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <vector>
 #ifdef ENABLE_ZMQ_CORE
-#    include "../common/zmqContextManager.h"
-#    include "cppzmq/zmq.hpp"
+#    include "../network/zmq/ZmqContextManager.h"
 #endif
 
 const char* helicsGetVersion(void)
 {
     return helics::versionString;
+}
+
+const char* helicsGetBuildFlags(void)
+{
+    return helics::buildFlags;
+}
+
+const char* helicsGetCompilerVersion(void)
+{
+    return helics::compiler;
 }
 
 static constexpr const char* nullstrPtr = "";
@@ -154,20 +163,14 @@ CoreObject* getCoreObject(helics_core core, helics_error* err) noexcept
         return nullptr;
     }
     if (core == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidCoreString;
-        }
+        assignError(err, helics_error_invalid_object, invalidCoreString);
         return nullptr;
     }
     auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
     if (coreObj->valid == coreValidationIdentifier) {
         return coreObj;
     }
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = invalidCoreString;
-    }
+    assignError(err, helics_error_invalid_object, invalidCoreString);
     return nullptr;
 }
 
@@ -177,24 +180,18 @@ BrokerObject* getBrokerObject(helics_broker broker, helics_error* err) noexcept
         return nullptr;
     }
     if (broker == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidBrokerString;
-        }
+        assignError(err, helics_error_invalid_object, invalidBrokerString);
         return nullptr;
     }
     auto* brokerObj = reinterpret_cast<helics::BrokerObject*>(broker);
     if (brokerObj->valid == brokerValidationIdentifier) {
         return brokerObj;
     }
-    if (err != nullptr) {
-        err->error_code = helics_error_invalid_object;
-        err->message = invalidBrokerString;
-    }
+    assignError(err, helics_error_invalid_object, invalidBrokerString);
     return nullptr;
 }
 
-} // namespace helics
+}  // namespace helics
 helics::Core* getCore(helics_core core, helics_error* err)
 {
     auto* coreObj = helics::getCoreObject(core, err);
@@ -442,10 +439,7 @@ void helicsBrokerDataLink(helics_broker broker, const char* source, const char* 
         return;
     }
     if ((source == nullptr) || (target == nullptr)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidDataLinkString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
         return;
     }
     brk->dataLink(source, target);
@@ -458,10 +452,7 @@ void helicsCoreDataLink(helics_core core, const char* source, const char* target
         return;
     }
     if ((source == nullptr) || (target == nullptr)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidDataLinkString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
         return;
     }
     cr->dataLink(source, target);
@@ -476,10 +467,7 @@ void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const ch
         return;
     }
     if (valueName == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidGlobalString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidGlobalString);
         return;
     }
     brk->setGlobal(valueName, AS_STRING(value));
@@ -501,10 +489,7 @@ void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* fil
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidDataLinkString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
         return;
     }
     brk->addSourceFilterToEndpoint(filter, endpoint);
@@ -517,10 +502,7 @@ void helicsBrokerAddDestinationFilterToEndpoint(helics_broker broker, const char
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidDataLinkString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
         return;
     }
     brk->addDestinationFilterToEndpoint(filter, endpoint);
@@ -547,10 +529,7 @@ void helicsCoreAddSourceFilterToEndpoint(helics_core core, const char* filter, c
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidDataLinkString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
         return;
     }
     cr->addSourceFilterToEndpoint(filter, endpoint);
@@ -563,10 +542,7 @@ void helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filt
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidDataLinkString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
         return;
     }
     cr->addDestinationFilterToEndpoint(filter, endpoint);
@@ -602,10 +578,7 @@ void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* va
         return;
     }
     if (valueName == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidGlobalString;
-        }
+        assignError(err, helics_error_invalid_argument, invalidGlobalString);
         return;
     }
     cr->setGlobal(valueName, AS_STRING(value));
@@ -830,18 +803,12 @@ static helics::QueryObject* getQueryObj(helics_query query, helics_error* err)
         return nullptr;
     }
     if (query == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidQueryString;
-        }
+        assignError(err, helics_error_invalid_object, invalidQueryString);
         return nullptr;
     }
     auto* queryPtr = reinterpret_cast<helics::QueryObject*>(query);
     if (queryPtr->valid != validQueryIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidQueryString;
-        }
+        assignError(err, helics_error_invalid_object, invalidQueryString);
         return nullptr;
     }
     return queryPtr;
@@ -977,6 +944,24 @@ helics_bool helicsQueryIsCompleted(helics_query query)
     return helics_false;
 }
 
+void helicsQuerySetTarget(helics_query query, const char* target, helics_error* err)
+{
+    auto* queryObj = getQueryObj(query, err);
+    if (queryObj == nullptr) {
+        return;
+    }
+    queryObj->target = AS_STRING(target);
+}
+
+void helicsQuerySetQueryString(helics_query query, const char* queryString, helics_error* err)
+{
+    auto* queryObj = getQueryObj(query, err);
+    if (queryObj == nullptr) {
+        return;
+    }
+    queryObj->query = AS_STRING(queryString);
+}
+
 void helicsQueryFree(helics_query query)
 {
     auto* queryObj = getQueryObj(query, nullptr);
@@ -1001,7 +986,7 @@ MasterObjectHolder::~MasterObjectHolder()
 {
 #ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete()) {
-        ZmqContextManager::getContext().close(); // LCOV_EXCL_LINE
+        ZmqContextManager::closeContext();  // LCOV_EXCL_LINE
     }
 #endif
     helics::LoggingCore::setFastShutdown();

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "coreTypeOperations.hpp"
@@ -232,7 +232,7 @@ namespace core {
             case core_type::TCP_SS:
                 available = tcp_availability;
                 break;
-            case core_type::DEFAULT: // default should always be available
+            case core_type::DEFAULT:  // default should always be available
                 available = true;
                 break;
             case core_type::INPROC:
@@ -275,5 +275,5 @@ namespace core {
         return (res != global_match_strings.end());
     }
 
-} // namespace core
-} // namespace helics
+}  // namespace core
+}  // namespace helics

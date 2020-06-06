@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TestComms.h"
@@ -171,8 +171,8 @@ namespace testcore {
                                 if (brk) {
                                     auto cbrk = std::dynamic_pointer_cast<CoreBroker>(brk);
                                     if (cbrk) {
-                                        routes.emplace(
-                                            route_id{cmd.getExtraData()}, std::move(cbrk));
+                                        routes.emplace(route_id{cmd.getExtraData()},
+                                                       std::move(cbrk));
                                         foundRoute = true;
                                     }
                                 }
@@ -217,14 +217,13 @@ namespace testcore {
                         tbroker->addActionMessage(std::move(cmd));
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(
-                                std::string("unknown route, message dropped ") +
-                                prettyPrintString(cmd));
+                            logWarning(std::string("unknown route, message dropped ") +
+                                       prettyPrintString(cmd));
                         }
                     }
                 }
             }
-        } // while (!haltLoop)
+        }  // while (!haltLoop)
 
         routes.clear();
         tbroker = nullptr;
@@ -248,6 +247,6 @@ namespace testcore {
 
     std::string TestComms::getAddress() const { return localTargetAddress; }
 
-} // namespace testcore
+}  // namespace testcore
 
-} // namespace helics
+}  // namespace helics

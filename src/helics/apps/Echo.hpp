@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -16,12 +16,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace apps {
-    /** class implementing an Echo object, which will generate endpoint interfaces and send a data message back to the
-source at the with a specified delay
-@details  the Echo class is NOT threadsafe in general,  don't try to use it from multiple threads without external
-protection, that will result in undefined behavior.  One exception is the setEchoDelay function is threadsafe, and
-const methods will not cause problems but may not give consistent answers if used from multiple threads unless
-protected.
+    /** class implementing an Echo object, which will generate endpoint interfaces and send a data
+message back to the source at the with a specified delay
+@details  the Echo class is NOT threadsafe in general,  don't try to use it from multiple threads
+without external protection, that will result in undefined behavior.  One exception is the
+setEchoDelay function is threadsafe, and const methods will not cause problems but may not give
+consistent answers if used from multiple threads unless protected.
 */
     class HELICS_CXX_EXPORT Echo: public App {
       public:
@@ -94,10 +94,10 @@ protected.
       private:
         /** process remaining command line arguments*/
         void processArgs();
-        std::vector<Endpoint> endpoints; //!< the actual endpoint objects
-        Time delayTime = timeZero; //!< respond to each message with the specified delay
-        size_t echoCounter = 0; //!< the current message index
-        std::mutex delayTimeLock; // mutex protecting delayTime
+        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        Time delayTime = timeZero;  //!< respond to each message with the specified delay
+        size_t echoCounter = 0;  //!< the current message index
+        std::mutex delayTimeLock;  // mutex protecting delayTime
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

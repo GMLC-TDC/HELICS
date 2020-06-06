@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -52,8 +52,8 @@ class Broker {
     }
     /** initialize from command line arguments
      */
-    [[deprecated("please use configureFromArgs instead")]] void
-        initializeFromArgs(int argc, char* argv[])
+    [[deprecated("please use configureFromArgs instead")]] void initializeFromArgs(int argc,
+                                                                                   char* argv[])
     {
         configureFromArgs(argc, argv);
     }
@@ -68,9 +68,9 @@ class Broker {
     /** set the broker logging level*/
     virtual void setLoggingLevel(int logLevel) = 0;
     /** set the logging callback function
-    @param logFunction a function with a signature of void(int level,  const std::string &source,  const
-    std::string &message) the function takes a level indicating the logging level string with the source name and a
-    string with the message
+    @param logFunction a function with a signature of void(int level,  const std::string &source,
+    const std::string &message) the function takes a level indicating the logging level string with
+    the source name and a string with the message
     */
     virtual void setLoggingCallback(
         const std::function<void(int, const std::string&, const std::string&)>& logFunction) = 0;
@@ -90,8 +90,8 @@ class Broker {
     query is a broken
     @param target the specific target of the query
     @param queryStr the actual query
-      @return a string containing the response to the query.  Query is a blocking call and will not return until
-      the query is answered so use with caution
+      @return a string containing the response to the query.  Query is a blocking call and will not
+    return until the query is answered so use with caution
     */
     virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
 
@@ -110,16 +110,17 @@ class Broker {
     @param source the name of the publication
     @param target the name of the input*/
     virtual void dataLink(const std::string& source, const std::string& target) = 0;
-    /** create a filter connection between a named filter and a named endpoint for messages coming from that
-    endpoint
+    /** create a filter connection between a named filter and a named endpoint for messages coming
+    from that endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void
-        addSourceFilterToEndpoint(const std::string& filter, const std::string& target) = 0;
-    /** create a filter connection between a named filter and a named endpoint for destination processing
+    virtual void addSourceFilterToEndpoint(const std::string& filter,
+                                           const std::string& target) = 0;
+    /** create a filter connection between a named filter and a named endpoint for destination
+    processing
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void
-        addDestinationFilterToEndpoint(const std::string& filter, const std::string& target) = 0;
+    virtual void addDestinationFilterToEndpoint(const std::string& filter,
+                                                const std::string& target) = 0;
 };
-} // namespace helics
+}  // namespace helics

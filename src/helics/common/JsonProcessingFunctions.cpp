@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -28,7 +28,8 @@ Json::Value loadJson(const std::string& jsonString)
             return loadJsonStr(jsonString);
         }
         catch (const std::invalid_argument&) {
-            // this was a guess lets try a file now, the same error will be generated again later as well
+            // this was a guess lets try a file now, the same error will be generated again later as
+            // well
         }
     }
     std::ifstream file(jsonString);
@@ -94,7 +95,7 @@ std::string generateJsonString(const Json::Value& block)
 {
     Json::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
-    builder["indentation"] = "   "; // or whatever you like
+    builder["indentation"] = "   ";  // or whatever you like
     auto writer = std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
     std::stringstream sstr;
     writer->write(block, &sstr);

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -34,11 +34,11 @@ namespace tcp {
 
       private:
         virtual bool brokerConnect() override;
-        bool no_outgoing_connections = false; //!< disable outgoing connections if true;
+        bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
         std::vector<std::string>
-            connections; //!< defined connections These are connections that the comm section
+            connections;  //!< defined connections These are connections that the comm section
         //!< reaches out to regardless of whether it is a broker/core/ or server
     };
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

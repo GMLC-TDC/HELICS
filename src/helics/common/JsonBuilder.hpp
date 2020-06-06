@@ -1,17 +1,18 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace Json {
 class Value;
-} // namespace Json
+}  // namespace Json
 
 namespace helics {
 /** class handling the construction in pieces of a JSON map*/
@@ -60,9 +61,11 @@ class JsonBuilder {
     void addElement(const std::string& path, const std::string& value);
     /** add a double element on a specific path*/
     void addElement(const std::string& path, double value);
+    /** add a vector element on a specific path*/
+    void addElement(const std::string& path, const std::vector<double>& value);
     /** generate the JSON value*/
     std::string generate();
     /** reset the builder*/
     void reset();
 };
-} // namespace helics
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -57,15 +57,14 @@ TEST_P(vfed_dual_transfer_ci_skip, float1)
 
 TEST_P(vfed_dual_transfer_ci_skip, string)
 {
-    runDualFederateTest<std::string>(
-        GetParam(),
-        "start",
-        "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runDualFederateTest<std::string>(GetParam(),
+                                     "start",
+                                     "inside of the functional relationship of helics",
+                                     std::string("I am a string"));
 }
 
-/** test case checking that the transfer between two federates works as expected with publication and subscription
- * objects
+/** test case checking that the transfer between two federates works as expected with publication
+ * and subscription objects
  */
 TEST_P(vfed_dual_transfer_ci_skip, obj_double)
 {
@@ -99,14 +98,12 @@ TEST_P(vfed_dual_transfer_ci_skip, obj_float)
 
 TEST_P(vfed_dual_transfer_ci_skip, obj_string)
 {
-    runDualFederateTestObj<std::string>(
-        GetParam(),
-        "start",
-        "inside of the functional relationship of helics",
-        std::string("I am a string"));
+    runDualFederateTestObj<std::string>(GetParam(),
+                                        "start",
+                                        "inside of the functional relationship of helics",
+                                        std::string("I am a string"));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    vfed_dual_transfer_tests,
-    vfed_dual_transfer_ci_skip,
-    ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(vfed_dual_transfer_tests,
+                         vfed_dual_transfer_ci_skip,
+                         ::testing::ValuesIn(core_types));

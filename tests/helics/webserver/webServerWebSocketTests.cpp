@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -33,11 +33,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
-namespace beast = boost::beast; // from <boost/beast.hpp>
-namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
-namespace http = beast::http; // from <boost/beast/http.hpp>
-namespace net = boost::asio; // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast;  // from <boost/beast.hpp>
+namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
+namespace http = beast::http;  // from <boost/beast/http.hpp>
+namespace net = boost::asio;  // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 const std::string localhost{"localhost"};
 
@@ -56,7 +56,7 @@ class webTest: public ::testing::Test {
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
-        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);
+        stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);  // NOLINT
 
         // Look up the domain name
         auto const results = resolver.resolve(localhost, "26247");
@@ -66,9 +66,8 @@ class webTest: public ::testing::Test {
 
         // Set a decorator to change the User-Agent of the handshake
         stream->set_option(websocket::stream_base::decorator([](websocket::request_type& req) {
-            req.set(
-                http::field::user_agent,
-                std::string(HELICS_VERSION_STRING) + " helics-websocket-test");
+            req.set(http::field::user_agent,
+                    std::string(HELICS_VERSION_STRING) + " helics-websocket-test");
         }));
 
         // Perform the websocket handshake
@@ -87,7 +86,7 @@ class webTest: public ::testing::Test {
         stream.reset();
     }
 
-    std::string sendText(const std::string& message)
+    static std::string sendText(const std::string& message)
     {
         // Send the message
         stream->write(net::buffer(message));
@@ -103,8 +102,8 @@ class webTest: public ::testing::Test {
         return result;
     }
 
-    static std::shared_ptr<helics::Broker>
-        addBroker(helics::core_type ctype, const std::string& init)
+    static std::shared_ptr<helics::Broker> addBroker(helics::core_type ctype,
+                                                     const std::string& init)
     {
         auto brk = helics::BrokerFactory::create(ctype, init);
         if (brk) {
@@ -132,7 +131,7 @@ class webTest: public ::testing::Test {
         helics::BrokerFactory::cleanUpBrokers();
     }
     // You can define per-test tear-down logic as usual.
-    virtual void TearDown() {}
+    void TearDown() final {}
 
   private:
     // Some expensive resource shared by all tests.
@@ -247,7 +246,15 @@ TEST_F(webTest, core)
     auto result = sendText(generateJsonString(query));
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
-    EXPECT_EQ(val["cores"].size(), 1U);
+    if (val["cores"].empty()) {
+        // on occasion the core might not be registered with the broker in low CPU count systems
+        // so we need to wait.
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        result = sendText(generateJsonString(query));
+        EXPECT_FALSE(result.empty());
+        val = loadJson(result);
+    }
+    ASSERT_EQ(val["cores"].size(), 1U);
     EXPECT_STREQ(val["cores"][0]["name"].asCString(), "cr1");
 
     query["target"] = "cr1";
@@ -311,6 +318,42 @@ TEST_F(webTest, deleteBroker)
     v1["broker"] = "brk1";
     sendText(generateJsonString(v1));
     result = sendText(generateJsonString(v2));
+    EXPECT_FALSE(result.empty());
+    val = loadJson(result);
+    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_EQ(val["brokers"].size(), 1U);
+}
+
+TEST_F(webTest, createBrokerUUID)
+{
+    Json::Value v1;
+    v1["command"] = "create";
+    v1["core_type"] = "ZMQ";
+    v1["num_feds"] = 3;
+    auto result = sendText(generateJsonString(v1));
+    auto val = loadJson(result);
+    EXPECT_TRUE(val["broker_uuid"].isString());
+    auto uuid = val["broker_uuid"].asString();
+
+    Json::Value v2;
+    v2["command"] = "get";
+    v2["uuid"] = uuid;
+
+    result = sendText(generateJsonString(v2));
+    val = loadJson(result);
+    EXPECT_TRUE(val["status"].asBool());
+
+    Json::Value v3;
+    v3["command"] = "delete";
+    v3["broker_uuid"] = uuid;
+
+    sendText(generateJsonString(v3));
+
+    Json::Value v4;
+    v4["command"] = "query";
+    v4["query"] = "brokers";
+
+    result = sendText(generateJsonString(v4));
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());

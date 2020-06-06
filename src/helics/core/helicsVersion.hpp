@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -23,5 +23,8 @@ constexpr int versionMinor = HELICS_VERSION_MINOR;
 constexpr int versionPatch = HELICS_VERSION_PATCH;
 /** the build string if any*/
 constexpr auto versionBuild = HELICS_VERSION_BUILD;
-
-} // namespace helics
+/** build flags used to compile helics*/
+constexpr auto buildFlags = HELICS_BUILD_FLAGS;
+/** compiler used to build helics*/
+constexpr auto compiler = HELICS_COMPILER_VERSION;
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -21,9 +21,9 @@ namespace helics {
 /** class containing a constant view of data block*/
 class data_view {
   private:
-    stx::string_view dblock; //!< using a string_view to represent the data
+    stx::string_view dblock;  //!< using a string_view to represent the data
     std::shared_ptr<const data_block>
-        ref; //!< need to capture a reference to the data being viewed if it is from a shared_ptr
+        ref;  //!< need to capture a reference to the data being viewed if it is from a shared_ptr
   public:
     /** default constructor*/
     data_view() = default;
@@ -31,28 +31,29 @@ class data_view {
     ~data_view() = default;
     /** construct from a shared_ptr to a data_block*/
     data_view(std::shared_ptr<const data_block> dt):
-        dblock(dt->m_data), ref(std::move(dt)) {} // NOLINT
+        dblock(dt->m_data), ref(std::move(dt)) {}  // NOLINT
     /** construct from a regular data_block*/
-    data_view(const data_block& dt) noexcept: dblock(dt.m_data) {} // NOLINT
+    data_view(const data_block& dt) noexcept: dblock(dt.m_data) {}  // NOLINT
     /** copy constructor*/
     data_view(const data_view& dt) noexcept = default;
     /** move constructor*/
     data_view(data_view&& dv) noexcept: dblock(dv.dblock), ref(std::move(dv.ref)) {}
 
     /** construct from a string*/
-    data_view(const char* dt) noexcept: dblock(dt) {} // NOLINT
+    data_view(const char* dt) noexcept: dblock(dt) {}  // NOLINT
     /** construct from a char Pointer and length*/
     data_view(const char* dt, size_t len) noexcept: dblock(dt, len) {}
     /** construct from a string*/
-    data_view(const std::string& str) noexcept: dblock(str) {} // NOLINT
+    data_view(const std::string& str) noexcept: dblock(str) {}  // NOLINT
     /** construct from a rValue to a string*/
     data_view(std::string&& str):
-        data_view(std::make_shared<data_block>(std::move(str))) {} // NOLINT
+        data_view(std::make_shared<data_block>(std::move(str))) {}  // NOLINT
     /** construct from a char vector*/
-    data_view(const std::vector<char>& dvec) noexcept: dblock(dvec.data(), dvec.size()) {} // NOLINT
+    data_view(const std::vector<char>& dvec) noexcept:
+        dblock(dvec.data(), dvec.size()) {}  // NOLINT
     /** construct from a string_view*/
     data_view(const stx::string_view& sview) noexcept:
-        dblock(sview){}; // NOLINT (intended implicit)
+        dblock(sview){};  // NOLINT (intended implicit)
     /** assignment operator from another ata_view*/
     data_view& operator=(const data_view& dv) noexcept = default;
 
@@ -130,7 +131,7 @@ inline const char* typeNameString<std::vector<data_block>>()
     return bvecstr;
 }
 
-} // namespace helics
+}  // namespace helics
 
 namespace std {
 template<>
@@ -138,4 +139,4 @@ inline void swap(helics::data_view& db1, helics::data_view& db2) noexcept
 {
     db1.swap(db2);
 }
-} // namespace std
+}  // namespace std

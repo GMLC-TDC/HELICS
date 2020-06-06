@@ -1,5 +1,4 @@
-Run tests
-=========
+# Run tests
 
 **Python**
 
@@ -15,4 +14,3 @@ Then run it by doing the following
 cd ~/GitRepos/HELICS/tests/
 pytest -sv python_helics
 ```
-

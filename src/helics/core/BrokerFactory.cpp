@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -26,8 +26,8 @@ namespace helics {
 namespace BrokerFactory {
 
     /*** class to hold the set of builders
-    @details this doesn't work as a global since it tends to get initialized after some of the things that call it
-    so it needs to be a static member of function call*/
+    @details this doesn't work as a global since it tends to get initialized after some of the
+    things that call it so it needs to be a static member of function call*/
     class MasterBrokerBuilder {
       public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
@@ -53,6 +53,21 @@ namespace BrokerFactory {
             }
             return std::get<2>(blder->builders[index]);
         }
+
+        static const std::shared_ptr<BrokerBuilder>& getDefaultBuilder()
+        {
+            const auto& blder = instance();
+            for (auto& bb : instance()->builders) {
+                if (std::get<0>(bb) <= 10) {
+                    return std::get<2>(bb);
+                }
+            }
+            if (blder->builders.empty()) {
+                throw(HelicsException("core type is not available"));
+            }
+            return std::get<2>(blder->builders[0]);
+        }
+
         static const std::shared_ptr<MasterBrokerBuilder>& instance()
         {
             static std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
@@ -63,7 +78,7 @@ namespace BrokerFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterBrokerBuilder() = default;
-        std::vector<BuildT> builders; //!< container for the builders
+        std::vector<BuildT> builders;  //!< container for the builders
     };
 
     void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
@@ -77,7 +92,7 @@ namespace BrokerFactory {
             throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         }
         if (type == core_type::DEFAULT) {
-            return MasterBrokerBuilder::getIndexedBuilder(0)->build(name);
+            return MasterBrokerBuilder::getDefaultBuilder()->build(name);
         }
         return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->build(name);
     }
@@ -142,27 +157,27 @@ namespace BrokerFactory {
         return broker;
     }
 
-    /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
- * loops*/
+    /** lambda function to join cores before the destruction happens to avoid potential problematic
+     * calls in the loops*/
     static auto destroyerCallFirst = [](auto& broker) {
         auto tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
         if (tbroker) {
-            tbroker->processDisconnect(
-                true); // use true here as it is possible the searchableObjectHolder is deleted already
+            tbroker->processDisconnect(true);  // use true here as it is possible the
+                                               // searchableObjectHolder is deleted already
             tbroker->joinAllThreads();
         }
     };
-    /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
-that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
-can do the unregister operation and destroy itself meaning it is unable to join and thus will call std::terminate
-what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
-need be without issue*/
+    /** so the problem this is addressing is that unregister can potentially cause a destructor to
+fire that destructor can delete a thread variable, unfortunately it is possible that a thread stored
+in this variable can do the unregister operation and destroy itself meaning it is unable to join and
+thus will call std::terminate what we do is delay the destruction until it is called in a different
+thread which allows the destructor to fire if need be without issue*/
 
     static gmlc::concurrency::DelayedDestructor<Broker>
-        delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
+        delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<Broker, core_type>
-        searchableBrokers; //!< the object managing the searchable objects
+        searchableBrokers;  //!< the object managing the searchable objects
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
@@ -174,8 +189,8 @@ need be without issue*/
 
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
     {
-        return searchableBrokers.findObject(
-            [](auto& ptr) { return ptr->isOpenToNewFederates(); }, type);
+        return searchableBrokers.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); },
+                                            type);
     }
 
     std::vector<std::shared_ptr<Broker>> getAllBrokers() { return searchableBrokers.getObjects(); }
@@ -273,5 +288,5 @@ need be without issue*/
         }
     }
 
-} // namespace BrokerFactory
-} // namespace helics
+}  // namespace BrokerFactory
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -73,8 +73,8 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
             if (val.is_floating()) {
                 return {val.as_floating() * toSecondMultiplier(defaultUnits)};
             }
-            return gmlc::utilities::loadTimeFromString<helics::Time>(
-                tomlAsString(val) + " " + units);
+            return gmlc::utilities::loadTimeFromString<helics::Time>(tomlAsString(val) + " " +
+                                                                     units);
         }
     } else if (timeElement.is_integer()) {
         return {timeElement.as_integer(), defaultUnits};

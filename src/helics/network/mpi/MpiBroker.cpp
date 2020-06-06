@@ -1,8 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
-See the top-level NOTICE for additional details.
-All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC. See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MpiBroker.h"
@@ -57,7 +56,7 @@ namespace mpi {
     bool MpiBroker::brokerConnect()
     {
         std::lock_guard<std::mutex> lock(
-            dataMutex); // mutex protecting the other information in the ipcBroker
+            dataMutex);  // mutex protecting the other information in the ipcBroker
 
         if (brokerAddress.empty()) {
             setAsRoot();
@@ -71,5 +70,5 @@ namespace mpi {
     }
 
     std::string MpiBroker::generateLocalAddressString() const { return comms->getAddress(); }
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

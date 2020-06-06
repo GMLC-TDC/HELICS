@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Source.hpp"
@@ -55,10 +55,9 @@ namespace apps {
         fed->setFlagOption(helics_flag_source_only);
     }
 
-    Source::Source(
-        const std::string& appName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi):
+    Source::Source(const std::string& appName,
+                   const std::shared_ptr<Core>& core,
+                   const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(helics_flag_source_only);
@@ -100,7 +99,8 @@ namespace apps {
 
     void Source::loadJsonFile(const std::string& jsonString)
     {
-        // we want to load the default period before constructing the interfaces so the default period works
+        // we want to load the default period before constructing the interfaces so the default
+        // period works
         auto doc = loadJson(jsonString);
 
         if (doc.isMember("source")) {
@@ -164,10 +164,9 @@ namespace apps {
                     if (el == "properties") {
                         for (auto& prop : genElement["properties"]) {
                             if ((prop.isMember("name")) && (prop.isMember("value"))) {
-                                setGeneratorProperty(
-                                    generators[index].get(),
-                                    prop["name"].asString(),
-                                    prop["value"]);
+                                setGeneratorProperty(generators[index].get(),
+                                                     prop["name"].asString(),
+                                                     prop["value"]);
                             }
                         }
                     } else {
@@ -254,26 +253,24 @@ namespace apps {
         }
     }
 
-    void Source::addPublication(
-        const std::string& key,
-        const std::string& generator,
-        data_type type,
-        Time period,
-        const std::string& units)
+    void Source::addPublication(const std::string& key,
+                                const std::string& generator,
+                                data_type type,
+                                Time period,
+                                const std::string& units)
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
             std::cerr << "publication already exists\n";
             return;
         }
-        SourceObject newObj(
-            Publication(
-                useLocal ? interface_visibility::local : interface_visibility::global,
-                fed,
-                key,
-                typeNameStringRef(type),
-                units),
-            period);
+        SourceObject newObj(Publication(useLocal ? interface_visibility::local :
+                                                   interface_visibility::global,
+                                        fed,
+                                        key,
+                                        typeNameStringRef(type),
+                                        units),
+                            period);
 
         if (!generator.empty()) {
             auto res = generatorLookup.find(generator);
@@ -391,5 +388,5 @@ namespace apps {
         return minTime;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

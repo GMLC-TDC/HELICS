@@ -1,8 +1,7 @@
 /*
 Copyright (c) 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
-See the top-level NOTICE for additional details.
-All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC. See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -35,10 +34,10 @@ namespace mpi {
 
       private:
         virtual bool brokerConnect() override;
-        mutable std::mutex dataMutex; //!< mutex protecting the configuration information
-        std::string brokerAddress; //!< the mpi rank:tag of the parent broker
+        mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+        std::string brokerAddress;  //!< the mpi rank:tag of the parent broker
         int brokerRank{0};
         int brokerTag{0};
     };
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

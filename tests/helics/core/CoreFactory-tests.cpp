@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/core/CommonCore.hpp"
@@ -24,12 +24,12 @@ TEST(CoreFactory_tests, ZmqCore_test)
     core->disconnect();
     core = nullptr;
 }
-#else // ENABLE_ZMQ_CORE
+#else  // ENABLE_ZMQ_CORE
 TEST(CoreFactory_tests, ZmqCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::ZMQ), false);
 }
-#endif // ENABLE_ZMQ_CORE
+#endif  // ENABLE_ZMQ_CORE
 
 /*
 #ifdef ENABLE_MPI_CORE

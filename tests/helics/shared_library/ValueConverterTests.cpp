@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/floating_point_comparison.hpp>
@@ -26,12 +26,11 @@ using namespace std::string_literals;
 BOOST_AUTO_TEST_SUITE(value_converter_tests, *utf::label("ci"))
 
 template<class X>
-void converterTests(
-    const X& testValue1,
-    const X& testValue2,
-    size_t sz1 = 0,
-    size_t sz2 = 0,
-    const std::string& type = "")
+void converterTests(const X& testValue1,
+                    const X& testValue2,
+                    size_t sz1 = 0,
+                    size_t sz2 = 0,
+                    const std::string& type = "")
 {
     auto converter = helics::ValueConverter<X>();
 
@@ -201,8 +200,8 @@ BOOST_AUTO_TEST_CASE(test_converter_errors)
     BOOST_CHECK_THROW(helics::ValueConverter<double>::interpret(vb2), std::invalid_argument);
     BOOST_CHECK_LT(vb2.size(), 8);
     BOOST_CHECK_GT(vb2.size(), 4);
-    BOOST_CHECK_THROW(
-        helics::ValueConverter<std::complex<double>>::interpret(vb1), std::invalid_argument);
+    BOOST_CHECK_THROW(helics::ValueConverter<std::complex<double>>::interpret(vb1),
+                      std::invalid_argument);
     BOOST_CHECK_LT(vb1.size(), 12);
     BOOST_CHECK_GT(vb1.size(), 8);
 }

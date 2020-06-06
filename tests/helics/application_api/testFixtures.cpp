@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "testFixtures.hpp"
@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 bool hasIndexCode(const std::string& type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
-        if (*(type_name.end() - 2) == '_') { // this check ignores the setup mode
+        if (*(type_name.end() - 2) == '_') {  // this check ignores the setup mode
             return true;
         }
     }
@@ -97,15 +97,15 @@ void FederateTestFixture::FullDisconnect()
     helics::cleanupHelicsLibrary();
 }
 
-std::shared_ptr<helics::Broker>
-    FederateTestFixture::AddBroker(const std::string& core_type_name, int count)
+std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker(const std::string& core_type_name,
+                                                               int count)
 {
     return AddBroker(core_type_name, std::string("-f ") + std::to_string(count));
 }
 
-std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker(
-    const std::string& core_type_name,
-    const std::string& initialization_string)
+std::shared_ptr<helics::Broker>
+    FederateTestFixture::AddBroker(const std::string& core_type_name,
+                                   const std::string& initialization_string)
 {
     std::shared_ptr<helics::Broker> broker;
     if (extraBrokerArgs.empty()) {

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 /*
@@ -28,24 +28,24 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class LoggingCore;
 
-constexpr int always_log = -100000; //!< level that will always log
-constexpr int log_everything = 100; //!< level that will log everything
+constexpr int always_log = -100000;  //!< level that will always log
+constexpr int log_everything = 100;  //!< level that will log everything
 
 /** class implementing a thread safe Logger
-@details the Logger uses a queuing mechanism and condition variable to store messages to a queue and print/display
-them in a single thread allowing for asynchronous logging
+@details the Logger uses a queuing mechanism and condition variable to store messages to a queue and
+print/display them in a single thread allowing for asynchronous logging
 */
 class Logger {
   private:
-    std::atomic<bool> halted{true}; //!< indicator that the Logger was halted
-    std::mutex fileLock; //!< mutex to protect the file itself
-    std::atomic<bool> hasFile{false}; //!< flag indicating the logger has a file
-    std::ofstream outFile; //!< the stream to write the log messages
-    std::shared_ptr<LoggingCore> logCore; //!< pointer to the core operation
-    int coreIndex = -1; //!< index into the core
+    std::atomic<bool> halted{true};  //!< indicator that the Logger was halted
+    std::mutex fileLock;  //!< mutex to protect the file itself
+    std::atomic<bool> hasFile{false};  //!< flag indicating the logger has a file
+    std::ofstream outFile;  //!< the stream to write the log messages
+    std::shared_ptr<LoggingCore> logCore;  //!< pointer to the core operation
+    int coreIndex = -1;  //!< index into the core
     std::atomic<int> consoleLevel{
-        log_everything}; //!< level below which we need to print to the console
-    std::atomic<int> fileLevel{log_everything}; //!< level below which we need to print to a file
+        log_everything};  //!< level below which we need to print to the console
+    std::atomic<int> fileLevel{log_everything};  //!< level below which we need to print to a file
   public:
     /** default constructor*/
     Logger();
@@ -93,14 +93,15 @@ class Logger {
 /** logging class that handle the logs immediately with no threading or synchronization*/
 class LoggerNoThread {
   private:
-    std::ofstream outFile; //!< the file stream to write the log messages to
+    std::ofstream outFile;  //!< the file stream to write the log messages to
   public:
-    int consoleLevel = log_everything; //!< level below which we need to print to the console
-    int fileLevel = log_everything; //!< level below which we need to print to a file
+    int consoleLevel = log_everything;  //!< level below which we need to print to the console
+    int fileLevel = log_everything;  //!< level below which we need to print to a file
   public:
     /** default constructor*/
     LoggerNoThread();
-    /**this does nothing with the argument since it is not threaded here to match the API of Logger*/
+    /**this does nothing with the argument since it is not threaded here to match the API of
+     * Logger*/
     explicit LoggerNoThread(const std::shared_ptr<LoggingCore>& core);
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
@@ -114,7 +115,8 @@ class LoggerNoThread {
     /** overload of /ref startLogging with unspecified logging levels*/
     void startLogging() { startLogging(consoleLevel, fileLevel); }
     // NOTE:: the interface for log in the noThreadLogging is slightly different
-    // due to the threaded Logger making use of move semantics which isn't that useful in the noThreadLogger
+    // due to the threaded Logger making use of move semantics which isn't that useful in the
+    // noThreadLogger
     /** log a message at a particular level
     @param level the level of the message
     @param logMessage the actual message to log
@@ -133,4 +135,4 @@ class LoggerNoThread {
     @param fLevel the level to print to the file if it is open*/
     void changeLevels(int cLevel, int fLevel);
 };
-} // namespace helics
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -29,8 +29,10 @@ class EchoHub: public BenchmarkFederate {
         // default final time for this benchmark
         finalTime = helics::Time(100, time_units::ms);
 
-        app->add_option(
-            "--num_leafs", num_leafs, "the number of echoleaf federates to expect", true);
+        app->add_option("--num_leafs",
+                        num_leafs,
+                        "the number of echoleaf federates to expect",
+                        true);
     }
 
     std::string getName() override { return "echohub"; }

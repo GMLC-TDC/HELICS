@@ -5,5 +5,3 @@
 %include "java_maps.i"
 
 %include "../helics.i"
-
-

@@ -27,7 +27,7 @@ java -Djava.library.path="/Library/Java/Extensions:/Network/Library/Java/Extensi
 
 You should see the output that is similar to the following.
 
-```
+```text
 HELICS Version: x.x.x (XX-XX-XX)
 ```
 

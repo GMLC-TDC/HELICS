@@ -1,8 +1,8 @@
 /*
 
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcQueueHelper.h"
@@ -42,8 +42,9 @@ namespace ipc {
         ipc_state::remove(stateName.c_str());
 
         try {
-            queue_state = std::make_unique<ipc_state>(
-                boostipc::create_only, stateName.c_str(), boostipc::read_write);
+            queue_state = std::make_unique<ipc_state>(boostipc::create_only,
+                                                      stateName.c_str(),
+                                                      boostipc::read_write);
         }
         catch (boost::interprocess::interprocess_exception const& ipe) {
             errorString = std::string("Unable to open local state shared memory:") + ipe.what();
@@ -57,8 +58,10 @@ namespace ipc {
         sstate->setState(queue_state_t::startup);
 
         try {
-            rqueue = std::make_unique<ipc_queue>(
-                boostipc::create_only, connectionName.c_str(), maxMessages, maxSize);
+            rqueue = std::make_unique<ipc_queue>(boostipc::create_only,
+                                                 connectionName.c_str(),
+                                                 maxMessages,
+                                                 maxSize);
         }
         catch (boost::interprocess::interprocess_exception const& ipe) {
             errorString = std::string("Unable to open local connection:") + ipe.what();
@@ -147,8 +150,9 @@ namespace ipc {
         int tries = 0;
         while (!goodToConnect) {
             try {
-                auto queue_state = std::make_unique<ipc_state>(
-                    boostipc::open_only, stateName.c_str(), boostipc::read_write);
+                auto queue_state = std::make_unique<ipc_state>(boostipc::open_only,
+                                                               stateName.c_str(),
+                                                               boostipc::read_write);
                 boostipc::mapped_region region(*queue_state, boostipc::read_write);
 
                 auto* sstate = reinterpret_cast<SharedQueueState*>(region.get_address());
@@ -163,7 +167,7 @@ namespace ipc {
                             goodToConnect = true;
                         }
                         break;
-                    case queue_state_t::unknown: // probably still undergoing setup
+                    case queue_state_t::unknown:  // probably still undergoing setup
                     default:
                         break;
                 }
@@ -218,5 +222,5 @@ namespace ipc {
             txqueue->send(buffer.data(), buffer.size(), priority);
         }
     }
-} // namespace ipc
-} // namespace helics
+}  // namespace ipc
+}  // namespace helics

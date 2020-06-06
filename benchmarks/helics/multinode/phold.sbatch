@@ -34,12 +34,18 @@ fi
 if [[ "${helics_broker_exe}" == "" ]]; then
     helics_broker_exe="${BUILD_PATH}/src/helics/apps/helics_broker"
 fi
-command -v "${helics_broker_exe}" || { echo >&2 "unable to find helics broker at ${helics_broker_exe}; check for working build and set BUILD_PATH if needed"; exit 1; }
+command -v "${helics_broker_exe}" || {
+    echo >&2 "unable to find helics broker at ${helics_broker_exe}; check for working build and set BUILD_PATH if needed"
+    exit 1
+}
 
 if [[ "${helics_bm_fed_exe}" == "" ]]; then
     helics_bm_fed_exe="${BUILD_PATH}/benchmarks/helics/${BM_FED}"
 fi
-command -v "${helics_bm_fed_exe}" || { echo >&2 "unable to find benchmark federate at ${helics_bm_fed_exe}; check for working build and set BUILD_PATH if needed"; exit 1; }
+command -v "${helics_bm_fed_exe}" || {
+    echo >&2 "unable to find benchmark federate at ${helics_bm_fed_exe}; check for working build and set BUILD_PATH if needed"
+    exit 1
+}
 
 # create an output folder for results
 output_folder="${BM_FED}-${CORE_TYPE}-N${SLURM_JOB_NUM_NODES}-job-${SLURM_JOB_ID}"
@@ -47,17 +53,16 @@ mkdir -p "${output_folder}"
 
 # Run info and srun job launch
 echo "Running broker on $HOSTNAME"
-"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --coretype "${CORE_TYPE}" --loglevel=5 > "${output_folder}/helics-broker-out.txt" 2>&1 &
+"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --coretype "${CORE_TYPE}" --loglevel=5 >"${output_folder}/helics-broker-out.txt" 2>&1 &
 
 # give some time for the broker to start up
 sleep 5
 
 # Run on 1 and 2 nodes to verify output, then scale to 4,8,16,32 to get performance numbers
 # Run on 1 node with 2, 4, 8, 16, and 32 instances to verify Eaton results for single node
-for i in $(seq 1 "${SLURM_JOB_NUM_NODES}");
-do
-    (( idx = i-1 ))
-    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" > "${output_folder}/${BM_FED}-${idx}-out.txt" 2>&1 &
+for i in $(seq 1 "${SLURM_JOB_NUM_NODES}"); do
+    ((idx = i - 1))
+    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" >"${output_folder}/${BM_FED}-${idx}-out.txt" 2>&1 &
 done
 
 wait

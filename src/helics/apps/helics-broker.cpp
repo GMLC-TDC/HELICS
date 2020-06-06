@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../application_api/BrokerApp.hpp"
@@ -25,7 +25,7 @@ void terminalFunction(std::vector<std::string> args);
 
 static const bool amb = helics::allowMultiBroker();
 
-int main(int argc, char* argv[]) //NOLINT
+int main(int argc, char* argv[])  // NOLINT
 {
     int ret{0};
     bool runterminal{false};
@@ -47,14 +47,12 @@ int main(int argc, char* argv[]) //NOLINT
         autorestart,
         "helics_broker --autorestart <broker args ...> will start a continually regenerating broker "
         "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
-    cmdLine.add_flag(
-        "--http",
-        http_webserver,
-        "start an http webserver that can respond to queries on the broker");
-    cmdLine.add_flag(
-        "--web",
-        websocket_server,
-        "start an websocket webserver that can respond to queries on the broker");
+    cmdLine.add_flag("--http",
+                     http_webserver,
+                     "start an http webserver that can respond to queries on the broker");
+    cmdLine.add_flag("--web",
+                     websocket_server,
+                     "start an websocket webserver that can respond to queries on the broker");
     cmdLine
         .footer(
             "helics_broker <broker args ..> starts a broker with the given args and waits for it to "
@@ -93,13 +91,13 @@ int main(int argc, char* argv[]) //NOLINT
 #endif
     try {
         if (runterminal) {
-            terminalFunction(cmdLine.remaining_for_passthrough());
+            terminalFunction(cmdLine.remainArgs());
         } else if (autorestart) {
             while (true) {
-                // I am purposely making an object that creates and destroys itself on the same line because this
-                // will run until termination so will take a while
+                // I am purposely making an object that creates and destroys itself on the same line
+                // because this will run until termination so will take a while
                 {
-                    helics::BrokerKeeper brkapp{cmdLine.remaining_for_passthrough(true)};
+                    helics::BrokerKeeper brkapp{cmdLine.remainArgs()};
                 }
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -110,7 +108,7 @@ int main(int argc, char* argv[]) //NOLINT
                 std::cout << "broker restarting" << std::endl;
             }
         } else {
-            helics::BrokerKeeper broker(cmdLine.remaining_for_passthrough());
+            helics::BrokerKeeper broker(cmdLine.remainArgs());
         }
     }
     catch (const std::invalid_argument& ia) {
@@ -197,10 +195,9 @@ void terminalFunction(std::vector<std::string> args)
     bool cmdcont = true;
     helics::helicsCLI11App termProg("helics broker command line terminal");
     termProg.ignore_case();
-    termProg.add_flag(
-        "-q{false},--quit{false},--exit{false}",
-        cmdcont,
-        "close the terminal and wait for the broker to exit");
+    termProg.add_flag("-q{false},--quit{false},--exit{false}",
+                      cmdcont,
+                      "close the terminal and wait for the broker to exit");
     termProg.add_subcommand("quit", "close the terminal and  wait for the broker to exit")
         ->callback([&cmdcont]() { cmdcont = false; });
     termProg.add_subcommand("terminate", "terminate the broker")->callback(closeBroker);
@@ -269,9 +266,8 @@ void terminalFunction(std::vector<std::string> args)
         std::string cmdin;
         std::cout << "\nhelics_broker>>";
         std::getline(std::cin, cmdin);
-        if (cmdin == "exit" ||
-            cmdin ==
-                "q") { // provide a fast path to exit without going through the terminal command line processor
+        if (cmdin == "exit" || cmdin == "q") {  // provide a fast path to exit without going through
+                                                // the terminal command line processor
             cmdcont = false;
             continue;
         }

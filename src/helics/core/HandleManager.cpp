@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "HandleManager.hpp"
@@ -10,12 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 // TODO(PT): move the flags out of actionMessage
 
 namespace helics {
-BasicHandleInfo& HandleManager::addHandle(
-    global_federate_id fed_id,
-    handle_type what,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+BasicHandleInfo& HandleManager::addHandle(global_federate_id fed_id,
+                                          handle_type what,
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units)
 {
     interface_handle local_id(static_cast<interface_handle::base_type>(handles.size()));
     std::string actKey = (!key.empty()) ? key : generateName(what);
@@ -24,13 +23,12 @@ BasicHandleInfo& HandleManager::addHandle(
     return handles.back();
 }
 
-BasicHandleInfo& HandleManager::addHandle(
-    global_federate_id fed_id,
-    interface_handle local_id,
-    handle_type what,
-    const std::string& key,
-    const std::string& type,
-    const std::string& units)
+BasicHandleInfo& HandleManager::addHandle(global_federate_id fed_id,
+                                          interface_handle local_id,
+                                          handle_type what,
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units)
 {
     auto index = static_cast<int32_t>(handles.size());
     std::string actKey = (!key.empty()) ? key : generateName(what);
@@ -148,13 +146,13 @@ const BasicHandleInfo* HandleManager::findHandle(global_handle fed_id) const
     }
     return nullptr;
 }
-void HandleManager::setHandleOption(interface_handle handle, int option, bool val)
+void HandleManager::setHandleOption(interface_handle handle, int32_t option, int32_t val)
 {
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         switch (option) {
             case helics_handle_option_connection_required:
-                if (val) {
+                if (val != 0) {
                     clearActionFlag(handles[index], optional_flag);
                     setActionFlag(handles[index], required_flag);
                 } else {
@@ -162,7 +160,7 @@ void HandleManager::setHandleOption(interface_handle handle, int option, bool va
                 }
                 break;
             case helics_handle_option_connection_optional:
-                if (val) {
+                if (val != 0) {
                     clearActionFlag(handles[index], required_flag);
                     setActionFlag(handles[index], optional_flag);
                 } else {
@@ -175,26 +173,32 @@ void HandleManager::setHandleOption(interface_handle handle, int option, bool va
     }
 }
 
-bool HandleManager::getHandleOption(interface_handle handle, int option) const
+int32_t HandleManager::getHandleOption(interface_handle handle, int32_t option) const
 {
     auto index = handle.baseValue();
+    bool rvalue{false};
     if (isValidIndex(index, handles)) {
         switch (option) {
             case helics_handle_option_only_update_on_change:
-                return checkActionFlag(handles[index], extra_flag1);
+                rvalue = checkActionFlag(handles[index], extra_flag1);
+                break;
             case helics_handle_option_only_transmit_on_change:
-                return checkActionFlag(handles[index], extra_flag2);
+                rvalue = checkActionFlag(handles[index], extra_flag2);
+                break;
             case helics_handle_option_connection_required:
-                return checkActionFlag(handles[index], required_flag);
+                rvalue = checkActionFlag(handles[index], required_flag);
+                break;
             case helics_handle_option_connection_optional:
-                return checkActionFlag(handles[index], optional_flag);
+                rvalue = checkActionFlag(handles[index], optional_flag);
+                break;
             case helics_handle_option_single_connection_only:
-                return checkActionFlag(handles[index], extra_flag4);
+                rvalue = checkActionFlag(handles[index], extra_flag4);
+                break;
             default:
-                return false;
+                break;
         }
     }
-    return false;
+    return rvalue;
 }
 
 BasicHandleInfo* HandleManager::getEndpoint(const std::string& name)
@@ -366,4 +370,4 @@ std::string HandleManager::generateName(handle_type what) const
             return std::string("_handle_") + std::to_string(handles.size());
     }
 }
-} // namespace helics
+}  // namespace helics

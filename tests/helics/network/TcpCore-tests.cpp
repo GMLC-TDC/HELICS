@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/common/AsioContextManager.h"
@@ -42,10 +42,9 @@ TEST(TcpCore, tcpComms_broker)
         helics::tcp::TcpServer::create(srv->getBaseContext(), DEFAULT_TCP_BROKER_PORT_NUMBER);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall([&counter](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* /*unused*/,
-                            size_t data_avail) {
+    server->setDataCall([&counter](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                   const char* /*unused*/,
+                                   size_t data_avail) {
         ++counter;
         return data_avail;
     });
@@ -78,15 +77,15 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
         helics::tcp::TcpServer::create(srv->getBaseContext(), host, DEFAULT_TCP_BROKER_PORT_NUMBER);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall([&data, &counter, &len](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* data_rec,
-                            size_t data_Size) {
-        std::copy(data_rec, data_rec + data_Size, data.begin());
-        len = data_Size;
-        ++counter;
-        return data_Size;
-    });
+    server->setDataCall(
+        [&data, &counter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                const char* data_rec,
+                                size_t data_Size) {
+            std::copy(data_rec, data_rec + data_Size, data.begin());
+            len = data_Size;
+            ++counter;
+            return data_Size;
+        });
     ASSERT_TRUE(server->isReady());
     server->start();
 
@@ -137,15 +136,15 @@ TEST(TcpCore, tcpComms_rx)
         helics::tcp::TcpServer::create(srv->getBaseContext(), host, TCP_BROKER_PORT_STRING);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall([&data, &ServerCounter, &len](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* data_rec,
-                            size_t data_Size) {
-        std::copy(data_rec, data_rec + data_Size, data.begin());
-        len = data_Size;
-        ++ServerCounter;
-        return data_Size;
-    });
+    server->setDataCall(
+        [&data, &ServerCounter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                      const char* data_rec,
+                                      size_t data_Size) {
+            std::copy(data_rec, data_rec + data_Size, data.begin());
+            len = data_Size;
+            ++ServerCounter;
+            return data_Size;
+        });
     ASSERT_TRUE(server->isReady());
     server->start();
 
@@ -196,10 +195,9 @@ TEST(TcpCore, tcpServerConnections1)
     std::vector<char> data(1024);
     std::atomic<bool> validData{true};
 
-    auto dataCheck = [&counter, &validData](
-                         const helics::tcp::TcpConnection::pointer& /*unused*/,
-                         const char* datablock,
-                         size_t datasize) {
+    auto dataCheck = [&counter, &validData](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                            const char* datablock,
+                                            size_t datasize) {
         size_t used = 0;
         while (datasize - used >= 20) {
             ++counter;
@@ -301,12 +299,13 @@ TEST(TcpCore, tcpComm_transmit_through)
         ++counter2;
         act2 = m;
     });
-    // need to launch the connection commands at the same time since they depend on each other in this case
+    // need to launch the connection commands at the same time since they depend on each other in
+    // this case
 
     bool connected1 = comm2.connect();
     ASSERT_TRUE(connected1);
     bool connected2 = comm.connect();
-    if (!connected2) { // lets just try again if it is not connected
+    if (!connected2) {  // lets just try again if it is not connected
         connected2 = comm.connect();
     }
     ASSERT_TRUE(connected2);
@@ -432,20 +431,21 @@ TEST(TcpCore, tcpCore_initialization)
     EXPECT_TRUE(core->isConfigured());
     auto srv = AsioContextManager::getContextPointer();
 
-    auto server = helics::tcp::TcpServer::create(
-        srv->getBaseContext(), "localhost", DEFAULT_TCP_BROKER_PORT_NUMBER);
+    auto server = helics::tcp::TcpServer::create(srv->getBaseContext(),
+                                                 "localhost",
+                                                 DEFAULT_TCP_BROKER_PORT_NUMBER);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     std::atomic<size_t> len{0};
-    server->setDataCall([&data, &counter, &len](
-                            const helics::tcp::TcpConnection::pointer& /*unused*/,
-                            const char* data_rec,
-                            size_t data_Size) {
-        std::copy(data_rec, data_rec + data_Size, data.begin());
-        len = data_Size;
-        ++counter;
-        return data_Size;
-    });
+    server->setDataCall(
+        [&data, &counter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+                                const char* data_rec,
+                                size_t data_Size) {
+            std::copy(data_rec, data_rec + data_Size, data.begin());
+            len = data_Size;
+            ++counter;
+            return data_Size;
+        });
     server->setPortReuse(true);
     EXPECT_TRUE(server->start());
     bool connected = core->connect();

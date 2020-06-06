@@ -1,5 +1,6 @@
 //this should be a valid json file (except comments are not recognized in standard JSON)
-{ //example json configuration file for a value federate all arguments are optional
+{
+  //example json configuration file for a value federate all arguments are optional
   "name": "valueFed", // the name of the federate
   //possible flags
   "observer": false, // indicator that the federate does not send anything
@@ -17,20 +18,20 @@
   "time_delta": 0.0, // the minimum time between subsequent return times
   "output_delay": 0, //the propagation delay for federates to send data
   "input_delay": 0, //the input delay for external data to propagate to federates
-  "log_level": "summary",  //specify the log level (either a number or string)
+  "log_level": "summary", //specify the log level (either a number or string)
 
   //Publications used in the federate
   "publications": [
     {
       "key": "pub1", // the name of the publication
-      "type": "double", // the type assocaited with a publication (optional)
+      "type": "double", // the type associated with a publication (optional)
       "unit": "m", // the units associated with a publication (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
       "info": "this is an information string for use by the application"
     },
     {
       "key": "pub2", // the name of the publication
-      "type": "double" // the type assocaited with a publication (optional)
+      "type": "double" // the type associated with a publication (optional)
       //no global:true implies this will have the federate name prepended like valueFed/pub2
     }
   ],
@@ -57,10 +58,8 @@
     //specify an input with a target multiple targets could be specified like "targets":["pub1","pub2","pub3"]
   ],
 
-
   "globals": [
-    [ "global1", "this is a global1 value" ],
-    [ "global2", "this is another global value" ]
+    ["global1", "this is a global1 value"],
+    ["global2", "this is another global value"]
   ]
 }
-

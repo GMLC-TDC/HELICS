@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CombinationFederate.hpp"
@@ -15,19 +15,17 @@ CombinationFederate::CombinationFederate(const std::string& fedName, const Feder
     Federate(fedName, fi), ValueFederate(true), MessageFederate(true)
 {
 }
-CombinationFederate::CombinationFederate(
-    const std::string& fedName,
-    const std::shared_ptr<Core>& core,
-    const FederateInfo& fi):
+CombinationFederate::CombinationFederate(const std::string& fedName,
+                                         const std::shared_ptr<Core>& core,
+                                         const FederateInfo& fi):
     Federate(fedName, core, fi),
     ValueFederate(true), MessageFederate(true)
 {
 }
 
-CombinationFederate::CombinationFederate(
-    const std::string& fedName,
-    CoreApp& core,
-    const FederateInfo& fi):
+CombinationFederate::CombinationFederate(const std::string& fedName,
+                                         CoreApp& core,
+                                         const FederateInfo& fi):
     Federate(fedName, core, fi),
     ValueFederate(true), MessageFederate(true)
 {
@@ -40,9 +38,8 @@ CombinationFederate::CombinationFederate(const std::string& configString):
     CombinationFederate::registerInterfaces(configString);
 }
 
-CombinationFederate::CombinationFederate(
-    const std::string& fedName,
-    const std::string& configString):
+CombinationFederate::CombinationFederate(const std::string& fedName,
+                                         const std::string& configString):
     Federate(fedName, loadFederateInfo(configString)),
     ValueFederate(true), MessageFederate(true)
 {
@@ -93,4 +90,4 @@ void CombinationFederate::registerInterfaces(const std::string& configString)
     MessageFederate::registerMessageInterfaces(configString);
     Federate::registerFilterInterfaces(configString);
 }
-} // namespace helics
+}  // namespace helics

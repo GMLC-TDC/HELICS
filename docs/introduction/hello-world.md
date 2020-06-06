@@ -35,12 +35,12 @@ Windows CMD:
 
 Next, make a new source file and call it `hello_world_sender.c`. Copy
 the contents from
-[hello\_world\_sender.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/72c9d38e/c/hello_world/hello_world_sender.c)
+[hello_world_sender.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/72c9d38e/c/hello_world/hello_world_sender.c)
 and paste it into the file.
 
 Next, create a new source file and call it `hello_world_receiver.c`.
 Copy the contents from
-[hello\_world\_receiver.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/72c9d38e/c/hello_world/hello_world_receiver.c)
+[hello_world_receiver.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/72c9d38e/c/hello_world/hello_world_receiver.c)
 and paste it into the file.
 
 We will go through in more detail the contents of these files. For now,
@@ -162,5 +162,5 @@ helicsFederateFree (vfed);
 helicsCloseLibrary ();
 ```
 
-***A note on the `&err` term***
-Many functions in the C API take a pointer to a helics_error structure. This can be created by a call to `helicsErrorInitialize` and can be reset by `helicsErrorClear(helics_error *err)`.  If an error occurs during the execution of a function or some inputs were invalid an error code in the helics_error structure will be set and a message included.  For all functions if an error structure that already has an error in place is passed as an argument the function short circuits and does nothing.  So checks can be done after a sequence of calls if desired with no worry about side effects.  In the C++98 API an error triggers an exception, and in the base C++ API these originate as exceptions.
+**_A note on the `&err` term_**
+Many functions in the C API take a pointer to a helics_error structure. This can be created by a call to `helicsErrorInitialize` and can be reset by `helicsErrorClear(helics_error *err)`. If an error occurs during the execution of a function or some inputs were invalid an error code in the helics_error structure will be set and a message included. For all functions if an error structure that already has an error in place is passed as an argument the function short circuits and does nothing. So checks can be done after a sequence of calls if desired with no worry about side effects. In the C++98 API an error triggers an exception, and in the base C++ API these originate as exceptions.

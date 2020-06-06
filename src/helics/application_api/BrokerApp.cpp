@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "BrokerApp.hpp"
@@ -18,10 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-BrokerApp::BrokerApp(
-    core_type ctype,
-    const std::string& broker_name,
-    std::vector<std::string> args):
+BrokerApp::BrokerApp(core_type ctype,
+                     const std::string& broker_name,
+                     std::vector<std::string> args):
     name(broker_name)
 {
     auto app = generateParser(ctype == core_type::MULTI);
@@ -187,9 +186,8 @@ void BrokerApp::addSourceFilterToEndpoint(const std::string& filter, const std::
     }
 }
 /** add a destination Filter to an endpoint*/
-void BrokerApp::addDestinationFilterToEndpoint(
-    const std::string& filter,
-    const std::string& endpoint)
+void BrokerApp::addDestinationFilterToEndpoint(const std::string& filter,
+                                               const std::string& endpoint)
 {
     if (broker) {
         broker->addDestinationFilterToEndpoint(filter, endpoint);
@@ -247,4 +245,4 @@ void BrokerApp::reset()
 {
     broker = nullptr;
 }
-} // namespace helics
+}  // namespace helics

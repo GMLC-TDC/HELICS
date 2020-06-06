@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/data/test_case.hpp>
@@ -39,10 +39,9 @@ BOOST_DATA_TEST_CASE(combo_federate_initialize_tests, bdata::make(core_types_sin
     BOOST_CHECK(vFed1->getCurrentState() == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE(
-    combo_federate_publication_registration,
-    bdata::make(core_types_single),
-    core_type)
+BOOST_DATA_TEST_CASE(combo_federate_publication_registration,
+                     bdata::make(core_types_single),
+                     core_type)
 {
     SetupSingleBrokerTest<helics::CombinationFederate>(core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -109,10 +108,9 @@ BOOST_DATA_TEST_CASE(combo_federate_single_transfer, bdata::make(core_types_sing
     BOOST_CHECK_EQUAL(s, "string2");
 }
 
-BOOST_DATA_TEST_CASE(
-    combo_federate_endpoint_registration,
-    bdata::make(core_types_single),
-    core_type)
+BOOST_DATA_TEST_CASE(combo_federate_endpoint_registration,
+                     bdata::make(core_types_single),
+                     core_type)
 {
     SetupSingleBrokerTest<helics::CombinationFederate>(core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);

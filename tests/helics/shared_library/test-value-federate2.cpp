@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details.
 */
 
 #include "ctestFixtures.hpp"
@@ -145,13 +145,13 @@ TEST_F(vfed2_tests, file_load)
     EXPECT_STREQ(s, "valueFed");
     EXPECT_EQ(helicsFederateGetInputCount(vFed), 3);
     EXPECT_EQ(helicsFederateGetPublicationCount(vFed), 2);
-    //	 helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
+    //     helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     CE(helicsFederateFinalize(vFed, &err));
     //
-    //	 EXPECT_EQ(vFed.getName(), "fedName");
+    //     EXPECT_EQ(vFed.getName(), "fedName");
 
-    //	 EXPECT_EQ(vFed.getSubscriptionCount(), 2);
-    //	 EXPECT_EQ(vFed.getPublicationCount(), 2);
+    //     EXPECT_EQ(vFed.getSubscriptionCount(), 2);
+    //     EXPECT_EQ(vFed.getPublicationCount(), 2);
     helicsFederateFree(vFed);
 }
 
@@ -172,8 +172,9 @@ TEST_F(vfed2_tests, json_publish)
     auto s3 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
     auto s4 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input1.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input1.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 1.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 99.9);
     char buffer[50];
@@ -184,8 +185,9 @@ TEST_F(vfed2_tests, json_publish)
     helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count");
 
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input2.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input2.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 2.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 88.2);
 
@@ -218,8 +220,9 @@ TEST_F(vfed2_tests, json_register_publish)
     auto s3 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubA", nullptr, nullptr);
     auto s4 = helicsFederateRegisterSubscription(vFed1, "fed0/group1/pubB", nullptr, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input1.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input1.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 1.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 99.9);
     char buffer[50];
@@ -230,8 +233,9 @@ TEST_F(vfed2_tests, json_register_publish)
     helicsInputGetString(s4, buffer, 50, &actLen, nullptr);
     EXPECT_STREQ(buffer, "count");
 
-    helicsFederatePublishJSON(
-        vFed1, (std::string(TEST_DIR) + "example_pub_input2.json").c_str(), nullptr);
+    helicsFederatePublishJSON(vFed1,
+                              (std::string(TEST_DIR) + "example_pub_input2.json").c_str(),
+                              nullptr);
     helicsFederateRequestTime(vFed1, 2.0, nullptr);
     EXPECT_EQ(helicsInputGetDouble(s1, nullptr), 88.2);
 
@@ -244,8 +248,7 @@ TEST_F(vfed2_tests, json_register_publish)
     CE(helicsFederateFinalize(vFed1, &err));
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    vfed_tests,
-    vfed2_simple_type_tests,
-    ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests,
+                         vfed2_simple_type_tests,
+                         ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed2_type_tests, ::testing::ValuesIn(core_types));

@@ -27,14 +27,14 @@ if (WIN32)
         endif(CMAKE_SYSTEM_VERSION)
     endmacro(get_WIN32_WINNT)
 endif()
-    
-	
+
+
 cmake_dependent_option(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS
        "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
 
 cmake_dependent_option(${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS
        "generate a compiler error for any warning encountered" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
-	   
+
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     mark_as_advanced(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     mark_as_advanced(${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS)
@@ -52,7 +52,7 @@ if(NOT TARGET compile_flags_target)
 endif()
 
 if (NOT TARGET build_flags_target)
-	add_library(build_flags_target INTERFACE)
+    add_library(build_flags_target INTERFACE)
 endif()
 
 target_compile_options(
@@ -60,6 +60,18 @@ target_compile_options(
     INTERFACE
         $<$<CXX_COMPILER_ID:MSVC>:$<$<BOOL:${${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS}>:/WX>>
         $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<BOOL:${${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS}>:-Werror>>
+)
+
+target_compile_options(
+    compile_flags_target
+    INTERFACE
+       ${${PROJECT_NAME}_EXTRA_COMPILE_FLAGS}
+)
+
+target_compile_options(
+    build_flags_target
+    INTERFACE
+       ${${PROJECT_NAME}_EXTRA_BUILD_FLAGS}
 )
 
 if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
@@ -90,7 +102,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
 
-   
+
     # this option produces a number of warnings in third party libraries
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:GNU>:-Wold-style-cast>>) this
@@ -114,19 +126,19 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
                 compile_flags_target
                 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough=2 -Wno-psabi>
             )
-			if (CMAKE_CXX_STANDARD GREATER 16)
-			target_compile_options(
+            if (CMAKE_CXX_STANDARD GREATER 16)
+            target_compile_options(
                 compile_flags_target
                 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-declarations>
             )
-			endif()
+            endif()
         endif()
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.9)
             target_compile_options(
                 compile_flags_target
                 INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wclass-memaccess>
             )
-			
+
         endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -151,6 +163,13 @@ if(MSVC)
         compile_flags_target
         INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
     )
+    if(MSVC_VERSION GREATER 1899 AND MSVC_VERSION LESS 1920 AND CMAKE_CXX_STANDARD GREATER 14)
+        #this is a bug in the visual studio 2017 compiler with C++17
+        target_compile_options(
+            compile_flags_target
+            INTERFACE -D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING
+        )
+    endif()
     # these next two should be global
     add_compile_options(/EHsc /MP)
     target_compile_options(build_flags_target INTERFACE /EHsc)

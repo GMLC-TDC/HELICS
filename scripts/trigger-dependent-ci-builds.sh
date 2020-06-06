@@ -20,7 +20,7 @@
 #    https://api.travis-ci.org/repo/GMLC-TDC%2FHELICS-FMI/requests
 
 # Takes 2 arguments, a Azure org/project slug and pipeline/build definition id
-trigger_azure_build () {
+trigger_azure_build() {
     local azure_slug=$1
     local def_id=$2
     local body='{
@@ -35,11 +35,11 @@ trigger_azure_build () {
     }'
 
     curl -s -X POST \
-         -H "Content-Type: application/json" \
-         -H "Accept: application/json" \
-         -H "Authorization: Basic ${HELICSBOT_AZURE_TOKEN}" \
-         -d "$body" \
-         "https://dev.azure.com/${azure_slug}/_apis/build/builds?api-version=4.1"
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        -H "Authorization: Basic ${HELICSBOT_AZURE_TOKEN}" \
+        -d "$body" \
+        "https://dev.azure.com/${azure_slug}/_apis/build/builds?api-version=4.1"
 
     echo "===Triggering Azure build==="
     echo "Slug: $azure_slug"

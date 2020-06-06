@@ -51,8 +51,10 @@ HELICS_EXPORT helics_filter helicsFederateRegisterFilter(helics_federate fed, he
  *
  * @return A helics_filter object.
  */
-HELICS_EXPORT helics_filter
-    helicsFederateRegisterGlobalFilter(helics_federate fed, helics_filter_type type, const char* name, helics_error* err);
+HELICS_EXPORT helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed,
+                                                               helics_filter_type type,
+                                                               const char* name,
+                                                               helics_error* err);
 
 /**
  * Create a cloning Filter on the specified federate.
@@ -137,7 +139,8 @@ HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
+ * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name
+ * exists.
  */
 HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const char* name, helics_error* err);
 /**
@@ -286,13 +289,13 @@ HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char* info, hel
  *
  * @param filt The given filter.
  * @param option The option to set /ref helics_handle_options.
- * @param value The value of the option (helics_true or helics_false).
+ * @param value The value of the option commonly 0 for false 1 for true.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, int value, helics_error* err);
 
 /**
  * Get a handle option for the filter.
@@ -300,7 +303,7 @@ HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, helics_
  * @param filt The given filter to query.
  * @param option The option to query /ref helics_handle_options.
  */
-HELICS_EXPORT helics_bool helicsFilterGetOption(helics_filter filt, int option);
+HELICS_EXPORT int helicsFilterGetOption(helics_filter filt, int option);
 
 /**
  * @}

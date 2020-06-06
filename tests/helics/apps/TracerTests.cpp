@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
@@ -26,8 +26,9 @@ TEST(tracer_tests, simple_tracer_test)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
-    auto cb = [&lastVal,
-               &lastTime](helics::Time tm, const std::string&, const std::string& newval) {
+    auto cb = [&lastVal, &lastTime](helics::Time tm,
+                                    const std::string& /*unused*/,
+                                    const std::string& newval) {
         lastTime = static_cast<double>(tm);
         lastVal = std::stod(newval);
     };
@@ -77,12 +78,12 @@ TEST(tracer_tests, tracer_test_message)
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
 
-    auto cb =
-        [&mguard,
-         &lastTime](helics::Time tm, const std::string&, std::unique_ptr<helics::Message> mess) {
-            mguard = std::move(mess);
-            lastTime = static_cast<double>(tm);
-        };
+    auto cb = [&mguard, &lastTime](helics::Time tm,
+                                   const std::string& /*unused*/,
+                                   std::unique_ptr<helics::Message> mess) {
+        mguard = std::move(mess);
+        lastTime = static_cast<double>(tm);
+    };
 
     helics::MessageFederate mfed("block1", fi);
     helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
@@ -153,7 +154,9 @@ TEST_P(tracer_file_tests, simple_tracer_test_files)
     helics::apps::Tracer trace1("trace1", fi);
 
     std::atomic<int> counter{0};
-    auto cb = [&counter](helics::Time, const std::string&, const std::string&) { ++counter; };
+    auto cb = [&counter](helics::Time /*unused*/,
+                         const std::string& /*unused*/,
+                         const std::string& /*unused*/) { ++counter; };
     trace1.setValueCallback(cb);
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
@@ -209,13 +212,15 @@ TEST_P(tracer_message_file_tests, test_message_files)
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
     std::atomic<int> counter{0};
-    auto cb = [&counter](helics::Time, const std::string&, const std::string&) { ++counter; };
+    auto cb = [&counter](helics::Time /*unused*/,
+                         const std::string& /*unused*/,
+                         const std::string& /*unused*/) { ++counter; };
     trace1.setValueCallback(cb);
 
     std::atomic<int> mcounter{0};
-    auto cbm = [&mcounter](helics::Time, const std::string&, std::unique_ptr<helics::Message>) {
-        ++mcounter;
-    };
+    auto cbm = [&mcounter](helics::Time /*unused*/,
+                           const std::string& /*unused*/,
+                           std::unique_ptr<helics::Message> /*unused*/) { ++mcounter; };
     trace1.setEndpointMessageCallback(cbm);
 
     helics::CombinationFederate cfed("block1", fi);
@@ -269,7 +274,9 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
 
     helics::apps::Tracer trace1(4, argv);
     std::atomic<int> counter{0};
-    auto cb = [&counter](helics::Time, const std::string&, const std::string&) { ++counter; };
+    auto cb = [&counter](helics::Time /*unused*/,
+                         const std::string& /*unused*/,
+                         const std::string& /*unused*/) { ++counter; };
     trace1.setValueCallback(cb);
 
     helics::FederateInfo fi;
@@ -312,10 +319,9 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
 }
 #endif
 
-INSTANTIATE_TEST_SUITE_P(
-    tracer_tests,
-    tracer_message_file_tests,
-    ::testing::ValuesIn(simple_message_files));
+INSTANTIATE_TEST_SUITE_P(tracer_tests,
+                         tracer_message_file_tests,
+                         ::testing::ValuesIn(simple_message_files));
 
 TEST(tracer_tests, tracer_test_destendpoint_clone)
 {
@@ -619,10 +625,9 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    tracer_tests,
-    tracer_clone_file_tests,
-    ::testing::ValuesIn(simple_clone_test_files));
+INSTANTIATE_TEST_SUITE_P(tracer_tests,
+                         tracer_clone_file_tests,
+                         ::testing::ValuesIn(simple_clone_test_files));
 
 #ifdef ENABLE_ZMQ_CORE
 #    ifndef DISABLE_SYSTEM_CALL_TESTS
@@ -633,7 +638,7 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
     std::string cmdArg("--name=tracer --coretype=zmq --stop=5s --print --skiplog " + exampleFile);
-    exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
+    exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_app");
     ASSERT_TRUE(tracerExe.isActive());
     auto out = tracerExe.runCaptureOutputAsync(std::string("tracer " + cmdArg));
     helics::FederateInfo fi(helics::core_type::ZMQ);

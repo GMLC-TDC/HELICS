@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
@@ -64,10 +65,9 @@ static const std::map<std::string, int> propStringsTranslations{
     {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
     {"maxIterations", helics_property_int_max_iterations},
-    {"iterations", helics_property_int_max_iterations},
-    {"interruptible", helics_flag_interruptible},
-    {"uninterruptible", helics_flag_uninterruptible},
-    {"observer", helics_flag_observer},
+    {"iterations", helics_property_int_max_iterations}};
+
+static const std::map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
@@ -99,54 +99,12 @@ static const std::map<std::string, int> propStringsTranslations{
     {"required", helics_handle_option_connection_required},
     {"optional", helics_handle_option_connection_optional},
     {"wait_for_current_time", helics_flag_wait_for_current_time_update},
+    {"wait_for_current_time_update", helics_flag_wait_for_current_time_update},
+    {"waitforcurrenttimeupdate", helics_flag_wait_for_current_time_update},
+    {"waitforcurrenttime", helics_flag_wait_for_current_time_update},
     {"terminate_on_error", helics_flag_terminate_on_error},
     {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
-
-static const std::set<std::string> validTimeProperties{"period",      "timedelta",    "time_delta",
-                                                       "timeDelta",   "offset",       "rtlead",
-                                                       "rtLead",      "rtlag",        "rtLag",
-                                                       "rttolerance", "rtTolerance",  "rt_lead",
-                                                       "rt_lag",      "rt_tolerance", "inputdelay",
-                                                       "inputDelay",  "outputdelay",  "outputDelay",
-                                                       "input_delay", "output_delay"};
-
-static const std::set<std::string> validIntProperties{"max_iterations",
-                                                      "loglevel",
-                                                      "log_level",
-                                                      "logLevel",
-                                                      "maxIterations",
-                                                      "maxiterations"};
-
-static const std::set<std::string> validFlagOptions{"interruptible",
-                                                    "uninterruptible",
-                                                    "observer",
-                                                    "source_only",
-                                                    "sourceonly",
-                                                    "sourceOnly",
-                                                    "only_update_on_change",
-                                                    "only_transmit_on_change",
-                                                    "forward_compute",
-                                                    "realtime",
-                                                    "realTime",
-                                                    "delayed_update",
-                                                    "wait_for_current_time",
-                                                    "strict_input_type_checking",
-                                                    "ignore_unit_mismatch",
-                                                    "restrictive_time_policy",
-                                                    "conservative_time_policy",
-                                                    "restrictive_time",
-                                                    "conservative_time",
-                                                    "buffer_data",
-                                                    "slow_response",
-                                                    "slow_responding",
-                                                    "disable_ping",
-                                                    "no_ping",
-                                                    "slow",
-                                                    "required",
-                                                    "optional",
-                                                    "terminate_on_error",
-                                                    "terminateonerror"};
 
 static const std::map<std::string, int> optionStringsTranslations{
     {"buffer", helics_handle_option_buffer_data},
@@ -187,7 +145,43 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"strictinputtypematching", helics_handle_option_strict_type_checking},
     {"stricttypechecking", helics_handle_option_strict_type_checking},
     {"stricttypematching", helics_handle_option_strict_type_checking},
-    {"strict", helics_handle_option_strict_type_checking}};
+    {"strict", helics_handle_option_strict_type_checking},
+    {"connections", helics_handle_option_connections},
+    {"clear_priority_list", helics_handle_option_clear_priority_list},
+    {"clear_priority", helics_handle_option_clear_priority_list},
+    {"input_priority", helics_handle_option_input_priority_location},
+    {"priority", helics_handle_option_input_priority_location},
+    {"input_priority_location", helics_handle_option_input_priority_location},
+    {"priority_location", helics_handle_option_input_priority_location},
+    {"multi_input_handling_method", helics_handle_option_multi_input_handling_method},
+    {"multi_input_handling", helics_handle_option_multi_input_handling_method}};
+
+static const std::map<std::string, int> option_value_map{
+    {"0", 0},
+    {"1", 1},
+    {"false", 0},
+    {"true", 1},
+    {"on", 1},
+    {"off", 0},
+    {"disable", 0},
+    {"enable", 1},
+    {"disabled", 0},
+    {"enabled", 1},
+    {"2", 2},
+    {"3", 3},
+    {"4", 4},
+    // vector operation values
+    {"none", helics_multi_input_no_op},
+    {"no_op", helics_multi_input_no_op},
+    {"and", helics_multi_input_and_operation},
+    {"or", helics_multi_input_or_operation},
+    {"sum", helics_multi_input_sum_operation},
+    {"max", helics_multi_input_max_operation},
+    {"min", helics_multi_input_min_operation},
+    {"average", helics_multi_input_average_operation},
+    {"mean", helics_multi_input_average_operation},
+    {"vectorize", helics_multi_input_vectorize_operation},
+    {"diff", helics_multi_input_diff_operation}};
 
 static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
                                                       {"no_print", helics_log_level_no_print},
@@ -215,16 +209,16 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             continue;
         }
         if (flg.empty()) {
-            continue; // LCOV_EXCL_LINE
+            continue;  // LCOV_EXCL_LINE
         }
-        auto loc = validFlagOptions.find(flg);
-        if (loc != validFlagOptions.end()) {
-            fi.setFlagOption(propStringsTranslations.at(flg), true);
+        auto loc = flagStringsTranslations.find(flg);
+        if (loc != flagStringsTranslations.end()) {
+            fi.setFlagOption(loc->second, true);
         } else {
             if (flg.front() == '-') {
-                loc = validFlagOptions.find(flg.substr(1));
-                if (loc != validFlagOptions.end()) {
-                    fi.setFlagOption(propStringsTranslations.at(flg.substr(1)), false);
+                loc = flagStringsTranslations.find(flg.substr(1));
+                if (loc != flagStringsTranslations.end()) {
+                    fi.setFlagOption(loc->second, false);
                 }
                 continue;
             }
@@ -250,9 +244,32 @@ int getPropertyIndex(std::string val)
     if (fnd != propStringsTranslations.end()) {
         return fnd->second;
     }
+    auto res = getFlagIndex(val);
+    if (res >= 0) {
+        return res;
+    }
     val.erase(std::remove(val.begin(), val.end(), '_'), val.end());
     fnd = propStringsTranslations.find(val);
     if (fnd != propStringsTranslations.end()) {
+        return fnd->second;
+    }
+    return getFlagIndex(val);
+}
+
+int getFlagIndex(std::string val)
+{
+    auto fnd = flagStringsTranslations.find(val);
+    if (fnd != flagStringsTranslations.end()) {
+        return fnd->second;
+    }
+    gmlc::utilities::makeLowerCase(val);
+    fnd = flagStringsTranslations.find(val);
+    if (fnd != flagStringsTranslations.end()) {
+        return fnd->second;
+    }
+    val.erase(std::remove(val.begin(), val.end(), '_'), val.end());
+    fnd = flagStringsTranslations.find(val);
+    if (fnd != flagStringsTranslations.end()) {
         return fnd->second;
     }
     return -1;
@@ -277,13 +294,36 @@ int getOptionIndex(std::string val)
     return -1;
 }
 
+int getOptionValue(std::string val)
+{
+    auto fnd2 = option_value_map.find(val);
+    if (fnd2 != option_value_map.end()) {
+        return fnd2->second;
+    }
+    auto fnd = log_level_map.find(val);
+    if (fnd != log_level_map.end()) {
+        return fnd->second;
+    }
+    gmlc::utilities::makeLowerCase(val);
+    fnd2 = option_value_map.find(val);
+    if (fnd2 != option_value_map.end()) {
+        return fnd2->second;
+    }
+    fnd = log_level_map.find(val);
+    if (fnd != log_level_map.end()) {
+        return fnd->second;
+    }
+    return -1;
+}
+
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");
     app->option_defaults()->ignore_case();
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
-    app->set_config(
-        "--config-file,--config,config", "helicsConfig.ini", "specify a configuration file");
+    app->set_config("--config-file,--config,config",
+                    "helicsConfig.ini",
+                    "specify a configuration file");
     auto* fmtr = addJsonConfig(app.get());
     fmtr->maxLayers(0);
     app->add_option("--name,-n", defName, "name of the federate");
@@ -310,20 +350,18 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->default_str("(" + to_string(coreType) + ")");
     app->add_option("--corename", coreName, "the name of the core to create or find")
         ->ignore_underscore();
-    app->add_option(
-           "--coreinitstring,-i,--coreinit",
-           coreInitString,
-           "The initialization arguments for the core")
+    app->add_option("--coreinitstring,-i,--coreinit",
+                    coreInitString,
+                    "The initialization arguments for the core")
         ->transform([](std::string arg) {
             arg.insert(arg.begin(), ' ');
             return arg;
         })
         ->ignore_underscore()
         ->multi_option_policy(CLI::MultiOptionPolicy::Join);
-    app->add_option(
-           "--brokerinitstring,--brokerinit",
-           brokerInitString,
-           "The initialization arguments for the broker if autogenerated")
+    app->add_option("--brokerinitstring,--brokerinit",
+                    brokerInitString,
+                    "The initialization arguments for the broker if autogenerated")
         ->transform([](std::string arg) {
             arg.insert(arg.begin(), ' ');
             return arg;
@@ -349,12 +387,12 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->check(CLI::PositiveNumber);
     app->add_option("--localport", localport, "Port number to use for connections to this federate")
         ->ignore_underscore();
-    app->add_flag(
-        "--autobroker", autobroker, "tell the core to automatically generate a broker if needed");
-    app->add_option(
-        "--key,--broker_key",
-        key,
-        "specify a key to use to match a broker should match the broker key");
+    app->add_flag("--autobroker",
+                  autobroker,
+                  "tell the core to automatically generate a broker if needed");
+    app->add_option("--key,--broker_key",
+                    key,
+                    "specify a key to use to match a broker should match the broker key");
     app->add_option_function<Time>(
            "--offset",
            [this](Time val) { setProperty(helics_property_time_offset, val); },
@@ -533,14 +571,24 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    std::function<void(const std::string&, Time)> timeCall =
-        [this](const std::string& fname, Time arg) {
-            setProperty(propStringsTranslations.at(fname), arg);
-        };
+    std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
+                                                                    Time arg) {
+        setProperty(propStringsTranslations.at(fname), arg);
+    };
 
-    for (const auto& prop : validTimeProperties) {
-        callIfMember(doc, prop, timeCall);
+    for (const auto& prop : propStringsTranslations) {
+        if (prop.second > 200) {
+            continue;
+        }
+        callIfMember(doc, prop.first, timeCall);
     }
+
+    processOptions(
+        doc,
+        [](const std::string& option) { return getFlagIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
+
     if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();
@@ -569,14 +617,24 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    std::function<void(const std::string&, Time)> timeCall =
-        [this](const std::string& fname, Time arg) {
-            setProperty(propStringsTranslations.at(fname), arg);
-        };
+    std::function<void(const std::string&, Time)> timeCall = [this](const std::string& fname,
+                                                                    Time arg) {
+        setProperty(propStringsTranslations.at(fname), arg);
+    };
 
-    for (const auto& prop : validTimeProperties) {
-        callIfMember(doc, prop, timeCall);
+    for (const auto& prop : propStringsTranslations) {
+        if (prop.second > 200) {
+            continue;
+        }
+        callIfMember(doc, prop.first, timeCall);
     }
+
+    processOptions(
+        doc,
+        [](const std::string& option) { return getFlagIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [this](int32_t option, int32_t value) { setFlagOption(option, value != 0); });
+
     if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();
@@ -625,11 +683,11 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
         res += " --key=";
         res.append(fi.key);
     }
-    if (!fi.fileInUse.empty()) { //we used the file, specify a core section
+    if (!fi.fileInUse.empty()) {  // we used the file, specify a core section
         res += " --config_section=core --config-file=";
         res.append(fi.fileInUse);
     }
     return res;
 }
 
-} // namespace helics
+}  // namespace helics

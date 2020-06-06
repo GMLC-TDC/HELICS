@@ -1,14 +1,14 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/core/CoreFederateInfo.hpp"
 #include "helics/core/EndpointInfo.hpp"
 #include "helics/core/FederateState.hpp"
 #include "helics/core/FilterInfo.hpp"
-#include "helics/core/NamedInputInfo.hpp"
+#include "helics/core/InputInfo.hpp"
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/helics_definitions.hpp"
 
@@ -40,12 +40,12 @@ TEST_F(federateStateTests, constructor_test)
     EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::source_only), false);
 
     // Check other default state values
-    EXPECT_EQ(fs->getQueueSize(), 0u);
-    EXPECT_EQ(fs->getEvents().size(), 0u);
+    EXPECT_EQ(fs->getQueueSize(), 0U);
+    EXPECT_EQ(fs->getEvents().size(), 0U);
 
     // EXPECT_EQ(fs->message_queue.size(), 0);
     // EXPECT_EQ(fs->dependencies.size(), 0);
-    EXPECT_EQ(fs->getDependents().size(), 0u);
+    EXPECT_EQ(fs->getDependents().size(), 0U);
     EXPECT_TRUE(fs->local_id == helics::local_federate_id{});
     EXPECT_TRUE(fs->global_id.load() == helics::global_federate_id{});
     EXPECT_EQ(fs->init_requested, false);
@@ -68,7 +68,7 @@ TEST_F(federateStateTests, create_input_test)
     fs->interfaces().createInput(interface_handle(3), "last", "type", "units");
     fs->interfaces().createInput(interface_handle(2), "cut-in-line", "type", "units");
 
-    helics::NamedInputInfo* info;
+    helics::InputInfo* info;
 
     // Check first subscription
     info = fs->interfaces().getInput("first!");
@@ -199,7 +199,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     });
 
     fs->global_id =
-        global_federate_id(0); // if it doesn't match the id in the command, this will hang
+        global_federate_id(0);  // if it doesn't match the id in the command, this will hang
     fs_process2.wait();
     fs->global_id = helics::global_federate_id();
     auto state = fs_process2.get();
@@ -242,8 +242,8 @@ TEST_F(federateStateTests, basic_processmessage_test)
         return fs->enterExecutingMode(iteration_request::no_iterations);
     });
     auto st = fs->getState();
-    EXPECT_TRUE(
-        (st == federate_state::HELICS_INITIALIZING) || (st == federate_state::HELICS_EXECUTING));
+    EXPECT_TRUE((st == federate_state::HELICS_INITIALIZING) ||
+                (st == federate_state::HELICS_EXECUTING));
     fs->addAction(cmd);
     auto res = fs_process2.get();
     if (res != iteration_result::error) {
@@ -256,16 +256,17 @@ TEST_F(federateStateTests, basic_processmessage_test)
 
     fs->reset();
 
-    // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done; returns 1 if
-    // fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true
+    // Test CMD_EXEC_REQUEST/CMD_EXEC_GRANT returns 0 if dependencies/dependents aren't done;
+    // returns 1 if fs->iterating is true, 2 otherwise; if 1 ret false, if 2 ret true
     cmd.setAction(helics::CMD_EXEC_GRANT);
 
     // Test CMD_TIME_REQUEST/CMD_TIME_GRANT
     cmd.setAction(helics::CMD_TIME_GRANT);
 
-    /* CMD_TIME_REQUEST and CMD_TIME_GRANT; manipulate time factors in ways to ensure behavior is correct for
-    deciding event to allow or not; test based on desired functionality time_next and time_minDe compared against
-    everything else Time Tallow(std::max(time_next, time_minDe)); if (time_event <= Tallow)
+    /* CMD_TIME_REQUEST and CMD_TIME_GRANT; manipulate time factors in ways to ensure behavior is
+    correct for deciding event to allow or not; test based on desired functionality time_next and
+    time_minDe compared against everything else Time Tallow(std::max(time_next, time_minDe)); if
+    (time_event <= Tallow)
     {
         return 2;  //we can grant the time request
     }
@@ -294,8 +295,8 @@ bool grant=false;
 bool converged=false;
 bool exec_requested = false;
 Time Tnext=timeZero;  //!<next time computation
-Time Te=timeZero;		//!< execution time computation
-Time Tdemin=timeZero;	//!< min dependency event time
+Time Te=timeZero;        //!< execution time computation
+Time Tdemin=timeZero;    //!< min dependency event time
 
 DependencyInfo() = default;
 DependencyInfo(Core::local_federate_id id) :fedID(id) {};

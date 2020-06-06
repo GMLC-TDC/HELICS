@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "PublicationInfo.hpp"
@@ -19,8 +19,8 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
 
 void PublicationInfo::removeSubscriber(global_handle subscriberToRemove)
 {
-    subscribers.erase(
-        std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove), subscribers.end());
+    subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove),
+                      subscribers.end());
 }
 
-} // namespace helics
+}  // namespace helics

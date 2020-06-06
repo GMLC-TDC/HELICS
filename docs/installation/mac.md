@@ -22,7 +22,7 @@ Some basics on using the macOS Terminal (or any Unix/Linux shell) will be useful
 
 ## Setup
 
-*Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
+_Note_: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
 
 To set up your environment:
 
@@ -39,23 +39,23 @@ To set up your environment:
 3. (if needed) Setup a command-line compile environment
 
    a) Install a C++11 compiler (C++14 preferred). e.g. `clang`
-      from the Xcode command line tools. These can be installed
-      from the command line in Terminal by typing
-      `xcode-select --install` and following the on-screen
-      prompts.
+   from the Xcode command line tools. These can be installed
+   from the command line in Terminal by typing
+   `xcode-select --install` and following the on-screen
+   prompts.
    b) Install cmake with `brew install cmake`. Alternately, a DMG
-      file is available for cmake from their
-      [website](https://cmake.org/download/).
+   file is available for cmake from their
+   [website](https://cmake.org/download/).
 
 4. Install most dependencies using homebrew.
 
-    ```bash
-    brew install boost
-    brew install zeromq
-    brew install cmake
-    ```
+   ```bash
+   brew install boost
+   brew install zeromq
+   brew install cmake
+   ```
 
-5. Make sure *cmake* and *git* are available in the Command Prompt
+5. Make sure _cmake_ and _git_ are available in the Command Prompt
    with `which cmake` and `which git` If they aren't, add them to the
    system PATH variable.
 
@@ -65,12 +65,12 @@ Getting and building from source:
 2. Create a build folder. Run cmake and give it the path that HELICS
    was checked out into.
 
-    ```bash
-    git clone https://github.com/GMLC-TDC/HELICS
-    cd HELICS
-    mkdir build
-    cd build
-    ```
+   ```bash
+   git clone https://github.com/GMLC-TDC/HELICS
+   cd HELICS
+   mkdir build
+   cd build
+   ```
 
 ## Compile and Install
 
@@ -78,7 +78,7 @@ There are a number of different options and approaches at this point depending o
 
 <div class="admonition note">
 
-Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`. There are also many other options, and you can check them out by running `ccmake .` in the `build` folder. 
+Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`. There are also many other options, and you can check them out by running `ccmake .` in the `build` folder.
 
 Keep in mind running HELICS commands like `helics_app` will not work from just any old random folder with a custom install folder.
 You will either need to run them from inside the `bin` subfolder of your custom install, or provide a more complete path to the command.
@@ -127,13 +127,13 @@ Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a
 
 If it does not, you should install MATLAB and add the path to all the MATLAB binaries to your PATH.
 
-```
+```bash
 export PATH="/Applications/MATLAB_R2017b.app/bin/:$PATH"
 ```
 
 </div>
 
-```
+```bash
 git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
@@ -181,7 +181,6 @@ boost.org website.
 In the following example we are doing to use [boost v1.69.0](http://www.boost.org/users/history/version_1_69_0.html)
 Keep in mind that your cmake version should be newer than the boost version, so if you have an older cmake you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake as well.
 
-
 Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
 ```bash
@@ -191,7 +190,7 @@ $ ./bootstrap.sh --prefix=/ --prefix=$HOME/local/boost-gcc-1.69.0
 
 Open `project-config.jam` and changes the lines as follows:
 
-```
+```bash
 # Compiler configuration. This definition will be used unless
 # you already have defined some toolsets in your user-config.jam
 # file.
@@ -205,8 +204,7 @@ Open `project-config.jam` and changes the lines as follows:
 using gcc : 8.2 : /usr/local/bin/g++-8 ;
 ```
 
-
-```
+```bash
 $ ./b2
 $ ./b2 install
 $ # OR
@@ -262,7 +260,7 @@ To run the MATLAB HELICS extension, one would have to load the `helicsSharedLib`
 This is run by the `helicsStartup` function in the generated MATLAB files.
 You can test this by opening MATLAB from the terminal or using the icon.
 
-```
+```bash
 /Applications/MATLAB_R2017b.app/bin/matlab -nodesktop -nosplash -nojvm
 ```
 
@@ -274,14 +272,13 @@ and running
 
 <div class="admonition note">
 
-Note: See [https://github.com/GMLC-TDC/HELICS/issues/763](https://github.com/GMLC-TDC/HELICS/issues/763) if your installation doesn't point the dylib to the correct location.
+Note: See [Helics issue #763](https://github.com/GMLC-TDC/HELICS/issues/763/), if your installation doesn't point the dylib to the correct location.
 
 </div>
 
-
 You can run the following in two separate windows to test an example from the following repository:
 
-```
+```bash
 git clone https://github.com/GMLC-TDC/HELICS-examples
 ```
 

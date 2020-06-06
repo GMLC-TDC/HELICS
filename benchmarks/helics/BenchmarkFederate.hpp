@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-using helics::core_type;
 /** class implementing common functionality for benchmarks */
 class BenchmarkFederate {
   public:
@@ -28,7 +27,6 @@ class BenchmarkFederate {
         //          JSON
     };
 
-  public:
     // getters and setters for parameters
     /** sets the delta time parameter
      * @param dt the delta time to set
@@ -47,13 +45,13 @@ class BenchmarkFederate {
      */
     void setIndex(int i) { index = i; }
     /** gets the index parameter*/
-    int getIndex() { return index; }
+    int getIndex() const { return index; }
     /** sets the max index parameter
      * @param i the max index
      */
     void setMaxIndex(int i) { maxIndex = i; }
     /** gets the max index parameter*/
-    int getMaxIndex() { return maxIndex; }
+    int getMaxIndex() const { return maxIndex; }
 
     // functions for setting callbacks
     /** sets a callback function to call immediately after doMainLoop() returns, but before
@@ -85,49 +83,55 @@ class BenchmarkFederate {
         std::string key;
         std::string value;
     };
-    std::vector<Result> results; //!< a vector of output results to print
+    std::vector<Result> results;  //!< a vector of output results to print
 
-    OutputFormat result_format{OutputFormat::PLAIN_TEXT}; //!< output format for printing results
+    OutputFormat result_format{OutputFormat::PLAIN_TEXT};  //!< output format for printing results
 
     // variables to track current state, mainly for gbenchmark piecewise setup
     bool initialized{false};
     bool readyToRun{false};
 
     // parameters most benchmark federates need
-    std::string benchmarkName; //<! the name of the benchmark federate
-    int index{0}; //<! the index for an instance of the benchmark federate
-    int maxIndex{0}; //<! the maximum index + 1 given to a benchmark federate in a run
-    helics::Time deltaTime{helics::Time(10, time_units::ns)}; //<! sampling rate
-    helics::Time finalTime{helics::Time(10000, time_units::ns)}; //<! final time
+    std::string benchmarkName;  //<! the name of the benchmark federate
+    int index{0};  //<! the index for an instance of the benchmark federate
+    int maxIndex{0};  //<! the maximum index + 1 given to a benchmark federate in a run
+    helics::Time deltaTime{helics::Time(10, time_units::ns)};  //<! sampling rate
+    helics::Time finalTime{helics::Time(10000, time_units::ns)};  //<! final time
 
     std::unique_ptr<helics::CombinationFederate>
-        fed; //<! the federate object to use in derived classes
+        fed;  //<! the federate object to use in derived classes
 
     // callbacks for more control when timing code
     std::function<void()> callBeforeFinalize{
-        nullptr}; //<! callback function immediately before helics finalize()
+        nullptr};  //<! callback function immediately before helics finalize()
     std::function<void()> callAfterFinalize{
-        nullptr}; //<! callback function immediately after helics finalize()
+        nullptr};  //<! callback function immediately after helics finalize()
 
     // CLI11 Options for derived classes to change them if needed (e.g. set required)
-    CLI::Option* opt_delta_time{nullptr}; //<! the CLI11 option for --delta_time
-    CLI::Option* opt_final_time{nullptr}; //<! the CLI11 option for --final_time
-    CLI::Option* opt_index{nullptr}; //<! the CLI11 option for --index
-    CLI::Option* opt_max_index{nullptr}; //<! the CLI11 option for --max_index
+    CLI::Option* opt_delta_time{nullptr};  //<! the CLI11 option for --delta_time
+    CLI::Option* opt_final_time{nullptr};  //<! the CLI11 option for --final_time
+    CLI::Option* opt_index{nullptr};  //<! the CLI11 option for --index
+    CLI::Option* opt_max_index{nullptr};  //<! the CLI11 option for --max_index
 
     // Command line options
-    std::unique_ptr<helics::helicsCLI11App> app; //<! the CLI11 app object to use in derived classes
+    std::unique_ptr<helics::helicsCLI11App>
+        app;  //<! the CLI11 app object to use in derived classes
 
-    // functions to be overriden by derived benchmark classes
-    /** set/override default base parameter values before arguments are parsed, and modify CLI11 options for default arguments*/
+    // functions to be overridden by derived benchmark classes
+    /** set/override default base parameter values before arguments are parsed, and modify CLI11
+     * options for default arguments*/
     virtual void setupArgumentParsing() {}
-    /** initialization steps after command line options have been parsed, but before the federate object is created
-     * @param fi a reference to a helics::FederateInfo object that can be used to change how the federate object is made
+    /** initialization steps after command line options have been parsed, but before the federate
+     * object is created
+     * @param fi a reference to a helics::FederateInfo object that can be used to change how the
+     * federate object is made
      */
     virtual void doParamInit(helics::FederateInfo& fi) { (void)fi; }
-    /** initialization that needs to happen after the federate object is created, such as creating endpoints and inputs*/
+    /** initialization that needs to happen after the federate object is created, such as creating
+     * endpoints and inputs*/
     virtual void doFedInit() {}
-    /** initialization that requires the federation to be set up, but before timing starts, like creating initial events*/
+    /** initialization that requires the federation to be set up, but before timing starts, like
+     * creating initial events*/
     virtual void doMakeReady() {}
     /** the main loop for the benchmark*/
     virtual void doMainLoop() {}
@@ -174,7 +178,8 @@ class BenchmarkFederate {
      * @param callOnReady a no argument, void return type function called after doMakeReady is run
      * @param callOnEnd a no argument, void return type function called after helics finalize()
      */
-    void run(std::function<void()> callOnReady = {}, std::function<void()> callOnEnd = {})
+    void run(const std::function<void()>& callOnReady = {},
+             const std::function<void()>& callOnEnd = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -191,7 +196,8 @@ class BenchmarkFederate {
 
     /** initialize function parses options and sets up parameters
      * @param coreName the name of the core to connect to
-     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings)
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of
+     * strings)
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>
@@ -204,11 +210,12 @@ class BenchmarkFederate {
 
     /** initialize function parses options and sets up parameters
      * @param fi a helics::FederateInfo object
-     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings) 
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of
+     * strings)
      * @return 0 on success, non-zero indicates failure
      */
     template<typename... Args>
-    int initialize(const helics::FederateInfo fi, Args... args)
+    int initialize(const helics::FederateInfo& fi, Args... args)
     {
         setupArgumentParsing();
         return internalInitialize(fi, parseArgs(args...));
@@ -229,7 +236,7 @@ class BenchmarkFederate {
     void printResults()
     {
         doAddBenchmarkResults();
-        for (auto r : results) {
+        for (const auto& r : results) {
             if (result_format == OutputFormat::PLAIN_TEXT) {
                 std::cout << r.name << ": " << r.value << std::endl;
             }
@@ -279,7 +286,8 @@ class BenchmarkFederate {
     /** do the main loop for the benchmark -- callbacks for extra timing info could be added here*/
     void execute() { doMainLoop(); }
 
-    /** internal initialization function that handles federate info arguments and calling derived class virtual functions*/
+    /** internal initialization function that handles federate info arguments and calling derived
+     * class virtual functions*/
     int internalInitialize(helics::FederateInfo fi, int parseArgsResult)
     {
         if (parseArgsResult != 0) {

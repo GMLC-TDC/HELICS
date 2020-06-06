@@ -6,58 +6,58 @@ static void throwHelicsMatlabError(helics_error *err) {
   switch (err->error_code)
   {
   case helics_ok:
-	return;
+    return;
   case helics_error_registration_failure:
-	mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
-	break;
+    mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
+    break;
   case   helics_error_connection_failure:
   mexErrMsgIdAndTxt( "helics:connection_failure", err->message);
-	break;
+    break;
   case   helics_error_invalid_object:
   mexErrMsgIdAndTxt( "helics:invalid_object", err->message);
-	break;
+    break;
   case   helics_error_invalid_argument:
   mexErrMsgIdAndTxt( "helics:invalid_argument", err->message);
-	break;
+    break;
   case   helics_error_discard:
   mexErrMsgIdAndTxt( "helics:discard", err->message);
-	break;
+    break;
   case helics_error_system_failure:
-	mexErrMsgIdAndTxt( "helics:system_failure", err->message);
-	break;
+    mexErrMsgIdAndTxt( "helics:system_failure", err->message);
+    break;
   case   helics_error_invalid_state_transition:
   mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->message);
-	break;
+    break;
   case   helics_error_invalid_function_call:
   mexErrMsgIdAndTxt( "helics:invalid_function_call", err->message);
-	break;
+    break;
   case   helics_error_execution_failure:
   mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
-	break;
+    break;
   case   helics_error_insufficient_space:
     mexErrMsgIdAndTxt( "helics:insufficient_space", err->message);
-	break;
+    break;
   case   helics_error_other:
   case   helics_error_external_type:
   default:
   mexErrMsgIdAndTxt( "helics:error", err->message);
-	break;
+    break;
   }
 }
 
 %}
 
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
-	etemp=helicsErrorInitialize();
-	$1=&etemp;
+    etemp=helicsErrorInitialize();
+    $1=&etemp;
 }
 
 %typemap(freearg) helics_error *
 {
-	if ($1->error_code!=helics_ok)
-	{
-		throwHelicsMatlabError($1);
-	}
+    if ($1->error_code!=helics_ok)
+    {
+        throwHelicsMatlabError($1);
+    }
 }
 
 //typemap for large string output with a length return in C
@@ -75,45 +75,45 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
-	
+
   if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3-1);
 }
 
 %typemap(in, numinputs=0)(double *real, double *imag)(double vals[2])
 {
-	$1=&(vals[0]);
-	$2=&(vals[1]);
+    $1=&(vals[0]);
+    $2=&(vals[1]);
 }
 
 %typemap(argout)(double *real, double *imag)
 {
-	mxArray *out=mxCreateDoubleMatrix(1, 1, mxCOMPLEX);
-	double *r=mxGetPr(out);
-	double *i=mxGetPi(out);
-	*r=*$1;
-	*i=*$2;
-	if (--resc>=0) *resv++ =out;
+    mxArray *out=mxCreateDoubleMatrix(1, 1, mxCOMPLEX);
+    double *r=mxGetPr(out);
+    double *i=mxGetPi(out);
+    *r=*$1;
+    *i=*$2;
+    if (--resc>=0) *resv++ =out;
 }
 
 
 %typemap(in) (double real, double imag)
 {
-	if(mxIsComplex($input))
-	{
-		
-		$1=mxGetPr($input)[0];
-		$2=mxGetPi($input)[0];
-	}  
+    if(mxIsComplex($input))
+    {
+
+        $1=mxGetPr($input)[0];
+        $2=mxGetPi($input)[0];
+    }
     else if (mxIsDouble($input))
-	{
-		$2=0.0;
-		$1=mxGetPr($input)[0];
-	}
-	else
-	{
-		$1=0.0;
-		$2 = 0.0;
-	}
+    {
+        $2=0.0;
+        $1=mxGetPr($input)[0];
+    }
+    else
+    {
+        $1=0.0;
+        $2 = 0.0;
+    }
 }
 
 //typemap for the input arguments
@@ -121,34 +121,34 @@ static void throwHelicsMatlabError(helics_error *err) {
   /* Check if is a list */
   if (mxIsCell($input)) {
     int ii;
-	int allocation2=0;
-	char *buffer_cell=NULL;
-	int cellSize=static_cast<int>(mxGetNumberOfElements($input));
-	$2 = (char **) malloc((cellSize+1)*sizeof(char *));
-	for (ii=0;ii<cellSize;++ii)
-	{
-		mxArray *cellElement=mxGetCell($input, ii);
-		int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
-		if (!SWIG_IsOK(resCode)) {
-			SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
-		}
-		$2[ii+1]=buffer_cell;
-	}
-    
-  } 
+    int allocation2=0;
+    char *buffer_cell=NULL;
+    int cellSize=static_cast<int>(mxGetNumberOfElements($input));
+    $2 = (char **) malloc((cellSize+1)*sizeof(char *));
+    for (ii=0;ii<cellSize;++ii)
+    {
+        mxArray *cellElement=mxGetCell($input, ii);
+        int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
+        if (!SWIG_IsOK(resCode)) {
+            SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
+        }
+        $2[ii+1]=buffer_cell;
+    }
+
+  }
   else if (mxIsChar($input))
   {
   int retval=0;
   char *buffer=NULL;
   int allocation=0;
-	$1=2;
-	$2 = (char **) malloc(2*sizeof(char *));
-	retval = SWIG_AsCharPtrAndSize($input, &buffer, NULL, &allocation);
+    $1=2;
+    $2 = (char **) malloc(2*sizeof(char *));
+    retval = SWIG_AsCharPtrAndSize($input, &buffer, NULL, &allocation);
   if (!SWIG_IsOK(retval)) {
     SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
   }
-	$2[0]=buffer;
-	$2[1]=buffer;
+    $2[0]=buffer;
+    $2[1]=buffer;
   }
   else
   {
@@ -197,8 +197,8 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
 
-	mxArray *mat=mxCreateDoubleMatrix(*$3,1,mxREAL);
-	mxSetPr(mat,$1);
+    mxArray *mat=mxCreateDoubleMatrix(*$3,1,mxREAL);
+    mxSetPr(mat,$1);
   if (--resc>=0) *resv++ = mat;
 }
 
@@ -207,30 +207,30 @@ static void throwHelicsMatlabError(helics_error *err) {
 // typemap for raw data input
 %typemap(in) (const void *data, int inputDataLength) {
   if (PyUnicode_Check($input)) {
-	int kind=PyUnicode_KIND($input);
+    int kind=PyUnicode_KIND($input);
     $1=PyUnicode_DATA($input);
-	switch(kind)
-	{
-	case PyUnicode_1BYTE_KIND:
-	default:
-		$2=PyUnicode_GetLength($input);
-	break;
-	case PyUnicode_2BYTE_KIND:
-	case PyUnicode_WCHAR_KIND:
-		$2=PyUnicode_GetLength($input)*2;
-	break;
-	case PyUnicode_4BYTE_KIND:
-		$2=PyUnicode_GetLength($input)*4;
-	break;
-	}
+    switch(kind)
+    {
+    case PyUnicode_1BYTE_KIND:
+    default:
+        $2=PyUnicode_GetLength($input);
+    break;
+    case PyUnicode_2BYTE_KIND:
+    case PyUnicode_WCHAR_KIND:
+        $2=PyUnicode_GetLength($input)*2;
+    break;
+    case PyUnicode_4BYTE_KIND:
+        $2=PyUnicode_GetLength($input)*4;
+    break;
+    }
   }
   else if (PyBytes_Check($input)) {
     $1=PyBytes_AsString($input);
-	$2=PyBytes_Size($input);
+    $2=PyBytes_Size($input);
   }
-  else 
+  else
   {
-	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
+    PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
    return NULL;
  }
 }

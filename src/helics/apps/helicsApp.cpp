@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helicsApp.hpp"
@@ -110,11 +110,10 @@ namespace apps {
         auto app =
             std::make_unique<helicsCLI11App>("common options for all Helics Apps", "[HELICS_APP]");
 
-        app->add_flag(
-            "--local",
-            useLocal,
-            "specify otherwise unspecified endpoints and publications as local( "
-            "i.e.the keys will be prepended with the player name)");
+        app->add_flag("--local",
+                      useLocal,
+                      "specify otherwise unspecified endpoints and publications as local( "
+                      "i.e.the keys will be prepended with the player name)");
         app->add_option("--stop", stopTime, "The time to stop the app");
         app->add_option("--input,input", masterFileName, "The primary input file")
             ->check(CLI::ExistingFile);
@@ -134,7 +133,7 @@ namespace apps {
 
     void App::loadTextFile(const std::string& textFile)
     {
-        //using namespace gmlc::utilities::stringOps;
+        // using namespace gmlc::utilities::stringOps;
         std::ifstream infile(textFile);
         std::string str;
 
@@ -212,5 +211,5 @@ namespace apps {
         fed->disconnect();
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

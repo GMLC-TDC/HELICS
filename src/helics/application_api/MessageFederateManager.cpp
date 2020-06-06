@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MessageFederateManager.hpp"
@@ -14,10 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-MessageFederateManager::MessageFederateManager(
-    Core* coreOb,
-    MessageFederate* fed,
-    local_federate_id id):
+MessageFederateManager::MessageFederateManager(Core* coreOb,
+                                               MessageFederate* fed,
+                                               local_federate_id id):
     coreObject(coreOb),
     mFed(fed), fedID(id)
 {
@@ -60,9 +59,8 @@ Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, cons
     throw(RegistrationFailure("Unable to register Endpoint"));
 }
 
-void MessageFederateManager::registerKnownCommunicationPath(
-    const Endpoint& localEndpoint,
-    const std::string& remoteEndpoint)
+void MessageFederateManager::registerKnownCommunicationPath(const Endpoint& localEndpoint,
+                                                            const std::string& remoteEndpoint)
 {
     coreObject->registerFrequentCommunicationsPair(localEndpoint.getName(), remoteEndpoint);
 }
@@ -145,19 +143,17 @@ std::unique_ptr<Message> MessageFederateManager::getMessage()
     return nullptr;
 }
 
-void MessageFederateManager::sendMessage(
-    const Endpoint& source,
-    const std::string& dest,
-    const data_view& message)
+void MessageFederateManager::sendMessage(const Endpoint& source,
+                                         const std::string& dest,
+                                         const data_view& message)
 {
     coreObject->send(source.handle, dest, message.data(), message.size());
 }
 
-void MessageFederateManager::sendMessage(
-    const Endpoint& source,
-    const std::string& dest,
-    const data_view& message,
-    Time sendTime)
+void MessageFederateManager::sendMessage(const Endpoint& source,
+                                         const std::string& dest,
+                                         const data_view& message,
+                                         Time sendTime)
 {
     coreObject->sendEvent(sendTime, source.handle, dest, message.data(), message.size());
 }
@@ -186,7 +182,7 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         /** find the id*/
 
         auto fid = epts->find(endpoint_id);
-        if (fid != epts->end()) { // assign the data
+        if (fid != epts->end()) {  // assign the data
 
             Endpoint& currentEpt = *fid;
             auto localEndpointIndex = fid->referenceIndex;
@@ -271,9 +267,8 @@ void MessageFederateManager::addSourceFilter(const Endpoint& ept, const std::str
 }
 
 /** add a named filter to an endpoint for all message going to the endpoint*/
-void MessageFederateManager::addDestinationFilter(
-    const Endpoint& ept,
-    const std::string& filterName)
+void MessageFederateManager::addDestinationFilter(const Endpoint& ept,
+                                                  const std::string& filterName)
 {
     coreObject->addDestinationTarget(ept.handle, filterName);
 }
@@ -309,4 +304,4 @@ void MessageFederateManager::removeOrderedMessage(unsigned int index)
         }
     }
 }
-} // namespace helics
+}  // namespace helics

@@ -60,8 +60,10 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint
-    helicsFederateRegisterGlobalEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
+HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed,
+                                                                   const char* name,
+                                                                   const char* type,
+                                                                   helics_error* err);
 
 /**
  * Get an endpoint object from a name.
@@ -164,13 +166,12 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendEventRaw(
-    helics_endpoint endpoint,
-    const char* dest,
-    const void* data,
-    int inputDataLength,
-    helics_time time,
-    helics_error* err);
+HELICS_EXPORT void helicsEndpointSendEventRaw(helics_endpoint endpoint,
+                                              const char* dest,
+                                              const void* data,
+                                              int inputDataLength,
+                                              helics_time time,
+                                              helics_error* err);
 
 /**
  * Send a message object from a specific endpoint.
@@ -272,6 +273,20 @@ HELICS_DEPRECATED_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint
 HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint);
 
 /**
+ * Create a new empty message object.
+ *
+ * @details The message is empty and isValid will return false since there is no data associated with the message yet.
+ *
+ * @param endpoint The endpoint object to associate the message with.
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ *
+ * @return A new helics_message_object.
+ */
+HELICS_EXPORT helics_message_object helicsEndpointCreateMessageObject(helics_endpoint endpoint, helics_error* err);
+
+/**
  * Receive a communication message for any endpoint in the federate.
  *
  * @deprecated This function is deprecated and will be removed in Helics 3.0.
@@ -301,6 +316,11 @@ HELICS_EXPORT helics_message_object helicsFederateGetMessageObject(helics_federa
  *
  * @details The message is empty and isValid will return false since there is no data associated with the message yet.
  *
+ * @param fed the federate object to associate the message with
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ *
  * @return A helics_message_object containing the message data.
  */
 HELICS_EXPORT helics_message_object helicsFederateCreateMessageObject(helics_federate fed, helics_error* err);
@@ -317,10 +337,10 @@ HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
 /**
  * Clear all message from an endpoint.
  *
- * @deprecated This function does nothing and will be removed. 
+ * @deprecated This function does nothing and will be removed.
  *             Use helicsFederateClearMessages to free all messages,
  *             or helicsMessageFree to clear an individual message.
- * 
+ *
  * @param endpoint The endpoint object to operate on.
  */
 HELICS_DEPRECATED_EXPORT void helicsEndpointClearMessages(helics_endpoint endpoint);
@@ -382,15 +402,16 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char* info, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, int value, helics_error* err);
 
 /**
  * Set a handle option on an endpoint.
  *
  * @param end The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
+ * @return the value of the option, for boolean options will be 0 or 1
  */
-HELICS_EXPORT helics_bool helicsEndpointGetOption(helics_endpoint end, int option);
+HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint end, int option);
 
 /**
  * \defgroup Message operation functions
@@ -675,6 +696,24 @@ HELICS_EXPORT void helicsMessageAppendData(helics_message_object message, const 
  * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error* err);
+
+/**
+ * Clone a message object.
+ *
+ * @param message The message object to copy from.
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT helics_message_object helicsMessageClone(helics_message_object message, helics_error* err);
+
+/**
+ * Free a message object from memory
+ * @details memory for message is managed so not using this function does not create memory leaks, this is an indication
+ * to the system that the memory for this message is done being used and can be reused for a new message.
+ * helicsFederateClearMessages() can also be used to clear up all stored messages at once
+ */
+HELICS_EXPORT void helicsMessageFree(helics_message_object message);
 
 /**@}*/
 #ifdef __cplusplus

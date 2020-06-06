@@ -7,15 +7,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(
-    SRC_FILES
+set(SRC_FILES
     CoreFactory.cpp
     BrokerFactory.cpp
     BrokerBase.cpp
     CommonCore.cpp
     FederateState.cpp
     PublicationInfo.cpp
-    NamedInputInfo.cpp
+    InputInfo.cpp
     InterfaceInfo.cpp
     FilterInfo.cpp
     EndpointInfo.cpp
@@ -33,8 +32,7 @@ set(
     helicsCLI11JsonConfig.cpp
 )
 
-set(
-    PUBLIC_INCLUDE_FILES
+set(PUBLIC_INCLUDE_FILES
     Core.hpp
     Broker.hpp
     CoreFactory.hpp
@@ -50,8 +48,7 @@ set(
     helicsCLI11.hpp
 )
 
-set(
-    INCLUDE_FILES
+set(INCLUDE_FILES
     coreTypeOperations.hpp
     BrokerBase.hpp
     TimeDependencies.hpp
@@ -68,7 +65,7 @@ set(
     CommonCore.hpp
     FederateState.hpp
     PublicationInfo.hpp
-    NamedInputInfo.hpp
+    InputInfo.hpp
     EndpointInfo.hpp
     flagOperations.hpp
     BasicHandleInfo.hpp
@@ -83,11 +80,10 @@ set(
     ../helics_enums.h
 )
 
-if (NOT HELICS_DISABLE_ASIO)
+if(NOT HELICS_DISABLE_ASIO)
     list(APPEND SRC_FILES MessageTimer.cpp)
     list(APPEND INCLUDE_FILES MessageTimer.hpp)
 endif()
-
 
 add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
@@ -96,11 +92,9 @@ target_link_libraries(helics_core PUBLIC helics_common PRIVATE fmt::fmt compile_
 add_library(HELICS::core ALIAS helics_core)
 
 target_compile_options(
-        helics_core
-        PRIVATE
-            $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
-    )
+    helics_core
+    PRIVATE $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
+)
 
-
-#adding a definition flag for some interaction with the shared library
+# adding a definition flag for some interaction with the shared library
 target_compile_definitions(helics_core PUBLIC HELICS_STATIC_CORE_LIBRARY)

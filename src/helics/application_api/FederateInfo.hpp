@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -19,22 +19,22 @@ class helicsCLI11App;
  */
 class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   public:
-    int uniqueKey = 0; //!< location for keying the info for application purposes
-    char separator = '/'; //!< separator for global name of localFederates
+    int uniqueKey = 0;  //!< location for keying the info for application purposes
+    char separator = '/';  //!< separator for global name of localFederates
     bool autobroker =
-        false; //!< specify that the core should generate a broker if not found otherwise
-    core_type coreType = core_type::DEFAULT; //!< the type of the core
-    int brokerPort = -1; //!< broker port information
+        false;  //!< specify that the core should generate a broker if not found otherwise
+    core_type coreType = core_type::DEFAULT;  //!< the type of the core
+    int brokerPort = -1;  //!< broker port information
 
-    std::string defName; //!< a default name to use for a federate
-    std::string coreName; //!< the name of the core
-    std::string coreInitString; //!< an initialization string for the core API object
-    std::string brokerInitString; //!< an initialization string for the broker if auto generated
-    std::string broker; //!< connection information for the broker
-    std::string key; //!< key for the broker
-    std::string
-        localport; //!< string for defining the local port to use usually a number but other strings are possible
-    std::string fileInUse; //!< string containing a configuration file that was used
+    std::string defName;  //!< a default name to use for a federate
+    std::string coreName;  //!< the name of the core
+    std::string coreInitString;  //!< an initialization string for the core API object
+    std::string brokerInitString;  //!< an initialization string for the broker if auto generated
+    std::string broker;  //!< connection information for the broker
+    std::string key;  //!< key for the broker
+    std::string localport;  //!< string for defining the local port to use usually a number but
+                            //!< other strings are possible
+    std::string fileInUse;  //!< string containing a configuration file that was used
     /** default constructor*/
     FederateInfo() = default;
     /** construct from a type
@@ -53,7 +53,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     FederateInfo(int argc, char* argv[]);
     /** load a federateInfo object from arguments stored in a vector
     @details calls /ref loadInfoFromArgs in the constructor
-    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
+    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the
+    vector
     */
     explicit FederateInfo(std::vector<std::string>& args);
     /** load a federateInfo object from command line arguments outside the constructor
@@ -68,7 +69,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     */
     std::vector<std::string> loadInfoFromArgs(int argc, char* argv[]);
     /** load a federateInfo object from command line arguments contained in a vector
-    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
+    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the
+    vector
     */
     void loadInfoFromArgs(std::vector<std::string>& args);
     /** load a federateInfo object from command line arguments outside the constructor
@@ -104,16 +106,31 @@ HELICS_CXX_EXPORT FederateInfo loadFederateInfo(const std::string& configString)
 /** generate string for passing arguments to the core*/
 HELICS_CXX_EXPORT std::string generateFullCoreInitString(const FederateInfo& fi);
 
-/** get an integer property/flag from a string name of the property or flag
-@param val a name of property to get an integer index code for used in /ref CoreFederateInfo::setProperty
+/** get an integer/time property/flag from a string name of the property or flag
+@param val a name of property to get an integer index code for used in /ref
+CoreFederateInfo::setProperty
 @return the integer code for a given property
 */
 HELICS_CXX_EXPORT int getPropertyIndex(std::string val);
 
+/** get a flag index from a string name of the flag
+@param val a name of a flag option to get an integer index code for use in /ref
+CoreFederateInfo::setFlagOption
+@return the integer code for a given flag
+*/
+HELICS_CXX_EXPORT int getFlagIndex(std::string val);
+
 /** get an integer option index for a binary flag option
-@param val a name of flag option to get an integer index code for used in /ref CoreFederateInfo::setOptionFlag
-@return the integer code for a given property
+@param val a name of flag option to get an integer index code for used in /ref
+CoreFederateInfo::setOptionFlag
+@return the integer code for a given property (-1) if not found
 */
 HELICS_CXX_EXPORT int getOptionIndex(std::string val);
 
-} // namespace helics
+/** get a numerical value for a string option value
+@param val a value from an enumeration or flag used as part of a value
+@return the integer code of a given option value (-1) if not found
+*/
+HELICS_CXX_EXPORT int getOptionValue(std::string val);
+
+}  // namespace helics

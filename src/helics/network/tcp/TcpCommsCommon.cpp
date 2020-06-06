@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCommsCommon.h"
@@ -17,17 +17,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace tcp {
-    TcpConnection::pointer makeConnection(
-        asio::io_context& io_context,
-        const std::string& connection,
-        const std::string& port,
-        size_t bufferSize,
-        std::chrono::milliseconds timeOut)
+    TcpConnection::pointer makeConnection(asio::io_context& io_context,
+                                          const std::string& connection,
+                                          const std::string& port,
+                                          size_t bufferSize,
+                                          std::chrono::milliseconds timeOut)
     {
         using std::chrono::milliseconds;
         using std::chrono::steady_clock;
 
-        using namespace std::chrono_literals; //NOLINT
+        using namespace std::chrono_literals;  // NOLINT
         auto tick = steady_clock::now();
         milliseconds timeRemaining(timeOut);
         milliseconds timeRemPrev(timeOut);
@@ -58,22 +57,20 @@ namespace tcp {
         return connectionPtr;
     }
 
-    bool commErrorHandler(
-        CommsInterface* comm,
-        TcpConnection* /*connection*/,
-        const std::error_code& error)
+    bool commErrorHandler(CommsInterface* comm,
+                          TcpConnection* /*connection*/,
+                          const std::error_code& error)
     {
         if (comm->isConnected()) {
             if ((error != asio::error::eof) && (error != asio::error::operation_aborted)) {
                 if (error != asio::error::connection_reset) {
-                    comm->logError(
-                        "error message while connected " + error.message() + "code " +
-                        std::to_string(error.value()));
+                    comm->logError("error message while connected " + error.message() + "code " +
+                                   std::to_string(error.value()));
                 }
             }
         }
         return false;
     }
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

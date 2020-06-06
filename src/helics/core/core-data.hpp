@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -24,14 +24,15 @@ all user functions are found in this namespace along with many other functions i
  */
 namespace helics {
 /** basic data object for use in the user API layer
-@details An adapter over a string,  many objects will be strings actually so this is just a wrapper for that
-common use case, and many other objects are small, so the small string optimization takes advantage of that
+@details An adapter over a string,  many objects will be strings actually so this is just a wrapper
+for that common use case, and many other objects are small, so the small string optimization takes
+advantage of that
 */
 class data_block {
   private:
-    std::string m_data; //!< using a string to represent the data
-    friend class data_view; //!< let data view access the string directly
-    friend class ActionMessage; //!< let action Message access the string directly
+    std::string m_data;  //!< using a string to represent the data
+    friend class data_view;  //!< let data view access the string directly
+    friend class ActionMessage;  //!< let action Message access the string directly
   public:
     /** default constructor */
     data_block() = default;
@@ -135,7 +136,7 @@ class data_block {
     void push_back(char newchar) { m_data.push_back(newchar); }
 };
 
-/** operator to check if two data blocks are not equal to eachother*/
+/** operator to check if two data blocks are not equal to each other*/
 inline bool operator!=(const data_block& db1, const data_block& db2)
 {
     return !(db1 == db2);
@@ -144,17 +145,17 @@ inline bool operator!=(const data_block& db1, const data_block& db2)
 /** class containing a message structure*/
 class Message {
   public:
-    Time time = timeZero; //!< the event time the message is sent
-    std::uint16_t flags{0}; //!< message flags
-    std::uint16_t messageValidation{0U}; //!< extra field for user object usage, not used by HELICS
-    std::int32_t messageID{0}; //!< the messageID for a message
-    data_block data; //!< the data packet for the message
-    std::string dest; //!< the destination of the message
-    std::string source; //!< the most recent source of the message
-    std::string original_source; //!< the original source of the message
-    std::string original_dest; //!< the original destination of a message
-    std::int32_t counter{0}; //!< indexing counter not used directly by helics
-    void* backReference{nullptr}; //!< back referencing pointer not used by helics
+    Time time = timeZero;  //!< the event time the message is sent
+    std::uint16_t flags{0};  //!< message flags
+    std::uint16_t messageValidation{0U};  //!< extra field for user object usage, not used by HELICS
+    std::int32_t messageID{0};  //!< the messageID for a message
+    data_block data;  //!< the data packet for the message
+    std::string dest;  //!< the destination of the message
+    std::string source;  //!< the most recent source of the message
+    std::string original_source;  //!< the original source of the message
+    std::string original_dest;  //!< the original destination of a message
+    std::int32_t counter{0};  //!< indexing counter not used directly by helics
+    void* backReference{nullptr};  //!< back referencing pointer not used by helics
 
     /** default constructor*/
     Message() = default;
@@ -234,4 +235,4 @@ inline bool isValidIndex(sizeType testSize, const SizedDataType& vec)
     return ((testSize >= sizeType(0)) && (testSize < static_cast<sizeType>(vec.size())));
 }
 
-} // namespace helics
+}  // namespace helics

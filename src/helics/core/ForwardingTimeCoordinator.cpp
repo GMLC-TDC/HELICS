@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -78,10 +78,9 @@ class minTimeSet {
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
 };
 
-static minTimeSet generateMinTimeSet(
-    const TimeDependencies& dependencies,
-    bool restricted,
-    global_federate_id ignore = global_federate_id())
+static minTimeSet generateMinTimeSet(const TimeDependencies& dependencies,
+                                     bool restricted,
+                                     global_federate_id ignore = global_federate_id())
 {
     minTimeSet mTime;
     for (auto& dep : dependencies) {
@@ -148,7 +147,8 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             time_next = time_minminDe;
         }
     }
-    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id,
+    //    static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next) {
         update = true;
@@ -191,18 +191,17 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
         }
         transmitTimingMessage(upd);
 
-        //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+        //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
         // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
 }
 
 std::string ForwardingTimeCoordinator::printTimeStatus() const
 {
-    return fmt::format(
-        R"raw({{"time_next":{}, "minDe":{}, "minminDe":{}}})raw",
-        static_cast<double>(time_next),
-        static_cast<double>(time_minDe),
-        static_cast<double>(time_minminDe));
+    return fmt::format(R"raw({{"time_next":{}, "minDe":{}, "minminDe":{}}})raw",
+                       static_cast<double>(time_next),
+                       static_cast<double>(time_minDe),
+                       static_cast<double>(time_minminDe));
 }
 
 bool ForwardingTimeCoordinator::isDependency(global_federate_id ofed) const
@@ -289,9 +288,9 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
     return ret;
 }
 
-ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency(
-    const ActionMessage& msg,
-    global_federate_id iFed) const
+ActionMessage
+    ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency(const ActionMessage& msg,
+                                                                   global_federate_id iFed) const
 {
     auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy, iFed);
     ActionMessage nTime(msg);
@@ -390,4 +389,4 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage(const ActionMessa
     }
 }
 
-} // namespace helics
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Federate.hpp"
@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-//a key link that does very little yet, but forces linking to a particular file
+// a key link that does very little yet, but forces linking to a particular file
 static const auto ldcores = loadCores();
 
-using namespace std::chrono_literals; //NOLINT
+using namespace std::chrono_literals;  // NOLINT
 void cleanupHelicsLibrary()
 {
     BrokerFactory::cleanUpBrokers(100ms);
@@ -84,10 +84,9 @@ Federate::Federate(const std::string& fedname, CoreApp& core, const FederateInfo
 {
 }
 
-Federate::Federate(
-    const std::string& fedName,
-    const std::shared_ptr<Core>& core,
-    const FederateInfo& fi):
+Federate::Federate(const std::string& fedName,
+                   const std::shared_ptr<Core>& core,
+                   const FederateInfo& fi):
     coreObject(core),
     name(fedName)
 {
@@ -129,7 +128,8 @@ Federate::Federate(const std::string& configString): Federate(std::string{}, con
 
 Federate::Federate() noexcept
 {
-    // this function needs to be defined for the virtual inheritance to compile but shouldn't actually be executed
+    // this function needs to be defined for the virtual inheritance to compile but shouldn't
+    // actually be executed
 }
 
 Federate::Federate(Federate&& fed) noexcept
@@ -166,7 +166,7 @@ Federate::~Federate()
             finalize();
         }
         // LCOV_EXCL_START
-        catch (...) // do not allow a throw inside the destructor
+        catch (...)  // do not allow a throw inside the destructor
         {
         }
         // LCOV_EXCL_STOP
@@ -437,7 +437,7 @@ bool Federate::getFlagOption(int flag) const
     return coreObject->getFlagOption(fedID, flag);
 }
 void Federate::finalize()
-{ // since finalize is called in the destructor we can't allow any potential virtual function calls
+{  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode) {
         case modes::startup:
             break;
@@ -463,7 +463,7 @@ void Federate::finalize()
             break;
         case modes::pending_iterative_time:
             asyncCallInfo->lock()
-                ->timeRequestIterativeFuture.get(); // I don't care about the return any more
+                ->timeRequestIterativeFuture.get();  // I don't care about the return any more
             break;
         case modes::finalize:
         case modes::error:
@@ -473,7 +473,7 @@ void Federate::finalize()
             finalizeComplete();
             return;
         default:
-            throw(InvalidFunctionCall("cannot call finalize in present state")); // LCOV_EXCL_LINE
+            throw(InvalidFunctionCall("cannot call finalize in present state"));  // LCOV_EXCL_LINE
     }
     coreObject->finalize(fedID);
     if (fManager) {
@@ -686,7 +686,7 @@ Time Federate::requestTimeComplete()
     if (currentMode.compare_exchange_strong(exp, modes::executing)) {
         auto asyncInfo = asyncCallInfo->lock();
         auto newTime = asyncInfo->timeRequestFuture.get();
-        asyncInfo.unlock(); // remove the lock;
+        asyncInfo.unlock();  // remove the lock;
         Time oldTime = currentTime;
         currentTime = newTime;
         updateTime(newTime, oldTime);
@@ -763,14 +763,13 @@ void Federate::registerFilterInterfaces(const std::string& configString)
     }
 }
 
-static Filter& generateFilter(
-    Federate* fed,
-    bool global,
-    bool cloning,
-    const std::string& name,
-    filter_types operation,
-    const std::string& inputType,
-    const std::string& outputType)
+static Filter& generateFilter(Federate* fed,
+                              bool global,
+                              bool cloning,
+                              const std::string& name,
+                              filter_types operation,
+                              const std::string& inputType,
+                              const std::string& outputType)
 {
     bool useTypes = !((inputType.empty()) && (outputType.empty()));
     if (useTypes) {
@@ -800,14 +799,11 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
             filt.setOption(getOptionIndex(target.substr(2)), false);
         }
     });
-    bool optional = getOrDefault(data, "optional", false);
-    if (optional) {
-        filt.setOption(defs::options::connection_optional, optional);
-    }
-    bool required = getOrDefault(data, "required", false);
-    if (required) {
-        filt.setOption(defs::options::connection_required, required);
-    }
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&filt](int32_t option, int32_t value) { filt.setOption(option, value); });
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
@@ -1025,7 +1021,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->getIdentifier();
         } else {
-            res = "#unknown";
+            res = "#disconnected";
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1036,7 +1032,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->query(getName(), queryStr);
         } else {
-            res = "#unknown";
+            res = "#disconnected";
         }
     }
     return res;
@@ -1051,7 +1047,7 @@ std::string Federate::query(const std::string& target, const std::string& queryS
         if (coreObject) {
             res = coreObject->query(target, queryStr);
         } else {
-            res = "#invalid";
+            res = "#disconnected";
         }
     }
     return res;
@@ -1079,7 +1075,7 @@ query_id_t Federate::queryAsync(const std::string& queryStr)
     return query_id_t(cnt);
 }
 
-std::string Federate::queryComplete(query_id_t queryIndex)
+std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
@@ -1089,7 +1085,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)
     return {"#invalid"};
 }
 
-bool Federate::isQueryCompleted(query_id_t queryIndex) const
+bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
@@ -1119,40 +1115,38 @@ void Federate::addDependency(const std::string& fedName)
     }
 }
 
-Filter& Federate::registerFilter(
-    const std::string& filterName,
-    const std::string& inputType,
-    const std::string& outputType)
+Filter& Federate::registerFilter(const std::string& filterName,
+                                 const std::string& inputType,
+                                 const std::string& outputType)
 {
-    return fManager->registerFilter(
-        (!filterName.empty()) ? (getName() + nameSegmentSeparator + filterName) : filterName,
-        inputType,
-        outputType);
+    return fManager->registerFilter((!filterName.empty()) ?
+                                        (getName() + nameSegmentSeparator + filterName) :
+                                        filterName,
+                                    inputType,
+                                    outputType);
 }
 
-CloningFilter& Federate::registerCloningFilter(
-    const std::string& filterName,
-    const std::string& inputType,
-    const std::string& outputType)
+CloningFilter& Federate::registerCloningFilter(const std::string& filterName,
+                                               const std::string& inputType,
+                                               const std::string& outputType)
 {
-    return fManager->registerCloningFilter(
-        (!filterName.empty()) ? (getName() + nameSegmentSeparator + filterName) : filterName,
-        inputType,
-        outputType);
+    return fManager->registerCloningFilter((!filterName.empty()) ?
+                                               (getName() + nameSegmentSeparator + filterName) :
+                                               filterName,
+                                           inputType,
+                                           outputType);
 }
 
-Filter& Federate::registerGlobalFilter(
-    const std::string& filterName,
-    const std::string& inputType,
-    const std::string& outputType)
+Filter& Federate::registerGlobalFilter(const std::string& filterName,
+                                       const std::string& inputType,
+                                       const std::string& outputType)
 {
     return fManager->registerFilter(filterName, inputType, outputType);
 }
 
-CloningFilter& Federate::registerGlobalCloningFilter(
-    const std::string& filterName,
-    const std::string& inputType,
-    const std::string& outputType)
+CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterName,
+                                                     const std::string& inputType,
+                                                     const std::string& outputType)
 {
     return fManager->registerCloningFilter(filterName, inputType, outputType);
 }
@@ -1235,7 +1229,7 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
     }
 }
 
-void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool option_value)
+void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value)
 {
     if (coreObject) {
         coreObject->setHandleOption(handle, option, option_value);
@@ -1246,9 +1240,9 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool 
 }
 
 /** get the current value for an interface option*/
-bool Federate::getInterfaceOption(interface_handle handle, int32_t option)
+int32_t Federate::getInterfaceOption(interface_handle handle, int32_t option)
 {
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
+    return (coreObject) ? coreObject->getHandleOption(handle, option) : 0;
 }
 
 void Federate::closeInterface(interface_handle handle)
@@ -1285,4 +1279,4 @@ void Federate::logMessage(int level, const std::string& message) const
     }
 }
 
-} // namespace helics
+}  // namespace helics

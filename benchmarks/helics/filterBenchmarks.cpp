@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -22,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 
+using helics::core_type;
+
 static void BMfilter_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -29,8 +31,9 @@ static void BMfilter_singleCore(benchmark::State& state)
 
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
-        auto wcore = helics::CoreFactory::create(
-            core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
+        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+                                                 std::string("--autobroker --federates=") +
+                                                     std::to_string(feds + 1));
         EchoMessageHub hub;
         hub.initialize(wcore->getIdentifier(), "");
         std::vector<EchoMessageLeaf> leafs(feds);
@@ -49,9 +52,9 @@ static void BMfilter_singleCore(benchmark::State& state)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
-                std::ref(leafs[ii]));
+            threadlist[ii] =
+                std::thread([&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
+                            std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -82,8 +85,10 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
 
-        auto broker = helics::BrokerFactory::create(
-            cType, "brokerb", std::string("--federates=") + std::to_string(feds + 1));
+        auto broker =
+            helics::BrokerFactory::create(cType,
+                                          "brokerb",
+                                          std::string("--federates=") + std::to_string(feds + 1));
         broker->setLoggingLevel(helics_log_level_no_print);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
@@ -113,9 +118,9 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
         filtcore->setCoreReadyToInit();
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
-                std::ref(leafs[ii]));
+            threadlist[ii] =
+                std::thread([&](EchoMessageLeaf& lf) { lf.run([&brr]() { brr.wait(); }); },
+                            std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -135,7 +140,7 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
     }
 }
 
-static constexpr int64_t maxscale{1 << 5};
+static constexpr int64_t maxscale{1 << (5 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMfilter_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)

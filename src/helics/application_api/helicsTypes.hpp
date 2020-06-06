@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -18,12 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 @details basic type information and control for HELICS
 */
 namespace helics {
-using identifier_type = std::uint32_t; //!< specify the underlying type used in the identifiers
+using identifier_type = std::uint32_t;  //!< specify the underlying type used in the identifiers
 using std::int32_t;
 using std::int64_t;
 
 constexpr identifier_type invalid_id_value =
-    static_cast<identifier_type>(-1); //!< defining an invalid id value
+    static_cast<identifier_type>(-1);  //!< defining an invalid id value
 
 /** the known types of identifiers*/
 enum class identifiers : char {
@@ -51,10 +51,10 @@ it also acts to limit any mistakes of on type of identifier for another
 template<typename BaseType, identifiers ID, BaseType invalidValue>
 class identifier_id_t {
   private:
-    BaseType ivalue = invalidValue; //!< the underlying index value
+    BaseType ivalue = invalidValue;  //!< the underlying index value
 
   public:
-    static const identifiers identity{ID}; //!< the type of the identifier
+    static const identifiers identity{ID};  //!< the type of the identifier
     using underlyingType = BaseType;
     /** default constructor*/
     constexpr identifier_id_t() noexcept: ivalue(invalidValue) {}
@@ -82,7 +82,7 @@ class identifier_id_t {
     // check if the current value is not the invalidValue
     bool isValid() const noexcept { return (ivalue != invalidValue); }
 };
-} // namespace helics
+}  // namespace helics
 
 // specialize std::hash
 namespace std {
@@ -90,15 +90,15 @@ namespace std {
 template<typename BaseType, helics::identifiers ID, BaseType invalidValue>
 struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>> {
     using argument_type =
-        helics::identifier_id_t<BaseType, ID, invalidValue>; //!< the type of object to hash
-    using result_type = std::size_t; //!< the result type of the hash code
+        helics::identifier_id_t<BaseType, ID, invalidValue>;  //!< the type of object to hash
+    using result_type = std::size_t;  //!< the result type of the hash code
     /** the actual hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
         return std::hash<BaseType>{}(key.value());
     }
 };
-} // namespace std
+}  // namespace std
 
 namespace helics {
 using publication_id_t =
@@ -110,8 +110,9 @@ using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_
 /** data class for pair of a string and double*/
 class NamedPoint {
   public:
-    std::string name; //!< the text value for the named point
-    double value = std::numeric_limits<double>::quiet_NaN(); //!< the data value for the named point
+    std::string name;  //!< the text value for the named point
+    double value =
+        std::numeric_limits<double>::quiet_NaN();  //!< the data value for the named point
     /** default constructor*/
     NamedPoint() = default;
     /** construct directly from name value*/
@@ -170,7 +171,7 @@ namespace typestrings {
     constexpr auto cdoublestr = "complex";
     constexpr auto npstr = "named_point";
     constexpr auto strstr = "string";
-} // namespace typestrings
+}  // namespace typestrings
 
 template<>
 inline constexpr const char* typeNameString<std::vector<std::string>>()
@@ -283,7 +284,9 @@ enum class data_type : int {
     helics_time = helics_data_type_time,
     helics_custom = helics_data_type_raw,
     helics_any = helics_data_type_any,
+    helics_multi = helics_data_type_multi,
     helics_unknown = 262355,
+
 };
 
 inline constexpr bool isRawType(data_type type)
@@ -327,8 +330,8 @@ HELICS_CXX_EXPORT void helicsGetVector(const std::string& val, std::vector<doubl
 HELICS_CXX_EXPORT std::vector<std::complex<double>> helicsGetComplexVector(const std::string& val);
 
 /** convert a string to a complex vector using an existing vector*/
-HELICS_CXX_EXPORT void
-    helicsGetComplexVector(const std::string& val, std::vector<std::complex<double>>& data);
+HELICS_CXX_EXPORT void helicsGetComplexVector(const std::string& val,
+                                              std::vector<std::complex<double>>& data);
 
 /** convert a string to a named point*/
 HELICS_CXX_EXPORT NamedPoint helicsGetNamedPoint(const std::string& val);
@@ -352,8 +355,8 @@ HELICS_CXX_EXPORT data_block typeConvert(data_type type, const char* val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::string& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::vector<double>& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const double* vals, size_t size);
-HELICS_CXX_EXPORT data_block
-    typeConvert(data_type type, const std::vector<std::complex<double>>& val);
+HELICS_CXX_EXPORT data_block typeConvert(data_type type,
+                                         const std::vector<std::complex<double>>& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::complex<double>& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const NamedPoint& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const char* str, double val);
@@ -532,11 +535,10 @@ constexpr int nonConvertibleType = 2;
 1 types convertible to primary types
 2 type not convertible to primary types */
 template<typename X>
-using typeCategory = std::conditional_t<
-    helicsType<remove_cv_ref<X>>() != data_type::helics_custom,
-    std::integral_constant<int, primaryType>,
-    std::conditional_t<
-        isConvertableType<remove_cv_ref<X>>(),
-        std::integral_constant<int, convertibleType>,
-        std::integral_constant<int, nonConvertibleType>>>;
-} // namespace helics
+using typeCategory =
+    std::conditional_t<helicsType<remove_cv_ref<X>>() != data_type::helics_custom,
+                       std::integral_constant<int, primaryType>,
+                       std::conditional_t<isConvertableType<remove_cv_ref<X>>(),
+                                          std::integral_constant<int, convertibleType>,
+                                          std::integral_constant<int, nonConvertibleType>>>;
+}  // namespace helics

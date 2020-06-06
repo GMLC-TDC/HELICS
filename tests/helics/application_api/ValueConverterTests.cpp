@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -20,12 +20,11 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::string_literals;
 
 template<class X>
-void converterTests(
-    const X& testValue1,
-    const X& testValue2,
-    size_t sz1 = 0,
-    size_t sz2 = 0,
-    const std::string& type = "")
+void converterTests(const X& testValue1,
+                    const X& testValue2,
+                    size_t sz1 = 0,
+                    size_t sz2 = 0,
+                    const std::string& type = "")
 {
     auto converter = helics::ValueConverter<X>();
 
@@ -206,8 +205,8 @@ TEST(valueConverter_tests, errors)
     EXPECT_THROW(helics::ValueConverter<double>::interpret(vb2), std::invalid_argument);
     EXPECT_LT(vb2.size(), 8u);
     EXPECT_GT(vb2.size(), 4u);
-    EXPECT_THROW(
-        helics::ValueConverter<std::complex<double>>::interpret(vb1), std::invalid_argument);
+    EXPECT_THROW(helics::ValueConverter<std::complex<double>>::interpret(vb1),
+                 std::invalid_argument);
     EXPECT_LT(vb1.size(), 12u);
     EXPECT_GT(vb1.size(), 8u);
 }

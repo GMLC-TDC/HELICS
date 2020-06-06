@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -21,9 +21,8 @@ template<class brkX>
 void makeConnectionsToml(brkX* brk, const std::string& file)
 {
     toml::value uVal;
-    static_assert(
-        std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
-        "broker must be Core or broker");
+    static_assert(std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
+                  "broker must be Core or broker");
     toml::value doc;
     try {
         doc = loadToml(file);
@@ -96,9 +95,8 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
 template<class brkX>
 void makeConnectionsJson(brkX* brk, const std::string& file)
 {
-    static_assert(
-        std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
-        "broker must be Core or broker");
+    static_assert(std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
+                  "broker must be Core or broker");
     Json::Value doc;
     try {
         doc = loadJson(file);
@@ -162,4 +160,4 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
     }
 }
 
-} // namespace helics
+}  // namespace helics

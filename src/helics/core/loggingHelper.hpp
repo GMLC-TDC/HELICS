@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -18,17 +18,17 @@ using elsewhere is probably not going to work.
 
 /** enumeration of defined print levels*/
 enum log_level : int {
-    no_print = helics_log_level_no_print, //!< never print
-    error = helics_log_level_error, //!< only print errors
-    warning = helics_log_level_warning, //!< print/log warning and errors
-    summary = helics_log_level_summary, //!< print/log summary information
+    no_print = helics_log_level_no_print,  //!< never print
+    error = helics_log_level_error,  //!< only print errors
+    warning = helics_log_level_warning,  //!< print/log warning and errors
+    summary = helics_log_level_summary,  //!< print/log summary information
     connections =
-        helics_log_level_connections, //!< print summary+ federate level connection information
+        helics_log_level_connections,  //!< print summary+ federate level connection information
     interfaces =
-        helics_log_level_interfaces, //!< print connections +interface level connection information
-    timing = helics_log_level_timing, //!< print interfaces+ timing(exec/grant/disconnect)
-    data = helics_log_level_data, //!< print timing+data transmissions
-    trace = helics_log_level_trace, //!< trace level printing (all processed messages)
+        helics_log_level_interfaces,  //!< print connections +interface level connection information
+    timing = helics_log_level_timing,  //!< print interfaces+ timing(exec/grant/disconnect)
+    data = helics_log_level_data,  //!< print timing+data transmissions
+    trace = helics_log_level_trace,  //!< trace level printing (all processed messages)
 };
 
 #define LOG_ERROR(id, ident, message) sendToLogger(id, log_level::error, ident, message);

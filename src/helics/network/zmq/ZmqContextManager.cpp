@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 /*
@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
-#include "zmqContextManager.h"
+#include "ZmqContextManager.h"
 
 #include "cppzmq/zmq.hpp"
 
@@ -29,15 +29,15 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 std::map<std::string, std::shared_ptr<ZmqContextManager>> ZmqContextManager::contexts;
 
-/** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
-safe so we are going to use a lock that is entirely controlled by this file*/
+/** we expect operations on core object that modify the map to be rare but we absolutely need them
+to be thread safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex contextLock;
 
 std::shared_ptr<ZmqContextManager>
     ZmqContextManager::getContextPointer(const std::string& contextName)
 {
     std::lock_guard<std::mutex> conlock(
-        contextLock); // just to ensure that nothing funny happens if you try to
+        contextLock);  // just to ensure that nothing funny happens if you try to
     // get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
@@ -98,8 +98,13 @@ ZmqContextManager::~ZmqContextManager()
     // std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
 
     if (leakOnDelete) {
-        // yes I am purposefully leaking this PHILIP TOP
-        auto val = zcontext.release();
+        // yes I am purposefully leaking this( PHILIP TOP)
+        // do the vagaries of library closeout this may end up being destroyed too soon and can
+        // cause some extraneous errors to show up when closing programs, so this just lets the OS
+        // process cleanup since the only issues occur on program termination, in other situations
+        // closing does present an issue and since this particular object is mostly only closed on
+        // termination this is the default.
+        auto* val = zcontext.release();
         (void)(val);
     }
 }

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_PUBLICATION_HPP_
@@ -30,7 +30,8 @@ class Publication {
         pub = publication.pub;
         return *this;
     }
-    // there is no need for move operators since copying the underlying object is fine, it is a non-owning pointer
+    // there is no need for move operators since copying the underlying object is fine, it is a
+    // non-owning pointer
     /** cast operator to the underlying helics_publication object*/
     operator helics_publication() const { return pub; }
     /** return the underlying helics_publication object*/
@@ -72,8 +73,15 @@ class Publication {
     /** publish a vector of doubles*/
     void publish(const std::vector<double>& data)
     {
-        helicsPublicationPublishVector(
-            pub, data.data(), static_cast<int>(data.size() * sizeof(double)), HELICS_IGNORE_ERROR);
+        helicsPublicationPublishVector(pub,
+                                       data.data(),
+                                       static_cast<int>(data.size()),
+                                       HELICS_IGNORE_ERROR);
+    }
+    /** publish a vector of doubles*/
+    void publish(const double* data, int length)
+    {
+        helicsPublicationPublishVector(pub, data, length, HELICS_IGNORE_ERROR);
     }
     /** publish a named point with a string and double*/
     void publish(const std::string& name, double val)
@@ -101,8 +109,8 @@ class Publication {
     }
 
   private:
-    helics_publication pub; //!< the reference to the underlying publication
+    helics_publication pub;  //!< the reference to the underlying publication
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

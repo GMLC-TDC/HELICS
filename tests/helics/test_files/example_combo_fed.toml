@@ -22,13 +22,13 @@ input_delay=0 #the input delay for external data to propagate to federates
 [[endpoints]]
 
 name="ept1" # the name of the publication
- type="genmessage" # the type assocaited with a endpoint endpoint types have limited usefullness at present (optional)
+ type="genmessage" # the type associated with a endpoint endpoint types have limited usefulness at present (optional)
  global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
 [[endpoints]]
 name="ept2" # the name of the publication
- type="message2" # the type assocaited with a endpoint (optional)
+ type="message2" # the type associated with a endpoint (optional)
  #the fact that there is no global value creates a local endpoint with global name comboFed/ept2
- 
+
  knownDestinations="ept1" #this value can be an array of strings or just a single one it names key paths
  #knownDestinations can be used to optimize the communication pathways inside of HELICS
  subscriptions="pub1"  #subscribe an endpoint to a particular publication  this means that an endpoint will get a message whenever anything is published to that particular key
@@ -38,13 +38,13 @@ name="ept2" # the name of the publication
 [[publications]]
 
 "key"="pub1" # the name of the publication
- "type"="double" # the type assocaited with a publication (optional)
+ "type"="double" # the type associated with a publication (optional)
  "unit"="m"  # the units associated with a publication (optional)
  "global"=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
 
 [[publications]]
 name="pub2" # the name of the publication (can be key or name)
- type="double" # the type assocaited with a publication (optional)
+ type="double" # the type associated with a publication (optional)
  info='{"field1":45,"field2":99}'  #literal info field
  #no global=true implies this will have the federate name prepended like comboFed/pub2
 
@@ -52,11 +52,9 @@ name="pub2" # the name of the publication (can be key or name)
 [[subscriptions]]
 
 key="pub1" # the key of the publication
- type="double" # the type assocaited with a publication (optional)
+ type="double" # the type associated with a publication (optional)
  required=true #set to true to make helics issue a warning if the publication is not found
- 
+
 [[subscriptions]]
 key="comboFed/pub2" # the name of the publication to subscribe to
 shortcut="pubshortcut"  #a naming shortcut for the publication for later retrieval
-
-

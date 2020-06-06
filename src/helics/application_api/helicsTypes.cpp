@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -15,9 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <numeric>
 #include <regex>
+#include <sstream>
 #include <unordered_map>
 
-using namespace gmlc::utilities; //NOLINT
+using namespace gmlc::utilities;  // NOLINT
 
 namespace helics {
 
@@ -107,14 +108,14 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(float).name(), data_type::helics_double},
     {typeid(char).name(), data_type::helics_string},
     {typeid(unsigned char).name(), data_type::helics_int},
-    {typeid(short).name(), data_type::helics_int}, // NOLINT
-    {typeid(unsigned short).name(), data_type::helics_int}, // NOLINT
+    {typeid(short).name(), data_type::helics_int},  // NOLINT
+    {typeid(unsigned short).name(), data_type::helics_int},  // NOLINT
     {typeid(int).name(), data_type::helics_int},
     {typeid(unsigned int).name(), data_type::helics_int},
-    {typeid(long).name(), data_type::helics_int}, // NOLINT
-    {typeid(unsigned long).name(), data_type::helics_int}, // NOLINT
-    {typeid(long long).name(), data_type::helics_int}, // NOLINT
-    {typeid(unsigned long long).name(), data_type::helics_int}, // NOLINT
+    {typeid(long).name(), data_type::helics_int},  // NOLINT
+    {typeid(unsigned long).name(), data_type::helics_int},  // NOLINT
+    {typeid(long long).name(), data_type::helics_int},  // NOLINT
+    {typeid(unsigned long long).name(), data_type::helics_int},  // NOLINT
     {typeid(int64_t).name(), data_type::helics_int},
     {typeid(uint64_t).name(), data_type::helics_int},
     {typeid(int32_t).name(), data_type::helics_int},
@@ -170,6 +171,8 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(Time).name(), data_type::helics_time},
     {gmlc::demangle(typeid(Time).name()), data_type::helics_time},
     {"tm", data_type::helics_time},
+    {"multi", data_type::helics_multi},
+    {"many", data_type::helics_multi},
     {"def", data_type::helics_any},
     {"any", data_type::helics_any},
     {"", data_type::helics_any},
@@ -177,6 +180,9 @@ static const std::unordered_map<std::string, data_type> typeMap{
 
 data_type getTypeFromString(const std::string& typeName)
 {
+    if (!typeName.empty() && typeName.front() == '[') {
+        return data_type::helics_multi;
+    }
     auto res = typeMap.find(typeName);
     if (res == typeMap.end()) {
         auto lcStr = convertToLowerCase(typeName);
@@ -239,7 +245,7 @@ std::string helicsVectorString(const std::vector<double>& val)
         vString.push_back(';');
         vString.push_back(' ');
     }
-    if (vString.size() > 3) // 3 for v0[ which would be for an empty vector
+    if (vString.size() > 3)  // 3 for v0[ which would be for an empty vector
     {
         vString.pop_back();
         vString.pop_back();
@@ -258,7 +264,7 @@ std::string helicsVectorString(const double* vals, size_t size)
         vString.push_back(';');
         vString.push_back(' ');
     }
-    if (vString.size() > 3) // 3 for c0[ which would be for an empty vector
+    if (vString.size() > 3)  // 3 for c0[ which would be for an empty vector
     {
         vString.pop_back();
         vString.pop_back();
@@ -376,8 +382,9 @@ static int readSize(const std::string& val)
             // go to the alternative path if this fails
         }
     }
-    auto res = std::count_if(
-                   val.begin() + fb, val.end(), [](auto c) { return (c == ',') || (c == ';'); }) +
+    auto res = std::count_if(val.begin() + fb,
+                             val.end(),
+                             [](auto c) { return (c == ',') || (c == ';'); }) +
         1;
     return static_cast<int>(res);
 }
@@ -550,7 +557,8 @@ bool helicsBoolValue(const std::string& val)
         {"enabled", true},
         {std::string{}, false},
     };
-    // all known false strings are captured in known strings so if it isn't in there it evaluates to true
+    // all known false strings are captured in known strings so if it isn't in there it evaluates to
+    // true
     auto res = knownStrings.find(val);
     if (res != knownStrings.end()) {
         return res->second;
@@ -632,7 +640,7 @@ data_block typeConvert(data_type type, int64_t val)
             return std::to_string(val);
         case data_type::helics_named_point:
             if (static_cast<uint64_t>(std::abs(val)) >
-                (2ULL << 51U)) // this checks whether the actual value will fit in a double
+                (2ULL << 51U))  // this checks whether the actual value will fit in a double
             {
                 return ValueConverter<NamedPoint>::convert(
                     NamedPoint{std::to_string(val), std::nan("0")});
@@ -737,7 +745,7 @@ data_block typeConvert(data_type type, const std::vector<double>& val)
         case data_type::helics_complex_vector: {
             std::vector<std::complex<double>> CD;
             CD.reserve(val.size() / 2);
-            for (size_t ii = 0; ii < val.size() - 1; ++ii) {
+            for (size_t ii = 0; ii < val.size() - 1; ii += 2) {
                 CD.emplace_back(val[ii], val[ii + 1]);
             }
             return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
@@ -784,7 +792,7 @@ data_block typeConvert(data_type type, const double* vals, size_t size)
         case data_type::helics_complex_vector: {
             std::vector<std::complex<double>> CD;
             CD.reserve(size / 2);
-            for (size_t ii = 0; ii < size - 1; ++ii) {
+            for (size_t ii = 0; ii < size - 1; ii += 2) {
                 CD.emplace_back(vals[ii], vals[ii + 1]);
             }
             return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
@@ -805,7 +813,7 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
             return ValueConverter<double>::convert(std::abs(val[0]));
         case data_type::helics_int:
             return ValueConverter<int64_t>::convert(
-                static_cast<int64_t>(std::abs(val[0]))); // NOLINT
+                static_cast<int64_t>(std::abs(val[0])));  // NOLINT
         case data_type::helics_complex:
             return ValueConverter<std::complex<double>>::convert(val[0]);
         case data_type::helics_bool:
@@ -959,4 +967,4 @@ data_block typeConvert(data_type type, const std::string& str, double val)
     return typeConvert(type, str.c_str(), val);
 }
 
-} // namespace helics
+}  // namespace helics

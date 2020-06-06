@@ -34,19 +34,20 @@ public final class helics_federate_flags {
    */
   public final static helics_federate_flags helics_flag_only_transmit_on_change = new helics_federate_flags("helics_flag_only_transmit_on_change", helicsJNI.helics_flag_only_transmit_on_change_get());
   /**
-   *  flag indicating a federate/interface should only trigger an update if a value has changed (binary<br>
-   * equivalence)
+   *  flag indicating a federate/interface should only trigger an update if a value has changed<br>
+   * (binary equivalence)
    */
   public final static helics_federate_flags helics_flag_only_update_on_change = new helics_federate_flags("helics_flag_only_update_on_change", helicsJNI.helics_flag_only_update_on_change_get());
   /**
-   *  flag indicating a federate should only grant time if all other federates have already passed the<br>
-   * requested time
+   *  flag indicating a federate should only grant time if all other federates have already passed<br>
+   * the requested time
    */
   public final static helics_federate_flags helics_flag_wait_for_current_time_update = new helics_federate_flags("helics_flag_wait_for_current_time_update", helicsJNI.helics_flag_wait_for_current_time_update_get());
   /**
-   *  flag indicating a federate should operate on a restrictive time policy, which disallows some 2nd order<br>
-   *         time evaluation and can be useful for certain types of dependency cycles<br>
-   *         and update patterns, but generally shouldn't be used as it can lead to some very slow update conditions
+   *  flag indicating a federate should operate on a restrictive time policy, which disallows some<br>
+   *        2nd order time evaluation and can be useful for certain types of dependency cycles<br>
+   *         and update patterns, but generally shouldn't be used as it can lead to some very slow update<br>
+   *        conditions
    */
   public final static helics_federate_flags helics_flag_restrictive_time_policy = new helics_federate_flags("helics_flag_restrictive_time_policy", helicsJNI.helics_flag_restrictive_time_policy_get());
   /**
@@ -67,7 +68,7 @@ public final class helics_federate_flags {
   public final static helics_federate_flags helics_flag_single_thread_federate = new helics_federate_flags("helics_flag_single_thread_federate", helicsJNI.helics_flag_single_thread_federate_get());
   /**
    *  flag specifying that a federate, core, or broker may be slow to respond to pings<br>
-   * 		If the federate goes offline there is no good way to detect it so use with caution
+   *         If the federate goes offline there is no good way to detect it so use with caution
    */
   public final static helics_federate_flags helics_flag_slow_responding = new helics_federate_flags("helics_flag_slow_responding", helicsJNI.helics_flag_slow_responding_get());
   /**

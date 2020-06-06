@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -19,19 +19,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 /** @file
-@brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
+@brief naming a set of types that are interchangeable and recognizable inside the HELICS application
+API and core
 */
 namespace helics {
 /** define a variant with the different types*/
 
-using defV = mpark::variant<
-    double,
-    int64_t,
-    std::string,
-    std::complex<double>,
-    std::vector<double>,
-    std::vector<std::complex<double>>,
-    NamedPoint>;
+using defV = mpark::variant<double,
+                            int64_t,
+                            std::string,
+                            std::complex<double>,
+                            std::vector<double>,
+                            std::vector<std::complex<double>>,
+                            NamedPoint>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location {
@@ -48,10 +48,9 @@ HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, const std::string& 
 HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, const char* val, double deltaV);
 HELICS_CXX_EXPORT bool
     changeDetected(const defV& prevValue, const std::vector<double>& val, double deltaV);
-HELICS_CXX_EXPORT bool changeDetected(
-    const defV& prevValue,
-    const std::vector<std::complex<double>>& val,
-    double deltaV);
+HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue,
+                                      const std::vector<std::complex<double>>& val,
+                                      double deltaV);
 HELICS_CXX_EXPORT bool
     changeDetected(const defV& prevValue, const double* vals, size_t size, double deltaV);
 HELICS_CXX_EXPORT bool
@@ -167,26 +166,26 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
     valueExtract(const defV& dv, X& val)
 {
     switch (dv.index()) {
-        case double_loc: // double
+        case double_loc:  // double
             val = static_cast<X>(mpark::get<double>(dv));
             break;
-        case int_loc: // int64_t
+        case int_loc:  // int64_t
             val = static_cast<X>(mpark::get<int64_t>(dv));
             break;
-        case string_loc: // string
+        case string_loc:  // string
         default:
             val = static_cast<X>(getDoubleFromString(mpark::get<std::string>(dv)));
             break;
-        case complex_loc: // complex
+        case complex_loc:  // complex
             val = static_cast<X>(std::abs(mpark::get<std::complex<double>>(dv)));
             break;
-        case vector_loc: // vector
+        case vector_loc:  // vector
         {
             const auto& vec = mpark::get<std::vector<double>>(dv);
             val = static_cast<X>(vectorNorm(vec));
             break;
         }
-        case complex_vector_loc: // complex vector
+        case complex_vector_loc:  // complex vector
         {
             const auto& vec = mpark::get<std::vector<std::complex<double>>>(dv);
             val = static_cast<X>(vectorNorm(vec));
@@ -237,7 +236,7 @@ std::enable_if_t<std::is_arithmetic<X>::value>
                 try {
                     val = static_cast<X>(std::stod(dv.string()));
                 }
-                catch (const std::invalid_argument&) { // well lets try a vector conversion
+                catch (const std::invalid_argument&) {  // well lets try a vector conversion
                     auto V = ValueConverter<std::vector<double>>::interpret(dv);
                     val = static_cast<X>(vectorNorm(V));
                 }
@@ -302,4 +301,4 @@ std::enable_if_t<std::is_arithmetic<X>::value>
 
 HELICS_CXX_EXPORT void valueConvert(defV& val, data_type newType);
 
-} // namespace helics
+}  // namespace helics

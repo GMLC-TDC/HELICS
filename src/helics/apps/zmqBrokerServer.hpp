@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -21,7 +21,7 @@ namespace zmq {
 class socket_t;
 class message_t;
 class context_t;
-} // namespace zmq
+}  // namespace zmq
 
 #endif
 
@@ -48,11 +48,10 @@ namespace apps {
 
         void mainLoop();
 #ifdef ENABLE_ZMQ_CORE
-        std::unique_ptr<zmq::socket_t> loadZMQsocket(zmq::context_t& ctx);
-        std::unique_ptr<zmq::socket_t> loadZMQSSsocket(zmq::context_t& ctx);
+        std::pair<std::unique_ptr<zmq::socket_t>, int> loadZMQsocket(zmq::context_t& ctx);
+        std::pair<std::unique_ptr<zmq::socket_t>, int> loadZMQSSsocket(zmq::context_t& ctx);
 
-        zmqServerData generateZMQServerData();
-        zmqServerData generateZMQSSServerData();
+        static zmqServerData generateServerData(int portNumber, int skip);
 
         std::string
             generateResponseToMessage(zmq::message_t& msg, portData& pdata, core_type ctype);
@@ -65,5 +64,5 @@ namespace apps {
         bool zmqss_enabled_{false};
         std::atomic_bool exitAll{false};
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

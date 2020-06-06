@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCore.h"
@@ -26,8 +26,9 @@ namespace tcp {
         auto hApp = NetworkCore::generateCLI();
         hApp->description("TCP Single Socket Core ");
         hApp->add_option("--connections", connections, "target link connections");
-        hApp->add_flag(
-                "--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
+        hApp->add_flag("--no_outgoing_connection",
+                       no_outgoing_connections,
+                       "disable outgoing connections")
             ->ignore_underscore();
         return hApp;
     }
@@ -45,5 +46,5 @@ namespace tcp {
         return NetworkCore::brokerConnect();
     }
 
-} // namespace tcp
-} // namespace helics
+}  // namespace tcp
+}  // namespace helics

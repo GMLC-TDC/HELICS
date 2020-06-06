@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
@@ -252,7 +252,7 @@ TEST(player_tests, simple_player_mlinecomment)
     helics::apps::Player play1("player1", fi);
     play1.loadFile(std::string(TEST_DIR) + "/example_comments.player");
 
-    EXPECT_EQ(play1.pointCount(), 7u);
+    EXPECT_EQ(play1.pointCount(), 7U);
     helics::ValueFederate vfed("block1", fi);
     auto& sub1 = vfed.registerSubscription("pub1");
     auto& sub2 = vfed.registerSubscription("pub2");
@@ -286,7 +286,7 @@ TEST(player_tests, simple_player_mlinecomment)
     EXPECT_EQ(retTime, 5.0);
     vfed.finalize();
     fut.get();
-    EXPECT_EQ(play1.publicationCount(), 2u);
+    EXPECT_EQ(play1.publicationCount(), 2U);
 }
 
 #ifdef ENABLE_IPC_CORE
@@ -354,11 +354,9 @@ TEST_P(player_file_tests, test_files_cmd)
 TEST_P(player_file_tests, test_files_exe)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    exeTestRunner playerExe(
-        std::string(HELICS_INSTALL_LOC), std::string(HELICS_BUILD_LOC) + "/apps/", "helics_player");
+    exeTestRunner playerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_player");
 
-    exeTestRunner brokerExe(
-        std::string(HELICS_INSTALL_LOC), std::string(HELICS_BUILD_LOC) + "/apps/", "helics_broker");
+    exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_broker");
 
     ASSERT_TRUE(playerExe.isActive());
     ASSERT_TRUE(brokerExe.isActive());
@@ -635,10 +633,9 @@ TEST_P(player_message_file_tests, message_test_files)
     fut.get();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    player_tests,
-    player_message_file_tests,
-    ::testing::ValuesIn(simple_message_files));
+INSTANTIATE_TEST_SUITE_P(player_tests,
+                         player_message_file_tests,
+                         ::testing::ValuesIn(simple_message_files));
 
 TEST(player_tests, player_test_help)
 {
@@ -662,8 +659,8 @@ TEST( player_tests,simple_player_test_exe)
 
     auto res = brokerExe.runAsync ("1 --coretype=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";
-    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc " +
-exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc "
++ exampleFile);
 
     auto val = res2.get ();
     auto val2 = res.get ();

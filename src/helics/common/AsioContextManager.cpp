@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 /*
@@ -29,8 +29,8 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 std::map<std::string, std::shared_ptr<AsioContextManager>> AsioContextManager::contexts;
 
-/** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
-safe so we are going to use a lock that is entirely controlled by this file*/
+/** we expect operations on core object that modify the map to be rare but we absolutely need them
+to be thread safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex contextLock;
 
 std::shared_ptr<AsioContextManager>
@@ -38,7 +38,7 @@ std::shared_ptr<AsioContextManager>
 {
     std::shared_ptr<AsioContextManager> contextPtr;
     std::lock_guard<std::mutex> ctxlock(
-        contextLock); // just to ensure that nothing funny happens if you try
+        contextLock);  // just to ensure that nothing funny happens if you try
     // to get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
@@ -56,7 +56,7 @@ std::shared_ptr<AsioContextManager>
     AsioContextManager::getExistingContextPointer(const std::string& contextName)
 {
     std::lock_guard<std::mutex> ctxlock(
-        contextLock); // just to ensure that nothing funny happens if you try
+        contextLock);  // just to ensure that nothing funny happens if you try
     // to get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
@@ -122,8 +122,9 @@ AsioContextManager::~AsioContextManager()
     }
     if (leakOnDelete) {
         // yes I am purposefully leaking this PHILIP TOP
-        // this capability is needed for some operations on particular OS's with the shared library operations that
-        // will crash if this is closed before the library closes which really only happens at program termination
+        // this capability is needed for some operations on particular OS's with the shared library
+        // operations that will crash if this is closed before the library closes which really only
+        // happens at program termination
         auto val = ictx.release();
         (void)(val);
     }
@@ -148,7 +149,7 @@ AsioContextManager::LoopHandle AsioContextManager::runContextLoop(const std::str
 
 AsioContextManager::LoopHandle AsioContextManager::startContextLoop()
 {
-    ++runCounter; // atomic
+    ++runCounter;  // atomic
 
     loop_mode exp = loop_mode::stopped;
     if (running.compare_exchange_strong(exp, loop_mode::starting)) {
@@ -214,7 +215,7 @@ void AsioContextManager::haltContextLoop()
                         }
                     }
                     loopRet.get();
-                    ictx->reset(); // prepare for future runs
+                    ictx->reset();  // prepare for future runs
                     terminateLoop = false;
                 }
             }

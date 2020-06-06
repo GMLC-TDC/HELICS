@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -14,16 +14,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace CLI {
 class App;
-} // namespace CLI
+}  // namespace CLI
 namespace Json {
 class Value;
-} // namespace Json
+}  // namespace Json
 
 namespace helics {
 namespace apps {
     /** class defining a basic helics App
-@details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple threads without
-external protection, that will result in undefined behavior
+@details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple
+threads without external protection, that will result in undefined behavior
 */
     class HELICS_CXX_EXPORT App {
       public:
@@ -58,7 +58,8 @@ external protection, that will result in undefined behavior
     */
         App(const std::string& appName, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
-    @param appName the name of the application, can be left empty to use a name specified in jsonString
+    @param appName the name of the application, can be left empty to use a name specified in
+    jsonString
     @param jsonString file or JSON string defining the federate information and other configuration
     */
         App(const std::string& appName, const std::string& jsonString);
@@ -69,18 +70,20 @@ external protection, that will result in undefined behavior
         App(const App& other_app) = delete;
         /** move assignment*/
         App& operator=(App&& app) = default;
-        /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
+        /** don't allow the copy assignment,  the default would fail anyway since federates are not
+         * copyable either*/
         App& operator=(const App& app) = delete;
         virtual ~App();
 
         /** load a file containing publication information
-    @param filename the file containing the configuration and Player data  accepted format are JSON, xml, and a
-    Player format which is tab delimited or comma delimited*/
+    @param filename the file containing the configuration and Player data  accepted format are JSON,
+    xml, and a Player format which is tab delimited or comma delimited*/
         void loadFile(const std::string& filename);
         /** initialize the Player federate
-    @details generate all the publications and organize the points, the final publication count will be available
-    after this time and the Player will enter the initialization mode, which means it will not be possible to add
-    more publications calling run will automatically do this if necessary
+    @details generate all the publications and organize the points, the final publication count will
+    be available after this time and the Player will enter the initialization mode, which means it
+    will not be possible to add more publications calling run will automatically do this if
+    necessary
     */
         virtual void initialize();
         /*run the Player*/
@@ -105,7 +108,8 @@ external protection, that will result in undefined behavior
     */
         virtual void loadJsonFile(const std::string& jsonString);
         /** load from a jsonString and check a field named appName for configuration options
-    @param appName the name of the app which may be used in section of the JSON for some local configuration
+    @param appName the name of the app which may be used in section of the JSON for some local
+    configuration
     @param jsonString either a JSON filename or a string containing JSON
     */
         void loadJsonFileConfiguration(const std::string& appName, const std::string& jsonString);
@@ -120,9 +124,9 @@ external protection, that will result in undefined behavior
         void processArgs(std::unique_ptr<helicsCLI11App>& app, const std::string& defaultAppName);
 
       protected:
-        std::shared_ptr<CombinationFederate> fed; //!< the federate created for the Player
-        Time stopTime = Time::maxVal(); //!< the time the Player should stop
-        std::string masterFileName; //!< the name of the master file used to do the construction
+        std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player
+        Time stopTime = Time::maxVal();  //!< the time the Player should stop
+        std::string masterFileName;  //!< the name of the master file used to do the construction
         bool useLocal{false};
         bool fileLoaded{false};
         bool deactivated{false};
@@ -130,5 +134,5 @@ external protection, that will result in undefined behavior
         bool helpMode{false};
         std::vector<std::string> remArgs;
     };
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

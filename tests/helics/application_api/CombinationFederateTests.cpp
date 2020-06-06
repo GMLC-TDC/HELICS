@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -277,10 +277,9 @@ TEST_P(combofed_type_tests, multimode_transfer)
     EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::modes::finalize);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    combofed_tests,
-    combofed_single_type_tests,
-    ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(combofed_tests,
+                         combofed_single_type_tests,
+                         ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(combofed_tests, combofed_type_tests, ::testing::ValuesIn(core_types));
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
@@ -308,10 +307,9 @@ TEST_P(combofed_file_load_tests, test_file_load)
     cFed.disconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    combofed_tests,
-    combofed_file_load_tests,
-    ::testing::ValuesIn(combo_config_files));
+INSTANTIATE_TEST_SUITE_P(combofed_tests,
+                         combofed_file_load_tests,
+                         ::testing::ValuesIn(combo_config_files));
 
 TEST(comboFederate, constructor2)
 {

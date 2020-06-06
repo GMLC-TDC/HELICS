@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -29,12 +29,12 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     bool skip_json_{false};
     bool fallback_to_default_{false};
     /// Internal parser for the configuration
-    std::vector<CLI::ConfigItem> fromConfigInternal(
-        Json::Value j,
-        const std::string& name = {},
-        const std::vector<std::string>& prefix = {}) const;
+    std::vector<CLI::ConfigItem>
+        fromConfigInternal(Json::Value j,
+                           const std::string& name = {},
+                           const std::vector<std::string>& prefix = {}) const;
 };
 /// Add the HELICS JSON configuration processor to the app
 HelicsConfigJSON* addJsonConfig(CLI::App* app);
 
-} // namespace helics
+}  // namespace helics

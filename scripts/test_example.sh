@@ -10,7 +10,7 @@ timeout_len=$1
 shift
 
 # Function to run example and a broker
-function launch_federation_with_broker () {
+function launch_federation_with_broker() {
     # Create a temporary file for broker output
     local broker_output
     broker_output=$(mktemp)
@@ -22,10 +22,9 @@ function launch_federation_with_broker () {
     local num_federates=${#@}
 
     # To support arguments for federates, decrement num_federates by 2x for each time '--args' appears in "$@"
-    for arg in "$@";
-    do
+    for arg in "$@"; do
         if [[ "${arg}" == "--args" ]]; then
-            (( num_federates=num_federates-2 ))
+            ((num_federates = num_federates - 2))
         fi
     done
 
@@ -34,9 +33,9 @@ function launch_federation_with_broker () {
         echo "Launching ${helics_broker} with ${num_federates} federate(s)"
     fi
     {
-        echo "${helics_broker}" > "${broker_output}" ;
-        timeout "${timeout_len}" "${helics_broker}" "${num_federates}" >> "${broker_output}" ;
-        echo "${helics_broker} exitcode:$?" > "${broker_returncode}" ;
+        echo "${helics_broker}" >"${broker_output}"
+        timeout "${timeout_len}" "${helics_broker}" "-f${num_federates}" >>"${broker_output}"
+        echo "${helics_broker} exitcode:$?" >"${broker_returncode}"
     } &
 
     # Store the pid of the broker
@@ -61,7 +60,7 @@ function launch_federation_with_broker () {
 }
 
 # Function to launch the example federation
-function launch_federation () {
+function launch_federation() {
     local outputfiles=()
     local returncodes=()
 
@@ -69,8 +68,7 @@ function launch_federation () {
     local federates=()
     local fed_cmd=""
     local isarg=false
-    for arg in "$@";
-    do
+    for arg in "$@"; do
 
         if [[ "${fed_cmd}" != "" ]]; then
             if [[ "${isarg}" == "true" ]]; then
@@ -98,8 +96,7 @@ function launch_federation () {
     fi
 
     # Launch federates
-    for fed in "${federates[@]}";
-    do
+    for fed in "${federates[@]}"; do
         # Create temp file for federate output
         output_file=$(mktemp)
         returncode_file=$(mktemp)
@@ -110,9 +107,9 @@ function launch_federation () {
             echo "Launching ${fed}"
         fi
         {
-            echo "${fed}" > "${output_file}" ;
-            timeout "${timeout_len}" "${fed}" >> "${output_file}" ;
-            echo "${fed} exitcode:$?" > "${returncode_file}" ;
+            echo "${fed}" >"${output_file}"
+            timeout "${timeout_len}" "${fed}" >>"${output_file}"
+            echo "${fed} exitcode:$?" >"${returncode_file}"
         } &
         pids+=($!)
     done
@@ -121,8 +118,7 @@ function launch_federation () {
     wait "${pids[@]}"
 
     # Cleanup return code files, check for non-zero return codes
-    for returncode_file in "${returncodes[@]}"
-    do
+    for returncode_file in "${returncodes[@]}"; do
         if grep -q 124 "${returncode_file}"; then
             if [[ ${VERBOSE+x} ]]; then
                 echo "ERROR Federate exceeded timeout ($(cat "$returncode_file)")"
@@ -133,8 +129,7 @@ function launch_federation () {
     done
 
     # Cleanup output files
-    for output_file in "${outputfiles[@]}";
-    do
+    for output_file in "${outputfiles[@]}"; do
         if [[ "$VERBOSE" == "all" ]]; then
             echo "-----Federate Output-----"
             cat "$output_file"

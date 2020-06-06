@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -21,9 +21,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 /** enumeration of possible processing results*/
 enum class message_process_result {
-    no_effect = 0, //!< the message did not result in an update
-    processed, //!< the message was used to update the current state
-    delay_processing, //!< the message should be delayed and reprocessed later
+    no_effect = 0,  //!< the message did not result in an update
+    processed,  //!< the message was used to update the current state
+    delay_processing,  //!< the message should be delayed and reprocessed later
 };
 
 /** class for the controlling fields and options for a time coordinator*/
@@ -47,49 +47,51 @@ class tcoptions {
 };
 
 /** class managing the coordination of time in HELICS
-the time coordinator manages dependencies and computes whether time can advance or enter execution mode
+the time coordinator manages dependencies and computes whether time can advance or enter execution
+mode
 */
 class TimeCoordinator {
   private:
     // the variables for time coordination
-    Time time_granted = Time::minVal(); //!< the most recent time granted
-    Time time_requested = Time::maxVal(); //!< the most recent time requested
-    Time time_next = timeZero; //!< the next possible internal event time
-    Time time_minminDe = timeZero; //!< the minimum  of the minimum dependency event Time
-    Time time_minDe = timeZero; //!< the minimum event time of the dependencies
-    Time time_allow = Time::minVal(); //!< the current allowable time
-    Time time_exec = Time::maxVal(); //!< the time of the next targeted execution
-    Time time_message = Time::maxVal(); //!< the time of the earliest message event
-    Time time_value = Time::maxVal(); //!< the time of the earliest value event
+    Time time_granted = Time::minVal();  //!< the most recent time granted
+    Time time_requested = Time::maxVal();  //!< the most recent time requested
+    Time time_next = timeZero;  //!< the next possible internal event time
+    Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
+    Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
+    Time time_allow = Time::minVal();  //!< the current allowable time
+    Time time_exec = Time::maxVal();  //!< the time of the next targeted execution
+    Time time_message = Time::maxVal();  //!< the time of the earliest message event
+    Time time_value = Time::maxVal();  //!< the time of the earliest value event
     Time time_grantBase =
-        Time::minVal(); //!< time to use as a basis for calculating the next grantable
+        Time::minVal();  //!< time to use as a basis for calculating the next grantable
     //!< time(usually time granted unless values are changing)
-    Time time_block = Time::maxVal(); //!< a blocking time to not grant time >= the specified time
+    Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
     shared_guarded_m<std::vector<global_federate_id>>
-        dependent_federates; //!< these are to maintain an accessible record of dependent federates
+        dependent_federates;  //!< these are to maintain an accessible record of dependent federates
     shared_guarded_m<std::vector<global_federate_id>>
-        dependency_federates; //!< these are to maintain an accessible record of dependency federates
-    TimeDependencies dependencies; //!< federates which this Federate is temporally dependent on
+        dependency_federates;  //!< these are to maintain an accessible record of dependency
+                               //!< federates
+    TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id>
-        dependents; //!< federates which temporally depend on this federate
-    std::deque<std::pair<Time, int32_t>> timeBlocks; //!< blocks for a particular timeblocking link
-    tcoptions info; //!< basic time control information
+        dependents;  //!< federates which temporally depend on this federate
+    std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
+    tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage&)>
-        sendMessageFunction; //!< callback used to send the messages
+        sendMessageFunction;  //!< callback used to send the messages
 
   public:
     global_federate_id source_id{
-        0}; //!< the identifier for inserting into the source id field of any generated messages;
+        0};  //!< the identifier for inserting into the source id field of any generated messages;
     iteration_request iterating{
-        iteration_request::
-            no_iterations}; //!< indicator that the coordinator should be iterating if need be
+        iteration_request::no_iterations};  //!< indicator that the coordinator should be iterating
+                                            //!< if need be
     bool checkingExec{
-        false}; //!< flag indicating that the coordinator is trying to enter the exec mode
-    bool executionMode{false}; //!< flag that the coordinator has entered the execution Mode
-    bool hasInitUpdates{
-        false}; //!< flag indicating that a value or message was received during initialization stage
+        false};  //!< flag indicating that the coordinator is trying to enter the exec mode
+    bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
+    bool hasInitUpdates{false};  //!< flag indicating that a value or message was received during
+                                 //!< initialization stage
   private:
-    std::atomic<int32_t> iteration{0}; //!< iteration counter
+    std::atomic<int32_t> iteration{0};  //!< iteration counter
     bool disconnected{false};
 
   public:
@@ -198,11 +200,10 @@ class TimeCoordinator {
     @param newValueTime  the time of the next value
     @param newMessageTime the time of the next message
     */
-    void timeRequest(
-        Time nextTime,
-        iteration_request iterate,
-        Time newValueTime,
-        Time newMessageTime);
+    void timeRequest(Time nextTime,
+                     iteration_request iterate,
+                     Time newValueTime,
+                     Time newMessageTime);
     /** function to enter the exec Mode
     @param mode the mode of iteration_request (no_iteration, force_iteration, iterate_if_needed)
     */
@@ -220,4 +221,4 @@ class TimeCoordinator {
     /** generate a configuration string(JSON)*/
     void generateConfig(Json::Value& base) const;
 };
-} // namespace helics
+}  // namespace helics

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 /*
@@ -97,9 +97,8 @@ void LoggingCore::haltOperations(int loggerIndex)
 }
 
 /** update a callback for a particular instance*/
-void LoggingCore::updateProcessingFunction(
-    int index,
-    std::function<void(std::string&& message)> newFunction)
+void LoggingCore::updateProcessingFunction(int index,
+                                           std::function<void(std::string&& message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock(functionLock);
     if (index < static_cast<int>(functions.size())) {
@@ -117,7 +116,8 @@ void LoggingCore::processingLoop()
         if (msg.size() > 3) {
             if (msg.compare(0, 3, "!!>") == 0) {
                 if (msg.compare(3, 5, "flush") ==
-                    0) { // any flush command we need flush the console, we may also need to flush a particular file
+                    0) {  // any flush command we need flush the console, we may also need to flush
+                          // a particular file
                     std::cout.flush();
                     if (index == -1) {
                         continue;
@@ -126,7 +126,7 @@ void LoggingCore::processingLoop()
                 }
                 if (msg.compare(3, 5, "close") == 0) {
                     if (index == -1) {
-                        break; // break the loop
+                        break;  // break the loop
                     }
                     msg.push_back('^');
                 }
@@ -173,14 +173,14 @@ void LoggingCore::processingLoop()
  */
 std::map<std::string, std::shared_ptr<LoggerManager>> LoggerManager::loggers;
 
-/** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
-safe so we are going to use a lock that is entirely controlled by this file*/
+/** we expect operations on core object that modify the map to be rare but we absolutely need them
+to be thread safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex loggerLock;
 
 std::shared_ptr<LoggerManager> LoggerManager::getLoggerManager(const std::string& loggerName)
 {
     std::lock_guard<std::mutex> loglock(
-        loggerLock); // just to ensure that nothing funny happens if you try to
+        loggerLock);  // just to ensure that nothing funny happens if you try to
     // get a context while it is being constructed
     auto fnd = loggers.find(loggerName);
     if (fnd != loggers.end()) {
@@ -227,4 +227,4 @@ LoggerManager::LoggerManager(const std::string& loggerName):
     name(loggerName), loggingControl(std::make_shared<LoggingCore>())
 {
 }
-} // namespace helics
+}  // namespace helics

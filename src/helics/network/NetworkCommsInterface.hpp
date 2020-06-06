@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -35,10 +35,9 @@ class NetworkCommsInterface: public CommsInterface {
 
   public:
     /** default constructor*/
-    explicit NetworkCommsInterface(
-        interface_type type,
-        CommsInterface::thread_generation threads =
-            CommsInterface::thread_generation::dual) noexcept;
+    explicit NetworkCommsInterface(interface_type type,
+                                   CommsInterface::thread_generation threads =
+                                       CommsInterface::thread_generation::dual) noexcept;
 
     /** load network information into the comms interface object*/
     virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
@@ -54,19 +53,19 @@ class NetworkCommsInterface: public CommsInterface {
     virtual void setFlag(const std::string& flag, bool val) override;
 
   protected:
-    int brokerPort{-1}; //!<standardized broker port to use for connection to the brokers
-    std::atomic<int> PortNumber{-1}; //!< port to use for the local connection
-    bool autoPortNumber{true}; //!< use an automatic port numbering based on broker responses
-    bool useOsPortAllocation{false}; //!< use the operating system to allocate a port number
-    bool appendNameToAddress{false}; //!< flag to append the name to the network address
-    bool noAckConnection{false}; //!< flag to bypass the connection acknowledge requirement
+    int brokerPort{-1};  //!< standardized broker port to use for connection to the brokers
+    std::atomic<int> PortNumber{-1};  //!< port to use for the local connection
+    bool autoPortNumber{true};  //!< use an automatic port numbering based on broker responses
+    bool useOsPortAllocation{false};  //!< use the operating system to allocate a port number
+    bool appendNameToAddress{false};  //!< flag to append the name to the network address
+    bool noAckConnection{false};  //!< flag to bypass the connection acknowledge requirement
     const interface_type networkType;
     interface_networks network{interface_networks::ipv4};
     std::atomic<bool> hasBroker{false};
-    int maxRetries{5}; // the maximum number of network retries
+    int maxRetries{5};  // the maximum number of network retries
 
   private:
-    PortAllocator openPorts; //!< a structure to deal with port allocations
+    PortAllocator openPorts;  //!< a structure to deal with port allocations
 
   public:
     /** find an open port for a subBroker*/
@@ -87,4 +86,4 @@ class NetworkCommsInterface: public CommsInterface {
     void loadPortDefinitions(const ActionMessage& cmd);
 };
 
-} // namespace helics
+}  // namespace helics

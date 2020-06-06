@@ -1,8 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
-See the top-level NOTICE for additional details.
-All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC. See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -31,8 +30,8 @@ namespace mpi {
 
       private:
         std::atomic<bool> shutdown{false};
-        virtual void queue_rx_function() override; //!< the functional loop for the receive queue
-        virtual void queue_tx_function() override; //!< the loop for transmitting data
+        virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
+        virtual void queue_tx_function() override;  //!< the loop for transmitting data
 
         /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
@@ -45,7 +44,7 @@ namespace mpi {
             txMessageQueue;
 
         std::atomic<bool> hasBroker{false};
-        virtual void closeReceiver() override; //!< function to instruct the receiver loop to close
+        virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 
       public:
         void setBrokerAddress(const std::string& address);
@@ -62,5 +61,5 @@ namespace mpi {
         }
     };
 
-} // namespace mpi
-} // namespace helics
+}  // namespace mpi
+}  // namespace helics

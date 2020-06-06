@@ -9,12 +9,7 @@
 
 set(betwork_test_headers)
 
-set(
-    network_test_sources
-    network-tests.cpp
-    networkInfoTests.cpp
-    TestCore-tests.cpp
-)
+set(network_test_sources network-tests.cpp networkInfoTests.cpp TestCore-tests.cpp)
 
 if(ENABLE_ZMQ_CORE)
     list(APPEND network_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
@@ -37,7 +32,7 @@ if(ENABLE_MPI_CORE)
 endif()
 
 add_executable(network-tests ${network_test_sources} ${network_test_headers})
-target_link_libraries(network-tests helics_network helics_test_base)
+target_link_libraries(network-tests helics_network helics_test_base helics::zmq)
 
 target_include_directories(network-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(network-tests PRIVATE BOOST_DATE_TIME_NO_LIB)
@@ -50,4 +45,3 @@ set_property(TEST network-tests PROPERTY LABELS Network Coverage Daily)
 add_test(NAME network-ci-tests COMMAND network-tests --gtest_filter=-*ci_skip*)
 set_property(TEST network-ci-tests PROPERTY LABELS NetworkCI Continuous)
 # set_property(TEST network-ci-tests PROPERTY LABELS DebugTest)
-copy_key_files_to_target_location(network-tests)

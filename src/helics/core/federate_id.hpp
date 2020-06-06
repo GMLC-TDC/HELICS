@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -39,8 +39,8 @@ class local_federate_id {
     bool isValid() const { return (fid != invalid_fid); }
 
   private:
-    static constexpr base_type invalid_fid{-2'000'000'000}; //!< defined invalid handle
-    base_type fid{invalid_fid}; //!< the underlying index value
+    static constexpr base_type invalid_fid{-2'000'000'000};  //!< defined invalid handle
+    base_type fid{invalid_fid};  //!< the underlying index value
 };
 
 #if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
@@ -77,7 +77,7 @@ class interface_handle {
 
   private:
     static constexpr base_type invalid_handle{-1'700'000'000};
-    base_type hid{invalid_handle}; //!< the underlying index value
+    base_type hid{invalid_handle};  //!< the underlying index value
 };
 
 #if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
@@ -87,17 +87,17 @@ std::ostream& operator<<(std::ostream& os, interface_handle handle);
 #endif
 
 constexpr interface_handle direct_send_handle{
-    -1'745'234}; //!< this special handle can be used to directly send a message in a core
+    -1'745'234};  //!< this special handle can be used to directly send a message in a core
 
-} // namespace helics
+}  // namespace helics
 
 namespace std {
 /** define a hash function for local_federate_id*/
 template<>
 struct hash<helics::local_federate_id> {
-    using argument_type = helics::local_federate_id; //!< type of object to hash
+    using argument_type = helics::local_federate_id;  //!< type of object to hash
     using result_type =
-        hash<helics::local_federate_id::base_type>::result_type; //!< the type of the return result
+        hash<helics::local_federate_id::base_type>::result_type;  //!< the type of the return result
     /** actual hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
@@ -105,12 +105,13 @@ struct hash<helics::local_federate_id> {
     }
 };
 
-/** define a template specialization for hash function for interface_handle so it can be used in unordered_map*/
+/** define a template specialization for hash function for interface_handle so it can be used in
+ * unordered_map*/
 template<>
 struct hash<helics::interface_handle> {
-    using argument_type = helics::interface_handle; //!< type of object to hash
+    using argument_type = helics::interface_handle;  //!< type of object to hash
     using result_type =
-        hash<helics::interface_handle::base_type>::result_type; //!< the type of the return result
+        hash<helics::interface_handle::base_type>::result_type;  //!< the type of the return result
     /** actual hash operator*/
     result_type operator()(argument_type const& key) const noexcept
     {
@@ -118,4 +119,4 @@ struct hash<helics::interface_handle> {
     }
 };
 
-} // namespace std
+}  // namespace std

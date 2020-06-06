@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -118,10 +118,9 @@ namespace apps {
         fed->setFlagOption(helics_flag_source_only);
     }
 
-    Player::Player(
-        const std::string& appName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi):
+    Player::Player(const std::string& appName,
+                   const std::shared_ptr<Core>& core,
+                   const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(helics_flag_source_only);
@@ -140,11 +139,10 @@ namespace apps {
         Player::loadJsonFile(configString);
     }
 
-    void Player::addMessage(
-        Time sendTime,
-        const std::string& src,
-        const std::string& dest,
-        const std::string& payload)
+    void Player::addMessage(Time sendTime,
+                            const std::string& src,
+                            const std::string& dest,
+                            const std::string& payload)
     {
         messages.resize(messages.size() + 1);
         messages.back().sendTime = sendTime;
@@ -154,12 +152,11 @@ namespace apps {
         messages.back().mess.time = sendTime;
     }
 
-    void Player::addMessage(
-        Time sendTime,
-        Time actionTime,
-        const std::string& src,
-        const std::string& dest,
-        const std::string& payload)
+    void Player::addMessage(Time sendTime,
+                            Time actionTime,
+                            const std::string& src,
+                            const std::string& dest,
+                            const std::string& payload)
     {
         messages.resize(messages.size() + 1);
         messages.back().sendTime = sendTime;
@@ -172,7 +169,7 @@ namespace apps {
     helics::Time Player::extractTime(const std::string& str, int lineNumber) const
     {
         try {
-            if (units == time_units::ns) // ns
+            if (units == time_units::ns)  // ns
             {
                 return helics::Time(std::stoll(str), time_units::ns);
             }
@@ -187,7 +184,7 @@ namespace apps {
     void Player::loadTextFile(const std::string& filename)
     {
         App::loadTextFile(filename);
-        using namespace gmlc::utilities::stringOps; //NOLINT
+        using namespace gmlc::utilities::stringOps;  // NOLINT
         std::ifstream infile(filename);
         std::string str;
 
@@ -321,9 +318,8 @@ namespace apps {
                             continue;
                         }
                     } else {
-                        if ((points[pIndex].time =
-                                 extractTime(trim(blk[0]).substr(0, cloc), lcount)) ==
-                            Time::minVal()) {
+                        if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc),
+                                                               lcount)) == Time::minVal()) {
                             continue;
                         }
                         points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
@@ -345,9 +341,8 @@ namespace apps {
                             continue;
                         }
                     } else {
-                        if ((points[pIndex].time =
-                                 extractTime(trim(blk[0]).substr(0, cloc), lcount)) ==
-                            Time::minVal()) {
+                        if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc),
+                                                               lcount)) == Time::minVal()) {
                             continue;
                         }
                         points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
@@ -368,9 +363,8 @@ namespace apps {
                             continue;
                         }
                     } else {
-                        if ((points[pIndex].time =
-                                 extractTime(trim(blk[0]).substr(0, cloc), lcount)) ==
-                            Time::minVal()) {
+                        if ((points[pIndex].time = extractTime(trim(blk[0]).substr(0, cloc),
+                                                               lcount)) == Time::minVal()) {
                             continue;
                         }
                         points[pIndex].iteration = std::stoi(blk[0].substr(cloc + 1));
@@ -544,7 +538,7 @@ namespace apps {
                     if (messageElement.isMember("encoding")) {
                         if (messageElement["encoding"].asString() == "base64") {
                             auto offset = hasB64Wrapper(str);
-                            if (offset == 0) // directly encoded no wrapper
+                            if (offset == 0)  // directly encoded no wrapper
                             {
                                 messages.back().mess.data =
                                     gmlc::utilities::base64_decode_to_string(str);
@@ -764,8 +758,8 @@ namespace apps {
         eptids[endpointName] = static_cast<int>(endpoints.size()) - 1;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics
 
 static int hasB64Wrapper(const std::string& str)
 {

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -20,9 +20,9 @@ communication methods*/
 template<class COMMS, class BrokerT>
 class CommsBroker: public BrokerT {
   protected:
-    std::atomic<int> disconnectionStage{0}; //!< the stage of disconnection
-    std::unique_ptr<COMMS> comms; //!< the actual comms object
-    std::atomic<bool> brokerInitialized{false}; //!< atomic protecting local initialization
+    std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
+    std::unique_ptr<COMMS> comms;  //!< the actual comms object
+    std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
   public:
     /** default constructor*/
     CommsBroker() noexcept;
@@ -51,4 +51,4 @@ class CommsBroker: public BrokerT {
     /** get a pointer to the comms object*/
     COMMS* getCommsObjectPointer();
 };
-} // namespace helics
+}  // namespace helics

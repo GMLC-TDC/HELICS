@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_INPUT_HPP_
@@ -36,30 +36,43 @@ class Input {
     helics_input baseObject() const { return inp; }
     /** check if the input is valid */
     bool isValid() const { return (helicsInputIsValid(inp) == helics_true); }
+    /** add a publication target to the input*/
+    void addTarget(const std::string& target)
+    {
+        helicsInputAddTarget(inp, target.c_str(), HELICS_IGNORE_ERROR);
+    }
     /** Methods to set default values for inputs **/
     /** set the default value as a raw data with length*/
-    void setDefault(const char* data, int len) { helicsInputSetDefaultRaw(inp, data, len, NULL); }
+    void setDefault(const char* data, int len)
+    {
+        helicsInputSetDefaultRaw(inp, data, len, HELICS_IGNORE_ERROR);
+    }
     /** set the default value as a string*/
-    void setDefault(const std::string& str) { helicsInputSetDefaultString(inp, str.c_str(), NULL); }
+    void setDefault(const std::string& str)
+    {
+        helicsInputSetDefaultString(inp, str.c_str(), HELICS_IGNORE_ERROR);
+    }
     /** set the default value as an integer*/
-    void setDefault(int64_t val) { helicsInputSetDefaultInteger(inp, val, NULL); }
+    void setDefault(int64_t val) { helicsInputSetDefaultInteger(inp, val, HELICS_IGNORE_ERROR); }
     /** set the default bool value*/
     void setDefault(bool val)
     {
-        helicsInputSetDefaultBoolean(inp, val ? helics_true : helics_false, NULL);
+        helicsInputSetDefaultBoolean(inp, val ? helics_true : helics_false, HELICS_IGNORE_ERROR);
     }
     /** set the default double value*/
-    void setDefault(double val) { helicsInputSetDefaultDouble(inp, val, NULL); }
+    void setDefault(double val) { helicsInputSetDefaultDouble(inp, val, HELICS_IGNORE_ERROR); }
     /** set the default complex value*/
     void setDefault(const std::complex<double>& cmplx)
     {
-        helicsInputSetDefaultComplex(inp, cmplx.real(), cmplx.imag(), NULL);
+        helicsInputSetDefaultComplex(inp, cmplx.real(), cmplx.imag(), HELICS_IGNORE_ERROR);
     }
     /** set the default vector data value*/
     void setDefault(const std::vector<double>& data)
     {
-        helicsInputSetDefaultVector(
-            inp, data.data(), static_cast<int>(data.size() * sizeof(double)), NULL);
+        helicsInputSetDefaultVector(inp,
+                                    data.data(),
+                                    static_cast<int>(data.size() * sizeof(double)),
+                                    HELICS_IGNORE_ERROR);
     }
 
     /** Methods to get subscription values **/
@@ -68,7 +81,8 @@ class Input {
     {
         int size = helicsInputGetRawValueSize(inp);
         data.resize(size);
-        helicsInputGetRawValue(inp, data.data(), static_cast<int>(data.size()), &size, NULL);
+        helicsInputGetRawValue(
+            inp, data.data(), static_cast<int>(data.size()), &size, HELICS_IGNORE_ERROR);
         return size;
     }
     /** get the size of the raw value */
@@ -82,7 +96,7 @@ class Input {
 
         result.resize(static_cast<size_t>(size) + 1);
         // this function results in a null terminated string
-        helicsInputGetString(inp, &result[0], size + 1, &size, NULL);
+        helicsInputGetString(inp, &result[0], size + 1, &size, HELICS_IGNORE_ERROR);
         if (!(result.empty()) && (result[static_cast<size_t>(size) - 1] == '\0')) {
             result.resize(static_cast<size_t>(size) - 1);
         } else {
@@ -97,30 +111,30 @@ class Input {
 
         name.resize(static_cast<size_t>(size) + 1);
         // this function results in a null terminated string
-        helicsInputGetNamedPoint(inp, &name[0], size + 1, &size, val, NULL);
+        helicsInputGetNamedPoint(inp, &name[0], size + 1, &size, val, HELICS_IGNORE_ERROR);
         name.resize(size);
     }
     /** get the current value as a 64 bit integer*/
-    int64_t getInteger() { return helicsInputGetInteger(inp, NULL); }
+    int64_t getInteger() { return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a boolean*/
     bool getBoolean()
     {
-        helics_bool val = helicsInputGetBoolean(inp, NULL);
+        helics_bool val = helicsInputGetBoolean(inp, HELICS_IGNORE_ERROR);
         return (val == helics_true);
     }
     /** get the value as a double*/
-    double getDouble() { return helicsInputGetDouble(inp, NULL); }
+    double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a complex number*/
     std::complex<double> getComplex()
     {
-        helics_complex hc = helicsInputGetComplexObject(inp, NULL);
+        helics_complex hc = helicsInputGetComplexObject(inp, HELICS_IGNORE_ERROR);
         std::complex<double> result(hc.real, hc.imag);
         return result;
     }
     /** get the current value as a vector of doubles
-	@param data pointer to space to store the current values
-	@param maxlen the maximum size of the allowed vector
-	@return the actual size of the vector stored*/
+    @param data pointer to space to store the current values
+    @param maxlen the maximum size of the allowed vector
+    @return the actual size of the vector stored*/
     int getVector(double* data, int maxlen)
     {
         helicsInputGetVector(inp, data, maxlen, &maxlen, hThrowOnError());
@@ -131,7 +145,7 @@ class Input {
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
-        helicsInputGetVector(inp, data.data(), actualSize, NULL, hThrowOnError());
+        helicsInputGetVector(inp, data.data(), actualSize, HELICS_NULL_POINTER, hThrowOnError());
     }
 
     /** Check if an input is updated **/
@@ -149,8 +163,10 @@ class Input {
     const char* getKey() const { return helicsInputGetKey(inp); }
     /** get the units associated with a input*/
     const char* getUnits() const { return helicsInputGetExtractionUnits(inp); }
-    /** get the units associated with a input*/
+    /** get the units associated with an inputs publication*/
     const char* getInjectionUnits() const { return helicsInputGetInjectionUnits(inp); }
+    /** get the units associated with a publication of an input*/
+    const char* getPublicationType() const { return helicsInputGetPublicationType(inp); }
     /** get the type of the input*/
     const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
@@ -162,10 +178,15 @@ class Input {
     {
         helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
     }
+    void setOption(int32_t option, int32_t value = 1)
+    {
+        helicsInputSetOption(inp, option, value, HELICS_IGNORE_ERROR);
+    }
+    int32_t getOption(int32_t option) { return helicsInputGetOption(inp, option); }
 
   private:
-    helics_input inp; //!< the reference to the underlying publication
+    helics_input inp;  //!< the reference to the underlying publication
 };
 
-} // namespace helicscpp
+}  // namespace helicscpp
 #endif

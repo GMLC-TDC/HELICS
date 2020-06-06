@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -202,10 +202,9 @@ CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName, interf
 {
 }
 
-CloningFilter::CloningFilter(
-    interface_visibility locality,
-    Federate* ffed,
-    const std::string& filtName)
+CloningFilter::CloningFilter(interface_visibility locality,
+                             Federate* ffed,
+                             const std::string& filtName)
 {
     if (ffed != nullptr) {
         corePtr = ffed->getCorePointer().get();
@@ -241,19 +240,20 @@ void Filter::removeTarget(const std::string& sourceName)
     corePtr->removeTarget(handle, sourceName);
 }
 
-void Filter::setOption(int32_t option, bool value)
+void Filter::setOption(int32_t option, int32_t value)
 {
     corePtr->setHandleOption(handle, option, value);
 }
 /** close a filter during an active simulation
-@details it is not necessary to call this function unless you are continuing the simulation after the close*/
+@details it is not necessary to call this function unless you are continuing the simulation after
+the close*/
 void Filter::close()
 {
     corePtr->closeHandle(handle);
 }
 
 /** get the current value of a flag for the handle*/
-bool Filter::getOption(int32_t option) const
+int32_t Filter::getOption(int32_t option) const
 {
     return corePtr->getHandleOption(handle, option);
 }
@@ -267,9 +267,8 @@ void CloningFilter::setString(const std::string& property, const std::string& va
 {
     if ((property == "source") || (property == "add source")) {
         addSourceTarget(val);
-    } else if (
-        (property == "dest") || (property == "destination") || (property == "add destination") ||
-        (property == "add dest")) {
+    } else if ((property == "dest") || (property == "destination") ||
+               (property == "add destination") || (property == "add dest")) {
         addDestinationTarget(val);
     } else if ((property == "endpoint") || (property == "add endpoint")) {
         addSourceTarget(val);
@@ -299,11 +298,10 @@ Filter& make_filter(filter_types type, Federate* mFed, const std::string& name)
     return dfilt;
 }
 
-Filter& make_filter(
-    interface_visibility locality,
-    filter_types type,
-    Federate* mFed,
-    const std::string& name)
+Filter& make_filter(interface_visibility locality,
+                    filter_types type,
+                    Federate* mFed,
+                    const std::string& name)
 
 {
     if (type == filter_types::clone) {
@@ -338,11 +336,10 @@ std::unique_ptr<Filter> make_filter(filter_types type, CoreApp& cr, const std::s
     return make_filter(type, cr.getCopyofCorePointer().get(), name);
 }
 
-CloningFilter& make_cloning_filter(
-    filter_types type,
-    Federate* mFed,
-    const std::string& delivery,
-    const std::string& name)
+CloningFilter& make_cloning_filter(filter_types type,
+                                   Federate* mFed,
+                                   const std::string& delivery,
+                                   const std::string& name)
 {
     auto& dfilt = mFed->registerCloningFilter(name);
     addOperations(&dfilt, type, mFed->getCorePointer().get());
@@ -352,12 +349,11 @@ CloningFilter& make_cloning_filter(
     return dfilt;
 }
 
-CloningFilter& make_cloning_filter(
-    interface_visibility locality,
-    filter_types type,
-    Federate* mFed,
-    const std::string& delivery,
-    const std::string& name)
+CloningFilter& make_cloning_filter(interface_visibility locality,
+                                   filter_types type,
+                                   Federate* mFed,
+                                   const std::string& delivery,
+                                   const std::string& name)
 
 {
     auto& dfilt = (locality == interface_visibility::global) ?
@@ -370,11 +366,10 @@ CloningFilter& make_cloning_filter(
     return dfilt;
 }
 
-std::unique_ptr<CloningFilter> make_cloning_filter(
-    filter_types type,
-    Core* cr,
-    const std::string& delivery,
-    const std::string& name)
+std::unique_ptr<CloningFilter> make_cloning_filter(filter_types type,
+                                                   Core* cr,
+                                                   const std::string& delivery,
+                                                   const std::string& name)
 
 {
     auto dfilt = std::make_unique<CloningFilter>(cr, name);
@@ -385,14 +380,13 @@ std::unique_ptr<CloningFilter> make_cloning_filter(
     return dfilt;
 }
 
-std::unique_ptr<CloningFilter> make_cloning_filter(
-    filter_types type,
-    CoreApp& cr,
-    const std::string& delivery,
-    const std::string& name)
+std::unique_ptr<CloningFilter> make_cloning_filter(filter_types type,
+                                                   CoreApp& cr,
+                                                   const std::string& delivery,
+                                                   const std::string& name)
 
 {
     return make_cloning_filter(type, cr.getCopyofCorePointer().get(), delivery, name);
 }
 
-} // namespace helics
+}  // namespace helics

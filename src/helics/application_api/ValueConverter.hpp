@@ -1,14 +1,15 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 /**
 @file
-the purpose of these objects are to convert a specific type into a data block for use in the core algorithms
+the purpose of these objects are to convert a specific type into a data block for use in the core
+algorithms
 */
 
 #include "../core/Core.hpp"
@@ -57,7 +58,7 @@ class ValueConverter<std::string> {
     static void interpret(const data_view& block, std::string& val) { val = interpret(block); }
     static std::string type() { return "string"; }
 };
-} // namespace helics
+}  // namespace helics
 
 // This should be at the end since it depends on the definitions in here
 #ifndef HELICS_CXX_STATIC_DEFINE

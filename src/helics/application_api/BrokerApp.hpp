@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -19,8 +19,8 @@ namespace helics {
 class Broker;
 class helicsCLI11App;
 
-/** class implementing a Broker object.  This object is meant to a be a very simple broker executor with a similar
- * interface to the other apps
+/** class implementing a Broker object.  This object is meant to a be a very simple broker executor
+ * with a similar interface to the other apps
  */
 class HELICS_CXX_EXPORT BrokerApp {
   public:
@@ -103,10 +103,11 @@ class HELICS_CXX_EXPORT BrokerApp {
     /** get the network address of the broker*/
     const std::string& getAddress() const;
     /** make a query at the broker
-	@param target the target of the query "federation", "parent", "broker", or a specific named object
-	@param queryStr the query to make
-	@return a string containing the query results
-	*/
+    @param target the target of the query "federation", "parent", "broker", or a specific named
+    object
+    @param queryStr the query to make
+    @return a string containing the query results
+    */
     std::string query(const std::string& target, const std::string& queryStr);
     /** set a federation global value
      @details this overwrites any previous value for this name
@@ -136,8 +137,8 @@ class HELICS_CXX_EXPORT BrokerApp {
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser(bool noTypeOption = false);
-    std::shared_ptr<Broker> broker; //!< the actual endpoint objects
-    std::string name; //!< the name of the broker
+    std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
+    std::string name;  //!< the name of the broker
 };
 
 /** class that waits for a broker to terminate before finishing the destructor*/
@@ -167,4 +168,4 @@ class BrokerKeeper {
     BrokerApp brk;
 };
 
-} //namespace helics
+}  // namespace helics

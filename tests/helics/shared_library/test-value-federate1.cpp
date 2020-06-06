@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -226,7 +226,7 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     tmp = helicsPublicationGetUnits(pubid_c);
     EXPECT_STREQ(tmp, "volts");
 
-    //this one should be invalid
+    // this one should be invalid
     auto pubid_d = helicsFederateGetPublicationByIndex(vFed1, 5, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(pubid_d, nullptr);
@@ -268,7 +268,7 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     helicsInputSetOption(inp_double2, helics_handle_option_connection_required, helics_true, &err);
     EXPECT_EQ(helicsInputIsValid(inp_double2), helics_true);
-    //anonymous publication
+    // anonymous publication
     auto pub = helicsFederateRegisterPublication(vFed1, nullptr, helics_data_type_int, "MW", &err);
     helicsPublicationSetOption(pub, helics_handle_option_connection_required, helics_true, &err);
     helicsPublicationAddTarget(pub, "fed0/key7", &err);
@@ -284,7 +284,7 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     helicsInputSetDefaultTime(inp_time, 12.3, &err);
     helicsInputSetDefaultChar(inp_char, 'q', &err);
-    //this should be ok since the data is NULL regardless of specified length
+    // this should be ok since the data is NULL regardless of specified length
     helicsInputSetDefaultVector(inp_vect, nullptr, 7, &err);
     helicsInputSetDefaultNamedPoint(inp_np, data, 15.7, &err);
 
@@ -298,7 +298,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     auto c2 = helicsInputGetChar(inp_char, &err);
     EXPECT_EQ(c2, 'q');
     int actSize = 56;
-    //this should not be an error
+    // this should not be an error
     helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 0);
@@ -406,11 +406,10 @@ TEST_P(vfed_type_tests, single_transfer)
 }
 
 // template <class X>
-void runFederateTestDouble(
-    const char* core,
-    double defaultValue,
-    double testValue1,
-    double testValue2)
+void runFederateTestDouble(const char* core,
+                           double defaultValue,
+                           double testValue1,
+                           double testValue2)
 {
     helics_time gtime;
     double val1 = 0;
@@ -458,14 +457,13 @@ void runFederateTestDouble(
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestComplex(
-    const char* core,
-    double defaultValue_r,
-    double defaultValue_i,
-    double testValue1_r,
-    double testValue1_i,
-    double testValue2_r,
-    double testValue2_i)
+void runFederateTestComplex(const char* core,
+                            double defaultValue_r,
+                            double defaultValue_i,
+                            double testValue1_r,
+                            double testValue1_i,
+                            double testValue2_r,
+                            double testValue2_i)
 {
     helics_time gtime;
     double val1_r = 0.0;
@@ -518,11 +516,10 @@ void runFederateTestComplex(
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestInteger(
-    const char* core,
-    int64_t defaultValue,
-    int64_t testValue1,
-    int64_t testValue2)
+void runFederateTestInteger(const char* core,
+                            int64_t defaultValue,
+                            int64_t testValue1,
+                            int64_t testValue2)
 {
     helics_time gtime;
     int64_t val1 = 0;
@@ -618,11 +615,10 @@ void runFederateTestBool(const char* core, bool defaultValue, bool testValue1, b
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestString(
-    const char* core,
-    const char* defaultValue,
-    const char* testValue1,
-    const char* testValue2)
+void runFederateTestString(const char* core,
+                           const char* defaultValue,
+                           const char* testValue1,
+                           const char* testValue2)
 {
     helics_time gtime;
 #define STRINGSIZE 100
@@ -674,14 +670,13 @@ void runFederateTestString(
     CE(helicsFederateFinalize(vFed, &err));
 }
 
-void runFederateTestVectorD(
-    const char* core,
-    const double defaultValue[],
-    const double testValue1[],
-    const double testValue2[],
-    int len,
-    int len1,
-    int len2)
+void runFederateTestVectorD(const char* core,
+                            const double defaultValue[],
+                            const double testValue1[],
+                            const double testValue2[],
+                            int len,
+                            int len1,
+                            int len2)
 {
     helics_time gtime;
     int maxlen = (len1 > len2) ? len1 : len2;
@@ -762,14 +757,13 @@ void runFederateTestVectorD(
     delete[] val;
 }
 
-void runFederateTestNamedPoint(
-    const char* core,
-    const char* defaultValue,
-    double defVal,
-    const char* testValue1,
-    double testVal1,
-    const char* testValue2,
-    double testVal2)
+void runFederateTestNamedPoint(const char* core,
+                               const char* defaultValue,
+                               double defVal,
+                               const char* testValue1,
+                               double testVal1,
+                               const char* testValue2,
+                               double testVal2)
 {
     helics_time gtime;
 #define STRINGSIZE 100
@@ -853,20 +847,21 @@ TEST_P(vfed_type_tests, single_transfer_complex)
 
 TEST_P(vfed_type_tests, single_transfer_string)
 {
-    runFederateTestString(
-        GetParam(), "start", "inside of the functional relationship of helics", "I am a string");
+    runFederateTestString(GetParam(),
+                          "start",
+                          "inside of the functional relationship of helics",
+                          "I am a string");
 }
 
 TEST_P(vfed_type_tests, single_transfer_named_point)
 {
-    runFederateTestNamedPoint(
-        GetParam(),
-        "start",
-        5.3,
-        "inside of the functional relationship of helics",
-        45.7823,
-        "I am a string",
-        0.0);
+    runFederateTestNamedPoint(GetParam(),
+                              "start",
+                              5.3,
+                              "inside of the functional relationship of helics",
+                              45.7823,
+                              "I am a string",
+                              0.0);
 }
 
 TEST_P(vfed_type_tests, single_transfer_boolean)
@@ -948,7 +943,7 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
 
 TEST_P(vfed_type_tests, single_transfer_publisher)
 {
-    //	helics_time stime = 1.0;
+    //    helics_time stime = 1.0;
     helics_time gtime;
 
     char s[STRINGLEN] = "n2";
@@ -1022,8 +1017,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_EQ(wait, helics_true);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    vfed_tests,
-    vfed_simple_type_tests,
-    ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests,
+                         vfed_simple_type_tests,
+                         ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(core_types));

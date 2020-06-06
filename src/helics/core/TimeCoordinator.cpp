@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -137,11 +137,10 @@ void TimeCoordinator::localError()
     disconnected = true;
 }
 
-void TimeCoordinator::timeRequest(
-    Time nextTime,
-    iteration_request iterate,
-    Time newValueTime,
-    Time newMessageTime)
+void TimeCoordinator::timeRequest(Time nextTime,
+                                  iteration_request iterate,
+                                  Time newValueTime,
+                                  Time newMessageTime)
 {
     iterating = iterate;
 
@@ -216,7 +215,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
 
 void TimeCoordinator::updateValueTime(Time valueUpdateTime)
 {
-    if (!executionMode) // updates before exec mode
+    if (!executionMode)  // updates before exec mode
     {
         if (valueUpdateTime < timeZero) {
             hasInitUpdates = true;
@@ -310,7 +309,7 @@ Time TimeCoordinator::generateAllowedTime(Time testTime) const
 
 void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 {
-    if (!executionMode) // updates before exec mode
+    if (!executionMode)  // updates before exec mode
     {
         if (messageUpdateTime < timeZero) {
             hasInitUpdates = true;
@@ -367,7 +366,8 @@ bool TimeCoordinator::updateTimeFactors()
     Time prev_next = time_next;
     updateNextPossibleEventTime();
 
-    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id,
+    //    static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next) {
         update = true;
@@ -425,7 +425,7 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             updateTimeGrant();
             return message_processing_result::iterating;
         }
-        if (time_allow == time_exec) // time_allow==time_exec==time_granted
+        if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
             if (dependencies.checkIfReadyForTimeGrant(true, time_exec)) {
                 ++iteration;
@@ -455,7 +455,7 @@ void TimeCoordinator::sendTimeRequest() const
         upd.counter = iteration;
     }
     transmitTimingMessage(upd);
-    //	printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
+    //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(time_exec), static_cast<double>(time_minDe));
 }
 
@@ -474,8 +474,8 @@ void TimeCoordinator::updateTimeGrant()
     }
     transmitTimingMessage(treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
-    // static_cast<double>(time_allow), static_cast<double>(time_next), static_cast<double>(time_exec),
-    // static_cast<double>(time_minDe));
+    // static_cast<double>(time_allow), static_cast<double>(time_next),
+    // static_cast<double>(time_exec), static_cast<double>(time_minDe));
 }
 std::string TimeCoordinator::printTimeStatus() const
 {
@@ -623,9 +623,8 @@ message_processing_result TimeCoordinator::checkExecEntry()
 
 static bool isDelayableMessage(const ActionMessage& cmd, global_federate_id localId)
 {
-    return (
-        ((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
-        (cmd.source_id != localId));
+    return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
+            (cmd.source_id != localId));
 }
 
 message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& cmd)
@@ -653,7 +652,8 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_DISCONNECT_BROKER:
         case CMD_GLOBAL_ERROR:
         case CMD_LOCAL_ERROR:
-            // this command requires removing dependents as well as dealing with dependency processing
+            // this command requires removing dependents as well as dealing with dependency
+            // processing
             removeDependent(global_federate_id(cmd.source_id));
             break;
 
@@ -717,12 +717,11 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
             }
             if (ltime <= time_block) {
                 if (!timeBlocks.empty()) {
-                    auto res = std::min_element(
-                        timeBlocks.begin(),
-                        timeBlocks.end(),
-                        [](const auto& blk1, const auto& blk2) {
-                            return (blk1.first < blk2.first);
-                        });
+                    auto res = std::min_element(timeBlocks.begin(),
+                                                timeBlocks.end(),
+                                                [](const auto& blk1, const auto& blk2) {
+                                                    return (blk1.first < blk2.first);
+                                                });
                     time_block = res->first;
                 } else {
                     time_block = Time::maxVal();
@@ -879,4 +878,4 @@ void TimeCoordinator::processConfigUpdateMessage(const ActionMessage& cmd)
     }
 }
 
-} // namespace helics
+}  // namespace helics

@@ -1,8 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
-See the top-level NOTICE for additional details.
-All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC. See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/application_api/Subscriptions.hpp"
@@ -14,18 +13,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 using helics::operator"" _t;
-helics::Time tend = 3600.0_t; // simulation end time
+helics::Time tend = 3600.0_t;  // simulation end time
 
 /** class implementing a single heat transfer block*/
 class HeatUnitBlock {
   public:
-    double ThermalCap = 4.0; // thermal capacity
-    double tRate = 0.05; // rate of energy transfer per degree
-    int x = 0; // x coordinate
-    int y = 0; // y coordinate
+    double ThermalCap = 4.0;  // thermal capacity
+    double tRate = 0.05;  // rate of energy transfer per degree
+    int x = 0;  // x coordinate
+    int y = 0;  // y coordinate
 
-    double T = 25.0; // temperature
-    helics::Time deltaTime = 5.0; // sampling rate
+    double T = 25.0;  // temperature
+    helics::Time deltaTime = 5.0;  // sampling rate
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication* pub;
@@ -95,7 +94,7 @@ class HeatUnitBlock {
 };
 
 class Wall {
-    double Temp = 80; // thermal capacity
+    double Temp = 80;  // thermal capacity
     std::vector<std::pair<helics::Time, double>> schedTemp;
 
   private:
@@ -216,8 +215,9 @@ class observer {
 
 TEST(heat_transfer_tests, linear_tests)
 {
-    auto wcore = helics::CoreFactory::FindOrCreate(
-        helics::core_type::TEST, "wallcore", "-f 22 --autobroker");
+    auto wcore = helics::CoreFactory::FindOrCreate(helics::core_type::TEST,
+                                                   "wallcore",
+                                                   "-f 22 --autobroker");
     Wall w;
     w.initialize("wallcore");
     int blockCount = 20;

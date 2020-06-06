@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -14,19 +14,19 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 /** define the network access*/
 enum class interface_networks : char {
-    local = 0, //!< just open local ports
-    ipv4 = 4, //!< use external ipv4 ports
-    ipv6 = 6, //!< use external ipv6 ports
-    all = 10, //!< use all external ports
+    local = 0,  //!< just open local ports
+    ipv4 = 4,  //!< use external ipv4 ports
+    ipv6 = 6,  //!< use external ipv6 ports
+    all = 10,  //!< use all external ports
 };
 
 /** define keys for particular interfaces*/
 enum class interface_type : char {
-    tcp = 0, //!< using tcp ports for communication
-    udp = 1, //!< using udp ports for communication
-    ip = 2, //!< using both types of ports (tcp/or udp) for communication
-    ipc = 3, //!< using ipc locations
-    inproc = 4, //!< using inproc sockets for communications
+    tcp = 0,  //!< using tcp ports for communication
+    udp = 1,  //!< using udp ports for communication
+    ip = 2,  //!< using both types of ports (tcp/or udp) for communication
+    ipc = 3,  //!< using ipc locations
+    inproc = 4,  //!< using inproc sockets for communications
 };
 
 class helicsCLI11App;
@@ -43,26 +43,26 @@ class NetworkBrokerData {
         server_deactivated = 4,
     };
 
-    std::string brokerName; //!< the identifier for the broker
-    std::string brokerAddress; //!< the address or domain name of the broker
-    std::string localInterface; //!< the interface to use for the local connection
-    std::string brokerInitString; //!< a string containing arguments for the broker initialization
-    int portNumber{-1}; //!< the port number for the local interface
-    int brokerPort{-1}; //!< the port number to use for the main broker interface
-    int portStart{-1}; //!< the starting port for automatic port definitions
-    int maxMessageSize{16 * 256}; //!< maximum message size
-    int maxMessageCount{256}; //!< maximum message count
-    int maxRetries{5}; //!< the maximum number of retries to establish a network connection
+    std::string brokerName;  //!< the identifier for the broker
+    std::string brokerAddress;  //!< the address or domain name of the broker
+    std::string localInterface;  //!< the interface to use for the local connection
+    std::string brokerInitString;  //!< a string containing arguments for the broker initialization
+    int portNumber{-1};  //!< the port number for the local interface
+    int brokerPort{-1};  //!< the port number to use for the main broker interface
+    int portStart{-1};  //!< the starting port for automatic port definitions
+    int maxMessageSize{16 * 256};  //!< maximum message size
+    int maxMessageCount{256};  //!< maximum message count
+    int maxRetries{5};  //!< the maximum number of retries to establish a network connection
     interface_networks interfaceNetwork{interface_networks::local};
-    bool reuse_address{false}; //!< allow reuse of binding address
-    bool use_os_port{
-        false}; //!< specify that any automatic port allocation should use operating system allocation
-    bool autobroker{false}; //!< flag for specifying an automatic broker generation
+    bool reuse_address{false};  //!< allow reuse of binding address
+    bool use_os_port{false};  //!< specify that any automatic port allocation should use operating
+                              //!< system allocation
+    bool autobroker{false};  //!< flag for specifying an automatic broker generation
     bool appendNameToAddress{
-        false}; //!< flag indicating that the name should be appended to the address
-    bool noAckConnection{
-        false}; //!< flag indicating that a connection ack message is not required for broker connections
-    server_mode_options server_mode{server_mode_options::unspecified}; //!< setup a server mode
+        false};  //!< flag indicating that the name should be appended to the address
+    bool noAckConnection{false};  //!< flag indicating that a connection ack message is not required
+                                  //!< for broker connections
+    server_mode_options server_mode{server_mode_options::unspecified};  //!< setup a server mode
   public:
     NetworkBrokerData() = default;
     /** constructor from the allowed type*/
@@ -71,8 +71,8 @@ class NetworkBrokerData {
     /** generate a command line argument parser for the network broker data
      @param localAddress a predefined string containing the desired local only address
     */
-    std::shared_ptr<helicsCLI11App>
-        commandLineParser(const std::string& localAddress, bool enableConfig = true);
+    std::shared_ptr<helicsCLI11App> commandLineParser(const std::string& localAddress,
+                                                      bool enableConfig = true);
     /** set the desired interface type
      */
     void setInterfaceType(interface_type type) { allowedType = type; }
@@ -127,36 +127,39 @@ void insertProtocol(std::string& networkAddress, interface_type interfaceT);
  */
 bool isipv6(const std::string& address);
 
-/** create a combined address list with choices in a rough order of priority based on if they appear in both lists,
-followed by the high priority addresses, and low priority addresses last
+/** create a combined address list with choices in a rough order of priority based on if they appear
+in both lists, followed by the high priority addresses, and low priority addresses last
 
 @param high addresses that should be considered before low addresses
 @param low addresses that should be considered last
 @return a vector of strings of ip addresses ordered in roughly the priority they should be used
  */
-std::vector<std::string>
-    prioritizeExternalAddresses(std::vector<std::string> high, std::vector<std::string> low);
+std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> high,
+                                                     std::vector<std::string> low);
 
 /** get the external ipv4 address of the current computer
  */
 std::string getLocalExternalAddressV4();
 
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed
+ * server*/
 std::string getLocalExternalAddress(const std::string& server);
 
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed
+ * server*/
 std::string getLocalExternalAddressV4(const std::string& server);
 
 /** get the external ipv4 address of the current computer
  */
 std::string getLocalExternalAddressV6();
 
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed
+ * server*/
 std::string getLocalExternalAddressV6(const std::string& server);
 
 /** generate an interface that matches a defined server or network specification
  */
-std::string generateMatchingInterfaceAddress(
-    const std::string& server,
-    interface_networks network = interface_networks::local);
-} // namespace helics
+std::string
+    generateMatchingInterfaceAddress(const std::string& server,
+                                     interface_networks network = interface_networks::local);
+}  // namespace helics

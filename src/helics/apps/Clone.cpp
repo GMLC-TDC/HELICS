@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -56,10 +56,9 @@ namespace apps {
         }
     }
 
-    Clone::Clone(
-        const std::string& appName,
-        const std::shared_ptr<Core>& core,
-        const FederateInfo& fi):
+    Clone::Clone(const std::string& appName,
+                 const std::shared_ptr<Core>& core,
+                 const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(helics_flag_observer);
@@ -191,10 +190,10 @@ namespace apps {
             cloneSubscriptionNames =
                 vectorizeQueryResult(queryFederateSubscriptions(fed.get(), captureFederate));
             // get rid of any empty strings that may have come to be
-            cloneSubscriptionNames.erase(
-                std::remove(
-                    cloneSubscriptionNames.begin(), cloneSubscriptionNames.end(), std::string{}),
-                cloneSubscriptionNames.end());
+            cloneSubscriptionNames.erase(std::remove(cloneSubscriptionNames.begin(),
+                                                     cloneSubscriptionNames.end(),
+                                                     std::string{}),
+                                         cloneSubscriptionNames.end());
 
             fedConfig = fed->query(captureFederate, "config");
         }
@@ -223,15 +222,16 @@ namespace apps {
                         }
                     } else {
                         if (iteration > 0) {
-                            valstr = fmt::format(
-                                "[{}:{}]value {}=block[{}]",
-                                currentTime,
-                                iteration,
-                                sub.getTarget(),
-                                val.size());
+                            valstr = fmt::format("[{}:{}]value {}=block[{}]",
+                                                 currentTime,
+                                                 iteration,
+                                                 sub.getTarget(),
+                                                 val.size());
                         } else {
-                            valstr = fmt::format(
-                                "[{}]value {}=block[{}]", currentTime, sub.getTarget(), val.size());
+                            valstr = fmt::format("[{}]value {}=block[{}]",
+                                                 currentTime,
+                                                 sub.getTarget(),
+                                                 val.size());
                         }
                     }
                     logger->addMessage(std::move(valstr));
@@ -254,9 +254,9 @@ namespace apps {
     std::string Clone::encode(const std::string& str2encode)
     {
         return std::string("b64[") +
-            gmlc::utilities::base64_encode(
-                   reinterpret_cast<const unsigned char*>(str2encode.c_str()),
-                   static_cast<int>(str2encode.size())) +
+            gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(
+                                               str2encode.c_str()),
+                                           static_cast<int>(str2encode.size())) +
             ']';
     }
 
@@ -304,8 +304,8 @@ namespace apps {
             subscriptions.emplace_back(fed->registerSubscription(key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
             auto id = subscriptions.back().getHandle();
-            subids[id] = index; // this is a new element
-            subkeys[key] = index; // this is a potential replacement
+            subids[id] = index;  // this is a new element
+            subkeys[key] = index;  // this is a potential replacement
         }
     }
 
@@ -355,5 +355,5 @@ namespace apps {
         return app;
     }
 
-} // namespace apps
-} // namespace helics
+}  // namespace apps
+}  // namespace helics

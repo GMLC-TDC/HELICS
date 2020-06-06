@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
@@ -341,10 +341,9 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
 }
 #endif
 
-INSTANTIATE_TEST_SUITE_P(
-    recorder_tests,
-    recorder_message_file_tests,
-    ::testing::ValuesIn(simple_message_files));
+INSTANTIATE_TEST_SUITE_P(recorder_tests,
+                         recorder_message_file_tests,
+                         ::testing::ValuesIn(simple_message_files));
 
 TEST(recorder_tests, recorder_test_destendpoint_clone)
 {
@@ -543,10 +542,9 @@ static constexpr const char* simple_clone_test_files[] = {"clone_example1.txt",
                                                           "clone_example7.json",
                                                           "clone_example8.JSON"};
 
-INSTANTIATE_TEST_SUITE_P(
-    recorder_tests,
-    recorder_clone_file_tests,
-    ::testing::ValuesIn(simple_clone_test_files));
+INSTANTIATE_TEST_SUITE_P(recorder_tests,
+                         recorder_clone_file_tests,
+                         ::testing::ValuesIn(simple_clone_test_files));
 
 TEST(recorder_tests, recorder_test_saveFile1)
 {

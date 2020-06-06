@@ -1,21 +1,21 @@
 ---
 engines:
- rubocop:
-   enabled: true
- duplication:
-   enabled: true
- metrics:
-   enabled: true
- coverage:
-   enabled: false
+  rubocop:
+    enabled: true
+  duplication:
+    enabled: true
+  metrics:
+    enabled: true
+  coverage:
+    enabled: false
 languages:
 
 exclude_paths:
-  - ThirdParty/**/*
-  - ThirdParty/*
-  - config/cmake/test_compiler_cxx/**
-  - interfaces/**/*
-  - scripts/**/*
-  - scripts/*
-  - tests/csharp/*
-
+  - 'ThirdParty/**/*'
+  - 'ThirdParty/*'
+  - 'config/cmake/test_compiler_cxx/**'
+  - 'interfaces/**/*'
+  - 'scripts/**/*'
+  - 'scripts/*'
+  - 'tests/csharp/*'
+  - '**.md'

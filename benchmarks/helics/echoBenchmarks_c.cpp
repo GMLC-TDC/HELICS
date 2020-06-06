@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2020,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
-the top-level NOTICE for additional details. All rights reserved.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -21,19 +21,19 @@ SPDX-License-Identifier: BSD-3-Clause
 /** class implementing the hub for an echo test*/
 class EchoHub_c {
   public:
-    helics_time finalTime = 0.1; // final time
+    helics_time finalTime{0.1};  // final time
   private:
-    helics_federate vFed;
+    helics_federate vFed{nullptr};
     std::vector<helics_publication> pubs;
     std::vector<helics_input> subs;
-    int cnt_ = 10;
-    bool initialized = false;
-    bool readyToRun = false;
+    int cnt_{10};
+    bool initialized{false};
+    bool readyToRun{false};
 
   public:
     EchoHub_c() = default;
     ~EchoHub_c() { helicsFederateFree(vFed); }
-    void run(std::function<void()> callOnReady = {})
+    void run(const std::function<void()>& callOnReady = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -48,7 +48,7 @@ class EchoHub_c {
     {
         cnt_ = cnt;
         std::string name = "echohub";
-        auto fi = helicsCreateFederateInfo();
+        auto* fi = helicsCreateFederateInfo();
         helicsFederateInfoSetCoreName(fi, coreName.c_str(), nullptr);
 
         vFed = helicsCreateValueFederate(name.c_str(), fi, nullptr);
@@ -68,7 +68,7 @@ class EchoHub_c {
     void makeReady()
     {
         if (!initialized) {
-            throw("must initialize first");
+            throw(std::runtime_error("must initialize first"));
         }
         helicsFederateEnterExecutingMode(vFed, nullptr);
         readyToRun = true;
@@ -80,8 +80,8 @@ class EchoHub_c {
         auto cTime = helics_time_zero;
         while (cTime <= finalTime) {
             for (int ii = 0; ii < cnt_; ++ii) {
-                if (helicsInputIsUpdated(subs[ii])) {
-                    int actLen = 0;
+                if (helicsInputIsUpdated(subs[ii]) == helics_true) {
+                    int actLen{0};
                     helicsInputGetString(subs[ii], buffer, 256, &actLen, nullptr);
                     helicsPublicationPublishRaw(pubs[ii], buffer, actLen, nullptr);
                 }
@@ -94,18 +94,18 @@ class EchoHub_c {
 
 class EchoLeaf_c {
   private:
-    helics_federate vFed;
-    helics_publication pub;
-    helics_input sub;
+    helics_federate vFed{nullptr};
+    helics_publication pub{nullptr};
+    helics_input sub{nullptr};
 
-    int index_ = 0;
-    bool initialized = false;
-    bool readyToRun = false;
+    int index_{0};
+    bool initialized{false};
+    bool readyToRun{false};
 
   public:
     EchoLeaf_c() = default;
     ~EchoLeaf_c() { helicsFederateFree(vFed); }
-    void run(std::function<void()> callOnReady = {})
+    void run(const std::function<void()>& callOnReady = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -119,7 +119,7 @@ class EchoLeaf_c {
     {
         std::string name = "echoleaf_" + std::to_string(index);
         index_ = index;
-        auto fi = helicsCreateFederateInfo();
+        auto* fi = helicsCreateFederateInfo();
         helicsFederateInfoSetCoreName(fi, coreName.c_str(), nullptr);
 
         vFed = helicsCreateValueFederate(name.c_str(), fi, nullptr);
@@ -145,8 +145,8 @@ class EchoLeaf_c {
     void mainLoop()
     {
         int cnt = 0;
-        // this is  to make a fixed size string that is different for each federate but has sufficient length to
-        // get beyond SSO
+        // this is  to make a fixed size string that is different for each federate but has
+        // sufficient length to get beyond SSO
         const std::string txstring = std::to_string(100000 + index_) + std::string(100, '1');
         char tbuffer[256];
         const int iter = 5000;
@@ -156,8 +156,8 @@ class EchoLeaf_c {
             if (cnt <= iter) {
                 helicsPublicationPublishString(pub, txstring.c_str(), nullptr);
             }
-            if (helicsInputIsUpdated(sub)) {
-                int actLen = 0;
+            if (helicsInputIsUpdated(sub) != helics_false) {
+                int actLen{0};
                 helicsInputGetString(sub, tbuffer, 256, &actLen, nullptr);
                 if (std::string(tbuffer) != txstring) {
                     std::cout << "incorrect string\n";
@@ -190,8 +190,8 @@ static void BMecho_singleCore(benchmark::State& state)
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+            threadlist[ii] = std::thread([&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); },
+                                         std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -209,7 +209,7 @@ static void BMecho_singleCore(benchmark::State& state)
 // Register the function as a benchmark
 BENCHMARK(BMecho_singleCore)
     ->RangeMultiplier(2)
-    ->Range(1, 1 << 8)
+    ->Range(1, 1U << 8)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
@@ -230,24 +230,28 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
         auto broker =
             helicsCreateBroker(cTypeString.c_str(), "brokerb", initString.c_str(), nullptr);
 
-        auto wcore = helicsCreateCore(
-            cTypeString.c_str(), "", "--federates=1 --log_level=no_print", nullptr);
+        auto wcore = helicsCreateCore(cTypeString.c_str(),
+                                      "",
+                                      "--federates=1 --log_level=no_print",
+                                      nullptr);
         // this is to delay until the threads are ready
         EchoHub_c hub;
         hub.initialize(helicsCoreGetIdentifier(wcore), feds);
         std::vector<EchoLeaf_c> leafs(feds);
         std::vector<helics_core> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            cores[ii] = helicsCreateCore(
-                cTypeString.c_str(), nullptr, "-f 1 --log_level=no_print", nullptr);
+            cores[ii] = helicsCreateCore(cTypeString.c_str(),
+                                         nullptr,
+                                         "-f 1 --log_level=no_print",
+                                         nullptr);
             helicsCoreConnect(cores[ii], nullptr);
             leafs[ii].initialize(helicsCoreGetIdentifier(cores[ii]), ii);
         }
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
-            threadlist[ii] = std::thread(
-                [&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+            threadlist[ii] = std::thread([&](EchoLeaf_c& lf) { lf.run([&brr]() { brr.wait(); }); },
+                                         std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -272,7 +276,7 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
     }
 }
 
-static constexpr int64_t maxscale{1 << 3};
+static constexpr int64_t maxscale{1U << (3 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, "inproc")
     ->RangeMultiplier(2)

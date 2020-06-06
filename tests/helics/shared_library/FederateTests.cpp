@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2017-2018,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(federate_initialize_tests, *utf::label("ci"))
     BOOST_CHECK(Fed->getCurrentState() == helics::Federate::op_states::initialization);
     Fed->enterExecutionState();
     BOOST_CHECK(Fed->getCurrentState() == helics::Federate::op_states::execution);
-    Fed = nullptr; // force the destructor
+    Fed = nullptr;  // force the destructor
 }
 
 BOOST_AUTO_TEST_CASE(federate_time_step_tests, *utf::label("ci"))
