@@ -12,18 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <set>
 namespace helics {
-bool changeDetected(const defV& prevValue, const std::string& val, double /*deltaV*/)
+bool changeDetected(const defV& prevValue, std::string_view val, double /*deltaV*/)
 {
     if (prevValue.index() == string_loc) {
         return (val != std::get<std::string>(prevValue));
-    }
-    return true;
-}
-
-bool changeDetected(const defV& prevValue, const char* val, double /*deltaV*/)
-{
-    if (prevValue.index() == string_loc) {
-        return (std::get<std::string>(prevValue) != val);
     }
     return true;
 }

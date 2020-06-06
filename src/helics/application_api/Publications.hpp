@@ -223,8 +223,7 @@ class HELICS_CXX_EXPORT Publication {
     /** send a value for publication
     @param val the value to publish*/
     void publish(double val);
-    void publish(const char* val);
-    void publish(const std::string& val);
+    void publish(std::string_view val);
     void publish(const std::vector<double>& val);
     void publish(const std::vector<std::complex<double>>& val);
     void publish(const double* vals, int size);
@@ -234,8 +233,7 @@ class HELICS_CXX_EXPORT Publication {
     void publish(Time val);
     void publish(char val);
     void publish(const NamedPoint& np);
-    void publish(const std::string& name, double val);
-    void publish(const char* name, double val);
+    void publish(std::string_view name, double val);
     /** secondary publish function to allow unit conversion before publication
     @param val the value to publish
     @param units  the units association with the publication

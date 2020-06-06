@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <typeinfo>
 #include <utility>
 #include <vector>
+#include <string_view>
 /** @file
 @details basic type information and control for HELICS
 */
@@ -116,7 +117,7 @@ class NamedPoint {
     /** default constructor*/
     NamedPoint() = default;
     /** construct directly from name value*/
-    NamedPoint(std::string valname, double valval): name(std::move(valname)), value(valval) {}
+    NamedPoint(std::string_view valname, double valval): name(valname), value(valval) {}
     /** equality operator
     @details if either value is nan it check only the string
     otherwise it checks the name and value
@@ -318,8 +319,7 @@ HELICS_CXX_EXPORT std::string
 @details string will look like {"<name>":val}
 */
 HELICS_CXX_EXPORT std::string helicsNamedPointString(const NamedPoint& point);
-HELICS_CXX_EXPORT std::string helicsNamedPointString(const std::string& pointName, double val);
-HELICS_CXX_EXPORT std::string helicsNamedPointString(const char* pointName, double val);
+HELICS_CXX_EXPORT std::string helicsNamedPointString(std::string_view pointName, double val);
 /** convert a string to a complex number*/
 HELICS_CXX_EXPORT std::complex<double> helicsGetComplex(const std::string& val);
 /** convert a string to a vector*/
@@ -351,16 +351,14 @@ HELICS_CXX_EXPORT double vectorNorm(const std::vector<std::complex<double>>& vec
 */
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, double val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, int64_t val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const char* val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::string& val);
+HELICS_CXX_EXPORT data_block typeConvert(data_type type, std::string_view val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::vector<double>& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const double* vals, size_t size);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type,
                                          const std::vector<std::complex<double>>& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::complex<double>& val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, const NamedPoint& val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const char* str, double val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::string& str, double val);
+HELICS_CXX_EXPORT data_block typeConvert(data_type type, std::string_view str, double val);
 HELICS_CXX_EXPORT data_block typeConvert(data_type type, bool val);
 
 /** template function for generating a known name of a type*/

@@ -46,12 +46,9 @@ class data_block {
     data_block(const data_block& db) = default;
     /** move constructor */
     data_block(data_block&& db) = default;
-    /** construct from char * */
-    // NOLINTNEXTLINE
-    /* implicit */ data_block(const char* s): m_data(s) {}
     /** construct from string */
     // NOLINTNEXTLINE
-    /* implicit */ data_block(const std::string& str): m_data(str) {}
+    /* implicit */ data_block(std::string_view str): m_data(str) {}
     /** move from string */
     // NOLINTNEXTLINE
     /* implicit */ data_block(std::string&& str) noexcept: m_data(std::move(str)) {}

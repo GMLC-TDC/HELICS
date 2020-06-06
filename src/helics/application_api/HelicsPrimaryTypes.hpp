@@ -44,8 +44,7 @@ enum type_location {
     named_point_loc = 6
 };
 /** detect a change from the previous values*/
-HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, const std::string& val, double deltaV);
-HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, const char* val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, std::string_view val, double deltaV);
 HELICS_CXX_EXPORT bool
     changeDetected(const defV& prevValue, const std::vector<double>& val, double deltaV);
 HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue,

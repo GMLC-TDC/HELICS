@@ -661,12 +661,12 @@ TEST_P(valuefed_single_type, all_callback)
         EXPECT_TRUE(false) << " missed callback\n";
     }
 
-    vFed1->publish(pubid2, 4);
+    pubid2.publish(4);
     vFed1->requestTime(2.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub2.getHandle());
     EXPECT_EQ(lastTime, 2.0);
-    vFed1->publish(pubid1, "this is a test");
+    pubid1.publish("this is a test");
     vFed1->requestTime(3.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub1.getHandle());

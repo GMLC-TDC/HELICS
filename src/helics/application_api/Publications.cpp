@@ -106,7 +106,7 @@ void Publication::publish(char val)
             break;
         case data_type::helics_string:
         case data_type::helics_named_point:
-            publish(std::string(1, val));
+            publish(std::string_view(&val,1));
             break;
         default:
             publishInt(static_cast<int64_t>(val));
@@ -132,10 +132,10 @@ void Publication::publish(Time val)
 void Publication::publish(bool val)
 {
     bool doPublish = true;
-    std::string bstring = val ? "1" : "0";
+    std::string_view bstring = val ? "1" : "0";
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, bstring, delta)) {
-            prevValue = bstring;
+            prevValue = std::string(bstring);
         } else {
             doPublish = false;
         }
@@ -146,12 +146,12 @@ void Publication::publish(bool val)
     }
 }
 
-void Publication::publish(const char* val)
+void Publication::publish(std::string_view val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
-            prevValue = val;
+            prevValue=std::string(val);
         } else {
             doPublish = false;
         }
@@ -161,21 +161,7 @@ void Publication::publish(const char* val)
         fed->publishRaw(*this, db);
     }
 }
-void Publication::publish(const std::string& val)
-{
-    bool doPublish = true;
-    if (changeDetectionEnabled) {
-        if (changeDetected(prevValue, val, delta)) {
-            prevValue = val;
-        } else {
-            doPublish = false;
-        }
-    }
-    if (doPublish) {
-        auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
-    }
-}
+
 void Publication::publish(const std::vector<double>& val)
 {
     bool doPublish = true;
@@ -256,28 +242,11 @@ void Publication::publish(const NamedPoint& np)
     }
 }
 
-void Publication::publish(const std::string& name, double val)
+void Publication::publish(std::string_view name, double val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled) {
         NamedPoint np(name, val);
-        if (changeDetected(prevValue, np, delta)) {
-            prevValue = std::move(np);
-        } else {
-            doPublish = false;
-        }
-    }
-    if (doPublish) {
-        auto db = typeConvert(pubType, name, val);
-        fed->publishRaw(*this, db);
-    }
-}
-
-void Publication::publish(const char* name, double val)
-{
-    bool doPublish = true;
-    if (changeDetectionEnabled) {
-        NamedPoint np{name, val};
         if (changeDetected(prevValue, np, delta)) {
             prevValue = std::move(np);
         } else {
@@ -320,7 +289,7 @@ data_block typeConvert(data_type type, const defV& val)
             return typeConvert(type, std::get<int64_t>(val));
         case string_loc:  // string
         default:
-            return typeConvert(type, std::get<std::string>(val));
+            return typeConvert(type, std::string_view(std::get<std::string>(val)));
         case complex_loc:  // complex
             return typeConvert(type, std::get<std::complex<double>>(val));
         case vector_loc:  // vector
