@@ -310,7 +310,8 @@ class valuefed_flagfile_tests:
 
 TEST_P(valuefed_flagfile_tests, configure_test)
 {
-    std::ifstream t(std::string(TEST_DIR) + GetParam());
+    std::string file = std::string(TEST_DIR) + GetParam();
+    std::ifstream t(file);
 
     std::string config((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 

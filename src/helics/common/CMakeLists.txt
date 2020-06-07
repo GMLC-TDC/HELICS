@@ -27,6 +27,7 @@ set(common_sources
     logger.cpp
     loggerCore.cpp
     configFileHelpers.cpp
+    addTargets.cpp
 )
 
 # headers that are part of the public interface
