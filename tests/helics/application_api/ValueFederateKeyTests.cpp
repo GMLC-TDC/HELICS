@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/helics_definitions.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -19,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+#include <fstream>
 
 /** these test cases test out the value federates
  */
