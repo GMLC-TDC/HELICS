@@ -34,28 +34,6 @@ inline Input& make_subscription(ValueFederate& valueFed,
     return valueFed.registerSubscription(key, units);
 }
 
-/** generate a typed subscription object from a value federate*/
-template<class X>
-inline InputT<X> make_subscription(ValueFederate* valueFed,
-                                   const std::string& key,
-                                   const std::string& units = std::string())
-{
-    InputT<X> ipt(valueFed, typeNameString<X>(), units);
-    ipt.addTarget(key);
-    return ipt;
-}
-
-/** generate a typed subscription object from a value federate*/
-template<class X>
-inline InputT<X> make_subscription(ValueFederate& valueFed,
-                                   const std::string& key,
-                                   const std::string& units = std::string())
-{
-    InputT<X> ipt(&valueFed, typeNameString<X>(), units);
-    ipt.addTarget(key);
-    return ipt;
-}
-
 /** get a value directly from the subscription key name
 @details this is a convenience function to get a value directly from the subscription key name
 this function should not be used as the primary means of retrieving value as it does involve an

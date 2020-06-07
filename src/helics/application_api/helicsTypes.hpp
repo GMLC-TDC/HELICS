@@ -321,26 +321,26 @@ HELICS_CXX_EXPORT std::string
 HELICS_CXX_EXPORT std::string helicsNamedPointString(const NamedPoint& point);
 HELICS_CXX_EXPORT std::string helicsNamedPointString(std::string_view pointName, double val);
 /** convert a string to a complex number*/
-HELICS_CXX_EXPORT std::complex<double> helicsGetComplex(const std::string& val);
+HELICS_CXX_EXPORT std::complex<double> helicsGetComplex(std::string_view val);
 /** convert a string to a vector*/
-HELICS_CXX_EXPORT std::vector<double> helicsGetVector(const std::string& val);
-HELICS_CXX_EXPORT void helicsGetVector(const std::string& val, std::vector<double>& data);
+HELICS_CXX_EXPORT std::vector<double> helicsGetVector(std::string_view val);
+HELICS_CXX_EXPORT void helicsGetVector(std::string_view val, std::vector<double>& data);
 
 /** convert a string to a complex vector*/
-HELICS_CXX_EXPORT std::vector<std::complex<double>> helicsGetComplexVector(const std::string& val);
+HELICS_CXX_EXPORT std::vector<std::complex<double>> helicsGetComplexVector(std::string_view val);
 
 /** convert a string to a complex vector using an existing vector*/
-HELICS_CXX_EXPORT void helicsGetComplexVector(const std::string& val,
+HELICS_CXX_EXPORT void helicsGetComplexVector(std::string_view val,
                                               std::vector<std::complex<double>>& data);
 
 /** convert a string to a named point*/
-HELICS_CXX_EXPORT NamedPoint helicsGetNamedPoint(const std::string& val);
+HELICS_CXX_EXPORT NamedPoint helicsGetNamedPoint(std::string_view val);
 /** get a double from a string*/
-HELICS_CXX_EXPORT double getDoubleFromString(const std::string& val);
+HELICS_CXX_EXPORT double getDoubleFromString(std::string_view val);
 /** get a complex number from a string*/
-HELICS_CXX_EXPORT std::complex<double> getComplexFromString(const std::string& val);
+HELICS_CXX_EXPORT std::complex<double> getComplexFromString(std::string_view val);
 /** get the boolean value of a string*/
-HELICS_CXX_EXPORT bool helicsBoolValue(const std::string& val);
+HELICS_CXX_EXPORT bool helicsBoolValue(std::string_view val);
 /** compute the L2 norm of a vector*/
 HELICS_CXX_EXPORT double vectorNorm(const std::vector<double>& vec);
 /** compute the L2 norm of a magnitudes of a complex vector*/

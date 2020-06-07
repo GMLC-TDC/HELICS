@@ -445,7 +445,7 @@ void ValueFederate::publishJSON(const std::string& jsonString)
             if (vp.second.index() == 0) {
                 pub.publish(std::get<double>(vp.second));
             } else {
-                pub.publish(std::get<std::string>(vp.second));
+                pub.publish(std::string_view(std::get<std::string>(vp.second)));
             }
         }
     }

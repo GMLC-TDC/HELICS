@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueConverter.hpp"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/string_viewConversion.h"
+#include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
 #include <algorithm>
 #include <functional>
@@ -222,7 +223,7 @@ std::complex<double> helicsGetComplex(std::string_view val)
                 re = 0.0;
             } else {
                 auto strval = val;
-                stringOps::trimString(strval);
+                string_viewOps::trimString(strval);
                 re = numConv<double>(strval);
             }
         }
@@ -343,12 +344,12 @@ NamedPoint helicsGetNamedPoint(std::string_view val)
     auto locend = val.find_last_of('}');
     auto str1 = val.substr(loc + 1, locsep - loc);
     string_viewOps::trimString(str1);
-    str1.pop_back();
+    str1.remove_suffix(1);
 
     NamedPoint point;
     point.name = string_viewOps::removeQuotes(str1);
     auto vstr = val.substr(locsep + 1, locend - locsep - 1);
-    stringOps::trimString(vstr);
+    string_viewOps::trimString(vstr);
     point.value = numConv<double>(vstr);
     return point;
 }
@@ -358,7 +359,7 @@ static int readSize(std::string_view val)
     auto fb = val.find_first_of('[');
     if (fb > 1) {
         try {
-            auto size = std::stoi(val.substr(1, fb - 1));
+            auto size = numConv<int>(val.substr(1, fb - 1));
             return size;
         }
         catch (const std::invalid_argument&) {
@@ -469,10 +470,10 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
             auto nc = val.find_first_of(",;]", fb + 1);
             auto nc2 = val.find_first_of(",;]", nc + 1);
             try {
-                std::string vstr1 = val.substr(fb + 1, nc - fb - 1);
-                stringOps::trimString(vstr1);
-                std::string vstr2 = val.substr(nc + 1, nc2 - nc - 1);
-                stringOps::trimString(vstr2);
+                auto vstr1 = val.substr(fb + 1, nc - fb - 1);
+                string_viewOps::trimString(vstr1);
+                auto vstr2 = val.substr(nc + 1, nc2 - nc - 1);
+                string_viewOps::trimString(vstr2);
                 auto V1 = numConv<double>(vstr1);
                 auto V2 = numConv<double>(vstr2);
                 data.emplace_back(V1, V2);
@@ -542,7 +543,7 @@ bool helicsBoolValue(std::string_view val)
     };
     // all known false strings are captured in known strings so if it isn't in there it evaluates to
     // true
-    auto res = knownStrings.find(val);
+    auto res = knownStrings.find(std::string(val));
     if (res != knownStrings.end()) {
         return res->second;
     }
@@ -916,11 +917,6 @@ data_block typeConvert(data_type type, bool val)
             return ValueConverter<double>::convert(&v2, 1);
         }
     }
-}
-
-data_block typeConvert(data_type type, const std::string& str, double val)
-{
-    return typeConvert(type, str.c_str(), val);
 }
 
 }  // namespace helics

@@ -501,7 +501,7 @@ void helicsPublicationPublishString(helics_publication pub, const char* str, hel
         return;
     }
     try {
-        pubObj->pubPtr->publish(AS_STRING(str));
+        pubObj->pubPtr->publish(std::string_view(AS_STRING(str)));
     }
     catch (...) {
         helicsErrorHandler(err);

@@ -25,22 +25,22 @@ TEST(subscriptionTObject, tests)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::PublicationT<std::string>(helics::GLOBAL, vFed.get(), "pub1");
+    auto pubObj = helics::make_publication<std::string>(helics::GLOBAL, vFed.get(), "pub1");
 
-    auto subObj = helics::make_subscription<std::string>(*vFed, "pub1");
+    auto subObj = helics::make_subscription(*vFed, "pub1");
     vFed->setProperty(helics_property_time_delta, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubObj.publish("string1");
+    pubObj->publish("string1");
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    std::string s = subObj.getValue();
+    std::string s = subObj.getString();
 
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubObj.publish("string2");
+    pubObj->publish("string2");
     // make sure the value is still what we expect
     subObj.getValue(s);
 
@@ -376,7 +376,7 @@ TEST(subscriptionObject, Size_tests)
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     std::string str("this is a string test");
-    pubObj->publish(str);
+    pubObj->publish(std::string_view(str));
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
