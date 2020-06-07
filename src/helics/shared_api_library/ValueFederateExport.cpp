@@ -1323,14 +1323,14 @@ void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_e
     // LCOV_EXCL_STOP
 }
 
-helics_bool helicsInputGetOption(helics_input inp, int option)
+int helicsInputGetOption(helics_input inp, int option)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
         return helics_false;
     }
     try {
-        return (inpObj->inputPtr->getOption(option)) ? helics_true : helics_false;
+        return (inpObj->inputPtr->getOption(option));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1339,14 +1339,14 @@ helics_bool helicsInputGetOption(helics_input inp, int option)
     // LCOV_EXCL_STOP
 }
 
-void helicsInputSetOption(helics_input inp, int option, helics_bool value, helics_error* err)
+void helicsInputSetOption(helics_input inp, int option, int value, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
         return;
     }
     try {
-        inpObj->inputPtr->setOption(option, (value == helics_true));
+        inpObj->inputPtr->setOption(option, value);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1355,14 +1355,14 @@ void helicsInputSetOption(helics_input inp, int option, helics_bool value, helic
     // LCOV_EXCL_STOP
 }
 
-helics_bool helicsPublicationGetOption(helics_publication pub, int option)
+int helicsPublicationGetOption(helics_publication pub, int option)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
         return helics_false;
     }
     try {
-        return (pubObj->pubPtr->getOption(option)) ? helics_true : helics_false;
+        return pubObj->pubPtr->getOption(option);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1371,14 +1371,14 @@ helics_bool helicsPublicationGetOption(helics_publication pub, int option)
     // LCOV_EXCL_STOP
 }
 
-void helicsPublicationSetOption(helics_publication pub, int option, helics_bool value, helics_error* err)
+void helicsPublicationSetOption(helics_publication pub, int option, int value, helics_error* err)
 {
     auto* pubObj = verifyPublication(pub, err);
     if (pubObj == nullptr) {
         return;
     }
     try {
-        pubObj->pubPtr->setOption(option, (value == helics_true));
+        pubObj->pubPtr->setOption(option, value);
     }
     // LCOV_EXCL_START
     catch (...) {

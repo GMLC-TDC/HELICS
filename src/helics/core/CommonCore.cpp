@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterCoordinator.hpp"
 #include "FilterInfo.hpp"
 #include "ForwardingTimeCoordinator.hpp"
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
@@ -949,9 +949,7 @@ const std::string& CommonCore::getInjectionUnits(interface_handle handle) const
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
-                    if (!inpInfo->inputUnits.empty()) {
-                        return inpInfo->inputUnits;
-                    }
+                    return inpInfo->getInjectionUnits();
                 }
                 break;
             }
@@ -988,9 +986,7 @@ const std::string& CommonCore::getInjectionType(interface_handle handle) const
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* inpInfo = fed->interfaces().getInput(handle);
                 if (inpInfo != nullptr) {
-                    if (!inpInfo->inputType.empty()) {
-                        return inpInfo->inputType;
-                    }
+                    return inpInfo->getInjectionType();
                 }
                 break;
             }
@@ -1023,7 +1019,7 @@ const std::string& CommonCore::getExtractionType(interface_handle handle) const
     return emptyStr;
 }
 
-void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool option_value)
+void CommonCore::setHandleOption(interface_handle handle, int32_t option, int32_t option_value)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1052,11 +1048,11 @@ void CommonCore::setHandleOption(interface_handle handle, int32_t option, bool o
     }
 }
 
-bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
+int32_t CommonCore::getHandleOption(interface_handle handle, int32_t option) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
-        return false;
+        return 0;
     }
     switch (option) {
         case defs::options::connection_required:
@@ -1074,7 +1070,7 @@ bool CommonCore::getHandleOption(interface_handle handle, int32_t option) const
     } else {
         // must be for filter
     }
-    return false;
+    return 0;
 }
 
 void CommonCore::closeHandle(interface_handle handle)
@@ -1267,7 +1263,8 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
     }
 }
 
-std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
+const std::shared_ptr<const data_block>& CommonCore::getValue(interface_handle handle,
+                                                              uint32_t* inputIndex)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1277,11 +1274,13 @@ std::shared_ptr<const data_block> CommonCore::getValue(interface_handle handle)
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    // TODO(PT): this is a long chain should be refactored
-    return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getData();
+    auto& fed = *getFederateAt(handleInfo->local_fed_id);
+    std::lock_guard<FederateState> lk(fed);
+    return fed.getValue(handle, inputIndex);
 }
 
-std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interface_handle handle)
+const std::vector<std::shared_ptr<const data_block>>&
+    CommonCore::getAllValues(interface_handle handle)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1291,8 +1290,9 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues(interfac
     if (handleInfo->handleType != handle_type::input) {
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
-    // TODO(PT): this is a long chain should be refactored
-    return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getAllData();
+    auto& fed = *getFederateAt(handleInfo->local_fed_id);
+    std::lock_guard<FederateState> lk(fed);
+    return fed.getAllValues(handle);
 }
 
 const std::vector<interface_handle>& CommonCore::getValueUpdates(local_federate_id federateID)

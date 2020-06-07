@@ -1,0 +1,8 @@
+{
+  "name": "test_bes",
+  "coreType": "zmq",
+  "log_level": -1,
+  "only_transmit_on_change": true,
+  "publications": [],
+  "wait_for_current_time_update": true
+}

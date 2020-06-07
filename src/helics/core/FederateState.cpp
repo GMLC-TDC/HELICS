@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "TimeDependencies.hpp"
@@ -97,18 +97,18 @@ static const std::string emptyStr;
 using namespace std::chrono_literals;  // NOLINT
 
 namespace helics {
-FederateState::FederateState(const std::string& name_, const CoreFederateInfo& info_):
-    name(name_),
+FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
+    name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
     global_id{global_federate_id()}
 {
-    for (const auto& prop : info_.timeProps) {
+    for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
     }
-    for (const auto& prop : info_.intProps) {
+    for (const auto& prop : fedInfo.intProps) {
         setProperty(prop.first, prop.second);
     }
-    for (const auto& prop : info_.flagProps) {
+    for (const auto& prop : fedInfo.flagProps) {
         setOptionFlag(prop.first, prop.second);
     }
 }
@@ -251,6 +251,18 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
     }
     id = interface_handle();
     return nullptr;
+}
+
+const std::shared_ptr<const data_block>& FederateState::getValue(interface_handle handle,
+                                                                 uint32_t* inputIndex)
+{
+    return interfaces().getInput(handle)->getData(inputIndex);
+}
+
+const std::vector<std::shared_ptr<const data_block>>&
+    FederateState::getAllValues(interface_handle handle)
+{
+    return interfaces().getInput(handle)->getAllData();
 }
 
 void FederateState::routeMessage(const ActionMessage& msg)
@@ -1484,7 +1496,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
     }
 }
 
-bool FederateState::getHandleOption(interface_handle handle, char iType, int32_t option) const
+int32_t FederateState::getHandleOption(interface_handle handle, char iType, int32_t option) const
 {
     switch (iType) {
         case 'i':

@@ -33,6 +33,7 @@ set(cpp_shared_library_test_sources
     test-message-federate_cpp.cpp
     # FederateTests.cpp TimingTests.cpp iterationTests.cpp subPubObjectTests.cpp
     QueryTests_cpp.cpp
+    MultiInputTests.cpp
 )
 
 add_executable(
