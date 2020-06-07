@@ -120,10 +120,10 @@ void Input::handleCallback(Time time)
 template<class X>
 X varMax(const std::vector<defV>& vals)
 {
-    X dmax = mpark::get<X>(vals.front());
+    X dmax = std::get<X>(vals.front());
     for (const auto& dval : vals) {
-        if (mpark::get<X>(dval) > dmax) {
-            dmax = mpark::get<X>(dval);
+        if (std::get<X>(dval) > dmax) {
+            dmax = std::get<X>(dval);
         }
     }
     return dmax;
@@ -132,9 +132,9 @@ X varMax(const std::vector<defV>& vals)
 template<class X, class Y, typename OP>
 Y varDiff(const std::vector<defV>& vals, const OP& op)
 {
-    Y val = op(mpark::get<X>(vals.front()));
+    Y val = op(std::get<X>(vals.front()));
     for (size_t ii = 1; ii < vals.size(); ++ii) {
-        val = val - op(mpark::get<X>(vals[ii]));
+        val = val - op(std::get<X>(vals[ii]));
     }
     return val;
 }
@@ -146,7 +146,7 @@ size_t varMaxIndex(const std::vector<defV>& vals, std::function<double(const X&)
     size_t index{0};
     size_t mxIndex{0};
     for (const auto& dval : vals) {
-        auto val = op(mpark::get<X>(dval));
+        auto val = op(std::get<X>(dval));
         if (val > dmax) {
             dmax = val;
             mxIndex = index;
@@ -159,10 +159,10 @@ size_t varMaxIndex(const std::vector<defV>& vals, std::function<double(const X&)
 template<class X>
 X varMin(const std::vector<defV>& vals)
 {
-    X dmin = mpark::get<X>(vals.front());
+    X dmin = std::get<X>(vals.front());
     for (const auto& dval : vals) {
-        if (mpark::get<X>(dval) < dmin) {
-            dmin = mpark::get<X>(dval);
+        if (std::get<X>(dval) < dmin) {
+            dmin = std::get<X>(dval);
         }
     }
     return dmin;
@@ -175,7 +175,7 @@ size_t varMinIndex(const std::vector<defV>& vals, std::function<double(const X&)
     size_t index{0};
     size_t mnIndex{0};
     for (const auto& dval : vals) {
-        auto val = op(mpark::get<X>(dval));
+        auto val = op(std::get<X>(dval));
         if (val < dmin) {
             dmin = val;
             mnIndex = index;
@@ -233,9 +233,9 @@ static defV diffOperation(const std::vector<defV>& vals)
         case int_loc:
             return varDiff<int64_t, int64_t>(vals, [](const int64_t& x) { return x; });
         case string_loc: {
-            const auto& val = mpark::get<std::string>(vals.front());
+            const auto& val = std::get<std::string>(vals.front());
             for (size_t ii = 1; ii < vals.size(); ++ii) {
-                if (mpark::get<std::string>(vals[ii]) != val) {
+                if (std::get<std::string>(vals[ii]) != val) {
                     return "1";
                 }
             }
@@ -267,7 +267,7 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
             }
             std::vector<double> res;
             for (const auto& val : vals) {
-                const auto& v = mpark::get<std::vector<double>>(val);
+                const auto& v = std::get<std::vector<double>>(val);
                 res.insert(res.end(), v.begin(), v.end());
             }
             return res;
@@ -278,7 +278,7 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
             }
             Json::Value svect = Json::arrayValue;
             for (const auto& val : vals) {
-                svect.append(mpark::get<std::string>(val));
+                svect.append(std::get<std::string>(val));
             }
 
             return generateJsonString(svect);
@@ -289,7 +289,7 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
             }
             std::vector<std::complex<double>> res;
             for (const auto& val : vals) {
-                const auto& v = mpark::get<std::vector<std::complex<double>>>(val);
+                const auto& v = std::get<std::vector<std::complex<double>>>(val);
                 res.insert(res.end(), v.begin(), v.end());
             }
             return res;
@@ -339,7 +339,7 @@ static defV vectorSum(const std::vector<defV>& vals)
 {
     double result{0.0};
     for (const auto& v : vals) {
-        const auto& vect = mpark::get<std::vector<double>>(v);
+        const auto& vect = std::get<std::vector<double>>(v);
         for (const auto& el : vect) {
             result += el;
         }
@@ -352,7 +352,7 @@ static defV vectorAvg(const std::vector<defV>& vals)
     double result{0.0};
     int N{0};
     for (const auto& v : vals) {
-        const auto& vect = mpark::get<std::vector<double>>(v);
+        const auto& vect = std::get<std::vector<double>>(v);
         for (const auto& el : vect) {
             result += el;
             ++N;
@@ -366,7 +366,7 @@ static defV vectorDiff(const std::vector<defV>& vals)
     std::vector<double> X;
     double start{invalidDouble};
     for (const auto& v : vals) {
-        const auto& vect = mpark::get<std::vector<double>>(v);
+        const auto& vect = std::get<std::vector<double>>(v);
         for (const auto& el : vect) {
             if (start != invalidDouble) {
                 X.push_back(start - el);
@@ -380,7 +380,7 @@ static defV vectorDiff(const std::vector<defV>& vals)
 static bool changeDetected(const defV& prevValue, const defV& newVal, double deltaV)
 {
     auto visitor = [&](const auto& arg) { return changeDetected(prevValue, arg, deltaV); };
-    return mpark::visit(visitor, newVal);
+    return std::visit(visitor, newVal);
 }
 
 bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV)
