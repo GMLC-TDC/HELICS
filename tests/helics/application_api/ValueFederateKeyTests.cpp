@@ -22,8 +22,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "testFixtures_shared.hpp"
 #endif
 #include <fstream>
-
-#include <fstream>
 #include <streambuf>
 
 /** these test cases test out the value federates
