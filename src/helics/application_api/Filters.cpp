@@ -267,8 +267,8 @@ void CloningFilter::setString(const std::string& property, const std::string& va
 {
     if ((property == "source") || (property == "add source")) {
         addSourceTarget(val);
-    } else if (property == "dest" || property == "destination" ||
-               property == "add destination" || property == "add dest") {
+    } else if (property == "dest" || property == "destination" || property == "add destination" ||
+               property == "add dest") {
         addDestinationTarget(val);
     } else if (property == "endpoint" || property == "add endpoint") {
         addSourceTarget(val);
