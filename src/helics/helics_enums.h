@@ -69,6 +69,8 @@ typedef enum {
     helics_data_type_time = 8,
     /** raw data type*/
     helics_data_type_raw = 25,
+    /** the data type can change*/
+    helics_data_type_multi = 33,
     /** open type that can be anything*/
     helics_data_type_any = 25262
 } helics_data_type;
@@ -202,6 +204,30 @@ typedef enum {
     helics_property_int_console_log_level = 274
 } helics_properties;
 
+/** enumeration of the multi_input operations*/
+typedef enum {
+    /** time and priority order the inputs from the core library*/
+    helics_multi_input_no_op = 0,
+    /** vectorize the inputs either double vector or string vector*/
+    helics_multi_input_vectorize_operation = 1,
+    /** all inputs are assumed to be boolean and all must be true to return true*/
+    helics_multi_input_and_operation = 2,
+    /** all inputs are assumed to be boolean and at least one must be true to return true*/
+    helics_multi_input_or_operation = 3,
+    /** sum all the inputs*/
+    helics_multi_input_sum_operation = 4,
+    /** do a difference operation on the inputs, first-sum(rest)
+    for double input, vector diff for vector input*/
+    helics_multi_input_diff_operation = 5,
+    /** find the max of the inputs*/
+    helics_multi_input_max_operation = 6,
+    /** find the min of the inputs*/
+    helics_multi_input_min_operation = 7,
+    /** take the average of the inputs*/
+    helics_multi_input_average_operation = 8
+
+} helics_multi_input_mode;
+
 /** enumeration of options that apply to handles*/
 typedef enum {
     /** specify that a connection is required for an interface and will generate an error if not
@@ -214,18 +240,26 @@ typedef enum {
     helics_handle_option_single_connection_only = 407,
     /** specify that multiple connections are allowed for an interface*/
     helics_handle_option_multiple_connections_allowed = 409,
-    /** specify that the last data should be buffered and send on subscriptions after init*/
+    /** specify that the last data should be buffered and sent on subscriptions after init*/
     helics_handle_option_buffer_data = 411,
     /** specify that the types should be checked strictly for pub/sub and filters*/
     helics_handle_option_strict_type_checking = 414,
     /** specify that the mismatching units should be ignored*/
     helics_handle_option_ignore_unit_mismatch = 447,
     /** specify that an interface will only transmit on change(only applicable to publications)*/
-    helics_handle_option_only_transmit_on_change = 6,
+    helics_handle_option_only_transmit_on_change = 452,
     /** specify that an interface will only update if the value has actually changed*/
-    helics_handle_option_only_update_on_change = 8,
+    helics_handle_option_only_update_on_change = 454,
     /** specify that an interface does not participate in determining time interrupts*/
-    helics_handle_option_ignore_interrupts = 475
+    helics_handle_option_ignore_interrupts = 475,
+    /** specify the multi-input processing method for inputs*/
+    helics_handle_option_multi_input_handling_method = 507,
+    /** specify the source index with the highest priority*/
+    helics_handle_option_input_priority_location = 510,
+    /** specify that the priority list should be cleared or question if it is cleared*/
+    helics_handle_option_clear_priority_list = 512,
+    /** specify the required number of connections or get the actual number of connections*/
+    helics_handle_option_connections = 522
 } helics_handle_options;
 
 /** enumeration of the predefined filter types*/

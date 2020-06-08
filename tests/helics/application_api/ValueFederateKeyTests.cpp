@@ -11,6 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/helics_definitions.hpp"
+#include "helics/helics_enums.h"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -19,6 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+#include <fstream>
+#include <streambuf>
 
 /** these test cases test out the value federates
  */
@@ -75,11 +79,11 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // check publications
 
-    auto pk = pubid.getKey();
-    auto pk2 = pubid2.getKey();
+    const auto& pk = pubid.getKey();
+    const auto& pk2 = pubid2.getKey();
     EXPECT_EQ(pk, "fed0/pub1");
     EXPECT_EQ(pk2, "pub2");
-    auto pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");
@@ -291,6 +295,42 @@ TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
     EXPECT_TRUE(res);
 }
 
+#ifdef ENABLE_ZMQ_CORE
+static constexpr const char* config_files[] = {"bes_config.json",
+                                               "bes_config.toml",
+                                               "bes_config2.json",
+                                               "bes_config2.toml"};
+
+class valuefed_flagfile_tests:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {
+};
+
+TEST_P(valuefed_flagfile_tests, configure_test)
+{
+    std::string file = std::string(TEST_DIR) + GetParam();
+    std::ifstream t(file);
+
+    std::string config((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+
+    AddBroker("zmq", 1);
+    helics::ValueFederate V2("", config);
+    V2.enterExecutingMode();
+    auto val = V2.getIntegerProperty(helics::defs::log_level);
+    EXPECT_EQ(val, -1);
+    EXPECT_EQ(V2.getName(), "test_bes");
+    bool result = V2.getFlagOption(helics_flag_only_transmit_on_change);
+    EXPECT_TRUE(result);
+    result = V2.getFlagOption(helics_flag_wait_for_current_time_update);
+    EXPECT_TRUE(result);
+    V2.finalize();
+}
+
+INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+                         valuefed_flagfile_tests,
+                         ::testing::ValuesIn(config_files));
+#endif
+
 TEST_F(valuefed_tests, dual_transfer_coreApp_link)
 {
     SetupTest<helics::ValueFederate>("test", 2);
@@ -380,7 +420,7 @@ TEST_F(valuefed_tests, dual_transfer_broker_link_json_string)
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    broker->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    broker->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
 
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
@@ -512,7 +552,7 @@ TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
 
     auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    core->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    core->makeConnections(R"({"connections":[["pub1", "inp1"]]})");
     core = nullptr;
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
@@ -633,7 +673,8 @@ TEST_P(valuefed_single_type, all_callback)
     EXPECT_EQ(lastTime, 3.0);
 
     int ccnt = 0;
-    vFed1->setInputNotificationCallback([&](const helics::Input&, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback(
+        [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
     vFed1->publishRaw(pubid3, db);
     vFed1->publish(pubid2, 4);

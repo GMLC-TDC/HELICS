@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "NamedInputInfo.hpp"
+#include "InputInfo.hpp"
 
 #include "units/units/units.hpp"
 
@@ -15,53 +15,74 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData()
+const std::vector<std::shared_ptr<const data_block>>& InputInfo::getAllData() const
 {
-    std::vector<std::shared_ptr<const data_block>> out;
-    out.reserve(current_data.size());
-    for (auto& cd : current_data) {
-        out.push_back(cd.data);
-    }
-    return out;
+    return current_data;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData(int index)
+static const std::shared_ptr<const data_block> NullData{nullptr};
+
+const std::shared_ptr<const data_block>& InputInfo::getData(int index) const
 {
     if (isValidIndex(index, current_data)) {
-        return current_data[index].data;
+        return current_data[index];
     }
-    return nullptr;
+    return NullData;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData()
+/** return true if index1 has higher priority than index2*/
+static bool priorityCheck(int32_t index1, int32_t index2, const std::vector<int32_t>& priorities)
 {
-    int ind = 0;
-    int mxind = -1;
-    Time mxTime = Time::minVal();
-    for (auto& cd : current_data) {
-        if (cd.time > mxTime) {
-            mxTime = cd.time;
+    for (auto priority = priorities.rbegin(); priority != priorities.rend(); ++priority) {
+        if (*priority == index1) {
+            return true;
+        }
+        if (*priority == index2) {
+            return false;
+        }
+    }
+    return false;
+}
+
+const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex) const
+{
+    int ind{0};
+    int mxind{-1};
+    Time mxTime{Time::minVal()};
+    for (const auto& cd : current_data_time) {
+        if (cd.first > mxTime) {
+            mxTime = cd.first;
             mxind = ind;
+        } else if (cd.first == mxTime) {
+            if (priorityCheck(ind, mxind, priority_sources)) {
+                mxind = ind;
+            }
         }
         ++ind;
     }
     if (mxind >= 0) {
-        return current_data[mxind].data;
+        if (inputIndex != nullptr) {
+            *inputIndex = mxind;
+        }
+        return current_data[mxind];
     }
-    return nullptr;
+    if (inputIndex != nullptr) {
+        *inputIndex = 0;
+    }
+    return NullData;
 }
 
-static auto recordComparison = [](const NamedInputInfo::dataRecord& rec1,
-                                  const NamedInputInfo::dataRecord& rec2) {
+static auto recordComparison = [](const InputInfo::dataRecord& rec1,
+                                  const InputInfo::dataRecord& rec2) {
     return (rec1.time < rec2.time) ?
         true :
         ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
-void NamedInputInfo::addData(global_handle source_id,
-                             Time valueTime,
-                             unsigned int iteration,
-                             std::shared_ptr<const data_block> data)
+void InputInfo::addData(global_handle source_id,
+                        Time valueTime,
+                        unsigned int iteration,
+                        std::shared_ptr<const data_block> data)
 {
     int index;
     bool found = false;
@@ -89,25 +110,26 @@ void NamedInputInfo::addData(global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource(global_handle newSource,
-                               const std::string& sourceName,
-                               const std::string& stype,
-                               const std::string& sunits)
+void InputInfo::addSource(global_handle newSource,
+                          const std::string& sourceName,
+                          const std::string& stype,
+                          const std::string& sunits)
 {
-    if (input_sources.empty()) {
-        inputType = stype;
-        inputUnits = sunits;
-    }
+    inputUnits.clear();
+    inputType.clear();
     input_sources.push_back(newSource);
     source_info.emplace_back(sourceName, stype, sunits);
     data_queues.resize(input_sources.size());
     current_data.resize(input_sources.size());
+    current_data_time.resize(input_sources.size(), {Time::minVal(), 0});
     deactivated.push_back(Time::maxVal());
     has_target = true;
 }
 
-void NamedInputInfo::removeSource(global_handle sourceToRemove, Time minTime)
+void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
 {
+    inputUnits.clear();
+    inputType.clear();
     for (size_t ii = 0; ii < input_sources.size(); ++ii) {
         if (input_sources[ii] == sourceToRemove) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
@@ -121,10 +143,12 @@ void NamedInputInfo::removeSource(global_handle sourceToRemove, Time minTime)
     }
 }
 
-void NamedInputInfo::removeSource(const std::string& sourceName, Time minTime)
+void InputInfo::removeSource(const std::string& sourceName, Time minTime)
 {
+    inputUnits.clear();
+    inputType.clear();
     for (size_t ii = 0; ii < source_info.size(); ++ii) {
-        if (std::get<0>(source_info[ii]) == sourceName) {
+        if (source_info[ii].key == sourceName) {
             while ((!data_queues[ii].empty()) && (data_queues[ii].back().time > minTime)) {
                 data_queues[ii].pop_back();
             }
@@ -136,26 +160,84 @@ void NamedInputInfo::removeSource(const std::string& sourceName, Time minTime)
     }
 }
 
-void NamedInputInfo::clearFutureData()
+void InputInfo::clearFutureData()
 {
     for (auto& vec : data_queues) {
         vec.clear();
     }
 }
 
-bool NamedInputInfo::updateTimeUpTo(Time newTime)
+const std::string& InputInfo::getInjectionType() const
 {
-    int index = 0;
-    bool updated = false;
+    if (inputType.empty()) {
+        if (!source_info.empty()) {
+            bool allTheSame{true};
+            for (const auto& src : source_info) {
+                if (src.type != source_info.front().type) {
+                    allTheSame = false;
+                    break;
+                }
+            }
+            if (allTheSame) {
+                inputType = source_info.front().type;
+            } else {
+                inputType.push_back('[');
+                for (const auto& src : source_info) {
+                    inputType.push_back('"');
+                    inputType.append(src.type);
+                    inputType.push_back('"');
+                    inputType.push_back(',');
+                }
+                inputType.back() = ']';
+            }
+        }
+    }
+    return inputType;
+}
+
+const std::string& InputInfo::getInjectionUnits() const
+{
+    if (inputUnits.empty()) {
+        if (!source_info.empty()) {
+            bool allTheSame{true};
+            for (const auto& src : source_info) {
+                if (src.units != source_info.front().units) {
+                    allTheSame = false;
+                    break;
+                }
+            }
+            if (allTheSame) {
+                inputUnits = source_info.front().units;
+            } else {
+                inputUnits.push_back('[');
+                for (const auto& src : source_info) {
+                    inputUnits.push_back('"');
+                    inputUnits.append(src.units);
+                    inputUnits.push_back('"');
+                    inputUnits.push_back(',');
+                }
+                inputUnits.back() = ']';
+            }
+        }
+    }
+    return inputUnits;
+}
+
+bool InputInfo::updateTimeUpTo(Time newTime)
+{
+    int index{0};
+    bool updated{false};
     for (auto& data_queue : data_queues) {
         auto currentValue = data_queue.begin();
 
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-            return false;
+            ++index;
+            continue;
         }
         if (currentValue->time > newTime) {
-            return false;
+            ++index;
+            continue;
         }
         auto last = currentValue;
         ++currentValue;
@@ -174,18 +256,20 @@ bool NamedInputInfo::updateTimeUpTo(Time newTime)
     return updated;
 }
 
-bool NamedInputInfo::updateTimeNextIteration(Time newTime)
+bool InputInfo::updateTimeNextIteration(Time newTime)
 {
-    int index = 0;
-    bool updated = false;
+    int index{0};
+    bool updated{false};
     for (auto& data_queue : data_queues) {
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-            return false;
+            ++index;
+            continue;
         }
         if (currentValue->time > newTime) {
-            return false;
+            ++index;
+            continue;
         }
         auto last = currentValue;
         ++currentValue;
@@ -214,7 +298,7 @@ bool NamedInputInfo::updateTimeNextIteration(Time newTime)
     return updated;
 }
 
-bool NamedInputInfo::updateTimeInclusive(Time newTime)
+bool InputInfo::updateTimeInclusive(Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -222,10 +306,12 @@ bool NamedInputInfo::updateTimeInclusive(Time newTime)
         auto currentValue = data_queue.begin();
         auto it_final = data_queue.end();
         if (currentValue == it_final) {
-            return false;
+            ++index;
+            continue;
         }
         if (currentValue->time > newTime) {
-            return false;
+            ++index;
+            continue;
         }
         auto last = currentValue;
         ++currentValue;
@@ -244,25 +330,27 @@ bool NamedInputInfo::updateTimeInclusive(Time newTime)
     return updated;
 }
 
-bool NamedInputInfo::updateData(dataRecord&& update, int index)
+bool InputInfo::updateData(dataRecord&& update, int index)
 {
-    if (!only_update_on_change || !current_data[index].data) {
-        current_data[index] = std::move(update);
+    if (!only_update_on_change || !current_data[index]) {
+        current_data[index] = std::move(update.data);
+        current_data_time[index] = {update.time, update.iteration};
         return true;
     }
 
-    if (*current_data[index].data != *(update.data)) {
-        current_data[index] = std::move(update);
+    if (*current_data[index] != *(update.data)) {
+        current_data[index] = std::move(update.data);
+        current_data_time[index] = {update.time, update.iteration};
         return true;
     }
-    if (current_data[index].time ==
-        update.time) {  // this is for bookkeeping purposes should still return false
-        current_data[index].iteration = update.iteration;
+    if (current_data_time[index].first == update.time) {
+        // this is for bookkeeping purposes should still return false
+        current_data_time[index].second = update.iteration;
     }
     return false;
 }
 
-Time NamedInputInfo::nextValueTime() const
+Time InputInfo::nextValueTime() const
 {
     Time nvtime = Time::maxVal();
     if (not_interruptible) {

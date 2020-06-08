@@ -157,7 +157,10 @@ class ActionMessage {
     void setExtraData(int32_t data) { dest_handle = interface_handle{data}; }
     /** get the extra piece of integer data*/
     int32_t getExtraData() const { return dest_handle.baseValue(); }
-
+    /** set some extra piece of data if the full source is not used*/
+    void setExtraDestData(int32_t data) { source_handle = interface_handle{data}; }
+    /** get the extra piece of integer data used in the destination*/
+    int32_t getExtraDestData() const { return source_handle.baseValue(); }
     // functions that convert to and from a byte stream
 
     /** generate a size of the message in bytes if it were to be serialized*/
