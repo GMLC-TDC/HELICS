@@ -1,3 +1,2 @@
-#unusedFunction:units/x12_conv.cpp:1024
-#unusedFunction:units/r20_conv.cpp:2738
-#unusedFunction:units/x12_conv.cpp:1009
+syntaxError:src/helics/application_api/helicsTypes.hpp:275
+syntaxError:usrc/helics/network/ipc/IpcBlockingPriorityQueueImpl.cpp:383
