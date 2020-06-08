@@ -124,6 +124,8 @@ helics_data_type_time = _helics.helics_data_type_time
 r""" time data type"""
 helics_data_type_raw = _helics.helics_data_type_raw
 r""" raw data type"""
+helics_data_type_multi = _helics.helics_data_type_multi
+r""" the data type can change"""
 helics_data_type_any = _helics.helics_data_type_any
 r""" open type that can be anything"""
 helics_flag_observer = _helics.helics_flag_observer
@@ -261,6 +263,27 @@ r"""
     integer property controlling the log level for file logging in a federate see
           helics_log_levels
     """
+helics_multi_input_no_op = _helics.helics_multi_input_no_op
+r""" time and priority order the inputs from the core library"""
+helics_multi_input_vectorize_operation = _helics.helics_multi_input_vectorize_operation
+r""" vectorize the inputs either double vector or string vector"""
+helics_multi_input_and_operation = _helics.helics_multi_input_and_operation
+r""" all inputs are assumed to be boolean and all must be true to return true"""
+helics_multi_input_or_operation = _helics.helics_multi_input_or_operation
+r""" all inputs are assumed to be boolean and at least one must be true to return true"""
+helics_multi_input_sum_operation = _helics.helics_multi_input_sum_operation
+r""" sum all the inputs"""
+helics_multi_input_diff_operation = _helics.helics_multi_input_diff_operation
+r"""
+    do a difference operation on the inputs, first-sum(rest)
+       for double input, vector diff for vector input
+    """
+helics_multi_input_max_operation = _helics.helics_multi_input_max_operation
+r""" find the max of the inputs"""
+helics_multi_input_min_operation = _helics.helics_multi_input_min_operation
+r""" find the min of the inputs"""
+helics_multi_input_average_operation = _helics.helics_multi_input_average_operation
+r""" take the average of the inputs"""
 helics_handle_option_connection_required = _helics.helics_handle_option_connection_required
 r"""
     specify that a connection is required for an interface and will generate an error if not
@@ -276,7 +299,7 @@ r""" specify that only a single connection is allowed for an interface"""
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 r""" specify that multiple connections are allowed for an interface"""
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
-r""" specify that the last data should be buffered and send on subscriptions after init"""
+r""" specify that the last data should be buffered and sent on subscriptions after init"""
 helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
 r""" specify that the types should be checked strictly for pub/sub and filters"""
 helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
@@ -287,6 +310,14 @@ helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_u
 r""" specify that an interface will only update if the value has actually changed"""
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
 r""" specify that an interface does not participate in determining time interrupts"""
+helics_handle_option_multi_input_handling_method = _helics.helics_handle_option_multi_input_handling_method
+r""" specify the multi-input processing method for inputs"""
+helics_handle_option_input_priority_location = _helics.helics_handle_option_input_priority_location
+r""" specify the source index with the highest priority"""
+helics_handle_option_clear_priority_list = _helics.helics_handle_option_clear_priority_list
+r""" specify that the priority list should be cleared or question if it is cleared"""
+helics_handle_option_connections = _helics.helics_handle_option_connections
+r""" specify the required number of connections or get the actual number of connections"""
 helics_filter_type_custom = _helics.helics_filter_type_custom
 r""" a custom filter type that executes a user defined callback"""
 helics_filter_type_delay = _helics.helics_filter_type_delay
@@ -1063,6 +1094,16 @@ def helicsGetPropertyIndex(val: "char const *") -> "int":
     """
     return _helics.helicsGetPropertyIndex(val)
 
+def helicsGetFlagIndex(val: "char const *") -> "int":
+    r"""
+    Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,
+    :type val: string
+    :param val: A string with the option name.
+    :rtype: int
+    :return: An int with the property code or (-1) if not a valid property.
+    """
+    return _helics.helicsGetFlagIndex(val)
+
 def helicsGetOptionIndex(val: "char const *") -> "int":
     r"""
     Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
@@ -1075,6 +1116,19 @@ def helicsGetOptionIndex(val: "char const *") -> "int":
     :return: An int with the option index or (-1) if not a valid property.
     """
     return _helics.helicsGetOptionIndex(val)
+
+def helicsGetOptionValue(val: "char const *") -> "int":
+    r"""
+    Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
+    /ref helicsFilterSetOption.
+
+    :type val: string
+    :param val: A string representing the value.
+
+    :rtype: int
+    :return: An int with the option value or (-1) if not a valid value.
+    """
+    return _helics.helicsGetOptionValue(val)
 
 def helicsFederateInfoSetFlagOption(fi: "helics_federate_info", flag: "int", value: "helics_bool") -> "void":
     r"""
@@ -2153,19 +2207,37 @@ def helicsFederateGetSubscription(fed: "helics_federate", key: "char const *") -
     return _helics.helicsFederateGetSubscription(fed, key)
 
 def helicsFederateClearUpdates(fed: "helics_federate") -> "void":
-    r"""Clear all the update flags from a federates inputs."""
+    r"""
+    Clear all the update flags from a federates inputs.
+
+    :type fed: void
+    :param fed: The value federate object for which to clear update flags.
+    """
     return _helics.helicsFederateClearUpdates(fed)
 
 def helicsFederateRegisterFromPublicationJSON(fed: "helics_federate", json: "char const *") -> "void":
     r"""
     Register the publications via JSON publication string.
 
+    :type fed: void
+    :param fed: The value federate object to use to register the publications.
+    :type json: string
+    :param json: The JSON publication string.
+
+
     This would be the same JSON that would be used to publish data.
     """
     return _helics.helicsFederateRegisterFromPublicationJSON(fed, json)
 
 def helicsFederatePublishJSON(fed: "helics_federate", json: "char const *") -> "void":
-    r"""Publish data contained in a json file or string."""
+    r"""
+    Publish data contained in a JSON file or string.
+
+    :type fed: void
+    :param fed: The value federate object through which to publish the data.
+    :type json: string
+    :param json: The publication file name or literal JSON data string.
+    """
     return _helics.helicsFederatePublishJSON(fed, json)
 
 def helicsPublicationIsValid(pub: "helics_publication") -> "helics_bool":
@@ -2788,9 +2860,9 @@ def helicsPublicationSetInfo(pub: "helics_publication", info: "char const *") ->
     """
     return _helics.helicsPublicationSetInfo(pub, info)
 
-def helicsInputGetOption(inp: "helics_input", option: "int") -> "helics_bool":
+def helicsInputGetOption(inp: "helics_input", option: "int") -> "int":
     r"""
-    Get the data in the info field of an input.
+    Get the current value of an input handle option
 
     :type inp: void
     :param inp: The input to query.
@@ -2798,13 +2870,13 @@ def helicsInputGetOption(inp: "helics_input", option: "int") -> "helics_bool":
     :param option: Integer representation of the option in question see /ref helics_handle_options.
 
     :rtype: int
-    :return: A string with the info field string.
+    :return: An integer value with the current value of the given option.
     """
     return _helics.helicsInputGetOption(inp, option)
 
-def helicsInputSetOption(inp: "helics_input", option: "int", value: "helics_bool") -> "void":
+def helicsInputSetOption(inp: "helics_input", option: "int", value: "int") -> "void":
     r"""
-    Set the data in the info field for an input.
+    Set an option on an input
 
     :type inp: void
     :param inp: The input to query.
@@ -2815,9 +2887,9 @@ def helicsInputSetOption(inp: "helics_input", option: "int", value: "helics_bool
     """
     return _helics.helicsInputSetOption(inp, option, value)
 
-def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "helics_bool":
+def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "int":
     r"""
-    Get the data in the info field of a publication.
+    Get the value of an option for a publication
 
     :type pub: void
     :param pub: The publication to query.
@@ -2829,9 +2901,9 @@ def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "hel
     """
     return _helics.helicsPublicationGetOption(pub, option)
 
-def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "helics_bool") -> "void":
+def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "int") -> "void":
     r"""
-    Set the data in the info field for a publication.
+    Set the value of an option for a publication
 
     :type pub: void
     :param pub: The publication to query.
@@ -3135,7 +3207,8 @@ def helicsEndpointCreateMessage(endpoint: "helics_endpoint") -> "helics_message"
 
     The message is empty and isValid will return false since there is no data associated with the message yet.
 
-    :param fed: the endpoint object to associate the message with
+    :type endpoint: void
+    :param endpoint: The endpoint object to associate the message with.
 
 
     :rtype: void
@@ -3241,7 +3314,7 @@ def helicsEndpointSetInfo(end: "helics_endpoint", info: "char const *") -> "void
     """
     return _helics.helicsEndpointSetInfo(end, info)
 
-def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "helics_bool") -> "void":
+def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "int") -> "void":
     r"""
     Set a handle option on an endpoint.
 
@@ -3254,7 +3327,7 @@ def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "helic
     """
     return _helics.helicsEndpointSetOption(end, option, value)
 
-def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "helics_bool":
+def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "int":
     r"""
     Set a handle option on an endpoint.
 
@@ -3262,6 +3335,8 @@ def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "helics_bo
     :param end: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
+    :rtype: int
+    :return: the value of the option, for boolean options will be 0 or 1
     """
     return _helics.helicsEndpointGetOption(end, option)
 
@@ -3860,7 +3935,7 @@ def helicsFilterSetInfo(filt: "helics_filter", info: "char const *") -> "void":
     """
     return _helics.helicsFilterSetInfo(filt, info)
 
-def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "helics_bool") -> "void":
+def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "int") -> "void":
     r"""
     Set the data in the info field for a filter.
 
@@ -3869,11 +3944,11 @@ def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "helics_b
     :type option: int
     :param option: The option to set /ref helics_handle_options.
     :type value: int
-    :param value: The value of the option (helics_true or helics_false).
+    :param value: The value of the option commonly 0 for false 1 for true.
     """
     return _helics.helicsFilterSetOption(filt, option, value)
 
-def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "helics_bool":
+def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "int":
     r"""
     Get a handle option for the filter.
 
