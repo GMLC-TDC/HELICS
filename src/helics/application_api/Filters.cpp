@@ -240,7 +240,7 @@ void Filter::removeTarget(const std::string& sourceName)
     corePtr->removeTarget(handle, sourceName);
 }
 
-void Filter::setOption(int32_t option, bool value)
+void Filter::setOption(int32_t option, int32_t value)
 {
     corePtr->setHandleOption(handle, option, value);
 }
@@ -253,7 +253,7 @@ void Filter::close()
 }
 
 /** get the current value of a flag for the handle*/
-bool Filter::getOption(int32_t option) const
+int32_t Filter::getOption(int32_t option) const
 {
     return corePtr->getHandleOption(handle, option);
 }
@@ -267,17 +267,14 @@ void CloningFilter::setString(const std::string& property, const std::string& va
 {
     if ((property == "source") || (property == "add source")) {
         addSourceTarget(val);
-    } else if ((property == "dest") || (property == "destination") ||
-               (property == "add destination") || (property == "add dest")) {
+    } else if (property == "dest" || property == "destination" || property == "add destination" ||
+               property == "add dest") {
         addDestinationTarget(val);
-    } else if ((property == "endpoint") || (property == "add endpoint")) {
+    } else if (property == "endpoint" || property == "add endpoint") {
         addSourceTarget(val);
         addDestinationTarget(val);
-    } else if ((property == "remove destination") || (property == "remove dest")) {
-        removeTarget(val);
-    } else if (property == "remove source") {
-        removeTarget(val);
-    } else if (property == "remove endpoint") {
+    } else if (property == "remove destination" || property == "remove dest" ||
+               property == "remove source" || property == "remove endpoint") {
         removeTarget(val);
     } else {
         Filter::setString(property, val);

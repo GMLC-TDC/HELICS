@@ -45,13 +45,13 @@ class BenchmarkFederate {
      */
     void setIndex(int i) { index = i; }
     /** gets the index parameter*/
-    int getIndex() const { return index; }
+    [[nodiscard]] int getIndex() const { return index; }
     /** sets the max index parameter
      * @param i the max index
      */
     void setMaxIndex(int i) { maxIndex = i; }
     /** gets the max index parameter*/
-    int getMaxIndex() const { return maxIndex; }
+    [[nodiscard]] int getMaxIndex() const { return maxIndex; }
 
     // functions for setting callbacks
     /** sets a callback function to call immediately after doMainLoop() returns, but before

@@ -120,7 +120,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_option("--federates,-f,--minfederates,--minfed,-m",
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
-    hApp->add_option("--name,-n,--identifier", identifier, "the name of the broker/core");
+    hApp->add_option("--name,-n,--identifier,--uuid", identifier, "the name of the broker/core");
     hApp->add_option("--maxiter,--maxiterations",
                      maxIterationCount,
                      "the maximum number of iterations allowed")
@@ -246,6 +246,12 @@ void BrokerBase::configureBase()
         }
     }
 
+    if (identifier.size() == 36) {
+        if (identifier[8] == '-' && identifier[12] == '-' && identifier[16] == '-' &&
+            identifier[20] == '-') {
+            uuid_like = true;
+        }
+    }
     timeCoord = std::make_unique<ForwardingTimeCoordinator>();
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
     timeCoord->restrictive_time_policy = restrictive_time_policy;
@@ -287,6 +293,7 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
 void BrokerBase::generateNewIdentifier()
 {
     identifier = genId();
+    uuid_like = false;
 }
 
 void BrokerBase::setErrorState(int eCode, const std::string& estring)

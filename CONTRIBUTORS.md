@@ -24,6 +24,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Philip Top](https://github.com/phlptp)
 - [Denis Nadeau](https://github.com/dnadeau4)
 - [Ben Salazar](https://github.com/salazar33)
+- [Brian Kelley](https://github.com/bmkelley)
 
 ### National Renewable Energy Lab
 
