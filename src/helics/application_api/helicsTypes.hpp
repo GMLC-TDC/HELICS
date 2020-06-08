@@ -271,7 +271,7 @@ inline constexpr const char* typeNameString<NamedPoint>()
     return typestrings::npstr;
 }
 
-/** the base types for  helics*/
+/** the base data types for helics*/
 enum class data_type : int {
     helics_string = helics_data_type_string,
     helics_double = helics_data_type_double,
