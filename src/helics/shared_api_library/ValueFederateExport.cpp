@@ -1110,8 +1110,7 @@ const char* helicsInputGetType(helics_input inp)
     }
 
     try {
-        const std::string& type = inpObj->inputPtr->getType();
-        return type.c_str();
+        return inpObj->inputPtr->getType().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1128,8 +1127,7 @@ const char* helicsInputGetPublicationType(helics_input ipt)
     }
 
     try {
-        const std::string& type = inpObj->inputPtr->getPublicationType();
-        return type.c_str();
+        return inpObj->inputPtr->getPublicationType().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1146,8 +1144,7 @@ const char* helicsPublicationGetType(helics_publication pub)
     }
 
     try {
-        const std::string& type = pubObj->pubPtr->getType();
-        return type.c_str();
+        return pubObj->pubPtr->getType().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1164,8 +1161,7 @@ const char* helicsInputGetKey(helics_input inp)
     }
 
     try {
-        const std::string& key = inpObj->inputPtr->getKey();
-        return key.c_str();
+        return inpObj->inputPtr->getKey().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1182,8 +1178,7 @@ const char* helicsSubscriptionGetKey(helics_input sub)
     }
 
     try {
-        const std::string& key = inpObj->fedptr->getTarget(*(inpObj->inputPtr));
-        return key.c_str();
+        return inpObj->fedptr->getTarget(*(inpObj->inputPtr)).c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1199,8 +1194,7 @@ const char* helicsPublicationGetKey(helics_publication pub)
         return emptyStr.c_str();
     }
     try {
-        const std::string& key = pubObj->pubPtr->getKey();
-        return key.c_str();
+        return pubObj->pubPtr->getKey().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1216,8 +1210,7 @@ const char* helicsInputGetInjectionUnits(helics_input ipt)
         return emptyStr.c_str();
     }
     try {
-        const std::string& units = inpObj->inputPtr->getInjectionUnits();
-        return units.c_str();
+        return inpObj->inputPtr->getInjectionUnits().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1233,8 +1226,7 @@ const char* helicsInputGetExtractionUnits(helics_input ipt)
         return emptyStr.c_str();
     }
     try {
-        const std::string& units = inpObj->inputPtr->getUnits();
-        return units.c_str();
+        return inpObj->inputPtr->getUnits().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1254,8 +1246,7 @@ const char* helicsPublicationGetUnits(helics_publication pub)
     if (pubObj == nullptr) {
         return emptyStr.c_str();
     }
-    const std::string& units = pubObj->pubPtr->getUnits();
-    return units.c_str();
+    return pubObj->pubPtr->getUnits().c_str();
 }
 
 const char* helicsInputGetInfo(helics_input inp)
@@ -1265,8 +1256,7 @@ const char* helicsInputGetInfo(helics_input inp)
         return emptyStr.c_str();
     }
     try {
-        const std::string& info = inpObj->inputPtr->getInfo();
-        return info.c_str();
+        return inpObj->inputPtr->getInfo().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1297,8 +1287,7 @@ const char* helicsPublicationGetInfo(helics_publication pub)
         return emptyStr.c_str();
     }
     try {
-        const std::string& info = pubObj->pubPtr->getInfo();
-        return info.c_str();
+        return pubObj->pubPtr->getInfo().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
