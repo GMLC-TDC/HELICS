@@ -412,15 +412,15 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
     }
     data_type type = data_type::helics_multi;
     switch (inputVectorOp) {
-        case multi_input_mode::and_operation:
-        case multi_input_mode::or_operation:
+        case multi_input_handling_method::and_operation:
+        case multi_input_handling_method::or_operation:
             type = data_type::helics_bool;
             break;
-        case multi_input_mode::sum_operation:
-        case multi_input_mode::average_operation:
+        case multi_input_handling_method::sum_operation:
+        case multi_input_handling_method::average_operation:
             type = data_type::helics_vector;
             break;
-        case multi_input_mode::vectorize_operation:
+        case multi_input_handling_method::vectorize_operation:
             switch (targetType) {
                 case data_type::helics_string:
                     type = targetType;
@@ -445,13 +445,13 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
     }
     defV result;
     switch (inputVectorOp) {
-        case multi_input_mode::max_operation:
+        case multi_input_handling_method::max_operation:
             result = maxOperation(res);
             break;
-        case multi_input_mode::min_operation:
+        case multi_input_handling_method::min_operation:
             result = minOperation(res);
             break;
-        case multi_input_mode::and_operation:
+        case multi_input_handling_method::and_operation:
             result = std::all_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
@@ -462,7 +462,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
                 "1" :
                 "0";
             break;
-        case multi_input_mode::or_operation:
+        case multi_input_handling_method::or_operation:
             result = std::any_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
@@ -473,20 +473,20 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
                 "1" :
                 "0";
             break;
-        case multi_input_mode::sum_operation:
+        case multi_input_handling_method::sum_operation:
             result = vectorSum(res);
             break;
-        case multi_input_mode::average_operation:
+        case multi_input_handling_method::average_operation:
             result = vectorAvg(res);
             break;
-        case multi_input_mode::diff_operation:
+        case multi_input_handling_method::diff_operation:
             if (type == data_type::helics_vector) {
                 result = vectorDiff(res);
             } else {
                 result = diffOperation(res);
             }
             break;
-        case multi_input_mode::vectorize_operation:
+        case multi_input_handling_method::vectorize_operation:
             result = vectorizeOperation(res);
             break;
         default:
@@ -544,7 +544,7 @@ bool Input::checkUpdate(bool assumeUpdate)
 void Input::setOption(int32_t option, int32_t value)
 {
     if (option == helics_handle_option_multi_input_handling_method) {
-        inputVectorOp = static_cast<multi_input_mode>(value);
+        inputVectorOp = static_cast<multi_input_handling_method>(value);
     } else {
         fed->setInterfaceOption(handle, option, value);
     }

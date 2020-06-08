@@ -21,16 +21,16 @@ class precise_unit;
 
 namespace helics {
 
-enum multi_input_mode : uint16_t {
-    no_op = 0,
-    and_operation = 1,
-    or_operation = 2,
-    sum_operation = 3,
-    diff_operation = 4,
-    max_operation = 5,
-    min_operation = 6,
-    average_operation = 7,
-    vectorize_operation = 8
+enum multi_input_handling_method : uint16_t {
+    no_op = helics_multi_input_no_op,
+    vectorize_operation = helics_multi_input_vectorize_operation,
+    and_operation = helics_multi_input_and_operation,
+    or_operation = helics_multi_input_or_operation,
+    sum_operation = helics_multi_input_sum_operation,
+    diff_operation = helics_multi_input_diff_operation,
+    max_operation = helics_multi_input_max_operation,
+    min_operation = helics_multi_input_min_operation,
+    average_operation = helics_multi_input_average_operation
 };
 
 /** base class for a input object*/
@@ -50,8 +50,8 @@ class HELICS_CXX_EXPORT Input {
     bool disableAssign{false};  //!< disable assignment for the object
     bool useThreshold{false};  //!< flag to indicate use a threshold for binary output
     bool multiUnits{false};  //!< flag indicating there are multiple Input Units
-    multi_input_mode inputVectorOp{
-        multi_input_mode::no_op};  //!< the vector processing method to use
+    multi_input_handling_method inputVectorOp{
+        multi_input_handling_method::no_op};  //!< the vector processing method to use
     int32_t prevInputCount{0};  //!< the previous number of inputs
     size_t customTypeHash{0U};  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
@@ -435,7 +435,7 @@ class HELICS_CXX_EXPORT Input {
     /** get the HELICS data type for the publication*/
     data_type getHelicsInjectionType() const { return injectionType; }
 
-    multi_input_mode getMultiInputMode() const { return inputVectorOp; }
+    multi_input_handling_method getMultiInputMode() const { return inputVectorOp; }
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);
 
@@ -447,7 +447,8 @@ class HELICS_CXX_EXPORT Input {
     /** check if updates from the federate are allowed*/
     bool allowDirectFederateUpdate() const
     {
-        return hasUpdate && !changeDetectionEnabled && inputVectorOp == no_op;
+        return hasUpdate && !changeDetectionEnabled &&
+            inputVectorOp == multi_input_handling_method::no_op;
     }
     friend class ValueFederateManager;
 };
