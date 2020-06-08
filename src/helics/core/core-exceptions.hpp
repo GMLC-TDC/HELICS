@@ -28,7 +28,8 @@ class HelicsException: public std::exception {
 /** exception class indicating that a function has failed for some reason*/
 class FunctionExecutionFailure: public HelicsException {
   public:
-    explicit FunctionExecutionFailure(const std::string& message = "HELICS execution failure") noexcept:
+    explicit FunctionExecutionFailure(
+        const std::string& message = "HELICS execution failure") noexcept:
         HelicsException(message)
     {
     }
