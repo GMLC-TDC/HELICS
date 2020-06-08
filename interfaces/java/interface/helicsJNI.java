@@ -34,6 +34,7 @@ public class helicsJNI {
   public final static native int helics_data_type_boolean_get();
   public final static native int helics_data_type_time_get();
   public final static native int helics_data_type_raw_get();
+  public final static native int helics_data_type_multi_get();
   public final static native int helics_data_type_any_get();
   public final static native int helics_flag_observer_get();
   public final static native int helics_flag_uninterruptible_get();
@@ -88,6 +89,15 @@ public class helicsJNI {
   public final static native int helics_property_int_log_level_get();
   public final static native int helics_property_int_file_log_level_get();
   public final static native int helics_property_int_console_log_level_get();
+  public final static native int helics_multi_input_no_op_get();
+  public final static native int helics_multi_input_vectorize_operation_get();
+  public final static native int helics_multi_input_and_operation_get();
+  public final static native int helics_multi_input_or_operation_get();
+  public final static native int helics_multi_input_sum_operation_get();
+  public final static native int helics_multi_input_diff_operation_get();
+  public final static native int helics_multi_input_max_operation_get();
+  public final static native int helics_multi_input_min_operation_get();
+  public final static native int helics_multi_input_average_operation_get();
   public final static native int helics_handle_option_connection_required_get();
   public final static native int helics_handle_option_connection_optional_get();
   public final static native int helics_handle_option_single_connection_only_get();
@@ -98,6 +108,10 @@ public class helicsJNI {
   public final static native int helics_handle_option_only_transmit_on_change_get();
   public final static native int helics_handle_option_only_update_on_change_get();
   public final static native int helics_handle_option_ignore_interrupts_get();
+  public final static native int helics_handle_option_multi_input_handling_method_get();
+  public final static native int helics_handle_option_input_priority_location_get();
+  public final static native int helics_handle_option_clear_priority_list_get();
+  public final static native int helics_handle_option_connections_get();
   public final static native int helics_filter_type_custom_get();
   public final static native int helics_filter_type_delay_get();
   public final static native int helics_filter_type_random_delay_get();
@@ -178,7 +192,9 @@ public class helicsJNI {
   public final static native void helicsFederateInfoSetBrokerPort(long jarg1, int jarg2);
   public final static native void helicsFederateInfoSetLocalPort(long jarg1, String jarg2);
   public final static native int helicsGetPropertyIndex(String jarg1);
+  public final static native int helicsGetFlagIndex(String jarg1);
   public final static native int helicsGetOptionIndex(String jarg1);
+  public final static native int helicsGetOptionValue(String jarg1);
   public final static native void helicsFederateInfoSetFlagOption(long jarg1, int jarg2, int jarg3);
   public final static native void helicsFederateInfoSetSeparator(long jarg1, char jarg2);
   public final static native void helicsFederateInfoSetTimeProperty(long jarg1, int jarg2, double jarg3);

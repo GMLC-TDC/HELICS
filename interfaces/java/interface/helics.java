@@ -737,6 +737,15 @@ public class helics {
   }
 
   /**
+   * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,<br>
+   * @param val A string with the option name.<br>
+   * @return An int with the property code or (-1) if not a valid property.
+   */
+  public static int helicsGetFlagIndex(String val) {
+    return helicsJNI.helicsGetFlagIndex(val);
+  }
+
+  /**
    * Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,<br>
    * /ref helicsFilterSetOption, and the corresponding get functions.<br>
    * <br>
@@ -746,6 +755,18 @@ public class helics {
    */
   public static int helicsGetOptionIndex(String val) {
     return helicsJNI.helicsGetOptionIndex(val);
+  }
+
+  /**
+   * Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,<br>
+   * /ref helicsFilterSetOption.<br>
+   * <br>
+   * @param val A string representing the value.<br>
+   * <br>
+   * @return An int with the option value or (-1) if not a valid value.
+   */
+  public static int helicsGetOptionValue(String val) {
+    return helicsJNI.helicsGetOptionValue(val);
   }
 
   /**
@@ -1738,7 +1759,9 @@ public class helics {
   }
 
   /**
-   * Clear all the update flags from a federates inputs.
+   * Clear all the update flags from a federates inputs.<br>
+   * <br>
+   * @param fed The value federate object for which to clear update flags.
    */
   public static void helicsFederateClearUpdates(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateClearUpdates(SWIGTYPE_p_void.getCPtr(fed));
@@ -1747,6 +1770,10 @@ public class helics {
   /**
    * Register the publications via JSON publication string.<br>
    * <br>
+   * @param fed The value federate object to use to register the publications.<br>
+   * @param json The JSON publication string.<br>
+   * <br>
+   * <br>
    * This would be the same JSON that would be used to publish data.
    */
   public static void helicsFederateRegisterFromPublicationJSON(SWIGTYPE_p_void fed, String json) {
@@ -1754,7 +1781,10 @@ public class helics {
   }
 
   /**
-   * Publish data contained in a json file or string.
+   * Publish data contained in a JSON file or string.<br>
+   * <br>
+   * @param fed The value federate object through which to publish the data.<br>
+   * @param json The publication file name or literal JSON data string.
    */
   public static void helicsFederatePublishJSON(SWIGTYPE_p_void fed, String json) {
     helicsJNI.helicsFederatePublishJSON(SWIGTYPE_p_void.getCPtr(fed), json);
@@ -2330,19 +2360,19 @@ public class helics {
   }
 
   /**
-   * Get the data in the info field of an input.<br>
+   * Get the current value of an input handle option<br>
    * <br>
    * @param inp The input to query.<br>
    * @param option Integer representation of the option in question see /ref helics_handle_options.<br>
    * <br>
-   * @return A string with the info field string.
+   * @return An integer value with the current value of the given option.
    */
   public static int helicsInputGetOption(SWIGTYPE_p_void inp, int option) {
     return helicsJNI.helicsInputGetOption(SWIGTYPE_p_void.getCPtr(inp), option);
   }
 
   /**
-   * Set the data in the info field for an input.<br>
+   * Set an option on an input<br>
    * <br>
    * @param inp The input to query.<br>
    * @param option The option to set for the input /ref helics_handle_options.<br>
@@ -2353,7 +2383,7 @@ public class helics {
   }
 
   /**
-   * Get the data in the info field of a publication.<br>
+   * Get the value of an option for a publication<br>
    * <br>
    * @param pub The publication to query.<br>
    * @param option The value to query see /ref helics_handle_options.<br>
@@ -2365,7 +2395,7 @@ public class helics {
   }
 
   /**
-   * Set the data in the info field for a publication.<br>
+   * Set the value of an option for a publication<br>
    * <br>
    * @param pub The publication to query.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
@@ -2654,7 +2684,7 @@ public class helics {
    * <br>
    * The message is empty and isValid will return false since there is no data associated with the message yet.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint object to associate the message with.<br>
    * <br>
    * <br>
    * @return A new helics_message.
@@ -2773,7 +2803,8 @@ public class helics {
    * Set a handle option on an endpoint.<br>
    * <br>
    * @param end The endpoint to modify.<br>
-   * @param option Integer code for the option to set /ref helics_handle_options.
+   * @param option Integer code for the option to set /ref helics_handle_options.<br>
+   * @return the value of the option, for boolean options will be 0 or 1
    */
   public static int helicsEndpointGetOption(SWIGTYPE_p_void end, int option) {
     return helicsJNI.helicsEndpointGetOption(SWIGTYPE_p_void.getCPtr(end), option);
@@ -3329,7 +3360,7 @@ public class helics {
    * <br>
    * @param filt The given filter.<br>
    * @param option The option to set /ref helics_handle_options.<br>
-   * @param value The value of the option (helics_true or helics_false).
+   * @param value The value of the option commonly 0 for false 1 for true.
    */
   public static void helicsFilterSetOption(SWIGTYPE_p_void filt, int option, int value) {
     helicsJNI.helicsFilterSetOption(SWIGTYPE_p_void.getCPtr(filt), option, value);
