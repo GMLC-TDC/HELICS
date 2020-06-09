@@ -223,12 +223,12 @@ class HELICS_CXX_EXPORT Publication {
     /** send a value for publication
     @param val the value to publish*/
     void publish(double val);
-    void publish(std::string_view val);
+    
     void publish(const std::vector<double>& val);
     void publish(const std::vector<std::complex<double>>& val);
     void publish(const double* vals, int size);
     void publish(std::complex<double> val);
-    void publish(const defV& val);
+    
     void publish(bool val);
     void publish(Time val);
     void publish(char val);
@@ -242,9 +242,26 @@ class HELICS_CXX_EXPORT Publication {
     void publish(double val, const std::string& units);
     void publish(double val, const units::precise_unit& units);
 
+    /** publish stringLike values */
+    template<class X>
+    std::enable_if_t<(std::is_constructible_v<std::string_view,X>),
+                     void>
+        publish(const X& val)
+    {
+        publishString(val);
+    }
+
+    /** publish stringLike values */
+    template<class X>
+    std::enable_if_t<(std::is_same_v<defV, remove_cv_ref<X>>), void>
+        publish(const X& val)
+    {
+        publishDefV(val);
+    }
+
     /** publish integral values */
     template<class X>
-    std::enable_if_t<(std::is_integral<X>::value && !std::is_same<remove_cv_ref<X>, char>::value),
+    std::enable_if_t<(std::is_integral_v<X> && !std::is_same_v<remove_cv_ref<X>, char>),
                      void>
         publish(X val)
     {
@@ -254,8 +271,8 @@ class HELICS_CXX_EXPORT Publication {
     /** publish anything not previously covered*/
     template<class X>
     std::enable_if_t<((typeCategory<X>::value == nonConvertibleType) &&
-                      (!std::is_convertible<X, std::string>::value) &&
-                      (!std::is_same<X, defV>::value) && (!std::is_convertible<X, Time>::value)),
+                      (!std::is_constructible_v<std::string_view,X>) &&
+                      (!std::is_same_v<X, defV>) && (!std::is_convertible_v<X, Time>)),
                      void>
         publish(const X& val)
     {
@@ -288,74 +305,10 @@ class HELICS_CXX_EXPORT Publication {
     all Int types and without this it would be recursive
     */
     void publishInt(int64_t val);
+    void publishString(std::string_view val);
+    void publishDefV(const defV& val);
     friend class ValueFederateManager;
 };
-
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template<class X>
-typename std::enable_if_t<helicsType<X>() != data_type::helics_custom, std::unique_ptr<Publication>>
-    make_publication(ValueFederate* valueFed,
-                     const std::string& key,
-                     const std::string& units = std::string())
-{
-    return std::make_unique<Publication>(valueFed, helicsType<X>(), key, units);
-}
-
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template<class X, class FedPtr>
-typename std::enable_if_t<helicsType<X>() != data_type::helics_custom, std::unique_ptr<Publication>>
-    make_publication(FedPtr& valueFed,
-                     const std::string& key,
-                     const std::string& units = std::string())
-{
-    return std::make_unique<Publication>(valueFed, helicsType<X>(), key, units);
-}
-
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template<class X>
-typename std::enable_if_t<helicsType<X>() != data_type::helics_custom, std::unique_ptr<Publication>>
-    make_publication(interface_visibility locality,
-                     ValueFederate* valueFed,
-                     const std::string& key,
-                     const std::string& units = std::string())
-{
-    return std::make_unique<Publication>(locality, valueFed, key, helicsType<X>(), units);
-}
-
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
-@param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template<class X, class FedPtr>
-typename std::enable_if_t<helicsType<X>() != data_type::helics_custom, std::unique_ptr<Publication>>
-    make_publication(interface_visibility locality,
-                     FedPtr& valueFed,
-                     const std::string& key,
-                     const std::string& units = std::string())
-{
-    return std::make_unique<Publication>(locality, valueFed, key, helicsType<X>(), units);
-}
 
 
 /** publish directly from the publication key name

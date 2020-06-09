@@ -358,7 +358,7 @@ TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj10)
     helics::NamedPoint def{"trigger", 0.7};
     helics::NamedPoint v1{"response", -1e-12};
     helics::NamedPoint v2{"variance", 45.23};
-    runDualFederateTestObjv2<helics::NamedPoint>(GetParam(), def, v1, v2);
+    runDualFederateTestObj<helics::NamedPoint>(GetParam(), def, v1, v2);
 }
 
 TEST_P(valuefed_add_type_tests_ci_skip, dual_transfer_types_obj11)

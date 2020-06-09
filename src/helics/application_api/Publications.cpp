@@ -82,6 +82,7 @@ void Publication::publish(double val)
         fed->publishRaw(*this, db);
     }
 }
+
 void Publication::publishInt(int64_t val)
 {
     bool doPublish = true;
@@ -106,7 +107,7 @@ void Publication::publish(char val)
             break;
         case data_type::helics_string:
         case data_type::helics_named_point:
-            publish(std::string_view(&val,1));
+            publishString({&val, 1});
             break;
         default:
             publishInt(static_cast<int64_t>(val));
@@ -146,7 +147,7 @@ void Publication::publish(bool val)
     }
 }
 
-void Publication::publish(std::string_view val)
+void Publication::publishString(std::string_view val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled) {
@@ -301,7 +302,7 @@ data_block typeConvert(data_type type, const defV& val)
     }
 }
 
-void Publication::publish(const defV& val)
+void Publication::publishDefV(const defV& val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled) {
