@@ -63,8 +63,8 @@ class RingTransmit: public BenchmarkFederate {
         while (nextTime < finalTime) {
             nextTime = fed->requestTime(finalTime);
             if (fed->isUpdated(*sub)) {
-                auto& nstring = fed->getString(*sub);
-                fed->publish(*pub, nstring);
+                auto& nstring = sub->getString();
+                pub->publish(nstring);
                 ++loopCount;
             }
         }

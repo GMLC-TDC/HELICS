@@ -42,8 +42,8 @@ class TimingHub: public BenchmarkFederate {
         pubs.reserve(num_leafs);
         subs.reserve(num_leafs);
         for (int ii = 0; ii < num_leafs; ++ii) {
-            pubs.push_back(fed->registerPublicationIndexed<std::string>("leafrx", ii));
-            subs.push_back(fed->registerSubscriptionIndexed("leafsend", ii));
+            pubs.push_back(fed->registerIndexedPublication<std::string>("leafrx", ii));
+            subs.push_back(fed->registerIndexedSubscription("leafsend", ii));
         }
     }
 

@@ -162,51 +162,6 @@ void runFederateTestv2(const std::string& core_type_str,
 }
 
 template<class X>
-void runFederateTestObjv2(const std::string& core_type_str,
-                          const X& defaultValue,
-                          const X& testValue1,
-                          const X& testValue2)
-{
-    FederateTestFixture fixture;
-
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
-    auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
-
-    // register the publications
-    helics::PublicationT<X> pubid(helics::GLOBAL, vFed.get(), "pub1");
-
-    auto sub = helics::make_subscription<X>(vFed.get(), "pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
-    sub.setDefault(defaultValue);
-    vFed->enterExecutingMode();
-    // publish string1 at time=0.0;
-    pubid.publish(testValue1);
-    auto val = sub.getValue();
-    EXPECT_TRUE(val == defaultValue);
-
-    auto gtime = vFed->requestTime(1.0);
-    EXPECT_EQ(gtime, 1.0);
-    // get the value
-    sub.getValue(val);
-    // make sure the string is what we expect
-    EXPECT_TRUE(val == testValue1);
-    // publish a second string
-    pubid.publish(testValue2);
-    // make sure the value is still what we expect
-    val = sub.getValue();
-    EXPECT_TRUE(val == testValue1);
-
-    // advance time
-    gtime = vFed->requestTime(2.0);
-    // make sure the value was updated
-    EXPECT_EQ(gtime, 2.0);
-    val = sub.getValue();
-    EXPECT_TRUE(val == testValue2);
-
-    vFed->finalize();
-}
-
-template<class X>
 void runDualFederateTest(const std::string& core_type_str,
                          const X& defaultValue,
                          const X& testValue1,

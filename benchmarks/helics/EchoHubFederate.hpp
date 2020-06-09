@@ -53,7 +53,7 @@ class EchoHub: public BenchmarkFederate {
         while (cTime <= finalTime) {
             for (int ii = 0; ii < num_leafs; ++ii) {
                 if (fed->isUpdated(subs[ii])) {
-                    auto& val = fed->getString(subs[ii]);
+                    auto& val = subs[ii].getString();
                     pubs[ii].publish(val);
                 }
             }

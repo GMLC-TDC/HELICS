@@ -124,13 +124,13 @@ void runPubSubThroughTypeTests(const TX& valtx, const RX& valrx)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::make_publication<IX>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto& pubObj = vFed->registerGlobalPublication<IX>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
     vFed->setProperty(helics_property_time_delta, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubObj->publish(valtx);
+    pubObj.publish(valtx);
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
