@@ -174,18 +174,18 @@ TEST_F(timing_tests2, ring_test3)
     vFed2->setFlagOption(helics::defs::restrictive_time_policy);
     vFed3->setFlagOption(helics::defs::restrictive_time_policy);
 
-    auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
-    auto pub2 = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2");
-    auto pub3 = helics::make_publication<double>(helics::GLOBAL, vFed3, "pub3");
-    auto sub1 = vFed1->registerSubscription("pub3");
-    auto sub2 = vFed2->registerSubscription("pub1");
-    auto sub3 = vFed3->registerSubscription("pub2");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
+    auto& pub3 = vFed3->registerGlobalPublication<double>("pub3");
+    auto& sub1 = vFed1->registerSubscription("pub3");
+    auto& sub2 = vFed2->registerSubscription("pub1");
+    auto& sub3 = vFed3->registerSubscription("pub2");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
     vFed3->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     vFed2->enterExecutingModeComplete();
-    pub1->publish(45.7);
+    pub1.publish(45.7);
     vFed1->requestTimeAsync(50.0);
     vFed2->requestTimeAsync(50.0);
     vFed3->requestTimeAsync(50.0);
@@ -194,38 +194,38 @@ TEST_F(timing_tests2, ring_test3)
     EXPECT_EQ(newTime, 1e-9);
     EXPECT_TRUE(sub2.isUpdated());
     double val = sub2.getValue<double>();
-    pub2->publish(val);
+    pub2.publish(val);
     vFed2->requestTimeAsync(50.0);
     newTime = vFed3->requestTimeComplete();
     EXPECT_EQ(newTime, 1e-9);
     EXPECT_TRUE(sub3.isUpdated());
     val = sub3.getValue<double>();
-    pub3->publish(val);
+    pub3.publish(val);
     vFed3->requestTimeAsync(50.0);
     newTime = vFed1->requestTimeComplete();
     EXPECT_EQ(newTime, 1e-9);
     EXPECT_TRUE(sub1.isUpdated());
     val = sub1.getValue<double>();
-    pub1->publish(val);
+    pub1.publish(val);
     vFed1->requestTimeAsync(50.0);
     // round 2 for time
     newTime = vFed2->requestTimeComplete();
     EXPECT_EQ(newTime, 2e-9);
     EXPECT_TRUE(sub2.isUpdated());
     val = sub2.getValue<double>();
-    pub2->publish(val);
+    pub2.publish(val);
     vFed2->requestTimeAsync(50.0);
     newTime = vFed3->requestTimeComplete();
     EXPECT_EQ(newTime, 2e-9);
     EXPECT_TRUE(sub3.isUpdated());
     val = sub3.getValue<double>();
-    pub3->publish(val);
+    pub3.publish(val);
     vFed3->requestTimeAsync(50.0);
     newTime = vFed1->requestTimeComplete();
     EXPECT_EQ(newTime, 2e-9);
     EXPECT_TRUE(sub1.isUpdated());
     val = sub1.getValue<double>();
-    pub1->publish(val);
+    pub1.publish(val);
     vFed1->requestTimeAsync(50.0);
     // round 3
     newTime = vFed2->requestTimeComplete();
@@ -255,7 +255,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
 
     vFed3->setFlagOption(helics::defs::wait_for_current_time_update);
 
-    auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
+    auto pub1 = vFed1->registerGlobalPublication<double>("pub1");
 
     auto& sub2 = vFed2->registerSubscription("pub1");
     auto& sub3 = vFed3->registerSubscription("pub1");
@@ -268,7 +268,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed2->enterExecutingModeComplete();
     // this works since there are no reverse dependencies
     vFed1->requestTime(1.0);
-    pub1->publish(3.5);
+    pub1.publish(3.5);
     auto tm1 = vFed1->requestTime(3.0);
     EXPECT_EQ(tm1, 3.0);
     auto tm2 = vFed2->requestTime(1.0);
@@ -293,7 +293,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     EXPECT_DOUBLE_EQ(val2, 3.5);
     EXPECT_DOUBLE_EQ(val3, 3.5);
 
-    pub1->publish(9.3);
+    pub1.publish(9.3);
     vFed1->finalize();
 
     // Now check that iteration works
