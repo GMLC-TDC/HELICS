@@ -651,8 +651,7 @@ const char* helicsEndpointGetInfo(helics_endpoint end)
         return emptyStr.c_str();
     }
     try {
-        const std::string& info = endObj->endPtr->getInfo();
-        return info.c_str();
+        return endObj->endPtr->getInfo().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {

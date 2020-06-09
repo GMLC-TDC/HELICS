@@ -32,3 +32,12 @@ jobs:
     - name: Run clang-tidy on changed files
       shell: bash
       run: ./.github/actions/run-clang-tidy-pr.sh
+
+  cppcheck:
+    runs-on: ubuntu-latest
+    container: helics/buildenv:cppcheck2
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run cppcheck
+      run: cppcheck -j 2 --enable=performance,portability --suppressions-list=config/cppcheck_suppressions.txt --error-exitcode=-4 -i ThirdParty -i interfaces -i docs -i config .
