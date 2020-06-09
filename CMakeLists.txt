@@ -111,10 +111,14 @@ endif()
 # Set the build output paths
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Archive output dir.")
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH
+                                                                           "Archive output dir."
+        )
     endif()
     if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH "Library output dir.")
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH
+                                                                           "Library output dir."
+        )
     endif()
     if(NOT CMAKE_PDB_OUTPUT_DIRECTORY)
         set(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
@@ -122,8 +126,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         )
     endif()
     if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH
-                                                                           "Executable/dll output dir."
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            CACHE PATH "Executable/dll output dir."
         )
     endif()
 endif()
