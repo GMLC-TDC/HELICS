@@ -216,7 +216,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     vFed2->setFlagOption(helics_flag_uninterruptible);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& pub2 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
     vFed1->registerSubscription("pub2");
     vFed2->registerSubscription("pub1");
 
