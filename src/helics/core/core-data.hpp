@@ -38,18 +38,21 @@ class data_block {
     data_block() = default;
     template<typename T,
              typename = typename std::enable_if_t<std::is_constructible_v<std::string, T>>>
-    data_block(T&& val) noexcept(std::is_nothrow_constructible_v<std::string,T>): m_data(std::forward<T>(val))
+    data_block(T&& val) noexcept(std::is_nothrow_constructible_v<std::string, T>):
+        m_data(std::forward<T>(val))
     {
     }
-    template<typename ARG1, typename ARG2,
-             typename = typename std::enable_if_t<std::is_constructible_v<std::string, ARG1,ARG2>>>
-    data_block(const ARG1& val1, const ARG2& val2) noexcept(std::is_nothrow_constructible_v<std::string, ARG1,ARG2>):
-        m_data(val1,val2)
+    template<typename ARG1,
+             typename ARG2,
+             typename = typename std::enable_if_t<std::is_constructible_v<std::string, ARG1, ARG2>>>
+    data_block(const ARG1& val1,
+               const ARG2& val2) noexcept(std::is_nothrow_constructible_v<std::string, ARG1, ARG2>):
+        m_data(val1, val2)
     {
     }
     /** size allocation constructor */
     explicit data_block(size_t blockSize) { m_data.resize(blockSize); }
-   
+
     /** construct from a vector object */
     // NOLINTNEXTLINE
     /* implicit */ data_block(const std::vector<char>& vdata): m_data(vdata.data(), vdata.size()) {}
@@ -60,8 +63,7 @@ class data_block {
         m_data(reinterpret_cast<const char*>(vdata.data()), vdata.size() * sizeof(X))
     {
     }
-    template<typename T,
-             typename = typename std::enable_if_t<std::is_assignable_v<std::string, T>>>
+    template<typename T, typename = typename std::enable_if_t<std::is_assignable_v<std::string, T>>>
     data_block& operator=(T&& str) noexcept(std::is_nothrow_assignable_v<std::string, T>)
     {
         m_data.operator=(std::forward<T>(str));
@@ -72,7 +74,9 @@ class data_block {
     /** append the existing data with a additional data*/
     void append(std::string_view str) { m_data.append(str.data(), str.length()); }
     /** append the existing data with additional data*/
-    void append(const void* data, int length) { m_data.append(static_cast<const char *>(data), length);
+    void append(const void* data, int length)
+    {
+        m_data.append(static_cast<const char*>(data), length);
     }
     /** equality operator with another data block*/
     bool operator==(const data_block& db) const { return m_data == db.m_data; }

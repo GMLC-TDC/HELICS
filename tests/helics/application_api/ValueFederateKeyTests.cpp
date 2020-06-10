@@ -50,7 +50,7 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // register the publications
     Publication pubid(vFed1.get(), "pub1", helicsType<std::string>());
-    Publication pubid2(GLOBAL, vFed1, "pub2",helicsType<double>());
+    Publication pubid2(GLOBAL, vFed1, "pub2", helicsType<double>());
 
     Publication pubid3(vFed1, "pub3", helicsType<double>(), "V");
 
@@ -573,7 +573,7 @@ TEST_P(valuefed_single_type, init_publish)
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode();
-    pubid.publish( 1.0);
+    pubid.publish(1.0);
 
     vFed1->enterExecutingMode();
     // get the value set at initialization
@@ -679,14 +679,14 @@ TEST_P(valuefed_single_type, all_callback)
         [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
     vFed1->publishRaw(pubid3, db);
-    pubid2.publish( 4);
+    pubid2.publish(4);
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 2);
     ccnt = 0;  // reset the counter
     vFed1->publishRaw(pubid3, db);
     pubid2.publish(4);
-    pubid1.publish( "test string2");
+    pubid1.publish("test string2");
     vFed1->requestTime(5.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 3);
@@ -875,7 +875,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish( "string2");
+    pubid.publish("string2");
     // make sure the value is still what we expect
     subid.getValue(s);
     EXPECT_EQ(s, "string1");
@@ -932,7 +932,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     auto gtime = vFed1->requestTime(1.0);
     EXPECT_EQ(gtime, 1.0);
     // publish a second string
-    pubid.publish( "string2");
+    pubid.publish("string2");
     gtime = vFed1->requestTime(2.0);
     pubid.publish("string3");
     gtime = vFed1->requestTime(3.0);

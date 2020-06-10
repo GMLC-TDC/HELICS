@@ -152,7 +152,7 @@ void Publication::publishString(std::string_view val)
     bool doPublish = true;
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
-            prevValue=std::string(val);
+            prevValue = std::string(val);
         } else {
             doPublish = false;
         }

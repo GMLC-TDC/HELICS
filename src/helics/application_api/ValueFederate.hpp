@@ -169,7 +169,6 @@ class HELICS_CXX_EXPORT ValueFederate:
                                             units);
     }
 
-
     /** register an input
     @details call is only valid in startup mode register a subscription with name type and units
     @param key the name of the publication to subscribe to
@@ -277,7 +276,6 @@ class HELICS_CXX_EXPORT ValueFederate:
                                     units);
     }
 
-   
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a input which may not have another name
@@ -527,5 +525,5 @@ class HELICS_CXX_EXPORT ValueFederate:
 
 }  // namespace helics
 
-#include "Publications.hpp"
 #include "Inputs.hpp"
+#include "Publications.hpp"
