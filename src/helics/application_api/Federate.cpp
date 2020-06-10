@@ -785,14 +785,11 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
             filt.setOption(getOptionIndex(target.substr(2)), false);
         }
     });
-    bool optional = getOrDefault(data, "optional", false);
-    if (optional) {
-        filt.setOption(defs::options::connection_optional, optional);
-    }
-    bool required = getOrDefault(data, "required", false);
-    if (required) {
-        filt.setOption(defs::options::connection_required, required);
-    }
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&filt](int32_t option, int32_t value) { filt.setOption(option, value); });
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
@@ -1074,7 +1071,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     return {"#invalid"};
 }
 
-bool Federate::isQueryCompleted(query_id_t queryIndex) const
+bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
@@ -1218,7 +1215,7 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
     }
 }
 
-void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool option_value)
+void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value)
 {
     if (coreObject) {
         coreObject->setHandleOption(handle, option, option_value);
@@ -1229,9 +1226,9 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, bool 
 }
 
 /** get the current value for an interface option*/
-bool Federate::getInterfaceOption(interface_handle handle, int32_t option)
+int32_t Federate::getInterfaceOption(interface_handle handle, int32_t option)
 {
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
+    return (coreObject) ? coreObject->getHandleOption(handle, option) : 0;
 }
 
 void Federate::closeInterface(interface_handle handle)

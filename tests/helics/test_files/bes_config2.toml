@@ -1,0 +1,4 @@
+name="test_bes"
+ coreType="zmq"
+  flags="only_transmit_on_change,wait_for_current_time_update"
+  log_level= "no_print"

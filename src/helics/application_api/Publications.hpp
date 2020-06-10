@@ -201,13 +201,13 @@ class HELICS_CXX_EXPORT Publication {
     /** set an option on the publication
     @param option the option to set
     @param value the value to set the option*/
-    void setOption(int option, bool value = true)
+    void setOption(int32_t option, int32_t value = 1)
     {
         fed->setInterfaceOption(handle, option, value);
     }
 
     /** get the current value of a flag for the handle*/
-    bool getOption(int option) const { return fed->getInterfaceOption(handle, option); }
+    int32_t getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
 
     /** add a target to the publication*/
     void addTarget(const std::string& target) { fed->addTarget(*this, target); }
