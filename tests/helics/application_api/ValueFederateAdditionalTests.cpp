@@ -101,7 +101,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     helics::Publication pubid(vFed1.get(), "pub1", helics::helicsType<std::string>());
-    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2",helics::data_type::helics_int);
+    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2", helics::data_type::helics_int);
 
     vFed1->setSeparator('-');
     helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(), "V");
@@ -272,7 +272,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-   pubid.publish("string1");
+    pubid.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -281,7 +281,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish( "string2");
+    pubid.publish("string2");
     // make sure the value is still what we expect
     s = subid.getString();
 
@@ -399,7 +399,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, vector_callback_lists)
     // callbacks here
     EXPECT_EQ(ccnt, 0);
 
-    pubid1.publish( "this is a test");
+    pubid1.publish("this is a test");
     vFed1->requestTime(3.0);
     EXPECT_EQ(ccnt, 1);
 
@@ -465,7 +465,7 @@ TEST_P(valuefed_add_type_tests_ci_skip, async_calls)
     vFed1->enterExecutingModeComplete();
     vFed2->enterExecutingModeComplete();
     // publish string1 at time=0.0;
-    pubid.publish( "string1");
+    pubid.publish("string1");
     vFed1->requestTimeAsync(1.0);
     vFed2->requestTimeAsync(1.0);
 

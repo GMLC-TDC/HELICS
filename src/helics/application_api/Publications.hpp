@@ -223,12 +223,12 @@ class HELICS_CXX_EXPORT Publication {
     /** send a value for publication
     @param val the value to publish*/
     void publish(double val);
-    
+
     void publish(const std::vector<double>& val);
     void publish(const std::vector<std::complex<double>>& val);
     void publish(const double* vals, int size);
     void publish(std::complex<double> val);
-    
+
     void publish(bool val);
     void publish(Time val);
     void publish(char val);
@@ -244,25 +244,21 @@ class HELICS_CXX_EXPORT Publication {
 
     /** publish stringLike values */
     template<class X>
-    std::enable_if_t<(std::is_constructible_v<std::string_view,X>),
-                     void>
-        publish(const X& val)
+    std::enable_if_t<(std::is_constructible_v<std::string_view, X>), void> publish(const X& val)
     {
         publishString(val);
     }
 
     /** publish stringLike values */
     template<class X>
-    std::enable_if_t<(std::is_same_v<defV, remove_cv_ref<X>>), void>
-        publish(const X& val)
+    std::enable_if_t<(std::is_same_v<defV, remove_cv_ref<X>>), void> publish(const X& val)
     {
         publishDefV(val);
     }
 
     /** publish integral values */
     template<class X>
-    std::enable_if_t<(std::is_integral_v<X> && !std::is_same_v<remove_cv_ref<X>, char>),
-                     void>
+    std::enable_if_t<(std::is_integral_v<X> && !std::is_same_v<remove_cv_ref<X>, char>), void>
         publish(X val)
     {
         publishInt(static_cast<int64_t>(val));
@@ -271,8 +267,8 @@ class HELICS_CXX_EXPORT Publication {
     /** publish anything not previously covered*/
     template<class X>
     std::enable_if_t<((typeCategory<X>::value == nonConvertibleType) &&
-                      (!std::is_constructible_v<std::string_view,X>) &&
-                      (!std::is_same_v<X, defV>) && (!std::is_convertible_v<X, Time>)),
+                      (!std::is_constructible_v<std::string_view, X>)&&(!std::is_same_v<X, defV>)&&(
+                          !std::is_convertible_v<X, Time>)),
                      void>
         publish(const X& val)
     {
@@ -309,7 +305,6 @@ class HELICS_CXX_EXPORT Publication {
     void publishDefV(const defV& val);
     friend class ValueFederateManager;
 };
-
 
 /** publish directly from the publication key name
 @details this is a convenience function to publish directly from the publication key

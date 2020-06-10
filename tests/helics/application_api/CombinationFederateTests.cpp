@@ -235,7 +235,7 @@ TEST_P(combofed_type_tests, multimode_transfer)
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubid.publish( "string2");
+    pubid.publish("string2");
     // make sure the value is still what we expect
     s = subid.getString();
 

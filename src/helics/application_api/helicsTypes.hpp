@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <typeinfo>
 #include <utility>
 #include <vector>
-#include <string_view>
 /** @file
 @details basic type information and control for HELICS
 */

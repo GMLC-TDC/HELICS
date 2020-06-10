@@ -8,18 +8,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 
 #include "ValueConverter.hpp"
+#include "fmt/format.h"
 #include "gmlc/utilities/demangle.hpp"
-#include "gmlc/utilities/string_viewConversion.h"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewConversion.h"
+
 #include <algorithm>
 #include <functional>
 #include <numeric>
 #include <regex>
 #include <sstream>
-#include <unordered_map>
 #include <string_view>
-#include "fmt/format.h"
+#include <unordered_map>
 
 using namespace gmlc::utilities;  // NOLINT
 
@@ -76,7 +77,8 @@ double vectorNorm(const std::vector<std::complex<double>>& vec)
 
 std::string helicsComplexString(double real, double imag)
 {
-    return (imag != 0.0) ? fmt::format(FMT_STRING("{:.9g}{:<+.9g}j"), real, imag) : fmt::format(FMT_STRING("{:.9g}"), real);
+    return (imag != 0.0) ? fmt::format(FMT_STRING("{:.9g}{:<+.9g}j"), real, imag) :
+                           fmt::format(FMT_STRING("{:.9g}"), real);
 }
 
 std::string helicsComplexString(std::complex<double> val)

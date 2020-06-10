@@ -469,7 +469,6 @@ HELICS_CXX_EXPORT void
                              const std::shared_ptr<units::precise_unit>& inputUnits,
                              const std::shared_ptr<units::precise_unit>& outputUnits);
 
-
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)
 {
