@@ -18,42 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-TEST(subscriptionTObject, tests)
-{
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
-    // register the publications
-    auto& pubObj = vFed->registerGlobalPublication<double>("pub1");
-    auto& subObj = helics::make_subscription(*vFed, "pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
-    vFed->enterExecutingMode();
-    // publish string1 at time=0.0;
-    pubObj.publish("string1");
-    auto gtime = vFed->requestTime(1.0);
-
-    EXPECT_EQ(gtime, 1.0);
-    std::string s = subObj.getString();
-
-    // make sure the string is what we expect
-    EXPECT_EQ(s, "string1");
-    // publish a second string
-    pubObj.publish("string2");
-    // make sure the value is still what we expect
-    subObj.getValue(s);
-
-    EXPECT_EQ(s, "string1");
-    // advance time
-    gtime = vFed->requestTime(2.0);
-    // make sure the value was updated
-    EXPECT_EQ(gtime, 2.0);
-    subObj.getValue(s);
-
-    EXPECT_EQ(s, "string2");
-    vFed->finalize();
-}
-
 TEST(subscriptionObject, tests)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -194,7 +158,7 @@ TEST(subscriptionObject, complex_tests_ci_skip)
     runPubSubTypeTests<std::string, c>("3.14159-2j", c(3.14159, -2));
     runPubSubTypeTests<std::string, c>("-3.14159-2j", c(-3.14159, -2));
 
-    runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, -2), {"-3.14159 -2j", std::nan("0")});
+    runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, -2), {"-3.14159-2j", std::nan("0")});
     runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, 0), {"value", -3.14159});
     runPubSubTypeTests<std::string, c>("-3.14159 + 2i", c(-3.14159, 2));
 

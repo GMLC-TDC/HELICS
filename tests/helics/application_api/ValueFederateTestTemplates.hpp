@@ -81,7 +81,7 @@ void runFederateTestObj(const std::string& core_type_str,
     // register the publications
     auto& pubid = vFed->registerGlobalPublication<X>("pub1");
 
-    auto& subid = helics::make_subscription(*vFed, "pub1");
+    auto& subid = vFed->registerSubscription("pub1");
 
     vFed->setProperty(helics_property_time_delta, 1.0);
     subid.setDefault(defaultValue);
@@ -295,9 +295,9 @@ void runDualFederateTestObj(const std::string& core_type_str,
     auto fedB = fixture.GetFederateAs<ValueFederate>(1);
 
     // register the publications
-    auto& pubid = fedA->registerGlobalPublication<double>("pub1");
+    auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
-    auto subid = make_subscription(*fedB, "pub1");
+    auto subid = fedB->registerSubscription("pub1");
     fedA->setProperty(helics_property_time_delta, 1.0);
     fedB->setProperty(helics_property_time_delta, 1.0);
 

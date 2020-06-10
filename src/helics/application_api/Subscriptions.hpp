@@ -18,21 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 namespace helics {
-/** generate a subscription object from a value federate*/
-inline Input& make_subscription(ValueFederate* valueFed,
-                                const std::string& key,
-                                const std::string& units = std::string())
-{
-    return valueFed->registerSubscription(key, units);
-}
-
-/** generate a subscription object from a value federate*/
-inline Input& make_subscription(ValueFederate& valueFed,
-                                const std::string& key,
-                                const std::string& units = std::string())
-{
-    return valueFed.registerSubscription(key, units);
-}
 
 /** get a value directly from the subscription key name
 @details this is a convenience function to get a value directly from the subscription key name

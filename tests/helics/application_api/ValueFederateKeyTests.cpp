@@ -55,11 +55,12 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     Publication pubid3(vFed1, "pub3", helicsType<double>(), "V");
 
     // these aren't meant to match the publications
-    auto& subid1 = make_subscription(*vFed1, "sub1");
+    auto& subid1 = vFed1->registerSubscription("sub1");
 
-    auto subid2 = make_subscription(*vFed1, "sub2");
+    auto subid2 = vFed1->registerGlobalInput<int>("inpA");
+    subid2.addTarget("sub2");
 
-    auto& subid3 = make_subscription(*vFed1, "sub3", "V");
+    auto& subid3 = vFed1->registerSubscription("sub3", "V");
     // enter execution
     vFed1->enterExecutingMode();
 
@@ -72,6 +73,7 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     const auto& sub3name = subid3.getTarget();
     EXPECT_EQ(sub3name, "sub3");
 
+    EXPECT_EQ(subid2.getName(), "inpA");
     EXPECT_TRUE(subid1.getType().empty());  // def is the default type
     EXPECT_EQ(subid2.getType(), "int32");
     EXPECT_TRUE(subid3.getType().empty());

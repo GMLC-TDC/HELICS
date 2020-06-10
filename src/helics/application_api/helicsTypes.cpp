@@ -76,7 +76,7 @@ double vectorNorm(const std::vector<std::complex<double>>& vec)
 
 std::string helicsComplexString(double real, double imag)
 {
-    return (imag != 0.0) ? fmt::format("{g}{+g}j", real, imag) : fmt::format("{g}", real);
+    return (imag != 0.0) ? fmt::format(FMT_STRING("{:.9g}{:<+.9g}j"), real, imag) : fmt::format(FMT_STRING("{:.9g}"), real);
 }
 
 std::string helicsComplexString(std::complex<double> val)
