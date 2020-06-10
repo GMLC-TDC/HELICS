@@ -877,7 +877,7 @@ void helicsMessageSetData(helics_message message, const void* data, int inputDat
     if (mess == nullptr) {
         return;
     }
-    mess->data.assign(static_cast<const char*>(data), inputDataLength);
+    mess->data=std::string_view(static_cast<const char*>(data), inputDataLength);
 }
 
 void helicsMessageAppendData(helics_message message, const void* data, int inputDataLength, helics_error* err)
@@ -886,7 +886,7 @@ void helicsMessageAppendData(helics_message message, const void* data, int input
     if (mess == nullptr) {
         return;
     }
-    mess->data.append(static_cast<const char*>(data), inputDataLength);
+    mess->data.append(std::string_view{static_cast<const char*>(data), static_cast<std::size_t>(inputDataLength)});
 }
 
 void helicsMessageCopy(helics_message source_message, helics_message dest_message, helics_error* err)

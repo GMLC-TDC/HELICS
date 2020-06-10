@@ -43,10 +43,10 @@ class EchoLeaf: public BenchmarkFederate {
             fed->requestNextStep();
             ++cnt;
             if (cnt <= iter) {
-                fed->publish(pub, txstring);
+                pub.publish(txstring);
             }
             while (fed->isUpdated(sub)) {
-                auto& nstring = fed->getString(sub);
+                auto& nstring = sub.getString();
                 if (nstring != txstring) {
                     throw("incorrect string");
                 }

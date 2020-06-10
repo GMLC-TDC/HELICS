@@ -18,43 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-TEST(subscriptionTObject, tests)
-{
-    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker";
-
-    auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
-    // register the publications
-    auto pubObj = helics::PublicationT<std::string>(helics::GLOBAL, vFed.get(), "pub1");
-
-    auto subObj = helics::make_subscription<std::string>(*vFed, "pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
-    vFed->enterExecutingMode();
-    // publish string1 at time=0.0;
-    pubObj.publish("string1");
-    auto gtime = vFed->requestTime(1.0);
-
-    EXPECT_EQ(gtime, 1.0);
-    std::string s = subObj.getValue();
-
-    // make sure the string is what we expect
-    EXPECT_EQ(s, "string1");
-    // publish a second string
-    pubObj.publish("string2");
-    // make sure the value is still what we expect
-    subObj.getValue(s);
-
-    EXPECT_EQ(s, "string1");
-    // advance time
-    gtime = vFed->requestTime(2.0);
-    // make sure the value was updated
-    EXPECT_EQ(gtime, 2.0);
-    subObj.getValue(s);
-
-    EXPECT_EQ(s, "string2");
-    vFed->finalize();
-}
-
 TEST(subscriptionObject, tests)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -63,14 +26,12 @@ TEST(subscriptionObject, tests)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj =
-        helics::make_publication<std::string>(helics::GLOBAL, vFed.get(), std::string("pub1"));
-
+    auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
     auto& subObj = vFed->registerSubscription("pub1");
     vFed->setProperty(helics_property_time_delta, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubObj->publish("string1");
+    pubObj.publish("string1");
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -79,7 +40,7 @@ TEST(subscriptionObject, tests)
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    pubObj->publish("string2");
+    pubObj.publish("string2");
     // make sure the value is still what we expect
     subObj.getValue<std::string>(s);
 
@@ -102,13 +63,13 @@ void runPubSubTypeTests(const TX& valtx, const RX& valrx)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::make_publication<TX>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto& pubObj = vFed->registerGlobalPublication<TX>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
     vFed->setProperty(helics_property_time_delta, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubObj->publish(valtx);
+    pubObj.publish(valtx);
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -127,13 +88,13 @@ void runPubSubThroughTypeTests(const TX& valtx, const RX& valrx)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::make_publication<IX>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto& pubObj = vFed->registerGlobalPublication<IX>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
     vFed->setProperty(helics_property_time_delta, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubObj->publish(valtx);
+    pubObj.publish(valtx);
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -197,7 +158,7 @@ TEST(subscriptionObject, complex_tests_ci_skip)
     runPubSubTypeTests<std::string, c>("3.14159-2j", c(3.14159, -2));
     runPubSubTypeTests<std::string, c>("-3.14159-2j", c(-3.14159, -2));
 
-    runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, -2), {"-3.14159 -2j", std::nan("0")});
+    runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, -2), {"-3.14159-2j", std::nan("0")});
     runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, 0), {"value", -3.14159});
     runPubSubTypeTests<std::string, c>("-3.14159 + 2i", c(-3.14159, 2));
 
@@ -324,15 +285,14 @@ TEST(subscriptionObject, ChangeDetection_tests)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::make_publication<double>(helics::GLOBAL, vFed.get(), std::string("pub1"));
-
+    auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
     auto& subObj1 = vFed->registerSubscription("pub1");
     auto& subObj2 = vFed->registerSubscription("pub1");
     subObj2.setMinimumChange(0.1);
     vFed->setProperty(helics_property_time_delta, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
-    pubObj->publish(23.7);
+    pubObj.publish(23.7);
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -349,7 +309,7 @@ TEST(subscriptionObject, ChangeDetection_tests)
     EXPECT_EQ(val1, val2);
     EXPECT_EQ(val1, 23.7);
     // publish a second string
-    pubObj->publish(23.61);
+    pubObj.publish(23.61);
     // advance time
     gtime = vFed->requestTime(2.0);
 
@@ -367,8 +327,7 @@ TEST(subscriptionObject, Size_tests)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj =
-        helics::make_publication<std::string>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
 
@@ -376,7 +335,7 @@ TEST(subscriptionObject, Size_tests)
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     std::string str("this is a string test");
-    pubObj->publish(str);
+    pubObj.publish(str);
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
@@ -397,9 +356,7 @@ TEST(subscriptionObject, VectorSize_tests)
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
     // register the publications
-    auto pubObj = helics::make_publication<std::vector<double>>(helics::GLOBAL,
-                                                                vFed.get(),
-                                                                std::string("pub1"));
+    auto& pubObj = vFed->registerGlobalPublication<std::vector<double>>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
 
@@ -407,7 +364,7 @@ TEST(subscriptionObject, VectorSize_tests)
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     std::vector<double> tvec{5, 7, 234.23, 99.1, 1e7, 0.0};
-    pubObj->publish(tvec);
+    pubObj.publish(tvec);
     auto gtime = vFed->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);

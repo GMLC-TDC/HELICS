@@ -41,7 +41,7 @@ class HeatUnitBlock {
         }
 
         vFed->enterInitializingMode();
-        vFed->publish(*pub, T);
+        pub->publish(T);
         vFed->enterExecutingMode();
         mainLoop();
     };
@@ -86,7 +86,7 @@ class HeatUnitBlock {
             }
             double deltaT = Etransfer / ThermalCap;
             T = T + deltaT;
-            vFed->publish(*pub, T);
+            pub->publish(T);
             cTime = vFed->requestTime(cTime + deltaTime);
         }
         vFed->finalize();
@@ -112,9 +112,9 @@ class Wall {
             initialize(coreName);
         }
         vFed->enterInitializingMode();
-        vFed->publish(*pub, Temp);
+        pub->publish(Temp);
         vFed->enterExecutingMode();
-        vFed->publish(*pub, Temp);
+        pub->publish(Temp);
         mainLoop();
     };
     void initialize(const std::string& coreName)
@@ -141,7 +141,7 @@ class Wall {
         do {
             retTime = vFed->requestTime(nextTime);
             if (index < static_cast<int>(schedTemp.size())) {
-                vFed->publish(*pub, schedTemp[index].second);
+                pub->publish(schedTemp[index].second);
                 nextTime = schedTemp[index].first;
                 ++index;
             } else {

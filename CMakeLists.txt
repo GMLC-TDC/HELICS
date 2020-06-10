@@ -643,6 +643,7 @@ hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
 hide_variable(GMLC_UTILITIES_OBJECT_LIB)
 hide_variable(GMLC_UTILITIES_STATIC_LIB)
 
+target_compile_definitions(gmlc_utilities PUBLIC USE_STD_STRING_VIEW=1)
 add_library(HELICS::utilities ALIAS gmlc_utilities)
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
 if(NOT HELICS_DISABLE_BOOST)

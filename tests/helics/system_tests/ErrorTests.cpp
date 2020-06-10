@@ -328,7 +328,7 @@ TEST_F(error_tests, duplicate_publication_names4)
 
     auto& sub = fed1->registerSubscription(fed1->getInterfaceName(pubid));
     fed1->enterExecutingMode();
-    fed1->publish(pubid, 45.7);
+    pubid.publish(45.7);
     fed1->requestTime(1.0);
     auto res = sub.getValue<double>();
     EXPECT_EQ(res, 45.7);

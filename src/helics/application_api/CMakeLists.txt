@@ -65,7 +65,7 @@ add_library(
 )
 
 target_link_libraries(helics_application_api PUBLIC helics_network)
-
+target_link_libraries(helics_application_api PRIVATE fmt::fmt)
 target_compile_definitions(helics_application_api PUBLIC HELICS_CXX_STATIC_DEFINE)
 if(MSYS AND USE_LIBCXX)
     target_compile_definitions(helics_application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")

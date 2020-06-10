@@ -30,13 +30,12 @@ TEST_F(timing_tests, simple_timing_test)
 
     vFed1->setProperty(helics_property_time_period, 0.5);
     vFed2->setProperty(helics_property_time_period, 0.5);
-
-    auto pub = helics::make_publication<double>(helics::GLOBAL, vFed1.get(), "pub1");
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     vFed2->registerSubscription("pub1");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-    pub->publish(0.27);
+    pub.publish(0.27);
     auto res = vFed1->requestTime(2.0);
     EXPECT_EQ(res, 2.0);
 
@@ -59,7 +58,7 @@ TEST_F(timing_tests, simple_timing_test2)
     vFed1->setProperty(helics_property_time_period, 0.5);
     vFed2->setProperty(helics_property_time_period, 0.5);
 
-    auto pub = helics::make_publication<double>(helics::GLOBAL, vFed1.get(), "pub1");
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     vFed2->registerSubscription("pub1");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -68,7 +67,7 @@ TEST_F(timing_tests, simple_timing_test2)
     auto res = vFed1->requestTime(0.32);
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(res, 0.5);
-    pub->publish(0.27);
+    pub.publish(0.27);
     res = vFed1->requestTime(1.85);
     EXPECT_EQ(res, 2.0);
     res = vFed2->requestTime(1.79);
@@ -124,22 +123,22 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     vFed2->setProperty(helics_property_time_delta, 1.0);
     vFed2->setFlagOption(helics_flag_uninterruptible);
 
-    auto pub = helics::make_publication<double>(helics::GLOBAL, vFed1.get(), "pub1");
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     vFed2->registerSubscription("pub1");
 
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        for (double ii = 1.0; ii <= 100.0; ii += 1.0) {
-            pub->publish(ii);
-            vFed1->requestTime(ii);
+        for (helics::Time t = 1.0; t <= 100.0; t += 1.0) {
+            pub.publish(t);
+            vFed1->requestTime(t);
         }
     };
 
     auto rfed2 = [&]() {
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
-        for (double ii = 5.0; ii <= 100.0; ii += 5.0) {
-            auto T2 = vFed2->requestTime(ii);
+        for (helics::Time t = 5.0; t <= 100.0; t += 5.0) {
+            auto T2 = vFed2->requestTime(t);
             res.push_back(T2);
         }
         return res;
@@ -168,15 +167,15 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed2->setProperty(helics_property_time_delta, 1.0);
 
-    auto pub = helics::make_publication<double>(helics::GLOBAL, vFed1.get(), "pub1");
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     auto& IP2 = vFed2->registerSubscription("pub1");
     // test with the handle option vs the federate option
     IP2.setOption(helics::defs::options::ignore_interrupts);
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        for (double ii = 1.0; ii <= 100.0; ii += 1.0) {
-            pub->publish(ii);
-            vFed1->requestTime(ii);
+        for (helics::Time t = 1.0; t <= 100.0; t += 1.0) {
+            pub.publish(t);
+            vFed1->requestTime(t);
         }
     };
 
@@ -216,15 +215,15 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     vFed2->setProperty(helics_property_time_period, 1.0);
     vFed2->setFlagOption(helics_flag_uninterruptible);
 
-    auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1.get(), "pub1");
-    auto pub2 = helics::make_publication<double>(helics::GLOBAL, vFed2.get(), "pub2");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
     vFed1->registerSubscription("pub2");
     vFed2->registerSubscription("pub1");
 
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0) {
-            pub1->publish(ii);
+            pub1.publish(ii);
             vFed1->requestTime(ii);
         }
     };
@@ -233,7 +232,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0) {
-            pub2->publish(ii);
+            pub2.publish(ii);
             auto T2 = vFed2->requestTime(ii);
             res.push_back(T2);
         }
