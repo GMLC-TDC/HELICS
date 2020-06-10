@@ -484,7 +484,7 @@ inline X invalidValue()
 }
 
 /// defined constant for an invalid value as a double
-constexpr double invalidDouble = -1e48;
+constexpr double invalidDouble = -1e49;
 
 template<>
 constexpr double invalidValue<double>()
