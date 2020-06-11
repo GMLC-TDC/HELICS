@@ -158,14 +158,16 @@ TEST_F(timing_tests2, small_period_test)
     EXPECT_EQ(cmess, 22);
 }
 
-/** this test requires a major change to the timing subsystem
+// Tests out the restrictive time policy
 TEST_F(timing_tests2,ring_test3)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-
+    vFed1->setFlagOption(helics::defs::restrictive_time_policy);
+    vFed2->setFlagOption(helics::defs::restrictive_time_policy);
+    vFed3->setFlagOption(helics::defs::restrictive_time_policy);
 
     auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
     auto pub2 = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2");
@@ -237,4 +239,44 @@ TEST_F(timing_tests2,ring_test3)
     vFed1->finalize();
 }
 
-*/
+
+TEST_F(timing_tests2, wait_for_current_time_flag)
+{
+    SetupTest<helics::ValueFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+    
+    vFed3->setFlagOption(helics::defs::wait_for_current_time_update);
+
+    auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
+
+    auto& sub2 = vFed2->registerSubscription("pub1");
+    auto& sub3 = vFed3->registerSubscription("pub1");
+    sub2.setDefault(2.6);
+    sub3.setDefault(1.9);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingModeAsync();
+    vFed3->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->enterExecutingModeComplete();
+    //this works since there are no reverse dependencies
+    vFed1->requestTime(1.0);
+    pub1->publish(3.5);
+    auto tm1 = vFed1->requestTime(3.0);
+    EXPECT_EQ(tm1, 3.0);
+    auto tm2 = vFed2->requestTime(1.0);
+    EXPECT_EQ(tm2, 1.0);
+    double val2 = sub2.getValue<double>();
+    EXPECT_DOUBLE_EQ(val2, 2.6); // shouldn't have gotten the update
+
+    auto tm3 = vFed3->requestTime(1.0);
+    EXPECT_EQ(tm3, 1.0);
+    double val3 = sub3.getValue<double>();
+    EXPECT_DOUBLE_EQ(val3, 3.5);  // should have gotten the update from the wait_for_current_time_flag
+    
+
+    vFed2->finalize();
+    vFed3->finalize();
+    vFed1->finalize();
+}

@@ -95,6 +95,13 @@ class TimeDependencies {
     @return true if the object is ready
     */
     bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const;
+
+    /** check if the dependencies would allow a delayed grant of the time
+    @param desiredGrantTime  the time to check for granting
+    @return true if the object is ready
+    */
+    bool checkIfReadyForDelayedTimeGrant(Time desiredGrantTime) const;
+
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();
     /** reset iterative time requests to prepare for next iteration
