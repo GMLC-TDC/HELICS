@@ -87,25 +87,25 @@ TEST_P(combofed_single_type_tests, single_transfer)
     vFed1->setProperty(helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
-    vFed1->publish(pubid, "string1");
+    pubid.publish("string1");
     auto gtime = vFed1->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    std::string s = vFed1->getString(subid);
+    std::string s = subid.getString();
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    vFed1->publish(pubid, "string2");
+    pubid.publish("string2");
     // make sure the value is still what we expect
-    s = vFed1->getString(subid);
+    s = subid.getString();
 
     EXPECT_EQ(s, "string1");
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
-    s = vFed1->getString(subid);
+    s = subid.getString();
 
     EXPECT_EQ(s, "string2");
 }
@@ -213,7 +213,7 @@ TEST_P(combofed_type_tests, multimode_transfer)
     cFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-    cFed1->publish(pubid, "string1");
+    pubid.publish("string1");
 
     EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::modes::executing);
@@ -230,14 +230,14 @@ TEST_P(combofed_type_tests, multimode_transfer)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(f1time.get(), 1.0);
 
-    std::string s = cFed2->getString(subid);
+    std::string s = subid.getString();
     // get the value
     // make sure the string is what we expect
     EXPECT_EQ(s, "string1");
     // publish a second string
-    cFed1->publish(pubid, "string2");
+    pubid.publish("string2");
     // make sure the value is still what we expect
-    s = cFed2->getString(subid);
+    s = subid.getString();
 
     EXPECT_EQ(s, "string1");
 
@@ -266,7 +266,7 @@ TEST_P(combofed_type_tests, multimode_transfer)
     EXPECT_EQ(f1time.get(), 2.0);
     // make sure the value was updated
 
-    auto& ns = cFed2->getString(subid);
+    const auto& ns = subid.getString();
 
     EXPECT_EQ(ns, "string2");
 

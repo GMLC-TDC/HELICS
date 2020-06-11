@@ -366,16 +366,6 @@ data_view ValueFederate::getValueRaw(const Input& inp)
     return vfManager->getValue(inp);
 }
 
-double ValueFederate::getDouble(Input& inp)
-{
-    return inp.getValue<double>();
-}
-/** get a string value*/
-const std::string& ValueFederate::getString(Input& inp)
-{
-    return inp.getValueRef<std::string>();
-}
-
 void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
@@ -384,16 +374,6 @@ void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLI
         throw(InvalidFunctionCall(
             "publications not allowed outside of execution and initialization state"));
     }
-}
-
-void ValueFederate::publish(Publication& pub, const std::string& str)
-{
-    pub.publish(str);
-}
-
-void ValueFederate::publish(Publication& pub, double val)
-{
-    pub.publish(val);
 }
 
 using dvalue = std::variant<double, std::string>;

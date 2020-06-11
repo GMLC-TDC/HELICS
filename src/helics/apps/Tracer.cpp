@@ -392,7 +392,7 @@ namespace apps {
     {
         auto res = subkeys.find(key);
         if ((res == subkeys.end()) || (res->second == -1)) {
-            subscriptions.push_back(helics::make_subscription(*fed, key));
+            subscriptions.push_back(fed->registerSubscription(key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
             subkeys[key] = index;  // this is a potential replacement
         }

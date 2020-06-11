@@ -25,10 +25,15 @@ TEST_F(timing_tests2, small_time_test)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    auto pub1_a = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1_a");
-    auto pub1_b = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1_b");
-    auto pub2_a = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_a");
-    auto pub2_b = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_b");
+    // auto& pub1_a = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1_a");
+    // auto& pub1_b = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1_b");
+    // auto& pub2_a = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_a");
+    // auto& pub2_b = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_b");
+
+    auto& pub1_a = vFed1->registerGlobalPublication<double>("pub1_a");
+    auto& pub1_b = vFed1->registerGlobalPublication<double>("pub1_b");
+    auto& pub2_a = vFed2->registerGlobalPublication<double>("pub2_a");
+    auto& pub2_b = vFed2->registerGlobalPublication<double>("pub2_b");
 
     auto sub1_a = vFed2->registerSubscription("pub1_a");
     auto sub1_b = vFed2->registerSubscription("pub1_b");
@@ -44,11 +49,11 @@ TEST_F(timing_tests2, small_time_test)
             grantedTime = vFed2->requestTime(stopTime);
             if (sub1_a.isUpdated()) {
                 auto val = sub1_a.getValue<double>();
-                pub2_a->publish(val);
+                pub2_a.publish(val);
             }
             if (sub1_b.isUpdated()) {
                 auto val = sub1_b.getValue<double>();
-                pub2_b->publish(val);
+                pub2_b.publish(val);
             }
         }
     };
@@ -60,8 +65,8 @@ TEST_F(timing_tests2, small_time_test)
     while (grantedTime < stopTime) {
         grantedTime = vFed1->requestTime(requestedTime);
         if (grantedTime == requestedTime) {
-            pub1_a->publish(10.3);
-            pub1_b->publish(11.2);
+            pub1_a.publish(10.3);
+            pub1_b.publish(11.2);
             requestedTime += helics::Time(10, time_units::ns);
         } else {
             EXPECT_TRUE(grantedTime == requestedTime - helics::Time(9, time_units::ns));
