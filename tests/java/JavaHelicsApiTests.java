@@ -501,26 +501,27 @@ public class JavaHelicsApiTests {
             double sub2UpdateTime = helics.helicsInputLastUpdateTime(sub2);
 
             if (sub2UpdateTime != 1.0) {
-                javaHelicsApiTests.helicsAssert("sub2UpdateTime != 1.0e9");
+                javaHelicsApiTests.helicsAssert("sub2UpdateTime != 1.0");
             }
 
             double[] sub2Real = { 0.0 };
             double[] sub2Imag = { 0.0 };
             helics.helicsInputGetComplex(sub2, sub2Real, sub2Imag);
             if (sub2Real[0] != 5.6) {
-                javaHelicsApiTests.helicsAssert("sub2Real[0] != 5.6");
+                javaHelicsApiTests.helicsAssert("sub2Real != 5.6");
             }
             if (sub2Imag[0] != -0.67) {
-                javaHelicsApiTests.helicsAssert("sub2Imag[0] != -0.67");
+                javaHelicsApiTests.helicsAssert("sub2Imag != -0.67");
             }
 
             double sub1Value = helics.helicsInputGetDouble(sub1);
             if (sub1Value != 457.234) {
-                javaHelicsApiTests.helicsAssert("sub1Value[0] != 457.234");
+                javaHelicsApiTests.helicsAssert("sub1Value != 457.234");
             }
             long sub4Value = helics.helicsInputGetInteger(sub4);
             if (sub4Value != 1) {
-                javaHelicsApiTests.helicsAssert("sub4Value[0] != 1");
+				System.out.println(sub4Value);
+                javaHelicsApiTests.helicsAssert("sub4Value != 1");
             }
             byte[] sub7Point = new byte[256];
             int[] sub7PointLength = new int[1];
