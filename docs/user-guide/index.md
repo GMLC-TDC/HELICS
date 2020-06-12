@@ -21,7 +21,7 @@ There are a number of classes of HELICS users:
 - [**Co-Simulation Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
 - **Running HELICS co-simulations via `helics_cli`(forthcoming)** - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
 - **Cores (forthcoming)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
-- **Broker Hierarchies (forthcoming)** - Advantages and disadvantages of implementing hierarchies of brokers and how that is accomplished in HELICS
+- [**Broker Hierarchies**](./broker_hierarchies.ms) - Purpose of broker hierarchies and how to 
 - **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
