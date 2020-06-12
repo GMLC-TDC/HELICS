@@ -216,16 +216,6 @@ void TimeDependencies::resetIteratingExecRequests()
     }
 }
 
-
-bool TimeDependencies::checkIfReadyForDelayedTimeGrant( Time desiredGrantTime) const
-{
-    return std::all_of(dependencies.begin(),
-                       dependencies.end(),
-                       [desiredGrantTime](const auto& dep) {
-                           return dep.Tnext > desiredGrantTime;
-                       });
-}
-
 bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const
 {
     if (iterating) {

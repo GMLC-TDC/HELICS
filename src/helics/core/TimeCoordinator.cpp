@@ -410,13 +410,16 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::next_step;
         }
         if (time_allow == time_exec) {
-            if (time_requested <= time_exec) {
-                updateTimeGrant();
-                return message_processing_result::next_step;
-            }
-            if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
-                updateTimeGrant();
-                return message_processing_result::next_step;
+            if (time_requested > time_exec || !info.wait_for_current_time_updates)
+            {
+                if (time_requested <= time_exec) {
+                    updateTimeGrant();
+                    return message_processing_result::next_step;
+                }
+                if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
+                    updateTimeGrant();
+                    return message_processing_result::next_step;
+                }
             }
         }
     } else {
