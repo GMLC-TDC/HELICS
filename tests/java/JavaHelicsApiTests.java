@@ -173,16 +173,17 @@ public class JavaHelicsApiTests {
             if (fed3 == null) {
                 javaHelicsApiTests.helicsAssert("fed3 == null");
             }
+			//set uninterruptible flag
             helics.helicsFederateSetFlagOption(fed2, 1, helics.getHelics_false());
 
-            helics.helicsFederateSetTimeProperty(fed2,
-                    helics_properties.helics_property_time_input_delay.swigValue(), 1.0);
+         //   helics.helicsFederateSetTimeProperty(fed2,
+          //          helics_properties.helics_property_time_input_delay.swigValue(), 1.0);
             helics.helicsFederateSetIntegerProperty(fed1,
                     helics_properties.helics_property_int_log_level.swigValue(), 1);
             helics.helicsFederateSetIntegerProperty(fed2,
                     helics_properties.helics_property_int_max_iterations.swigValue(), 100);
-            helics.helicsFederateSetTimeProperty(fed2,
-                    helics_properties.helics_property_time_output_delay.swigValue(), 1.0);
+           // helics.helicsFederateSetTimeProperty(fed2,
+            //        helics_properties.helics_property_time_output_delay.swigValue(), 1.0);
             helics.helicsFederateSetTimeProperty(fed2, helics_properties.helics_property_time_period.swigValue(),
                     0.0);
             helics.helicsFederateSetTimeProperty(fed2,
