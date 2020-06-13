@@ -227,11 +227,13 @@ TEST_F(timing_tests2,ring_test3)
     EXPECT_EQ(newTime, 3e-9);
     EXPECT_TRUE(sub2.isUpdated());
     val = sub2.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 49.7);
     vFed2->finalize();
     newTime = vFed3->requestTimeComplete();
     EXPECT_EQ(newTime, 50.0);
     EXPECT_TRUE(!sub3.isUpdated());
     val = sub3.getValue<double>();
+    EXPECT_DOUBLE_EQ(val, 49.7);
     vFed3->finalize();
     newTime = vFed1->requestTimeComplete();
     EXPECT_EQ(newTime, 50.0);

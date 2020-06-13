@@ -665,7 +665,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             break;
     }
     if (isDelayableMessage(cmd, source_id)) {
-        auto dep = dependencies.getDependencyInfo(global_federate_id(cmd.source_id));
+        auto* dep = dependencies.getDependencyInfo(global_federate_id(cmd.source_id));
         if (dep == nullptr) {
             return message_process_result::no_effect;
         }
