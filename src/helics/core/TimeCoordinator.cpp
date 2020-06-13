@@ -19,11 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-static auto nullMessageFunction = [](const ActionMessage&) {};
+static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
 
-TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> sendMessageFunction_):
-    sendMessageFunction(std::move(sendMessageFunction_))
+TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction):
+    sendMessageFunction(std::move(userSendMessageFunction))
 {
     if (!sendMessageFunction) {
         sendMessageFunction = nullMessageFunction;
@@ -31,9 +31,9 @@ TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> sendM
 }
 
 void TimeCoordinator::setMessageSender(
-    std::function<void(const ActionMessage&)> sendMessageFunction_)
+    std::function<void(const ActionMessage&)> userSendMessageFunction)
 {
-    sendMessageFunction = std::move(sendMessageFunction_);
+    sendMessageFunction = std::move(userSendMessageFunction);
     if (!sendMessageFunction) {
         sendMessageFunction = nullMessageFunction;
     }
@@ -276,17 +276,18 @@ Time TimeCoordinator::getNextPossibleTime() const
     if (time_granted == timeZero) {
         if (info.offset > info.timeDelta) {
             return info.offset;
-        } else if (info.offset == timeZero) {
+        }
+        if (info.offset == timeZero) {
             return generateAllowedTime(std::max(info.timeDelta, info.period));
-        } else if (info.period <= Time::epsilon()) {
+        }
+        if (info.period <= Time::epsilon()) {
             return info.timeDelta;
-        } else {
+        } 
             Time retTime = info.offset + info.period;
             while (retTime < info.timeDelta) {
                 retTime += info.period;
             }
             return retTime;
-        }
     }
     return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
 }
@@ -786,6 +787,8 @@ void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
         case defs::properties::offset:
             info.offset = propertyVal;
             break;
+        default:
+            break;
     }
 }
 
@@ -838,7 +841,7 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
 /** get a time Property*/
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
-    switch (intProperty) {
+    switch (intProperty) { // NOLINT
         case defs::properties::max_iterations:
             return info.maxIterations;
         default:
