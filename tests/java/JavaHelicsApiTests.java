@@ -423,11 +423,13 @@ public class JavaHelicsApiTests {
             }
             helics_message msg2 = helics.helicsEndpointGetMessage(ep2);
             double msg2Time = msg2.getTime();
-            if (msg2Time != 1.0) {
+            if (msg2Time != 0.0) {
+			   System.out.println(msg2Time);
                 javaHelicsApiTests.helicsAssert("msg2Time != 1.0");
             }
             String msg2Data = msg2.getData();
             if (!"Hello".equals(msg2Data)) {
+			 System.out.println(msg2Data);
                 javaHelicsApiTests.helicsAssert("!msg2Data.equals(\"Hello\")");
             }
             long msg2Length = msg2.getLength();
@@ -444,6 +446,7 @@ public class JavaHelicsApiTests {
             }
             String msg2Destination = msg2.getDest();
             if (!"Ep2".equals(msg2Destination)) {
+			    System.out.println(msg2Destination);
                 javaHelicsApiTests.helicsAssert("!msg2Destination.equals(\"Ep2\")");
             }
             String msg2OriginalDestination = msg2.getOriginal_dest();
@@ -460,7 +463,7 @@ public class JavaHelicsApiTests {
             }
             helics_message msg3 = helics.helicsFederateGetMessage(fed1);
             double msg3Time = msg3.getTime();
-            if (msg3Time != 1.0) {
+            if (msg3Time != 0.0) {
                 javaHelicsApiTests.helicsAssert("msg3Time != 1.0");
             }
             String msg3Data = msg3.getData();
