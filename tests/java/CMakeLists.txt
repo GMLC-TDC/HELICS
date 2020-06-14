@@ -47,7 +47,9 @@ if(CMAKE_HOST_WIN32 AND NOT CYGWIN AND CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
 else()
     set(CMAKE_JAVA_INCLUDE_FLAG_SEP ":")
 endif()
-set(java_test_classpath "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}${CMAKE_CURRENT_BINARY_DIR}")
+set(java_test_classpath
+    "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}${CMAKE_CURRENT_BINARY_DIR}${CMAKE_JAVA_INCLUDE_FLAG_SEP}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+)
 
 add_test(NAME Java_hello_world_test
          COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:helics::java>
@@ -59,6 +61,12 @@ add_test(NAME Java_Helics_Api_tests
                  -classpath "${java_test_classpath}" JavaHelicsApiTests
 )
 
-set_target_properties(Java_hello_world Java_Helics_Api PROPERTIES FOLDER tests)
+add_custom_target(
+    RUN_JAVA_TEST
+    COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:helics::java> -classpath
+            "${java_test_classpath}" JavaHelicsApiTests DEPENDS Java_Helics_Api
+)
+
+set_target_properties(Java_hello_world Java_Helics_Api RUN_JAVA_TEST PROPERTIES FOLDER tests)
 
 set_property(TEST Java_hello_world_test Java_Helics_Api_tests PROPERTY LABELS Java Continuous Daily)
