@@ -8,6 +8,22 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [2.5.2][] ~ 2020-06-15
+
+Bug fix release for some build issues and a fix to the `wait_for_current_time` flag
+
+### Fixed
+
+- Bug in the timing subsystem that was preventing the `wait_for_current_time` from functioning properly
+- Fixed some oddities in the java tests, that were doing confusing things and happened to work because of the bug in the timing subsystem
+- A build system issue that caused the automated generation of python packages to fail on the 2.5.1 release. This was caused by overriding the output build location in all cases, when it should have been limited if the python interface was build separately.
+- A few cppcheck issue from the new check (#1414)
+
+### Added
+
+- Add print_systeminfo flag to root helics_benchmark command (#1417)
+- Added cppcheck github action for PR's
+
 ## [2.5.1][] ~ 2020-06-05
 
 ### Changed
@@ -717,3 +733,4 @@ This is a major revision so this changelog will not capture all the changes that
 [2.4.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.2
 [2.5.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.0
 [2.5.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.1
+[2.5.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.2
