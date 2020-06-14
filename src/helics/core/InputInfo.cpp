@@ -235,7 +235,7 @@ bool InputInfo::updateTimeUpTo(Time newTime)
             ++index;
             continue;
         }
-        if (currentValue->time > newTime) {
+        if (currentValue->time >= newTime) {
             ++index;
             continue;
         }
@@ -256,7 +256,7 @@ bool InputInfo::updateTimeUpTo(Time newTime)
     return updated;
 }
 
-bool InputInfo::updateTimeNextIteration(Time newTime)
+bool InputInfo::updateTimeNextIteration(Time newTime) 
 {
     int index{0};
     bool updated{false};
