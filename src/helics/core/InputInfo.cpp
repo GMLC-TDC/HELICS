@@ -256,7 +256,7 @@ bool InputInfo::updateTimeUpTo(Time newTime)
     return updated;
 }
 
-bool InputInfo::updateTimeNextIteration(Time newTime) 
+bool InputInfo::updateTimeNextIteration(Time newTime)
 {
     int index{0};
     bool updated{false};

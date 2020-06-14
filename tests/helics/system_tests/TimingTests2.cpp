@@ -159,7 +159,7 @@ TEST_F(timing_tests2, small_period_test)
 }
 
 // Tests out the restrictive time policy
-TEST_F(timing_tests2,ring_test3)
+TEST_F(timing_tests2, ring_test3)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -172,9 +172,9 @@ TEST_F(timing_tests2,ring_test3)
     auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
     auto pub2 = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2");
     auto pub3 = helics::make_publication<double>(helics::GLOBAL, vFed3, "pub3");
-    auto sub1 = vFed1->registerSubscription ("pub3");
-    auto sub2 = vFed2->registerSubscription ("pub1");
-    auto sub3 = vFed3->registerSubscription ("pub2");
+    auto sub1 = vFed1->registerSubscription("pub3");
+    auto sub2 = vFed2->registerSubscription("pub1");
+    auto sub3 = vFed3->registerSubscription("pub2");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
     vFed3->enterExecutingMode();
@@ -241,14 +241,13 @@ TEST_F(timing_tests2,ring_test3)
     vFed1->finalize();
 }
 
-
 TEST_F(timing_tests2, wait_for_current_time_flag)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-    
+
     vFed3->setFlagOption(helics::defs::wait_for_current_time_update);
 
     auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
@@ -262,7 +261,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed3->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
     vFed2->enterExecutingModeComplete();
-    //this works since there are no reverse dependencies
+    // this works since there are no reverse dependencies
     vFed1->requestTime(1.0);
     pub1->publish(3.5);
     auto tm1 = vFed1->requestTime(3.0);
@@ -270,15 +269,16 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     auto tm2 = vFed2->requestTime(1.0);
     EXPECT_EQ(tm2, 1.0);
     double val2 = sub2.getValue<double>();
-    EXPECT_DOUBLE_EQ(val2, 2.6); // shouldn't have gotten the update
+    EXPECT_DOUBLE_EQ(val2, 2.6);  // shouldn't have gotten the update
 
     auto tm3 = vFed3->requestTime(1.0);
     EXPECT_EQ(tm3, 1.0);
     double val3 = sub3.getValue<double>();
-    EXPECT_DOUBLE_EQ(val3, 3.5);  // should have gotten the update from the wait_for_current_time_flag
-    
+    EXPECT_DOUBLE_EQ(val3,
+                     3.5);  // should have gotten the update from the wait_for_current_time_flag
+
     tm2 = vFed2->requestTime(2.0);
-    EXPECT_EQ(tm2, helics::Time(1.0)+helics::Time(1,time_units::ns));
+    EXPECT_EQ(tm2, helics::Time(1.0) + helics::Time(1, time_units::ns));
 
     tm3 = vFed3->requestTime(2.0);
     EXPECT_EQ(tm3, 2.0);
@@ -291,13 +291,13 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     pub1->publish(9.3);
     vFed1->finalize();
 
-    //Now check that iteration works
+    // Now check that iteration works
     tm3 = vFed2->requestTime(3.0);
     EXPECT_EQ(tm3, 3.0);
     val2 = sub2.getValue<double>();
     EXPECT_DOUBLE_EQ(val2, 3.5);
 
-    auto itTime = vFed2->requestTimeIterative(4.0,helics::iteration_request::iterate_if_needed);
+    auto itTime = vFed2->requestTimeIterative(4.0, helics::iteration_request::iterate_if_needed);
     EXPECT_EQ(itTime.state, helics::iteration_result::iterating);
     EXPECT_EQ(itTime.grantedTime, 3.0);
     val2 = sub2.getValue<double>();
@@ -319,5 +319,4 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     EXPECT_DOUBLE_EQ(val3, 9.3);
 
     vFed3->finalize();
-    
 }

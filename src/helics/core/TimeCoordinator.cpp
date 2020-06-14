@@ -282,12 +282,12 @@ Time TimeCoordinator::getNextPossibleTime() const
         }
         if (info.period <= Time::epsilon()) {
             return info.timeDelta;
-        } 
-            Time retTime = info.offset + info.period;
-            while (retTime < info.timeDelta) {
-                retTime += info.period;
-            }
-            return retTime;
+        }
+        Time retTime = info.offset + info.period;
+        while (retTime < info.timeDelta) {
+            retTime += info.period;
+        }
+        return retTime;
     }
     return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
 }
@@ -411,8 +411,7 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::next_step;
         }
         if (time_allow == time_exec) {
-            if (time_requested > time_exec || !info.wait_for_current_time_updates)
-            {
+            if (time_requested > time_exec || !info.wait_for_current_time_updates) {
                 if (time_requested <= time_exec) {
                     updateTimeGrant();
                     return message_processing_result::next_step;
@@ -841,7 +840,7 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
 /** get a time Property*/
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
-    switch (intProperty) { // NOLINT
+    switch (intProperty) {  // NOLINT
         case defs::properties::max_iterations:
             return info.maxIterations;
         default:
