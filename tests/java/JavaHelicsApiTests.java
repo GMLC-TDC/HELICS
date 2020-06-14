@@ -464,7 +464,7 @@ public class JavaHelicsApiTests {
             helics_message msg3 = helics.helicsFederateGetMessage(fed1);
             double msg3Time = msg3.getTime();
             if (msg3Time != 0.0) {
-                javaHelicsApiTests.helicsAssert("msg3Time != 1.0");
+                javaHelicsApiTests.helicsAssert("msg3Time != 0.0");
             }
             String msg3Data = msg3.getData();
             if (!"There".equals(msg3Data)) {
