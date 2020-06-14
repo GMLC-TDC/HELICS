@@ -14,9 +14,9 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 
 ### Fixed
 
-- Bug in the timing subsystem that was preventing the `wait_for_current_time` from functioning properly
+- Bug in the timing subsystem that was preventing the `wait_for_current_time` flag from functioning properly
 - Fixed some oddities in the java tests, that were doing confusing things and happened to work because of the bug in the timing subsystem
-- A build system issue that caused the automated generation of python packages to fail on the 2.5.1 release. This was caused by overriding the output build location in all cases, when it should have been limited if the python interface was build separately.
+- A build system issue that caused the automated generation of python packages to fail on the 2.5.1 release. This was caused by overriding the output build location in all cases, when it should have been limited if the python interface is getting built separately.
 - A few cppcheck issue from the new check (#1414)
 
 ### Added
