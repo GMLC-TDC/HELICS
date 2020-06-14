@@ -574,10 +574,8 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
                 fillEventVectorNextIteration(time_granted);
                 break;
             case iteration_request::iterate_if_needed:
-                if (iterating) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorNextIteration(time_granted);
-                } else if (time_granted < nextTime || wait_for_current_time) {
-                    fillEventVectorInclusive(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
                 }
