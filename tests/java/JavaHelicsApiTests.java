@@ -173,7 +173,7 @@ public class JavaHelicsApiTests {
             if (fed3 == null) {
                 javaHelicsApiTests.helicsAssert("fed3 == null");
             }
-			//set uninterruptible flag
+            //set uninterruptible flag
             helics.helicsFederateSetFlagOption(fed2, 1, helics.getHelics_false());
 
          //   helics.helicsFederateSetTimeProperty(fed2,
@@ -424,12 +424,12 @@ public class JavaHelicsApiTests {
             helics_message msg2 = helics.helicsEndpointGetMessage(ep2);
             double msg2Time = msg2.getTime();
             if (msg2Time != 0.0) {
-			   System.out.println(msg2Time);
+               System.out.println(msg2Time);
                 javaHelicsApiTests.helicsAssert("msg2Time != 1.0");
             }
             String msg2Data = msg2.getData();
             if (!"Hello".equals(msg2Data)) {
-			 System.out.println(msg2Data);
+             System.out.println(msg2Data);
                 javaHelicsApiTests.helicsAssert("!msg2Data.equals(\"Hello\")");
             }
             long msg2Length = msg2.getLength();
@@ -446,7 +446,7 @@ public class JavaHelicsApiTests {
             }
             String msg2Destination = msg2.getDest();
             if (!"Ep2".equals(msg2Destination)) {
-			    System.out.println(msg2Destination);
+                System.out.println(msg2Destination);
                 javaHelicsApiTests.helicsAssert("!msg2Destination.equals(\"Ep2\")");
             }
             String msg2OriginalDestination = msg2.getOriginal_dest();
@@ -524,7 +524,7 @@ public class JavaHelicsApiTests {
             }
             long sub4Value = helics.helicsInputGetInteger(sub4);
             if (sub4Value != 1) {
-				System.out.println(sub4Value);
+                System.out.println(sub4Value);
                 javaHelicsApiTests.helicsAssert("sub4Value != 1");
             }
             byte[] sub7Point = new byte[256];

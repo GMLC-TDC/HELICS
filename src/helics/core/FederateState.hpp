@@ -78,7 +78,8 @@ class FederateState {
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
-    bool wait_for_current_time{false};  //!< flag indicating that the federate should delay for the current time
+    bool wait_for_current_time{
+        false};  //!< flag indicating that the federate should delay for the current time
     int errorCode{0};  //!< storage for an error code
     CommonCore* parent_{nullptr};  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
