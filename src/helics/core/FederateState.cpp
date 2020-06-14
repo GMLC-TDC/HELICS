@@ -575,14 +575,14 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
                 fillEventVectorNextIteration(time_granted);
                 break;
             case iteration_request::iterate_if_needed:
-                if (time_granted < nextTime) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorNextIteration(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
                 }
                 break;
             case iteration_request::no_iterations:
-                if (time_granted < nextTime) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorInclusive(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
@@ -1434,6 +1434,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             break;
         case defs::flags::ignore_time_mismatch_warnings:
             ignore_time_mismatch_warnings = value;
+            break;
+        case defs::flags::wait_for_current_time_update:
+            // this flag is needed in both locations
+            wait_for_current_time = value;
+            timeCoord->setOptionFlag(optionFlag, value);
             break;
         case defs::options::buffer_data:
             break;
