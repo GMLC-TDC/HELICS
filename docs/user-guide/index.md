@@ -39,13 +39,14 @@ There are a number of classes of HELICS users:
 - [**Federates**](./federates.md) - Discussion of the different types of federates in HELICS ([value federates](./value_federates.md) and [message federates](./message_federates.md)) and how configure them
 - [**Message Filters**](./filters) - How HELICS message filters can be implemented natively in HELICS or as stand-alone federates
 - [**Co-Simulation Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
-- **Running HELICS co-simulations via `helics_cli`(forthcoming)** - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
+- [**Running HELICS co-simulations via `helics_cli`**](./helics_cli.md) - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
 - **Cores (forthcoming)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
-- [**Broker Hierarchies**](./broker_hierarchies.ms) - Purpose of broker hierarchies and how to 
+- [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to 
 - **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
 - [**Getting Information from a running simulation**](./webserver.md) - Getting live information from a running co-simulation through a webserver.
+- [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 - [**Integrating a New Simulator**](./simulator_integration.md) - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
 - **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
