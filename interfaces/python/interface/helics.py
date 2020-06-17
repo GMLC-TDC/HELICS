@@ -265,6 +265,8 @@ r"""
     """
 helics_multi_input_no_op = _helics.helics_multi_input_no_op
 r""" time and priority order the inputs from the core library"""
+helics_multi_input_vectorize_operation = _helics.helics_multi_input_vectorize_operation
+r""" vectorize the inputs either double vector or string vector"""
 helics_multi_input_and_operation = _helics.helics_multi_input_and_operation
 r""" all inputs are assumed to be boolean and all must be true to return true"""
 helics_multi_input_or_operation = _helics.helics_multi_input_or_operation
@@ -282,8 +284,6 @@ helics_multi_input_min_operation = _helics.helics_multi_input_min_operation
 r""" find the min of the inputs"""
 helics_multi_input_average_operation = _helics.helics_multi_input_average_operation
 r""" take the average of the inputs"""
-helics_multi_input_vectorize_operation = _helics.helics_multi_input_vectorize_operation
-r""" vectorize the inputs either double vector or string vector"""
 helics_handle_option_connection_required = _helics.helics_handle_option_connection_required
 r"""
     specify that a connection is required for an interface and will generate an error if not
@@ -1120,6 +1120,16 @@ def helicsGetPropertyIndex(val: "char const *") -> "int":
     """
     return _helics.helicsGetPropertyIndex(val)
 
+def helicsGetFlagIndex(val: "char const *") -> "int":
+    r"""
+    Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,
+    :type val: string
+    :param val: A string with the option name.
+    :rtype: int
+    :return: An int with the property code or (-1) if not a valid property.
+    """
+    return _helics.helicsGetFlagIndex(val)
+
 def helicsGetOptionIndex(val: "char const *") -> "int":
     r"""
     Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
@@ -1132,6 +1142,19 @@ def helicsGetOptionIndex(val: "char const *") -> "int":
     :return: An int with the option index or (-1) if not a valid property.
     """
     return _helics.helicsGetOptionIndex(val)
+
+def helicsGetOptionValue(val: "char const *") -> "int":
+    r"""
+    Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
+    /ref helicsFilterSetOption.
+
+    :type val: string
+    :param val: A string representing the value.
+
+    :rtype: int
+    :return: An int with the option value or (-1) if not a valid value.
+    """
+    return _helics.helicsGetOptionValue(val)
 
 def helicsFederateInfoSetFlagOption(fi: "helics_federate_info", flag: "int", value: "helics_bool") -> "void":
     r"""
@@ -3235,7 +3258,8 @@ def helicsEndpointCreateMessageObject(endpoint: "helics_endpoint") -> "helics_me
 
     The message is empty and isValid will return false since there is no data associated with the message yet.
 
-    :param fed: the endpoint object to associate the message with
+    :type endpoint: void
+    :param endpoint: The endpoint object to associate the message with.
 
 
     :rtype: void

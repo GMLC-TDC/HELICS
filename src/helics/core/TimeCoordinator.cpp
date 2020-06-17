@@ -19,11 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-static auto nullMessageFunction = [](const ActionMessage&) {};
+static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
 
-TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> sendMessageFunction_):
-    sendMessageFunction(std::move(sendMessageFunction_))
+TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction):
+    sendMessageFunction(std::move(userSendMessageFunction))
 {
     if (!sendMessageFunction) {
         sendMessageFunction = nullMessageFunction;
@@ -31,9 +31,9 @@ TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> sendM
 }
 
 void TimeCoordinator::setMessageSender(
-    std::function<void(const ActionMessage&)> sendMessageFunction_)
+    std::function<void(const ActionMessage&)> userSendMessageFunction)
 {
-    sendMessageFunction = std::move(sendMessageFunction_);
+    sendMessageFunction = std::move(userSendMessageFunction);
     if (!sendMessageFunction) {
         sendMessageFunction = nullMessageFunction;
     }
@@ -276,17 +276,18 @@ Time TimeCoordinator::getNextPossibleTime() const
     if (time_granted == timeZero) {
         if (info.offset > info.timeDelta) {
             return info.offset;
-        } else if (info.offset == timeZero) {
-            return generateAllowedTime(std::max(info.timeDelta, info.period));
-        } else if (info.period <= Time::epsilon()) {
-            return info.timeDelta;
-        } else {
-            Time retTime = info.offset + info.period;
-            while (retTime < info.timeDelta) {
-                retTime += info.period;
-            }
-            return retTime;
         }
+        if (info.offset == timeZero) {
+            return generateAllowedTime(std::max(info.timeDelta, info.period));
+        }
+        if (info.period <= Time::epsilon()) {
+            return info.timeDelta;
+        }
+        Time retTime = info.offset + info.period;
+        while (retTime < info.timeDelta) {
+            retTime += info.period;
+        }
+        return retTime;
     }
     return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
 }
@@ -410,13 +411,15 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::next_step;
         }
         if (time_allow == time_exec) {
-            if (time_requested <= time_exec) {
-                updateTimeGrant();
-                return message_processing_result::next_step;
-            }
-            if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
-                updateTimeGrant();
-                return message_processing_result::next_step;
+            if (time_requested > time_exec || !info.wait_for_current_time_updates) {
+                if (time_requested <= time_exec) {
+                    updateTimeGrant();
+                    return message_processing_result::next_step;
+                }
+                if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
+                    updateTimeGrant();
+                    return message_processing_result::next_step;
+                }
             }
         }
     } else {
@@ -661,7 +664,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             break;
     }
     if (isDelayableMessage(cmd, source_id)) {
-        auto dep = dependencies.getDependencyInfo(global_federate_id(cmd.source_id));
+        auto* dep = dependencies.getDependencyInfo(global_federate_id(cmd.source_id));
         if (dep == nullptr) {
             return message_process_result::no_effect;
         }
@@ -783,6 +786,8 @@ void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
         case defs::properties::offset:
             info.offset = propertyVal;
             break;
+        default:
+            break;
     }
 }
 
@@ -835,7 +840,7 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
 /** get a time Property*/
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
-    switch (intProperty) {
+    switch (intProperty) {  // NOLINT
         case defs::properties::max_iterations:
             return info.maxIterations;
         default:

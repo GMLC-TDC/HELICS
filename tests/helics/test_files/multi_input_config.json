@@ -1,0 +1,33 @@
+//this should be a valid json file (except comments are not recognized in standard JSON)
+{
+  "name": "valueFed_multi", // the name of the federate
+  //possible flags
+  "coretype": "test", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
+  "corename": "multi_core1", //this matters most for ipc and inproc cores, can be empty
+  "coreinit": "--autobroker", // the initialization string for the core in the form of a command line arguments
+
+  //Publications used in the federate
+  "publications": [
+    {
+      "key": "pub1", // the name of the publication
+      "type": "double", // the type associated with a publication (optional)
+      "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+      "info": "this is an information string for use by the application"
+    },
+    {
+      "key": "pub2", // the name of the publication
+      "type": "double", // the type associated with a publication (optional)
+      "global": true
+    }
+  ],
+
+  "inputs": [
+    {
+      "key": "ipt2",
+      "type": "double",
+      "connections": 2,
+      "multi_input_handling_method": "average",
+      "targets": ["pub1", "pub2"]
+    }
+  ]
+}

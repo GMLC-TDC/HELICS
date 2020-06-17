@@ -6447,6 +6447,32 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsGetFlagIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_AsCharPtrAndSize(swig_obj[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetFlagIndex" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = (char *)(buf1);
+  result = (int)helicsGetFlagIndex((char const *)arg1);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsGetOptionIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -6464,6 +6490,32 @@ SWIGINTERN PyObject *_wrap_helicsGetOptionIndex(PyObject *SWIGUNUSEDPARM(self), 
   }
   arg1 = (char *)(buf1);
   result = (int)helicsGetOptionIndex((char const *)arg1);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsGetOptionValue(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_AsCharPtrAndSize(swig_obj[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetOptionValue" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = (char *)(buf1);
+  result = (int)helicsGetOptionValue((char const *)arg1);
   resultobj = SWIG_From_int((int)(result));
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   return resultobj;
@@ -16663,6 +16715,13 @@ static PyMethodDef SwigMethods[] = {
 		":rtype: int\n"
 		":return: An int with the property code or (-1) if not a valid property.\n"
 		""},
+	 { "helicsGetFlagIndex", _wrap_helicsGetFlagIndex, METH_O, "\n"
+		"Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateSetFlagOption,\n"
+		":type val: string\n"
+		":param val: A string with the option name.\n"
+		":rtype: int\n"
+		":return: An int with the property code or (-1) if not a valid property.\n"
+		""},
 	 { "helicsGetOptionIndex", _wrap_helicsGetOptionIndex, METH_O, "\n"
 		"Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,\n"
 		"/ref helicsFilterSetOption, and the corresponding get functions.\n"
@@ -16672,6 +16731,16 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":rtype: int\n"
 		":return: An int with the option index or (-1) if not a valid property.\n"
+		""},
+	 { "helicsGetOptionValue", _wrap_helicsGetOptionValue, METH_O, "\n"
+		"Get an option value for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,\n"
+		"/ref helicsFilterSetOption.\n"
+		"\n"
+		":type val: string\n"
+		":param val: A string representing the value.\n"
+		"\n"
+		":rtype: int\n"
+		":return: An int with the option value or (-1) if not a valid value.\n"
 		""},
 	 { "helicsFederateInfoSetFlagOption", _wrap_helicsFederateInfoSetFlagOption, METH_VARARGS, "\n"
 		"Set a flag in the info structure.\n"
@@ -18285,7 +18354,8 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"The message is empty and isValid will return false since there is no data associated with the message yet.\n"
 		"\n"
-		":param fed: the endpoint object to associate the message with\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint object to associate the message with.\n"
 		"\n"
 		"\n"
 		":rtype: void\n"
@@ -19802,6 +19872,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_property_int_file_log_level",SWIG_From_int((int)(helics_property_int_file_log_level)));
   SWIG_Python_SetConstant(d, "helics_property_int_console_log_level",SWIG_From_int((int)(helics_property_int_console_log_level)));
   SWIG_Python_SetConstant(d, "helics_multi_input_no_op",SWIG_From_int((int)(helics_multi_input_no_op)));
+  SWIG_Python_SetConstant(d, "helics_multi_input_vectorize_operation",SWIG_From_int((int)(helics_multi_input_vectorize_operation)));
   SWIG_Python_SetConstant(d, "helics_multi_input_and_operation",SWIG_From_int((int)(helics_multi_input_and_operation)));
   SWIG_Python_SetConstant(d, "helics_multi_input_or_operation",SWIG_From_int((int)(helics_multi_input_or_operation)));
   SWIG_Python_SetConstant(d, "helics_multi_input_sum_operation",SWIG_From_int((int)(helics_multi_input_sum_operation)));
@@ -19809,7 +19880,6 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_multi_input_max_operation",SWIG_From_int((int)(helics_multi_input_max_operation)));
   SWIG_Python_SetConstant(d, "helics_multi_input_min_operation",SWIG_From_int((int)(helics_multi_input_min_operation)));
   SWIG_Python_SetConstant(d, "helics_multi_input_average_operation",SWIG_From_int((int)(helics_multi_input_average_operation)));
-  SWIG_Python_SetConstant(d, "helics_multi_input_vectorize_operation",SWIG_From_int((int)(helics_multi_input_vectorize_operation)));
   SWIG_Python_SetConstant(d, "helics_handle_option_connection_required",SWIG_From_int((int)(helics_handle_option_connection_required)));
   SWIG_Python_SetConstant(d, "helics_handle_option_connection_optional",SWIG_From_int((int)(helics_handle_option_connection_optional)));
   SWIG_Python_SetConstant(d, "helics_handle_option_single_connection_only",SWIG_From_int((int)(helics_handle_option_single_connection_only)));

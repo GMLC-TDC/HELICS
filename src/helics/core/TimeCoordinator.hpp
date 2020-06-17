@@ -98,7 +98,7 @@ class TimeCoordinator {
     /** default constructor*/
     TimeCoordinator();
     /** construct from a federate info and message send function*/
-    explicit TimeCoordinator(std::function<void(const ActionMessage&)> sendMessageFunction_);
+    explicit TimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction);
 
     /** set a timeProperty for a the coordinator*/
     void setProperty(int timeProperty, Time propertyVal);
@@ -113,7 +113,7 @@ class TimeCoordinator {
     /** get an option flag value*/
     int getIntegerProperty(int intProperty) const;
     /** set the callback function used for the sending messages*/
-    void setMessageSender(std::function<void(const ActionMessage&)> sendMessageFunction_);
+    void setMessageSender(std::function<void(const ActionMessage&)> userSendMessageFunction);
 
     /** get the current granted time*/
     Time getGrantedTime() const { return time_granted; }

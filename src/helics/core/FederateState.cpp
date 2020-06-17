@@ -301,12 +301,12 @@ void FederateState::createInterface(handle_type htype,
             if (checkActionFlag(getInterfaceFlags(), required_flag)) {
                 interfaceInformation.setPublicationProperty(handle,
                                                             defs::options::connection_required,
-                                                            true);
+                                                            1);
             }
             if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
                 interfaceInformation.setPublicationProperty(handle,
                                                             defs::options::connection_optional,
-                                                            true);
+                                                            1);
             }
         } break;
         case handle_type::input: {
@@ -314,22 +314,22 @@ void FederateState::createInterface(handle_type htype,
             if (strict_input_type_checking) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::options::strict_type_checking,
-                                                      true);
+                                                      1);
             }
             if (ignore_unit_mismatch) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::options::ignore_unit_mismatch,
-                                                      true);
+                                                      1);
             }
             if (checkActionFlag(getInterfaceFlags(), required_flag)) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::options::connection_required,
-                                                      true);
+                                                      1);
             }
             if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::options::connection_optional,
-                                                      true);
+                                                      1);
             }
         } break;
         case handle_type::endpoint: {
@@ -574,14 +574,14 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
                 fillEventVectorNextIteration(time_granted);
                 break;
             case iteration_request::iterate_if_needed:
-                if (time_granted < nextTime) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorNextIteration(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
                 }
                 break;
             case iteration_request::no_iterations:
-                if (time_granted < nextTime) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorInclusive(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
@@ -1286,7 +1286,9 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
         case 'i':
             used = interfaceInformation.setInputProperty(cmd.dest_handle,
                                                          cmd.messageID,
-                                                         checkActionFlag(cmd, indicator_flag));
+                                                         checkActionFlag(cmd, indicator_flag) ?
+                                                             cmd.getExtraDestData() :
+                                                             0);
             if (!used) {
                 auto* ipt = interfaceInformation.getInput(cmd.dest_handle);
                 if (ipt != nullptr) {
@@ -1302,7 +1304,9 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             used =
                 interfaceInformation.setPublicationProperty(cmd.dest_handle,
                                                             cmd.messageID,
-                                                            checkActionFlag(cmd, indicator_flag));
+                                                            checkActionFlag(cmd, indicator_flag) ?
+                                                                cmd.getExtraDestData() :
+                                                                0);
             if (!used) {
                 auto* pub = interfaceInformation.getPublication(cmd.dest_handle);
                 if (pub != nullptr) {
@@ -1318,7 +1322,9 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
         case 'e':
             used = interfaceInformation.setEndpointProperty(cmd.dest_handle,
                                                             cmd.messageID,
-                                                            checkActionFlag(cmd, indicator_flag));
+                                                            checkActionFlag(cmd, indicator_flag) ?
+                                                                cmd.getExtraDestData() :
+                                                                0);
             if (!used) {
                 auto* ept = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (ept != nullptr) {
@@ -1384,9 +1390,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
 {
     switch (optionFlag) {
         case defs::flags::only_transmit_on_change:
+        case defs::options::handle_only_transmit_on_change:
             only_transmit_on_change = value;
             break;
         case defs::flags::only_update_on_change:
+        case defs::options::handle_only_update_on_change:
             interfaceInformation.setChangeUpdateFlag(value);
             break;
         case defs::flags::strict_input_type_checking:
@@ -1430,6 +1438,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
         case defs::flags::ignore_time_mismatch_warnings:
             ignore_time_mismatch_warnings = value;
             break;
+        case defs::flags::wait_for_current_time_update:
+            // this flag is needed in both locations
+            wait_for_current_time = value;
+            timeCoord->setOptionFlag(optionFlag, value);
+            break;
         case defs::options::buffer_data:
             break;
         case defs::flags::connections_required:
@@ -1471,8 +1484,10 @@ bool FederateState::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {
         case defs::flags::only_transmit_on_change:
+        case defs::options::handle_only_transmit_on_change:
             return only_transmit_on_change;
         case defs::flags::only_update_on_change:
+        case defs::options::handle_only_update_on_change:
             return interfaceInformation.getChangeUpdateFlag();
         case defs::flags::realtime:
             return realtime;
@@ -1511,7 +1526,7 @@ int32_t FederateState::getHandleOption(interface_handle handle, char iType, int3
         default:
             break;
     }
-    return false;
+    return 0;
 }
 
 /** get an option flag value*/

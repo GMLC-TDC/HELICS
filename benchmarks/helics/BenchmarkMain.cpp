@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimingLeafFederate.hpp"
 #include "WattsStrogatzFederate.hpp"
 #include "helics/core/helicsCLI11.hpp"
+#include "helics_benchmark_util.h"
 
 #include <chrono>
 #include <iostream>
@@ -48,6 +49,16 @@ int main(int argc, char* argv[])
             "HELICS benchmark federates for use in multinode benchmark setups",
             "helics_benchmarks");
         app.ignore_case()->prefix_command()->ignore_underscore();
+
+        // add a flag for printing system info
+        app.add_flag_callback(
+            "--print_systeminfo",
+            []() {
+                printHELICSsystemInfo();
+                exit(0);
+            },
+            "prints the HELICS system info and exits");
+
         addBM<EchoHub>(app, "echohub", "Echo Hub benchmark federate");
         addBM<EchoLeaf>(app, "echoleaf", "Echo Leaf benchmark federate");
         addBM<EchoMessageHub>(app, "echomessagehub", "Echo Message Hub benchmark federate");

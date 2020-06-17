@@ -184,19 +184,17 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 {
     addTargets(data, "flags", [&objUpdate](const std::string& target) {
         if (target.front() != '-') {
-            objUpdate.setOption(getOptionIndex(target), true);
+            objUpdate.setOption(getOptionIndex(target), 1);
         } else {
-            objUpdate.setOption(getOptionIndex(target.substr(2)), false);
+            objUpdate.setOption(getOptionIndex(target.substr(2)), 0);
         }
     });
-    bool optional = getOrDefault(data, "optional", false);
-    if (optional) {
-        objUpdate.setOption(defs::options::connection_optional, optional);
-    }
-    bool required = getOrDefault(data, "required", false);
-    if (required) {
-        objUpdate.setOption(defs::options::connection_required, required);
-    }
+    processOptions(
+        data,
+        [](const std::string& option) { return getOptionIndex(option); },
+        [](const std::string& value) { return getOptionValue(value); },
+        [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
+
     callIfMember(data, "shortcut", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
     });
@@ -378,7 +376,7 @@ const std::string& ValueFederate::getString(Input& inp)
     return inp.getValueRef<std::string>();
 }
 
-void ValueFederate::publishRaw(const Publication& pub, data_view block)
+void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         vfManager->publish(pub, block);
