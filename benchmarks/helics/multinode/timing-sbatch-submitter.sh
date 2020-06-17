@@ -14,6 +14,6 @@ for ct in "${coretypes_arr[@]}"
 do
     for numnodes in "${numnodes_arr[@]}"
     do
-        sbatch --export="CORE_TYPE=${ct},BM_FED=TimingLeafFederate,BM_HUB=TimingHubFederate,LEAFS_ARG=true" -N "${numnodes}" index-hub-bm.sbatch
+        sbatch --export="CORE_TYPE=${ct},BM_FED=TimingLeaf,BM_HUB=TimingHub,LEAFS_ARG=true" -N "${numnodes}" index-hub-bm.sbatch
     done
 done

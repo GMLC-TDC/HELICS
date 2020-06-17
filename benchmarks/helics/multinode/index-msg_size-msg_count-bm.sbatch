@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -t 0:30:00
-#SBATCH -p pdebug
+#SBATCH -p pbatch
 #SBATCH -N 1
 
 # the sbatch arguments set above can be changed by passing the same argument to the sbatch command (e.g. -N100 to use 100 nodes instead of 1)
@@ -46,12 +46,12 @@ fi
 command -v "${helics_broker_exe}" || { echo >&2 "unable to find helics broker at ${helics_broker_exe}; check for working build and set BUILD_PATH if needed"; exit 1; }
 
 if [[ "${helics_bm_fed_exe}" == "" ]]; then
-    helics_bm_fed_exe="${BUILD_PATH}/bin/${BM_FED}"
+    helics_bm_fed_exe="${BUILD_PATH}/bin/helics_benchmarks"
 fi
 command -v "${helics_bm_fed_exe}" || { echo >&2 "unable to find benchmark federate at ${helics_bm_fed_exe}; check for working build and set BUILD_PATH if needed"; exit 1; }
 
 # create an output folder for results
-output_folder="${BM_FED}-${CORE_TYPE}-N${SLURM_JOB_NUM_NODES}-job-${SLURM_JOB_ID}"
+output_folder="${BM_FED}Federate-${CORE_TYPE}-N${SLURM_JOB_NUM_NODES}-job-${SLURM_JOB_ID}"
 mkdir -p "${output_folder}"
 
 # output some basic info for this benchmark run
@@ -75,7 +75,7 @@ sleep 5
 for i in $(seq 1 "${SLURM_JOB_NUM_NODES}");
 do
     (( idx = i-1 ))
-    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" --msg_size="${MSG_SIZE}" --msg_count="${MSG_COUNT}"> "${output_folder}/${BM_FED}-${idx}-out.txt" 2>&1 &
+    srun -N1 "${helics_bm_fed_exe}" "${BM_FED}" --index="$idx" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" --msg_size="${MSG_SIZE}" --msg_count="${MSG_COUNT}"> "${output_folder}/${BM_FED}Federate-${idx}-out.txt" 2>&1 &
 done
 
 wait

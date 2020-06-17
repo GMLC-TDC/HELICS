@@ -15,7 +15,7 @@ do
     do
         for msg_count in "${msg_count_arr[@]}"
         do
-            sbatch --export="CORE_TYPE=${ct},BM_FED=MessageExchangeFederate,MSG_SIZE=${msg_size},MSG_COUNT=${msg_count}" -N "2" index-msg_size-msg_count-bm.sbatch
+            sbatch --export="CORE_TYPE=${ct},BM_FED=MessageExchange,MSG_SIZE=${msg_size},MSG_COUNT=${msg_count}" -N "2" index-msg_size-msg_count-bm.sbatch
         done
     done
 done

@@ -14,7 +14,7 @@ for ct in "${coretypes_arr[@]}"
 do
     for numnodes in "${numnodes_arr[@]}"
     do
-        sbatch --export="CORE_TYPE=${ct},BM_FED=RingTransmitFederate" -N "${numnodes}" index-maxindex-bm.sbatch
-        sbatch --export="CORE_TYPE=${ct},BM_FED=RingTransmitMessageFederate" -N "${numnodes}" index-maxindex-bm.sbatch
+        sbatch --export="CORE_TYPE=${ct},BM_FED=RingTransmit" -N "${numnodes}" index-maxindex-bm.sbatch
+        sbatch --export="CORE_TYPE=${ct},BM_FED=RingTransmitMessage" -N "${numnodes}" index-maxindex-bm.sbatch
     done
 done

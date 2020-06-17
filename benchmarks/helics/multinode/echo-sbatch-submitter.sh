@@ -14,7 +14,7 @@ for ct in "${coretypes_arr[@]}"
 do
     for numnodes in "${numnodes_arr[@]}"
     do
-        sbatch --export="CORE_TYPE=${ct},BM_FED=EchoLeafFederate,BM_HUB=EchoHubFederate,LEAFS_ARG=true" -N "${numnodes}" index-hub-bm.sbatch
-        sbatch --export="CORE_TYPE=${ct},BM_FED=EchoMessageLeafFederate,BM_HUB=EchoMessageHubFederate" -N "${numnodes}" index-hub-bm.sbatch
+        sbatch --export="CORE_TYPE=${ct},BM_FED=EchoLeaf,BM_HUB=EchoHub,LEAFS_ARG=true" -N "${numnodes}" index-hub-bm.sbatch
+        sbatch --export="CORE_TYPE=${ct},BM_FED=EchoMessageLeaf,BM_HUB=EchoMessageHub" -N "${numnodes}" index-hub-bm.sbatch
     done
 done
