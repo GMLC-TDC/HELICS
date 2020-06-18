@@ -15,23 +15,23 @@ There are a number of classes of HELICS users:
 ```eval_rst
 .. toctree::
 	:hidden:
-    :maxdepth: 1
-    
-    co-simulation_overview
-    helics_key_concepts
-    helics_co-sim_sequence
-    federates
-    value_federates
-    message_federates
-    filters
-    timing
-    broker_hierarchies
-    queries
-    logging
-    webserver
-    simulator_integration
-    simultaneous_cosimulations
-    multi-broker
+	:maxdepth: 1
+	
+	co-simulation_overview
+	helics_key_concepts
+	helics_co-sim_sequence
+	federates
+	value_federates
+	message_federates
+	filters
+	timing
+	broker_hierarchies
+	queries
+	logging
+	webserver
+	simulator_integration
+	simultaneous_cosimulations
+	multi-broker
 ```
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
