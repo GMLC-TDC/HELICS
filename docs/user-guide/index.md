@@ -11,7 +11,7 @@ There are a number of classes of HELICS users:
 - Experienced users that are incorporating a new simulator and need to know how to use specific features in the HELICS API
 - Developers of HELICS who are improving HELICS functionality and contributing to the code base
 
-## User Guide Overview
+## Fundamental Topics
 ```eval_rst
 .. toctree::
     :hidden:
@@ -26,11 +26,9 @@ There are a number of classes of HELICS users:
     filters
     timing
     helics_cli
-    broker_hierarchies
-    queries
     logging
     webserver
-    simultaneous_cosimulations
+    simulator_integration
 ```
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
@@ -39,18 +37,35 @@ There are a number of classes of HELICS users:
 - [**Message Filters**](./filters) - How HELICS message filters can be implemented natively in HELICS or as stand-alone federates
 - [**Co-Simulation Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
 - [**Running HELICS co-simulations via `helics_cli`**](./helics_cli.md) - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
-- **Cores (forthcoming)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
-- [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to 
-- **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
-- [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
 - [**Getting Information from a running simulation**](./webserver.md) - Getting live information from a running co-simulation through a webserver.
 - [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 - [**Integrating a New Simulator**](./simulator_integration.md) - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
 - **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
-- [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
+
+
+## Advanced Topics
+```eval_rst
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    broker_hierarchies
+    queries
+    multibroker
+    simultaneous_cosimulations
+    
+
+```
+- [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to 
+- **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
+- **Cores (forthcoming)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
+- [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type of communication isn't sufficient.
+- [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
 - **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
+- **HELICS Timing Algorithm (forthcoming)** - Detailed description of the HELICS timing algorithm and the finer points of manipulating it for maximum co-simulation performance.
+- **Value Message Types (forthcoming)** - Detailed description of the four types of value messages in HELICS and how they can be used to minimize federation configuration effort.
 
 ## Additional Resources
 
