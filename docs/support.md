@@ -25,3 +25,5 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 
 
 - **[Gitter](https://gitter.im/GMLC-TDC/HELICS)** - Live chat with developers (when they're logged in) for quick fix support.
+
+- **Virtual Office Hours** - HELICS developers have periodic 
