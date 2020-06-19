@@ -30,6 +30,7 @@ There are a number of classes of HELICS users:
     logging
     webserver
     simulator_integration
+    configuration_options_reference
 ```
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
@@ -43,6 +44,7 @@ There are a number of classes of HELICS users:
 - [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 Though 
 - **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
+- **[Configuration Options Reference](./configuration_options_reference.md)** - Comprehensive reference to all the HELICS configuration options.
 
 
 ## Advanced Topics
