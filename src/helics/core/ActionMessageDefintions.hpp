@@ -352,8 +352,8 @@ across different compilers*/
 const char* actionMessageType(action_message_def::action_t action);
 
 enum cmd_error_codes : int {
-    connection_error_code = -2,
     lost_server_connection_code = -5,
+    connection_error_code = -2,
     already_init_error_code = 5,
     duplicate_federate_name_error_code = 6,
     duplicate_broker_name_error_code = 7,
