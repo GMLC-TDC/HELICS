@@ -653,6 +653,7 @@ void CoreBroker::generateTimeBarrier(ActionMessage& m)
     }
     m.setAction(CMD_TIME_BARRIER);
     m.source_id = global_broker_id_local;
+    m.messageID = global_broker_id_local.baseValue();
     //time should already be set
     broadcast(m);
 }
