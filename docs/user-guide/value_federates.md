@@ -2,7 +2,7 @@
 
 HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](./federates.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
 
-## Value Federate Message Types
+## Value Federate Interface Types
 
 There are four interface types for value federates that allow the interactions between the federates (a large part of co-simulation/federation configuration) to be flexibly defined. The difference between the four types revolve around whether the interface is for sending or receiving HELICS messages and whether the sender/receiver is defined by the federate (technically, the core associated with the federate):
 
