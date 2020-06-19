@@ -68,12 +68,3 @@ Though
 - **HELICS Timing Algorithm (forthcoming)** - Detailed description of the HELICS timing algorithm and the finer points of manipulating it for maximum co-simulation performance.
 - **Value Message Types (forthcoming)** - Detailed description of the four types of value messages in HELICS and how they can be used to minimize federation configuration effort.
 
-## Additional Resources
-
-- [HELICS API](../doxygen/index.html) - Doxygen of the current API. If you need to know the details of the APIs and function calls, this is the place.
-- [HELICS federate configuration](../configuration/index.html) - Details on how the federates can be configured
-- [Installation](../installation/index.html) - Instructions on how to install HELICS
-- [C API](../c-api-reference/index.html)
-- [Developer's Guide](../developer-guide/index.html) - Details on how the software is assembled and some of the underlying components.
-- [Existing Tools](../Tools_using_HELICS.md) - List of the existing tools using HELICS and some under development.
-- [Youtube Channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg/featured) - Throughout the development of HELICS, developers and users have given mini-tutorials providing overviews of the work they have been doing. Due to its nature, many of the specifics of the content are out of date but many of the general concepts of HELICS haven't changed. A good, broad overview of the project as a whole.
