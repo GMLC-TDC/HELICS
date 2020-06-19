@@ -30,6 +30,8 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 ### General Configuration Parameter
 
+(xxxxxxx figure out what needs to be in here now that we have the Configuration Options Reference page)
+
 Though contained here in this section on value federates, the options below are applicable to both value and message federates. As value federates are the more common type, we've put them here.
 
 ```json

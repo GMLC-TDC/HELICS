@@ -37,33 +37,4 @@ The following table may be useful in understanding the differences between the t
 
 3. **Combination federates** - As you might guess, this type of federate makes use of both the value method and the endpoint method for transferring data between federates. An example of a federate like this could be a transmission system simulator that is acting both as a physical model of a system as well as a collection of PMUs that are sending data to a centralized generator dispatcher. The solution to the powerflow could be used to define substation voltages to some attached distribution circuits (physical values sent via publication) and the generator output powers could be sent to the centralized controller (control/measurement values being sent over a communication network via endpoints in a message federate).
 
-## Federate Configuration Flags
 
-There are a number of flags which control how a federate acts with respect to timing and its signal interfaces. This section will look at the general federate configuration option while the [timing options are found in their own section](./timing.md). These options are enabled as part of the federate configuration JSON; a few examples are shown below
-
-```json
-{
-  "name":"generic_federate",
-  ...
-  "ignore_time_mismatch_warnings": false,
-  "terminate_on_error": true,
-  ...
-
-```
-
-
-
-- **ignore\_time\_mismatch\_warnings [false]** - If certain timing options (_i.e._ `period`, or `minTimeDelta`) are used it is possible for the time granted a federate to be greater than the requested time. This situation would normally generate a warning message, but if this flag is set those warnings are silenced.
-
-- **connections\_required [false] and connections\_optional [false]** - When a federate is initialized, one of its tasks is to make sure the recipients of directed signals exist. If, after the federation is initialized, the recipient can't be found, then by default a warning is generated and written to the log file. If the `connections\_required` flag is set, this warning becomes a fatal error that stops the co-simulation.  
-
-- **connections\_optional [false]** - When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.
-
-- **strict\_input\_type\_checking [false]** - Only applicable to Named Input interfaces ([see section on value federate interface types](./value_federates.md)), if enabled this flag checks that data type of the incoming signals match that specified for the input. (xxxxxxx - What happens if they don't match?)
-
-- **slow\_responding [false]** -If specified on a federate, setting this flag indicates the federate may be slow in responding, and to not forcibly eject the federate from the federation for the slow response. This is an uncommon scenario.
-
-	If applied to a core or broker (xxxxxxx need examples of this syntax), it is indicative that the broker doesn't respond to internal pings quickly and should not be disconnected from the federation for the slow response.
-	
-	
-- **terminate\_on\_error [false]** - If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions.
