@@ -47,4 +47,4 @@ Just like writing code, it is not unusual for a co-simulation to not quite work 
 ## Web interface demonstration
 Below is a demonstration of how the web interface is used to run Example xxxxxxx.
 
-![web interface demonstration movie](../img/filler_movie.mp4)
+<iframe width="560" height="315" src="https://www.youtube.com/embed/7-THWaRNcQw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
