@@ -52,6 +52,7 @@ Though
     :maxdepth: 1
 
     broker_hierarchies
+    CoreTypes
     queries
     multibroker
     simultaneous_cosimulations
@@ -60,7 +61,7 @@ Though
 ```
 - [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to 
 - **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
-- **Cores (forthcoming)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
+- **[Cores](./CoreTypes.md)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type of communication isn't sufficient.
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
