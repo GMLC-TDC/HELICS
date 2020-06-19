@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsWebServer.hpp"
 
+#include "../utilities/timeStringOps.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
@@ -201,6 +202,18 @@ std::string getBrokerList()
     return generateJsonString(base);
 }
 
+/** get a connected Broker*/
+static std::shared_ptr<helics::Broker> getValidBroker()
+{
+    auto brks = helics::BrokerFactory::getAllBrokers();
+    for (auto& brk : brks) {
+        if (brk->isConnected()) {
+            return brk;
+        }
+    }
+    return nullptr;
+}
+
 enum class return_val : std::int32_t {
     ok = 0,
     bad_request = static_cast<std::int32_t>(http::status::bad_request),
@@ -208,7 +221,7 @@ enum class return_val : std::int32_t {
     not_implemented = static_cast<std::int32_t>(http::status::not_implemented)
 };
 
-enum class cmd { query, create, remove, unknown };
+enum class cmd { query, create, remove, barrier, clear_barrier, unknown };
 
 std::pair<return_val, std::string>
     generateResults(cmd command,
@@ -227,6 +240,9 @@ std::pair<return_val, std::string>
             if (cmdstr == "create") {
                 command = cmd::create;
             }
+            if (cmdstr == "barrier") {
+                command = cmd::barrier;
+            }
             if (cmdstr == "delete" || cmdstr == "remove") {
                 command = cmd::remove;
             }
@@ -238,8 +254,22 @@ std::pair<return_val, std::string>
     if (command == cmd::create && brokerName == "create") {
         brokerName.clear();
     }
+    if (command == cmd::create && brokerName == "barrier") {
+        brokerName.clear();
+        command = cmd::barrier;
+    }
+    if (command == cmd::create && target == "barrier") {
+        command = cmd::barrier;
+    }
     if (command == cmd::remove && (brokerName == "delete" || brokerName == "remove")) {
         brokerName.clear();
+    }
+    if (command == cmd::remove && brokerName == "barrier") {
+        brokerName.clear();
+        command = cmd::clear_barrier;
+    }
+    if (command == cmd::remove && target == "barrier") {
+        command = cmd::clear_barrier;
     }
     if (command == cmd::query && (brokerName == "query" || brokerName == "search")) {
         brokerName.clear();
@@ -271,75 +301,102 @@ std::pair<return_val, std::string>
     }
     std::shared_ptr<helics::Broker> brkr =
         helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName : target.to_string());
-    if (command == cmd::create) {
-        if (brkr) {
-            return {return_val::bad_request, brokerName + " already exists"};
-        }
-        std::string start_args;
-        std::string type;
-        if (fields.find("args") != fields.end()) {
-            start_args = fields.at("args");
-        }
-        if (fields.find("type") != fields.end()) {
-            type = fields.at("type");
-        } else if (fields.find("core_type") != fields.end()) {
-            type = fields.at("core_type");
-        }
-        helics::core_type ctype{helics::core_type::DEFAULT};
-        if (!type.empty()) {
-            ctype = helics::core::coreTypeFromString(type);
-            if (!helics::core::isCoreTypeAvailable(ctype)) {
-                // return send(bad_request(type + " is not available"));
-                return {return_val::bad_request, type + " is not available"};
+    switch (command) {
+        case cmd::create: {
+            if (brkr) {
+                return {return_val::bad_request, brokerName + " already exists"};
             }
-        }
-        if (fields.find("num_feds") != fields.end()) {
-            start_args += " -f " + fields.at("num_feds");
-        }
-        if (fields.find("num_brokers") != fields.end()) {
-            start_args += " --minbrokers=" + fields.at("num_brokers");
-        }
-        bool useUuid{false};
-        if (brokerName.empty()) {
-            boost::uuids::random_generator generator;
+            std::string start_args;
+            std::string type;
+            if (fields.find("args") != fields.end()) {
+                start_args = fields.at("args");
+            }
+            if (fields.find("type") != fields.end()) {
+                type = fields.at("type");
+            } else if (fields.find("core_type") != fields.end()) {
+                type = fields.at("core_type");
+            }
+            helics::core_type ctype{helics::core_type::DEFAULT};
+            if (!type.empty()) {
+                ctype = helics::core::coreTypeFromString(type);
+                if (!helics::core::isCoreTypeAvailable(ctype)) {
+                    // return send(bad_request(type + " is not available"));
+                    return {return_val::bad_request, type + " is not available"};
+                }
+            }
+            if (fields.find("num_feds") != fields.end()) {
+                start_args += " -f " + fields.at("num_feds");
+            }
+            if (fields.find("num_brokers") != fields.end()) {
+                start_args += " --minbrokers=" + fields.at("num_brokers");
+            }
+            bool useUuid{false};
+            if (brokerName.empty()) {
+                boost::uuids::random_generator generator;
 
-            boost::uuids::uuid uuid1 = generator();
-            std::ostringstream ss1;
-            ss1 << uuid1;
-            brokerName = ss1.str();
-            useUuid = true;
+                boost::uuids::uuid uuid1 = generator();
+                std::ostringstream ss1;
+                ss1 << uuid1;
+                brokerName = ss1.str();
+                useUuid = true;
+            }
+            brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
+            if (!brkr) {
+                return {return_val::bad_request, "unable to create broker"};
+                // return send(bad_request("unable to create broker"));
+            }
+            if (useUuid) {
+                return {return_val::ok, std::string(R"({"broker_uuid":")") + brokerName + "\"}"};
+            }
+            return {return_val::ok, emptyString};
         }
-        brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
-        if (!brkr) {
-            return {return_val::bad_request, "unable to create broker"};
-            // return send(bad_request("unable to create broker"));
-        }
-        if (useUuid) {
-            return {return_val::ok, std::string(R"({"broker_uuid":")") + brokerName + "\"}"};
-        }
-        return {return_val::ok, emptyString};
-    }
-    if (command == cmd::remove) {
-        if (!brkr) {
-            return {return_val::not_found, brokerName + " not found"};
-        }
-        brkr->disconnect();
-        return {return_val::ok, emptyString};
-    }
+        case cmd::remove:
+            if (!brkr) {
+                return {return_val::not_found, brokerName + " not found"};
+            }
+            brkr->disconnect();
+            return {return_val::ok, emptyString};
+        case cmd::barrier:
+            if (!brkr) {
+                brkr = getValidBroker();
+                if (!brkr) {
+                    return {return_val::bad_request, "unable to locate broker"};
+                }
+            }
+            if (fields.find("time") != fields.end()) {
+                auto bTime =
+                    gmlc::utilities::loadTimeFromString<helics::Time>(fields.at("time"));
+                if (bTime >= helics::timeZero) {
+                    brkr->setTimeBarrier(bTime);
+                } else {
+                    brkr->clearTimeBarrier();
+                }
+                return {return_val::ok, emptyString};
+            } else {
+                brkr->clearTimeBarrier();
+            }
+            return {return_val::ok, emptyString};
+        case cmd::clear_barrier:
+            if (!brkr) {
+                brkr = getValidBroker();
+                if (!brkr) {
+                    return {return_val::bad_request, "unable to locate broker"};
+                }
+            }
+            brkr->clearTimeBarrier();
+            return {return_val::ok, emptyString};
+        default:
+            break;
+    } // end switch
 
     bool autoquery{false};
     if (!brkr) {
-        auto brks = helics::BrokerFactory::getAllBrokers();
-        for (auto& brk : brks) {
-            if (brk->isConnected()) {
-                brkr = brk;
-            }
-        }
-        query = target;
-        target = brokerName;
+        brkr = getValidBroker();
         if (!brkr) {
             return {return_val::not_found, brokerName + " not found"};
         }
+        query = target;
+        target = brokerName;
     } else if (query.empty() && !target.empty()) {
         query = target;
         autoquery = true;
