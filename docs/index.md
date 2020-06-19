@@ -22,39 +22,26 @@ Motivation: Energy systems and their associated information and communication te
 ```eval_rst
 .. toctree::
    :maxdepth: 1
-   :caption: Basics
+   :caption: Getting Started
 
    installation/index
-   introduction/index
    user-guide/index
-   Tools_using_HELICS
-```
-
-```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :caption: Reference
-
-   configuration/index
+   support
    apps/index
 ```
 
 ```eval_rst
 .. toctree::
    :maxdepth: 1
-   :caption: API Docs
-
-   c-api-reference/index
-   doxygen/index
-```
-
-```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :caption: Contributing
+   :caption: Developer Reference
 
    developer-guide/index
+   c-api-reference/index
+   doxygen/index
+   configuration/index
    ROADMAP
 ```
+
+
 
 You can find [Doxygen documentation here](doxygen/index.html).
