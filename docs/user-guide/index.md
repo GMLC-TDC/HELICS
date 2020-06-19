@@ -14,6 +14,7 @@ There are a number of classes of HELICS users:
 ## User Guide Overview
 ```eval_rst
 .. toctree::
+    :hidden:
     :maxdepth: 1
 
     co-simulation_overview
