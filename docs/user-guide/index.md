@@ -29,6 +29,8 @@ There are a number of classes of HELICS users:
     broker_hierarchies
     queries
     logging
+    webserver
+    simultaneous_cosimulations
 ```
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
