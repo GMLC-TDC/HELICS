@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include "../core/helics-time.hpp"
 
 namespace helics {
 class Broker;
@@ -134,6 +135,10 @@ class HELICS_CXX_EXPORT BrokerApp {
     /** get a copy of the core pointer*/
     std::shared_ptr<Broker> getCopyofBrokerPointer() const { return broker; }
 
+    /** set a global time Barrier*/
+    void setTimeBarrier(Time barrierTime);
+    /** clear a global time Barrier*/
+    void clearTimeBarrier();
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser(bool noTypeOption = false);

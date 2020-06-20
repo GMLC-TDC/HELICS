@@ -635,6 +635,8 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
     switch (cmd.action()) {
         case CMD_TIME_BLOCK:
         case CMD_TIME_UNBLOCK:
+        case CMD_TIME_BARRIER:
+        case CMD_TIME_BARRIER_CLEAR:
             return processTimeBlockMessage(cmd);
         case CMD_FORCE_TIME_GRANT:
             if (time_granted < cmd.actionTime) {
@@ -695,44 +697,48 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                                             message_process_result::no_effect;
 }
 
+Time TimeCoordinator::updateTimeBlocks(int32_t blockId, Time newTime) {
+        auto blk = std::find_if(timeBlocks.begin(), timeBlocks.end(), [blockId](const auto& block) {
+            return (block.second == blockId);
+        });
+        if (blk != timeBlocks.end()) {
+            blk->first = newTime;
+        }
+        else
+        {
+            timeBlocks.emplace_back( newTime,blockId);
+        }
+        auto res = std::min_element(timeBlocks.begin(),
+                                    timeBlocks.end(),
+                                    [](const auto& blk1, const auto& blk2) {
+                                        return (blk1.first < blk2.first);
+                                    });
+        return res->first;
+}
+
 message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMessage& cmd)
 {
-    if (cmd.action() == CMD_TIME_BLOCK) {
-        timeBlocks.emplace_back(cmd.actionTime, cmd.messageID);
-        if (cmd.actionTime < time_block) {
-            time_block = cmd.actionTime;
-        }
-    } else if (cmd.action() == CMD_TIME_UNBLOCK) {
-        if (!timeBlocks.empty()) {
-            auto ltime = Time::maxVal();
-            if (timeBlocks.front().second == cmd.messageID) {
-                ltime = timeBlocks.front().first;
-                timeBlocks.pop_front();
-            } else {
-                auto blk =
-                    std::find_if(timeBlocks.begin(), timeBlocks.end(), [&cmd](const auto& block) {
-                        return (block.second == cmd.messageID);
-                    });
-                if (blk != timeBlocks.end()) {
-                    ltime = blk->first;
-                    timeBlocks.erase(blk);
-                }
+    Time ltime = Time::maxVal();
+    switch (cmd.action())
+    {
+        case CMD_TIME_BLOCK:
+        case CMD_TIME_BARRIER:
+            ltime = updateTimeBlocks(cmd.messageID, cmd.actionTime);
+            break;
+        case CMD_TIME_UNBLOCK:
+        case CMD_TIME_BARRIER_CLEAR:
+            if (!timeBlocks.empty()) {
+                ltime = updateTimeBlocks(cmd.messageID, Time::maxVal());
             }
-            if (ltime <= time_block) {
-                if (!timeBlocks.empty()) {
-                    auto res = std::min_element(timeBlocks.begin(),
-                                                timeBlocks.end(),
-                                                [](const auto& blk1, const auto& blk2) {
-                                                    return (blk1.first < blk2.first);
-                                                });
-                    time_block = res->first;
-                } else {
-                    time_block = Time::maxVal();
-                }
-                return message_process_result::processed;
-            }
-        }
+            break;
+        default:
+            break;
     }
+    if (ltime > time_block) {
+        time_block = ltime;
+        return message_process_result::processed;
+    }
+    time_block = ltime;
     return message_process_result::no_effect;
 }
 
