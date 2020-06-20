@@ -133,8 +133,13 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
             Json::Value val = loadJsonStr(body.to_string());
             auto mnames = val.getMemberNames();
             for (auto& vb : mnames) {
+                
                 if (val[vb].isString()) {
                     results.second[vb] = val[vb].asString();
+                }
+                else
+                {
+                    results.second[vb] = generateJsonString(val[vb]);
                 }
             }
         } else {
@@ -242,6 +247,9 @@ std::pair<return_val, std::string>
             }
             if (cmdstr == "barrier") {
                 command = cmd::barrier;
+            }
+            if (cmdstr == "clearbarrier") {
+                command = cmd::clear_barrier;
             }
             if (cmdstr == "delete" || cmdstr == "remove") {
                 command = cmd::remove;
@@ -379,7 +387,10 @@ std::pair<return_val, std::string>
                     return {return_val::bad_request, "unable to locate broker"};
                 }
             }
-            if (fields.find("time") != fields.end()) {
+            if (fields.find("time") == fields.end()) {
+                brkr->clearTimeBarrier();
+                return {return_val::ok, emptyString};
+            }
                 auto bTime =
                     gmlc::utilities::loadTimeFromString<helics::Time>(fields.at("time"));
                 if (bTime >= helics::timeZero) {
@@ -387,10 +398,6 @@ std::pair<return_val, std::string>
                 } else {
                     brkr->clearTimeBarrier();
                 }
-                return {return_val::ok, emptyString};
-            } else {
-                brkr->clearTimeBarrier();
-            }
             return {return_val::ok, emptyString};
         case cmd::clear_barrier:
             if (!brkr) {

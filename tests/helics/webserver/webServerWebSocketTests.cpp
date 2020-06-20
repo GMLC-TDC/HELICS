@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/apps/helicsWebServer.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -375,4 +376,51 @@ TEST_F(webTest, deleteJson)
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 0U);
+}
+
+
+
+TEST_F(webTest, timeBlock)
+{
+    Json::Value create;
+    create["broker"] = "brk_timerws";
+    create["command"] = "create";
+    create["core_type"] = "ZMQ";
+    create["num_feds"] = 1;
+    sendText(generateJsonString(create));
+    auto cr = addCore(helics::core_type::ZMQ, "--name=c_timer -f1 --broker=brk_timerws");
+    EXPECT_TRUE(cr->connect());
+
+    helics::ValueFederate vFed("fed1", cr);
+
+    Json::Value barrier;
+    barrier["broker"] = "brk_timerws";
+    barrier["command"] = "barrier";
+    barrier["time"] = 2;
+    sendText(generateJsonString(barrier));
+
+    vFed.enterExecutingMode();
+    auto treq = vFed.requestTime(1.75);
+    EXPECT_EQ(treq, 1.75);
+    vFed.requestTimeAsync(3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(vFed.isAsyncOperationCompleted());
+    barrier["time"] = 5.0;
+    sendText(generateJsonString(barrier));
+    auto rtime = vFed.requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+
+    vFed.requestTimeAsync(6.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(vFed.isAsyncOperationCompleted());
+    barrier["command"] = "clearbarrier";
+    sendText(generateJsonString(barrier));
+    rtime = vFed.requestTimeComplete();
+    EXPECT_EQ(rtime, 6.0);
+
+    vFed.finalize();
+    Json::Value v1;
+    v1["command"] = "delete";
+    v1["broker"] = "brk_timerws";
+    sendText(generateJsonString(v1));
 }
