@@ -331,7 +331,7 @@ namespace tcp {
 
     void TcpComms::queue_tx_function()
     {
-        std::vector<char> buffer;
+        //std::vector<char> buffer;
         auto ioctx = AsioContextManager::getContextPointer();
         auto contextLoop = ioctx->startContextLoop();
         TcpConnection::pointer brokerConnection;
