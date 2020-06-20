@@ -301,6 +301,22 @@ std::pair<return_val, std::string>
     }
     std::shared_ptr<helics::Broker> brkr =
         helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName : target.to_string());
+    if (!brkr)
+    {
+        if (fields.find("broker") != fields.end())
+        {
+            if (query.empty())
+            {
+                query = target;
+                target = brokerName;
+            }
+            else if (target.empty())
+            {
+                target = brokerName;
+            }
+            brkr = helics::BrokerFactory::findBroker(fields.at("broker"));
+        }
+    }
     switch (command) {
         case cmd::create: {
             if (brkr) {
