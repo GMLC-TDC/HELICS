@@ -3927,7 +3927,7 @@ bool CommonCore::checkAndProcessDisconnect()
 }
 
 void CommonCore::sendDisconnect()
-    {
+{
     LOG_CONNECTIONS(global_broker_id_local, "core", "sending disconnect");
     ActionMessage bye(CMD_STOP);
     bye.source_id = global_broker_id_local;

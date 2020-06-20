@@ -6,12 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "helics-time.hpp"
+
 #include <chrono>
 #include <functional>
 #include <string>
 #include <vector>
-
-#include "helics-time.hpp"
 
 namespace helics {
 /** virtual class defining a public interface to a broker*/
@@ -128,7 +128,7 @@ class Broker {
     /** update a time barrier with a new time*/
     virtual void setTimeBarrier(Time barrierTime) = 0;
 
-     /** update a time barrier with a new time*/
+    /** update a time barrier with a new time*/
     virtual void clearTimeBarrier() = 0;
 };
 }  // namespace helics

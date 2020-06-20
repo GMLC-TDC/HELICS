@@ -378,8 +378,6 @@ TEST_F(webTest, deleteJson)
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
-
-
 TEST_F(webTest, timeBlock)
 {
     Json::Value create;

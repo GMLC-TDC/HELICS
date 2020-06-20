@@ -73,7 +73,8 @@ class TimeCoordinator {
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id>
         dependents;  //!< federates which temporally depend on this federate
-    std::vector<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
+    std::vector<std::pair<Time, int32_t>>
+        timeBlocks;  //!< blocks for a particular timeblocking link
     tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage&)>
         sendMessageFunction;  //!< callback used to send the messages
@@ -165,6 +166,7 @@ class TimeCoordinator {
     message_process_result processTimeBlockMessage(const ActionMessage& cmd);
 
     Time updateTimeBlocks(int32_t blockId, Time newTime);
+
   public:
     /** process a message related to time
     @return the result of processing the message

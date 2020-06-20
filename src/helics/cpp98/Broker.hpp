@@ -161,8 +161,7 @@ class Broker {
     {
         helicsBrokerSetTimeBarrier(broker, barrierTime, HELICS_IGNORE_ERROR);
     }
-    void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker);
-    }
+    void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
 
   protected:
     helics_broker broker;  //!< underlying broker information

@@ -342,10 +342,7 @@ TEST_F(timing_tests2, time_barrier1)
     EXPECT_EQ(rtime, 3.0);
     vFed1->finalize();
     vFed2->finalize();
-
-
 }
-
 
 // Tests out the restrictive time policy
 TEST_F(timing_tests2, time_barrier_update)
@@ -366,7 +363,6 @@ TEST_F(timing_tests2, time_barrier_update)
     brokers[0]->setTimeBarrier(4.0);
     rtime = vFed1->requestTimeComplete();
     EXPECT_EQ(rtime, 3.0);
-
 
     vFed1->finalize();
     vFed2->finalize();
