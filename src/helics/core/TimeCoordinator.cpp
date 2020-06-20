@@ -728,7 +728,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
         case CMD_TIME_UNBLOCK:
         case CMD_TIME_BARRIER_CLEAR:
             if (!timeBlocks.empty()) {
-                auto ltime = updateTimeBlocks(cmd.messageID, Time::maxVal());
+                ltime = updateTimeBlocks(cmd.messageID, Time::maxVal());
             }
             break;
         default:

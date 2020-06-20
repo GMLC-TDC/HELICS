@@ -380,7 +380,8 @@ std::pair<return_val, std::string>
             }
             brkr->disconnect();
             return {return_val::ok, emptyString};
-        case cmd::barrier:
+        case cmd::barrier: {
+        
             if (!brkr) {
                 brkr = getValidBroker();
                 if (!brkr) {
@@ -399,6 +400,7 @@ std::pair<return_val, std::string>
                     brkr->clearTimeBarrier();
                 }
             return {return_val::ok, emptyString};
+            }
         case cmd::clear_barrier:
             if (!brkr) {
                 brkr = getValidBroker();
