@@ -443,7 +443,7 @@ TEST_F(httpTest, timeBlock)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_FALSE(vFed.isAsyncOperationCompleted());
     sendCommand(http::verb::post, "brk_timer/barrier", "time=5");
-    auto rtime=vFed.requestTimeComplete();
+    auto rtime = vFed.requestTimeComplete();
     EXPECT_EQ(rtime, 3.0);
 
     vFed.requestTimeAsync(6.0);

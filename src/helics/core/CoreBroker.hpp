@@ -215,7 +215,6 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void clearTimeBarrier() override final;
 
   private:
-
     /** implementation details of the connection process
      */
     virtual bool brokerConnect() = 0;

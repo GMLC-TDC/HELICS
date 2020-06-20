@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../src/helics/cpp98/ValueFederate.hpp"
 #include "cpptestFixtures.hpp"
 
-#include <thread>
 #include <gtest/gtest.h>
+#include <thread>
 
 struct timing_tests: public FederateTestFixture_cpp, public ::testing::Test {
 };

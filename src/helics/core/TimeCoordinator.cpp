@@ -697,30 +697,28 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                                             message_process_result::no_effect;
 }
 
-Time TimeCoordinator::updateTimeBlocks(int32_t blockId, Time newTime) {
-        auto blk = std::find_if(timeBlocks.begin(), timeBlocks.end(), [blockId](const auto& block) {
-            return (block.second == blockId);
-        });
-        if (blk != timeBlocks.end()) {
-            blk->first = newTime;
-        }
-        else
-        {
-            timeBlocks.emplace_back( newTime,blockId);
-        }
-        auto res = std::min_element(timeBlocks.begin(),
-                                    timeBlocks.end(),
-                                    [](const auto& blk1, const auto& blk2) {
-                                        return (blk1.first < blk2.first);
-                                    });
-        return res->first;
+Time TimeCoordinator::updateTimeBlocks(int32_t blockId, Time newTime)
+{
+    auto blk = std::find_if(timeBlocks.begin(), timeBlocks.end(), [blockId](const auto& block) {
+        return (block.second == blockId);
+    });
+    if (blk != timeBlocks.end()) {
+        blk->first = newTime;
+    } else {
+        timeBlocks.emplace_back(newTime, blockId);
+    }
+    auto res = std::min_element(timeBlocks.begin(),
+                                timeBlocks.end(),
+                                [](const auto& blk1, const auto& blk2) {
+                                    return (blk1.first < blk2.first);
+                                });
+    return res->first;
 }
 
 message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMessage& cmd)
 {
     Time ltime = Time::maxVal();
-    switch (cmd.action())
-    {
+    switch (cmd.action()) {
         case CMD_TIME_BLOCK:
         case CMD_TIME_BARRIER:
             ltime = updateTimeBlocks(cmd.messageID, cmd.actionTime);

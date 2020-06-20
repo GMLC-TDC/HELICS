@@ -1375,7 +1375,6 @@ HELICS_EXPORT void helicsCoreSetLogFile(helics_core core, const char* logFileNam
  */
 HELICS_EXPORT void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helics_error* err);
 
-
 /**
  * Set a broker time barrier
  *

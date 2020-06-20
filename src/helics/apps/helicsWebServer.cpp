@@ -22,10 +22,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsWebServer.hpp"
 
-#include "../utilities/timeStringOps.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
+#include "../utilities/timeStringOps.hpp"
 
 #include <algorithm>
 #include <boost/asio/dispatch.hpp>
@@ -133,12 +133,9 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
             Json::Value val = loadJsonStr(body.to_string());
             auto mnames = val.getMemberNames();
             for (auto& vb : mnames) {
-                
                 if (val[vb].isString()) {
                     results.second[vb] = val[vb].asString();
-                }
-                else
-                {
+                } else {
                     results.second[vb] = generateJsonString(val[vb]);
                 }
             }
@@ -309,17 +306,12 @@ std::pair<return_val, std::string>
     }
     std::shared_ptr<helics::Broker> brkr =
         helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName : target.to_string());
-    if (!brkr)
-    {
-        if (fields.find("broker") != fields.end())
-        {
-            if (query.empty())
-            {
+    if (!brkr) {
+        if (fields.find("broker") != fields.end()) {
+            if (query.empty()) {
                 query = target;
                 target = brokerName;
-            }
-            else if (target.empty())
-            {
+            } else if (target.empty()) {
                 target = brokerName;
             }
             brkr = helics::BrokerFactory::findBroker(fields.at("broker"));
@@ -381,7 +373,6 @@ std::pair<return_val, std::string>
             brkr->disconnect();
             return {return_val::ok, emptyString};
         case cmd::barrier: {
-        
             if (!brkr) {
                 brkr = getValidBroker();
                 if (!brkr) {
@@ -392,15 +383,14 @@ std::pair<return_val, std::string>
                 brkr->clearTimeBarrier();
                 return {return_val::ok, emptyString};
             }
-                auto bTime =
-                    gmlc::utilities::loadTimeFromString<helics::Time>(fields.at("time"));
-                if (bTime >= helics::timeZero) {
-                    brkr->setTimeBarrier(bTime);
-                } else {
-                    brkr->clearTimeBarrier();
-                }
-            return {return_val::ok, emptyString};
+            auto bTime = gmlc::utilities::loadTimeFromString<helics::Time>(fields.at("time"));
+            if (bTime >= helics::timeZero) {
+                brkr->setTimeBarrier(bTime);
+            } else {
+                brkr->clearTimeBarrier();
             }
+            return {return_val::ok, emptyString};
+        }
         case cmd::clear_barrier:
             if (!brkr) {
                 brkr = getValidBroker();
@@ -412,7 +402,7 @@ std::pair<return_val, std::string>
             return {return_val::ok, emptyString};
         default:
             break;
-    } // end switch
+    }  // end switch
 
     bool autoquery{false};
     if (!brkr) {
