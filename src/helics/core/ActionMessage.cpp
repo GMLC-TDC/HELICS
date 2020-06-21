@@ -4,6 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+
+// For warnings about constexpr paths in visual studio from frozen libraries
 #if defined(_MSC_VER)
 #pragma warning(disable : 4127 4245)
 #endif
@@ -696,7 +698,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
 
 const char* actionMessageType(action_message_def::action_t action)
 {
-    auto res = actionStrings.find(action);
+    const auto* res = actionStrings.find(action);
     return (res != actionStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
@@ -709,12 +711,9 @@ static constexpr frozen::unordered_map<int, frozen::string,6> errorStrings = {
     {duplicate_broker_name_error_code, "duplicate broker name detected"},
     {mismatch_broker_key_error_code, "Broker key does not match"}};
 
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
-// this function can (in actuality-there was a case that did this) be used as the program is
-// shutting down
 const char* commandErrorString(int errorcode)
 {
-    auto res = errorStrings.find(errorcode);
+    const auto* res = errorStrings.find(errorcode);
     return (res !=errorStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
