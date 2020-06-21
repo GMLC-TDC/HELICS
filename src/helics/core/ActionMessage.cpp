@@ -4,10 +4,19 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+
+// For warnings about constexpr paths in visual studio from frozen libraries
+#if defined(_MSC_VER)
+#pragma warning(disable : 4127 4245)
+#endif
+
 #include "ActionMessage.hpp"
 
 #include "../common/fmt_format.h"
 #include "flagOperations.hpp"
+
+#include <frozen/unordered_map.h>
+#include <frozen/string.h>
 
 #include <algorithm>
 #include <complex>
@@ -573,13 +582,15 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
     return msg;
 }
 
+
 static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed
 // so static consts can cause seg faults someday will change to frozen::  once we can use all of
 // C++14
 
-static constexpr std::pair<action_message_def::action_t, const char*> actionStrings[] = {
+static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string,93> actionStrings =
+    {
     // priority commands
     {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
     {action_message_def::action_t::cmd_disconnect, "disconnect"},
@@ -684,24 +695,15 @@ static constexpr std::pair<action_message_def::action_t, const char*> actionStri
     {action_message_def::action_t::cmd_protocol, "protocol"},
     {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
-using actionPair = std::pair<action_message_def::action_t, const char*>;
-static constexpr size_t actEnd = sizeof(actionStrings) / sizeof(actionPair);
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
-// this function can (in actuality) be used as the program is shutting down
+
 const char* actionMessageType(action_message_def::action_t action)
 {
-    const auto* pptr = static_cast<const actionPair*>(actionStrings);
-    const auto* res = std::find_if(pptr, pptr + actEnd, [action](const auto& pt) {
-        return (pt.first == action);
-    });
-    if (res != pptr + actEnd) {
-        return res->second;
-    }
-    return static_cast<const char*>(unknownStr);
+    const auto* res = actionStrings.find(action);
+    return (res != actionStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
 // set of strings to translate error codes to something sensible
-static constexpr std::pair<int, const char*> errorStrings[] = {
+static constexpr frozen::unordered_map<int, frozen::string,6> errorStrings = {
     {connection_error_code, "connection error"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
@@ -709,22 +711,10 @@ static constexpr std::pair<int, const char*> errorStrings[] = {
     {duplicate_broker_name_error_code, "duplicate broker name detected"},
     {mismatch_broker_key_error_code, "Broker key does not match"}};
 
-using errorPair = std::pair<int, const char*>;
-static constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
-
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
-// this function can (in actuality-there was a case that did this) be used as the program is
-// shutting down
 const char* commandErrorString(int errorcode)
 {
-    const auto* pptr = static_cast<const errorPair*>(errorStrings);
-    const auto* res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
-        return (pt.first == errorcode);
-    });
-    if (res != pptr + errEnd) {
-        return res->second;
-    }
-    return static_cast<const char*>(unknownStr);
+    const auto* res = errorStrings.find(errorcode);
+    return (res !=errorStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
 std::string errorMessageString(const ActionMessage& command)
