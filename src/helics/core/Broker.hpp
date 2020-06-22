@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "helics-time.hpp"
+
 #include <chrono>
 #include <functional>
 #include <string>
@@ -122,5 +124,11 @@ class Broker {
     @param target the name of the source target*/
     virtual void addDestinationFilterToEndpoint(const std::string& filter,
                                                 const std::string& target) = 0;
+
+    /** update a time barrier with a new time*/
+    virtual void setTimeBarrier(Time barrierTime) = 0;
+
+    /** update a time barrier with a new time*/
+    virtual void clearTimeBarrier() = 0;
 };
 }  // namespace helics
