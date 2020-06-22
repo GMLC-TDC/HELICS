@@ -31,11 +31,11 @@ constexpr char universalKey[] = "**";
 
 const std::string& state_string(connection_state state)
 {
-    static const std::string c1{"connected"};
-    static const std::string init{"init_requested"};
-    static const std::string operating{"operating"};
-    static const std::string estate{"error"};
-    static const std::string dis{"disconnected"};
+    static const std::string c1{"\"connected\""};
+    static const std::string init{"\"init_requested\""};
+    static const std::string operating{"\"operating\""};
+    static const std::string estate{"\"error\""};
+    static const std::string dis{"\"disconnected\""};
     switch (state) {
         case connection_state::operating:
             return operating;
@@ -2336,7 +2336,7 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
     }
     if (target == "parent") {
         if (isRootc) {
-            return "#na";
+            return "{\"error\":{\"code\":404\n\"message\":\"broker has no parent\"\n}";
         }
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = gid;
@@ -2414,21 +2414,21 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return (isConnected()) ? std::string("true") : std::string("false");
     }
     if (request == "name" || request == "identifier") {
-        return getIdentifier();
+        return std::string{"\""} + getIdentifier() + '"';
     }
     if (request == "exists") {
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
-               "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;status;global_time;version;version_all;exists]";
+        return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\""
+               "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
+               "\"current_time\",\"current_state\",\"status;global_time\",\"version\",\"version_all\",\"exists\"]";
     }
     if (request == "address") {
-        return getAddress();
+        return std::string{"\""} + getAddress() + '"';
     }
     if (request == "version") {
-        return versionString;
+        return std::string{"\""} + versionString + '"';
     }
     if (request == "status") {
         Json::Value base;
@@ -2579,7 +2579,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
         return generateJsonString(base);
     }
-    return "#invalid";
+    return "{\"error\":{\"code\":400\n\"message\":\"unrecognized broker query\"\n}";
 }
 
 std::string CoreBroker::getNameList(std::string gidString) const
