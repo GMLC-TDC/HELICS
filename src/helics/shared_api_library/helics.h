@@ -1376,10 +1376,10 @@ HELICS_EXPORT void helicsCoreSetLogFile(helics_core core, const char* logFileNam
 HELICS_EXPORT void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helics_error* err);
 
 /**
- * Set a broker time barrier
+ * Set a broker time barrier.
  *
- * @param broker The broker to set the time barrier
- * @param barrierTime the time to set the barrier at
+ * @param broker The broker to set the time barrier for.
+ * @param barrierTime The time to set the barrier at.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -1387,9 +1387,9 @@ HELICS_EXPORT void helicsBrokerSetLogFile(helics_broker broker, const char* logF
 HELICS_EXPORT void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time barrierTime, helics_error* err);
 
 /**
- * clear any time barrier on a broker
+ * Clear any time barrier on a broker.
  *
- * @param broker The broker to clear the barriers on
+ * @param broker The broker to clear the barriers on.
  */
 HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
 
