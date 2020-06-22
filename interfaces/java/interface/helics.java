@@ -1380,6 +1380,25 @@ public class helics {
   }
 
   /**
+   * Set a broker time barrier.<br>
+   * <br>
+   * @param broker The broker to set the time barrier for.<br>
+   * @param barrierTime The time to set the barrier at.
+   */
+  public static void helicsBrokerSetTimeBarrier(SWIGTYPE_p_void broker, double barrierTime) {
+    helicsJNI.helicsBrokerSetTimeBarrier(SWIGTYPE_p_void.getCPtr(broker), barrierTime);
+  }
+
+  /**
+   * Clear any time barrier on a broker.<br>
+   * <br>
+   * @param broker The broker to clear the barriers on.
+   */
+  public static void helicsBrokerClearTimeBarrier(SWIGTYPE_p_void broker) {
+    helicsJNI.helicsBrokerClearTimeBarrier(SWIGTYPE_p_void.getCPtr(broker));
+  }
+
+  /**
    * Create a query object.<br>
    * <br>
    * A query object consists of a target and query string.<br>
