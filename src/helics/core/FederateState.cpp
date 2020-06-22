@@ -832,6 +832,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
 
         break;
         case CMD_TIME_BLOCK:
+        case CMD_TIME_BARRIER:
+        case CMD_TIME_BARRIER_CLEAR:
         case CMD_TIME_UNBLOCK: {
             auto processed = timeCoord->processTimeMessage(cmd);
             if (processed == message_process_result::processed) {

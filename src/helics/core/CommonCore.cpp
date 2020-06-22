@@ -2633,6 +2633,16 @@ void CommonCore::sendErrorToFederates(int error_code, const std::string& message
     });
 }
 
+void CommonCore::broadcastToFederates(ActionMessage& cmd)
+{
+    loopFederates.apply([&cmd](auto& fed) {
+        if ((fed) && (fed.state == operation_state::operating)) {
+            cmd.dest_id = fed->global_id;
+            fed->addAction(cmd);
+        }
+    });
+}
+
 void CommonCore::transmitDelayedMessages(global_federate_id source)
 {
     std::vector<ActionMessage> buffer;
@@ -2705,6 +2715,10 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            break;
+        case CMD_TIME_BARRIER:
+        case CMD_TIME_BARRIER_CLEAR:
+            broadcastToFederates(command);
             break;
         case CMD_CHECK_CONNECTIONS: {
             auto res = checkAndProcessDisconnect();

@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <utility>
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
 
     static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
                                                   std::shared_ptr<Broker>& brk)
@@ -127,4 +126,3 @@ namespace apps {
 
     void TypedBrokerServer::logMessage(const std::string& message) { spdlog::info(message); }
 }  // namespace apps
-}  // namespace helics

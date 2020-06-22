@@ -325,3 +325,50 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
 
     vFed3->finalize();
 }
+
+// Tests out the restrictive time policy
+TEST_F(timing_tests2, time_barrier1)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    brokers[0]->setTimeBarrier(2.0);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed1->requestTimeAsync(3.0);
+    auto rtime = vFed2->requestTime(1.89);
+    EXPECT_EQ(rtime, 1.89);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    brokers[0]->clearTimeBarrier();
+    rtime = vFed1->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+// Tests out the restrictive time policy
+TEST_F(timing_tests2, time_barrier_update)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    brokers[0]->setTimeBarrier(2.0);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed1->requestTimeAsync(3.0);
+    auto rtime = vFed2->requestTime(1.89);
+    EXPECT_EQ(rtime, 1.89);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    brokers[0]->setTimeBarrier(4.0);
+    rtime = vFed1->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+
+    vFed1->finalize();
+    vFed2->finalize();
+}

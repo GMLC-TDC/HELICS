@@ -481,6 +481,24 @@ void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helic
     brk->setLogFile(AS_STRING(logFileName));
 }
 
+void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time barrierTime, helics_error* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->setTimeBarrier(barrierTime);
+}
+
+void helicsBrokerClearTimeBarrier(helics_broker broker)
+{
+    auto* brk = getBroker(broker, nullptr);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->clearTimeBarrier();
+}
+
 void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err)
 {
     auto* brk = getBroker(broker, err);

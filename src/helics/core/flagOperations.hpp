@@ -27,14 +27,18 @@ enum operation_flags : uint16_t {
     extra_flag2 = 8,  //!< extra flag
     destination_processing_flag =
         11,  //!< flag indicating the message is for destination processing
-    disconnected_flag = 12,  //!< flag indicating that a broker the time constraint
+    disconnected_flag = 12,  //!< flag indicating that a broker/federate is disconnected
     extra_flag3 = 13,  //!< extra flag
     extra_flag4 = 14,  //!< extra flag
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
 constexpr uint16_t slow_responding_flag =
-    14;  // overload of extra_flag4 indicating a federate, core or broker is slow responding
+    extra_flag4;  // overload of extra_flag4 indicating a federate, core or broker is slow
+                  // responding
+
+constexpr uint16_t cancel_flag =
+    extra_flag3;  // overload of extra_flag3 indicating an operation is canceled
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
