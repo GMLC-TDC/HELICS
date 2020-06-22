@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 #include "gtest/gtest.h"
 #include <thread>
@@ -20,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 struct query: public FederateTestFixture, public ::testing::Test {
 };
 
+using gmlc::utilities::stringOps::removeQuotes;
 class query_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
 /** test simple creation and destruction*/
@@ -43,16 +45,16 @@ TEST_P(query_type, publication_queries)
 
     auto core = vFed1->getCorePointer();
     auto res = core->query("fed0", "publications");
-    EXPECT_EQ(res, "[pub1;fed0/pub2]");
+    EXPECT_EQ(res, R"(["pub1","fed0/pub2"])");
     auto rvec = helics::vectorizeQueryResult(res);
 
     ASSERT_EQ(rvec.size(), 2U);
     EXPECT_EQ(rvec[0], "pub1");
     EXPECT_EQ(rvec[1], "fed0/pub2");
-    EXPECT_EQ(vFed2->query("fed0", "publications"), "[pub1;fed0/pub2]");
+    EXPECT_EQ(vFed2->query("fed0", "publications"), "[\"pub1\",\"fed0/pub2\"]");
     EXPECT_EQ(vFed1->query("fed1", "isinit"), "true");
 
-    EXPECT_EQ(vFed1->query("fed1", "publications"), "[fed1/pub3]");
+    EXPECT_EQ(vFed1->query("fed1", "publications"), "[\"fed1/pub3\"]");
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -71,7 +73,7 @@ TEST_P(query_type, broker_queries)
     str.push_back(';');
     str.append(vFed2->getName());
     str.push_back(']');
-    EXPECT_EQ(res, "[fed0;fed1]");
+    EXPECT_EQ(res, "[\"fed0\",\"fed1\"]");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -295,13 +297,13 @@ TEST_F(query, version)
     mFed1->requestTimeAsync(1.0);
     mFed2->requestTime(1.0);
     mFed1->requestTimeComplete();
-    auto res = mFed1->query("version");
+    auto res = removeQuotes(mFed1->query("version"));
     EXPECT_EQ(res, helics::versionString);
-    res = mFed1->query("broker", "version");
+    res = removeQuotes(mFed1->query("broker", "version"));
     EXPECT_EQ(res, helics::versionString);
-    res = mFed1->query("core", "version");
+    res = removeQuotes(mFed1->query("core", "version"));
     EXPECT_EQ(res, helics::versionString);
-    res = mFed1->query("root", "version");
+    res = removeQuotes(mFed1->query("root", "version"));
     EXPECT_EQ(res, helics::versionString);
     res = mFed1->query("root", "version_all");
     auto val = loadJsonStr(res);
@@ -534,7 +536,7 @@ TEST_F(query, updates_indices)
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_indices");
-    EXPECT_EQ(qres, "[0;1;2]");
+    EXPECT_EQ(qres, "[0,1,2]");
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_indices");
     EXPECT_EQ(qres, "[]");
@@ -542,7 +544,7 @@ TEST_F(query, updates_indices)
     p3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updated_input_indices");
-    EXPECT_EQ(qres, "[0;2]");
+    EXPECT_EQ(qres, "[0,2]");
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
 }
@@ -566,7 +568,8 @@ TEST_F(query, updates_names)
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_names");
-    EXPECT_EQ(qres, "[pub1;pub2;pub3]");
+    auto res=helics::vectorizeQueryResult(qres);
+    EXPECT_EQ(res.size(), 3U);
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_names");
     EXPECT_EQ(qres, "[]");
@@ -574,7 +577,8 @@ TEST_F(query, updates_names)
     p3.publish(15.1);
     vFed1->requestTime(2.0);
     qres = vFed1->query("updated_input_names");
-    EXPECT_EQ(qres, "[pub1;pub3]");
+    res = helics::vectorizeQueryResult(qres);
+    EXPECT_EQ(res.size(), 2U);
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
 }

@@ -31,11 +31,11 @@ constexpr char universalKey[] = "**";
 
 const std::string& state_string(connection_state state)
 {
-    static const std::string c1{"\"connected\""};
-    static const std::string init{"\"init_requested\""};
-    static const std::string operating{"\"operating\""};
-    static const std::string estate{"\"error\""};
-    static const std::string dis{"\"disconnected\""};
+    static const std::string c1{"connected"};
+    static const std::string init{"init_requested"};
+    static const std::string operating{"operating"};
+    static const std::string estate{"error"};
+    static const std::string dis{"disconnected"};
     switch (state) {
         case connection_state::operating:
             return operating;
@@ -2701,7 +2701,9 @@ static std::string checkFedQuery(const BasicFedInfo& fed, const std::string& que
             "true" :
             "false";
     } else if (query == "state") {
-        response = state_string(fed.state);
+        response.push_back('"');
+        response.append(state_string(fed.state));
+        response.push_back('"');
     } else if (query == "isinit") {
         if (fed.state >= connection_state::operating) {
             response = "true";
