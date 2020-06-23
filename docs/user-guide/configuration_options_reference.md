@@ -14,17 +14,21 @@ xxxxxxx Describe the various way these key words can be used to configure the co
 ## Federate Options
 There are a number of flags which control how a federate acts with respect to timing and its signal interfaces. 
 
-- **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
+#### `name`
 
-- **`coreType`** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). (xxxxxxxx add link to core type pages)
+Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 
-- **`coreType`** - Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
+##### `coreType`
 
-- **`coreinit`** - ???
+There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). (xxxxxxxx add link to core type pages)
 
-- **`logfile`** - ???
+- **coreType** - Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
 
-- **`log_level`** - Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid values are:
+- **coreinit** - ???
+
+- **logfile** - ???
+
+- **log_level** - Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid values are:
 	- -1 - no logging
 	- 0 - error
 	- 1 - warning
