@@ -1814,6 +1814,26 @@ def helicsBrokerSetLogFile(broker: "helics_broker", logFileName: "char const *")
     """
     return _helics.helicsBrokerSetLogFile(broker, logFileName)
 
+def helicsBrokerSetTimeBarrier(broker: "helics_broker", barrierTime: "helics_time") -> "void":
+    r"""
+    Set a broker time barrier.
+
+    :type broker: void
+    :param broker: The broker to set the time barrier for.
+    :type barrierTime: float
+    :param barrierTime: The time to set the barrier at.
+    """
+    return _helics.helicsBrokerSetTimeBarrier(broker, barrierTime)
+
+def helicsBrokerClearTimeBarrier(broker: "helics_broker") -> "void":
+    r"""
+    Clear any time barrier on a broker.
+
+    :type broker: void
+    :param broker: The broker to clear the barriers on.
+    """
+    return _helics.helicsBrokerClearTimeBarrier(broker)
+
 def helicsCreateQuery(target: "char const *", query: "char const *") -> "helics_query":
     r"""
     Create a query object.

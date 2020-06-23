@@ -8970,6 +8970,73 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsBrokerSetTimeBarrier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsBrokerSetTimeBarrier", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerSetTimeBarrier" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsBrokerSetTimeBarrier" "', argument " "2"" of type '" "helics_time""'");
+  } 
+  arg2 = (helics_time)(val2);
+  helicsBrokerSetTimeBarrier(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsBrokerClearTimeBarrier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerClearTimeBarrier" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  helicsBrokerClearTimeBarrier(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCreateQuery(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -17240,6 +17307,20 @@ static PyMethodDef SwigMethods[] = {
 		":param broker: The broker to set the log file for.\n"
 		":type logFileName: string\n"
 		":param logFileName: The name of the file to log to.\n"
+		""},
+	 { "helicsBrokerSetTimeBarrier", _wrap_helicsBrokerSetTimeBarrier, METH_VARARGS, "\n"
+		"Set a broker time barrier.\n"
+		"\n"
+		":type broker: void\n"
+		":param broker: The broker to set the time barrier for.\n"
+		":type barrierTime: float\n"
+		":param barrierTime: The time to set the barrier at.\n"
+		""},
+	 { "helicsBrokerClearTimeBarrier", _wrap_helicsBrokerClearTimeBarrier, METH_O, "\n"
+		"Clear any time barrier on a broker.\n"
+		"\n"
+		":type broker: void\n"
+		":param broker: The broker to clear the barriers on.\n"
 		""},
 	 { "helicsCreateQuery", _wrap_helicsCreateQuery, METH_VARARGS, "\n"
 		"Create a query object.\n"
