@@ -1037,7 +1037,7 @@ std::string Federate::query(const std::string& target, const std::string& queryS
         if (coreObject) {
             res = coreObject->query(target, queryStr);
         } else {
-            res = "#disconnected";
+            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}";
         }
     }
     return res;
