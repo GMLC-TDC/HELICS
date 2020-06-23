@@ -721,7 +721,7 @@ TEST_F(query, query_subscriptions)
     vFed1->enterInitializingModeComplete();
 
     auto subs = helics::queryFederateSubscriptions(vFed1.get(), "fed1");
-    EXPECT_EQ(subs, "[pub1;pub2;pub3]");
+    EXPECT_EQ(subs, "[\"pub1\",\"pub2\",\"pub3\"]");
     vFed1->finalize();
     vFed2->finalize();
     helics::cleanupHelicsLibrary();
