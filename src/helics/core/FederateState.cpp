@@ -1763,7 +1763,7 @@ std::string FederateState::processQuery(const std::string& query) const
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            "\"publications\",\"inputs\",\"endpoints\",\"interfaces\",\"subscriptions\",\"dependencies\",\"timeconfig\",\"config\",\"dependents\",\"current_time\"";
+            R"("publications","inputs","endpoints","interfaces","subscriptions","dependencies","timeconfig","config","dependents","current_time")";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

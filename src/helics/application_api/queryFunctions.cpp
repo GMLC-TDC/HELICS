@@ -103,7 +103,7 @@ std::vector<int> vectorizeIndexQuery(const std::string& queryres)
             } else if (v.isDouble()) {
                 result.push_back(v.asDouble());
             } else if (v.isString()) {
-                result.push_back(v.asDouble());
+                result.push_back(std::stoi(v.asString()));
             } else {
                 result.push_back(std::stoi(queryres));
             }
