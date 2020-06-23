@@ -2590,7 +2590,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     if (gidString.front() == '[') {
         gidString = gidString.substr(1);
     }
-    auto val = gmlc::utilities::str2vector<int>(gidString, -23, ";:");
+    auto val = gmlc::utilities::str2vector<int>(gidString, -23, ",:;");
     gidString.clear();
     gidString.push_back('[');
     size_t index = 0;
@@ -2598,13 +2598,15 @@ std::string CoreBroker::getNameList(std::string gidString) const
         const auto* info = handles.findHandle(
             global_handle(global_federate_id(val[index]), interface_handle(val[index + 1])));
         if (info != nullptr) {
+            gidString.push_back('"');
             gidString.append(info->key);
-            gidString.push_back(';');
+            gidString.push_back('"');
+            gidString.push_back(',');
         }
 
         index += 2;
     }
-    if (gidString.back() == ';') {
+    if (gidString.back() == ',') {
         gidString.pop_back();
     }
     gidString.push_back(']');
