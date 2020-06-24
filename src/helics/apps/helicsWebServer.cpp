@@ -56,13 +56,11 @@ namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
 namespace net = boost::asio;  // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     class IocWrapper {
       public:
         net::io_context ioc{1};
     };
-}  // namespace apps
 }  // namespace helics
 
 static std::string loadFile(const std::string& fileName)
@@ -826,8 +824,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
 
 static const Json::Value null;
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     void WebServer::startServer(const Json::Value* val)
     {
         logMessage("starting broker web server");
@@ -898,4 +895,3 @@ namespace apps {
     }
 
 }  // namespace apps
-}  // namespace helics
