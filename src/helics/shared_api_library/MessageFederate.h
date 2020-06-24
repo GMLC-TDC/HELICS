@@ -390,7 +390,7 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(helics_endpoint end);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* info, helics_error* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -402,7 +402,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char* info, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, int value, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option, int value, helics_error* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -411,7 +411,7 @@ HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, int 
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @return the value of the option, for boolean options will be 0 or 1
  */
-HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint end, int option);
+HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint endpoint, int option);
 
 /**
  * \defgroup Message operation functions
