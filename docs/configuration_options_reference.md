@@ -19,6 +19,200 @@ xxxxxxx Describe the various way these key words can be used to configure the co
 
 ### API parameters
 
+## Sample Configurations
+
+### Control_test.json
+xxxxxxx Description of configuration options
+```json
+{
+  "name": "EV_Controller",
+  "loglevel": 5,
+  "coreType": "zmq",
+  "timeDelta": 1.0,
+
+  "endpoints": [
+    {
+      "name": "EV_Controller/EV6",
+      "type": "genmessage",
+      "global": true
+    },
+	...
+  ],
+  "filters": [
+    {
+      "name": "filterEV6", 
+      "target": "EV_Controller/EV6",
+      "mode": "source",
+      "operation": "delay",
+      "properties": {
+        "name": "delay", 
+        "value": 600 
+      }
+    },
+    ...
+  ],
+  "subscriptions": [
+    {
+      "key": "IEEE_123_feeder_0/totalLoad",
+      "type": "complex",
+      "required": true
+    },
+    {
+      "key": "IEEE_123_feeder_0/charge_EV6",
+      "type": "complex",
+      "required": true
+    },
+    ...
+  ]
+}
+
+```
+### example_combo_fed.json
+xxxxxxx Description of JSON options
+```json
+{
+  "name": "comboFed",
+  "observer": false,
+  "rollback": false,
+  "only_update_on_change": false,
+  "only_transmit_on_change": false,
+  "source_only": false,
+  "uninterruptible": false,
+  "coretype": "inproc",
+  "corename": "the name of the core",
+  "coreinit": "--autobroker",
+  "max_iterations": 10,
+  "period": 1.0,
+  "offset": 0.0,
+  "time_delta": 0.0,
+  "output_delay": 0,
+  "input_delay": 0,
+
+  "endpoints": [
+    {
+      "name": "ept1",
+      "type": "genmessage",
+      "global": true 
+    },
+    {
+      "name": "ept2",
+      "type": "message2",
+      "knownDestinations": "ept1",
+      "subscriptions": "pub1" 
+    }
+  ],
+  "publications": [
+    {
+      "key": "pub1", 
+      "type": "double",
+      "unit": "m",
+      "global": true
+    },
+    {
+      "key": "pub2",
+      "type": "double",
+      "info": { "field1": 45, "field2": 99 }
+    }
+  ],
+  "subscriptions": [
+    {
+      "key": "pub1",
+      "type": "double",
+      "required": true 
+    },
+    {
+      "key": "comboFed/pub2",
+      "shortcut": "pubshortcut" 
+    }
+  ]
+}
+```
+
+### example_unusual_filters3.json
+xxxxxxx Description of JSON options
+```json
+{
+  "name": "filterFed", 
+  "observer": false, 
+  "rollback": false, 
+  "only_update_on_change": false, 
+  "only_transmit_on_change": false, 
+  "source_only": false, 
+  "uninterruptible": false, 
+  "coretype": "inproc", 
+  "corename": "ucore3", 
+  "coreinit": "-f 1 --autobroker", 
+  "max_iterations": 10, 
+  "period": 1.0, 
+  "offset": 0.0, 
+  "time_delta": 0.0, 
+  "output_delay": 0, 
+  "input_delay": 0, 
+
+  "endpoints": [
+    {
+      "name": "ept1", 
+      "type": "genmessage",  
+      "global": true 
+    },
+    {
+      "name": "clonedest", 
+      "global": true 
+    },
+    {
+      "name": "ept2", 
+      "type": "message2", 
+      "knownDestinations": "ept1", 
+      "subscriptions": "fed2/sub1" 
+    }
+  ],
+  "filters": [
+    {
+      "name": "filtername", 
+      "sourcetargets": "ept1",
+      "operation": "delay", 
+      "info": "this is an information string for use by the application",
+      "properties": [
+        {
+          "value": 0.2,
+          "name": "delay" 
+        },
+        {
+          "value": 0.3,
+          "name": "delay" 
+        }
+      ]
+    },
+    {
+      "name": "filtername2", 
+      "sourcetargets": ["filterFed/ept2"], 
+      "dest":["dest targets"], 
+      "operation": "blahblah",
+      "properties": {
+        "name": "newdestination",
+        "value": "ept1"
+      }
+    },
+    {
+      "name": "filterClone", 
+      "delivery": "ept2",
+      "cloning": true,
+      "properties": [
+        {
+          "id4": "destination",
+          "value": 0.1
+        },
+        {
+          "name": "source",
+          "value": "ept1"
+        }
+      ]
+    }
+  ]
+}
+```
+
+
 ## Federate Options
 There are a number of flags which control how a federate acts with respect to timing and its signal interfaces. 
 
