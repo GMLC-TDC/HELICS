@@ -56,13 +56,11 @@ namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
 namespace net = boost::asio;  // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     class IocWrapper {
       public:
         net::io_context ioc{1};
     };
-}  // namespace apps
 }  // namespace helics
 
 static std::string loadFile(const std::string& fileName)
@@ -352,13 +350,13 @@ std::pair<return_val, std::string>
         query = "current_state";
     }
     auto res = brkr->query(target.to_string(), query.to_string());
-    if (res != "#invalid") {
+    if (res.find("\"error\"")==std::string::npos) {
         return {return_val::ok, res};
     }
 
     if (autoquery) {
         res = brkr->query(query.to_string(), "current_state");
-        if (res == "#invalid") {
+        if (res.find("\"error\"") != std::string::npos) {
             return {return_val::not_found, "target not found"};
         }
         return {return_val::ok, res};
@@ -826,8 +824,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
 
 static const Json::Value null;
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     void WebServer::startServer(const Json::Value* val)
     {
         logMessage("starting broker web server");
@@ -898,4 +895,3 @@ namespace apps {
     }
 
 }  // namespace apps
-}  // namespace helics
