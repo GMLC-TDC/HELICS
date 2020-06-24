@@ -507,7 +507,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message_object message);
  * @param message A message object to get the data for.
  * @forcpponly
  * @param[out] data The memory location of the data.
- * @param maxMessagelen The maximum size of information that data can hold.
+ * @param maxMessageLength The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -517,7 +517,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message_object message);
  * @endPythonOnly
  */
 HELICS_EXPORT void
-    helicsMessageGetRawData(helics_message_object message, void* data, int maxMessagelen, int* actualSize, helics_error* err);
+    helicsMessageGetRawData(helics_message_object message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
 
 /**
  * Get a pointer to the raw data of a message.
