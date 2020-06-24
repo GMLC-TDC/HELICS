@@ -110,12 +110,12 @@ HELICS_EXPORT helics_bool helicsEndpointIsValid(helics_endpoint endpoint);
  * Set the default destination for an endpoint if no other endpoint is given.
  *
  * @param endpoint The endpoint to set the destination for.
- * @param dest A string naming the desired default endpoint.
+ * @param dst A string naming the desired default endpoint.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dst, helics_error* err);
 
 /**
  * Get the default destination for an endpoint.
@@ -130,7 +130,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * Send a message to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
- * @param dest The target destination.
+ * @param dst The target destination.
  * @forcpponly
  *             nullptr to use the default destination.
  * @endforcpponly
@@ -144,13 +144,13 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, const void* data, int inputDataLength, helics_error* err);
+    helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dst, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Send a message at a specific time to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
- * @param dest The target destination.
+ * @param dst The target destination.
  * @forcpponly
  *             nullptr to use the default destination.
  * @endforcpponly
@@ -167,7 +167,7 @@ HELICS_EXPORT void
  * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSendEventRaw(helics_endpoint endpoint,
-                                              const char* dest,
+                                              const char* dst,
                                               const void* data,
                                               int inputDataLength,
                                               helics_time time,
@@ -552,12 +552,12 @@ HELICS_EXPORT void helicsMessageSetSource(helics_message_object message, const c
  * Set the destination of a message.
  *
  * @param message The message object in question.
- * @param dest A string containing the new destination.
+ * @param dst A string containing the new destination.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetDestination(helics_message_object message, const char* dest, helics_error* err);
+HELICS_EXPORT void helicsMessageSetDestination(helics_message_object message, const char* dst, helics_error* err);
 
 /**
  * Set the original source of a message.
@@ -574,12 +574,12 @@ HELICS_EXPORT void helicsMessageSetOriginalSource(helics_message_object message,
  * Set the original destination of a message.
  *
  * @param message The message object in question.
- * @param dest A string containing the new original source.
+ * @param dst A string containing the new original source.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message_object message, const char* dest, helics_error* err);
+HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message_object message, const char* dst, helics_error* err);
 
 /**
  * Set the delivery time for a message.
@@ -689,13 +689,13 @@ HELICS_EXPORT void helicsMessageAppendData(helics_message_object message, const 
 /**
  * Copy a message object.
  *
- * @param source_message The message object to copy from.
- * @param dest_message The message object to copy to.
+ * @param src_message The message object to copy from.
+ * @param dst_message The message object to copy to.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error* err);
+HELICS_EXPORT void helicsMessageCopy(helics_message_object src_message, helics_message_object dst_message, helics_error* err);
 
 /**
  * Clone a message object.
