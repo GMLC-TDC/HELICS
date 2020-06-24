@@ -26,11 +26,11 @@ There are a number of flags which control how a federate acts with respect to ti
 
 Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 
-#### `coretype`
+#### `coreType`
 
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). (xxxxxxxx add link to core type pages)
 
-#### `corename`
+#### `coreType`
 Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
 
 #### `coreinit`
@@ -70,10 +70,6 @@ Only applicable to Named Input interfaces ([see section on value federate interf
 If specified on a federate, setting this flag indicates the federate may be slow in responding, and to not forcibly eject the federate from the federation for the slow response. This is an uncommon scenario.
 
 If applied to a core or broker (xxxxxxx need examples of this syntax), it is indicative that the broker doesn't respond to internal pings quickly and should not be disconnected from the federation for the slow response.
-
-#### max_iterations
-Maximum number of iterations for a time step. xxxxxxx - needs more work.
-
 	
 	
 #### `terminate_on_error` [false]
