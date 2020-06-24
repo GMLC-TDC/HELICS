@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "queryFunctions.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "Federate.hpp"
 #include "gmlc/utilities/stringOps.h"
-#include "../common/JsonProcessingFunctions.hpp"
 
 #include <algorithm>
 #include <thread>
@@ -20,13 +20,13 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
     if (queryres.empty()) {
         return std::vector<std::string>();
     }
-    
+
     if (queryres.front() == '[') {
         try {
             auto v = loadJsonStr(queryres);
             std::vector<std::string> strs;
             if (v.isArray()) {
-                for (auto &str:v) {
+                for (auto& str : v) {
                     if (str.isString()) {
                         strs.emplace_back(str.asCString());
                     } else {
@@ -41,9 +41,7 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
             return strs;
         }
         catch (...) {
-
         }
-        
     }
     std::vector<std::string> res;
     res.push_back(std::move(queryres));
@@ -142,7 +140,7 @@ bool waitForInit(helics::Federate* fed,
     std::chrono::milliseconds waitTime{0};
     const std::chrono::milliseconds delta{400};
     while (res != "true") {
-        if (res.find("error")!=std::string::npos) {
+        if (res.find("error") != std::string::npos) {
             return false;
         }
         std::this_thread::sleep_for(delta);
@@ -176,7 +174,7 @@ bool waitForFed(helics::Federate* fed,
 std::string queryFederateSubscriptions(helics::Federate* fed, const std::string& fedName)
 {
     auto res = fed->query(fedName, "subscriptions");
-    if (res.size() > 2 && res.find("error")==std::string::npos) {
+    if (res.size() > 2 && res.find("error") == std::string::npos) {
         res = fed->query("gid_to_name", res);
     }
     return res;

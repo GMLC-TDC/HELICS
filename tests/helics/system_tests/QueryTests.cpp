@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
@@ -13,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
-#include "gmlc/utilities/stringOps.h"
 
 #include "gtest/gtest.h"
 #include <thread>
@@ -568,7 +568,7 @@ TEST_F(query, updates_names)
     vFed1->requestTime(1.0);
 
     auto qres = vFed1->query("updated_input_names");
-    auto res=helics::vectorizeQueryResult(qres);
+    auto res = helics::vectorizeQueryResult(qres);
     EXPECT_EQ(res.size(), 3U);
     vFed1->clearUpdates();
     qres = vFed1->query("updated_input_names");
@@ -754,7 +754,7 @@ TEST_F(query, queries_query)
         try {
             auto v = loadJsonStr(qres);
         }
-        catch(...) {
+        catch (...) {
             EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
         }
     }

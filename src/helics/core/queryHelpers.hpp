@@ -21,7 +21,7 @@ std::string generateStringVector(const X& data, Proc generator)
         ret.push_back('"');
         ret.push_back(',');
     }
-    if (ret.size() >1) {
+    if (ret.size() > 1) {
         ret.back() = ']';
     } else {
         ret.push_back(']');
