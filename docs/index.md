@@ -25,6 +25,7 @@ Motivation: Energy systems and their associated information and communication te
 
    installation/index
    user-guide/index
+   configuration_options_reference
    support
    apps/index
 ```
