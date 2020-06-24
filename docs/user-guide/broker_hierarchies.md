@@ -13,11 +13,11 @@ So, using an example we've seen several times, imagine a scenario where a single
 
 The diagrams below show the message and broker topologies for this hypothetical examples.
 
-   ![Broker hierarchy message topology](../img/broker_hierarchy_message_topology.png)
+   ![Message topology](../img/broker_hierarchy_message_topology.png)
 
 
 
-   ![Broker hierarchy broker topology](../img/broker_hierarchy_broker_topology.png)
+   ![Broker topology](../img/broker_hierarchy_broker_topology.png)
 
 
 ## Broker Hierarchy Implementation
