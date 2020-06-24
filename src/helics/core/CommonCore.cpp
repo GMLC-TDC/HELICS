@@ -51,7 +51,7 @@ const std::string& state_string(operation_state state)
     switch (state) {
         case operation_state::operating:
             return c1;
-        case operation_state::disconnected:  
+        case operation_state::disconnected:
             return dis;
         case operation_state::error:
         default:
@@ -2205,8 +2205,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     }
 
     if (queryStr == "address") {
-        return std::string{"\""} +
-            getAddress() + '"';
+        return std::string{"\""} + getAddress() + '"';
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
@@ -2349,7 +2348,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                         status = std::future_status::ready;  // LCOV_EXCL_LINE
                 }
             }
-            return generateJsonErrorResponse(500, "Unexpected Error #13"); // LCOV_EXCL_LINE
+            return generateJsonErrorResponse(500, "Unexpected Error #13");  // LCOV_EXCL_LINE
         }
     }
 

@@ -891,7 +891,7 @@ TEST(federate_tests, queryTest1)
     EXPECT_EQ(qres, "\"fed_q\"");
     qres = Fed1->query("corename");
     auto cr = Fed1->getCorePointer();
-    EXPECT_EQ(qres, std::string("\"")+cr->getIdentifier()+'"');
+    EXPECT_EQ(qres, std::string("\"") + cr->getIdentifier() + '"');
     qres = Fed1->query("federate", "name");
     EXPECT_EQ(qres, "\"fed_q\"");
 
