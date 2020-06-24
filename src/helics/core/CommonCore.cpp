@@ -51,7 +51,7 @@ const std::string& state_string(operation_state state)
     switch (state) {
         case operation_state::operating:
             return c1;
-        case operation_state::disconnected:
+        case operation_state::disconnected:  
             return dis;
         case operation_state::error:
         default:
@@ -2008,7 +2008,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         if (queryStr == "exists") {
             return "false";
         }
-        return "{\"error\":{\"code\":404\n\"message\":\"Federate not found\"\n}";
+        return generateJsonErrorResponse(404, "Federate not found");
     }
     if (queryStr == "exists") {
         return "true";
@@ -2205,8 +2205,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     }
 
     if (queryStr == "address") {
-        return std::string{"\""
-               } +
+        return std::string{"\""} +
             getAddress() + '"';
     }
     if (queryStr == "filtered_endpoints") {
@@ -2278,7 +2277,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
         return generateJsonString(base);
     }
-    return "{\"error\":{\"code\":400\n\"message\":\"unrecognized core query\"\n}";
+    return generateJsonErrorResponse(400, "unrecognized core query");
 }
 
 std::string CommonCore::query(const std::string& target, const std::string& queryStr)
@@ -2290,7 +2289,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                 return res;
             }
         }
-        return "{\"error\":{\"code\":410\n\"message\":\"Core has terminated\"\n}";
+        return generateJsonErrorResponse(410, "Core has terminated");
     }
     ActionMessage querycmd(CMD_QUERY);
     querycmd.source_id = direct_core_id;
@@ -2306,7 +2305,10 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
             return res;
         }
         if (queryStr == "address") {
-            return getAddress();
+            res.push_back('"');
+            res.append(getAddress());
+            res.push_back('"');
+            return res;
         }
         querycmd.setAction(CMD_BROKER_QUERY);
         querycmd.dest_id = direct_core_id;
@@ -2347,7 +2349,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                         status = std::future_status::ready;  // LCOV_EXCL_LINE
                 }
             }
-            return "{\"error\":{\"code\":500\n\"message\":\"Unexpected Error #13\"\n}"; // LCOV_EXCL_LINE
+            return generateJsonErrorResponse(500, "Unexpected Error #13"); // LCOV_EXCL_LINE
         }
     }
 

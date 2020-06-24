@@ -713,4 +713,9 @@ const std::string& brokerStateName(BrokerBase::broker_state_t state)
 }
 // LCOV_EXCL_STOP
 
+
+std::string generateJsonErrorResponse(int code, const std::string& message) {
+    return fmt::format("{{\n  \"error\":{{\n    \"code\":{},\n    \"message\":\"{}\"\n  }}\n}}", code, message);
+}
+
 }  // namespace helics

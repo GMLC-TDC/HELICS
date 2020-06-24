@@ -623,23 +623,24 @@ std::string CoreBroker::generateFederationSummary() const
                 break;
         }
     }
-    std::string output = fmt::format(
-        "Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
-        "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
-        _federates.size(),
-        minFederateCount,
-        std::count_if(_brokers.begin(),
-                      _brokers.end(),
-                      [](auto& brk) { return !static_cast<bool>(brk._core); }),
-        std::count_if(_brokers.begin(),
-                      _brokers.end(),
-                      [](auto& brk) { return static_cast<bool>(brk._core); }),
-        minBrokerCount,
-        pubs,
-        ipts,
-        epts,
-        filt);
-    return output;
+    Json::Value summary;
+    Json::Value block;
+    block["federates"] = _federates.size();
+    block["min_federates"] = minFederateCount;
+    block["brokers"] = std::count_if(_brokers.begin(),
+                                     _brokers.end(),
+                                     [](auto& brk) { return !static_cast<bool>(brk._core); }),
+    block["cores"] = std::count_if(_brokers.begin(),
+                                   _brokers.end(),
+                                   [](auto& brk) { return static_cast<bool>(brk._core); }),
+    block["min_brokers"] = minBrokerCount;
+    block["publications"] = pubs;
+    block["inputs"] = ipts;
+    block["filters"] = filt;
+    block["endpoints"] = epts;
+    summary["summary"] = block;
+
+    return generateJsonString(summary);
 }
 
 void CoreBroker::transmitDelayedMessages()
@@ -2336,7 +2337,7 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
     }
     if (target == "parent") {
         if (isRootc) {
-            return "{\"error\":{\"code\":404\n\"message\":\"broker has no parent\"\n}";
+            return generateJsonErrorResponse(404, "broker has no parent");  // LCOV_EXCL_LINE
         }
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = gid;
@@ -2420,9 +2421,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\""
+        return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
                "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
-               "\"current_time\",\"current_state\",\"status;global_time\",\"version\",\"version_all\",\"exists\"]";
+               "\"current_time\",\"current_state\",\"status\",\"global_time\",\"version\",\"version_all\",\"exists\"]";
     }
     if (request == "address") {
         return std::string{"\""} + getAddress() + '"';
@@ -2579,7 +2580,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
         return generateJsonString(base);
     }
-    return "{\"error\":{\"code\":400\n\"message\":\"unrecognized broker query\"\n}";
+    return generateJsonErrorResponse(400, "unrecognized broker query");
 }
 
 std::string CoreBroker::getNameList(std::string gidString) const
@@ -2773,7 +2774,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             }
             queryResp.payload = globalSet.generate();
         } else {
-            queryResp.payload = "#invalid";
+            queryResp.payload = generateJsonErrorResponse(404, "Global value not found");
         }
         if (queryResp.dest_id == global_broker_id_local) {
             activeQueries.setDelayedValue(m.messageID, queryResp.payload);
@@ -2800,7 +2801,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         }
         if (((route == parent_route_id) && (isRootc)) || !response.empty()) {
             if (response.empty()) {
-                response = "#invalid";
+                response = generateJsonErrorResponse(404, "query not valid");
             }
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;

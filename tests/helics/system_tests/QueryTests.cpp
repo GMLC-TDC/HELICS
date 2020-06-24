@@ -750,21 +750,39 @@ TEST_F(query, queries_query)
     auto vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query(qstr);
-        EXPECT_NE(qres, "#invalid") << qstr << " produced #invalid";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error";
+        try {
+            auto v = loadJsonStr(qres);
+        }
+        catch(...) {
+            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
+        }
     }
 
     res = vFed1->query("core", "queries");
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query("core", qstr);
-        EXPECT_NE(qres, "#invalid") << qstr << " produced #invalid in core";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced and error in core";
+        try {
+            auto v = loadJsonStr(qres);
+        }
+        catch (...) {
+            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
+        }
     }
 
     res = vFed1->query("root", "queries");
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query("root", qstr);
-        EXPECT_NE(qres, "#invalid") << qstr << " produced #invalid in root";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in root";
+        try {
+            auto v = loadJsonStr(qres);
+        }
+        catch (...) {
+            EXPECT_TRUE(false) << "Unable to load JSON string " << qstr;
+        }
     }
 
     vFed1->finalize();

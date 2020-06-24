@@ -1011,7 +1011,7 @@ std::string Federate::query(const std::string& queryStr)
             res.append(coreObject->getIdentifier());
             res.push_back('"');
         } else {
-            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}";
+            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}}";
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1022,7 +1022,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->query(getName(), queryStr);
         } else {
-            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}";
+            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}}";
         }
     }
     return res;
@@ -1037,7 +1037,7 @@ std::string Federate::query(const std::string& target, const std::string& queryS
         if (coreObject) {
             res = coreObject->query(target, queryStr);
         } else {
-            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}";
+            res = "{\"error\":{\"code\":410\n\"message\":\"Federate is disconnected\"\n}}";
         }
     }
     return res;
@@ -1072,7 +1072,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     if (fnd != asyncInfo->inFlightQueries.end()) {
         return fnd->second.get();
     }
-    return "{\"error\":{\"code\":404\n\"message\":\"No Async queries are available\"\n}";
+    return "{\"error\":{\"code\":404\n\"message\":\"No Async queries are available\"\n}}";
 }
 
 bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT

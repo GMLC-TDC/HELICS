@@ -221,4 +221,7 @@ class BrokerBase {
 /** helper function to generate the name of a state as a string
  */
 const std::string& brokerStateName(BrokerBase::broker_state_t state);
+
+/** generate a json error response string*/
+std::string generateJsonErrorResponse(int code, const std::string& message);
 }  // namespace helics

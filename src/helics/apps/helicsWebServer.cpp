@@ -352,13 +352,13 @@ std::pair<return_val, std::string>
         query = "current_state";
     }
     auto res = brkr->query(target.to_string(), query.to_string());
-    if (res != "#invalid") {
+    if (res.find("\"error\"")==std::string::npos) {
         return {return_val::ok, res};
     }
 
     if (autoquery) {
         res = brkr->query(query.to_string(), "current_state");
-        if (res == "#invalid") {
+        if (res.find("\"error\"") != std::string::npos) {
             return {return_val::not_found, "target not found"};
         }
         return {return_val::ok, res};
