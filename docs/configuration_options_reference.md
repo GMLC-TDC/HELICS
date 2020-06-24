@@ -66,7 +66,6 @@ As a complement to the extensive listing of HELICS options and flags that can be
     ...
   ]
 }
-
 ```
 
 ### example\_combo\_fed.json
@@ -155,7 +154,7 @@ Only applicable for `ipc` and `test` core types; otherwise can be left undefined
 #### `log_level`
 Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid values are:
 
-	-1 - no logging
+	- 1 - no logging
 	- 0 - error
 	- 1 - warning
 	- 2 - summary
