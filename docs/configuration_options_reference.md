@@ -41,8 +41,7 @@ As a complement to the extensive listing of HELICS options and flags that can be
       "name": "EV_Controller/EV6",
       "type": "genmessage",
       "global": true
-    },
-	...
+    }
   ],
   "filters": [
     {
@@ -54,16 +53,14 @@ As a complement to the extensive listing of HELICS options and flags that can be
         "name": "delay", 
         "value": 600 
       }
-    },
-    ...
+    }
   ],
   "subscriptions": [
     {
       "key": "IEEE_123_feeder_0/totalLoad",
       "type": "complex",
       "required": true
-    },
-    ...
+    }
   ]
 }
 ```
