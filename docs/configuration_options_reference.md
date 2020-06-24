@@ -22,7 +22,9 @@ xxxxxxx Describe the various way these key words can be used to configure the co
 ## Sample Configurations
 
 ### Control_test.json
+
 xxxxxxx Description of configuration options
+
 ```json
 {
   "name": "EV_Controller",
@@ -67,8 +69,10 @@ xxxxxxx Description of configuration options
 }
 
 ```
-### example_combo_fed.json
+### example\_combo\_fed.json
+
 xxxxxxx Description of JSON options
+
 ```json
 {
   "name": "comboFed",
@@ -128,8 +132,10 @@ xxxxxxx Description of JSON options
 }
 ```
 
-### example_unusual_filters3.json
+### example\_unusual\_filters3.json
+
 xxxxxxx Description of JSON options
+
 ```json
 {
   "name": "filterFed", 
