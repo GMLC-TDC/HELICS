@@ -14,16 +14,20 @@ Many of the HELICS entities have significant configuration options. Rather than 
 xxxxxxx Describe the various way these key words can be used to configure the co-simulation.
 
 ### JSON configuration file
+xxxxxxx content TBD
 
 ### Command-line arguments
+xxxxxxx content TBD
 
 ### API parameters
+xxxxxxx content TBD
 
 ## Sample Configurations
+As a complement to the extensive listing of HELICS options and flags that can be used to configure HELICS to run in particular ways, the following example JSON configuration files are also provided to show specifically how this configuration can be implemented.
 
-### Control_test.json
+### Control\_test.json
 
-xxxxxxx Description of configuration options
+[This configuration](../examples/example_files/Control_test.json) is pulled from one of the User Guide examples as it utilizes [endpoints](./user-guide/message_federates.md) (for communicating control signal messages), [filters](./user-guide/filters.md) (which can modify messages _en route_) and [subscriptions](./user-guide/value_federates.md) (for receiving value signals, in this case the load of the electric vehicle on the distribution system).	
 
 ```json
 {
@@ -59,19 +63,15 @@ xxxxxxx Description of configuration options
       "type": "complex",
       "required": true
     },
-    {
-      "key": "IEEE_123_feeder_0/charge_EV6",
-      "type": "complex",
-      "required": true
-    },
     ...
   ]
 }
 
 ```
+
 ### example\_combo\_fed.json
 
-xxxxxxx Description of JSON options
+[This configuration](../examples/example_files/example_combo_fed.json) shows the extensive use of configuration flags and demonstrates their location in the JSON file. It also shows how to configure endpoints so they receive a message every time a value signal is updated in the federation and how the info field is constructed (necessary for some simulators to use HELICS data properly).
 
 ```json
 {
@@ -132,93 +132,6 @@ xxxxxxx Description of JSON options
 }
 ```
 
-### example\_unusual\_filters3.json
-
-xxxxxxx Description of JSON options
-
-```json
-{
-  "name": "filterFed", 
-  "observer": false, 
-  "rollback": false, 
-  "only_update_on_change": false, 
-  "only_transmit_on_change": false, 
-  "source_only": false, 
-  "uninterruptible": false, 
-  "coretype": "inproc", 
-  "corename": "ucore3", 
-  "coreinit": "-f 1 --autobroker", 
-  "max_iterations": 10, 
-  "period": 1.0, 
-  "offset": 0.0, 
-  "time_delta": 0.0, 
-  "output_delay": 0, 
-  "input_delay": 0, 
-
-  "endpoints": [
-    {
-      "name": "ept1", 
-      "type": "genmessage",  
-      "global": true 
-    },
-    {
-      "name": "clonedest", 
-      "global": true 
-    },
-    {
-      "name": "ept2", 
-      "type": "message2", 
-      "knownDestinations": "ept1", 
-      "subscriptions": "fed2/sub1" 
-    }
-  ],
-  "filters": [
-    {
-      "name": "filtername", 
-      "sourcetargets": "ept1",
-      "operation": "delay", 
-      "info": "this is an information string for use by the application",
-      "properties": [
-        {
-          "value": 0.2,
-          "name": "delay" 
-        },
-        {
-          "value": 0.3,
-          "name": "delay" 
-        }
-      ]
-    },
-    {
-      "name": "filtername2", 
-      "sourcetargets": ["filterFed/ept2"], 
-      "dest":["dest targets"], 
-      "operation": "blahblah",
-      "properties": {
-        "name": "newdestination",
-        "value": "ept1"
-      }
-    },
-    {
-      "name": "filterClone", 
-      "delivery": "ept2",
-      "cloning": true,
-      "properties": [
-        {
-          "id4": "destination",
-          "value": 0.1
-        },
-        {
-          "name": "source",
-          "value": "ept1"
-        }
-      ]
-    }
-  ]
-}
-```
-
-
 ## Federate Options
 There are a number of flags which control how a federate acts with respect to timing and its signal interfaces. 
 
@@ -230,14 +143,14 @@ Every federate must have a unique name across the entire federation; this is fun
 
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). (xxxxxxxx add link to core type pages)
 
-#### `coreType`
+#### `corename`
 Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
 
 #### `coreinit`
-???
+??? xxxxxxx
 
 #### `logfile`
-???
+??? xxxxxxx
 
 #### `log_level`
 Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid values are:
@@ -289,6 +202,9 @@ If the `terminate_on_error` flag is set then a federate encountering an internal
 
 #### `type`
 HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)).
+
+### `shortcut`
+??? xxxxxxx
 
 #### `units`
 HELICS is able to do some levels of unit conversion, currently only on double type publications but more may be added in the future. The units can be any sort of unit string, a wide assortment is supported and can be compound units such as m/s^2 and the conversion will convert as long as things are convertible. The unit match is also checked for other types and an error if mismatching units are detected. A warning is also generated if the units are not understood and not matching. The unit checking and conversion is only active if both the publication and subscription specify units.
