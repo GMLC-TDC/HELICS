@@ -32,6 +32,7 @@ There are a number of classes of HELICS users:
 - [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type of communication isn't sufficient.
 - [**N to 1 input connections**](./multiSourceInputs.md) - Handling multiple publications to a single input
 - **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
+- [**Debugging**](./debugging.md) - Capabilities to help with debugging
 
 ## Additional Resources
 
