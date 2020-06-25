@@ -21,20 +21,20 @@
 %apply (char *outputString, int maxLength) { (char *outputString, int maxStringLength) };
 
 ////typemap for large string output with a length return in C
-//%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(in, numinputs=0) (char *outputString, int maxStringLength, int *actualLength) {
 //  $3=&($2);
 //}
 //
-//%typemap(freearg) (char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(freearg) (char *outputString, int maxStringLength, int *actualLength) {
 //   if ($1) free($1);
 //}
 //
-//%typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(check)(char *outputString, int maxStringLength, int *actualLength) {
 //    $2=helicsInputGetStringSize(arg1)+2;
 //    $1 = (char *) malloc($2);
 //}
 //
-//%typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(argout) (char *outputString, int maxStringLength, int *actualLength) {
 //  PyObject *o2=PyString_FromString($1);
 //  $result = SWIG_Python_AppendOutput($result, o2);
 //}
