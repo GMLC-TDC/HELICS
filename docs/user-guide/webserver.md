@@ -248,7 +248,7 @@ More are expected to be added.
 
 ## Time Barriers
 
-[Time Barriers](./debugging.md) can be created and cleared through the Webserver.  
+[Time Barriers](./debugging.md) can be created and cleared through the Webserver.
 
 ## Json
 
