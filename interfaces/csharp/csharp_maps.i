@@ -183,21 +183,21 @@
 //
 //
 //// typemap for raw data output function
-//%typemap(in, numinputs=0) (void *data, int maxDatalen, int *actualSize) {
+//%typemap(in, numinputs=0) (void *data, int maxDataLength, int *actualSize) {
 //  $3=&($2);
 //}
 //
-//%typemap(freearg) (void *data, int maxDatalen, int *actualSize) {
+//%typemap(freearg) (void *data, int maxDataLength, int *actualSize) {
 //   if ($1) free($1);
 //}
 //
 //// Set argument to NULL before any conversion occurs
-//%typemap(check)(void *data, int maxDatalen, int *actualSize) {
+//%typemap(check)(void *data, int maxDataLength, int *actualSize) {
 //    $2=helicsSubscriptionGetValueSize(arg1)+2;
 //    $1 =  malloc($2);
 //}
 //
-//%typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+//%typemap(argout) (void *data, int maxDataLength, int *actualSize) {
 //  PyObject *o2=PyBytes_FromStringAndSize($1,*$3);
 //  $result = SWIG_Python_AppendOutput($result, o2);
 //}

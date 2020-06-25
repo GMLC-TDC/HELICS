@@ -200,41 +200,41 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 
 // typemap for raw data output function
-%typemap(in, numinputs=0) (void *data, int maxDatalen, int *actualSize) {
+%typemap(in, numinputs=0) (void *data, int maxDataLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (void *data, int maxDatalen, int *actualSize) {
+%typemap(freearg) (void *data, int maxDataLength, int *actualSize) {
    if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(void *data, int maxDatalen, int *actualSize) {
+%typemap(check)(void *data, int maxDataLength, int *actualSize) {
     $2=helicsInputGetRawValueSize(arg1)+2;
     $1 =  malloc($2);
 }
 
-%typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+%typemap(argout) (void *data, int maxDataLength, int *actualSize) {
  _outv = SWIG_FromCharPtrAndSize(static_cast<char *>($1),*$3);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
 
 // typemap for raw data message functions
-%typemap(in, numinputs=0) (void *data, int maxMessagelen, int *actualSize) {
+%typemap(in, numinputs=0) (void *data, int maxMessageLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (void *data, int maxMessagelen, int *actualSize) {
+%typemap(freearg) (void *data, int maxMessageLength, int *actualSize) {
    if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(void *data, int maxMessagelen, int *actualSize) {
+%typemap(check)(void *data, int maxMessageLength, int *actualSize) {
     $2=helicsMessageGetRawDataSize(arg1)+2;
     $1 =  malloc($2);
 }
 
-%typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
+%typemap(argout) (void *data, int maxMessageLength, int *actualSize) {
 _outv = SWIG_FromCharPtrAndSize(static_cast<char *>($1),*$3);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
