@@ -221,18 +221,19 @@ The Following queries will be answered by a broker.
 `federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
 
 ### Invalid queries
+
 Queries that are not valid as either the query itself or the target is not recognized will return an error JSON object
 
 ```json
 {
   "error": {
-    "code":404,
-    "message":"query not recognized"
+    "code": 404,
+    "message": "query not recognized"
   }
 }
 ```
 
-The error codes follow http error codes for not found(404) or resource not available(400) or server failure(500).  
+The error codes follow http error codes for not found(404) or resource not available(400) or server failure(500).
 
 ## Usage Notes
 
