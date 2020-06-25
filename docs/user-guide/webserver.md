@@ -47,19 +47,19 @@ The running webserver will start a process that can respond to HTTP requests.
 ### HTTP actions
 
 ```eval_rst
-+------------+---------------------------------------------------------------------------------------+
-| HTTP VERB  | Description                                                                           |
-+============+=======================================================================================+
-| ``GET``    | Make a query, usually with nothing in the message body                                |
-+------------+---------------------------------------------------------------------------------------+
-| ``PUSH``   | most general command,  usually for creating a broker, but other actions are possible  |
-+------------+---------------------------------------------------------------------------------------+
-| ``SEARCH`` | make a query mostly with data in the body                                             |
-+------------+---------------------------------------------------------------------------------------+
-| ``PUT``    | create a broker                                                                       |
-+------------+---------------------------------------------------------------------------------------+
-| ``DELETE`` | remove a broker                                                                       |
-+------------+---------------------------------------------------------------------------------------+
++------------+------------------------------------------------------------------------------------------------------+
+| HTTP VERB  | Description                                                                                          |
++============+======================================================================================================+
+| ``GET``    | Make a query, usually with nothing in the message body                                               |
++------------+------------------------------------------------------------------------------------------------------+
+| ``PUSH``   | most general command,  usually for creating a broker or time barrier but other actions are possible  |
++------------+------------------------------------------------------------------------------------------------------+
+| ``SEARCH`` | make a query mostly with data in the body                                                            |
++------------+------------------------------------------------------------------------------------------------------+
+| ``PUT``    | create a broker, or time barrier on a broker                                                         |
++------------+------------------------------------------------------------------------------------------------------+
+| ``DELETE`` | remove a broker or time barrier                                                                      |
++------------+------------------------------------------------------------------------------------------------------+
 ```
 
 ### Parameters
@@ -80,6 +80,8 @@ The running webserver will start a process that can respond to HTTP requests.
 +-------------+---------------------------------------------------------------------------------------+
 | ``args``    | The command line args to pass into a created broker                                   |
 +-------------+---------------------------------------------------------------------------------------+
+| ``time``    | The time associated with creation or update of a time barrier                         |
++-------------+---------------------------------------------------------------------------------------+
 ```
 
 Valid commands for the `command` parameter in either JSON or the URI:
@@ -87,6 +89,8 @@ Valid commands for the `command` parameter in either JSON or the URI:
 - `query`, `search` : run a query
 - `create` : create a broker
 - `delete`, `remove` : remove a broker
+- `barrier` : create or update a time barrier
+- `clear_barrier`: clear a time barrier
 
 ## Websocket API
 
@@ -241,6 +245,10 @@ Queries have a target and a query.
 The target is some named object in the federation and the query is a question.
 The available queries are listed [here](queries.md).
 More are expected to be added.
+
+## Time Barriers
+
+[Time Barriers](./debugging.md) can be created and cleared through the Webserver.  
 
 ## Json
 
