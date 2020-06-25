@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "queryFunctions.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "Federate.hpp"
 #include "gmlc/utilities/stringOps.h"
 
@@ -19,11 +20,28 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
     if (queryres.empty()) {
         return std::vector<std::string>();
     }
+
     if (queryres.front() == '[') {
-        std::vector<std::string> strs = gmlc::utilities::stringOps::splitline(queryres, ';');
-        strs.front() = strs.front().substr(1);  // get rid of the leading '['
-        strs.back().pop_back();  // get rid of the trailing ']';
-        return strs;
+        try {
+            auto v = loadJsonStr(queryres);
+            std::vector<std::string> strs;
+            if (v.isArray()) {
+                for (auto& str : v) {
+                    if (str.isString()) {
+                        strs.emplace_back(str.asCString());
+                    } else {
+                        strs.emplace_back(generateJsonString(str));
+                    }
+                }
+            } else if (v.isString()) {
+                strs.emplace_back(v.asCString());
+            } else {
+                strs.emplace_back(generateJsonString(v));
+            }
+            return strs;
+        }
+        catch (...) {
+        }
     }
     std::vector<std::string> res;
     res.push_back(std::move(queryres));
@@ -32,17 +50,29 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
 
 std::vector<std::string> vectorizeQueryResult(const std::string& queryres)
 {
-    if (queryres.empty()) {
-        return std::vector<std::string>();
-    }
     if (queryres.front() == '[') {
-        std::vector<std::string> strs = gmlc::utilities::stringOps::splitline(queryres, ';');
-        strs.front() = strs.front().substr(1);  // get rid of the leading '['
-        strs.back().pop_back();  // get rid of the trailing ']';
-        return strs;
+        try {
+            auto v = loadJsonStr(queryres);
+            std::vector<std::string> strs;
+            if (v.isArray()) {
+                for (auto& str : v) {
+                    if (str.isString()) {
+                        strs.emplace_back(str.asCString());
+                    } else {
+                        strs.emplace_back(generateJsonString(str));
+                    }
+                }
+            } else if (v.isString()) {
+                strs.emplace_back(v.asCString());
+            } else {
+                strs.emplace_back(generateJsonString(v));
+            }
+            return strs;
+        }
+        catch (...) {
+        }
     }
-    std::vector<std::string> res;
-    res.push_back(queryres);
+    std::vector<std::string> res{queryres};
     return res;
 }
 
@@ -54,15 +84,30 @@ std::vector<int> vectorizeIndexQuery(const std::string& queryres)
     }
 
     if (queryres.front() == '[') {
-        auto strs = vectorizeQueryResult(queryres);
-        result.reserve(strs.size());
-        for (auto& str : strs) {
-            try {
-                result.push_back(std::stoi(str));
+        try {
+            auto v = loadJsonStr(queryres);
+            if (v.isArray()) {
+                for (auto& val : v) {
+                    if (val.isInt()) {
+                        result.push_back(val.asInt());
+                    } else if (val.isDouble()) {
+                        result.push_back(val.asDouble());
+                    } else {
+                        continue;
+                    }
+                }
+            } else if (v.isInt()) {
+                result.push_back(v.asInt());
+            } else if (v.isDouble()) {
+                result.push_back(v.asDouble());
+            } else if (v.isString()) {
+                result.push_back(std::stoi(v.asString()));
+            } else {
+                result.push_back(std::stoi(queryres));
             }
-            catch (const std::invalid_argument&) {
-                continue;
-            }
+            return result;
+        }
+        catch (...) {
         }
     }
     try {
@@ -95,7 +140,7 @@ bool waitForInit(helics::Federate* fed,
     std::chrono::milliseconds waitTime{0};
     const std::chrono::milliseconds delta{400};
     while (res != "true") {
-        if (res == "#invalid") {
+        if (res.find("error") != std::string::npos) {
             return false;
         }
         std::this_thread::sleep_for(delta);
@@ -129,7 +174,7 @@ bool waitForFed(helics::Federate* fed,
 std::string queryFederateSubscriptions(helics::Federate* fed, const std::string& fedName)
 {
     auto res = fed->query(fedName, "subscriptions");
-    if (res.size() > 2 && res != "#invalid") {
+    if (res.size() > 2 && res.find("error") == std::string::npos) {
         res = fed->query("gid_to_name", res);
     }
     return res;
