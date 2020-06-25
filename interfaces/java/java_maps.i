@@ -3,22 +3,22 @@
 
 %}
 
-//typemap for short maxlen strings
-%typemap(in) (char *outputString, int maxlen) {
+//typemap for short maxLength strings
+%typemap(in) (char *outputString, int maxLength) {
   $1 = (char*)JCALL2(GetByteArrayElements, jenv, $input, 0);
   $2 = (int)JCALL1(GetArrayLength, jenv, $input);
 }
 
-%typemap(argout) (char *outputString, int maxlen) {
+%typemap(argout) (char *outputString, int maxLength) {
   JCALL3(ReleaseByteArrayElements, jenv, $input, (jbyte*)$1, 0);
 }
 
-%typemap(jni) (char *outputString, int maxlen) "jbyteArray"
-%typemap(jtype) (char *outputString, int maxlen) "byte[]"
-%typemap(jstype) (char *outputString, int maxlen) "byte[]"
-%typemap(javain) (char *outputString, int maxlen) "$javainput"
+%typemap(jni) (char *outputString, int maxLength) "jbyteArray"
+%typemap(jtype) (char *outputString, int maxLength) "byte[]"
+%typemap(jstype) (char *outputString, int maxLength) "byte[]"
+%typemap(javain) (char *outputString, int maxLength) "$javainput"
 
-%apply (char *outputString, int maxlen) { (char *outputString, int maxStringLen) };
+%apply (char *outputString, int maxLength) { (char *outputString, int maxStringLength) };
 
 ////typemap for large string output with a length return in C
 //%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
