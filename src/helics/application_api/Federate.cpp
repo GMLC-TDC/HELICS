@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 
 #include "../common/GuardedTypes.hpp"
+#include "../common/JsonGeneration.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
 #include "../core/BrokerFactory.hpp"
@@ -15,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/helics_definitions.hpp"
 #include "../network/loadCores.hpp"
-#include "../common/JsonGeneration.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "CoreApp.hpp"
 #include "FilterFederateManager.hpp"
@@ -1008,7 +1008,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = generateJsonQuotedString(coreObject->getIdentifier());
         } else {
-            res= generateJsonErrorResponse(410, "Federate is disconnected");
+            res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);

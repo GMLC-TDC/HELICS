@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "fmt_format.h"
-#include <string>
+
 #include "json/json.h"
 #include "json/writer.h"
+#include <string>
 
 namespace helics {
 
@@ -25,6 +26,5 @@ inline std::string generateJsonErrorResponse(int code, const std::string& messag
                        code,
                        generateJsonQuotedString(message));
 }
-
 
 }  // namespace helics

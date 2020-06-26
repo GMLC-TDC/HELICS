@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
-#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/JsonGeneration.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
