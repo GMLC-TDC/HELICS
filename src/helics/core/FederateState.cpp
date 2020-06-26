@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FederateState.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/JsonGeneration.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -1751,7 +1752,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (queryCallback) {
         return queryCallback(query);
     }
-    return "#invalid";
+    return generateJsonErrorResponse(400, "unrecognized Federate query");
 }
 
 std::string FederateState::processQuery(const std::string& query) const
@@ -1762,7 +1763,7 @@ std::string FederateState::processQuery(const std::string& query) const
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents;current_time";
+            R"("publications","inputs","endpoints","interfaces","subscriptions","dependencies","timeconfig","config","dependents","current_time")";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

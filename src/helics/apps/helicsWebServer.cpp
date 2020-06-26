@@ -56,14 +56,12 @@ namespace websocket = beast::websocket;  // from <boost/beast/websocket.hpp>
 namespace net = boost::asio;  // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
-namespace helics {
-namespace apps {
-    class IocWrapper {
-      public:
-        net::io_context ioc{1};
-    };
-}  // namespace apps
-}  // namespace helics
+namespace helics::apps {
+class IocWrapper {
+  public:
+    net::io_context ioc{1};
+};
+}  // namespace helics::apps
 
 static std::string loadFile(const std::string& fileName)
 {
@@ -352,13 +350,13 @@ std::pair<return_val, std::string>
         query = "current_state";
     }
     auto res = brkr->query(target.to_string(), query.to_string());
-    if (res != "#invalid") {
+    if (res.find("\"error\"") == std::string::npos) {
         return {return_val::ok, res};
     }
 
     if (autoquery) {
         res = brkr->query(query.to_string(), "current_state");
-        if (res == "#invalid") {
+        if (res.find("\"error\"") != std::string::npos) {
             return {return_val::not_found, "target not found"};
         }
         return {return_val::ok, res};
@@ -826,76 +824,73 @@ class Listener: public std::enable_shared_from_this<Listener> {
 
 static const Json::Value null;
 
-namespace helics {
-namespace apps {
-    void WebServer::startServer(const Json::Value* val)
-    {
-        logMessage("starting broker web server");
-        config = (val != nullptr) ? val : &null;
-        bool exp{false};
-        if (running.compare_exchange_strong(exp, true)) {
-            // The io_context is required for all I/O
-            context = std::make_shared<IocWrapper>();
+namespace helics::apps {
+void WebServer::startServer(const Json::Value* val)
+{
+    logMessage("starting broker web server");
+    config = (val != nullptr) ? val : &null;
+    bool exp{false};
+    if (running.compare_exchange_strong(exp, true)) {
+        // The io_context is required for all I/O
+        context = std::make_shared<IocWrapper>();
 
-            std::lock_guard<std::mutex> tlock(threadGuard);
+        std::lock_guard<std::mutex> tlock(threadGuard);
 
-            mainLoopThread = std::thread([this]() { mainLoop(); });
-            mainLoopThread.detach();
-            std::this_thread::yield();
-            while (!executing) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            }
+        mainLoopThread = std::thread([this]() { mainLoop(); });
+        mainLoopThread.detach();
+        std::this_thread::yield();
+        while (!executing) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
+}
 
-    /** stop the server*/
-    void WebServer::stopServer()
-    {
-        bool exp{true};
-        if (running.compare_exchange_strong(exp, false)) {
-            logMessage("stopping broker web server");
-            std::lock_guard<std::mutex> tlock(threadGuard);
-            context->ioc.stop();
+/** stop the server*/
+void WebServer::stopServer()
+{
+    bool exp{true};
+    if (running.compare_exchange_strong(exp, false)) {
+        logMessage("stopping broker web server");
+        std::lock_guard<std::mutex> tlock(threadGuard);
+        context->ioc.stop();
+    }
+}
+
+void WebServer::mainLoop()
+{
+    if (http_enabled_) {
+        if (config->isMember("http")) {
+            auto V = (*config)["http"];
+            replaceIfMember(V, "interface", httpAddress_);
+            replaceIfMember(V, "port", httpPort_);
         }
+        auto const address = net::ip::make_address(httpAddress_);
+        // Create and launch a listening port
+        std::make_shared<Listener>(context->ioc,
+                                   tcp::endpoint{address, static_cast<std::uint16_t>(httpPort_)})
+            ->run();
     }
 
-    void WebServer::mainLoop()
-    {
-        if (http_enabled_) {
-            if (config->isMember("http")) {
-                auto V = (*config)["http"];
-                replaceIfMember(V, "interface", httpAddress_);
-                replaceIfMember(V, "port", httpPort_);
-            }
-            auto const address = net::ip::make_address(httpAddress_);
-            // Create and launch a listening port
-            std::make_shared<Listener>(context->ioc,
-                                       tcp::endpoint{address,
-                                                     static_cast<std::uint16_t>(httpPort_)})
-                ->run();
+    if (websocket_enabled_) {
+        if (config->isMember("websocket")) {
+            auto V = (*config)["websocket"];
+            replaceIfMember(V, "interface", websocketAddress_);
+            replaceIfMember(V, "port", websocketPort_);
         }
-
-        if (websocket_enabled_) {
-            if (config->isMember("websocket")) {
-                auto V = (*config)["websocket"];
-                replaceIfMember(V, "interface", websocketAddress_);
-                replaceIfMember(V, "port", websocketPort_);
-            }
-            auto const address = net::ip::make_address(websocketAddress_);
-            // Create and launch a listening port
-            std::make_shared<Listener>(context->ioc,
-                                       tcp::endpoint{address,
-                                                     static_cast<std::uint16_t>(websocketPort_)},
-                                       true)
-                ->run();
-        }
-        executing.store(true);
-        // Run the I/O service
-        if (running.load()) {
-            context->ioc.run();
-        }
-        executing.store(false);
+        auto const address = net::ip::make_address(websocketAddress_);
+        // Create and launch a listening port
+        std::make_shared<Listener>(context->ioc,
+                                   tcp::endpoint{address,
+                                                 static_cast<std::uint16_t>(websocketPort_)},
+                                   true)
+            ->run();
     }
+    executing.store(true);
+    // Run the I/O service
+    if (running.load()) {
+        context->ioc.run();
+    }
+    executing.store(false);
+}
 
-}  // namespace apps
-}  // namespace helics
+}  // namespace helics::apps
