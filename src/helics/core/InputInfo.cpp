@@ -6,8 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InputInfo.hpp"
 
-#include "units/units/units.hpp"
 #include "../common/JsonGeneration.hpp"
+#include "units/units/units.hpp"
+
 #include <algorithm>
 #include <memory>
 #include <set>

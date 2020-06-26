@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
+#include "../common/JsonGeneration.hpp"
+
 #include <string>
 #include <type_traits>
-#include "../common/JsonGeneration.hpp"
 
 template<typename X, typename Proc>
 std::string generateStringVector(const X& data, Proc generator)

@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CoreBroker.hpp"
 
-#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/JsonGeneration.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logger.h"
 #include "BrokerFactory.hpp"
