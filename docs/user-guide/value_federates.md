@@ -46,27 +46,6 @@ Though contained here in this section on value federates, the options below are 
 - **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 - **`coreType` [zmq]** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
 
-### Value Federate Data Exchange Options
-
-```json
-{
-    ...
-    "only_update_on_change":false, //indicator that the federate should only indicate updated values on change
-    "only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
-    "source_only":false,
-    "observer":false,
-    ...
-}
-```
-
-- **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one.
-
-- **`only_transmit_on_change` [false]** - Complementary to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
-
-- **`source_only` [false]** - Some federates may exist only to provide data for the federation to use in their calculations. If using such a federate, set the `source_only` flag to `true`; doing so allows for slightly more efficient synchronization and higher performance of the federation.
-
-- **`observer` [false]** - Conversely, some federates may only participate in the federation by recording values (perhaps for diagnostic purposes or for logging results). If using such a federate, set the `observer` flag to `true` to achieve similar efficiencies as in the `source_only` flag.
-
 ### Value Federate Interface Configuration
 
 ```json
@@ -81,9 +60,6 @@ Though contained here in this section on value federates, the options below are 
                     \"object\" : \"network_node\",
                     \"property\" : \"distribution_load\"
                }"
-          },
-          {
-          ...
           }
      ],
      "subscriptions" : [
@@ -96,9 +72,6 @@ Though contained here in this section on value federates, the options below are 
                     \"object\" : \"network_node\",
                     \"property\" : \"positive_sequence_voltage\"
                     }"
-          },
-          {
-          ...
           }
      ]
 }

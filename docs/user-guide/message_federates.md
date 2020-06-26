@@ -64,10 +64,6 @@ Once the message topology considering endpoints has been determined, the definit
 - **`destination`** - For endpoints that send all outgoing messages to only a single endpoint, `destination` allows the endpoint to be specified in the JSON configuration. This allows for a more modular implementation of the federate since this parameter is externally defined rather than being hardcoded in the federate itself.
 - **`info`** - Just as in the value federate, the string in this field is ignored by HELICS and can be used by the federate for internal configuration purposes.
 
-There are a few other configuration parameters that are applicable if the endpoint is interacting with a HELICS value message.
-
-- **`knownSubscription`** - The string in this field specifies the key for a HELICS value message that the message federate would like to receive at the specified endpoint. HELICS will generate a message and send it to this endpoint whenever the originating value federate updates to value.
-- **`type`** and **`units`** - Just as in HELICS values, messages that come from value federates have associated data types and units. As in value federates, HELICS can use the specified `type` and `units` field to perform appropriate conversions. (As of v2.0, unit conversion is not supported.)
 
 ## Example 1b - Distribution system EV charge controller
 
