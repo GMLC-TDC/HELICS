@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FederateState.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/JsonGeneration.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -1751,8 +1752,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (queryCallback) {
         return queryCallback(query);
     }
-    return "{\"error\":{\"code\":400\n\"message\":\"unrecognized core query\"\n}";
-    ;
+    return generateJsonErrorResponse(400, "unrecognized Federate query");
 }
 
 std::string FederateState::processQuery(const std::string& query) const

@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logger.h"
+#include "../common/JsonGeneration.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -2304,9 +2305,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
             return res;
         }
         if (queryStr == "address") {
-            res.push_back('"');
-            res.append(getAddress());
-            res.push_back('"');
+            res = generateJsonQuotedString(getAddress());
             return res;
         }
         querycmd.setAction(CMD_BROKER_QUERY);

@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreBroker.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/JsonGeneration.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logger.h"
 #include "BrokerFactory.hpp"
@@ -2599,9 +2600,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
         const auto* info = handles.findHandle(
             global_handle(global_federate_id(val[index]), interface_handle(val[index + 1])));
         if (info != nullptr) {
-            gidString.push_back('"');
-            gidString.append(info->key);
-            gidString.push_back('"');
+            gidString.append(generateJsonQuotedString(info->key));
             gidString.push_back(',');
         }
 
