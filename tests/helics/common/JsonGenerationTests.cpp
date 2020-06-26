@@ -60,6 +60,7 @@ TEST(error_generation, egen2)
     EXPECT_TRUE(V.isObject());
 
     EXPECT_TRUE(V["error"].isObject());
-    EXPECT_TRUE(V["error"]["code"].isInt(), code);
+    EXPECT_TRUE(V["error"]["code"].isInt());
+    EXPECT_EQ(V["error"]["code"].asInt(), code);
     EXPECT_EQ(V["error"]["message"].asString(), message);
 }
