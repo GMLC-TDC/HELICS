@@ -596,7 +596,7 @@ def create_output_file(benchmark, output_path, filename, date, bm_dicts):
     bm_dict = {
         'context': {
             'date': date,
-            'host_name': '',  # platform.node(),
+            'host_name': platform.node(),
             'executable': sys.executable,
             'num_cpus': multiprocessing.cpu_count(),
             'mhz_per_cpu': cpu_freq.max,
