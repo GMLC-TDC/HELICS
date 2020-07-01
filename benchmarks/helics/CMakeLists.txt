@@ -62,14 +62,18 @@ foreach(T ${HELICS_BENCHMARKS})
     target_compile_definitions(
         ${T} PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})"
     )
+    install(TARGETS ${T} ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT benchmarks)
 endforeach()
 
 add_executable(helics_benchmarks BenchmarkMain.cpp BenchmarkFederate.hpp)
 target_link_libraries(helics_benchmarks PUBLIC helics_application_api)
 set_target_properties(helics_benchmarks PROPERTIES FOLDER benchmarks_multimachine)
 foreach(T ${HELICS_MULTINODE_BENCHMARKS})
-    target_sources(helics_benchmarks PUBLIC ${T}.hpp)
+    target_sources(helics_benchmarks PRIVATE ${T}.hpp)
 endforeach()
+install(TARGETS helics_benchmarks ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT benchmarks)
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
