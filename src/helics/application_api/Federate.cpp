@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 
 #include "../common/GuardedTypes.hpp"
+#include "../common/JsonGeneration.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
 #include "../core/BrokerFactory.hpp"
@@ -1002,12 +1003,12 @@ std::string Federate::query(const std::string& queryStr)
 {
     std::string res;
     if (queryStr == "name") {
-        res = getName();
+        res = generateJsonQuotedString(getName());
     } else if (queryStr == "corename") {
         if (coreObject) {
-            res = coreObject->getIdentifier();
+            res = generateJsonQuotedString(coreObject->getIdentifier());
         } else {
-            res = "#disconnected";
+            res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1018,7 +1019,7 @@ std::string Federate::query(const std::string& queryStr)
         if (coreObject) {
             res = coreObject->query(getName(), queryStr);
         } else {
-            res = "#disconnected";
+            res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
     }
     return res;
@@ -1033,7 +1034,7 @@ std::string Federate::query(const std::string& target, const std::string& queryS
         if (coreObject) {
             res = coreObject->query(target, queryStr);
         } else {
-            res = "#disconnected";
+            res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
     }
     return res;
@@ -1068,7 +1069,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     if (fnd != asyncInfo->inFlightQueries.end()) {
         return fnd->second.get();
     }
-    return {"#invalid"};
+    return generateJsonErrorResponse(404, "No Async queries are available");
 }
 
 bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT

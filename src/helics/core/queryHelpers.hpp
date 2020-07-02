@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
+#include "../common/JsonGeneration.hpp"
+
 #include <string>
 #include <type_traits>
 
@@ -14,10 +16,10 @@ std::string generateStringVector(const X& data, Proc generator)
 {
     static_assert(std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value,
                   "generator output must be convertible to std::string");
-    std::string ret(1, '[');
+    std::string ret{"["};
     for (auto& ele : data) {
-        ret.append(generator(ele));
-        ret.push_back(';');
+        ret.append(helics::generateJsonQuotedString(generator(ele)));
+        ret.push_back(',');
     }
     if (ret.size() > 1) {
         ret.back() = ']';
@@ -32,11 +34,11 @@ std::string generateStringVector_if(const X& data, Proc generator, validator val
 {
     static_assert(std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value,
                   "generator output must be convertible to std::string");
-    std::string ret(1, '[');
+    std::string ret{"["};
     for (auto& ele : data) {
         if (valid(ele)) {
-            ret.append(generator(ele));
-            ret.push_back(';');
+            ret.append(helics::generateJsonQuotedString(generator(ele)));
+            ret.push_back(',');
         }
     }
     if (ret.size() > 1) {

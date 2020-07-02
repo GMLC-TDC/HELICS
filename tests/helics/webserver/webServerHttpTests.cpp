@@ -256,10 +256,10 @@ TEST_F(httpTest, bad_request)
 TEST_F(httpTest, not_found)
 {
     auto result = sendGet("/broker7");
-    EXPECT_TRUE(result.find("not") != std::string::npos);
+    EXPECT_NE(result.find("not"), std::string::npos);
 
     result = sendGet("/brk2/ch5");
-    EXPECT_TRUE(result.find("not found") != std::string::npos);
+    EXPECT_NE(result.find("not found"), std::string::npos);
 }
 
 TEST_F(httpTest, core)

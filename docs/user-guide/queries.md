@@ -36,13 +36,13 @@ A target is specified, and can be one of the following. A federate named one of 
 ## Query String
 
 The `queryStr` is a specific data to request, there are a number of different things that can be queried from the system.
-Unrecognized queries or targets return `#invalid`
+Unrecognized queries or targets return a json object "error" containing a code and an error message.
 Answers to queries can be
 
-- "true"/"false" \[T/F\]
-- a single string `"answer"` \[string\]
-- a vector of strings delimited by `';'` `[answer1;answer2;answer3]` \[sv\]
-- a JSON string \[JSON\]
+- true/false \[T/F\]
+- a single quoted string `"answer"` \[string\]
+- a vector of quoted strings delimited by `','` `["answer1","answer"","answer3"]` \[sv\] this is a JSON compliant string vector
+- a JSON string with an object \[JSON\]
 
 ### Federate Queries
 
@@ -219,6 +219,21 @@ The Following queries will be answered by a broker.
 ```
 
 `federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
+
+### Invalid queries
+
+Queries that are not valid as either the query itself or the target is not recognized will return an error JSON object
+
+```json
+{
+  "error": {
+    "code": 404,
+    "message": "query not recognized"
+  }
+}
+```
+
+The error codes follow http error codes for not found(404) or resource not available(400) or server failure(500).
 
 ## Usage Notes
 

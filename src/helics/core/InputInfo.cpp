@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InputInfo.hpp"
 
+#include "../common/JsonGeneration.hpp"
 #include "units/units/units.hpp"
 
 #include <algorithm>
@@ -183,9 +184,7 @@ const std::string& InputInfo::getInjectionType() const
             } else {
                 inputType.push_back('[');
                 for (const auto& src : source_info) {
-                    inputType.push_back('"');
-                    inputType.append(src.type);
-                    inputType.push_back('"');
+                    inputType.append(generateJsonQuotedString(src.type));
                     inputType.push_back(',');
                 }
                 inputType.back() = ']';
@@ -211,9 +210,7 @@ const std::string& InputInfo::getInjectionUnits() const
             } else {
                 inputUnits.push_back('[');
                 for (const auto& src : source_info) {
-                    inputUnits.push_back('"');
-                    inputUnits.append(src.units);
-                    inputUnits.push_back('"');
+                    inputUnits.append(generateJsonQuotedString(src.units));
                     inputUnits.push_back(',');
                 }
                 inputUnits.back() = ']';

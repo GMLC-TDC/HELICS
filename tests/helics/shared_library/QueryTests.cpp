@@ -33,11 +33,11 @@ TEST_P(query_tests, publication_queries)
 
     CE(std::string res(helicsQueryCoreExecute(q1, core, &err)));
 
-    EXPECT_EQ(res, "[pub1;fed0/pub2]");
+    EXPECT_EQ(res, "[\"pub1\",\"fed0/pub2\"]");
     helicsQueryFree(q1);
     q1 = helicsCreateQuery(nullptr, "publications");
     CE(std::string res2 = helicsQueryExecute(q1, vFed2, &err));
-    EXPECT_EQ(res2, "[fed1/pub3]");
+    EXPECT_EQ(res2, "[\"fed1/pub3\"]");
 
     helicsQueryFree(q1);
 
@@ -49,7 +49,7 @@ TEST_P(query_tests, publication_queries)
 
     q1 = helicsCreateQuery("fed1", "publications");
     CE(res = helicsQueryExecute(q1, vFed1, &err));
-    EXPECT_EQ(res, "[fed1/pub3]");
+    EXPECT_EQ(res, "[\"fed1/pub3\"]");
     helicsQueryFree(q1);
     helicsCoreFree(core);
     CE(helicsFederateFinalizeAsync(vFed1, &err));
@@ -67,11 +67,11 @@ TEST_P(query_tests, broker_queries)
 
     auto q1 = helicsCreateQuery("root", "federates");
     std::string res = helicsQueryCoreExecute(q1, core, nullptr);
-    std::string str("[");
+    std::string str("[\"");
     str.append(helicsFederateGetName(vFed1));
-    str.push_back(';');
+    str.append("\",\"");
     str.append(helicsFederateGetName(vFed2));
-    str.push_back(']');
+    str.append("\"]");
 
     EXPECT_EQ(res, str);
 
