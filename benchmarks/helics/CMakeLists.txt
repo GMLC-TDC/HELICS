@@ -89,7 +89,8 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
         echoBenchmarks_c PRIVATE ${HELICS_BINARY_DIR}/helics_generated_includes/
     )
     install(TARGETS echoBenchmarks_c ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT benchmarks)
+            COMPONENT benchmarks
+    )
 endif()
 
 string(TIMESTAMP current_date "%Y-%m-%d")
