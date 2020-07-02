@@ -980,6 +980,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+        benchmarks
         cereal
     )
     if(WIN32)
@@ -994,6 +995,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
     set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
     set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
+    set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
     set(CPACK_COMPONENT_PYTHON_DISPLAY_NAME "Python")
@@ -1021,6 +1023,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_LIBS_DESCRIPTION "Libraries for compiling and linking with HELICS")
     set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
+    set(CPACK_COMPONENT_BENCHMARKS_DESCRIPTION "Benchmark applications for HELICS")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION
         "cereal C++11 serialization library [no support for other language interfaces]"
     )
