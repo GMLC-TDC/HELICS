@@ -4,6 +4,12 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+
+// For warnings about constexpr paths in visual studio from frozen libraries
+#if defined(_MSC_VER)
+#    pragma warning(disable : 4127 4245)
+#endif
+
 #include "ActionMessage.hpp"
 
 #include "../common/fmt_format.h"
@@ -12,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <complex>
 #include <cstring>
+#include <frozen/string.h>
+#include <frozen/unordered_map.h>
 #include <ostream>
 #include <utility>
 #include <vector>
@@ -575,133 +583,121 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
 
 static constexpr char unknownStr[] = "unknown";
 
-// done in this screwy way because this can be called after things have started to be deconstructed
-// so static consts can cause seg faults someday will change to frozen::  once we can use all of
-// C++14
+// Map to translate the action to a description
+static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string, 93>
+    actionStrings = {
+        // priority commands
+        {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
+        {action_message_def::action_t::cmd_disconnect, "disconnect"},
+        {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
+        {action_message_def::action_t::cmd_user_disconnect, "disconnect from user"},
+        {action_message_def::action_t::cmd_broadcast_disconnect, "broadcast disconnect"},
+        {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
-static constexpr std::pair<action_message_def::action_t, const char*> actionStrings[] = {
-    // priority commands
-    {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
-    {action_message_def::action_t::cmd_disconnect, "disconnect"},
-    {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
-    {action_message_def::action_t::cmd_user_disconnect, "disconnect from user"},
-    {action_message_def::action_t::cmd_broadcast_disconnect, "broadcast disconnect"},
-    {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
+        {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
+        {action_message_def::action_t::cmd_add_route, "add_route"},
+        {action_message_def::action_t::cmd_route_ack, "route_ack"},
+        {action_message_def::action_t::cmd_register_route, "register_route"},
+        {action_message_def::action_t::cmd_reg_fed, "reg_fed"},
+        {action_message_def::action_t::cmd_priority_ack, "priority_ack"},
+        {action_message_def::action_t::cmd_query, "query"},
+        {action_message_def::action_t::cmd_query_reply, "query_reply"},
+        {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
 
-    {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
-    {action_message_def::action_t::cmd_add_route, "add_route"},
-    {action_message_def::action_t::cmd_route_ack, "route_ack"},
-    {action_message_def::action_t::cmd_register_route, "register_route"},
-    {action_message_def::action_t::cmd_reg_fed, "reg_fed"},
-    {action_message_def::action_t::cmd_priority_ack, "priority_ack"},
-    {action_message_def::action_t::cmd_query, "query"},
-    {action_message_def::action_t::cmd_query_reply, "query_reply"},
-    {action_message_def::action_t::cmd_reg_broker, "reg_broker"},
+        {action_message_def::action_t::cmd_ignore, "ignore"},
+        {action_message_def::action_t::cmd_tick, "tick"},
+        {action_message_def::action_t::cmd_ping, "ping"},
+        {action_message_def::action_t::cmd_ping_reply, "ping reply"},
+        {action_message_def::action_t::cmd_fed_configure_time, "fed_configure_time"},
+        {action_message_def::action_t::cmd_fed_configure_int, "fed_configure_int"},
+        {action_message_def::action_t::cmd_fed_configure_flag, "fed_configure_flag"},
+        {action_message_def::action_t::cmd_init, "init"},
+        {action_message_def::action_t::cmd_init_grant, "init_grant"},
+        {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
+        {action_message_def::action_t::cmd_exec_request, "exec_request"},
+        {action_message_def::action_t::cmd_exec_grant, "exec_grant"},
+        {action_message_def::action_t::cmd_exec_check, "exec_check"},
+        {action_message_def::action_t::cmd_disconnect_broker_ack, "disconnect broker acknowledge"},
+        {action_message_def::action_t::cmd_disconnect_core_ack, "disconnect core acknowledge"},
+        {action_message_def::action_t::cmd_disconnect_fed_ack, "disconnect fed acknowledge"},
+        {action_message_def::action_t::cmd_ack, "ack"},
 
-    {action_message_def::action_t::cmd_ignore, "ignore"},
-    {action_message_def::action_t::cmd_tick, "tick"},
-    {action_message_def::action_t::cmd_ping, "ping"},
-    {action_message_def::action_t::cmd_ping_reply, "ping reply"},
-    {action_message_def::action_t::cmd_fed_configure_time, "fed_configure_time"},
-    {action_message_def::action_t::cmd_fed_configure_int, "fed_configure_int"},
-    {action_message_def::action_t::cmd_fed_configure_flag, "fed_configure_flag"},
-    {action_message_def::action_t::cmd_init, "init"},
-    {action_message_def::action_t::cmd_init_grant, "init_grant"},
-    {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
-    {action_message_def::action_t::cmd_exec_request, "exec_request"},
-    {action_message_def::action_t::cmd_exec_grant, "exec_grant"},
-    {action_message_def::action_t::cmd_exec_check, "exec_check"},
-    {action_message_def::action_t::cmd_disconnect_broker_ack, "disconnect broker acknowledge"},
-    {action_message_def::action_t::cmd_disconnect_core_ack, "disconnect core acknowledge"},
-    {action_message_def::action_t::cmd_disconnect_fed_ack, "disconnect fed acknowledge"},
-    {action_message_def::action_t::cmd_ack, "ack"},
+        {action_message_def::action_t::cmd_stop, "stop"},
+        {action_message_def::action_t::cmd_terminate_immediately, "terminate_immediately"},
 
-    {action_message_def::action_t::cmd_stop, "stop"},
-    {action_message_def::action_t::cmd_terminate_immediately, "terminate_immediately"},
+        {action_message_def::action_t::cmd_time_grant, "time_grant"},
+        {action_message_def::action_t::cmd_time_check, "time_check"},
+        {action_message_def::action_t::cmd_time_block, "time_block"},
+        {action_message_def::action_t::cmd_time_unblock, "time_unblock"},
+        {action_message_def::action_t::cmd_pub, "pub"},
+        {action_message_def::action_t::cmd_bye, "bye"},
+        {action_message_def::action_t::cmd_log, "log"},
+        {action_message_def::action_t::cmd_warning, "warning"},
+        {action_message_def::action_t::cmd_error, "error"},
 
-    {action_message_def::action_t::cmd_time_grant, "time_grant"},
-    {action_message_def::action_t::cmd_time_check, "time_check"},
-    {action_message_def::action_t::cmd_time_block, "time_block"},
-    {action_message_def::action_t::cmd_time_unblock, "time_unblock"},
-    {action_message_def::action_t::cmd_pub, "pub"},
-    {action_message_def::action_t::cmd_bye, "bye"},
-    {action_message_def::action_t::cmd_log, "log"},
-    {action_message_def::action_t::cmd_warning, "warning"},
-    {action_message_def::action_t::cmd_error, "error"},
+        {action_message_def::action_t::cmd_send_route, "send_route"},
+        {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
+        {action_message_def::action_t::cmd_remove_dependency, "remove_dependency"},
+        {action_message_def::action_t::cmd_add_dependent, "add_dependent"},
+        {action_message_def::action_t::cmd_remove_dependent, "remove_dependent"},
+        {action_message_def::action_t::cmd_add_interdependency, "add_interdependency"},
+        {action_message_def::action_t::cmd_remove_interdependency, "remove_interdependency"},
 
-    {action_message_def::action_t::cmd_send_route, "send_route"},
-    {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
-    {action_message_def::action_t::cmd_remove_dependency, "remove_dependency"},
-    {action_message_def::action_t::cmd_add_dependent, "add_dependent"},
-    {action_message_def::action_t::cmd_remove_dependent, "remove_dependent"},
-    {action_message_def::action_t::cmd_add_interdependency, "add_interdependency"},
-    {action_message_def::action_t::cmd_remove_interdependency, "remove_interdependency"},
+        {action_message_def::action_t::null_info_command, "null_info"},
+        {action_message_def::action_t::priority_null_info_command, "priority_null_info"},
+        {action_message_def::action_t::cmd_time_request, "time_request"},
+        {action_message_def::action_t::cmd_send_message, "send_message"},
+        {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
+        {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
+        {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
+        {action_message_def::action_t::cmd_null_message, "null message"},
 
-    {action_message_def::action_t::null_info_command, "null_info"},
-    {action_message_def::action_t::priority_null_info_command, "priority_null_info"},
-    {action_message_def::action_t::cmd_time_request, "time_request"},
-    {action_message_def::action_t::cmd_send_message, "send_message"},
-    {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
-    {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
-    {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
-    {action_message_def::action_t::cmd_null_message, "null message"},
+        {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
+        {action_message_def::action_t::cmd_add_publisher, "add publisher"},
+        {action_message_def::action_t::cmd_remove_publication, "remove publisher"},
+        {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
+        {action_message_def::action_t::cmd_add_filter, "add_filter"},
+        {action_message_def::action_t::cmd_remove_filter, "remove filter"},
+        {action_message_def::action_t::cmd_filter_link, "link filter"},
+        {action_message_def::action_t::cmd_data_link, "data link"},
+        {action_message_def::action_t::cmd_reg_input, "reg_input"},
+        {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
+        {action_message_def::action_t::cmd_remove_subscriber, "remove subscriber"},
+        {action_message_def::action_t::cmd_reg_end, "reg_end"},
+        {action_message_def::action_t::cmd_resend, "reg_resend"},
+        {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
+        {action_message_def::action_t::cmd_remove_endpoint, "remove endpoint"},
+        {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
+        {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
+        {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
+        {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
+        {action_message_def::action_t::cmd_remove_named_endpoint, "remove_named_endpoint"},
+        {action_message_def::action_t::cmd_disconnect_fed, "disconnect_fed"},
+        {action_message_def::action_t::cmd_disconnect_broker, "disconnect_broker"},
+        {action_message_def::action_t::cmd_disconnect_core, "disconnect_core"},
+        {action_message_def::action_t::cmd_remove_named_input, "remove_named_input"},
+        {action_message_def::action_t::cmd_remove_named_publication, "remove_named_publication"},
+        {action_message_def::action_t::cmd_remove_named_filter, "remove_named_filter"},
+        {action_message_def::action_t::cmd_close_interface, "close_interface"},
+        {action_message_def::action_t::cmd_multi_message, "multi message"},
+        {action_message_def::action_t::cmd_broker_configure, "broker_configure"},
+        {action_message_def::action_t::cmd_time_barrier_request, "request time barrier"},
+        {action_message_def::action_t::cmd_time_barrier, "time barrier"},
+        {action_message_def::action_t::cmd_time_barrier_clear, "clear time barrier"},
+        // protocol messages are meant for the communication standard and are not used in the
+        // Cores/Brokers
+        {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
+        {action_message_def::action_t::cmd_protocol, "protocol"},
+        {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
-    {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
-    {action_message_def::action_t::cmd_add_publisher, "add publisher"},
-    {action_message_def::action_t::cmd_remove_publication, "remove publisher"},
-    {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
-    {action_message_def::action_t::cmd_add_filter, "add_filter"},
-    {action_message_def::action_t::cmd_remove_filter, "remove filter"},
-    {action_message_def::action_t::cmd_filter_link, "link filter"},
-    {action_message_def::action_t::cmd_data_link, "data link"},
-    {action_message_def::action_t::cmd_reg_input, "reg_input"},
-    {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
-    {action_message_def::action_t::cmd_remove_subscriber, "remove subscriber"},
-    {action_message_def::action_t::cmd_reg_end, "reg_end"},
-    {action_message_def::action_t::cmd_resend, "reg_resend"},
-    {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
-    {action_message_def::action_t::cmd_remove_endpoint, "remove endpoint"},
-    {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
-    {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
-    {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
-    {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
-    {action_message_def::action_t::cmd_remove_named_endpoint, "remove_named_endpoint"},
-    {action_message_def::action_t::cmd_disconnect_fed, "disconnect_fed"},
-    {action_message_def::action_t::cmd_disconnect_broker, "disconnect_broker"},
-    {action_message_def::action_t::cmd_disconnect_core, "disconnect_core"},
-    {action_message_def::action_t::cmd_remove_named_input, "remove_named_input"},
-    {action_message_def::action_t::cmd_remove_named_publication, "remove_named_publication"},
-    {action_message_def::action_t::cmd_remove_named_filter, "remove_named_filter"},
-    {action_message_def::action_t::cmd_close_interface, "close_interface"},
-    {action_message_def::action_t::cmd_multi_message, "multi message"},
-    {action_message_def::action_t::cmd_broker_configure, "broker_configure"},
-    {action_message_def::action_t::cmd_time_barrier_request, "request time barrier"},
-    {action_message_def::action_t::cmd_time_barrier, "time barrier"},
-    {action_message_def::action_t::cmd_time_barrier_clear, "clear time barrier"},
-    // protocol messages are meant for the communication standard and are not used in the
-    // Cores/Brokers
-    {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
-    {action_message_def::action_t::cmd_protocol, "protocol"},
-    {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
-
-using actionPair = std::pair<action_message_def::action_t, const char*>;
-static constexpr size_t actEnd = sizeof(actionStrings) / sizeof(actionPair);
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
-// this function can (in actuality) be used as the program is shutting down
 const char* actionMessageType(action_message_def::action_t action)
 {
-    const auto* pptr = static_cast<const actionPair*>(actionStrings);
-    const auto* res = std::find_if(pptr, pptr + actEnd, [action](const auto& pt) {
-        return (pt.first == action);
-    });
-    if (res != pptr + actEnd) {
-        return res->second;
-    }
-    return static_cast<const char*>(unknownStr);
+    const auto* res = actionStrings.find(action);
+    return (res != actionStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
 // set of strings to translate error codes to something sensible
-static constexpr std::pair<int, const char*> errorStrings[] = {
+static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
     {connection_error_code, "connection error"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
@@ -709,22 +705,10 @@ static constexpr std::pair<int, const char*> errorStrings[] = {
     {duplicate_broker_name_error_code, "duplicate broker name detected"},
     {mismatch_broker_key_error_code, "Broker key does not match"}};
 
-using errorPair = std::pair<int, const char*>;
-static constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
-
-// this was done this way to keep the string array as a constexpr otherwise it could be deleted as
-// this function can (in actuality-there was a case that did this) be used as the program is
-// shutting down
 const char* commandErrorString(int errorcode)
 {
-    const auto* pptr = static_cast<const errorPair*>(errorStrings);
-    const auto* res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
-        return (pt.first == errorcode);
-    });
-    if (res != pptr + errEnd) {
-        return res->second;
-    }
-    return static_cast<const char*>(unknownStr);
+    const auto* res = errorStrings.find(errorcode);
+    return (res != errorStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
 std::string errorMessageString(const ActionMessage& command)

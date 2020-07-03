@@ -44,19 +44,6 @@ class Broker {
     /** initialize from command line arguments
      */
     virtual void configureFromArgs(int argc, char* argv[]) = 0;
-    /** start up the broker with an initialization string containing commands and parameters*/
-    [[deprecated("please use configure instead")]] void
-        initialize(const std::string& configureString)
-    {
-        configure(configureString);
-    }
-    /** initialize from command line arguments
-     */
-    [[deprecated("please use configureFromArgs instead")]] void initializeFromArgs(int argc,
-                                                                                   char* argv[])
-    {
-        configureFromArgs(argc, argv);
-    }
     /** Initialize the Broker from command line arguments contained in a vector
      * Should be invoked a single time to initialize the co-simulation broker.
      */
