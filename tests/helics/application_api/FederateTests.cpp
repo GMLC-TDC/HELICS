@@ -888,24 +888,24 @@ TEST(federate_tests, queryTest1)
     Fed1->enterExecutingMode();
 
     auto qres = Fed1->query("name");
-    EXPECT_EQ(qres, "fed_q");
+    EXPECT_EQ(qres, "\"fed_q\"");
     qres = Fed1->query("corename");
     auto cr = Fed1->getCorePointer();
-    EXPECT_EQ(qres, cr->getIdentifier());
+    EXPECT_EQ(qres, std::string("\"") + cr->getIdentifier() + '"');
     qres = Fed1->query("federate", "name");
-    EXPECT_EQ(qres, "fed_q");
+    EXPECT_EQ(qres, "\"fed_q\"");
 
     cr.reset();
     Fed1->disconnect();
     qres = Fed1->query("corename");
-    EXPECT_EQ(qres.front(), '#');
+    EXPECT_NE(qres.find("error"), std::string::npos);
     qres = Fed1->query("subscriptions");
-    EXPECT_EQ(qres.front(), '#');
+    EXPECT_NE(qres.find("error"), std::string::npos);
     qres = Fed1->query("root", "subscriptions");
-    EXPECT_EQ(qres.front(), '#');
+    EXPECT_NE(qres.find("error"), std::string::npos);
 
     qres = Fed1->queryComplete(helics::query_id_t{4});
-    EXPECT_EQ(qres.front(), '#');
+    EXPECT_NE(qres.find("error"), std::string::npos);
 
     EXPECT_FALSE(Fed1->isQueryCompleted(helics::query_id_t{2}));
     EXPECT_NO_THROW(Fed1->logMessage(10, "test log message"));

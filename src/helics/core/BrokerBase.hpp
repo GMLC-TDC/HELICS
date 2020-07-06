@@ -221,4 +221,5 @@ class BrokerBase {
 /** helper function to generate the name of a state as a string
  */
 const std::string& brokerStateName(BrokerBase::broker_state_t state);
+
 }  // namespace helics

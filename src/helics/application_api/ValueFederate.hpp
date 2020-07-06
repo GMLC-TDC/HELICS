@@ -169,41 +169,6 @@ class HELICS_CXX_EXPORT ValueFederate:
                                             units);
     }
 
-    /** register a publication as part of an indexed structure
-    @details call is only valid in startup mode by default prepends the name with the federate name
-    the name is registered as a global structure with the index appended
-    @param key the name of the publication
-    @param index1 an index associated with the publication
-    @param units  the optional units of the publication
-    @return an identifier for use with this publication
-    */
-    template<typename X>
-    Publication& registerPublicationIndexed(const std::string& key,
-                                            int index1,
-                                            const std::string& units = std::string())
-    {
-        return registerGlobalPublication<X>(key + '_' + std::to_string(index1), units);
-    }
-    /** register a publication as part of a 2 dimensional indexed structure
-    @details call is only valid in startup mode by default prepends the name with the federate name
-    the name is registered as a global structure with the indices appended
-    @param key the name of the publication
-    @param index1 an index associated with the publication
-    @param index2 a second index
-    @param units  the optional units of the publication
-    @return an identifier for use with this publication
-    */
-    template<typename X>
-    Publication& registerPublicationIndexed(const std::string& key,
-                                            int index1,
-                                            int index2,
-                                            const std::string& units = std::string())
-    {
-        return registerGlobalPublication<X>(key + '_' + std::to_string(index1) + '_' +
-                                                std::to_string(index2),
-                                            units);
-    }
-
     /** register an input
     @details call is only valid in startup mode register a subscription with name type and units
     @param key the name of the publication to subscribe to
@@ -274,41 +239,6 @@ class HELICS_CXX_EXPORT ValueFederate:
                                       units);
     }
 
-    /** register a required subscription
-    @details call is only valid in startup mode, register an optional subscription for a 1D array of
-    values
-    @param key the name of the subscription
-    @param index1 the index into a 1 dimensional array of values
-    @param units the optional units on the subscription
-    */
-    template<typename X>
-    Input& registerInputIndexed(const std::string& key,
-                                int index1,
-                                const std::string& units = std::string())
-    {
-        return registerGlobalInput<X>(key + '_' + std::to_string(index1), units);
-    }
-
-    /** register a publication as part of a 2 dimensional indexed structure
-  @details call is only valid in startup mode by default prepends the name with the federate name
-  the name is registered as a global structure with the indices appended
-  @param key the name of the publication
-  @param index1 an index associated with the publication
-  @param index2 a second index
-  @param units  the optional units of the publication
-  @return an identifier for use with this publication
-  */
-    template<typename X>
-    Input& registerInputIndexed(const std::string& key,
-                                int index1,
-                                int index2,
-                                const std::string& units = std::string())
-    {
-        return registerGlobalInput<X>(key + '_' + std::to_string(index1) + '_' +
-                                          std::to_string(index2),
-                                      units);
-    }
-
     /** register a subscription
     @param target the name of the publication to subscribe to
     @param units the units associated with the desired output
@@ -346,35 +276,6 @@ class HELICS_CXX_EXPORT ValueFederate:
                                     units);
     }
 
-    /** register a subscription
-    @details register a subscription for a 1D array of values
-    @param target the name of the publication to target
-    @param index1 the index into a 1 dimensional array of values
-    @param units the optional units on the subscription
-    */
-    Input& registerSubscriptionIndexed(const std::string& target,
-                                       int index1,
-                                       const std::string& units = std::string())
-    {
-        return registerSubscription(target + '_' + std::to_string(index1), units);
-    }
-
-    /** register a subscription for an index of a 2-D array of values
-    @details call is only valid in startup mode
-    @param target the name of the publication to subscribe to
-    @param index1 the first index of a 2-D value structure
-    @param index2 the 2nd index of a 2-D value structure
-    @param units the optional units on the subscription
-    */
-    Input& registerSubscriptionIndexed(const std::string& target,
-                                       int index1,
-                                       int index2,
-                                       const std::string& units = std::string())
-    {
-        return registerSubscription(target + '_' + std::to_string(index1) + '_' +
-                                        std::to_string(index2),
-                                    units);
-    }
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a input which may not have another name
@@ -429,10 +330,6 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     data_view getValueRaw(const Input& inp);
 
-    /** get a double value*/
-    static double getDouble(Input& inp);
-    /** get a string value*/
-    static const std::string& getString(Input& inp);
     /** publish a value
     @param pub the publication identifier
     @param block a data block containing the data
@@ -450,20 +347,6 @@ class HELICS_CXX_EXPORT ValueFederate:
     {
         publishRaw(pub, data_view{data, data_size});
     }
-
-    /** direct publish a string
-   @param pub the publication to use
-   @param str a string to publish
-   @throw invalid_argument if the publication id is invalid
-   */
-    static void publish(Publication& pub, const std::string& str);
-
-    /** direct publish a double
- @param pub the publication identifier
- @param val the value to publish
- @throw invalid_argument if the publication is invalid
- */
-    static void publish(Publication& pub, double val);
 
     /** register a set of publications based on a publication JSON
     @param jsonString a json string containing the data to publish and establish publications from
@@ -641,3 +524,6 @@ class HELICS_CXX_EXPORT ValueFederate:
 };
 
 }  // namespace helics
+
+#include "Inputs.hpp"
+#include "Publications.hpp"

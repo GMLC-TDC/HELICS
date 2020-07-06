@@ -8,14 +8,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 
 #include "ValueConverter.hpp"
+#include "fmt/format.h"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
+#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewConversion.h"
 
 #include <algorithm>
 #include <functional>
 #include <numeric>
 #include <regex>
 #include <sstream>
+#include <string_view>
 #include <unordered_map>
 
 using namespace gmlc::utilities;  // NOLINT
@@ -73,12 +77,8 @@ double vectorNorm(const std::vector<std::complex<double>>& vec)
 
 std::string helicsComplexString(double real, double imag)
 {
-    std::stringstream ss;
-    ss << real;
-    if (imag != 0.0) {
-        ss << ((imag >= 0.0) ? '+' : ' ') << imag << 'j';
-    }
-    return ss.str();
+    return (imag != 0.0) ? fmt::format(FMT_STRING("{:.9g}{:<+.9g}j"), real, imag) :
+                           fmt::format(FMT_STRING("{:.9g}"), real);
 }
 
 std::string helicsComplexString(std::complex<double> val)
@@ -198,7 +198,7 @@ data_type getTypeFromString(const std::string& typeName)
 const std::regex creg(
     R"(([+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)\s*([+-]\s*(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)[ji]*)");
 
-std::complex<double> helicsGetComplex(const std::string& val)
+std::complex<double> helicsGetComplex(std::string_view val)
 {
     if (val.empty()) {
         return invalidValue<std::complex<double>>();
@@ -206,7 +206,8 @@ std::complex<double> helicsGetComplex(const std::string& val)
     std::smatch m;
     double re{invalidValue<double>()};
     double im{0.0};
-    std::regex_search(val, m, creg);
+    auto temp = std::string(val);
+    std::regex_search(temp, m, creg);
     try {
         if (m.size() == 9) {
             re = numConv<double>(m[1]);
@@ -219,12 +220,12 @@ std::complex<double> helicsGetComplex(const std::string& val)
         } else {
             if ((val.back() == 'j') || (val.back() == 'i')) {
                 auto strval = val.substr(0, val.size() - 1);
-                stringOps::trimString(strval);
+                string_viewOps::trimString(strval);
                 im = numConv<double>(strval);
                 re = 0.0;
             } else {
                 auto strval = val;
-                stringOps::trimString(strval);
+                string_viewOps::trimString(strval);
                 re = numConv<double>(strval);
             }
         }
@@ -295,7 +296,7 @@ std::string helicsNamedPointString(const NamedPoint& point)
 {
     return helicsNamedPointString(point.name, point.value);
 }
-std::string helicsNamedPointString(const std::string& pointName, double val)
+std::string helicsNamedPointString(std::string_view pointName, double val)
 {
     std::string retStr = "{\"";
     if (!pointName.empty()) {
@@ -310,36 +311,21 @@ std::string helicsNamedPointString(const std::string& pointName, double val)
     return retStr;
 }
 
-std::string helicsNamedPointString(const char* pointName, double val)
-{
-    std::string retStr = "{\"";
-    if (pointName != nullptr) {
-        retStr.append(pointName);
-    } else {
-        retStr.append("value");
-    }
-    retStr.push_back('"');
-    retStr.push_back(':');
-    retStr.append(std::to_string(val));
-    retStr.push_back('}');
-    return retStr;
-}
-
-std::vector<double> helicsGetVector(const std::string& val)
+std::vector<double> helicsGetVector(std::string_view val)
 {
     std::vector<double> V;
     helicsGetVector(val, V);
     return V;
 }
 
-std::vector<std::complex<double>> helicsGetComplexVector(const std::string& val)
+std::vector<std::complex<double>> helicsGetComplexVector(std::string_view val)
 {
     std::vector<std::complex<double>> V;
     helicsGetComplexVector(val, V);
     return V;
 }
 
-NamedPoint helicsGetNamedPoint(const std::string& val)
+NamedPoint helicsGetNamedPoint(std::string_view val)
 {
     auto loc = val.find_first_of('{');
     if (loc == std::string::npos) {
@@ -359,23 +345,23 @@ NamedPoint helicsGetNamedPoint(const std::string& val)
     auto locsep = val.find_last_of(':');
     auto locend = val.find_last_of('}');
     auto str1 = val.substr(loc + 1, locsep - loc);
-    stringOps::trimString(str1);
-    str1.pop_back();
+    string_viewOps::trimString(str1);
+    str1.remove_suffix(1);
 
     NamedPoint point;
-    point.name = stringOps::removeQuotes(str1);
+    point.name = string_viewOps::removeQuotes(str1);
     auto vstr = val.substr(locsep + 1, locend - locsep - 1);
-    stringOps::trimString(vstr);
+    string_viewOps::trimString(vstr);
     point.value = numConv<double>(vstr);
     return point;
 }
 
-static int readSize(const std::string& val)
+static int readSize(std::string_view val)
 {
     auto fb = val.find_first_of('[');
     if (fb > 1) {
         try {
-            auto size = std::stoi(val.substr(1, fb - 1));
+            auto size = numConv<int>(val.substr(1, fb - 1));
             return size;
         }
         catch (const std::invalid_argument&) {
@@ -389,7 +375,7 @@ static int readSize(const std::string& val)
     return static_cast<int>(res);
 }
 
-std::complex<double> getComplexFromString(const std::string& val)
+std::complex<double> getComplexFromString(std::string_view val)
 {
     if (val.empty()) {
         return invalidValue<std::complex<double>>();
@@ -407,7 +393,7 @@ std::complex<double> getComplexFromString(const std::string& val)
     return helicsGetComplex(val);
 }
 
-double getDoubleFromString(const std::string& val)
+double getDoubleFromString(std::string_view val)
 {
     if (val.empty()) {
         return invalidValue<double>();
@@ -423,7 +409,7 @@ double getDoubleFromString(const std::string& val)
     return std::abs(helicsGetComplex(val));
 }
 
-void helicsGetVector(const std::string& val, std::vector<double>& data)
+void helicsGetVector(std::string_view val, std::vector<double>& data)
 {
     if (val.empty()) {
         data.resize(0);
@@ -439,8 +425,8 @@ void helicsGetVector(const std::string& val, std::vector<double>& data)
         for (decltype(sz) ii = 0; ii < sz; ++ii) {
             auto nc = val.find_first_of(";,]", fb + 1);
 
-            std::string vstr = val.substr(fb + 1, nc - fb - 1);
-            stringOps::trimString(vstr);
+            auto vstr = val.substr(fb + 1, nc - fb - 1);
+            string_viewOps::trimString(vstr);
             auto V = numeric_conversion<double>(vstr, invalidValue<double>());
             data.push_back(V);
 
@@ -471,7 +457,7 @@ void helicsGetVector(const std::string& val, std::vector<double>& data)
     }
 }
 
-void helicsGetComplexVector(const std::string& val, std::vector<std::complex<double>>& data)
+void helicsGetComplexVector(std::string_view val, std::vector<std::complex<double>>& data)
 {
     if (val.empty()) {
         data.resize(0);
@@ -486,10 +472,10 @@ void helicsGetComplexVector(const std::string& val, std::vector<std::complex<dou
             auto nc = val.find_first_of(",;]", fb + 1);
             auto nc2 = val.find_first_of(",;]", nc + 1);
             try {
-                std::string vstr1 = val.substr(fb + 1, nc - fb - 1);
-                stringOps::trimString(vstr1);
-                std::string vstr2 = val.substr(nc + 1, nc2 - nc - 1);
-                stringOps::trimString(vstr2);
+                auto vstr1 = val.substr(fb + 1, nc - fb - 1);
+                string_viewOps::trimString(vstr1);
+                auto vstr2 = val.substr(nc + 1, nc2 - nc - 1);
+                string_viewOps::trimString(vstr2);
                 auto V1 = numConv<double>(vstr1);
                 auto V2 = numConv<double>(vstr2);
                 data.emplace_back(V1, V2);
@@ -517,7 +503,7 @@ void helicsGetComplexVector(const std::string& val, std::vector<std::complex<dou
     }
 }
 
-bool helicsBoolValue(const std::string& val)
+bool helicsBoolValue(std::string_view val)
 {
     static const std::unordered_map<std::string, bool> knownStrings{
 
@@ -559,7 +545,7 @@ bool helicsBoolValue(const std::string& val)
     };
     // all known false strings are captured in known strings so if it isn't in there it evaluates to
     // true
-    auto res = knownStrings.find(val);
+    auto res = knownStrings.find(std::string(val));
     if (res != knownStrings.end()) {
         return res->second;
     }
@@ -660,34 +646,7 @@ data_block typeConvert(data_type type, int64_t val)
     }
 }
 
-data_block typeConvert(data_type type, const char* val)
-{
-    if (val == nullptr) {
-        return emptyBlock(type);
-    }
-    switch (type) {
-        case data_type::helics_double:
-            return ValueConverter<double>::convert(getDoubleFromString(val));
-        case data_type::helics_int:
-            return ValueConverter<int64_t>::convert(static_cast<int64_t>(getDoubleFromString(val)));
-        case data_type::helics_complex:
-            return ValueConverter<std::complex<double>>::convert(helicsGetComplex(val));
-        case data_type::helics_bool:
-            return (helicsBoolValue(val)) ? "0" : "1";
-        case data_type::helics_string:
-        default:
-            return data_block(val);
-        case data_type::helics_named_point:
-            return ValueConverter<NamedPoint>::convert(NamedPoint{val, std::nan("0")});
-        case data_type::helics_complex_vector:
-            return ValueConverter<std::vector<std::complex<double>>>::convert(
-                helicsGetComplexVector(val));
-        case data_type::helics_vector:
-            return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
-    }
-}
-
-data_block typeConvert(data_type type, const std::string& val)
+data_block typeConvert(data_type type, std::string_view val)
 {
     if (val.empty()) {
         return emptyBlock(type);
@@ -900,7 +859,7 @@ data_block typeConvert(data_type type, const NamedPoint& val)
     }
 }
 
-data_block typeConvert(data_type type, const char* str, double val)
+data_block typeConvert(data_type type, std::string_view str, double val)
 {
     if (type == data_type::helics_named_point) {
         return ValueConverter<NamedPoint>::convert(NamedPoint(str, val));
@@ -917,7 +876,7 @@ data_block typeConvert(data_type type, const char* str, double val)
         case data_type::helics_complex:
             return ValueConverter<std::complex<double>>::convert(std::complex<double>(val, 0.0));
         case data_type::helics_bool:
-            return (val != 0) ? "1" : "0";
+            return (val != 0.0) ? "1" : "0";
         case data_type::helics_named_point:
         default:
             return ValueConverter<NamedPoint>::convert(NamedPoint(str, val));
@@ -960,11 +919,6 @@ data_block typeConvert(data_type type, bool val)
             return ValueConverter<double>::convert(&v2, 1);
         }
     }
-}
-
-data_block typeConvert(data_type type, const std::string& str, double val)
-{
-    return typeConvert(type, str.c_str(), val);
 }
 
 }  // namespace helics

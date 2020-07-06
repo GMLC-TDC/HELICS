@@ -416,6 +416,10 @@ class HELICS_CXX_EXPORT Input {
 
     template<class X>
     const X& getValueRef();
+    /** get the current value as a Double*/
+    double getDouble() { return getValue_impl<double>(std::integral_constant<int, primaryType>()); }
+    /** get the current value as a string*/
+    const std::string& getString() { return getValueRef<std::string>(); }
 
     /** get the raw binary data*/
     data_view getRawValue();
@@ -464,79 +468,6 @@ HELICS_CXX_EXPORT void
                              const data_view& dv,
                              const std::shared_ptr<units::precise_unit>& inputUnits,
                              const std::shared_ptr<units::precise_unit>& outputUnits);
-
-/** class to handle an input and extract a specific type
-@tparam X the class of the value associated with a input*/
-template<class X>
-class InputT: public Input {
-  private:
-    std::function<void(X, Time)> value_callback;  //!< callback function for the federate
-    std::function<double(const X& v1, const X& v2)>
-        changeDetectionOperator;  //!< callback function for change detection
-    // determine if we can convert to a primary type
-    using is_convertible_to_primary_type =
-        std::conditional_t<((helicsType<X>() != data_type::helics_custom) ||
-                            (isConvertableType<X>())),
-                           std::true_type,
-                           std::false_type>;
-
-  public:
-    InputT() = default;
-    /**constructor to build an input with a defined object type
-    @param valueFed  the ValueFederate to use
-    @param name the name of the input
-    @param units the units associated with a Federate
-    */
-    InputT(ValueFederate* valueFed,
-           const std::string& name,
-           const std::string& units = std::string()):
-        Input(valueFed, name, ValueConverter<X>::type(), units)
-    {
-    }
-    /**constructor to build an input with a defined type
-    @param valueFed  the ValueFederate to use
-    @param name the name of the input
-    @param units the units associated with a Federate
-    */
-    template<class FedPtr>
-    InputT(FedPtr& valueFed, const std::string& name, const std::string& units = std::string()):
-        Input(valueFed, name, ValueConverter<X>::type(), units)
-    {
-    }
-
-    /** get the most recent value
-    @return the value*/
-    X getValue() { return Input::getValue<X>(); }
-    /** store the value in the given variable
-    @param[out] out the location to store the value
-    */
-    void getValue(X& out) { Input::getValue<X>(out); }
-
-    /** register a callback for the update
-    @details the callback is called in the just before the time request function returns
-    @param callback a function with signature void(X val, Time time)
-    val is the new value and time is the time the value was updated
-    */
-    void setInputNotificationCallback(std::function<void(X, Time)> callback)
-    {
-        value_callback = callback;
-        fed->setInputNotificationCallback(*this, [=](Input& /*unused*/, Time time) {
-            handleCallback(time);
-        });
-    }
-    /** set a default value
-    @param val the value to set as the default
-    */
-    void setDefault(const X& val) { Input::setDefault(val); }
-
-  private:
-    void handleCallback(Time time)
-    {
-        X out;
-        Input::getValue(out);
-        value_callback(out, time);
-    }
-};
 
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)

@@ -305,11 +305,11 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         for (const auto& inp : *hand) {
             if (inp.isUpdated()) {
                 ret.append(std::to_string(ii));
-                ret.push_back(';');
+                ret.push_back(',');
             }
             ++ii;
         }
-        if (ret.back() == ';') {
+        if (ret.back() == ',') {
             ret.pop_back();
         }
         ret.push_back(']');

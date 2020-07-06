@@ -182,11 +182,11 @@ TEST(MultiBroker, link2)
     fedB.enterExecutingMode();
     fedA.enterExecutingModeComplete();
 
-    fedA.publish(pub, 27.045);
+    pub.publish(27.045);
     fedA.finalize();
     fedB.requestNextStep();
 
-    EXPECT_DOUBLE_EQ(fedB.getDouble(sub), 27.045);
+    EXPECT_DOUBLE_EQ(sub.getValue<double>(), 27.045);
     fedB.finalize();
 
     App.waitForDisconnect(std::chrono::milliseconds(300));

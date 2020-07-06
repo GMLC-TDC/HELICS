@@ -29,8 +29,8 @@ class TimingLeaf: public BenchmarkFederate {
 
     void doFedInit() override
     {
-        pub = fed->registerPublicationIndexed<std::string>("leafsend", index);
-        sub = fed->registerSubscriptionIndexed("leafrx", index);
+        pub = fed->registerIndexedPublication<std::string>("leafsend", index);
+        sub = fed->registerIndexedSubscription("leafrx", index);
     }
 
     void doMainLoop() override

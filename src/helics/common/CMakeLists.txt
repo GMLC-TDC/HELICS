@@ -18,6 +18,7 @@ set(common_headers
     fmt_ostream.h
     addTargets.hpp
     configFileHelpers.hpp
+    JsonGeneration.hpp
 )
 
 set(common_sources

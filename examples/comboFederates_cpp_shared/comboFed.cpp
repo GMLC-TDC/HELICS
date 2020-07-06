@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         std::string message =
             "message sent from " + name + " to " + etarget + " at time " + std::to_string(i);
         cFed->sendMessage(id, etarget, message.data(), message.size());
-        cFed->publish(pubid, i);
+        pubid.publish(i);
         std::cout << message << std::endl;
         auto newTime = cFed->requestTime(i);
         std::cout << "processed time " << static_cast<double>(newTime) << "\n";
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
         }
 
         if (cFed->isUpdated(subid)) {
-            auto val = cFed->getDouble(subid);
+            auto val = subid.getDouble();
             std::cout << "received updated value of " << val << " at " << newTime << " from "
                       << cFed->getTarget(subid) << '\n';
         }
