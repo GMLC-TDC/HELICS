@@ -2,7 +2,7 @@
 
 HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](./federates.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
 
-## Value Federate Message Types
+## Value Federate Interface Types
 
 There are four interface types for value federates that allow the interactions between the federates (a large part of co-simulation/federation configuration) to be flexibly defined. The difference between the four types revolve around whether the interface is for sending or receiving HELICS messages and whether the sender/receiver is defined by the federate (technically, the core associated with the federate):
 
@@ -30,6 +30,8 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 ### General Configuration Parameter
 
+(xxxxxxx figure out what needs to be in here now that we have the Configuration Options Reference page)
+
 Though contained here in this section on value federates, the options below are applicable to both value and message federates. As value federates are the more common type, we've put them here.
 
 ```json
@@ -43,27 +45,6 @@ Though contained here in this section on value federates, the options below are 
 
 - **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 - **`coreType` [zmq]** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
-
-### Value Federate Data Exchange Options
-
-```json
-{
-    ...
-    "only_update_on_change":false, //indicator that the federate should only indicate updated values on change
-    "only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
-    "source_only":false,
-    "observer":false,
-    ...
-}
-```
-
-- **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one.
-
-- **`only_transmit_on_change` [false]** - Complementary to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
-
-- **`source_only` [false]** - Some federates may exist only to provide data for the federation to use in their calculations. If using such a federate, set the `source_only` flag to `true`; doing so allows for slightly more efficient synchronization and higher performance of the federation.
-
-- **`observer` [false]** - Conversely, some federates may only participate in the federation by recording values (perhaps for diagnostic purposes or for logging results). If using such a federate, set the `observer` flag to `true` to achieve similar efficiencies as in the `source_only` flag.
 
 ### Value Federate Interface Configuration
 
@@ -79,9 +60,6 @@ Though contained here in this section on value federates, the options below are 
                     \"object\" : \"network_node\",
                     \"property\" : \"distribution_load\"
                }"
-          },
-          {
-          ...
           }
      ],
      "subscriptions" : [
@@ -94,9 +72,6 @@ Though contained here in this section on value federates, the options below are 
                     \"object\" : \"network_node\",
                     \"property\" : \"positive_sequence_voltage\"
                     }"
-          },
-          {
-          ...
           }
      ]
 }
@@ -116,7 +91,7 @@ Though contained here in this section on value federates, the options below are 
 
 ## Example 1a - Basic transmission and distribution powerflow
 
-To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [here](../../examples/user_guide_examples/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
+To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS/tree/helics3/examples/user_guide_examples/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
 
 1.  [HELICS](https://helics.readthedocs.io/en/latest/installation/index.html)
 2.  [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)

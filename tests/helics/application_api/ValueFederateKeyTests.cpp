@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #else
 #    include "testFixtures_shared.hpp"
 #endif
+
 #include <fstream>
 #include <streambuf>
 
@@ -310,8 +311,7 @@ class valuefed_flagfile_tests:
 
 TEST_P(valuefed_flagfile_tests, configure_test)
 {
-    std::string file = std::string(TEST_DIR) + GetParam();
-    std::ifstream t(file);
+    std::ifstream t(std::string(TEST_DIR) + GetParam());
 
     std::string config((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 

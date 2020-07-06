@@ -406,7 +406,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::options::connection_required, true);
+    i2.setOption(helics::defs::options::connection_required, 1);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -493,6 +493,57 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     EXPECT_THROW(fed2->enterExecutingModeComplete(), helics::ConnectionFailure);
 
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
+}
+
+TEST_F(error_tests, too_many_connections)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::ValueFederate>("test", 2, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("t1", "double");
+    fed1->registerGlobalPublication("t2", "double");
+    fed1->registerGlobalPublication("t3", "double");
+    auto& inp1 = fed2->registerGlobalInput("c1", "double");
+    inp1.setOption(helics::defs::connections, 2);
+    inp1.addTarget("t1");
+    inp1.addTarget("t2");
+    inp1.addTarget("t3");
+    fed1->enterExecutingModeAsync();
+
+    EXPECT_THROW(fed2->enterExecutingMode(), helics::ConnectionFailure);
+    fed1->enterExecutingModeComplete();
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+TEST_F(error_tests, not_enough_connections)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::ValueFederate>("test", 2, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("t1", "double");
+    fed1->registerGlobalPublication("t2", "double");
+    fed1->registerGlobalPublication("t3", "double");
+    auto& inp1 = fed2->registerGlobalInput("c1", "double");
+    inp1.setOption(helics::defs::connections, 3);
+    inp1.addTarget("t1");
+    inp1.addTarget("t2");
+    fed1->enterExecutingModeAsync();
+
+    EXPECT_THROW(fed2->enterExecutingMode(), helics::ConnectionFailure);
+    fed1->enterExecutingModeComplete();
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
 }
 
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {

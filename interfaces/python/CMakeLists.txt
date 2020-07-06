@@ -7,13 +7,19 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-cmake_minimum_required(VERSION 3.10...3.17)
+cmake_minimum_required(VERSION 3.4)
 project(helicsPYTHON)
 
 get_directory_property(hasParent PARENT_DIRECTORY)
 
 if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
+
+    if(CMAKE_VERSION VERSION_LESS 3.17)
+        cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+    else()
+        cmake_policy(VERSION 3.17)
+    endif()
 
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
@@ -110,6 +116,13 @@ else()
     set(USE_MODERNIZED_SWIG OFF)
 endif()
 
+# This can be removed in HELICS 3 if the minimum CMake version is >= 3.8
+if(NOT CMAKE_VERSION VERSION_LESS 3.8)
+    set(USE_SWIG_ADD_LIBRARY ON)
+else()
+    set(USE_SWIG_ADD_LIBRARY OFF)
+endif()
+
 # ##################################################################################################
 # Run SWIG only (no build)
 # ##################################################################################################
@@ -176,12 +189,17 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
     endif()
 
-    swig_add_library(
-        helics
-        TYPE MODULE
-        LANGUAGE python
-        SOURCES helicsPython${_py_ver}.i
-    )
+    if(USE_SWIG_ADD_LIBRARY)
+        swig_add_library(
+            helics
+            TYPE MODULE
+            LANGUAGE python
+            SOURCES helicsPython${_py_ver}.i
+        )
+    else()
+        swig_add_module(helics python helicsPython${_py_ver}.i)
+        message(STATUS "Using old swig_add_module")
+    endif()
 
     swig_link_libraries(helics HELICS::helicsSharedLib)
 
@@ -277,7 +295,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT
 if(WIN32)
     # Realistically for bundling into a Python wheel, the dll should be given a unique name to avoid
     # conflicts with other packages using a different version of the dll with the same name
-
+    add_custom_command(
+        TARGET ${HELICS_PYTHON_TARGET_NAME}
+        POST_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy_if_different # which executes "cmake - E copy_if_different..."
+            "$<TARGET_FILE:HELICS::helicsSharedLib>" # <--this is in- file
+            "$<TARGET_FILE_DIR:${HELICS_PYTHON_TARGET_NAME}>/" # <--this is out- file path
+    )
+    if(COMMAND copy_key_files_to_target_location)
+        copy_key_files_to_target_location(${HELICS_PYTHON_TARGET_NAME})
+    endif()
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(python)
     else()

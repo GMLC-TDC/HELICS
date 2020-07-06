@@ -7,16 +7,24 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.10...3.17)
+cmake_minimum_required(VERSION 3.4)
+# Make sure users don't get warnings on a tested (3.4 to 3.17) version of CMake. For most of the
+# policies, the new version is better (hence the change). We don't use the 3.0...3.16 syntax because
+# of a bug in MSVC 15.7 built-in and modified CMake 3.11
+if(CMAKE_VERSION VERSION_LESS 3.17)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+else()
+    cmake_policy(VERSION 3.17)
+endif()
 
-project(HELICS VERSION 3.0.0)
+project(HELICS VERSION 2.5.2)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
-set(HELICS_VERSION_BUILD "pre-alpha")
+set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-06-05")
+set(HELICS_DATE "2020-06-14")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -158,7 +166,7 @@ cmake_dependent_option(
 
 cmake_dependent_option(
     HELICS_BUILD_BENCHMARKS "Build HELICS Benchmarks" OFF
-    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF
+    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME;CMAKE_VERSION VERSION_GREATER 3.5" OFF
 )
 
 cmake_dependent_advanced_option(
@@ -302,6 +310,13 @@ if(HELICS_BUILD_TESTS AND HELICS_TEST_CODE_COVERAGE)
         message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Coverage for testing code coverage")
     endif()
 endif()
+
+# -------------------------------------------------------------
+# Get some configuration for C++17 as that becomes available
+# -------------------------------------------------------------
+# message(STATUS ${CMAKE_CXX_FLAGS})
+set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/helics_generated_includes/helics/)
+include(configGenerator)
 
 if(HELICS_GENERATE_DOXYGEN_DOC)
     find_package(Doxygen)
@@ -467,7 +482,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=0")
-target_compile_definitions(helics_base INTERFACE "USE_STD_OPTIONAL=1")
 # -------------------------------------------------------------
 # add some additional libraries for MINGW and MSYS
 # -------------------------------------------------------------

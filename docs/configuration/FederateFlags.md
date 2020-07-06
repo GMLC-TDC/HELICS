@@ -6,7 +6,7 @@ There are a number of flags which control how a federate acts with respect to ti
 
 If specified in the federateInfo on creation this tells the core that this federate will only execute in a single thread and only a single federate is interacting with the connected core.
 
-NOTE: This option is not fully enabled.
+NOTE: This option is not fully enabled and won't be fully available until HELICS 3.0 is released.
 
 This disables the asynchronous functions in the federate and turns off a number of protection mechanisms for handling federate interaction across multiple threads. This can be used for performance reasons and can interact with the single_thread core types that are in development.
 
