@@ -391,6 +391,32 @@ helics_time_maxtime = cvar.helics_time_maxtime
 helics_true = cvar.helics_true
 helics_false = cvar.helics_false
 
+class helics_message(object):
+    r"""
+     Message_t mapped to a c compatible structure
+
+    use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
+    """
+
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    time = property(_helics.helics_message_time_get, _helics.helics_message_time_set, doc=r""" message time""")
+    data = property(_helics.helics_message_data_get, _helics.helics_message_data_set, doc=r""" message data""")
+    length = property(_helics.helics_message_length_get, _helics.helics_message_length_set, doc=r""" message length""")
+    messageID = property(_helics.helics_message_messageID_get, _helics.helics_message_messageID_set, doc=r""" message identification information""")
+    flags = property(_helics.helics_message_flags_get, _helics.helics_message_flags_set, doc=r""" flags related to the message""")
+    original_source = property(_helics.helics_message_original_source_get, _helics.helics_message_original_source_set, doc=r""" original source""")
+    source = property(_helics.helics_message_source_get, _helics.helics_message_source_set, doc=r""" the most recent source""")
+    dest = property(_helics.helics_message_dest_get, _helics.helics_message_dest_set, doc=r""" the final destination""")
+    original_dest = property(_helics.helics_message_original_dest_get, _helics.helics_message_original_dest_set, doc=r""" the original destination of the message""")
+
+    def __init__(self):
+        _helics.helics_message_swiginit(self, _helics.new_helics_message())
+    __swig_destroy__ = _helics.delete_helics_message
+
+# Register helics_message in _helics:
+_helics.helics_message_swigregister(helics_message)
+
 
 def helicsGetVersion() -> "char const *":
     r"""Get a version string for HELICS."""
@@ -3117,15 +3143,26 @@ def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dest: "char const *"
 def helicsEndpointSendMessage(endpoint: "helics_endpoint", message: "helics_message") -> "void":
     r"""
     Send a message object from a specific endpoint.
+    Deprecated: Use helicsEndpointSendMessageObject instead.
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type message: :py:class:`helics_message`
+    :param message: The actual message to send.
+    """
+    return _helics.helicsEndpointSendMessage(endpoint, message)
+
+def helicsEndpointSendMessageObject(endpoint: "helics_endpoint", message: "helics_message_object") -> "void":
+    r"""
+    Send a message object from a specific endpoint.
 
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
     :type message: void
     :param message: The actual message to send which will be copied.
     """
-    return _helics.helicsEndpointSendMessage(endpoint, message)
+    return _helics.helicsEndpointSendMessageObject(endpoint, message)
 
-def helicsEndpointSendMessageZeroCopy(endpoint: "helics_endpoint", message: "helics_message") -> "void":
+def helicsEndpointSendMessageObjectZeroCopy(endpoint: "helics_endpoint", message: "helics_message_object") -> "void":
     r"""
     Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
     after the call.
@@ -3135,7 +3172,7 @@ def helicsEndpointSendMessageZeroCopy(endpoint: "helics_endpoint", message: "hel
     :type message: void
     :param message: The actual message to send which will be copied.
     """
-    return _helics.helicsEndpointSendMessageZeroCopy(endpoint, message)
+    return _helics.helicsEndpointSendMessageObjectZeroCopy(endpoint, message)
 
 def helicsEndpointSubscribe(endpoint: "helics_endpoint", key: "char const *") -> "void":
     r"""
@@ -3194,14 +3231,28 @@ def helicsEndpointGetMessage(endpoint: "helics_endpoint") -> "helics_message":
     r"""
     Receive a packet from a particular endpoint.
 
+    Deprecated: This function is deprecated and will be removed in Helics 3.0.
+                Use helicsEndpointGetMessageObject instead.
+
+    endpoint The identifier for the endpoint.
+
+    :rtype: :py:class:`helics_message`
+    :return: A message object.
+    """
+    return _helics.helicsEndpointGetMessage(endpoint)
+
+def helicsEndpointGetMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
+    r"""
+    Receive a packet from a particular endpoint.
+
     endpoint The identifier for the endpoint.
 
     :rtype: void
     :return: A message object.
     """
-    return _helics.helicsEndpointGetMessage(endpoint)
+    return _helics.helicsEndpointGetMessageObject(endpoint)
 
-def helicsEndpointCreateMessage(endpoint: "helics_endpoint") -> "helics_message":
+def helicsEndpointCreateMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
     r"""
     Create a new empty message object.
 
@@ -3212,11 +3263,27 @@ def helicsEndpointCreateMessage(endpoint: "helics_endpoint") -> "helics_message"
 
 
     :rtype: void
-    :return: A new helics_message.
+    :return: A new helics_message_object.
     """
-    return _helics.helicsEndpointCreateMessage(endpoint)
+    return _helics.helicsEndpointCreateMessageObject(endpoint)
 
 def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
+    r"""
+    Receive a communication message for any endpoint in the federate.
+
+    Deprecated: This function is deprecated and will be removed in Helics 3.0.
+                Use helicsFederateGetMessageObject instead.
+
+    The return order will be in order of endpoint creation.
+             So all messages that are available for the first endpoint, then all for the second, and so on.
+             Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
+
+    :rtype: :py:class:`helics_message`
+    :return: A unique_ptr to a Message object containing the message data.
+    """
+    return _helics.helicsFederateGetMessage(fed)
+
+def helicsFederateGetMessageObject(fed: "helics_federate") -> "helics_message_object":
     r"""
     Receive a communication message for any endpoint in the federate.
 
@@ -3225,11 +3292,11 @@ def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
              Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
 
     :rtype: void
-    :return: A helics_message which references the data in the message.
+    :return: A helics_message_object which references the data in the message.
     """
-    return _helics.helicsFederateGetMessage(fed)
+    return _helics.helicsFederateGetMessageObject(fed)
 
-def helicsFederateCreateMessage(fed: "helics_federate") -> "helics_message":
+def helicsFederateCreateMessageObject(fed: "helics_federate") -> "helics_message_object":
     r"""
     Create a new empty message object.
 
@@ -3240,20 +3307,33 @@ def helicsFederateCreateMessage(fed: "helics_federate") -> "helics_message":
 
 
     :rtype: void
-    :return: A helics_message containing the message data.
+    :return: A helics_message_object containing the message data.
     """
-    return _helics.helicsFederateCreateMessage(fed)
+    return _helics.helicsFederateCreateMessageObject(fed)
 
 def helicsFederateClearMessages(fed: "helics_federate") -> "void":
     r"""
     Clear all stored messages from a federate.
 
-    This clears messages retrieved through helicsEndpointGetMessage or helicsFederateGetMessage
+    This clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
 
     :type fed: void
     :param fed: The federate to clear the message for.
     """
     return _helics.helicsFederateClearMessages(fed)
+
+def helicsEndpointClearMessages(endpoint: "helics_endpoint") -> "void":
+    r"""
+    Clear all message from an endpoint.
+
+    Deprecated: This function does nothing and will be removed.
+                Use helicsFederateClearMessages to free all messages,
+                or helicsMessageFree to clear an individual message.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object to operate on.
+    """
+    return _helics.helicsEndpointClearMessages(endpoint)
 
 def helicsEndpointGetType(endpoint: "helics_endpoint") -> "char const *":
     r"""
@@ -3340,7 +3420,7 @@ def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "int":
     """
     return _helics.helicsEndpointGetOption(end, option)
 
-def helicsMessageGetSource(message: "helics_message") -> "char const *":
+def helicsMessageGetSource(message: "helics_message_object") -> "char const *":
     r"""
     Get the source endpoint of a message.
 
@@ -3352,7 +3432,7 @@ def helicsMessageGetSource(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetSource(message)
 
-def helicsMessageGetDestination(message: "helics_message") -> "char const *":
+def helicsMessageGetDestination(message: "helics_message_object") -> "char const *":
     r"""
     Get the destination endpoint of a message.
 
@@ -3364,7 +3444,7 @@ def helicsMessageGetDestination(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetDestination(message)
 
-def helicsMessageGetOriginalSource(message: "helics_message") -> "char const *":
+def helicsMessageGetOriginalSource(message: "helics_message_object") -> "char const *":
     r"""
     Get the original source endpoint of a message, the source may have been modified by filters or other actions.
 
@@ -3376,7 +3456,7 @@ def helicsMessageGetOriginalSource(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetOriginalSource(message)
 
-def helicsMessageGetOriginalDestination(message: "helics_message") -> "char const *":
+def helicsMessageGetOriginalDestination(message: "helics_message_object") -> "char const *":
     r"""
     Get the original destination endpoint of a message, the destination may have been modified by filters or other actions.
 
@@ -3388,7 +3468,7 @@ def helicsMessageGetOriginalDestination(message: "helics_message") -> "char cons
     """
     return _helics.helicsMessageGetOriginalDestination(message)
 
-def helicsMessageGetTime(message: "helics_message") -> "helics_time":
+def helicsMessageGetTime(message: "helics_message_object") -> "helics_time":
     r"""
     Get the helics time associated with a message.
 
@@ -3400,7 +3480,7 @@ def helicsMessageGetTime(message: "helics_message") -> "helics_time":
     """
     return _helics.helicsMessageGetTime(message)
 
-def helicsMessageGetString(message: "helics_message") -> "char const *":
+def helicsMessageGetString(message: "helics_message_object") -> "char const *":
     r"""
     Get the payload of a message as a string.
 
@@ -3412,7 +3492,7 @@ def helicsMessageGetString(message: "helics_message") -> "char const *":
     """
     return _helics.helicsMessageGetString(message)
 
-def helicsMessageGetMessageID(message: "helics_message") -> "int":
+def helicsMessageGetMessageID(message: "helics_message_object") -> "int":
     r"""
     Get the messageID of a message.
 
@@ -3424,7 +3504,7 @@ def helicsMessageGetMessageID(message: "helics_message") -> "int":
     """
     return _helics.helicsMessageGetMessageID(message)
 
-def helicsMessageCheckFlag(message: "helics_message", flag: "int") -> "helics_bool":
+def helicsMessageCheckFlag(message: "helics_message_object", flag: "int") -> "helics_bool":
     r"""
     Check if a flag is set on a message.
 
@@ -3438,7 +3518,7 @@ def helicsMessageCheckFlag(message: "helics_message", flag: "int") -> "helics_bo
     """
     return _helics.helicsMessageCheckFlag(message, flag)
 
-def helicsMessageGetRawDataSize(message: "helics_message") -> "int":
+def helicsMessageGetRawDataSize(message: "helics_message_object") -> "int":
     r"""
     Get the size of the data payload in bytes.
 
@@ -3450,7 +3530,7 @@ def helicsMessageGetRawDataSize(message: "helics_message") -> "int":
     """
     return _helics.helicsMessageGetRawDataSize(message)
 
-def helicsMessageGetRawData(message: "helics_message") -> "int *":
+def helicsMessageGetRawData(message: "helics_message_object") -> "int *":
     r"""
     Get the raw data for a message object.
 
@@ -3464,7 +3544,7 @@ def helicsMessageGetRawData(message: "helics_message") -> "int *":
     """
     return _helics.helicsMessageGetRawData(message)
 
-def helicsMessageIsValid(message: "helics_message") -> "helics_bool":
+def helicsMessageIsValid(message: "helics_message_object") -> "helics_bool":
     r"""
     A check if the message contains a valid payload.
 
@@ -3476,7 +3556,7 @@ def helicsMessageIsValid(message: "helics_message") -> "helics_bool":
     """
     return _helics.helicsMessageIsValid(message)
 
-def helicsMessageSetSource(message: "helics_message", src: "char const *") -> "void":
+def helicsMessageSetSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
     Set the source of a message.
 
@@ -3487,7 +3567,7 @@ def helicsMessageSetSource(message: "helics_message", src: "char const *") -> "v
     """
     return _helics.helicsMessageSetSource(message, src)
 
-def helicsMessageSetDestination(message: "helics_message", dest: "char const *") -> "void":
+def helicsMessageSetDestination(message: "helics_message_object", dest: "char const *") -> "void":
     r"""
     Set the destination of a message.
 
@@ -3498,7 +3578,7 @@ def helicsMessageSetDestination(message: "helics_message", dest: "char const *")
     """
     return _helics.helicsMessageSetDestination(message, dest)
 
-def helicsMessageSetOriginalSource(message: "helics_message", src: "char const *") -> "void":
+def helicsMessageSetOriginalSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
     Set the original source of a message.
 
@@ -3509,7 +3589,7 @@ def helicsMessageSetOriginalSource(message: "helics_message", src: "char const *
     """
     return _helics.helicsMessageSetOriginalSource(message, src)
 
-def helicsMessageSetOriginalDestination(message: "helics_message", dest: "char const *") -> "void":
+def helicsMessageSetOriginalDestination(message: "helics_message_object", dest: "char const *") -> "void":
     r"""
     Set the original destination of a message.
 
@@ -3520,7 +3600,7 @@ def helicsMessageSetOriginalDestination(message: "helics_message", dest: "char c
     """
     return _helics.helicsMessageSetOriginalDestination(message, dest)
 
-def helicsMessageSetTime(message: "helics_message", time: "helics_time") -> "void":
+def helicsMessageSetTime(message: "helics_message_object", time: "helics_time") -> "void":
     r"""
     Set the delivery time for a message.
 
@@ -3531,7 +3611,7 @@ def helicsMessageSetTime(message: "helics_message", time: "helics_time") -> "voi
     """
     return _helics.helicsMessageSetTime(message, time)
 
-def helicsMessageReserve(message: "helics_message", reserveSize: "int") -> "void":
+def helicsMessageReserve(message: "helics_message_object", reserveSize: "int") -> "void":
     r"""
     Reserve space in a buffer but don't actually resize.
 
@@ -3544,7 +3624,7 @@ def helicsMessageReserve(message: "helics_message", reserveSize: "int") -> "void
     """
     return _helics.helicsMessageReserve(message, reserveSize)
 
-def helicsMessageSetMessageID(message: "helics_message", messageID: "int32_t") -> "void":
+def helicsMessageSetMessageID(message: "helics_message_object", messageID: "int32_t") -> "void":
     r"""
     Set the message ID for the message.
 
@@ -3557,7 +3637,7 @@ def helicsMessageSetMessageID(message: "helics_message", messageID: "int32_t") -
     """
     return _helics.helicsMessageSetMessageID(message, messageID)
 
-def helicsMessageClearFlags(message: "helics_message") -> "void":
+def helicsMessageClearFlags(message: "helics_message_object") -> "void":
     r"""
     Clear the flags of a message.
 
@@ -3566,7 +3646,7 @@ def helicsMessageClearFlags(message: "helics_message") -> "void":
     """
     return _helics.helicsMessageClearFlags(message)
 
-def helicsMessageSetFlagOption(message: "helics_message", flag: "int", flagValue: "helics_bool") -> "void":
+def helicsMessageSetFlagOption(message: "helics_message_object", flag: "int", flagValue: "helics_bool") -> "void":
     r"""
     Set a flag on a message.
 
@@ -3579,7 +3659,7 @@ def helicsMessageSetFlagOption(message: "helics_message", flag: "int", flagValue
     """
     return _helics.helicsMessageSetFlagOption(message, flag, flagValue)
 
-def helicsMessageSetString(message: "helics_message", str: "char const *") -> "void":
+def helicsMessageSetString(message: "helics_message_object", str: "char const *") -> "void":
     r"""
     Set the data payload of a message as a string.
 
@@ -3590,7 +3670,7 @@ def helicsMessageSetString(message: "helics_message", str: "char const *") -> "v
     """
     return _helics.helicsMessageSetString(message, str)
 
-def helicsMessageSetData(message: "helics_message", data: "void const *") -> "int":
+def helicsMessageSetData(message: "helics_message_object", data: "void const *") -> "int":
     r"""
     Set the data payload of a message as raw data.
 
@@ -3603,7 +3683,7 @@ def helicsMessageSetData(message: "helics_message", data: "void const *") -> "in
     """
     return _helics.helicsMessageSetData(message, data)
 
-def helicsMessageAppendData(message: "helics_message", data: "void const *") -> "int":
+def helicsMessageAppendData(message: "helics_message_object", data: "void const *") -> "int":
     r"""
     Append data to the payload.
 
@@ -3616,7 +3696,7 @@ def helicsMessageAppendData(message: "helics_message", data: "void const *") -> 
     """
     return _helics.helicsMessageAppendData(message, data)
 
-def helicsMessageCopy(source_message: "helics_message", dest_message: "helics_message") -> "void":
+def helicsMessageCopy(source_message: "helics_message_object", dest_message: "helics_message_object") -> "void":
     r"""
     Copy a message object.
 
@@ -3627,7 +3707,7 @@ def helicsMessageCopy(source_message: "helics_message", dest_message: "helics_me
     """
     return _helics.helicsMessageCopy(source_message, dest_message)
 
-def helicsMessageClone(message: "helics_message") -> "helics_message":
+def helicsMessageClone(message: "helics_message_object") -> "helics_message_object":
     r"""
     Clone a message object.
 
@@ -3636,7 +3716,7 @@ def helicsMessageClone(message: "helics_message") -> "helics_message":
     """
     return _helics.helicsMessageClone(message)
 
-def helicsMessageFree(message: "helics_message") -> "void":
+def helicsMessageFree(message: "helics_message_object") -> "void":
     r"""
     Free a message object from memory
     memory for message is managed so not using this function does not create memory leaks, this is an indication

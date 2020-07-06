@@ -413,8 +413,7 @@ const char* helicsFilterGetInfo(helics_filter filt)
         return emptyStr.c_str();
     }
     try {
-        const std::string& info = filtObj->filtPtr->getInfo();
-        return info.c_str();
+        return filtObj->filtPtr->getInfo().c_str();
     }
     // LCOV_EXCL_START
     catch (...) {

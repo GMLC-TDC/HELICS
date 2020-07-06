@@ -89,12 +89,14 @@ class TimeDependencies {
 
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry(bool iterating) const;
+
     /** check if the dependencies would allow a grant of the time
     @param iterating true if the object is iterating
     @param desiredGrantTime  the time to check for granting
     @return true if the object is ready
     */
     bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const;
+
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();
     /** reset iterative time requests to prepare for next iteration

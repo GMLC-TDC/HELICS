@@ -66,6 +66,7 @@ There are a number of classes of HELICS users:
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type of communication isn't sufficient.
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
+- [**N to 1 input connections**](./multiSourceInputs.md) - Handling multiple publications to a single input
 - **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
 - **HELICS Timing Algorithm (forthcoming)** - Detailed description of the HELICS timing algorithm and the finer points of manipulating it for maximum co-simulation performance.
 - **Value Message Types (forthcoming)** - Detailed description of the four types of value messages in HELICS and how they can be used to minimize federation configuration effort.

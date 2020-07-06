@@ -22,7 +22,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
@@ -382,10 +381,10 @@ void FederateState::closeInterface(interface_handle handle, handle_type type)
     }
 }
 
-std::optional<ActionMessage>
+stx::optional<ActionMessage>
     FederateState::processPostTerminationAction(const ActionMessage& /*action*/)  // NOLINT
 {
-    return {};
+    return stx::nullopt;
 }
 
 iteration_result FederateState::waitSetup()
@@ -575,14 +574,14 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
                 fillEventVectorNextIteration(time_granted);
                 break;
             case iteration_request::iterate_if_needed:
-                if (time_granted < nextTime) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorNextIteration(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
                 }
                 break;
             case iteration_request::no_iterations:
-                if (time_granted < nextTime) {
+                if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorInclusive(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
@@ -878,7 +877,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 cmd.setAction(CMD_EXEC_CHECK);
                 return processActionMessage(cmd);
             }
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case CMD_EXEC_GRANT:
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
@@ -889,7 +889,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 default:
                     break;
             }
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case CMD_EXEC_CHECK:  // just check the time for entry
         {
             if (state != HELICS_INITIALIZING) {
@@ -1013,7 +1014,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 cmd.setAction(CMD_TIME_CHECK);
                 return processActionMessage(cmd);
             }
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case CMD_TIME_GRANT:
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
@@ -1024,7 +1026,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 default:
                     break;
             }
-            [[fallthrough]];
+            FALLTHROUGH
+            /* FALLTHROUGH */
         case CMD_TIME_CHECK: {
             if (state != HELICS_EXECUTING) {
                 break;
@@ -1435,6 +1438,11 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
         case defs::flags::ignore_time_mismatch_warnings:
             ignore_time_mismatch_warnings = value;
             break;
+        case defs::flags::wait_for_current_time_update:
+            // this flag is needed in both locations
+            wait_for_current_time = value;
+            timeCoord->setOptionFlag(optionFlag, value);
+            break;
         case defs::options::buffer_data:
             break;
         case defs::flags::connections_required:
@@ -1662,7 +1670,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
         s << "[";
         auto ipts = interfaceInformation.getInputs();
         for (const auto& ipt : ipts) {
-            for (const auto& isrc : ipt->input_sources) {
+            for (auto& isrc : ipt->input_sources) {
                 s << isrc.fed_id << ':' << isrc.handle << ';';
             }
         }
