@@ -32,6 +32,7 @@ There are a number of classes of HELICS users:
     simulator_integration
     configuration_options_reference
 ```
+
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
 - [**HELICS Co-Simulation Walk-through**](./helics_co-sim_sequence.md) - A notional walk-through of a simple transmission and distribution HELICS co-simulation to show the basic steps the software runs through
@@ -45,8 +46,8 @@ There are a number of classes of HELICS users:
 - **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
 - [**Configuration Options Reference**](./configuration_options_reference.md) - Comprehensive reference to all the HELICS configuration options.
 
-
 ## Advanced Topics
+
 ```eval_rst
 .. toctree::
     :hidden:
@@ -57,10 +58,11 @@ There are a number of classes of HELICS users:
     queries
     multibroker
     simultaneous_cosimulations
-    
+
 
 ```
-- [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to 
+
+- [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to
 - **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 - **[Cores](./CoreTypes.md)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
@@ -70,4 +72,3 @@ There are a number of classes of HELICS users:
 - **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
 - **HELICS Timing Algorithm (forthcoming)** - Detailed description of the HELICS timing algorithm and the finer points of manipulating it for maximum co-simulation performance.
 - **Value Message Types (forthcoming)** - Detailed description of the four types of value messages in HELICS and how they can be used to minimize federation configuration effort.
-
