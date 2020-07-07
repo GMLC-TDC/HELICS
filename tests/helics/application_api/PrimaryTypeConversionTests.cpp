@@ -126,9 +126,6 @@ TEST(type_conversion_tests, namedType_tests)
     EXPECT_TRUE(getTypeFromString(typeid(bool).name()) == data_type::helics_bool);
     EXPECT_TRUE(getTypeFromString(typeid(int64_t).name()) == data_type::helics_int);
     EXPECT_TRUE(getTypeFromString(typeid(char).name()) == data_type::helics_string);
-    printf("typeid(char)=%s produces %d\n",
-           typeid(char).name(),
-           static_cast<int>(getTypeFromString(typeid(char).name())));
     EXPECT_TRUE(getTypeFromString(typeid(std::complex<double>).name()) ==
                 data_type::helics_complex);
     EXPECT_TRUE(getTypeFromString("COMPLEX") == data_type::helics_complex);
