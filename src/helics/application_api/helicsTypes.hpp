@@ -299,7 +299,7 @@ inline constexpr bool isRawType(data_type type)
 HELICS_CXX_EXPORT const std::string& typeNameStringRef(data_type type);
 
 /** convert a string to a type*/
-HELICS_CXX_EXPORT data_type getTypeFromString(const std::string& typeName);
+HELICS_CXX_EXPORT data_type getTypeFromString(std::string_view typeName);
 
 /** generate a string representation of a complex number from separate real and imaginary parts*/
 HELICS_CXX_EXPORT std::string helicsComplexString(double real, double imag);
