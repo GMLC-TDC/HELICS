@@ -98,7 +98,6 @@ TEST(helics_types, cvector_string)
     EXPECT_EQ(v[2], invalidValue<std::complex<double>>());
 }
 
-
 TEST(helics_types, cvector_to_string)
 {
     std::vector<std::complex<double>> V1{{1, 4}, {2, -3}};

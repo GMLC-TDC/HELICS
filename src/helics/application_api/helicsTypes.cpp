@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsTypes.hpp"
 
-#include "ValueConverter.hpp"
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "frozen/unordered_map.h"
-#include "frozen/string.h"
+#include "ValueConverter.hpp"
 #include "fmt/format.h"
+#include "frozen/string.h"
+#include "frozen/unordered_map.h"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
@@ -28,25 +28,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace gmlc::utilities;  // NOLINT
 
-
-
 template<>
 struct fmt::formatter<std::complex<double>> {
     // Formats the point p using the parsed format specification (presentation)
     // stored in this formatter.
-    static constexpr auto parse(format_parse_context& ctx)
-    {
-        return ctx.end();
-    }
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
 
     template<typename FormatContext>
     auto format(const std::complex<double>& p, FormatContext& ctx)
     {
         // ctx.out() is an output iterator to write to.
-        return format_to(ctx.out(),
-                         "[{:.9g},{:.9g}]",
-                         p.real(),
-                         p.imag());
+        return format_to(ctx.out(), "[{:.9g},{:.9g}]", p.real(), p.imag());
     }
 };
 
@@ -112,7 +104,7 @@ std::string helicsComplexString(std::complex<double> val)
     return helicsComplexString(val.real(), val.imag());
 }
 /** map of an assortment of type string that can be converted to a known type*/
-static constexpr frozen::unordered_map<frozen::string, data_type,55> typeMap{
+static constexpr frozen::unordered_map<frozen::string, data_type, 55> typeMap{
     {"double", data_type::helics_double},
     {"string", data_type::helics_string},
     {"binary", data_type::helics_bool},
@@ -204,33 +196,32 @@ static const std::unordered_map<std::string, data_type> demangle_names{
     {typeid(std::string).name(), data_type::helics_string},
     {typeid(char*).name(), data_type::helics_string},
     {typeid(const char*).name(), data_type::helics_string},
-    {typeid(Time).name(), data_type::helics_time}
-};
+    {typeid(Time).name(), data_type::helics_time}};
 
 data_type getTypeFromString(std::string_view typeName)
 {
     if (!typeName.empty() && typeName.front() == '[') {
         return data_type::helics_multi;
     }
-    const auto* res = typeMap.find(frozen::string(typeName.data(),typeName.size()));
-    if (res!=typeMap.end()) {
+    const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
+    if (res != typeMap.end()) {
         return res->second;
     }
-        std::string strName(typeName);
-        auto dres = demangle_names.find(strName);
-        if (dres!=demangle_names.end()) {
-            return dres->second;
-        }
-        makeLowerCase(strName);
-        res = typeMap.find(frozen::string(strName.data(), strName.size()));
-        if (res != typeMap.end()) {
-            return res->second;
-        }
-        dres = demangle_names.find(strName);
-        if (dres != demangle_names.end()) {
-            return dres->second;
-        }
-        return data_type::helics_custom;
+    std::string strName(typeName);
+    auto dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return dres->second;
+    }
+    makeLowerCase(strName);
+    res = typeMap.find(frozen::string(strName.data(), strName.size()));
+    if (res != typeMap.end()) {
+        return res->second;
+    }
+    dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return dres->second;
+    }
+    return data_type::helics_custom;
 }
 
 // regular expression to handle complex numbers of various formats
@@ -244,18 +235,17 @@ std::complex<double> helicsGetComplex(std::string_view val)
     }
     double re{invalidValue<double>()};
     double im{0.0};
-    if (val.front() =='[') {
-        
+    if (val.front() == '[') {
         auto sep = val.find_first_of(',');
-        if (sep==std::string_view::npos) {
+        if (sep == std::string_view::npos) {
             val.remove_prefix(1);
             val.remove_suffix(1);
             re = numConv<double>(val);
             return {re, im};
         }
-        if (val.find_first_of(',',sep+1)!=std::string_view::npos) {
+        if (val.find_first_of(',', sep + 1) != std::string_view::npos) {
             auto V = helicsGetVector(val);
-            if (V.size()>=2) {
+            if (V.size() >= 2) {
                 return {V[0], V[1]};
             }
             return invalidValue<std::complex<double>>();
@@ -266,7 +256,7 @@ std::complex<double> helicsGetComplex(std::string_view val)
         return {re, im};
     }
     std::smatch m;
-   
+
     auto temp = std::string(val);
     std::regex_search(temp, m, creg);
     try {
@@ -322,7 +312,7 @@ std::string helicsNamedPointString(std::string_view pointName, double val)
     NP["value"] = val;
     if (pointName.empty()) {
     } else {
-        NP["name"] = Json::Value(pointName.data(), pointName.data()+pointName.size());
+        NP["name"] = Json::Value(pointName.data(), pointName.data() + pointName.size());
     }
     return generateJsonString(NP);
 }
@@ -516,7 +506,7 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
             fb = nc;
         }
     } else {
-        if (val.find_first_of("ji")!=std::string_view::npos) {
+        if (val.find_first_of("ji") != std::string_view::npos) {
             auto V = helicsGetComplex(val);
             data.resize(0);
             data.push_back(V);
@@ -530,10 +520,10 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
                     data.resize(0);
                     data.emplace_back(JV.asDouble(), 0.0);
                     break;
-                case Json::ValueType::arrayValue: 
+                case Json::ValueType::arrayValue:
                     for (auto& av : JV) {
                         if (av.isNumeric()) {
-                            if (cnt==0) {
+                            if (cnt == 0) {
                                 data.emplace_back(av.asDouble(), 0.0);
                                 cnt = 1;
                             } else {
@@ -548,7 +538,7 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
                                 }
                             } else if (av.size() == 1) {
                                 if (av[0].isNumeric()) {
-                                    data.emplace_back(av[0].asDouble(),0.0);
+                                    data.emplace_back(av[0].asDouble(), 0.0);
                                 }
                             } else {
                                 data.push_back(invalidValue<std::complex<double>>());
@@ -560,19 +550,18 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
                     break;
             }
         }
-        
     }
 }
 
 bool helicsBoolValue(std::string_view val)
 {
-    static constexpr const frozen::unordered_map<frozen::string, bool,35> knownStrings{
+    static constexpr const frozen::unordered_map<frozen::string, bool, 35> knownStrings{
 
         {"0", false},
         {"00", false},
-        {frozen::string("\0",1), false},
+        {frozen::string("\0", 1), false},
         {"0000", false},
-        {frozen::string("\0\0\0\0\0\0\0\0",8), false},
+        {frozen::string("\0\0\0\0\0\0\0\0", 8), false},
         {"1", true},
         {"false", false},
         {"true", true},
@@ -602,11 +591,10 @@ bool helicsBoolValue(std::string_view val)
         {"enable", true},
         {"disabled", false},
         {"enabled", true},
-        {"", false}
-    };
+        {"", false}};
     // all known false strings are captured in known strings so if it isn't in there it evaluates to
     // true
-    const auto * res = knownStrings.find(frozen::string(val.data(),val.size()));
+    const auto* res = knownStrings.find(frozen::string(val.data(), val.size()));
     if (res != knownStrings.end()) {
         return res->second;
     }

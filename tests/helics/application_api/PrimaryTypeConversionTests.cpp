@@ -5,11 +5,12 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/common/JsonProcessingFunctions.hpp"
+
 #include <complex>
 #include <gtest/gtest.h>
 #include <list>
 #include <set>
-#include "helics/common/JsonProcessingFunctions.hpp"
 
 /** these test cases test out the value converters
  */
