@@ -104,7 +104,7 @@ std::string helicsComplexString(std::complex<double> val)
     return helicsComplexString(val.real(), val.imag());
 }
 /** map of an assortment of type string that can be converted to a known type*/
-static constexpr frozen::unordered_map<frozen::string, data_type, 55> typeMap{
+static constexpr frozen::unordered_map<frozen::string, data_type, 56> typeMap{
     {"double", data_type::helics_double},
     {"string", data_type::helics_string},
     {"binary", data_type::helics_bool},
@@ -136,13 +136,15 @@ static constexpr frozen::unordered_map<frozen::string, data_type, 55> typeMap{
     {"byte", data_type::helics_int},
     {"int8", data_type::helics_int},
     {"uint8", data_type::helics_int},
+    {"char8_t", data_type::helics_string},
     {"complex_vector", data_type::helics_complex_vector},
     {"complex vector", data_type::helics_complex_vector},
     {"d", data_type::helics_double},
     {"s", data_type::helics_string},
     {"f", data_type::helics_double},
     {"v", data_type::helics_vector},
-    {"c", data_type::helics_complex},
+    // typeid(char).name sometimes is produced from char
+    {"c", data_type::helics_string},
     {"t", data_type::helics_time},
     {"i", data_type::helics_int},
     {"i64", data_type::helics_int},
