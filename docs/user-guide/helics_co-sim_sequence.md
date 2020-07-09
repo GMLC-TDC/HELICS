@@ -10,7 +10,7 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
 
    Given the fact that only two federates are being used (the minimum number to be a co-simulation, though HELICS itself works just fine with a single federate), only a single broker is required.
 
-   ![Transmission distribution co-simulation message topology](../img/ditl_message_topology.png)
+   ![Transmission and distribution co-simulation signal topology](../img/ditl_message_topology.png)
 
    ![Transmission distribution co-simulation broker topology](../img/ditl_broker_topology.png)
 
