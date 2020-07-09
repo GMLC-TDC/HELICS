@@ -7,7 +7,7 @@ on:
               description: 'Webhook to call with the completed workflow run id'
               required: false
   schedule:
-    - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
+    - cron: '15 09 * * */2' # Run at in the early hours of the morning every other day of the week (UTC)
 
 jobs:
 #####################################
