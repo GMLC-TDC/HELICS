@@ -8,6 +8,7 @@ on:
               required: false
   schedule:
     - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
+  push:
 
 jobs:
 #####################################
