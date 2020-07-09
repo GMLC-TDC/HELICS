@@ -17,6 +17,7 @@ HELICS defines three specific types of federates defined by the nature of the me
    Message federates interact with the federation through a conceptually different mechanism than a value federate. If message federates can be thought of as attaching to communication networks, the federate's "endpoints" are the specific interfaces to that communication network. By default, HELICS acts as the communication network, transferring signals between message federates from the endpoint on one to the endpoint on another.
 
 The following table may be useful in understanding the differences between the two methods by which federates can communicate:
+
 ```eval_rst
 +--------------------------------------------------------------------+--------------------------------------------------------+
 |`Publication <Publications.html>`__/`Input <Inputs.html>`__ Values  | `Endpoint <Endpoints.html>`__                          |
@@ -34,7 +35,4 @@ The following table may be useful in understanding the differences between the t
 +--------------------------------------------------------------------+--------------------------------------------------------+
 ```
 
-
 3. **Combination federates** - As you might guess, this type of federate makes use of both the value method and the endpoint method for transferring data between federates. An example of a federate like this could be a transmission system simulator that is acting both as a physical model of a system as well as a collection of PMUs that are sending data to a centralized generator dispatcher. The solution to the powerflow could be used to define substation voltages to some attached distribution circuits (physical values sent via publication) and the generator output powers could be sent to the centralized controller (control/measurement values being sent over a communication network via endpoints in a message federate).
-
-
