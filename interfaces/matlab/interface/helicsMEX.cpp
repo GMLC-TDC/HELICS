@@ -9792,40 +9792,45 @@ int _wrap_helicsInputGetVector(int resc, mxArray *resv[], int argc, mxArray *arg
   int *arg4 = (int *) 0 ;
   helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int temp4 ;
+  int res4 = SWIG_TMPOBJ ;
   helics_error etemp5 ;
   mxArray * _out;
   
-  {
-    arg2=(double *)(NULL);
-  }
-  {
-    arg4=&(arg3);
-  }
+  arg4 = &temp4;
   {
     etemp5=helicsErrorInitialize();
     arg5=&etemp5;
   }
-  if (!SWIG_check_num_args("helicsInputGetVector",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetVector",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetVector" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  {
-    arg3=helicsInputGetVectorSize(arg1);
-    arg2 = (double *) mxCalloc(arg3,sizeof(double));
-  }
+  res2 = SWIG_ConvertPtr(argv[1], &argp2,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputGetVector" "', argument " "2"" of type '" "double []""'"); 
+  } 
+  arg2 = reinterpret_cast< double * >(argp2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputGetVector" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
   helicsInputGetVector(arg1,arg2,arg3,arg4,arg5);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
-  {
-    mxArray *mat=mxCreateDoubleMatrix(*arg4,1,mxREAL);
-    mxSetPr(mat,arg2);
-    if (--resc>=0) *resv++ = mat;
-  }
-  {
-    //if (arg2) free(arg2);
+  if (SWIG_IsTmpObj(res4)) {
+    if (--resc>=0) *resv++ = SWIG_From_int((*arg4));
+  } else {
+    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags);
   }
   {
     if (arg5->error_code!=helics_ok)
@@ -9835,9 +9840,6 @@ int _wrap_helicsInputGetVector(int resc, mxArray *resv[], int argc, mxArray *arg
   }
   return 0;
 fail:
-  {
-    //if (arg2) free(arg2);
-  }
   {
     if (arg5->error_code!=helics_ok)
     {
