@@ -29,8 +29,7 @@ template class ValueConverter<std::vector<std::complex<double>>>;
 template class ValueConverter<NamedPoint>;
 
 namespace detail {
-    size_t getBinaryLength(double val) { return 9;
-    }
+    size_t getBinaryLength(double val) { return 9; }
     static constexpr unsigned char doubleCode = 0xB0;
 
     static constexpr unsigned char intCode = 0x50;
@@ -41,10 +40,11 @@ namespace detail {
     static constexpr unsigned char cvCode = 0x62;
     static constexpr unsigned char customCode = 0xF4;
 
-    void convertToBinary(char* data, double val) {
+    void convertToBinary(char* data, double val)
+    {
         std::memcpy(data, &val, 8);
         data[8] = doubleCode;
     }
-}
+}  // namespace detail
 
 }  // namespace helics
