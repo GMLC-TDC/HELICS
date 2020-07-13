@@ -4,7 +4,6 @@
 # 2. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
 echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
-choco install -y swig
 BOOST_ROOT="${BOOST_ROOT_1_72_0}"
 export BOOST_ROOT
 mkdir build && cd build || exit
