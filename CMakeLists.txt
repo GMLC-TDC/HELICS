@@ -100,6 +100,18 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL P
     endif(WIN32)
 endif()
 
+# Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
+get_filename_component(tmp_install_prefix ${CMAKE_INSTALL_PREFIX} REALPATH)
+get_filename_component(tmp_proj_bindir ${PROJECT_BINARY_DIR} REALPATH)
+# Windows paths are case insensitive
+if(WIN32)
+    string(TOLOWER "${tmp_install_prefix}" tmp_install_prefix)
+    string(TOLOWER "${tmp_proj_bindir}" tmp_proj_bindir)
+endif()
+if(tmp_install_prefix STREQUAL tmp_proj_bindir)
+    message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must not be set to the build folder")
+endif()
+
 if(MSYS
    OR CYGWIN
    OR UNIX
