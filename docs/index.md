@@ -17,43 +17,27 @@ Brief History: HELICS began as the core software development of the Grid Moderni
 
 Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
-- [Gitter](https://gitter.im/GMLC-TDC/HELICS)
-
 ```eval_rst
 .. toctree::
    :maxdepth: 1
-   :caption: Basics
+   :caption: Getting Started
 
    installation/index
-   introduction/index
    user-guide/index
-   Tools_using_HELICS
-```
-
-```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :caption: Reference
-
-   configuration/index
+   configuration_options_reference
+   support
    apps/index
 ```
 
 ```eval_rst
 .. toctree::
    :maxdepth: 1
-   :caption: API Docs
-
-   c-api-reference/index
-   doxygen/index
-```
-
-```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :caption: Contributing
+   :caption: Developer Reference
 
    developer-guide/index
+   c-api-reference/index
+   doxygen/index
+   configuration/index
    ROADMAP
 ```
 

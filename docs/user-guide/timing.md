@@ -18,30 +18,23 @@ HELICS co-simulations end under one of two conditions: when all federates have b
 
 The same JSON configuration file used to set the publications, subscriptions, and endpoints as discussed in the [section on federates](./federates.md) also has a number of parameters that can be set to influence how the federate manages its timing with the co-simulation.
 
+Below is an example of how two of these are implemented in a federate configuration JSON file:
+
 ```json
 {
   "name":"generic_federate",
   ...
   "uninterruptible":false,
   "period":  1.0,
-  "offset": 0.0,
   ...
 }
 ```
 
-- **uninterruptible [false]** - Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag to `true` will prevent premature time grants.
-
-- **period** - Many time-based simulators have a minimum time-resolution or a user-configurable step size. The `period` parameter can be used to effectively synchronize the times that are granted with the defined simulation period. The default units for `period` are in seconds but the string for this parameter can include its own units (e.g. "2 ms" or "1 hour"). Setting `period` will force all time grants to occur at times of `n*period` even if subscriptions are updated, messages arrive, or the federate requests a time between periods. This value effectively makes the federates `uninterruptible` during the times between periods. Relatedly...
-
-- **offset [0]** - There may be cases where it is preferable to have a simulator receive time grants that are offset slightly in time to one or more other federates. Defining an `offset` value allows this to take place; units are handled the same as in `period`. Setting both `period` and `offset`, will result in the all times granted to the federate in question being constrained to `n*period + offset`.
-
-- **timeDelta [0]** - timeDelta has some similarities to `period`; where `period` constrained the granted time to regular intervals, `timeDelta` constrains the grant time to a minimum amount from the last granted time. Units are handled the same as in `period`.
-
-More than likely you're going to want to set at least one of these based on how the federate in question handles time (assuming that whoever integrated the federate didn't set any of them programmatically). For example, if the federate has a minimum time-step, setting `period` to that time-step value will guarantee that grants will only happen on that time-step. That is, if the federate has no concept of time shorter than one second, setting `period` to 1 second will guarantee that the federate is never granted a time of, say, 3.3 seconds even if new publication values arrive at that time. If those new values show up at 3.3 seconds and `period` is set to 1 second, the federate will see them when it is woken up at 4 seconds. HELICS will also delay any requests of invalid times to the next allowed time. For example if a period of 1.0 was set and request was made at 3.3 seconds the grant would occur at 4.0 seconds.
+For this hypothetical federate, if the federate has a minimum time-step, setting `period` to that time-step value will guarantee that grants will only happen on that time-step. That is, if the federate has no concept of time shorter than one second, setting `period` to 1 second will guarantee that the federate is never granted a time of, say, 3.3 seconds even if new publication values arrive at that time. If those new values show up at 3.3 seconds and `period` is set to 1 second, the federate will see them when it is woken up at 4 seconds. HELICS will also delay any requests of invalid times to the next allowed time. For example if a period of 1.0 was set and request was made at 3.3 seconds the grant would occur at 4.0 seconds.
 
 Alternatively, if the federate has been integrated in a manner such that it already makes time requests on the simulators minimum time-step, then setting `uninterruptible` will have the same effect. The federate will always request values on its time-step and any new publications or messages that arrive in between those time will be ignored. Also alternatively, setting `timeDelta` to the time-step and setting `uninterruptible` has the same effect as setting `period` to time-step (`uninterruptible` effectively becomes irrelevant and can be set or cleared).
 
-Its important to note that these settings specifically impact the granted time and not the ability to make a time request. That is, with `period` set to 1 second and the current time is 3 seconds, making a time request of 3.1 seconds will not throw an error. It will generate a log warning message but this can be disabled as well; it will result in a time of 4 seconds being granted.
+It's important to note that these settings specifically impact the granted time and not the ability to make a time request. That is, with `period` set to 1 second and the current time is 3 seconds, making a time request of 3.1 seconds will not throw an error. It will generate a log warning message but this can be disabled as well; it will result in a time of 4 seconds being granted.
 
 ## Example: Timing in a Small Federation
 
@@ -67,4 +60,4 @@ Items of notes:
 
 ## Exercises
 
-To get a reader some practice on how timing working in HELICS some exercises originally used as part of an in person tutorial are [available](./timing_exercise.md)
+To get a reader some practice on how timing working in HELICS some exercises originally used as part of an [in-person tutorial are available](./timing_exercise.md)

@@ -10,13 +10,13 @@ As previously discussed, message federates interact with the federation by defin
 
 In fact, as you'll see in [a later section](./filters.md), it is possible to create more realistic communication-system effects natively in HELICS (as well as use a full-blown communication simulator like [ns-3](https://www.nsnam.org) to do the same). This is relevant now, though, because it influences how the endpoints are created and, as a consequence, how the simulator handles messages. You could, for example, have a system with three federates communicating with each other: a remote voltage sensor, a voltage controller, and a voltage regulation actuator (we'll pretend for the case of this example that the last two are physically separated though they often aren't). In this case, you could imagine that the voltage sensor only sends messages to the voltage controller and the voltage controller only sends messages to the voltage regulation actuator. That is, those two paths between the three entities are distinct, have no interaction, and have unique properties (though they may not be modeled). Given this, referring to the figure below, the voltage sensor could have one endpoint ("Endpoint 1") to send the voltage signal, the voltage regulator could receive the measurement at one endpoint ("Endpoint 2") and send the control signal on another ("Endpoint 3"), and the voltage regulation actuator would receive the control signal on its own endpoint ("Endpoint 4").
 
-![voltage regulation message federates](../img/voltage_reg_message_federate.png)
+![Voltage regulation message federates](../img/voltage_reg_message_federate.png)
 
 The federate code handling these messages can be relatively simple because the data coming in or going out of each endpoint is unique. The voltage controller always receives (and only receives) the voltage measurement at one endpoint and similarly only sends the control signal on another.
 
 Consider a counter-example: automated meter-reading (AMI) using a wireless network that connects all meters in a distribution system to a data-aggregator in the substation (where, presumably, the data travels over a dedicated wired connection to a control room). All meters will have a single endpoint over which they will send their data but what about the receiver? The co-simulation could be designed with the data-aggregator having a unique endpoint for each meter but this implies come kind of dedicated communication channel for each meter; this is not the case with wireless communication. Instead, it is probably better to create a single endpoint representing the wireless connection the data aggregator has with the AMI network. In this case, messages from any of the meters in the system will be flowing through the same endpoint and to differentiate the messages from each other, the federate will have to be written to examine the metadata with the message to determine its original source.
 
-![ami message federates](../img/ami_message_federate.png)
+![Signal topology for AMI message federates](../img/ami_message_federate.png)
 
 ## Interactions Between Messages and Values
 
@@ -64,11 +64,6 @@ Once the message topology considering endpoints has been determined, the definit
 - **`destination`** - For endpoints that send all outgoing messages to only a single endpoint, `destination` allows the endpoint to be specified in the JSON configuration. This allows for a more modular implementation of the federate since this parameter is externally defined rather than being hardcoded in the federate itself.
 - **`info`** - Just as in the value federate, the string in this field is ignored by HELICS and can be used by the federate for internal configuration purposes.
 
-There are a few other configuration parameters that are applicable if the endpoint is interacting with a HELICS value message.
-
-- **`knownSubscription`** - The string in this field specifies the key for a HELICS value message that the message federate would like to receive at the specified endpoint. HELICS will generate a message and send it to this endpoint whenever the originating value federate updates to value.
-- **`type`** and **`units`** - Just as in HELICS values, messages that come from value federates have associated data types and units. As in value federates, HELICS can use the specified `type` and `units` field to perform appropriate conversions. (As of v2.0, unit conversion is not supported.)
-
 ## Example 1b - Distribution system EV charge controller
 
 To demonstrate how a message federate interacts with the federation, let's take the previous example and add two things to it: electric vehicle (EV) loads in the distribution system, and a centralized EV charge control manager.
@@ -86,9 +81,9 @@ Keeping in mind that this a model for demonstration purposes (which is to say, d
 
 The message topology (including the endpoints) and the not very interesting broker topology are shown below.
 
-![Ex. 1b message topology](../img/Ex1b_Message_topology.png)
+![Ex. 1b signal topology](../img/Ex1b_Message_topology.png)
 
-![Ex. 1b message topology](../img/Ex1b_Broker_topology.png)
+![Ex. 1b broker topology](../img/Ex1b_Broker_topology.png)
 
 Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/EV_Controller/Control.json) we can learn important details about how the controller works.
 
@@ -215,4 +210,4 @@ Running [the example](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e3681
 
 Given the relatively dramatic changes in load, you might expect the voltage on the transmission system to be impacted. You would be right:
 
-![Ex. 1b EV charge pattern](../img/Ex1b_Bus_voltage_118.png)
+![Ex. 1b transmission system voltage magnitude](../img/Ex1b_Bus_voltage_118.png)

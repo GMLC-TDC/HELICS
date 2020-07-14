@@ -8,7 +8,9 @@ Before digging into the specifics of how a HELICS co-simulation runs, there are 
 
 - **Core** - The core is the software that has been embedded inside a simulator to allow it to join a HELICS federation. Generally, each federate has a single core but there are special cases where a single executable is used to represent multiple federates and all of those federates use a single core. Cores are built around specific message buses with HELICS supporting a number of different bus types. Selection of the message bus is part of the configuration process required to form the federation. See [Core Types](../configuration/CoreTypes.md) for details on the available Types of cores.
 
-- **Messages** - Messages are the the information passed between federates during the execution of the co-simulation. Fundamentally, co-simulation is about message-passing. In HELICS, there are various techniques and implementations of the message-passing infrastructure that have been implemented in the core. There are also a variety of mechanisms within a co-simulation to define the nature of the data being exchanged (data type, for example) and how the data is distributed around the federation.
+- **Signals** - Signals are the the information passed between federates during the execution of the co-simulation. Fundamentally, co-simulation is about message-passing via these signals. HELICS divides these messages into two types: value signals and message signal. The former is used when coupling two federates so they share physics (_e.g._ batteries providing power to wheel motors on an electric car) and the later is used to couple two federates with information (_e.g._ a battery charge controller and a charge relay on a battery).
+
+  In HELICS, there are various techniques and implementations of the message-passing infrastructure that have been implemented in the core. There are also a variety of mechanisms within a co-simulation to define the nature of the data being exchanged (data type, for example) and how the data is distributed around the federation.
 
 - **Broker** - The broker is a special executable distributed with HELICS; it is responsible for performing the two key tasks of a co-simulation (maintaining synchronization in the federation and facilitating message exchange, see [the section on timing](./timing.md). Each core (which generally is synonymous with "federate") must connect to a broker to be part of the federation. Brokers receive and distribute messages from any federates that are connected to it, routing them to the appropriate location. HELICS also supports a hierarchy of brokers, allowing brokers to pass messages between each other to connect federates associated with different brokers and thus maintain the integrity of the federation. The broker at the top of the hierarchy is called the "root broker" and it is the message router of last resort.
 
@@ -19,19 +21,19 @@ Given the definitions of the entities above, there are several co-simulation arc
 ### Everyday Co-simulation
 
 The figure below shows the most common architecture for HELICS co-simulation. Each core has only one federate as an integrated executable, all executables reside on the same computer and are connected to the same broker. This architecture is particularly common for small federates and/or co-simulations under development.
-![HELICS Architecture 1](../img/helics_architecture_1.png)
+![Common HELICS architecture](../img/helics_architecture_1.png)
 
 ### Multi-threading
 
 The architecture below shows a much less common scenario where more than one federate is associated with a single core. For most simulators that have already been integrated with HELICS this architecture would generally not be used. For simulators that are multi-threaded by nature, HELICS can be configured this way to facilitate message passing between threads. For a co-simulation that exists entirely within a single executable, this architecture will provide the highest performance. For example, of a large number of small controllers are written as a single, multi-threaded application (perhaps all the thermostats in an commercial building are being managed by a centralized controller), particularly where there is communication between the threads, using a single core inside a single multi-threaded application (with essentially one thread per federate) will provide the highest level of performance.
-![HELICS Architecture 2](../img/helics_architecture_2.png)
+![Multi-threading allowing multiple federates on a single HELICS core](../img/helics_architecture_2.png)
 
 ### Computationally Heavy Federates
 
 For co-simulations on limited hardware where a federate requires significant computational resources and high performance is important, it may be necessary to spread the federates out across a number of compute nodes to give each federate the resources it needs. All federates are still connected to a common broker and it would be required that the computers have a valid network connection so all federates can communicate with said broker. In this case, it may or may not be necessary to place the broker on its own compute node, based on the degree of competition for resources on its current compute node.
-![HELICS Architecture 3](../img/helics_architecture_3.png)
+![Architecture for multiple compute nodes](../img/helics_architecture_3.png)
 
-### Multi-Broker
+### Multiple brokers
 
 Alternatively, it would be possible to locate a broker on each computer and create a root broker on a third node. This kind of architecture could help if higher performance is needed and the federates on each computer primarily interact with each other and very little with the federates on the other computer. As compared to the previous architecture, adding the extra layer of brokers would keep local messages on the same compute node and reduce congestion on the root broker.
-![HELICS Architecture 4](../img/helics_architecture_4.png)
+![Multiple broker architecture](../img/helics_architecture_4.png)

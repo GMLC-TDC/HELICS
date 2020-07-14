@@ -9,7 +9,7 @@
 
 if(MSVC)
 
-    set(doc_sources
+    set(app_doc_sources
         apps/Echo.md
         apps/Broker.md
         apps/App.md
@@ -18,20 +18,18 @@ if(MSVC)
         apps/Source.md
         apps/Clone.md
         apps/BrokerServer.md
-        configuration/CoreTypes.md
-        configuration/Federate.md
-        configuration/index.md
-        configuration/Timing.md
-        configuration/Filters.md
-        configuration/MessageFederate.md
-        configuration/ValueFederate.md
+        apps/cmdArgs.md
+        apps/Recorder.md
+        apps/Tracer.md
     )
 
-    add_custom_target(helics_docs SOURCES ${doc_sources})
+    add_custom_target(helics_app_docs SOURCES ${app_doc_sources})
 
     file(GLOB user_guide_sources user-guide/*.md)
-
     add_custom_target(helics_user_guide SOURCES ${user_guide_sources})
+
+    file(GLOB developer_guide_sources developer-guide/*.md)
+    add_custom_target(helics_developer_guide SOURCES ${developer_guide_sources})
 
     set(helics_main_docs
         ${PROJECT_SOURCE_DIR}/README.md
@@ -45,6 +43,9 @@ if(MSVC)
 
     add_custom_target(helics_package_docs SOURCES ${helics_main_docs})
 
-    set_target_properties(helics_user_guide helics_docs helics_package_docs PROPERTIES FOLDER docs)
+    set_target_properties(
+        helics_user_guide helics_developer_guide helics_app_docs helics_package_docs
+        PROPERTIES FOLDER docs
+    )
 
 endif(MSVC)
