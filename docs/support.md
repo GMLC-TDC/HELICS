@@ -21,6 +21,6 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 
 - **[YouTube Channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg/featured)** - HELICS developers have created a number of short lectures and tutorials about how HELICS works and how to use it.
 
-* **[Gitter](https://gitter.im/GMLC-TDC/HELICS)** - Live chat with developers (when they're logged in) for quick fix support.
+- **[Gitter](https://gitter.im/GMLC-TDC/HELICS)** - Live chat with developers (when they're logged in) for quick fix support.
 
-* **Virtual Office Hours** - HELICS developers have periodic open office hours where anybody can come and get hands-on help with understanding HELICS better or getting a particular feature to work. Contact xxxxxxx for an invitation.
+- **Virtual Office Hours** - HELICS developers have periodic open office hours where anybody can come and get hands-on help with understanding HELICS better or getting a particular feature to work. Contact xxxxxxx for an invitation.
