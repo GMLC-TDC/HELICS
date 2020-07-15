@@ -8,6 +8,7 @@ Created on 5/27/2020
 import helics as h
 import logging
 import numpy as np
+import sys
 
 #logger = logging.getLogger(__name__)
 #logger.addHandler(logging.StreamHandler())
@@ -18,25 +19,25 @@ import numpy as np
 helicsversion = h.helicsGetVersion()
 
 print("EV_toy: Helics version = {}".format(helicsversion))
-
+broker = sys.argv[1]
 #################################  Creating Broker  ########################################
 
 initstring = "-f 2 --name=thisbroker"
 # see command line
 # https://docs.helics.org/en/latest/apps/Broker.html
-fedinitstring = "--broker=thisbroker --federates=1"
+fedinitstring = " --federates=1 --broker="+broker
 deltat = 0.1
 
-print("Creating Broker")
-broker = h.helicsCreateBroker("zmq", "", initstring)
-print("Created Broker")
+# print("Creating Broker")
+# broker = h.helicsCreateBroker("zmq", "", initstring)
+# print("Created Broker")
 
-print("Checking if Broker is connected")
-isconnected = h.helicsBrokerIsConnected(broker)
-print("Checked if Broker is connected")
+# print("Checking if Broker is connected")
+# isconnected = h.helicsBrokerIsConnected(broker)
+# print("Checked if Broker is connected")
 
-if isconnected == 1:
-    print("Broker created and connected")
+# if isconnected == 1:
+#     print("Broker created and connected")
 
 # Create Federate Info object that describes the federate properties
 fedinfo = h.helicsCreateFederateInfo()

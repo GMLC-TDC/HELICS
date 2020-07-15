@@ -13,12 +13,14 @@ from datetime import datetime, timedelta
 import json
 import logging
 import numpy as np
+import sys
 
 #logger = logging.getLogger(__name__)
 #logger.addHandler(logging.StreamHandler())
 #logger.setLoggingLevel(logging.DEBUG)
 
-fedinitstring = "--federates=1"
+broker = sys.argv[1]
+fedinitstring = " --federates=1 --broker="+broker
 
 deltat = 0.1
 # Create Federate Info object that describes the federate properties
