@@ -96,7 +96,8 @@ size_t convertToBinary(std::byte* data, const double* val, size_t size);
 
 size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val);
 
-data_type detectType(const std::byte* data, size_t size);
+/** detect the contained data type,  assumes data is at least 1 byte long*/
+data_type detectType(const std::byte* data);
 
 void convertFromBinary(const std::byte* data, double& val);
 void convertFromBinary(const std::byte* data, std::int64_t& val);
@@ -110,6 +111,8 @@ void convertFromBinary(const std::byte* data, double* val);
 
 void convertFromBinary(const std::byte* data, std::vector<std::complex<double>>& val);
 
-/** get the size of the data from the data stream for a specific type*/
-size_t getDataSize(const std::byte* data, data_type type);
+/** get the size of the data from the data stream for a specific type
+@details this returns the number of elements of the specific data type  it is NOT in bytes
+*/
+size_t getDataSize(const std::byte* data);
 }  // namespace helics::detail

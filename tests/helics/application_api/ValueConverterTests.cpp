@@ -222,9 +222,9 @@ TEST_P(new_converter_tests_double, double_tests)
     std::string convString;
     convString.resize(40);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_double);
-    EXPECT_EQ(sz, 9);
+    EXPECT_EQ(sz, 16);
     double v3;
     helics::detail::convertFromBinary(reinterpret_cast<std::byte*>(convString.data()), v3);
     if (std::isnan(v2)) {
@@ -252,8 +252,8 @@ TEST_P(new_converter_tests_int, int_tests)
     std::string convString;
     convString.resize(40);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
-    EXPECT_EQ(sz, 9);
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+    EXPECT_EQ(sz, 16);
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_int);
     std::int64_t v3;
     helics::detail::convertFromBinary(reinterpret_cast<std::byte*>(convString.data()), v3);
@@ -277,9 +277,9 @@ TEST_P(new_converter_tests_complex, complex_tests)
     std::string convString;
     convString.resize(40);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
-    EXPECT_EQ(sz, 17);
+    EXPECT_EQ(sz, 24);
 
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_complex);
 
     decltype(v2) v3;
@@ -316,12 +316,11 @@ TEST_P(new_converter_tests_string, string_tests)
     std::string convString;
     convString.resize(v2.size() + 20);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
-    EXPECT_EQ(sz, v2.size() + 4);
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+    EXPECT_EQ(sz, v2.size() + 8);
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_string);
     EXPECT_EQ(v2.size(),
-              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()),
-                                          helics::data_type::helics_string));
+              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data())));
     decltype(v2) v3;
     helics::detail::convertFromBinary(reinterpret_cast<std::byte*>(convString.data()), v3);
     EXPECT_EQ(v3, v2);
@@ -333,9 +332,8 @@ TEST_P(new_converter_tests_string, char_star_tests)
     std::string convString;
     convString.resize(v2.size() + 20);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
-    EXPECT_EQ(sz, v2.size() + 4);
-    auto sz_result = helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()),
-                                                 helics::data_type::helics_string);
+    EXPECT_EQ(sz, v2.size() + 8);
+    auto sz_result = helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()));
     EXPECT_EQ(v2.size(), sz_result);
     decltype(v2) v3;
     v3.resize(sz_result);
@@ -361,12 +359,11 @@ TEST_P(new_converter_tests_np, np_tests)
     std::string convString;
     convString.resize(v2.name.size() + 20);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
-    EXPECT_EQ(sz, v2.name.size() + 12);
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+    EXPECT_EQ(sz, v2.name.size() + 16);
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_named_point);
     EXPECT_EQ(v2.name.size(),
-              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()),
-                                          helics::data_type::helics_named_point));
+              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data())));
     decltype(v2) v3;
     helics::detail::convertFromBinary(reinterpret_cast<const std::byte*>(convString.data()), v3);
     EXPECT_EQ(v3.name, v2.name);
@@ -400,9 +397,8 @@ TEST_P(new_converter_tests_vector, vector_tests)
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
     EXPECT_EQ(sz, v2.size() * 8 + 8);
     EXPECT_EQ(v2.size(),
-              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()),
-                                          helics::data_type::helics_vector));
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data())));
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_vector);
     decltype(v2) v3;
     helics::detail::convertFromBinary(reinterpret_cast<const std::byte*>(convString.data()), v3);
@@ -426,8 +422,7 @@ TEST_P(new_converter_tests_vector, double_star_tests)
     convString.resize(v2.size() * 8 + 20);
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
     EXPECT_EQ(sz, v2.size() * 8 + 8);
-    auto sz_result = helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()),
-                                                 helics::data_type::helics_vector);
+    auto sz_result = helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()));
     EXPECT_EQ(v2.size(), sz_result);
     decltype(v2) v3;
     v3.resize(sz_result);
@@ -476,9 +471,8 @@ TEST_P(new_converter_tests_cvector, cvector_tests)
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
     EXPECT_EQ(sz, v2.size() * 16 + 8);
     EXPECT_EQ(v2.size(),
-              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data()),
-                                          helics::data_type::helics_complex_vector));
-    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data()), sz),
+              helics::detail::getDataSize(reinterpret_cast<std::byte*>(convString.data())));
+    EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::data_type::helics_complex_vector);
     decltype(v2) v3;
     helics::detail::convertFromBinary(reinterpret_cast<const std::byte*>(convString.data()), v3);
