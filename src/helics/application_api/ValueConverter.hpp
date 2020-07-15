@@ -16,8 +16,11 @@ algorithms
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 
+#include <cstddef>
 #include <string>
 #include <utility>
+#include <vector>
+
 namespace helics {
 /** converter for a basic value*/
 template<class X>
@@ -64,3 +67,52 @@ class ValueConverter<std::string> {
 #ifndef HELICS_CXX_STATIC_DEFINE
 #    include "ValueConverter_impl.hpp"
 #endif
+
+namespace helics::detail {
+size_t getBinaryLength(double val);
+size_t getBinaryLength(std::int64_t val);
+size_t getBinaryLength(std::complex<double> val);
+size_t getBinaryLength(std::string_view val);
+size_t getBinaryLength(const std::vector<double>& val);
+size_t getBinaryLength(const double* val, size_t size);
+
+size_t getBinaryLength(const NamedPoint& np);
+
+size_t getBinaryLength(const std::vector<std::complex<double>>& cv);
+
+size_t convertToBinary(std::byte* data, double val);
+
+size_t convertToBinary(std::byte* data, std::int64_t val);
+
+size_t convertToBinary(std::byte* data, const std::complex<double>& val);
+
+size_t convertToBinary(std::byte* data, std::string_view val);
+
+size_t convertToBinary(std::byte* data, const NamedPoint& val);
+
+size_t convertToBinary(std::byte* data, const std::vector<double>& val);
+
+size_t convertToBinary(std::byte* data, const double* val, size_t size);
+
+size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val);
+
+/** detect the contained data type,  assumes data is at least 1 byte long*/
+data_type detectType(const std::byte* data);
+
+void convertFromBinary(const std::byte* data, double& val);
+void convertFromBinary(const std::byte* data, std::int64_t& val);
+void convertFromBinary(const std::byte* data, std::complex<double>& val);
+void convertFromBinary(const std::byte* data, char* val);
+void convertFromBinary(const std::byte* data, std::string& val);
+void convertFromBinary(const std::byte* data, NamedPoint& val);
+
+void convertFromBinary(const std::byte* data, std::vector<double>& val);
+void convertFromBinary(const std::byte* data, double* val);
+
+void convertFromBinary(const std::byte* data, std::vector<std::complex<double>>& val);
+
+/** get the size of the data from the data stream for a specific type
+@details this returns the number of elements of the specific data type  it is NOT in bytes
+*/
+size_t getDataSize(const std::byte* data);
+}  // namespace helics::detail
