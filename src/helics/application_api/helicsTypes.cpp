@@ -226,6 +226,32 @@ data_type getTypeFromString(std::string_view typeName)
     return data_type::helics_custom;
 }
 
+std::string_view getCleanedTypeName(std::string_view typeName)
+{
+    if (!typeName.empty() && typeName.front() == '[') {
+        return typeName;
+    }
+    const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
+    if (res != typeMap.end()) {
+        return typeName;
+    }
+    std::string strName(typeName);
+    auto dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return typeNameStringRef(dres->second);
+    }
+    makeLowerCase(strName);
+    res = typeMap.find(frozen::string(strName.data(), strName.size()));
+    if (res != typeMap.end()) {
+        return typeName;
+    }
+    dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return typeNameStringRef(dres->second);
+    }
+    return typeName;
+}
+
 // regular expression to handle complex numbers of various formats
 const std::regex creg(
     R"(([+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)\s*([+-]\s*(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?)[ji]*)");
