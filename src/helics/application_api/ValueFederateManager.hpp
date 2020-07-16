@@ -68,9 +68,8 @@ class ValueFederateManager {
     ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id);
     ~ValueFederateManager();
 
-    Publication& registerPublication(const std::string& key,
-                                     std::string type,
-                                     const std::string& units);
+    Publication&
+        registerPublication(const std::string& key, std::string type, const std::string& units);
     /** register a subscription
     @details call is only valid in startup mode
     */
