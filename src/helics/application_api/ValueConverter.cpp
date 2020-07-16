@@ -10,9 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueConverter_impl.hpp"
 
 #include <complex>
-#include <vector>
 #include <frozen/unordered_map.h>
-
+#include <vector>
 
 namespace helics {
 template class ValueConverter<int64_t>;
@@ -132,7 +131,7 @@ namespace detail {
         std::memset(data, 0, 8);
         data[0] = intCode | littleEndianCode;
         data[3] = std::byte{1};
-        std::memcpy(data+8, &val, 8);
+        std::memcpy(data + 8, &val, 8);
         return 16;
     }
 
@@ -213,10 +212,9 @@ namespace detail {
             static_cast<size_t>(data[3]);
     }
 
-
     static constexpr const frozen::unordered_map<std::int8_t, helics::data_type, 16> typeDetect{
         {std::to_integer<std::int8_t>(intCode), data_type::helics_int},
-        {std::to_integer<std::int8_t>(intCode|bigEndianCode), data_type::helics_int},
+        {std::to_integer<std::int8_t>(intCode | bigEndianCode), data_type::helics_int},
         {std::to_integer<std::int8_t>(doubleCode), data_type::helics_double},
         {std::to_integer<std::int8_t>(doubleCode | bigEndianCode), data_type::helics_double},
         {std::to_integer<std::int8_t>(complexCode), data_type::helics_complex},
@@ -230,8 +228,7 @@ namespace detail {
         {std::to_integer<std::int8_t>(customCode), data_type::helics_custom},
         {std::to_integer<std::int8_t>(customCode | bigEndianCode), data_type::helics_custom},
         {std::to_integer<std::int8_t>(stringCode), data_type::helics_string},
-        {std::to_integer<std::int8_t>(stringCode | bigEndianCode), data_type::helics_string}
-    };
+        {std::to_integer<std::int8_t>(stringCode | bigEndianCode), data_type::helics_string}};
 
     data_type detectType(const std::byte* data)
     {
@@ -241,7 +238,7 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, double& val)
     {
-        std::memcpy(&val, data+8, 8);
+        std::memcpy(&val, data + 8, 8);
         if ((data[0] & endianMask) != littleEndianCode) {
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val));
         }
@@ -249,7 +246,7 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, std::int64_t& val)
     {
-        std::memcpy(&val, data+8, 8);
+        std::memcpy(&val, data + 8, 8);
         if ((data[0] & endianMask) != littleEndianCode) {
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val));
         }
@@ -257,7 +254,7 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, std::complex<double>& val)
     {
-        std::memcpy(&val, data+8, 16);
+        std::memcpy(&val, data + 8, 16);
         if ((data[0] & endianMask) != littleEndianCode) {
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val));
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val) + 8);
@@ -279,8 +276,8 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, NamedPoint& val)
     {
-        std::memcpy(&val.value, data+8, 8);
-        std::size_t size= getDataSize(data);
+        std::memcpy(&val.value, data + 8, 8);
+        std::size_t size = getDataSize(data);
         val.name.assign(reinterpret_cast<const char*>(data) + 16U,
                         reinterpret_cast<const char*>(data) + 16U + size);
         if ((data[0] & endianMask) != littleEndianCode) {
