@@ -100,7 +100,7 @@ As a complement to the extensive listing of HELICS options and flags that can be
     {
       "name": "ept2",
       "type": "message2",
-      "knownDestinations": "ept1",
+      "destination": "ept1",
       "subscriptions": "pub1"
     }
   ],
