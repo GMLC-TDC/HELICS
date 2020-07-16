@@ -5,6 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/common/JsonProcessingFunctions.hpp"
+
 #include <complex>
 #include <gtest/gtest.h>
 #include <list>
@@ -23,10 +25,7 @@ bool checkTypeConversion1(const T1& val1, const T2& exp)
     defV val = val1;
     T2 v2{};
     valueExtract(val, v2);
-    if (v2 != exp) {
-        return false;
-    }
-    return true;
+    return (v2 == exp);
 }
 
 TEST(type_conversion_tests, vectorNorm_tests)
@@ -177,7 +176,10 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
         checkTypeConversion1(vp,
                              std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
     EXPECT_TRUE(checkTypeConversion1(vp, true));
-    EXPECT_TRUE(checkTypeConversion1(vp, std::string("{\"point\":" + std::to_string(val) + "}")));
+    Json::Value v1;
+    v1["name"] = "point";
+    v1["value"] = val;
+    EXPECT_TRUE(checkTypeConversion1(vp, generateJsonString(v1)));
 
     NamedPoint vp2{"v2[3.0,-4.0]", std::nan("0")};
     double v2 = 5.0;
