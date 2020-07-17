@@ -7,8 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsTypes.hpp"
 
+#include "../common/JsonGeneration.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "ValueConverter.hpp"
 #include "fmt/format.h"
+#include "frozen/string.h"
+#include "frozen/unordered_map.h"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
@@ -23,6 +27,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 
 using namespace gmlc::utilities;  // NOLINT
+
+template<>
+struct fmt::formatter<std::complex<double>> {
+    // Formats the point p using the parsed format specification (presentation)
+    // stored in this formatter.
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+
+    template<typename FormatContext>
+    auto format(const std::complex<double>& p, FormatContext& ctx)
+    {
+        // ctx.out() is an output iterator to write to.
+        return format_to(ctx.out(), "[{:.9g},{:.9g}]", p.real(), p.imag());
+    }
+};
 
 namespace helics {
 
@@ -77,7 +95,7 @@ double vectorNorm(const std::vector<std::complex<double>>& vec)
 
 std::string helicsComplexString(double real, double imag)
 {
-    return (imag != 0.0) ? fmt::format(FMT_STRING("{:.9g}{:<+.9g}j"), real, imag) :
+    return (imag != 0.0) ? fmt::format(FMT_STRING("[{:.9g},{:.9g}]"), real, imag) :
                            fmt::format(FMT_STRING("{:.9g}"), real);
 }
 
@@ -86,7 +104,7 @@ std::string helicsComplexString(std::complex<double> val)
     return helicsComplexString(val.real(), val.imag());
 }
 /** map of an assortment of type string that can be converted to a known type*/
-static const std::unordered_map<std::string, data_type> typeMap{
+static constexpr frozen::unordered_map<frozen::string, data_type, 56> typeMap{
     {"double", data_type::helics_double},
     {"string", data_type::helics_string},
     {"binary", data_type::helics_bool},
@@ -97,13 +115,63 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {"vector", data_type::helics_vector},
     {"double_vector", data_type::helics_vector},
     {"double vector", data_type::helics_vector},
-    {typeid(std::vector<double>).name(), data_type::helics_vector},
-    {gmlc::demangle(typeid(std::vector<double>).name()), data_type::helics_vector},
-    {typeid(double*).name(), data_type::helics_vector},
     {"complex", data_type::helics_complex},
     {"pair", data_type::helics_complex},
     {"int", data_type::helics_int},
     {"int64", data_type::helics_int},
+    {"long long", data_type::helics_int},
+    {"integer", data_type::helics_int},
+    {"int32", data_type::helics_int},
+    {"uint32", data_type::helics_int},
+    {"uint64", data_type::helics_int},
+    {"int16", data_type::helics_int},
+    {"uint16", data_type::helics_int},
+    {"short", data_type::helics_int},
+    {"unsigned short", data_type::helics_int},
+    {"long", data_type::helics_int},
+    {"unsigned long", data_type::helics_int},
+    {"char", data_type::helics_string},
+    {"uchar", data_type::helics_int},
+    {"unsigned char", data_type::helics_int},
+    {"byte", data_type::helics_int},
+    {"int8", data_type::helics_int},
+    {"uint8", data_type::helics_int},
+    {"char8_t", data_type::helics_string},
+    {"complex_vector", data_type::helics_complex_vector},
+    {"complex vector", data_type::helics_complex_vector},
+    {"d", data_type::helics_double},
+    {"s", data_type::helics_string},
+    {"f", data_type::helics_double},
+    {"v", data_type::helics_vector},
+    // typeid(char).name sometimes is produced from char
+    {"c", data_type::helics_string},
+    {"t", data_type::helics_time},
+    {"i", data_type::helics_int},
+    {"i64", data_type::helics_int},
+    {"cv", data_type::helics_complex_vector},
+    {"np", data_type::helics_named_point},
+    {"point", data_type::helics_named_point},
+    {"pt", data_type::helics_named_point},
+    {"named_point", data_type::helics_named_point},
+    {"default", data_type::helics_any},
+    {"time", data_type::helics_time},
+    {"tm", data_type::helics_time},
+    {"multi", data_type::helics_multi},
+    {"many", data_type::helics_multi},
+    {"def", data_type::helics_any},
+    {"any", data_type::helics_any},
+    {"", data_type::helics_any},
+    {"all", data_type::helics_any}};
+
+static const std::unordered_map<std::string, data_type> demangle_names{
+    {gmlc::demangle(typeid(Time).name()), data_type::helics_time},
+    {gmlc::demangle(typeid(std::string).name()), data_type::helics_string},
+    {gmlc::demangle(typeid(std::complex<double>).name()), data_type::helics_complex},
+    {gmlc::demangle(typeid(std::vector<double>).name()), data_type::helics_vector},
+    {gmlc::demangle(typeid(std::vector<std::complex<double>>).name()),
+     data_type::helics_complex_vector},
+    {typeid(std::vector<double>).name(), data_type::helics_vector},
+    {typeid(double*).name(), data_type::helics_vector},
     {typeid(double).name(), data_type::helics_double},
     {typeid(float).name(), data_type::helics_double},
     {typeid(char).name(), data_type::helics_string},
@@ -125,73 +193,63 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(int8_t).name(), data_type::helics_int},
     {typeid(uint8_t).name(), data_type::helics_int},
     {typeid(bool).name(), data_type::helics_bool},
-    {"long long", data_type::helics_int},
-    {"integer", data_type::helics_int},
-    {"int32", data_type::helics_int},
-    {"uint32", data_type::helics_int},
-    {"uint64", data_type::helics_int},
-    {"int16", data_type::helics_int},
-    {"uint16", data_type::helics_int},
-    {"short", data_type::helics_int},
-    {"unsigned short", data_type::helics_int},
-    {"long", data_type::helics_int},
-    {"unsigned long", data_type::helics_int},
-    {"char", data_type::helics_string},
-    {"uchar", data_type::helics_int},
-    {"unsigned char", data_type::helics_int},
-    {"byte", data_type::helics_int},
-    {"int8", data_type::helics_int},
-    {"uint8", data_type::helics_int},
-    {"complex_vector", data_type::helics_complex_vector},
-    {"complex vector", data_type::helics_complex_vector},
     {typeid(std::vector<std::complex<double>>).name(), data_type::helics_complex_vector},
-    {gmlc::demangle(typeid(std::vector<std::complex<double>>).name()),
-     data_type::helics_complex_vector},
-    {"d", data_type::helics_double},
-    {"s", data_type::helics_string},
-    {"f", data_type::helics_double},
-    {"v", data_type::helics_vector},
-    {"c", data_type::helics_complex},
     {typeid(std::complex<double>).name(), data_type::helics_complex},
-    {gmlc::demangle(typeid(std::complex<double>).name()), data_type::helics_complex},
-    {"t", data_type::helics_time},
-    {"i", data_type::helics_int},
-    {"i64", data_type::helics_int},
-    {"cv", data_type::helics_complex_vector},
-    {"np", data_type::helics_named_point},
-    {"point", data_type::helics_named_point},
-    {"pt", data_type::helics_named_point},
-    {"named_point", data_type::helics_named_point},
     {typeid(std::string).name(), data_type::helics_string},
-    {gmlc::demangle(typeid(std::string).name()), data_type::helics_string},
     {typeid(char*).name(), data_type::helics_string},
     {typeid(const char*).name(), data_type::helics_string},
-    {"default", data_type::helics_any},
-    {"time", data_type::helics_time},
-    {typeid(Time).name(), data_type::helics_time},
-    {gmlc::demangle(typeid(Time).name()), data_type::helics_time},
-    {"tm", data_type::helics_time},
-    {"multi", data_type::helics_multi},
-    {"many", data_type::helics_multi},
-    {"def", data_type::helics_any},
-    {"any", data_type::helics_any},
-    {"", data_type::helics_any},
-    {"all", data_type::helics_any}};
+    {typeid(Time).name(), data_type::helics_time}};
 
-data_type getTypeFromString(const std::string& typeName)
+data_type getTypeFromString(std::string_view typeName)
 {
     if (!typeName.empty() && typeName.front() == '[') {
         return data_type::helics_multi;
     }
-    auto res = typeMap.find(typeName);
-    if (res == typeMap.end()) {
-        auto lcStr = convertToLowerCase(typeName);
-        res = typeMap.find(lcStr);
-        if (res == typeMap.end()) {
-            return data_type::helics_custom;
-        }
+    const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
+    if (res != typeMap.end()) {
+        return res->second;
     }
-    return res->second;
+    std::string strName(typeName);
+    auto dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return dres->second;
+    }
+    makeLowerCase(strName);
+    res = typeMap.find(frozen::string(strName.data(), strName.size()));
+    if (res != typeMap.end()) {
+        return res->second;
+    }
+    dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return dres->second;
+    }
+    return data_type::helics_custom;
+}
+
+std::string_view getCleanedTypeName(std::string_view typeName)
+{
+    if (!typeName.empty() && typeName.front() == '[') {
+        return typeName;
+    }
+    const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
+    if (res != typeMap.end()) {
+        return typeName;
+    }
+    std::string strName(typeName);
+    auto dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return typeNameStringRef(dres->second);
+    }
+    makeLowerCase(strName);
+    res = typeMap.find(frozen::string(strName.data(), strName.size()));
+    if (res != typeMap.end()) {
+        return typeName;
+    }
+    dres = demangle_names.find(strName);
+    if (dres != demangle_names.end()) {
+        return typeNameStringRef(dres->second);
+    }
+    return typeName;
 }
 
 // regular expression to handle complex numbers of various formats
@@ -203,9 +261,30 @@ std::complex<double> helicsGetComplex(std::string_view val)
     if (val.empty()) {
         return invalidValue<std::complex<double>>();
     }
-    std::smatch m;
     double re{invalidValue<double>()};
     double im{0.0};
+    if (val.front() == '[') {
+        auto sep = val.find_first_of(',');
+        if (sep == std::string_view::npos) {
+            val.remove_prefix(1);
+            val.remove_suffix(1);
+            re = numConv<double>(val);
+            return {re, im};
+        }
+        if (val.find_first_of(',', sep + 1) != std::string_view::npos) {
+            auto V = helicsGetVector(val);
+            if (V.size() >= 2) {
+                return {V[0], V[1]};
+            }
+            return invalidValue<std::complex<double>>();
+        }
+        re = numConv<double>(val.substr(1, sep));
+        val.remove_suffix(1);
+        im = numConv<double>(val.substr(sep + 1));
+        return {re, im};
+    }
+    std::smatch m;
+
     auto temp = std::string(val);
     std::regex_search(temp, m, creg);
     try {
@@ -238,58 +317,17 @@ std::complex<double> helicsGetComplex(std::string_view val)
 
 std::string helicsVectorString(const std::vector<double>& val)
 {
-    std::string vString("v");
-    vString.append(std::to_string(val.size()));
-    vString.push_back('[');
-    for (const auto& v : val) {
-        vString.append(std::to_string(v));
-        vString.push_back(';');
-        vString.push_back(' ');
-    }
-    if (vString.size() > 3)  // 3 for v0[ which would be for an empty vector
-    {
-        vString.pop_back();
-        vString.pop_back();
-    }
-    vString.push_back(']');
-    return vString;
+    return fmt::format("[{:g}]", fmt::join(val, ","));
 }
 
 std::string helicsVectorString(const double* vals, size_t size)
 {
-    std::string vString("v");
-    vString.append(std::to_string(size));
-    vString.push_back('[');
-    for (size_t ii = 0; ii < size; ++ii) {
-        vString.append(std::to_string(vals[ii]));
-        vString.push_back(';');
-        vString.push_back(' ');
-    }
-    if (vString.size() > 3)  // 3 for c0[ which would be for an empty vector
-    {
-        vString.pop_back();
-        vString.pop_back();
-    }
-    vString.push_back(']');
-    return vString;
+    return fmt::format("[{:g}]", fmt::join(vals, vals + size, ","));
 }
 
 std::string helicsComplexVectorString(const std::vector<std::complex<double>>& val)
 {
-    std::string vString("c");
-    vString.append(std::to_string(val.size()));
-    vString.push_back('[');
-    for (const auto& v : val) {
-        vString.append(helicsComplexString(v.real(), v.imag()));
-        vString.push_back(';');
-        vString.push_back(' ');
-    }
-    if (vString.size() > 3) {
-        vString.pop_back();
-        vString.pop_back();
-    }
-    vString.push_back(']');
-    return vString;
+    return fmt::format("[{}]", fmt::join(val, ","));
 }
 
 std::string helicsNamedPointString(const NamedPoint& point)
@@ -298,17 +336,13 @@ std::string helicsNamedPointString(const NamedPoint& point)
 }
 std::string helicsNamedPointString(std::string_view pointName, double val)
 {
-    std::string retStr = "{\"";
-    if (!pointName.empty()) {
-        retStr.append(pointName);
+    Json::Value NP;
+    NP["value"] = val;
+    if (pointName.empty()) {
     } else {
-        retStr.append("value");
+        NP["name"] = Json::Value(pointName.data(), pointName.data() + pointName.size());
     }
-    retStr.push_back('"');
-    retStr.push_back(':');
-    retStr.append(std::to_string(val));
-    retStr.push_back('}');
-    return retStr;
+    return generateJsonString(NP);
 }
 
 std::vector<double> helicsGetVector(std::string_view val)
@@ -327,33 +361,36 @@ std::vector<std::complex<double>> helicsGetComplexVector(std::string_view val)
 
 NamedPoint helicsGetNamedPoint(std::string_view val)
 {
-    auto loc = val.find_first_of('{');
-    if (loc == std::string::npos) {
-        auto fb = val.find_first_of('[');
-        if (fb != std::string::npos) {
-            return {val, std::nan("0")};
+    NamedPoint p;
+    try {
+        auto jv = loadJsonStr(val);
+        switch (jv.type()) {
+            case Json::ValueType::realValue:
+                p.value = jv.asDouble();
+                p.name = "value";
+                break;
+            case Json::ValueType::stringValue:
+                p.name = jv.asString();
+                break;
+            case Json::ValueType::arrayValue:
+                break;
+            case Json::ValueType::intValue:
+            case Json::ValueType::uintValue:
+                p.value = static_cast<double>(jv.asInt());
+                p.name = "value";
+                break;
+            case Json::ValueType::objectValue:
+                replaceIfMember(jv, "value", p.value);
+                replaceIfMember(jv, "name", p.name);
+                break;
+            default:
+                break;
         }
-        auto V = helicsGetComplex(val);
-        if (V.real() <= invalidDouble) {
-            return {val, std::nan("0")};
-        }
-        if (V.imag() == 0) {
-            return {"value", std::abs(V)};
-        }
-        return {val, V.real()};
     }
-    auto locsep = val.find_last_of(':');
-    auto locend = val.find_last_of('}');
-    auto str1 = val.substr(loc + 1, locsep - loc);
-    string_viewOps::trimString(str1);
-    str1.remove_suffix(1);
-
-    NamedPoint point;
-    point.name = string_viewOps::removeQuotes(str1);
-    auto vstr = val.substr(locsep + 1, locend - locsep - 1);
-    string_viewOps::trimString(vstr);
-    point.value = numConv<double>(vstr);
-    return point;
+    catch (...) {
+        p.name = val;
+    }
+    return p;
 }
 
 static int readSize(std::string_view val)
@@ -497,21 +534,62 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
             fb = nc;
         }
     } else {
-        auto V = helicsGetComplex(val);
-        data.resize(0);
-        data.push_back(V);
+        if (val.find_first_of("ji") != std::string_view::npos) {
+            auto V = helicsGetComplex(val);
+            data.resize(0);
+            data.push_back(V);
+        } else {
+            auto JV = loadJsonStr(val);
+            int cnt = 0;
+            switch (JV.type()) {
+                case Json::ValueType::realValue:
+                case Json::ValueType::intValue:
+                case Json::ValueType::uintValue:
+                    data.resize(0);
+                    data.emplace_back(JV.asDouble(), 0.0);
+                    break;
+                case Json::ValueType::arrayValue:
+                    for (auto& av : JV) {
+                        if (av.isNumeric()) {
+                            if (cnt == 0) {
+                                data.emplace_back(av.asDouble(), 0.0);
+                                cnt = 1;
+                            } else {
+                                data.back() += std::complex<double>{0.0, av.asDouble()};
+                                cnt = 0;
+                            }
+                        } else if (av.isArray()) {
+                            cnt = 0;
+                            if (av.size() >= 2) {
+                                if (av[0].isNumeric()) {
+                                    data.emplace_back(av[0].asDouble(), av[1].asDouble());
+                                }
+                            } else if (av.size() == 1) {
+                                if (av[0].isNumeric()) {
+                                    data.emplace_back(av[0].asDouble(), 0.0);
+                                }
+                            } else {
+                                data.push_back(invalidValue<std::complex<double>>());
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
 
 bool helicsBoolValue(std::string_view val)
 {
-    static const std::unordered_map<std::string, bool> knownStrings{
+    static constexpr const frozen::unordered_map<frozen::string, bool, 35> knownStrings{
 
         {"0", false},
         {"00", false},
-        {"\0", false},
+        {frozen::string("\0", 1), false},
         {"0000", false},
-        {std::string(8, '\0'), false},
+        {frozen::string("\0\0\0\0\0\0\0\0", 8), false},
         {"1", true},
         {"false", false},
         {"true", true},
@@ -541,11 +619,10 @@ bool helicsBoolValue(std::string_view val)
         {"enable", true},
         {"disabled", false},
         {"enabled", true},
-        {std::string{}, false},
-    };
+        {"", false}};
     // all known false strings are captured in known strings so if it isn't in there it evaluates to
     // true
-    auto res = knownStrings.find(std::string(val));
+    const auto* res = knownStrings.find(frozen::string(val.data(), val.size()));
     if (res != knownStrings.end()) {
         return res->second;
     }
@@ -575,7 +652,7 @@ data_block emptyBlock(data_type outputType, data_type inputType = data_type::hel
                 case data_type::helics_complex_vector:
                     return helicsComplexVectorString(std::vector<std::complex<double>>());
                 case data_type::helics_named_point:
-                    return "{\"\":0}";
+                    return "0";
             }
         case data_type::helics_complex_vector: {
             return ValueConverter<std::vector<std::complex<double>>>::convert(

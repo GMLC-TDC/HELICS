@@ -68,13 +68,12 @@ class ValueFederateManager {
     ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id);
     ~ValueFederateManager();
 
-    Publication& registerPublication(const std::string& key,
-                                     const std::string& type,
-                                     const std::string& units);
+    Publication&
+        registerPublication(const std::string& key, std::string type, const std::string& units);
     /** register a subscription
     @details call is only valid in startup mode
     */
-    Input& registerInput(const std::string& key, const std::string& type, const std::string& units);
+    Input& registerInput(const std::string& key, std::string type, const std::string& units);
 
     /** add a shortcut for locating a subscription
     @details primarily for use in looking up an id from a different location

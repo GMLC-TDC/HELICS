@@ -726,7 +726,7 @@ void runFederateTestVectorD(const char* core,
     buf.resize(static_cast<size_t>(actualLen) + 2);
     CE(helicsInputGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen, &err));
     buf.resize(static_cast<size_t>(actualLen) - 1);
-    EXPECT_EQ(buf[0], 'v');
+    EXPECT_EQ(buf[0], '[');
     EXPECT_EQ(buf.back(), ']');
 
     // publish a second vector
