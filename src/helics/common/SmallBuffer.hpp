@@ -4,16 +4,18 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <string>
+#pragma once
+
 #include <array>
 #include <cstddef>
+#include <string>
 #include <string_view>
-
+#include <utility>
 
 namespace helics {
 class SmallBuffer {
   public:
-    SmallBuffer() noexcept: heap(buffer.data()){};
+    SmallBuffer() noexcept: heap(buffer.data()) {}
 
     SmallBuffer(const SmallBuffer& sb);
     SmallBuffer(SmallBuffer&& sb) noexcept;
@@ -24,7 +26,7 @@ class SmallBuffer {
     SmallBuffer& operator=(SmallBuffer&& sb) noexcept;
     SmallBuffer& operator=(std::string_view val);
     /** return a pointer to the data location*/
-    std::byte* data() const { return heap;}
+    std::byte* data() const { return heap; }
     /** get the start of the data*/
     std::byte* begin() { return heap; }
     /** end iterator*/
@@ -34,29 +36,26 @@ class SmallBuffer {
     /** get a const end iterator*/
     const std::byte* end() const { return heap + bufferSize; }
     /** get an element*/
-    std::byte operator[](size_t index) const{ return heap[index]; }
+    std::byte operator[](size_t index) const { return heap[index]; }
     /** get an assignable reference to an element*/
-    std::byte & operator[](size_t index) { return heap[index]; }
+    std::byte& operator[](size_t index) { return heap[index]; }
+    /** assign some data to the SmallBuffer*/
+    void assign(const void* start, const void* end);
+    void assign(const void* start, std::size_t size);
+    void append(const void* start, const void* end);
+    void append(const void* start, std::size_t size);
     /** interpret the data as a string*/
     std::string_view to_string() const
     {
         return std::string_view{reinterpret_cast<const char*>(heap), bufferSize};
     }
-    void moveAssign(void* data, std::size_t size, std::size_t capacity) { heap = reinterpret_cast<std::byte*>(data);
-        bufferCapacity = capacity;
-        bufferSize = size;
-    }
-
-    void spanAssign(void* data, std::size_t size, std::size_t capacity)
-    {
-        heap = reinterpret_cast<std::byte*>(data);
-        bufferCapacity = capacity;
-        bufferSize = size;
-        nonOwning = true;
-    }
+    /** move raw memory into the buffer and give it a preallocated buffer*/
+    void moveAssign(void* data, std::size_t size, std::size_t capacity);
+    /** use other managed memory */
+    void spanAssign(void* data, std::size_t size, std::size_t capacity);
     void resize(size_t size);
     void resize(size_t size, std::byte val);
-    void reserve(size_t reserve);
+    void reserve(size_t size);
     /** check if the buffer is empty*/
     bool empty() const { return (bufferSize == 0); }
     /** get the current size of the buffer*/
@@ -66,14 +65,18 @@ class SmallBuffer {
     /** clear the buffer*/
     void clear() { bufferSize = 0; }
 
-    private:
+    /** swap function */
+    void swap(SmallBuffer& sb2) noexcept;
+    /** release the memory from ownership */
+    std::byte* release();
+  private:
     std::array<std::byte, 64> buffer{};
     std::size_t bufferSize{0};
     std::size_t bufferCapacity{64};
     std::byte* heap;
     bool nonOwning{false};
+    bool usingAllocatedBuffer{false};
 };
-
 
 /** operator to check if small buffers are equal to eachother*/
 inline bool operator==(const SmallBuffer& sb1, const SmallBuffer& sb2)
@@ -86,4 +89,4 @@ inline bool operator!=(const SmallBuffer& sb1, const SmallBuffer& sb2)
 {
     return (sb1.to_string() != sb2.to_string());
 }
-}
+}  // namespace helics

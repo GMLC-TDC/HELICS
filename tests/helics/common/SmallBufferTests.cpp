@@ -215,10 +215,59 @@ TEST(small_buffer_tests, move_constructor)
 }
 
 
+TEST(small_buffer_tests, move_assign)
+{
+    SmallBuffer sb1(std::string(400, 'a'));
+    EXPECT_EQ(sb1[234], std::byte{'a'});
+    SmallBuffer sb2;
+    EXPECT_TRUE(sb2.empty());
+    sb2 = std::move(sb1);
+    EXPECT_EQ(sb2[219], std::byte{'a'});
+    EXPECT_EQ(sb2.size(), 400U);
+}
+
+TEST(small_buffer_tests, move_assign2)
+{
+    SmallBuffer sb1(std::string(16, 'a'));
+    EXPECT_EQ(sb1[13], std::byte{'a'});
+    SmallBuffer sb2;
+    EXPECT_TRUE(sb2.empty());
+    sb2 = std::move(sb1);
+    EXPECT_EQ(sb2[11], std::byte{'a'});
+}
+
+TEST(small_buffer_tests, move_assign_full)
+{
+    SmallBuffer sb1(std::string(400, 'a'));
+    EXPECT_EQ(sb1[234], std::byte{'a'});
+    SmallBuffer sb2(std::string(36223, 'b'));
+    EXPECT_EQ(sb2.size(), 36223);
+    sb2 = std::move(sb1);
+    EXPECT_EQ(sb2[219], std::byte{'a'});
+}
+
+TEST(small_buffer_tests, move_assign_full2)
+{
+    SmallBuffer sb1(std::string(16, 'a'));
+    EXPECT_EQ(sb1[13], std::byte{'a'});
+    SmallBuffer sb2(std::string(36223, 'b'));
+    EXPECT_EQ(sb2.size(), 36223);
+    sb2 = std::move(sb1);
+    EXPECT_EQ(sb2[11], std::byte{'a'});
+}
+
+TEST(small_buffer_tests, move_assign_self)
+{
+    SmallBuffer sb1(std::string(36214, 'e'));
+    EXPECT_EQ(sb1.size(), 36214);
+    sb1 = std::move(sb1);
+    EXPECT_EQ(sb1[11], std::byte{'e'}); // NOLINT
+}
+
 TEST(small_buffer_tests, buffer_transfer)
 {
     SmallBuffer sb1;
-    std::byte* buffer = new std::byte[5000];
+    auto* buffer = new std::byte[5000];
 
     sb1.moveAssign(buffer, 4567, 5000);
     EXPECT_EQ(sb1.size(), 4567U);
@@ -228,6 +277,34 @@ TEST(small_buffer_tests, buffer_transfer)
     EXPECT_EQ(buffer[27], std::byte{15});
     //the SMallbuffer should take care of deletion
 
+}
+
+TEST(small_buffer_tests, buffer_transfer_full)
+{
+    SmallBuffer sb1(std::string(2354, 'b'));
+    auto* buffer = new std::byte[5000];
+
+    sb1.moveAssign(buffer, 4567, 5000);
+    EXPECT_EQ(sb1.size(), 4567U);
+    EXPECT_EQ(sb1.capacity(), 5000);
+    sb1[27] = std::byte{15};
+
+    EXPECT_EQ(buffer[27], std::byte{15});
+    // the SMallbuffer should take care of deletion
+}
+
+TEST(small_buffer_tests, buffer_transfer_self_assign)
+{
+    SmallBuffer sb1(std::string(2354, 'b'));
+    
+    sb1.moveAssign(sb1.data(), 2314, 2354);
+    EXPECT_EQ(sb1.size(), 2314U);
+    EXPECT_GE(sb1.capacity(), 2354);
+    sb1[27] = std::byte{15};
+
+    EXPECT_EQ(sb1[27], std::byte{15});
+    EXPECT_EQ(sb1[20], std::byte{'b'});
+    // the SMallbuffer should take care of deletion
 }
 
 TEST(small_buffer_tests, buffer_borrow)
@@ -242,5 +319,155 @@ TEST(small_buffer_tests, buffer_borrow)
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(buffer[27], std::byte{15});
-    // the SMallbuffer should not delete the object
+    // the Smallbuffer should not delete the object
+}
+
+TEST(small_buffer_tests, buffer_borrow_full)
+{
+    SmallBuffer sb1(std::string(2354, 'b'));
+    std::vector<std::byte> buffer;
+    buffer.resize(5000);
+
+    sb1.spanAssign(buffer.data(), 4567, 5000);
+    EXPECT_EQ(sb1.size(), 4567U);
+    EXPECT_EQ(sb1.capacity(), 5000);
+    sb1[27] = std::byte{15};
+
+    EXPECT_EQ(buffer[27], std::byte{15});
+    // the Smallbuffer should not delete the object
+}
+
+
+TEST(small_buffer_tests, buffer_borrow_self_assign)
+{
+    SmallBuffer sb1(std::string(2354, 'b'));
+
+    sb1.spanAssign(sb1.data(), 1986,2000);
+    EXPECT_EQ(sb1.size(), 1986U);
+    EXPECT_GE(sb1.capacity(), 2000);
+    sb1[27] = std::byte{15};
+
+    EXPECT_EQ(sb1[27], std::byte{15});
+    EXPECT_EQ(sb1[20], std::byte{'b'});
+    // this should trigger self assignment detection
+}
+
+
+TEST(small_buffer_tests, assign)
+{
+    SmallBuffer sb1;
+    std::string t1(3634, 'g');
+    sb1.assign(t1.data(), t1.data() + t1.size());
+    EXPECT_EQ(t1.size(), sb1.size());
+    EXPECT_EQ(sb1[3333], std::byte{'g'});
+}
+
+TEST(small_buffer_tests, assign_size)
+{
+    SmallBuffer sb1;
+    std::string t1(3615, 'q');
+    sb1.assign(t1.data(), t1.size());
+    EXPECT_EQ(t1.size(), sb1.size());
+    EXPECT_EQ(sb1[3333], std::byte{'q'});
+}
+
+
+TEST(small_buffer_tests, append)
+{
+    SmallBuffer sb1;
+    std::string t1(3634, 'g');
+    std::string t2(1516, 'k');
+    sb1.append(t1.data(), t1.data() + t1.size());
+    sb1.append(t2.data(), t2.data() + t2.size());
+    EXPECT_EQ(t1.size()+t2.size(), sb1.size());
+    EXPECT_EQ(sb1[3333], std::byte{'g'});
+    EXPECT_EQ(sb1[3634], std::byte{'k'});
+}
+
+TEST(small_buffer_tests, append_size)
+{
+    SmallBuffer sb1;
+    std::string t1(3634, 'r');
+    std::string t2(1516, 't');
+    sb1.append(t1.data(), t1.size());
+    sb1.append(t2.data(), t2.size());
+    EXPECT_EQ(t1.size() + t2.size(), sb1.size());
+    EXPECT_EQ(sb1[3333], std::byte{'r'});
+    EXPECT_EQ(sb1[3634], std::byte{'t'});
+}
+
+TEST(small_buffer_tests, swap1)
+{
+    constexpr std::string_view testString("this is a test");
+    SmallBuffer sb1;
+    SmallBuffer sb2(testString);
+    sb1.swap(sb2);
+    EXPECT_TRUE(sb2.empty());
+    EXPECT_EQ(sb1.to_string(), testString);
+}
+
+
+TEST(small_buffer_tests, swap2)
+{
+    const std::string testString(21514, 'c');
+    SmallBuffer sb1;
+    SmallBuffer sb2(testString);
+    sb1.swap(sb2);
+    EXPECT_TRUE(sb2.empty());
+    EXPECT_EQ(sb1.to_string(), testString);
+}
+
+TEST(small_buffer_tests, swap3)
+{
+    const std::string testString1(21514, 'c');
+    const std::string testString2(3453, 'e');
+    SmallBuffer sb1(testString1);
+    SmallBuffer sb2(testString2);
+    sb1.swap(sb2);
+    EXPECT_EQ(sb2.to_string(), testString1);
+    EXPECT_EQ(sb1.to_string(), testString2);
+}
+
+TEST(small_buffer_tests, swap4)
+{
+    const std::string testString(21514, 'c');
+    SmallBuffer sb1;
+    SmallBuffer sb2(testString);
+    sb2.swap(sb1);
+    EXPECT_TRUE(sb2.empty());
+    EXPECT_EQ(sb1.to_string(), testString);
+}
+
+
+TEST(small_buffer_tests, swap5)
+{
+    const std::string testString(21514, 'c');
+    SmallBuffer sb1;
+    std::vector<std::byte> buffer;
+    buffer.resize(5000);
+
+    sb1.spanAssign(buffer.data(), 4567, 5000);
+
+    SmallBuffer sb2(testString);
+    sb2.swap(sb1);
+    EXPECT_EQ(sb2.size(),4567U);
+    EXPECT_EQ(sb1.to_string(), testString);
+}
+
+TEST(small_buffer_tests, release)
+{
+    auto* sb1 = new SmallBuffer(std::string(1562268, 'f'));
+
+    EXPECT_EQ(sb1->size(), 1562268U);
+    (*sb1)[57515] = std::byte{'q'};
+
+    auto* buffer = sb1->release();
+
+    buffer[13] = std::byte{'r'};
+    EXPECT_EQ(buffer[57515], std::byte{'q'});
+    EXPECT_EQ(buffer[13], std::byte{'r'});
+    delete sb1;
+    EXPECT_EQ(buffer[57515], std::byte{'q'});
+    EXPECT_EQ(buffer[13], std::byte{'r'});
+    delete[] buffer;
 }
