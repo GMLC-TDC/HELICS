@@ -19,6 +19,7 @@ set(common_headers
     addTargets.hpp
     configFileHelpers.hpp
     JsonGeneration.hpp
+    SmallBuffer.hpp
 )
 
 set(common_sources
@@ -29,6 +30,7 @@ set(common_sources
     loggerCore.cpp
     configFileHelpers.cpp
     addTargets.cpp
+    SmallBuffer.cpp
 )
 
 # headers that are part of the public interface
