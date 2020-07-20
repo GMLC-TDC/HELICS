@@ -30,7 +30,7 @@ There are a number of classes of HELICS users:
     logging
     webserver
     simulator_integration
-    configuration_options_reference
+    ../configuration_options_reference
 ```
 
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used

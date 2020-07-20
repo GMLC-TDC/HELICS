@@ -26,7 +26,7 @@ For any simulator that you didn't write for yourself, the most common way of con
 
 As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options and in [Timing section](./timing.md) we'll look at the timing parameters.
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [federate configuration](../configuration/Federate.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [federate configuration](../configuration_options_reference.md) guide.
 
 ### General Configuration Parameter
 

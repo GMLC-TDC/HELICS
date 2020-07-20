@@ -30,7 +30,7 @@ As a complement to the extensive listing of HELICS options and flags that can be
 
 ### Control_test.json
 
-[This configuration](../examples/example_files/Control_test.json) is pulled from one of the User Guide examples as it utilizes [endpoints](./user-guide/message_federates.md) (for communicating control signal messages), [filters](./user-guide/filters.md) (which can modify messages _en route_) and [subscriptions](./user-guide/value_federates.md) (for receiving value signals, in this case the load of the electric vehicle on the distribution system).
+[This configuration](https://github.com/GMLC-TDC/HELICS/blob/master/examples/example_files/Control_test.json) is pulled from one of the User Guide examples as it utilizes [endpoints](./user-guide/message_federates.md) (for communicating control signal messages), [filters](./user-guide/filters.md) (which can modify messages _en route_) and [subscriptions](./user-guide/value_federates.md) (for receiving value signals, in this case the load of the electric vehicle on the distribution system).
 
 ```json
 {
@@ -70,7 +70,7 @@ As a complement to the extensive listing of HELICS options and flags that can be
 
 ### example_combo_fed.json
 
-[This configuration](../examples/example_files/example_combo_fed.json) shows the extensive use of configuration flags and demonstrates their location in the JSON file. It also shows how to configure endpoints so they receive a message every time a value signal is updated in the federation and how the info field is constructed (necessary for some simulators to use HELICS data properly).
+[This configuration](https://github.com/GMLC-TDC/HELICS/blob/master/examples/example_files/example_combo_fed.json) shows the extensive use of configuration flags and demonstrates their location in the JSON file. It also shows how to configure endpoints so they receive a message every time a value signal is updated in the federation and how the info field is constructed (necessary for some simulators to use HELICS data properly).
 
 ```json
 {
@@ -187,7 +187,7 @@ When an interface requests a target it tries to find a match in the federation. 
 
 ### `strict_input_type_checking` [false]
 
-Only applicable to Named Input interfaces ([see section on value federate interface types](./value_federates.md)), if enabled this flag checks that data type of the incoming signals match that specified for the input. (xxxxxxx - What happens if they don't match?)
+Only applicable to Named Input interfaces ([see section on value federate interface types](./user-guide/value_federates.md)), if enabled this flag checks that data type of the incoming signals match that specified for the input. (xxxxxxx - What happens if they don't match?)
 
 ### `slow_responding` [false]
 

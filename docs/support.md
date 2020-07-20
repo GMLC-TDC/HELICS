@@ -5,7 +5,7 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 - [**Documentation**](https://docs.helics.org/en/latest/) - Though you're already here at the documentation site, the following pages may be of particular interest:
 
   - [Installation Guide](./installation/index.md) - Help with getting HELICS installed with the correct options for your particular use case
-  - [User Guide](./user_guide/index.md) - Comprehensive guide to understanding and using HELICS covering both the [fundamentals](./user_guide/co-simulation_overview.md) as well as more [advanced topics](./user_guide/broker_hierarchies.md).
+  - [User Guide](./user-guide/index.md) - Comprehensive guide to understanding and using HELICS covering both the [fundamentals](./user-guide/co-simulation_overview.md) as well as more [advanced topics](./user-guide/broker_hierarchies.md).
   - [API reference](./user_guide/index.md) - HELICS is written in C++ with many supported language bindings. The C++ Doxygen is the most comprehensive reference for the HELICS API
 
 - **User Forum (forthcoming)** - Once Github moves their forums feature out of beta we'll implement it to provide a space where user's can discuss their HELICS use cases and get support on how to use HELICS.
