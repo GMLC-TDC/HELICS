@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "SmallBuffer.hpp"
 
 #include <cstring>
+#include <stdexcept>
 
 namespace helics {
 
