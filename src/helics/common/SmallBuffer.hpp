@@ -69,6 +69,7 @@ class SmallBuffer {
     void swap(SmallBuffer& sb2) noexcept;
     /** release the memory from ownership */
     std::byte* release();
+
   private:
     std::array<std::byte, 64> buffer{};
     std::size_t bufferSize{0};
@@ -78,13 +79,13 @@ class SmallBuffer {
     bool usingAllocatedBuffer{false};
 };
 
-/** operator to check if small buffers are equal to eachother*/
+/** operator to check if small buffers are equal to each other*/
 inline bool operator==(const SmallBuffer& sb1, const SmallBuffer& sb2)
 {
     return (sb1.to_string() == sb2.to_string());
 }
 
-/** operator to check if small buffers are not equal to eachother*/
+/** operator to check if small buffers are not equal to each other*/
 inline bool operator!=(const SmallBuffer& sb1, const SmallBuffer& sb2)
 {
     return (sb1.to_string() != sb2.to_string());
