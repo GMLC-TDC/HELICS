@@ -22,7 +22,6 @@ TEST(small_buffer_tests, empty)
     EXPECT_EQ(sb.begin(), sb.end());
 }
 
-
 TEST(small_buffer_tests, resize)
 {
     SmallBuffer sb;
@@ -32,23 +31,21 @@ TEST(small_buffer_tests, resize)
     EXPECT_EQ(sb.size(), 135121);
     sb.resize(1541);
     EXPECT_EQ(sb.size(), 1541);
-
 }
-
 
 TEST(small_buffer_tests, resize_assign)
 {
     SmallBuffer sb;
     sb.resize(37, std::byte{34});
     EXPECT_EQ(sb.size(), 37U);
-    for (auto be:sb) {
+    for (auto be : sb) {
         EXPECT_EQ(be, std::byte{34});
     }
 
     sb.resize(182, std::byte{36});
     EXPECT_EQ(sb.size(), 182U);
-    for (std::size_t ii=0;ii<sb.size();++ii) {
-        if (ii<37) {
+    for (std::size_t ii = 0; ii < sb.size(); ++ii) {
+        if (ii < 37) {
             EXPECT_EQ(sb[ii], std::byte{34});
         } else {
             EXPECT_EQ(sb[ii], std::byte{36});
@@ -56,7 +53,8 @@ TEST(small_buffer_tests, resize_assign)
     }
 }
 
-TEST(small_buffer_tests, index_assign) {
+TEST(small_buffer_tests, index_assign)
+{
     SmallBuffer sb;
     sb.resize(45);
     sb[23] = std::byte{5};
@@ -75,10 +73,9 @@ TEST(small_buffer_tests, string_construct)
 
 TEST(small_buffer_tests, string_construct2)
 {
-    SmallBuffer sb("test111111",5);
+    SmallBuffer sb("test111111", 5);
     EXPECT_EQ(sb.to_string(), "test1");
 }
-
 
 TEST(small_buffer_tests, string_assign)
 {
@@ -97,30 +94,27 @@ TEST(small_buffer_tests, string_assign2)
     EXPECT_EQ(ts, testStr);
 }
 
-
 TEST(small_buffer_tests, capacity)
 {
     SmallBuffer sb;
     sb.reserve(450);
-    EXPECT_GE(sb.capacity(),450);
+    EXPECT_GE(sb.capacity(), 450);
     sb.reserve(12514);
     EXPECT_GE(sb.capacity(), 12514);
     sb.reserve(400);
     EXPECT_GE(sb.capacity(), 12514);
 }
 
-
 TEST(small_buffer_tests, equality)
 {
     SmallBuffer sb1("string test 1");
     SmallBuffer sb2("string test 2");
-    EXPECT_FALSE(sb1==sb2);
+    EXPECT_FALSE(sb1 == sb2);
     EXPECT_TRUE(sb1 != sb2);
     SmallBuffer sb3("string test 1");
     EXPECT_EQ(sb1, sb3);
     EXPECT_NE(sb2, sb3);
 }
-
 
 TEST(small_buffer_tests, iterators)
 {
@@ -135,14 +129,13 @@ TEST(small_buffer_tests, iterators)
     std::string b3(reinterpret_cast<const char*>(sb2.begin()),
                    reinterpret_cast<const char*>(sb2.end()));
     EXPECT_EQ(b3.size(), 9U);
-    //first 9 elements of the string
+    // first 9 elements of the string
     EXPECT_EQ(b3, "string te");
 }
 
-
 TEST(small_buffer_tests, copy_constructor)
 {
-    SmallBuffer sb1(std::string(400,'a'));
+    SmallBuffer sb1(std::string(400, 'a'));
     EXPECT_EQ(sb1[234], std::byte{'a'});
     SmallBuffer sb2(sb1);
 
@@ -159,7 +152,6 @@ TEST(small_buffer_tests, copy_constructor2)
     EXPECT_EQ(sb1, sb2);
     EXPECT_EQ(sb2[11], std::byte{'a'});
 }
-
 
 TEST(small_buffer_tests, copy_assign)
 {
@@ -188,7 +180,7 @@ TEST(small_buffer_tests, copy_assign_full)
     SmallBuffer sb1(std::string(400, 'a'));
     EXPECT_EQ(sb1[234], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(),36223);
+    EXPECT_EQ(sb2.size(), 36223);
     sb2 = sb1;
     EXPECT_EQ(sb1, sb2);
     EXPECT_EQ(sb2[219], std::byte{'a'});
@@ -213,7 +205,6 @@ TEST(small_buffer_tests, move_constructor)
 
     EXPECT_EQ(sb2[219], std::byte{'a'});
 }
-
 
 TEST(small_buffer_tests, move_assign)
 {
@@ -261,7 +252,7 @@ TEST(small_buffer_tests, move_assign_self)
     SmallBuffer sb1(std::string(36214, 'e'));
     EXPECT_EQ(sb1.size(), 36214);
     sb1 = std::move(sb1);
-    EXPECT_EQ(sb1[11], std::byte{'e'}); // NOLINT
+    EXPECT_EQ(sb1[11], std::byte{'e'});  // NOLINT
 }
 
 TEST(small_buffer_tests, buffer_transfer)
@@ -275,8 +266,7 @@ TEST(small_buffer_tests, buffer_transfer)
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(buffer[27], std::byte{15});
-    //the SMallbuffer should take care of deletion
-
+    // the SMallbuffer should take care of deletion
 }
 
 TEST(small_buffer_tests, buffer_transfer_full)
@@ -296,7 +286,7 @@ TEST(small_buffer_tests, buffer_transfer_full)
 TEST(small_buffer_tests, buffer_transfer_self_assign)
 {
     SmallBuffer sb1(std::string(2354, 'b'));
-    
+
     sb1.moveAssign(sb1.data(), 2314, 2354);
     EXPECT_EQ(sb1.size(), 2314U);
     EXPECT_GE(sb1.capacity(), 2354);
@@ -337,12 +327,11 @@ TEST(small_buffer_tests, buffer_borrow_full)
     // the Smallbuffer should not delete the object
 }
 
-
 TEST(small_buffer_tests, buffer_borrow_self_assign)
 {
     SmallBuffer sb1(std::string(2354, 'b'));
 
-    sb1.spanAssign(sb1.data(), 1986,2000);
+    sb1.spanAssign(sb1.data(), 1986, 2000);
     EXPECT_EQ(sb1.size(), 1986U);
     EXPECT_GE(sb1.capacity(), 2000);
     sb1[27] = std::byte{15};
@@ -351,7 +340,6 @@ TEST(small_buffer_tests, buffer_borrow_self_assign)
     EXPECT_EQ(sb1[20], std::byte{'b'});
     // this should trigger self assignment detection
 }
-
 
 TEST(small_buffer_tests, assign)
 {
@@ -371,7 +359,6 @@ TEST(small_buffer_tests, assign_size)
     EXPECT_EQ(sb1[3333], std::byte{'q'});
 }
 
-
 TEST(small_buffer_tests, append)
 {
     SmallBuffer sb1;
@@ -379,7 +366,7 @@ TEST(small_buffer_tests, append)
     std::string t2(1516, 'k');
     sb1.append(t1.data(), t1.data() + t1.size());
     sb1.append(t2.data(), t2.data() + t2.size());
-    EXPECT_EQ(t1.size()+t2.size(), sb1.size());
+    EXPECT_EQ(t1.size() + t2.size(), sb1.size());
     EXPECT_EQ(sb1[3333], std::byte{'g'});
     EXPECT_EQ(sb1[3634], std::byte{'k'});
 }
@@ -405,7 +392,6 @@ TEST(small_buffer_tests, swap1)
     EXPECT_TRUE(sb2.empty());
     EXPECT_EQ(sb1.to_string(), testString);
 }
-
 
 TEST(small_buffer_tests, swap2)
 {
@@ -438,7 +424,6 @@ TEST(small_buffer_tests, swap4)
     EXPECT_EQ(sb1.to_string(), testString);
 }
 
-
 TEST(small_buffer_tests, swap5)
 {
     const std::string testString(21514, 'c');
@@ -450,7 +435,7 @@ TEST(small_buffer_tests, swap5)
 
     SmallBuffer sb2(testString);
     sb2.swap(sb1);
-    EXPECT_EQ(sb2.size(),4567U);
+    EXPECT_EQ(sb2.size(), 4567U);
     EXPECT_EQ(sb1.to_string(), testString);
 }
 

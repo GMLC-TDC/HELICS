@@ -55,7 +55,7 @@ SmallBuffer::SmallBuffer(const void* data, size_t size): heap(buffer.data())
 
 SmallBuffer& SmallBuffer::operator=(const SmallBuffer& sb)
 {
-    if (this==&sb) {
+    if (this == &sb) {
         return *this;
     }
     resize(sb.size());
@@ -65,7 +65,7 @@ SmallBuffer& SmallBuffer::operator=(const SmallBuffer& sb)
 
 SmallBuffer& SmallBuffer::operator=(std::string_view val)
 {
-    if (reinterpret_cast<const std::byte *>(val.data())==heap) {
+    if (reinterpret_cast<const std::byte*>(val.data()) == heap) {
         bufferSize = val.size();
         return *this;
     }
@@ -90,7 +90,6 @@ SmallBuffer& SmallBuffer::operator=(SmallBuffer&& sb) noexcept
             }
             delete[] heap;
         }
-        
     }
     if (sb.usingAllocatedBuffer) {
         heap = sb.heap;
@@ -112,7 +111,8 @@ SmallBuffer& SmallBuffer::operator=(SmallBuffer&& sb) noexcept
     return *this;
 }
 
-std::byte* SmallBuffer::release() {
+std::byte* SmallBuffer::release()
+{
     if (!usingAllocatedBuffer) {
         return nullptr;
     }
@@ -129,7 +129,7 @@ void SmallBuffer::moveAssign(void* data, std::size_t size, std::size_t capacity)
 {
     auto* newHeap = reinterpret_cast<std::byte*>(data);
     if (usingAllocatedBuffer && !nonOwning) {
-        if (newHeap!=heap) {
+        if (newHeap != heap) {
             delete[] heap;
         }
     }
@@ -145,7 +145,7 @@ void SmallBuffer::spanAssign(void* data, std::size_t size, std::size_t capacity)
     auto* newHeap = reinterpret_cast<std::byte*>(data);
     if (usingAllocatedBuffer && !nonOwning) {
         if (newHeap == heap) {
-            //if the heaps are the same the only thing to change is the size and capacity
+            // if the heaps are the same the only thing to change is the size and capacity
             // don't change the other characteristics
             bufferSize = size;
             bufferCapacity = capacity;
