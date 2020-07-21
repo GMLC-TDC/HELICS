@@ -1987,7 +1987,7 @@ void CoreBroker::executeInitializationOperations()
     if (res == message_processing_result::next_step) {
         enteredExecutionMode = true;
     }
-    loggingObj->flush();
+    logFlush();
 }
 
 void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)

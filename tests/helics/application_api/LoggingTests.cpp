@@ -44,11 +44,27 @@ TEST(logging_tests, basic_logging)
 
 TEST(logging_tests, file_logging)
 {
+    const std::string lfilename = "logfile.txt";
+    if (ghc::filesystem::exists(lfilename))
+    {
+        std::error_code ec;
+        bool res = ghc::filesystem::remove(lfilename, ec);
+        int ii = 0;
+        while (!res) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            res = ghc::filesystem::remove(lfilename, ec);
+            ++ii;
+            if (ii > 15) {
+                break;
+            }
+        }
+        EXPECT_TRUE(res);
+    }
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=5";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
-    const std::string lfilename = "logfile.txt";
+    
     Fed->enterExecutingMode();
     Fed->finalize();
     auto cr = Fed->getCorePointer();
@@ -59,27 +75,32 @@ TEST(logging_tests, file_logging)
     cr.reset();
     helics::cleanupHelicsLibrary();
     std::error_code ec;
-    bool res = ghc::filesystem::remove(lfilename, ec);
-    int ii = 0;
-    while (!res) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        res = ghc::filesystem::remove(lfilename, ec);
-        ++ii;
-        if (ii > 15) {
-            break;
-        }
-    }
-    EXPECT_TRUE(res);
+    ghc::filesystem::remove(lfilename, ec);
 }
 
 TEST(logging_tests, file_logging_p2)
 {
+    const std::string lfilename = "logfile2.txt";
+    if (ghc::filesystem::exists(lfilename)) {
+        std::error_code ec;
+        bool res = ghc::filesystem::remove(lfilename, ec);
+        int ii = 0;
+        while (!res) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            res = ghc::filesystem::remove(lfilename, ec);
+            ++ii;
+            if (ii > 15) {
+                break;
+            }
+        }
+        EXPECT_TRUE(res);
+    }
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker --fileloglevel=5";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
     auto cr = Fed->getCorePointer();
-    const std::string lfilename = "logfile2.txt";
+    
     cr->setLogFile(lfilename);
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -90,17 +111,7 @@ TEST(logging_tests, file_logging_p2)
     cr.reset();
     helics::cleanupHelicsLibrary();
     std::error_code ec;
-    bool res = ghc::filesystem::remove(lfilename, ec);
-    int ii = 0;
-    while (!res) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        res = ghc::filesystem::remove(lfilename, ec);
-        ++ii;
-        if (ii > 15) {
-            break;
-        }
-    }
-    EXPECT_TRUE(res);
+    ghc::filesystem::remove(lfilename, ec);
 }
 
 TEST(logging_tests, check_log_message)
