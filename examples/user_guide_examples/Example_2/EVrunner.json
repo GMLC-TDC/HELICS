@@ -2,17 +2,22 @@
   "federates": [
     {
       "directory": ".",
-      "exec": "python -u EV0.py 1",
+      "exec": "python3 -u EV0.py 127.0.0.1",
       "host": "localhost",
       "name": "EV_federate"
     },
     {
       "directory": ".",
-      "exec": "python -u EVController0.py 1",
+      "exec": "python3 -u EVController0.py 127.0.0.1",
       "host": "localhost",
       "name": "EVController_federate"
+    },
+    {
+      "directory": ".",
+      "exec": "helics_broker --federates 2",
+      "host": "localhost",
+      "name": "TheBroker"
     }
-
   ],
   "name": "EV_toy"
 }
