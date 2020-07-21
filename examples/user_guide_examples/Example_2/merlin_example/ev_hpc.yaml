@@ -1,0 +1,105 @@
+description:
+    name: Ev Charging simulation
+    description: Prelim merlin spec for EV uncertainty quanrification
+
+env:
+  variables:
+    OUTPUT_PATH: output
+    N_SAMPLES: 2
+    ITER: 1
+    MAX_ITER: 5
+
+batch:
+   type: slurm
+   bank: naerm
+   queue: pdebug
+   shell: /bin/bash
+   nodes: 5
+
+
+study:
+    - name: start_broker
+      description: start the helics broker
+      run:
+        cmd: |
+          source /usr/WS2/yee29/spack/share/spack/setup-env.sh
+          spack load helics
+
+          $(LAUNCHER) hostname -I ; hostname -I | awk '{print $1}' > $(MERLIN_INFO)/broker.ip ; helics_app broker --external --federates $(N_SAMPLES)
+          echo "DONE"
+        nodes: 1
+        procs: 1
+
+    - name: start_EV
+      description: Start the EV sim
+      run:
+        cmd: |
+          source /usr/WS2/yee29/spack/share/spack/setup-env.sh
+          spack load helics
+
+          while [ ! -f "$(MERLIN_INFO)/broker.ip" ] ; do sleep 1 ; done
+          $(LAUNCHER) python3 $(MERLIN_INFO)/EV0.py $(cat $(MERLIN_INFO)/broker.ip)
+        nodes: 1
+        procs: 1
+
+    - name: start_EV_Controller
+      description: Start the EV Controller sim
+      run:
+        cmd: |
+          source /usr/WS2/yee29/spack/share/spack/setup-env.sh
+          spack load helics
+
+          while [ ! -f "$(MERLIN_INFO)/broker.ip" ] ; do sleep 1 ; done
+          $(LAUNCHER) python3 $(MERLIN_INFO)/EVController0.py $(cat $(MERLIN_INFO)/broker.ip)
+        nodes: 1
+        procs: 1
+
+    - name: Analysis
+      description: Analysis
+      run:
+        cmd: |
+          echo "Analysis"
+          rm -fr $(SPECROOT)/empty.csv
+          
+        nodes: 1
+        procs: 1
+        depends: [start_EV_*, start_EV_Controller_*]
+
+    - name: run-samples-again
+      description: Criteria not met. Running analysis again
+      run:
+        cmd: |
+          if [ $(ITER) -ge $(MAX_ITER) ] ; then
+
+             echo "COMPLETE $(ITER)" > $(SPECROOT)/COMPLETE.merlin
+          else
+             next_iter=$(ITER)
+             ((next_iter=next_iter+1))
+             echo "Starting iteration " $next_iter
+             cd $(SPECROOT)
+             merlin run $(SPECROOT)/ev_hpc.yaml --vars ITER=$next_iter
+          fi
+        nodes: 1
+        procs: 1
+        depends: [Analysis]
+          
+merlin:
+  resources:
+    task_server: celery
+    overlap: False
+    workers:
+        nameworkers:
+            args: --concurrency 36 --prefetch-multiplier 3
+            steps: [start_broker, start_EV, start_EV_Controller]
+            nodes: 2
+            machines: [quartz]
+
+  samples:
+    generate:
+      cmd: |
+        echo "0" > empty.csv
+        cp -r $(SPECROOT)/EV0.py $(MERLIN_INFO)
+        cp -r $(SPECROOT)/EVController0.py $(MERLIN_INFO)
+    file: empty.csv
+    column_labels: [empty]
+

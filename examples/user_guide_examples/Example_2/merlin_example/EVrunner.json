@@ -1,0 +1,18 @@
+{
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python3 -u EV0.py 1",
+      "host": "localhost",
+      "name": "EV_federate"
+    },
+    {
+      "directory": ".",
+      "exec": "python3 -u EVController0.py 1",
+      "host": "localhost",
+      "name": "EVController_federate"
+    }
+
+  ],
+  "name": "EV_toy"
+}
