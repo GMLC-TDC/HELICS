@@ -44,7 +44,7 @@ There are a number of classes of HELICS users:
 - [**Getting Information from a running simulation**](./webserver.md) - Getting live information from a running co-simulation through a webserver.
 - [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 - **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
-- [**Configuration Options Reference**](./configuration_options_reference.md) - Comprehensive reference to all the HELICS configuration options.
+- [Configuration Options Reference](../configuration_options_reference.md) - Comprehensive reference to all the HELICS configuration options.
 
 ## Advanced Topics
 
