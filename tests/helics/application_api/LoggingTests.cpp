@@ -31,9 +31,10 @@ TEST(logging_tests, basic_logging)
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback([&mlog](int level, const std::string& /*unused*/, const std::string& message) {
-        mlog.lock()->emplace_back(level, message);
-    });
+    Fed->setLoggingCallback(
+        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+            mlog.lock()->emplace_back(level, message);
+        });
     Fed->logMessage(3, "test log message");
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -44,8 +45,7 @@ TEST(logging_tests, basic_logging)
 TEST(logging_tests, file_logging)
 {
     const std::string lfilename = "logfile.txt";
-    if (ghc::filesystem::exists(lfilename))
-    {
+    if (ghc::filesystem::exists(lfilename)) {
         std::error_code ec;
         bool res = ghc::filesystem::remove(lfilename, ec);
         int ii = 0;
@@ -63,7 +63,7 @@ TEST(logging_tests, file_logging)
     fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=5";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
-    
+
     Fed->enterExecutingMode();
     Fed->finalize();
     auto cr = Fed->getCorePointer();
@@ -99,7 +99,7 @@ TEST(logging_tests, file_logging_p2)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
     auto cr = Fed->getCorePointer();
-    
+
     cr->setLogFile(lfilename);
     Fed->enterExecutingMode();
     Fed->finalize();
@@ -124,8 +124,8 @@ TEST(logging_tests, check_log_message)
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
         [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
-        mlog.lock()->emplace_back(level, message);
-    });
+            mlog.lock()->emplace_back(level, message);
+        });
 
     Fed->enterExecutingMode();
     Fed->logInfoMessage("test MEXAGE");
@@ -153,8 +153,8 @@ TEST(logging_tests, check_log_message_functions)
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
         [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
-        mlog.lock()->emplace_back(level, message);
-    });
+            mlog.lock()->emplace_back(level, message);
+        });
 
     Fed->enterExecutingMode();
     Fed->logErrorMessage("test ERROR");
@@ -201,8 +201,8 @@ TEST(logging_tests, check_log_message_levels)
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
         [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
-        mlog.lock()->emplace_back(level, message);
-    });
+            mlog.lock()->emplace_back(level, message);
+        });
 
     Fed->enterExecutingMode();
     Fed->logMessage(3, "test MEXAGE1");
@@ -235,8 +235,8 @@ TEST(logging_tests, check_log_message_levels_high)
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
         [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
-        mlog.lock()->emplace_back(level, message);
-    });
+            mlog.lock()->emplace_back(level, message);
+        });
 
     Fed->enterExecutingMode();
     Fed->logMessage(3, "test MEXAGE1");

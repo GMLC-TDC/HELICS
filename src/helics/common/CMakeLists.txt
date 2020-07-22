@@ -18,12 +18,8 @@ set(common_headers
     configFileHelpers.hpp
 )
 
-set(common_sources
-    JsonProcessingFunctions.cpp
-    JsonBuilder.cpp
-    TomlProcessingFunctions.cpp
-    configFileHelpers.cpp
-    addTargets.cpp
+set(common_sources JsonProcessingFunctions.cpp JsonBuilder.cpp TomlProcessingFunctions.cpp
+                   configFileHelpers.cpp addTargets.cpp
 )
 
 # headers that are part of the public interface

@@ -28,5 +28,5 @@
     path = ThirdParty/netif
     url = https://github.com/GMLC-TDC/netif.git
 [submodule "ThirdParty/spdlog"]
-	path = ThirdParty/spdlog
-	url = https://github.com/gabime/spdlog.git
+    path = ThirdParty/spdlog
+    url = https://github.com/gabime/spdlog.git

@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Tracer.hpp"
 
-#include <spdlog/spdlog.h>
 #include "../application_api/Filters.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
@@ -24,6 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <regex>
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
