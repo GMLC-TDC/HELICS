@@ -30,6 +30,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
+    /** encode the string in base64 if needed otherwise just return the string*/
+static std::string encode(const std::string& str2encode)
+{
+    return std::string("b64[") +
+        gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(str2encode.c_str()),
+                                       static_cast<int>(str2encode.size())) +
+        ']';
+}
+
 namespace helics {
 namespace apps {
     Clone::Clone(const std::string& appName, FederateInfo& fi): App(appName, fi)
@@ -250,14 +259,7 @@ namespace apps {
         }
     }
 
-    std::string Clone::encode(const std::string& str2encode)
-    {
-        return std::string("b64[") +
-            gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(
-                                               str2encode.c_str()),
-                                           static_cast<int>(str2encode.size())) +
-            ']';
-    }
+
 
     /** run the Player until the specified time*/
     void Clone::runTo(Time runToTime)
