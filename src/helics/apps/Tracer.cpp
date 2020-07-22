@@ -270,7 +270,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << valstr << '\n';
                     } else {
-                        spdlog::info(std::move(valstr));
+                        spdlog::info(valstr);
                     }
                 }
                 if (valueCallback) {
@@ -442,7 +442,7 @@ namespace apps {
             ->ignore_underscore();
         app->add_flag("--print", printMessage, "print messages to the screen");
         app->add_flag("--skiplog", skiplog, "print messages to the screen through cout");
-        auto clone_group = app->add_option_group(
+        auto* clone_group = app->add_option_group(
             "cloning", "Options related to endpoint cloning operations and specifications");
         clone_group->add_option("--clone", "existing endpoints to clone all packets to and from")
             ->each([this](const std::string& clone) {
@@ -471,7 +471,7 @@ namespace apps {
             ->ignore_underscore()
             ->type_size(-1);
 
-        auto capture_group = app->add_option_group(
+        auto* capture_group = app->add_option_group(
             "capture_group", "Options related to capturing publications, endpoints, or federates");
         capture_group
             ->add_option(

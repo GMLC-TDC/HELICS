@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #if !defined(WIN32)
 #    include "spdlog/sinks/syslog_sink.h"
 #endif
-#include "loggingHelper.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "../common/AsioContextManager.h"
