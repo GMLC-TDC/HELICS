@@ -29,6 +29,7 @@ enum log_level : int {
     timing = helics_log_level_timing,  //!< print interfaces+ timing(exec/grant/disconnect)
     data = helics_log_level_data,  //!< print timing+data transmissions
     trace = helics_log_level_trace,  //!< trace level printing (all processed messages)
+    fed = 99999  //!< special logging command for message coming from a fed
 };
 
 #define LOG_ERROR(id, ident, message) sendToLogger(id, log_level::error, ident, message)
