@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Tracer.hpp"
 
+#include <spdlog/spdlog.h>
 #include "../application_api/Filters.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "PrecHelper.hpp"
@@ -239,7 +239,6 @@ namespace apps {
 
     void Tracer::captureForCurrentTime(Time currentTime, int iteration)
     {
-        static auto logger = LoggerManager::getLoggerCore();
         for (auto& sub : subscriptions) {
             if (sub.isUpdated()) {
                 auto val = sub.getValue<std::string>();
@@ -271,7 +270,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << valstr << '\n';
                     } else {
-                        logger->addMessage(std::move(valstr));
+                        spdlog::info(std::move(valstr));
                     }
                 }
                 if (valueCallback) {
@@ -301,7 +300,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << messstr << '\n';
                     } else {
-                        logger->addMessage(std::move(messstr));
+                        spdlog::info(messstr);
                     }
                 }
                 if (endpointMessageCallback) {
@@ -332,7 +331,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << messstr << '\n';
                     } else {
-                        logger->addMessage(std::move(messstr));
+                        spdlog::info(messstr);
                     }
                 }
                 if (clonedMessageCallback) {

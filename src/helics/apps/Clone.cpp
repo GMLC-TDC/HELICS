@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/fmt_ostream.h"
-#include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
+#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <fstream>
@@ -201,7 +201,6 @@ namespace apps {
 
     void Clone::captureForCurrentTime(Time currentTime, int iteration)
     {
-        static auto logger = LoggerManager::getLoggerCore();
         for (auto& sub : subscriptions) {
             if (sub.isUpdated()) {
                 auto val = sub.getValue<std::string>();
@@ -234,7 +233,7 @@ namespace apps {
                                                  val.size());
                         }
                     }
-                    logger->addMessage(std::move(valstr));
+                    spdlog::info(valstr);
                 }
                 if (pubPointCount[ii] == 0) {
                     points.back().first = true;
