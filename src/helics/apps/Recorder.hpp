@@ -54,9 +54,9 @@ namespace apps {
         Recorder(const std::string& name, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param name the name of the app
-    @param file a file defining the federate information in JSon or text
+    @param jsonString a file or jsonString defining the federate information in JSON
     */
-        Recorder(const std::string& name, const std::string& file);
+        Recorder(const std::string& name, const std::string& jsonString);
         /** move construction*/
         Recorder(Recorder&& other_recorder) = default;
         /** move assignment*/
@@ -110,8 +110,7 @@ namespace apps {
         void generateInterfaces();
         void captureForCurrentTime(Time currentTime, int iteration = 0);
         void loadCaptureInterfaces();
-        /** encode the string in base64 if needed otherwise just return the string*/
-        std::string encode(const std::string& str2encode);
+
         /** build the command line argument processing application*/
         std::shared_ptr<helicsCLI11App> buildArgParserApp();
         /** process remaining command line arguments*/

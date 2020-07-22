@@ -5,11 +5,9 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "testFixtures.hpp"
-
-#include "helics/common/loggerCore.hpp"
+#include <spdlog/spdlog.h>
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-
 #include <cctype>
 #include <iostream>
 #include <string>
@@ -72,7 +70,7 @@ FederateTestFixture::~FederateTestFixture()
         }
 
         if (broker->isConnected()) {
-            helics::LoggerManager::logMessage("forcing disconnect");
+            spdlog::info("forcing disconnect");
             broker->disconnect();
         }
     }

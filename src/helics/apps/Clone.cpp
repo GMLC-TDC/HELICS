@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/fmt_ostream.h"
-#include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
+#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <fstream>
@@ -29,6 +29,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 #include <vector>
+
+    /** encode the string in base64 if needed otherwise just return the string*/
+static std::string encode(const std::string& str2encode)
+{
+    return std::string("b64[") +
+        gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(str2encode.c_str()),
+                                       static_cast<int>(str2encode.size())) +
+        ']';
+}
 
 namespace helics {
 namespace apps {
@@ -201,7 +210,6 @@ namespace apps {
 
     void Clone::captureForCurrentTime(Time currentTime, int iteration)
     {
-        static auto logger = LoggerManager::getLoggerCore();
         for (auto& sub : subscriptions) {
             if (sub.isUpdated()) {
                 auto val = sub.getValue<std::string>();
@@ -234,7 +242,7 @@ namespace apps {
                                                  val.size());
                         }
                     }
-                    logger->addMessage(std::move(valstr));
+                    spdlog::info(valstr);
                 }
                 if (pubPointCount[ii] == 0) {
                     points.back().first = true;
@@ -251,14 +259,7 @@ namespace apps {
         }
     }
 
-    std::string Clone::encode(const std::string& str2encode)
-    {
-        return std::string("b64[") +
-            gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(
-                                               str2encode.c_str()),
-                                           static_cast<int>(str2encode.size())) +
-            ']';
-    }
+
 
     /** run the Player until the specified time*/
     void Clone::runTo(Time runToTime)

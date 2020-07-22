@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Tracer.hpp"
 
+#include <spdlog/spdlog.h>
 #include "../application_api/Filters.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "PrecHelper.hpp"
@@ -239,7 +239,6 @@ namespace apps {
 
     void Tracer::captureForCurrentTime(Time currentTime, int iteration)
     {
-        static auto logger = LoggerManager::getLoggerCore();
         for (auto& sub : subscriptions) {
             if (sub.isUpdated()) {
                 auto val = sub.getValue<std::string>();
@@ -271,7 +270,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << valstr << '\n';
                     } else {
-                        logger->addMessage(std::move(valstr));
+                        spdlog::info(valstr);
                     }
                 }
                 if (valueCallback) {
@@ -301,7 +300,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << messstr << '\n';
                     } else {
-                        logger->addMessage(std::move(messstr));
+                        spdlog::info(messstr);
                     }
                 }
                 if (endpointMessageCallback) {
@@ -332,7 +331,7 @@ namespace apps {
                     if (skiplog) {
                         std::cout << messstr << '\n';
                     } else {
-                        logger->addMessage(std::move(messstr));
+                        spdlog::info(messstr);
                     }
                 }
                 if (clonedMessageCallback) {
@@ -443,7 +442,7 @@ namespace apps {
             ->ignore_underscore();
         app->add_flag("--print", printMessage, "print messages to the screen");
         app->add_flag("--skiplog", skiplog, "print messages to the screen through cout");
-        auto clone_group = app->add_option_group(
+        auto* clone_group = app->add_option_group(
             "cloning", "Options related to endpoint cloning operations and specifications");
         clone_group->add_option("--clone", "existing endpoints to clone all packets to and from")
             ->each([this](const std::string& clone) {
@@ -472,7 +471,7 @@ namespace apps {
             ->ignore_underscore()
             ->type_size(-1);
 
-        auto capture_group = app->add_option_group(
+        auto* capture_group = app->add_option_group(
             "capture_group", "Options related to capturing publications, endpoints, or federates");
         capture_group
             ->add_option(

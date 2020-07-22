@@ -103,8 +103,6 @@ namespace apps {
         virtual void initialize() override;
         void generateInterfaces();
         void captureForCurrentTime(Time currentTime, int iteration = 0);
-        /** encode the string in base64 if needed otherwise just return the string*/
-        std::string encode(const std::string& str2encode);
         /** build the command line argument processing application*/
         std::shared_ptr<helicsCLI11App> buildArgParserApp();
         /** process remaining command line arguments*/
