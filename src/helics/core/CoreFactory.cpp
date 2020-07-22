@@ -241,8 +241,6 @@ namespace CoreFactory {
         }
     };
 
-
-
     /** so the problem this is addressing is that unregister can potentially cause a destructor to
 fire that destructor can delete a thread variable, unfortunately it is possible that a thread stored
 in this variable can do the unregister operation and destroy itself meaning it is unable to join and

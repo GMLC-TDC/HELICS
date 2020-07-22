@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
-#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <fstream>
@@ -24,13 +23,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <regex>
 #include <set>
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
 
-    /** encode the string in base64 if needed otherwise just return the string*/
+/** encode the string in base64 if needed otherwise just return the string*/
 static std::string encode(const std::string& str2encode)
 {
     return std::string("b64[") +
@@ -258,8 +258,6 @@ namespace apps {
             }
         }
     }
-
-
 
     /** run the Player until the specified time*/
     void Clone::runTo(Time runToTime)

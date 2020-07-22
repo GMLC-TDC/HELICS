@@ -286,7 +286,7 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                               const std::string& message) const
 {
     bool alwaysLog{false};
-    if (logLevel>log_level::fed-100) {
+    if (logLevel > log_level::fed - 100) {
         logLevel -= static_cast<int>(log_level::fed);
         alwaysLog = true;
     }
@@ -311,7 +311,7 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                     spdlog::error("{} ({})::{}", name, federateID.baseValue(), message);
                 }
             }
-            if (fileLogger && (logLevel <= fileLogLevel  || alwaysLog)) {
+            if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
                 if (logLevel >= helics_log_level_trace) {
                     fileLogger->log(
                         spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
@@ -517,7 +517,10 @@ void BrokerBase::queueProcessingLoop()
     }
     auto timerStop = [&, this]() {
         if (!haltTimer(active, ticktimer)) {
-            sendToLogger(global_broker_id_local,log_level::warning, identifier, "timer unable to cancel properly");
+            sendToLogger(global_broker_id_local,
+                         log_level::warning,
+                         identifier,
+                         "timer unable to cancel properly");
         }
         contextLoop = nullptr;
     };
