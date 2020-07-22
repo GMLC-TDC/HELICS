@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerBase.hpp"
 
 #include "../common/fmt_format.h"
-#include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"

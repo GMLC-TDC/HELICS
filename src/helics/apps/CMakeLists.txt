@@ -71,7 +71,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     )
 
     target_link_libraries(helics_apps PUBLIC helics_application_api)
-    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt helics::zmq)
+    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target spdlog::spdlog fmt::fmt helics::zmq)
 
     if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
                                                OR HELICS_DISABLE_ASIO)
@@ -127,7 +127,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
         add_executable(helics_app appMain.cpp)
         target_link_libraries(helics_app PUBLIC helics_apps)
-        target_link_libraries(helics_app PRIVATE compile_flags_target)
+        target_link_libraries(helics_app PRIVATE spdlog::spdlog compile_flags_target)
         set_target_properties(helics_app PROPERTIES FOLDER apps)
         install(TARGETS helics_app ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
                 COMPONENT applications
@@ -152,7 +152,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         target_link_libraries(helics-apps-shared PUBLIC HELICS::helics-shared)
-        target_link_libraries(helics-apps-shared PRIVATE helics_common fmt::fmt HELICS::utilities)
+        target_link_libraries(helics-apps-shared PRIVATE helics_common  spdlog::spdlog fmt::fmt HELICS::utilities)
 
         # add and alias library to match the find_package
         add_library(HELICS::helics-apps-shared ALIAS helics-apps-shared)

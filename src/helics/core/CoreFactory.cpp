@@ -23,6 +23,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 
+DECLARE_TRIPLINE()
+
 namespace helics {
 
 namespace CoreFactory {
@@ -238,6 +240,8 @@ namespace CoreFactory {
             ccore->joinAllThreads();
         }
     };
+
+
 
     /** so the problem this is addressing is that unregister can potentially cause a destructor to
 fire that destructor can delete a thread variable, unfortunately it is possible that a thread stored

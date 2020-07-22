@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/BrokerApp.hpp"
-#include "../common/loggerCore.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "Clone.hpp"
@@ -15,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Recorder.hpp"
 #include "Source.hpp"
 #include "Tracer.hpp"
+#include <spdlog/logger.h>
 
 #include <iostream>
 
@@ -111,7 +111,6 @@ int main(int argc, char* argv[])
     app.footer(
         "helics_app [SUBCOMMAND] --help will display the options for a particular subcommand");
     auto ret = app.helics_parse(argc, argv);
-    helics::LoggerManager::getLoggerCore()->addMessage("!!>flush");
 
     helics::cleanupHelicsLibrary();
 
