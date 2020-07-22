@@ -287,15 +287,20 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                               const std::string& name,
                               const std::string& message) const
 {
+    bool alwaysLog{false};
+    if (logLevel>log_level::fed-100) {
+        logLevel -= static_cast<int>(log_level::fed);
+        alwaysLog = true;
+    }
     if ((federateID == parent_broker_id) || (federateID == global_id.load())) {
-        if (logLevel > maxLogLevel) {
+        if (logLevel > maxLogLevel && !alwaysLog) {
             // check the logging level
             return true;
         }
         if (loggerFunction) {
             loggerFunction(logLevel, fmt::format("{} ({})", name, federateID.baseValue()), message);
         } else {
-            if (consoleLogLevel >= logLevel) {
+            if (consoleLogLevel >= logLevel || alwaysLog) {
                 if (logLevel >= helics_log_level_trace) {
                     spdlog::trace("{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_timing) {
@@ -308,7 +313,7 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                     spdlog::error("{} ({})::{}", name, federateID.baseValue(), message);
                 }
             }
-            if (fileLogger && logLevel <= fileLogLevel) {
+            if (fileLogger && (logLevel <= fileLogLevel  || alwaysLog)) {
                 if (logLevel >= helics_log_level_trace) {
                     fileLogger->log(
                         spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
