@@ -65,6 +65,9 @@ BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
 
 BrokerBase::~BrokerBase()
 {
+    if (fileLogger) {
+        spdlog::drop(identifier);
+    }
     if (!queueDisabled) {
         try {
             joinAllThreads();
@@ -371,6 +374,7 @@ void BrokerBase::setLoggingFile(const std::string& lfile)
             fileLogger = spdlog::basic_logger_mt(identifier, logFile);
         } else {
             if (fileLogger) {
+                spdlog::drop(identifier);
                 fileLogger.reset();
             }
         }
