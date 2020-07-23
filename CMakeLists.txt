@@ -392,6 +392,9 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/netif)
     endif()
 
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
+        submod_update(ThirdParty/spdlog)
+    endif()
     check_submodule_status()
 
 endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
@@ -660,6 +663,12 @@ include(addfmt)
 # -----------------------------------------------------------
 include(addJsoncpp)
 add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
+
+# --------------------------------------------------------------
+# Create the target for spdlog
+# -----------------------------------------------------------
+include(addSpdlog)
+add_library(HELICS::spdlog ALIAS spdlog)
 
 # --------------------------------------------------------------
 # Create the target for unitslib
