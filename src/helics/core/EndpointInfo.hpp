@@ -13,6 +13,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 namespace helics {
+
+    struct EndpointInformation {
+    std::string key;
+    std::string type;
+    global_handle id;
+    EndpointInformation() = default;
+    EndpointInformation(global_handle gid, const std::string& key_, const std::string& type_):
+       id(gid), key(key_), type(type_)
+    {
+    }
+};
 /** data class containing the information about an endpoint*/
 class EndpointInfo {
   public:
@@ -28,6 +39,8 @@ class EndpointInfo {
   private:
     shared_guarded<std::deque<std::unique_ptr<Message>>>
         message_queue;  //!< storage for the messages
+    std::vector<EndpointInformation> sourceInformation;
+    std::vector<EndpointInformation> targetInformation;
   public:
     bool hasFilter = false;  //!< indicator that the message has a filter
     /** get the next message up to the specified time*/

@@ -1337,6 +1337,41 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
     return id;
 }
 
+interface_handle CommonCore::registerTargettedEndpoint(local_federate_id federateID,
+                                              const std::string& name,
+                                              const std::string& type)
+{
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid (registerEndpoint)"));
+    }
+    const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
+    if (ept != nullptr) {
+        throw(RegistrationFailure("endpoint name is already used"));
+    }
+    auto flags = fed->getInterfaceFlags();
+    flags |= (1 << targetted_flag);
+    const auto& handle = createBasicHandle(fed->global_id,
+                                           fed->local_id,
+                                           handle_type::endpoint,
+                                           name,
+                                           type,
+                                           std::string{},
+                                           flags);
+
+    auto id = handle.getInterfaceHandle();
+    fed->createInterface(handle_type::endpoint, id, name, type, emptyStr);
+    ActionMessage m(CMD_REG_ENDPOINT);
+    m.source_id = fed->global_id.load();
+    m.source_handle = id;
+    m.name = name;
+    m.setStringData(type);
+    m.flags = handle.flags;
+    actionQueue.push(std::move(m));
+
+    return id;
+}
+
 interface_handle CommonCore::getEndpoint(local_federate_id federateID,
                                          const std::string& name) const
 {

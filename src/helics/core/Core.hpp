@@ -494,10 +494,21 @@ class Core {
 
     /**
      * Register an endpoint.
-     *
-     * May only be invoked in the Initialization state.
+     @param federateID the federate to associate the endpoint with
+     @param name the name of the endpoint
+     @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual interface_handle registerEndpoint(local_federate_id federateID,
+                                              const std::string& name,
+                                              const std::string& type) = 0;
+
+    /**
+     * Register an endpoint which can only send or receive to specific targets
+     @param federateID the federate to associate the endpoint with
+     @param name the name of the endpoint
+     @param type the type of data the endpoint should accept or generate(can be left empty)
+     */
+    virtual interface_handle registerTargettedEndpoint(local_federate_id federateID,
                                               const std::string& name,
                                               const std::string& type) = 0;
 
@@ -579,7 +590,7 @@ class Core {
      * May be used for error checking for compatible types and possible optimization by
      * pre-registering the intent for these endpoints to communicate.
      */
-    virtual void registerFrequentCommunicationsPair(const std::string& source,
+    virtual void linkEndpoints(const std::string& source,
                                                     const std::string& dest) = 0;
 
     /** load a file containing connection information
@@ -602,6 +613,22 @@ class Core {
     @param target the name of the source target*/
     virtual void addDestinationFilterToEndpoint(const std::string& filter,
                                                 const std::string& target) = 0;
+
+    /**
+     * Send data from a source to its targets
+     *
+     * Time is implicitly defined as the end of the current time
+     * advancement window (value returned by last call to nextTime().
+     *
+     * This send version was designed to enable communication of
+     * data between federates with the possible introduction of
+     * source and destination filters to represent properties of a
+     * communication network.  This enables simulations to be run with/without
+     * a communications model present.
+     */
+    virtual void send(interface_handle sourceHandle,
+                        const char* data,
+                        uint64_t length) = 0;
     /**
      * Send data from source to destination.
      *
@@ -614,7 +641,7 @@ class Core {
      * communication network.  This enables simulations to be run with/without
      * a communications model present.
      */
-    virtual void send(interface_handle sourceHandle,
+    virtual void sendTo(interface_handle sourceHandle,
                       const std::string& destination,
                       const char* data,
                       uint64_t length) = 0;
@@ -635,11 +662,32 @@ class Core {
      @param data the raw data for the event
      @param length the record length of the event
      */
-    virtual void sendEvent(Time time,
-                           interface_handle sourceHandle,
-                           const std::string& destination,
+    virtual void sendAt(interface_handle sourceHandle,
+                        Time time,
                            const char* data,
                            uint64_t length) = 0;
+
+     /**
+    * Send data from source to destination with explicit expected delivery time.
+    *
+    * Time supplied is the time that will be reported in the message in the receiving
+    * federate.
+    *
+    * This send version was designed to enable communication of
+    * events between discrete event federates.  For this use case
+    * the receiving federate can deserialize the data and schedule
+    * an event for the specified time.
+    @param time the time the event is scheduled for
+    @param sourceHandle the source of the event
+    @param destination  the target of the event
+    @param data the raw data for the event
+    @param length the record length of the event
+    */
+    virtual void sendToAt(interface_handle sourceHandle,
+                          const std::string& destination,
+                          Time time,
+                          const char* data,
+                          uint64_t length) = 0;
 
     /**
      * Send for filters.

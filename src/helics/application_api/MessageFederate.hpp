@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace helics {
 class MessageFederateManager;
@@ -99,6 +100,14 @@ class HELICS_CXX_EXPORT MessageFederate:
     Endpoint& registerEndpoint(const std::string& eptName = std::string(),
                                const std::string& type = std::string());
 
+    /** register a targetted endpoint
+    @details this type of endpoint can can send messages to predefined targets
+    @param eptName the name of the endpoint
+    @param type the defined type of the interface for endpoint checking if requested
+    */
+    Endpoint& registerTargettedEndpoint(const std::string& eptName = std::string(),
+                               const std::string& type = std::string());
+
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
     @param eptName the name of the endpoint
@@ -106,6 +115,14 @@ class HELICS_CXX_EXPORT MessageFederate:
     @return a Reference to an Endpoint Object
     */
     Endpoint& registerGlobalEndpoint(const std::string& eptName,
+                                     const std::string& type = std::string());
+
+     /** register a targetted endpoint directly without prepending the federate name
+   @param eptName the name of the endpoint
+   @param type the defined type of the interface for endpoint checking if requested
+   @return a Reference to an Endpoint Object
+   */
+    Endpoint& registerGlobalTargettedEndpoint(const std::string& eptName,
                                      const std::string& type = std::string());
 
     /** register an indexed Endpoint
@@ -187,12 +204,12 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param data a buffer containing the data
     @param dataLength the length of the data buffer
     */
-    void sendMessage(const Endpoint& source,
+    void sendMessageTo(const Endpoint& source,
                      const std::string& dest,
                      const char* data,
                      size_t dataLength)
     {
-        sendMessage(source, dest, data_view(data, dataLength));
+        sendMessageTo(source, dest, data_view(data, dataLength));
     }
     /** send a message
     @details send a message to a specific destination
@@ -200,7 +217,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param dest a string naming the destination
     @param message a data_view of the message
     */
-    void sendMessage(const Endpoint& source, const std::string& dest, const data_view& message);
+    void sendMessageTo(const Endpoint& source, const std::string& dest, const data_view& message);
     /** send an event message at a particular time
     @details send a message to a specific destination
     @param source the source endpoint

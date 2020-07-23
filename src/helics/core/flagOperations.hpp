@@ -28,8 +28,8 @@ enum operation_flags : uint16_t {
     destination_processing_flag =
         11,  //!< flag indicating the message is for destination processing
     disconnected_flag = 12,  //!< flag indicating that a broker/federate is disconnected
-    extra_flag3 = 13,  //!< extra flag
-    extra_flag4 = 14,  //!< extra flag
+    targetted_flag = 13,  //!< flag indicating the endpoint is targetted
+    extra_flag3 = 14,  //!< extra flag
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
