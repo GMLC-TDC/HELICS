@@ -165,8 +165,8 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(helicsFederateRequestTimeAsync(vFed1, 1.9, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
     EXPECT_DOUBLE_EQ(gtime,
-              1.1);  // the message should show up at the next available time point after the impact
-                     // window
+                     1.1);  // the message should show up at the next available time point after the
+                            // impact window
     CE(helicsFederateRequestTimeAsync(vFed2, 2.0, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed1, &err));
     EXPECT_DOUBLE_EQ(gtime, 1.9);
