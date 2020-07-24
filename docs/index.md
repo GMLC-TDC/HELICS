@@ -36,7 +36,8 @@ Motivation: Energy systems and their associated information and communication te
 
    developer-guide/index
    c-api-reference/index
-`Julia API <https://gmlc-tdc.github.io/HELICS.jl/latest/api/>`_
+   ..raw:: 
+       html <a href="https://gmlc-tdc.github.io/HELICS.jl/latest/api/">Julia API</a>
    doxygen/index
    configuration/index
    ROADMAP
