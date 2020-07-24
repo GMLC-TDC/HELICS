@@ -11,8 +11,6 @@ set(common_headers
     JsonProcessingFunctions.hpp
     JsonBuilder.hpp
     TomlProcessingFunctions.hpp
-    logger.h
-    loggerCore.hpp
     GuardedTypes.hpp
     fmt_format.h
     fmt_ostream.h
@@ -22,19 +20,13 @@ set(common_headers
     SmallBuffer.hpp
 )
 
-set(common_sources
-    JsonProcessingFunctions.cpp
-    JsonBuilder.cpp
-    TomlProcessingFunctions.cpp
-    logger.cpp
-    loggerCore.cpp
-    configFileHelpers.cpp
-    addTargets.cpp
+set(common_sources JsonProcessingFunctions.cpp JsonBuilder.cpp TomlProcessingFunctions.cpp
+                   configFileHelpers.cpp addTargets.cpp
     SmallBuffer.cpp
 )
 
 # headers that are part of the public interface
-set(helics_public_common JsonProcessingFunctions.hpp AsioContextManager.h logger.h GuardedTypes.hpp)
+set(helics_public_common JsonProcessingFunctions.hpp AsioContextManager.h GuardedTypes.hpp)
 
 if(NOT HELICS_DISABLE_ASIO)
     list(APPEND common_headers AsioContextManager.h)

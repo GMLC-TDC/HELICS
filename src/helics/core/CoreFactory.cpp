@@ -23,6 +23,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 
+DECLARE_TRIPLINE()
+
 namespace helics {
 
 namespace CoreFactory {

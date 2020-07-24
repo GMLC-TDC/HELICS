@@ -125,7 +125,7 @@ type is used
      */
     std::shared_ptr<Core> FindOrCreate(core_type type,
                                        const std::string& coreName,
-                                       const std::string& initializationString);
+                                       const std::string& configureString);
 
     /** tries to find a named core if it fails it creates a new one
      */

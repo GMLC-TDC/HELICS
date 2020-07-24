@@ -6,12 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "testFixtures.hpp"
 
-#include "helics/common/loggerCore.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 
 #include <cctype>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <string>
 
 bool hasIndexCode(const std::string& type_name)
@@ -72,7 +72,7 @@ FederateTestFixture::~FederateTestFixture()
         }
 
         if (broker->isConnected()) {
-            helics::LoggerManager::logMessage("forcing disconnect");
+            spdlog::info("forcing disconnect");
             broker->disconnect();
         }
     }
