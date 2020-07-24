@@ -17,8 +17,6 @@ Brief History: HELICS began as the core software development of the Grid Moderni
 
 Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
-- [Julia API](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)
-
 ```eval_rst
 .. toctree::
    :maxdepth: 1
@@ -39,10 +37,7 @@ Motivation: Energy systems and their associated information and communication te
    developer-guide/index
    doxygen/index
    c-api-reference/index
-```
-```eval_rst
-.. toctree::
-   :maxdepth: 1
+   Julia API
    ROADMAP
 ```
 
