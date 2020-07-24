@@ -1,0 +1,20 @@
+{
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python -u EVComboFed.py 1",
+      "host": "localhost",
+      "name": "EV_federate",
+      "loglevel": 3
+    },
+    {
+      "directory": ".",
+      "exec": "python -u EVControllerComboFed.py 1",
+      "host": "localhost",
+      "name": "EVController_federate",
+      "loglevel": 3
+    }
+
+  ],
+  "name": "EV_toy"
+}
