@@ -35,10 +35,13 @@ Motivation: Energy systems and their associated information and communication te
    :caption: Developer Reference
 
    developer-guide/index
-   c-api-reference/index
-   Julia API
    doxygen/index
-   configuration/index
+   c-api-reference/index
+```
+[Julia API](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)
+```eval_rst
+.. toctree::
+   :maxdepth: 1
    ROADMAP
 ```
 
