@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/logger.h"
 #include "BrokerFactory.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
@@ -1987,7 +1986,7 @@ void CoreBroker::executeInitializationOperations()
     if (res == message_processing_result::next_step) {
         enteredExecutionMode = true;
     }
-    loggingObj->flush();
+    logFlush();
 }
 
 void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)

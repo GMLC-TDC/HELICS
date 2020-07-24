@@ -4,7 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
@@ -807,7 +806,7 @@ void helicsCloseLibrary(void)
     helics::BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(2000));
     ret.get();
 
-    helics::LoggerManager::closeLogger();
+    // helics::LoggerManager::closeLogger();
     // helics::cleanupHelicsLibrary();
 }
 
@@ -1007,7 +1006,6 @@ MasterObjectHolder::~MasterObjectHolder()
         ZmqContextManager::closeContext();  // LCOV_EXCL_LINE
     }
 #endif
-    helics::LoggingCore::setFastShutdown();
     deleteAll();
     // std::cout << "end of master Object Holder destructor" << std::endl;
 }
