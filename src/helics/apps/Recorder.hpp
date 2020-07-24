@@ -54,7 +54,7 @@ namespace apps {
         Recorder(const std::string& name, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param name the name of the app
-    @param jsonString a file or jsonString defining the federate information in JSON
+    @param jsonString a file or JSON string defining the federate information in JSON
     */
         Recorder(const std::string& name, const std::string& jsonString);
         /** move construction*/
