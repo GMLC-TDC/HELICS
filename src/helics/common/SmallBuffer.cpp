@@ -216,7 +216,7 @@ void SmallBuffer::swap(SmallBuffer& sb2) noexcept
         heap = buffer.data();
         bufferCapacity = 64;
 
-        memcpy(heap, sb2.buffer.data(), sb2.size());
+         std::memcpy(heap, sb2.buffer.data(), sb2.size());
         std::swap(sb2.bufferSize, bufferSize);
     } else if (sb2.usingAllocatedBuffer) {
         heap = sb2.heap;
@@ -228,7 +228,7 @@ void SmallBuffer::swap(SmallBuffer& sb2) noexcept
         sb2.heap = buffer.data();
         sb2.bufferCapacity = 64;
 
-        memcpy(sb2.heap, buffer.data(), bufferSize);
+        std::memcpy(sb2.heap, buffer.data(), bufferSize);
         std::swap(sb2.bufferSize, bufferSize);
     } else {
         std::swap(sb2.buffer, buffer);
