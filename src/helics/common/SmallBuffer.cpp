@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cstring>
 
-
 namespace helics {
 
 SmallBuffer::SmallBuffer(const SmallBuffer& sb): heap(buffer.data())
@@ -216,7 +215,7 @@ void SmallBuffer::swap(SmallBuffer& sb2) noexcept
         heap = buffer.data();
         bufferCapacity = 64;
 
-         std::memcpy(heap, sb2.buffer.data(), sb2.size());
+        std::memcpy(heap, sb2.buffer.data(), sb2.size());
         std::swap(sb2.bufferSize, bufferSize);
     } else if (sb2.usingAllocatedBuffer) {
         heap = sb2.heap;
