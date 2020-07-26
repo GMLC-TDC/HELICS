@@ -65,6 +65,23 @@ TEST(small_buffer_tests, index_assign)
     EXPECT_NE(sb[24], std::byte{17});
 }
 
+TEST(small_buffer_tests, at)
+{
+    SmallBuffer sb;
+    sb.resize(45);
+    sb.at(23) = std::byte{5};
+    EXPECT_EQ(sb[23], std::byte{5});
+    EXPECT_EQ(sb.at(23), std::byte{5});
+
+    EXPECT_THROW(sb.at(56), std::out_of_range);
+
+    sb.at(14) = std::byte{7};
+    const SmallBuffer& sb2 = sb;
+
+    EXPECT_EQ(sb2.at(14), std::byte{7});
+    EXPECT_EQ(sb2[14], std::byte{7});
+}
+
 TEST(small_buffer_tests, string_construct)
 {
     SmallBuffer sb("test string 1");
@@ -348,6 +365,9 @@ TEST(small_buffer_tests, assign)
     sb1.assign(t1.data(), t1.data() + t1.size());
     EXPECT_EQ(t1.size(), sb1.size());
     EXPECT_EQ(sb1[3333], std::byte{'g'});
+
+    sb1.assign(t1.data(), t1.data());
+    EXPECT_EQ(sb1.size(), 0);
 }
 
 TEST(small_buffer_tests, assign_size)

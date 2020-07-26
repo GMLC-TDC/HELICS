@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 #include <utility>
+#include <stdexcept>
 
 namespace helics {
 class SmallBuffer {
@@ -39,6 +40,22 @@ class SmallBuffer {
     std::byte operator[](size_t index) const { return heap[index]; }
     /** get an assignable reference to an element*/
     std::byte& operator[](size_t index) { return heap[index]; }
+    /** get the value at a particular index with bounds checking*/
+    std::byte at(size_t index) const
+    {
+        if (index >= bufferSize) {
+            throw(std::out_of_range("specified index is not valid"));
+        }
+        return heap[index];
+    }
+    /** get a value reference at a particular index with bounds checking*/
+    std::byte& at(size_t index)
+    {
+        if (index >= bufferSize) {
+            throw(std::out_of_range("specified index is not valid"));
+        }
+        return heap[index];
+    }
     /** assign some data to the SmallBuffer*/
     void assign(const void* start, const void* end);
     void assign(const void* start, std::size_t size);
