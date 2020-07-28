@@ -47,13 +47,13 @@ Json::Value loadJson(const std::string& jsonString)
     return loadJsonStr(jsonString);
 }
 
-Json::Value loadJsonStr(const std::string& jsonString)
+Json::Value loadJsonStr(std::string_view jsonString)
 {
     Json::Value doc;
     Json::CharReaderBuilder rbuilder;
     std::string errs;
-    std::istringstream jstring(jsonString);
-    bool ok = Json::parseFromStream(rbuilder, jstring, &doc, &errs);
+    auto reader = std::unique_ptr<Json::CharReader>(rbuilder.newCharReader());
+    bool ok = reader->parse(jsonString.data(), jsonString.data() + jsonString.size(), &doc, &errs);
     if (!ok) {
         throw(std::invalid_argument(errs.c_str()));
     }

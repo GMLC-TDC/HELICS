@@ -26,7 +26,7 @@ Json::Value loadJson(const std::string& jsonString);
 
 /** load a JSON object in a string
  */
-Json::Value loadJsonStr(const std::string& jsonString);
+Json::Value loadJsonStr(std::string_view jsonString);
 
 /** read a time from a JSON value element*/
 helics::Time loadJsonTime(const Json::Value& timeElement,
@@ -131,5 +131,12 @@ inline void replaceIfMember(const Json::Value& element, const std::string& key, 
 {
     if (element.isMember(key)) {
         sval = element[key].asInt();
+    }
+}
+
+inline void replaceIfMember(const Json::Value& element, const std::string& key, double& sval)
+{
+    if (element.isMember(key)) {
+        sval = element[key].asDouble();
     }
 }

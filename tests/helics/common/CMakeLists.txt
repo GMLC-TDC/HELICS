@@ -13,7 +13,7 @@
 
 set(common_test_headers)
 
-set(common_test_sources TimeTests.cpp JsonGenerationTests.cpp)
+set(common_test_sources TimeTests.cpp JsonGenerationTests.cpp SmallBufferTests.cpp)
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers})
 target_link_libraries(common-tests PRIVATE helics_core helics_test_base fmt::fmt)

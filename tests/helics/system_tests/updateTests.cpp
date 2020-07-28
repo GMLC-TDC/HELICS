@@ -168,7 +168,7 @@ TEST_F(update_tests, test_single_update_vector)
     sub.getValue(val);
     EXPECT_TRUE(!sub.isUpdated());
     // make sure the string is what we expect
-    EXPECT_EQ(val, "v1[4.790000]");
+    EXPECT_EQ(val, "[4.79]");
     sub.getValue(val);
     EXPECT_TRUE(!sub.isUpdated());
     pub.publish(testValue2);
@@ -181,7 +181,7 @@ TEST_F(update_tests, test_single_update_vector)
     sub.getValue(val);
     EXPECT_TRUE(!sub.isUpdated());
     // make sure the string is what we expect
-    EXPECT_EQ(val, "v1[9.340000]");
+    EXPECT_EQ(val, "[9.34]");
     sub.getValue(val);
     EXPECT_TRUE(!sub.isUpdated());
     double v2{0};
@@ -233,7 +233,7 @@ TEST_F(update_tests, test_single_update_vector_char_ptr)
     sub.getValue(val.data(), 50);
     EXPECT_TRUE(!sub.isUpdated());
     // make sure the string is what we expect
-    EXPECT_EQ(std::string(val.data()), "v1[4.790000]");
+    EXPECT_EQ(std::string(val.data()), "[4.79]");
     sub.getValue(val.data(), 50);
     EXPECT_TRUE(!sub.isUpdated());
     pub.publish(testValue2);
@@ -246,7 +246,7 @@ TEST_F(update_tests, test_single_update_vector_char_ptr)
     sub.getValue(val.data(), 50);
     EXPECT_TRUE(!sub.isUpdated());
     // make sure the string is what we expect
-    EXPECT_EQ(std::string(val.data()), "v1[9.340000]");
+    EXPECT_EQ(std::string(val.data()), "[9.34]");
     sub.getValue(val.data(), 50);
     EXPECT_TRUE(!sub.isUpdated());
     double v2{0};
