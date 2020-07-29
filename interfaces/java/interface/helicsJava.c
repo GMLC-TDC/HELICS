@@ -4765,6 +4765,41 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerSetLogFile(JN
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerSetTimeBarrier(JNIEnv *jenv, jclass jcls, jlong jarg1, jdouble jarg2) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_broker *)&jarg1; 
+  arg2 = (helics_time)jarg2; 
+  helicsBrokerSetTimeBarrier(arg1,arg2,arg3);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerClearTimeBarrier(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_broker *)&jarg1; 
+  helicsBrokerClearTimeBarrier(arg1);
+}
+
+
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateQuery(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
