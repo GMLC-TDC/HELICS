@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/logger.h"
 #include "BrokerFactory.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
@@ -644,6 +643,22 @@ std::string CoreBroker::generateFederationSummary() const
     return generateJsonString(summary);
 }
 
+void CoreBroker::generateTimeBarrier(ActionMessage& m)
+{
+    if (checkActionFlag(m, cancel_flag)) {
+        ActionMessage cancelBarrier(CMD_TIME_BARRIER_CLEAR);
+        cancelBarrier.source_id = global_broker_id_local;
+        cancelBarrier.messageID = global_broker_id_local.baseValue();
+        broadcast(cancelBarrier);
+        return;
+    }
+    m.setAction(CMD_TIME_BARRIER);
+    m.source_id = global_broker_id_local;
+    m.messageID = global_broker_id_local.baseValue();
+    // time should already be set
+    broadcast(m);
+}
+
 void CoreBroker::transmitDelayedMessages()
 {
     auto msg = delayTransmitQueue.pop();
@@ -748,7 +763,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         "disconnecting from check connections");
             break;
         case CMD_CONNECTION_ERROR:
-            // if anyone else as has terminated assume they finalized and the connection was lost
+            // if anyone else as has terminated assume they finalized and the connection was
+            // lost
             if (command.dest_id == global_broker_id_local) {
                 bool partDisconnected{false};
                 bool ignore{false};
@@ -969,8 +985,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
         } break;
         case CMD_STOP:
             if ((getAllConnectionState() <
-                 connection_state::disconnected)) {  // only send a disconnect message if we haven't
-                                                     // done so already
+                 connection_state::disconnected)) {  // only send a disconnect message if we
+                                                     // haven't done so already
                 timeCoord->disconnect();
                 if (!isRootc) {
                     ActionMessage m(CMD_DISCONNECT);
@@ -1003,6 +1019,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 transmit(getRoute(command.dest_id), command);
             }
 
+            break;
+        case CMD_TIME_BARRIER:
+        case CMD_TIME_BARRIER_CLEAR:
+            broadcast(command);
+            break;
+        case CMD_TIME_BARRIER_REQUEST:
+            generateTimeBarrier(command);
             break;
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
@@ -1685,6 +1708,26 @@ bool CoreBroker::connect()
     return isConnected();
 }
 
+void CoreBroker::setTimeBarrier(Time barrierTime)
+{
+    if (barrierTime == Time::maxVal()) {
+        return clearTimeBarrier();
+    }
+    ActionMessage tbarrier(CMD_TIME_BARRIER_REQUEST);
+    tbarrier.source_id = global_id.load();
+    tbarrier.actionTime = barrierTime;
+    addActionMessage(tbarrier);
+}
+
+void CoreBroker::clearTimeBarrier()
+{
+    ActionMessage tbarrier(CMD_TIME_BARRIER_REQUEST);
+    tbarrier.source_id = global_id.load();
+    tbarrier.actionTime = Time::maxVal();
+    setActionFlag(tbarrier, cancel_flag);
+    addActionMessage(tbarrier);
+}
+
 bool CoreBroker::isConnected() const
 {
     auto state = brokerState.load(std::memory_order_acquire);
@@ -1944,7 +1987,7 @@ void CoreBroker::executeInitializationOperations()
     if (res == message_processing_result::next_step) {
         enteredExecutionMode = true;
     }
-    loggingObj->flush();
+    logFlush();
 }
 
 void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
@@ -2904,8 +2947,8 @@ void CoreBroker::checkDependencies()
             }
         }
     } else {
-        // if there is more than 2 dependents(higher broker + 2 or more other objects then we need
-        // to be a timeCoordinator
+        // if there is more than 2 dependents(higher broker + 2 or more other objects then we
+        // need to be a timeCoordinator
         if (timeCoord->getDependents().size() > 2) {
             return;
         }

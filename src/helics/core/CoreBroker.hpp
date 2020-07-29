@@ -210,6 +210,10 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual bool waitForDisconnect(
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override final;
 
+    virtual void setTimeBarrier(Time barrierTime) override final;
+
+    virtual void clearTimeBarrier() override final;
+
   private:
     /** implementation details of the connection process
      */
@@ -353,6 +357,8 @@ class CoreBroker: public Broker, public BrokerBase {
     /** label the broker and all children as disconnected*/
     void labelAsDisconnected(global_broker_id brkid);
 
+    /** generate a time barrier request*/
+    void generateTimeBarrier(ActionMessage& m);
     friend class TimeoutMonitor;
 };
 

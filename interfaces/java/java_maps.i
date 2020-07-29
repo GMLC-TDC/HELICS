@@ -3,38 +3,38 @@
 
 %}
 
-//typemap for short maxlen strings
-%typemap(in) (char *outputString, int maxlen) {
+//typemap for short maxLength strings
+%typemap(in) (char *outputString, int maxLength) {
   $1 = (char*)JCALL2(GetByteArrayElements, jenv, $input, 0);
   $2 = (int)JCALL1(GetArrayLength, jenv, $input);
 }
 
-%typemap(argout) (char *outputString, int maxlen) {
+%typemap(argout) (char *outputString, int maxLength) {
   JCALL3(ReleaseByteArrayElements, jenv, $input, (jbyte*)$1, 0);
 }
 
-%typemap(jni) (char *outputString, int maxlen) "jbyteArray"
-%typemap(jtype) (char *outputString, int maxlen) "byte[]"
-%typemap(jstype) (char *outputString, int maxlen) "byte[]"
-%typemap(javain) (char *outputString, int maxlen) "$javainput"
+%typemap(jni) (char *outputString, int maxLength) "jbyteArray"
+%typemap(jtype) (char *outputString, int maxLength) "byte[]"
+%typemap(jstype) (char *outputString, int maxLength) "byte[]"
+%typemap(javain) (char *outputString, int maxLength) "$javainput"
 
-%apply (char *outputString, int maxlen) { (char *outputString, int maxStringLen) };
+%apply (char *outputString, int maxLength) { (char *outputString, int maxStringLength) };
 
 ////typemap for large string output with a length return in C
-//%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(in, numinputs=0) (char *outputString, int maxStringLength, int *actualLength) {
 //  $3=&($2);
 //}
 //
-//%typemap(freearg) (char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(freearg) (char *outputString, int maxStringLength, int *actualLength) {
 //   if ($1) free($1);
 //}
 //
-//%typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(check)(char *outputString, int maxStringLength, int *actualLength) {
 //    $2=helicsInputGetStringSize(arg1)+2;
 //    $1 = (char *) malloc($2);
 //}
 //
-//%typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
+//%typemap(argout) (char *outputString, int maxStringLength, int *actualLength) {
 //  PyObject *o2=PyString_FromString($1);
 //  $result = SWIG_Python_AppendOutput($result, o2);
 //}
@@ -188,21 +188,21 @@
 //
 //
 //// typemap for raw data output function
-//%typemap(in, numinputs=0) (void *data, int maxDatalen, int *actualSize) {
+//%typemap(in, numinputs=0) (void *data, int maxDataLength, int *actualSize) {
 //  $3=&($2);
 //}
 //
-//%typemap(freearg) (void *data, int maxDatalen, int *actualSize) {
+//%typemap(freearg) (void *data, int maxDataLength, int *actualSize) {
 //   if ($1) free($1);
 //}
 //
 //// Set argument to NULL before any conversion occurs
-//%typemap(check)(void *data, int maxDatalen, int *actualSize) {
+//%typemap(check)(void *data, int maxDataLength, int *actualSize) {
 //    $2=helicsSubscriptionGetValueSize(arg1)+2;
 //    $1 =  malloc($2);
 //}
 //
-//%typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+//%typemap(argout) (void *data, int maxDataLength, int *actualSize) {
 //  PyObject *o2=PyBytes_FromStringAndSize($1,*$3);
 //  $result = SWIG_Python_AppendOutput($result, o2);
 //}

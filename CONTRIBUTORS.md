@@ -98,6 +98,10 @@ A library that provides runtime unit values, instead of individual unit types, f
 
 The cereal library is used for serialization of messages sent around inside HELICS. A modified version of cereal is included in the HELICS source and licensed under the [BSD-3 clause](https://github.com/USCiLab/cereal/blob/master/LICENSE) license. The modifications include modifying the headers to use relative paths instead of absolute so it can be included in different locations.
 
+### [spdlog](https://https://github.com/gabime/spdlog)
+
+Very fast, header-only/compiled, C++ logging library. The spdlog library is used for logging. It is included in HELICS as a submodule and is released under a [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE) license.
+
 ### [FNCS](https://github.com/FNCS/fncs), [IGMS](https://www.nrel.gov/docs/fy16osti/65552.pdf), and FSKIT
 
 While not used directly, much of the inspiration for HELICS comes from three separate projects at the different National Labs. These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL. The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.

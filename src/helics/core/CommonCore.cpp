@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/logger.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -577,8 +576,8 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control
     // the level*/
-    fed->setLogger([this](int /*level*/, const std::string& ident, const std::string& message) {
-        sendToLogger(parent_broker_id, log_level::error - 2, ident, message);
+    fed->setLogger([this](int level, const std::string& ident, const std::string& message) {
+        sendToLogger(parent_broker_id, log_level::fed + level, ident, message);
     });
 
     fed->local_id = local_id;
@@ -2634,6 +2633,16 @@ void CommonCore::sendErrorToFederates(int error_code, const std::string& message
     });
 }
 
+void CommonCore::broadcastToFederates(ActionMessage& cmd)
+{
+    loopFederates.apply([&cmd](auto& fed) {
+        if ((fed) && (fed.state == operation_state::operating)) {
+            cmd.dest_id = fed->global_id;
+            fed->addAction(cmd);
+        }
+    });
+}
+
 void CommonCore::transmitDelayedMessages(global_federate_id source)
 {
     std::vector<ActionMessage> buffer;
@@ -2706,6 +2715,10 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            break;
+        case CMD_TIME_BARRIER:
+        case CMD_TIME_BARRIER_CLEAR:
+            broadcastToFederates(command);
             break;
         case CMD_CHECK_CONNECTIONS: {
             auto res = checkAndProcessDisconnect();

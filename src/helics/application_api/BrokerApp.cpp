@@ -233,6 +233,20 @@ void BrokerApp::setLoggingLevel(int loglevel)
     }
 }
 
+void BrokerApp::setTimeBarrier(Time barrierTime)
+{
+    if (broker) {
+        broker->setTimeBarrier(barrierTime);
+    }
+}
+
+void BrokerApp::clearTimeBarrier()
+{
+    if (broker) {
+        broker->clearTimeBarrier();
+    }
+}
+
 /** set the log file to use for the broker*/
 void BrokerApp::setLogFile(const std::string& logFile)
 {
