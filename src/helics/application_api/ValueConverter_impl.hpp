@@ -281,7 +281,7 @@ constexpr size_t getMinSize<NamedPoint>()
 template<class X>
 SmallBuffer ValueConverter<X>::convert(const X* vals, size_t size)
 {
-    auto dv = data_block();
+    auto dv = SmallBuffer();
     convert(vals, size, dv);
     return dv;
 }
@@ -290,7 +290,7 @@ SmallBuffer ValueConverter<X>::convert(const X* vals, size_t size)
 template<class X>
 SmallBuffer ValueConverter<X>::convert(const X& val)
 {
-    auto dv = data_block();
+    auto dv = SmallBuffer();
     convert(val, dv);
     return dv;
 }

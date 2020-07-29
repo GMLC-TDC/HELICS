@@ -316,7 +316,7 @@ TEST(UdpCore, udpCore_initialization)
     EXPECT_GT(len, 32U);
     helics::ActionMessage rM(data.data(), len);
 
-    EXPECT_EQ(rM.name, "core1");
+    EXPECT_EQ(rM.name(), "core1");
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
     helics::ActionMessage resp(helics::CMD_PRIORITY_ACK);
     rxSocket.send_to(asio::buffer(resp.to_string()), remote_endpoint, 0, error);

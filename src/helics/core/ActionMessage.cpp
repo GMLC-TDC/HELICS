@@ -76,9 +76,9 @@ ActionMessage::ActionMessage(const std::vector<char>& bytes): ActionMessage()
     from_vector(bytes);
 }
 
-ActionMessage::ActionMessage(const std::byte* data, size_t size): ActionMessage()
+ActionMessage::ActionMessage(const void* data, size_t size): ActionMessage()
 {
-    fromByteArray(data, static_cast<int>(size));
+    fromByteArray(static_cast<const std::byte *>(data), size);
 }
 
 ActionMessage::~ActionMessage() = default;

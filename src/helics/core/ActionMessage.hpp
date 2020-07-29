@@ -70,7 +70,7 @@ class ActionMessage {
     /** construct from a data vector*/
     explicit ActionMessage(const std::vector<char>& bytes);
     /** construct from a data pointer and size*/
-    explicit ActionMessage(const std::byte * data, size_t size);
+    ActionMessage(const void * data, size_t size);
     /** destructor*/
     ~ActionMessage();
     /** copy constructor*/
