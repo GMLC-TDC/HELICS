@@ -20,6 +20,7 @@ endif()
 set(SUPPORTS_VARIADIC_TEMPLATES ON)
 set(SUPPORTS_USER_DEFINED_LITERALS ON)
 set(FMT_HAS_VARIANT OFF)
+set(type STRING CACHE INTERNAL "")
 
 # get the FMT header only library
 add_subdirectory(ThirdParty/fmtlib)

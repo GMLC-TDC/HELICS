@@ -1,0 +1,95 @@
+name: Build benchmarks
+
+on:
+  workflow_dispatch:
+      inputs:
+          webhook:
+              description: 'Webhook to call with the completed workflow run id'
+              required: false
+  schedule:
+    - cron: '15 09 * * */2' # Run at in the early hours of the morning every other day of the week (UTC)
+
+jobs:
+#####################################
+# Build benchmarks
+#####################################
+  build-benchmarks:
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Benchmarks
+    strategy:
+      matrix:
+        id: [windows-x64, macos-x64, linux-x64]
+        include:
+          - id: windows-x64
+            os: windows-latest
+            arch: x64
+            cpack_gen: ZIP
+            cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
+          - id: macos-x64
+            os: macos-latest
+            arch: x64
+            cpack_gen: ZIP
+            macos_target_ver: '10.9'
+          - id: linux-x64
+            os: ubuntu-latest
+            arch: x64
+            cpack_gen: TGZ
+
+    steps:
+    - name: Checkout event ref
+      uses: actions/checkout@v2
+      if: github.event_name != 'schedule'
+    
+    - name: Checkout develop branch
+      uses: actions/checkout@v2
+      with:
+        ref: develop
+      if: github.event_name == 'schedule'
+      
+    # Setup a copy of the macOS SDK
+    - name: Setup macOS SDK
+      if: runner.os == 'macOS'
+      run: ./.github/actions/setup-macos-10.9-sdk.sh
+        
+    # Compile HELICS and create the benchmark package
+    - name: Build benchmarks
+      if: runner.os != 'Linux'
+      env:
+        BUILD_ARCH: ${{ matrix.arch }}
+        BUILD_GEN: ${{ matrix.cmake_gen }}
+        MSVC_VER: ${{ matrix.msvc_ver }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_target_ver }}
+        CPACK_GEN: ${{ matrix.cpack_gen }}
+      shell: bash
+      run: ./.github/actions/benchmark-build/benchmark-${{ runner.os }}.sh
+ 
+    - name: Build benchmarks (container)
+      if: runner.os == 'Linux'
+      uses: ./.github/actions/linux-release-builder
+      with:
+        script: ./.github/actions/benchmark-build/benchmark-${{ runner.os }}.sh
+       
+    # GitHub Actions combines artifacts uploaded with the same name
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ runner.os }}-benchmarks
+        path: artifact
+      
+
+#####################################
+# Call webhook for finished build 
+#####################################
+  benchmark-build-complete-webhook:
+    name: Call webhook to notify of the finished benchmark build
+    needs: [build-benchmarks]
+    runs-on: ubuntu-latest
+    if: github.event.inputs.webhook
+    steps:
+      - name: Call webhook
+        run: |
+          curl -X POST --header 'authorization: Bearer ${{ secrets.BM_BUILD_SECRET }}' \
+               --url ${{ github.event.inputs.webhook }} \
+               --header 'content-type: application/json' \
+               --data "{\"id\":\"${{ github.run_id }}\"}"

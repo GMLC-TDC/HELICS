@@ -14,7 +14,7 @@ include(AddGoogletest)
 # add a baseline library for underlying dependencies and flags for test executables
 add_library(helics_test_base INTERFACE)
 target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
-target_link_libraries(helics_test_base INTERFACE compile_flags_target)
+target_link_libraries(helics_test_base INTERFACE compile_flags_target spdlog::spdlog)
 
 add_subdirectory(core)
 add_subdirectory(network)

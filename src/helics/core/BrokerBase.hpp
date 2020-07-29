@@ -21,8 +21,10 @@ and some common methods used cores and brokers
 #include <thread>
 #include <vector>
 
+namespace spdlog {
+class logger;
+}
 namespace helics {
-class Logger;
 class ForwardingTimeCoordinator;
 class helicsCLI11App;
 /** base class for broker like objects
@@ -54,8 +56,8 @@ class BrokerBase {
     // consistent public interface for extracting it this variable may need to be updated in a
     // constant function
     mutable std::string address;  //!< network location of the broker
-    std::unique_ptr<Logger>
-        loggingObj;  //!< default logging object to use if the logging callback is not specified
+    std::shared_ptr<spdlog::logger>
+        fileLogger;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string&, const std::string&)> loggerFunction;
@@ -146,7 +148,8 @@ class BrokerBase {
     */
     void setLoggerFunction(
         std::function<void(int, const std::string&, const std::string&)> logFunction);
-
+    /** flush the loggers*/
+    void logFlush();
     /** check if the main processing loop of a broker is running*/
     bool isRunning() const { return mainLoopIsRunning.load(); }
     /** set the logging level */
@@ -168,6 +171,8 @@ class BrokerBase {
 
     /** Generate the base CLI processor*/
     std::shared_ptr<helicsCLI11App> generateBaseCLI();
+    /** generate the loggers for the broker*/
+    void generateLoggers();
 
   protected:
     /** process a disconnect signal*/
