@@ -22,7 +22,7 @@ namespace helics {
 class data_view {
   private:
     std::string_view dblock;  //!< using a string_view to represent the data
-    std::shared_ptr<const data_block>
+    std::shared_ptr<const SmallBuffer>
         ref;  //!< need to capture a reference to the data being viewed if it is from a shared_ptr
   public:
     /** default constructor*/
@@ -30,10 +30,10 @@ class data_view {
     /** destructor*/
     ~data_view() = default;
     /** construct from a shared_ptr to a data_block*/
-    data_view(std::shared_ptr<const data_block> dt):
-        dblock(dt->m_data), ref(std::move(dt)) {}  // NOLINT
+    data_view(std::shared_ptr<const SmallBuffer> dt):
+        dblock(dt->to_string()), ref(std::move(dt)) {}  // NOLINT
     /** construct from a regular data_block*/
-    data_view(const data_block& dt) noexcept: dblock(dt.m_data) {}  // NOLINT
+    data_view(const SmallBuffer& dt) noexcept: dblock(dt.to_string()) {}  // NOLINT
     /** copy constructor*/
     data_view(const data_view& dt) noexcept = default;
     /** move constructor*/
@@ -43,11 +43,9 @@ class data_view {
     data_view(const char* dt) noexcept: dblock(dt) {}  // NOLINT
     /** construct from a char Pointer and length*/
     data_view(const char* dt, size_t len) noexcept: dblock(dt, len) {}
-    /** construct from a string*/
-    data_view(const std::string& str) noexcept: dblock(str) {}  // NOLINT
     /** construct from a rValue to a string*/
     data_view(std::string&& str):
-        data_view(std::make_shared<data_block>(std::move(str))) {}  // NOLINT
+        data_view(std::make_shared<SmallBuffer>(std::move(str))) {}  // NOLINT
     /** construct from a char vector*/
     data_view(const std::vector<char>& dvec) noexcept:
         dblock(dvec.data(), dvec.size()) {}  // NOLINT
@@ -65,16 +63,16 @@ class data_view {
     }
 
     /** assignment from a data_block shared_ptr*/
-    data_view& operator=(std::shared_ptr<const data_block> dt) noexcept
+    data_view& operator=(std::shared_ptr<const SmallBuffer> dt) noexcept
     {
-        dblock = dt->m_data;
+        dblock = dt->to_string();
         ref = std::move(dt);
         return *this;
     }
     /** assignment from a data_block*/
-    data_view& operator=(const data_block& dt) noexcept
+    data_view& operator=(const SmallBuffer& dt) noexcept
     {
-        dblock = dt.m_data;
+        dblock = dt.to_string();
         ref = nullptr;
         return *this;
     }
@@ -93,7 +91,7 @@ class data_view {
         return *this;
     }
     /** create a new data_block from the data*/
-    data_block to_data_block() const { return data_block(dblock.data(), dblock.length()); }
+    SmallBuffer to_buffer() const { return SmallBuffer(dblock); }
     /** swap function */
 
     void swap(data_view& dv2) noexcept
@@ -126,7 +124,7 @@ class data_view {
 constexpr auto bvecstr = "block_vector";
 
 template<>
-inline const char* typeNameString<std::vector<data_block>>()
+inline const char* typeNameString<std::vector<SmallBuffer>>()
 {
     return bvecstr;
 }

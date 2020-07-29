@@ -116,9 +116,9 @@ class FederateState {
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string&, const std::string&)>
+    std::function<void(int, std::string_view, std::string_view)>
         loggerFunction;  //!< callback for logging functions
-    std::function<std::string(const std::string&)>
+    std::function<std::string(std::string_view)>
         queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
     Time nextValueTime() const;
@@ -168,14 +168,14 @@ class FederateState {
     /**
      * Return the data for the specified handle or the latest input
      */
-    const std::shared_ptr<const data_block>& getValue(interface_handle handle,
+    const std::shared_ptr<const SmallBuffer>& getValue(interface_handle handle,
                                                       uint32_t* inputIndex);
 
     /**
      * Return all the available data for the specified handle or the latest input
      *
      */
-    const std::vector<std::shared_ptr<const data_block>>& getAllValues(interface_handle handle);
+    const std::vector<std::shared_ptr<const SmallBuffer>>& getAllValues(interface_handle handle);
 
     /** set the CommonCore object that is managing this Federate*/
     void setParent(CommonCore* coreObject) { parent_ = coreObject; }
@@ -284,7 +284,7 @@ class FederateState {
     /** check the interfaces for any issues*/
     int checkInterfaces();
     /** generate results from a query*/
-    std::string processQueryActual(const std::string& query) const;
+    std::string processQueryActual(std::string_view query) const;
 
   public:
     /** get the granted time of a federate*/
@@ -346,21 +346,21 @@ class FederateState {
     @param message the message to log
     */
     void logMessage(int level,
-                    const std::string& logMessageSource,
-                    const std::string& message) const;
+                    std::string_view logMessageSource,
+                    std::string_view message) const;
 
     /** set the logging function
     @details function must have signature void(int level, const std::string &sourceName, const
     std::string &message)
     */
-    void setLogger(std::function<void(int, const std::string&, const std::string&)> logFunction)
+    void setLogger(std::function<void(int, std::string_view, std::string_view)> logFunction)
     {
         loggerFunction = std::move(logFunction);
     }
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)
     */
-    void setQueryCallback(std::function<std::string(const std::string&)> queryCallbackFunction)
+    void setQueryCallback(std::function<std::string(std::string_view)> queryCallbackFunction)
     {
         queryCallback = std::move(queryCallbackFunction);
     }

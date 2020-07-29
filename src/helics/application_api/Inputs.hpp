@@ -441,7 +441,7 @@ class HELICS_CXX_EXPORT Input {
 
     multi_input_handling_method getMultiInputMode() const { return inputVectorOp; }
 
-    bool vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV);
+    bool vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffer>>& dataV);
 
   private:
     /** load some information about the data source such as type and units*/

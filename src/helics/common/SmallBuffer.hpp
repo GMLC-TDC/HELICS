@@ -22,6 +22,10 @@ class SmallBuffer {
     SmallBuffer(SmallBuffer&& sb) noexcept;
     SmallBuffer(std::string_view val);
     SmallBuffer(const void* data, size_t size);
+    /** create a buffer with a specific size*/
+    SmallBuffer(std::size_t size);
+    /** create a buffer with a specific size and contents*/
+    SmallBuffer(std::size_t size, std::byte val);
     ~SmallBuffer();
     SmallBuffer& operator=(const SmallBuffer& sb);
     SmallBuffer& operator=(SmallBuffer&& sb) noexcept;
@@ -61,6 +65,7 @@ class SmallBuffer {
     void assign(const void* start, std::size_t size);
     void append(const void* start, const void* end);
     void append(const void* start, std::size_t size);
+    void append(std::string_view data);
     /** interpret the data as a string*/
     std::string_view to_string() const
     {

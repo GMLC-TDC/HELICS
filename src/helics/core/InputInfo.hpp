@@ -22,16 +22,16 @@ class InputInfo {
     struct dataRecord {
         Time time{Time::minVal()};  //!< the time of the data value
         unsigned int iteration{0};  //!< the iteration number of the data value
-        std::shared_ptr<const data_block> data;  //!< the data value
+        std::shared_ptr<const SmallBuffer> data;  //!< the data value
         /** default constructor*/
         dataRecord() = default;
-        dataRecord(Time recordTime, std::shared_ptr<const data_block> recordData):
+        dataRecord(Time recordTime, std::shared_ptr<const SmallBuffer> recordData):
             time(recordTime), data(std::move(recordData))
         {
         }
         dataRecord(Time recordTime,
                    unsigned int recordIteration,
-                   std::shared_ptr<const data_block> recordData):
+                   std::shared_ptr<const SmallBuffer> recordData):
             time(recordTime),
             iteration(recordIteration), data(std::move(recordData))
         {
@@ -79,7 +79,7 @@ class InputInfo {
     int32_t required_connnections{0};  //!< an exact number of connections required
     std::vector<std::pair<helics::Time, unsigned int>>
         current_data_time;  //!< the most recent published data times
-    std::vector<std::shared_ptr<const data_block>>
+    std::vector<std::shared_ptr<const SmallBuffer>>
         current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;  //!< indicator that the source has been deactivated
@@ -90,16 +90,16 @@ class InputInfo {
 
   public:
     /** get all the current data*/
-    const std::vector<std::shared_ptr<const data_block>>& getAllData() const;
+    const std::vector<std::shared_ptr<const SmallBuffer>>& getAllData() const;
     /** get a particular data input*/
-    const std::shared_ptr<const data_block>& getData(int index) const;
+    const std::shared_ptr<const SmallBuffer>& getData(int index) const;
     /** get a the most recent data point*/
-    const std::shared_ptr<const data_block>& getData(uint32_t* inputIndex) const;
+    const std::shared_ptr<const SmallBuffer>& getData(uint32_t* inputIndex) const;
     /** add a data block into the queue*/
     void addData(global_handle source_id,
                  Time valueTime,
                  unsigned int iteration,
-                 std::shared_ptr<const data_block> data);
+                 std::shared_ptr<const SmallBuffer> data);
 
     /** update current data not including data at the specified time
     @param newTime the time to move the subscription to

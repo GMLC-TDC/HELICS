@@ -264,9 +264,9 @@ namespace apps {
                 }
                 if (isBinaryData(mess->data)) {
                     message["encoding"] = "base64";
-                    message["message"] = encode(mess->data.to_string());
+                    message["message"] = encode(std::string(mess->data.to_string()));
                 } else {
-                    message["message"] = mess->data.to_string();
+                    message["message"] = std::string(mess->data.to_string());
                 }
                 doc["messages"].append(message);
             }
