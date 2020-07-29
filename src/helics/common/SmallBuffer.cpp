@@ -53,6 +53,16 @@ SmallBuffer::SmallBuffer(const void* data, size_t size): heap(buffer.data())
     std::memcpy(heap, data, size);
 }
 
+SmallBuffer::SmallBuffer(size_t size): heap(buffer.data())
+{
+    resize(size);
+}
+
+SmallBuffer::SmallBuffer(size_t size, std::byte val): heap(buffer.data())
+{
+    resize(size, val);
+}
+
 SmallBuffer& SmallBuffer::operator=(const SmallBuffer& sb)
 {
     if (this == &sb) {
@@ -196,6 +206,14 @@ void SmallBuffer::append(const void* start, std::size_t size)
     auto csize = bufferSize;
     resize(bufferSize + size);
     std::memcpy(heap + csize, st1, size);
+}
+
+void SmallBuffer::append(std::string_view data)
+{
+    const auto* st1 = reinterpret_cast<const std::byte*>(data.data());
+    auto csize = bufferSize;
+    resize(bufferSize + data.size());
+    std::memcpy(heap + csize, st1, data.size());
 }
 
 void SmallBuffer::swap(SmallBuffer& sb2) noexcept

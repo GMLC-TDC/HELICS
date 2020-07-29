@@ -172,7 +172,7 @@ TEST(TestCore_tests, testcore_messagefilter_callback_test)
             msg->source = filterName;
 
             if (!msg->data.empty()) {
-                ++msg->data[0];
+                msg->data[0] = std::byte(std::to_integer<int>(msg->data[0]) + 1);
             }
             return msg;
         }

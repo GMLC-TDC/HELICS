@@ -39,13 +39,13 @@ using retriever = cereal::PortableBinaryInputArchive;
 
 namespace helics {
 template<class Archive>
-void save(Archive& ar, const data_block& db)
+void save(Archive& ar, const SmallBuffer& db)
 {
     ar(db.to_string());
 }
 
 template<class Archive>
-void load(Archive& ar, data_block& db)
+void load(Archive& ar, SmallBuffer& db)
 {
     std::string val;
     ar(val);
@@ -189,7 +189,7 @@ namespace detail {
 }  // namespace detail
 
 template<class X>
-void ValueConverter<X>::convert(const X& val, data_block& store)
+void ValueConverter<X>::convert(const X& val, SmallBuffer& store)
 {
     detail::ostringbufstream s;
     archiver oa(s);
@@ -202,7 +202,7 @@ void ValueConverter<X>::convert(const X& val, data_block& store)
 }
 
 template<class X>
-void ValueConverter<X>::convert(const X* vals, size_t size, data_block& store)
+void ValueConverter<X>::convert(const X* vals, size_t size, SmallBuffer& store)
 {
     detail::ostringbufstream s;
     archiver oa(s);
@@ -279,7 +279,7 @@ constexpr size_t getMinSize<NamedPoint>()
 }
 
 template<class X>
-data_block ValueConverter<X>::convert(const X* vals, size_t size)
+SmallBuffer ValueConverter<X>::convert(const X* vals, size_t size)
 {
     auto dv = data_block();
     convert(vals, size, dv);
@@ -288,7 +288,7 @@ data_block ValueConverter<X>::convert(const X* vals, size_t size)
 
 /** converter for a basic value*/
 template<class X>
-data_block ValueConverter<X>::convert(const X& val)
+SmallBuffer ValueConverter<X>::convert(const X& val)
 {
     auto dv = data_block();
     convert(val, dv);
