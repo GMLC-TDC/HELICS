@@ -467,8 +467,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message message);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void
-    helicsMessageGetRawData(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsMessageGetRawData(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
 
 /**
  * Get a pointer to the raw data of a message.

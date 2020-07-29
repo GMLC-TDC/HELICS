@@ -20,8 +20,12 @@ set(common_headers
     SmallBuffer.hpp
 )
 
-set(common_sources JsonProcessingFunctions.cpp JsonBuilder.cpp TomlProcessingFunctions.cpp
-                   configFileHelpers.cpp addTargets.cpp
+set(common_sources
+    JsonProcessingFunctions.cpp
+    JsonBuilder.cpp
+    TomlProcessingFunctions.cpp
+    configFileHelpers.cpp
+    addTargets.cpp
     SmallBuffer.cpp
 )
 
