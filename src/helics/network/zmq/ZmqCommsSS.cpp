@@ -126,7 +126,7 @@ namespace zeromq {
                         if (sdata.size() == 3) {
                             connection_info.emplace(M.name(), sdata[2]);
                         } else {
-                            connection_info.emplace(M.name(), M.payload);
+                            connection_info.emplace(M.name(), M.payload.to_string());
                         }
                         status = 3;
                     }

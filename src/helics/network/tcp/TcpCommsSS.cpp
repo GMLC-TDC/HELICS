@@ -272,7 +272,7 @@ namespace tcp {
                                         }
                                     }
                                     if (conn) {
-                                        made_connections.emplace_back(cmd.payload, std::move(conn));
+                                        made_connections.emplace_back(cmd.payload.to_string(), std::move(conn));
                                     }
                                 } else {
                                     logWarning("(tcpss) unable to locate socket");
