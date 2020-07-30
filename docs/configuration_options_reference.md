@@ -5,6 +5,9 @@
     :hidden:
     :maxdepth: 2
 ```
+xxxxxxx Update Julia links to specific points in page
+
+xxxxxxx Add horizontal rule in each section
 
 Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSONs for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](https://docs.helics.org/en/v3userguide/c-api-reference/index.html) to set the logging level, among other things). As such
 
@@ -31,6 +34,8 @@ xxxxxxx - What happens if an option is defined on the JSON config, command line,
 
 ### How to Use This Reference
 The remainder of this reference lists the configuration options that are supported in the JSON configuration file. Where possible, the corresponding C++ API calls and the links to that documentation will be provided. Generally, the command-line options use the exact same syntax as the JSON configuration options preceded by a `--` and followed by either an `=` or a space and then the parameter value (_i.e._ `--name testname`). In the cases where a single letter switch is available, that will be listed (_i.e._ `-n testname`).
+
+Default values are shown in "[]" following the name(s) of the option.
 
 xxxxxxx is this the place to talk about how the JSON config is invoked? 
 
@@ -192,135 +197,417 @@ An example of one publication, subscription, named input, endpoint, and filter i
 
 There are a number of flags which control how a federate acts with respect to timing and its signal interfaces.
 
-### `name` (required)
-_command line:_ `-n` 
-
-_C++ API:_
+=================================================
+### `name` | `-n` (required)
+_API:_ `helicsFederateInfoSetCoreName` 
+[C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a1fc4b4563bd06ac54d9569d1df5f8d0c)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
 Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 
-### `coreType` | `coretype` | `core` | `type`
-_command line:_  `-t`
 
-_C++ API:_
+=================================================
+### `coreType` | `coretype` | `core` | `type` | `-t` ["zmq"]
+_API:_ `helicsFederateInfoSetCoreTypeFromString`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). (xxxxxxxx add link to core type pages)
 
-### `corename`
+
+
+### `corename` 
+_command line:_ xxxxxxx
+
+_API:_ xxxxxxxx
 
 Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
 
-### `coreinit` | `coreinitstring`
-_command line:_ `--i`
+
+
+### `coreinit` | `coreinitstring` | `-i`
+_API:_ `helicsFederateInfoSetCoreInitString`
+[C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a472ea0a8ff1a57d91bfa01b04137e2a8)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
 A command-line-like string that specifies options for the core as it connects to the federation. These options are:
 
-- `--broker=`: xxxxxxx
-- `--brokerports=`: xxxxxxxx
-- `--localport=`: xxxxxxx
-- `--autobroker`: xxxxxxxx
-- `--key=`: xxxxxxx
-- `--brokerinit `: xxxxxxxxx  Could be options seen in BrokerBase.cpp?
+- `--broker=` | `broker_address=`: IP address of broker
+- `--brokerport=`: Port number on which the broker is communicating
+- `--broker_rank=`: For MPI cores only; identifies the MPI rank of the broker
+- `--broker_tag=`: For MPI cores only; identifies the MPI tag of the broker
+- `--localport=`: Port number to use when communicating with this core
+- `--autobroker`: When included the core will automatically generate a broker
+- `--key=`: Specifies a key to use when communicating with the broker. xxxxxxx This needs to be fleshed out.
+
+xxxxxxxx Figure out how to represent all the options shown in BrokerBase.cpp
+
+
 
 ### `terminate_on_error`
+_API:_ (none)
+
 If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions.
 
-### `source_only`
+
+
+### `source_only` | `sourceOnly` | `sourceonly` | `source`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_source_only`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+Used to indicate to the federation that this federate is only producing data and has no inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
+
+
 
 ### `observer`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_observer`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+Used to indicate to the federation that this federate produces no data and only has inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
 
 
 
 ## Logging Options
 
-### `logfile`
-_command line:_
+### `logfile` | `logFile`
+_API:_ `helicsFederateSetLogFile`
+[C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#abde89169985b8a18c2d1b8fa803e5169)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federate)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
-_C++ API:_ `helicsFederateSetLogFile`
-??? xxxxxxx
+Specifies the name of the log file where logging messages will be written.
 
-### `log_level`
 
-Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid values are:
 
-- -1 - no logging
-- 0 - error
-- 1 - warning
-- 2 - summary
-- 3 - connections
-- 4 - interfaces
-- 5 - timing
-- 6 - data
-- 7 - trace
+### `loglevel` | `log-level`
+_API:_ `helicsFederateInfoSetIntegerProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
-### `force_logging_flush`
+_Property's enumerated name:_ `helics_property_int_log_level`
+
+_Valid values:_ 
+
+- -1 - no logging - `helics_log_level_no_print`
+- 0 - error - `helics_log_level_error`
+- 1 - warning - `helics_log_level_warning`
+- 2 - summary - `helics_log_level_summary`
+- 3 - connections - `helics_log_level_connections`
+- 4 - interfaces - `helics_log_level_interfaces`
+- 5 - timing - `helics_log_level_timing`
+- 6 - data - `helics_log_level_data`
+- 7 - trace - `helics_log_level_trace`
+
+Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid levels and their corresponding enumerations are shown below.
+
+
+
+
+
 
 ### `file_log_level`
+_API:_ `helicsFederateInfoSetIntegerProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_int_file_log_level`
+
+_Valid values:_ Same as in `loglevel`
+
+Allows a distinct log level for the written log file to be specified.
+
+
 
 ### `console_log_level`
+_API:_ `helicsFederateInfoSetIntegerProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_int_console_log_level`
+
+_Valid values:_ Same as in `loglevel`
+
+Allows a distinct log level for the displayed log file to be specified.
+
+
+
+
+### `force_logging_flush`
+_API:_ (none)
+
+Setting this option forces HELICS logging messages to be flushed to file after each one is written. This prevents the buffered IO most OSs implement to be bypassed such that all messages appear in the log file immediately after being written at the cost of slower simulation times due to more time spent writing to file.
+
 
 ### `dumplog`
+_API:_ (none)
 
-
+When set, a record of all messages is captured and written out to the log file at the conclusion of the co-simulation.
 
 
 
 ## Timing Options
 
-### `ignore_time_mismatch_warnings`
-If certain timing options (_i.e._ `period`, or `minTimeDelta`) are used it is possible for the time granted a federate to be greater than the requested time. This situation would normally generate a warning message, but if this flag is set those warnings are silenced.
+### `ignore_time_mismatch`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_ignore_time_mismatch_warnings`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+If certain timing options (_i.e._ `period`, or `minTimeDelta`) are used it is possible for the time granted a federate to be greater than the requested time. This situation would normally generate a warning message, but if this flag is set those warnings are silenced. 
+
+
+
 
 ### `uninterruptible`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
-Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag to `true` will prevent premature time grants.
+_Property's enumerated name:_ `helics_flag_uninterruptible`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag will prevent premature time grants.
+
+
+
 
 ### `period`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_period`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
 Many time-based simulators have a minimum time-resolution or a user-configurable step size. The `period` parameter can be used to effectively synchronize the times that are granted with the defined simulation period. The default units for `period` are in seconds but the string for this parameter can include its own units (e.g. "2 ms" or "1 hour"). Setting `period` will force all time grants to occur at times of `n*period` even if subscriptions are updated, messages arrive, or the federate requests a time between periods. This value effectively makes the federates `uninterruptible` during the times between periods. Relatedly...
 
+
+
 ### `offset`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_offset`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
 There may be cases where it is preferable to have a simulator receive time grants that are offset slightly in time to one or more other federates. Defining an `offset` value allows this to take place; units are handled the same as in `period`. Setting both `period` and `offset`, will result in the all times granted to the federate in question being constrained to `n*period + offset`.
 
-### `time_delta`
+
+
+### `time_delta` | `timeDelta` | `timedelta`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_delta`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
 timeDelta has some similarities to `period`; where `period` constrained the granted time to regular intervals, `timeDelta` constrains the grant time to a minimum amount from the last granted time. Units are handled the same as in `period`.
 
-### `minTimeDelta`
-The minimum time delta of federate determines how close two granted times may be to each other. The default value is set to the system epsilon which is the minimum time resolution of the Time class used in HELICS. This can be used to achieve similar effects as the period, but it has a different meaning. If the period is set to be smaller than the minTimeDelta, then when granted the federate will skip ahead a couple time steps.
+
+
 
 ### `input_delay` | `inputdelay` | `inputDelay`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_input_delay`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
 `inputDelay` specifies a delay in simulated time between when a signal arrives at a federate and when that federate is notified that a new value is available. `outputDelay` is similar but applies to signals being sent by a federate. Note that this applies to both value signals and message signals. (xxxxxxx - Need to clarify with developers if messages are delayed t_filter + t_outputDelay or max(t_filter, t_outputDelay)
 
-### `output_delay` | `outputdelay` | `outputDelay`
 
-### `real_time`
+
+### `output_delay` | `outputdelay` | `outputDelay`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_output_delay`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
+`outputDelay` is similar to `input_delay` but applies to signals being sent by a federate. Note that this applies to both value signals and message signals. (xxxxxxx - Need to clarify with developers if messages are delayed t_filter + t_outputDelay or max(t_filter, t_outputDelay)
+
+
+
+
+### `realtime` | `realTime`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_realtime`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
 If set to true the federate uses `rt_lag` and `rt_lead` to match the time grants of a federate to the computer wall clock.
 If the federate is running faster than real time this will insert additional delays. If the federate is running slower than real time this will cause a force grant, which can lead to non-deterministic behavior. `rt_lag` can be set to maxVal to disable force grant
 
-### `rt_tolerance` | `rttolerance` | `rtTolerance`
 
-### `rt_lag` and `rt_lead`
+### `rt_lag`| `rtlag` | `rtLag` and `rt_lead` | `rtlead` | `rtLead`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_rt_lag` and `helics_property_time_rt_lead`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
 Defines "real-time" for HELICS by setting tolerances for HELICS to use when running a real-time co-simulation. HELICS is forced to keep simulated time within this window of wall-clock time. Most general purpose OSes do not provide guarantees of execution timing and thus very small values of `rt_lag` and `rt_lead` (less than 0.005) are not likely to be achievable.
 
 
-### `wait_for_current_time_update` | `wait_for_current_time` | `waitforcurrenttimeupdate` | `waitforcurrenttime` [false]
+
+### `rt_tolerance` | `rttolerance` | `rtTolerance`
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_property_time_rt_tolerance`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: value of type `helics_time` 
+* **C++**: value of type `Time`
+
+Implements the same functionality of `rt_lag` and `rt_lead` but does so by using a single value to set symmetrical lead and lag constraints. 
+
+
+
+### `wait_for_current_time_update` | `wait_for_current_time` | `waitforcurrenttimeupdate` | `waitforcurrenttime` | `delayed_update` | `delayedUpdate` [false]
+
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_wait_for_current_time_update`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
 
 If set to true a federate will not be granted the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it. If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.
 
+
+
+
 ### `restrictive_time_policy` | `conservative_time_policy` | `restrictive_time` | `conservative_time` | `restrictiveTime` | `conservativeTime` [false]
+
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_restrictive_time_policy`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+If set, a federate will not be granted the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it. If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.
 
 Using the option `restrictive-time-policy` forces HELICS to use a fully conservative mode in granting time. This can be useful in situations beyond the current reach of the distributed time algorithms. It is generally used in cases where it is known that some federate is executing and will trigger someone else, but most federates won't know who that might be. This prevents extra messages from being sent and a potential for time skips. It is not needed if some federates are periodic and execute every time step. The flag can be used for federates, brokers, and cores to force very conservative timing with the potential loss of performance as well.
 
 Only applicable to Named Input interfaces ([see section on value federate interface types](./user-guide/value_federates.md)), if enabled this flag checks that data type of the incoming signals match that specified for the input. (xxxxxxx - What happens if they don't match?)
 
 
+
+
 ### `slow_responding` | `slow_response` | `slowResponding` | `slow` | `no_ping` | `disable_ping`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_slow_responding`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
 If specified on a federate, setting this flag indicates the federate may be slow in responding, and to not forcibly eject the federate from the federation for the slow response. This is an uncommon scenario.
 
 If applied to a core or broker (xxxxxxx need examples of this syntax), it is indicative that the broker doesn't respond to internal pings quickly and should not be disconnected from the federation for the slow response.
 
 
-### `forward_compute`
 
-### `delayed_update` | `delayedUpdate`
+
+
 
 
 
@@ -329,10 +616,52 @@ If applied to a core or broker (xxxxxxx need examples of this syntax), it is ind
 
 ## Iteration
 
+### `forward_compute`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_slow_responding`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+Indicates to the broker and the rest of the federation that this federate computes ahead of its granted time and can/does roll back when necessary. xxxxxxx - How does this affect co-simulation operation?
+
+
+
+
 ### `rollback`
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+
+_Property's enumerated name:_ `helics_flag_slow_responding`
+
+_Valid values:_ 
+
+* **C/Python/Julia/Nim**: `helics_true` or `helics_false`
+* **C++**: `true` or `false`
+
+Indicates to the broker and the rest of the federation that this federate can/does roll back when necessary. xxxxxxx - How does this affect co-simulation operation?
+
+
 
 ### `max_iterations` | `maxiterations` | `maxIteration` | `iterations`
+_API:_ `helicsFederateInfoSetIntegerProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
+[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
 
+_Property's enumerated name:_ `helics_property_int_max_iterations`
+
+_Valid values:_ integer value
+
+For federates engaged in iteration (recomputing values based on updated inputs at a single simulation timestep) there may be a need to enforce a maximum number of iterations. This option allows that value to be set. xxxxxxx What triggers this limit (number of times the same time is requested?)? What happens when the limit is reached?
 
 
 ## Network
