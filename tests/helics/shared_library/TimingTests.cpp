@@ -164,18 +164,18 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(helicsEndpointSendMessageRaw(ept1, "e2", "test1", 5, &err));
     CE(helicsFederateRequestTimeAsync(vFed1, 1.9, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
-    EXPECT_EQ(gtime,
-              1.1);  // the message should show up at the next available time point after the impact
-                     // window
+    EXPECT_DOUBLE_EQ(gtime,
+                     1.1);  // the message should show up at the next available time point after the
+                            // impact window
     CE(helicsFederateRequestTimeAsync(vFed2, 2.0, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed1, &err));
-    EXPECT_EQ(gtime, 1.9);
+    EXPECT_DOUBLE_EQ(gtime, 1.9);
 
     CE(auto tres = helicsFederateGetTimeProperty(vFed1, helics_property_time_period, &err));
     EXPECT_DOUBLE_EQ(tres, 0.1);
 
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
-    EXPECT_EQ(gtime, 2.0);
+    EXPECT_DOUBLE_EQ(gtime, 2.0);
     CE(helicsFederateFinalize(vFed1, &err));
     CE(helicsFederateFinalize(vFed2, &err));
 }

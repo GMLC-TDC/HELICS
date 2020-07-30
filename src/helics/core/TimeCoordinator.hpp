@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "json/forwards.h"
 #include <atomic>
-#include <deque>
 #include <functional>
 #include <string>
 #include <utility>
@@ -74,7 +73,8 @@ class TimeCoordinator {
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id>
         dependents;  //!< federates which temporally depend on this federate
-    std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
+    std::vector<std::pair<Time, int32_t>>
+        timeBlocks;  //!< blocks for a particular timeblocking link
     tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage&)>
         sendMessageFunction;  //!< callback used to send the messages
@@ -164,6 +164,8 @@ class TimeCoordinator {
     void transmitTimingMessage(ActionMessage& msg) const;
 
     message_process_result processTimeBlockMessage(const ActionMessage& cmd);
+
+    Time updateTimeBlocks(int32_t blockId, Time newTime);
 
   public:
     /** process a message related to time

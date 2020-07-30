@@ -483,7 +483,7 @@ HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
  * @param ipt The input to get the data for.
  * @forcpponly
  * @param[out] data The memory location of the data
- * @param maxDatalen The maximum size of information that data can hold.
+ * @param maxDataLength The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -492,7 +492,7 @@ HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxDatalen, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxDataLength, int* actualSize, helics_error* err);
 
 /**
  * Get the size of a value for subscription assuming return as a string.
@@ -507,7 +507,7 @@ HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
  * @param ipt The input to get the data for.
  * @forcpponly
  * @param[out] outputString Storage for copying a null terminated string.
- * @param maxStringLen The maximum size of information that str can hold.
+ * @param maxStringLength The maximum size of information that str can hold.
  * @param[out] actualLength The actual length of the string.
  * @param[in,out] err Error term for capturing errors.
  * @endforcpponly
@@ -516,7 +516,7 @@ HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
  * @return A string data
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetString(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, helics_error* err);
+HELICS_EXPORT void helicsInputGetString(helics_input ipt, char* outputString, int maxStringLength, int* actualLength, helics_error* err);
 
 /**
  * Get an integer value from a subscription.
@@ -624,7 +624,7 @@ HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
  * @param ipt The input to get the result for.
  * @forcpponly
  * @param[out] data The location to store the data.
- * @param maxlen The maximum size of the vector.
+ * @param maxLength The maximum size of the vector.
  * @param[out] actualSize Location to place the actual length of the resulting vector.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -633,7 +633,7 @@ HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
  * @return a list of floating point values
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int maxlen, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int maxLength, int* actualSize, helics_error* err);
 
 /**
  * Get a named point from a subscription.
@@ -641,7 +641,7 @@ HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int max
  * @param ipt The input to get the result for.
  * @forcpponly
  * @param[out] outputString Storage for copying a null terminated string.
- * @param maxStringLen The maximum size of information that str can hold.
+ * @param maxStringLength The maximum size of information that str can hold.
  * @param[out] actualLength The actual length of the string
  * @param[out] val The double value for the named point.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -652,7 +652,7 @@ HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int max
  * @endPythonOnly
  */
 HELICS_EXPORT void
-    helicsInputGetNamedPoint(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, double* val, helics_error* err);
+    helicsInputGetNamedPoint(helics_input ipt, char* outputString, int maxStringLength, int* actualLength, double* val, helics_error* err);
 
 /**@}*/
 

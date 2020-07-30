@@ -203,12 +203,12 @@ HELICS_EXPORT void helicsFilterSetString(helics_filter filt, const char* prop, c
  *
  * @details All messages going to a destination are copied to the delivery address(es).
  * @param filt The given filter to add a destination target to.
- * @param dest The name of the endpoint to add as a destination target.
+ * @param dst The name of the endpoint to add as a destination target.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterAddDestinationTarget(helics_filter filt, const char* dest, helics_error* err);
+HELICS_EXPORT void helicsFilterAddDestinationTarget(helics_filter filt, const char* dst, helics_error* err);
 
 /**
  * Add a source target to a filter.
