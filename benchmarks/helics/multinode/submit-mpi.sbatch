@@ -12,10 +12,10 @@ fi
 numnodes_arr=("${SLURM_JOB_NUM_NODES}")
 bm_arr=("${BM_FED}")
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-if [ -n "$SLURM_JOB_ID" ];  then
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+if [ -n "$SLURM_JOB_ID" ]; then
     sbatch_orig_file="$(scontrol show job "$SLURM_JOBID" | awk -F= '/Command=/{print $2}')"
-    SCRIPT_DIR="$( cd "$( dirname "${sbatch_orig_file}" )" >/dev/null 2>&1 && pwd )"
+    SCRIPT_DIR="$(cd "$(dirname "${sbatch_orig_file}")" >/dev/null 2>&1 && pwd)"
 fi
 export SCRIPT_DIR
 
@@ -24,7 +24,6 @@ if [[ "${BM_FED}" == "" ]]; then
     echo "Using default bmfeds: \"Phold\", \"Echo\", \"EchoMessage\", \"RingTransmit\", \"RingTransmitMessage\", \"Timing\""
     bm_arr=("Phold" "Echo" "EchoMessage" "RingTransmit" "RingTransmitMessage" "Timing")
 fi
-
 
 if [[ "${NUM_NODES}" == "" ]]; then
     echo "Using default numnodes: 2, 3, 5, 9"
@@ -60,8 +59,7 @@ NUM NODES: ${SLURM_JOB_NUM_NODES}
 FEDS PER NODE: 1
 TOPOLOGY: ${TOPOLOGY}
 MESSAGE SIZE: ${MSG_SIZE}
-MESSAGE COUNT: ${MSG_COUNT}" > "${output_dir}/summary.txt"
-
+MESSAGE COUNT: ${MSG_COUNT}" >"${output_dir}/summary.txt"
 
 pushd "$BUILD_PATH/bin" || exit 1
 for bm in "${bm_arr[@]}"; do
