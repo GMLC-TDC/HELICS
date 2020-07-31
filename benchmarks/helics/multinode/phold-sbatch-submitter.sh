@@ -4,9 +4,9 @@
 # if arguments are given when running the script, they are used as an array for the number of nodes to use
 
 # mpi is not on this list because starting an mpi federation requires a different setup procedure
-numnodes_arr=( 1 2 4 8 )
+numnodes_arr=(1 2 4 8)
 coretypes_arr=("zmq" "zmqss" "tcp" "tcpss" "udp")
-fedcount_arr=( 1 2 4 16 )
+fedcount_arr=(1 2 4 16)
 topology="single_broker"
 
 if [ "$#" -ne 0 ]; then
