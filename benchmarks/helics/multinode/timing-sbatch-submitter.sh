@@ -6,6 +6,9 @@
 # mpi is not on this list because starting an mpi federation requires a different setup procedure
 coretypes_arr=( "zmq" "zmqss" "tcp" "tcpss" "udp" )
 numnodes_arr=( 1 2 4 8 )
+fedcount_arr=( 2 4 8 16 )
+topology="single_broker"
+
 if [ "$#" -ne 0 ]; then
     numnodes_arr=( "$@" )
 fi
@@ -14,6 +17,9 @@ for ct in "${coretypes_arr[@]}"
 do
     for numnodes in "${numnodes_arr[@]}"
     do
-        sbatch --export="CORE_TYPE=${ct},BM_FED=TimingLeaf,BM_HUB=TimingHub,LEAFS_ARG=true" -N "${numnodes}" index-hub-bm.sbatch
+        for fedcount in "${fedcount_arr[@]}"
+        do
+            sbatch --export="CORE_TYPE=${ct},BM_FED=TimingLeaf,BM_HUB=TimingHub,LEAFS_ARG=true,FEDS_PER_NODE=${fedcount},TOPOLOGY=${topology}" -N "${numnodes}" index-hub-bm.sbatch
+        done
     done
 done

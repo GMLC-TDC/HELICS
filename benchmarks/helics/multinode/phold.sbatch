@@ -58,8 +58,6 @@ echo "Running broker on $HOSTNAME"
 # give some time for the broker to start up
 sleep 5
 
-# Run on 1 and 2 nodes to verify output, then scale to 4,8,16,32 to get performance numbers
-# Run on 1 node with 2, 4, 8, 16, and 32 instances to verify Eaton results for single node
 for i in $(seq 1 "${SLURM_JOB_NUM_NODES}"); do
     ((idx = i - 1))
     srun -N1 "${helics_bm_fed_exe}" "${BM_FED}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" >"${output_folder}/${BM_FED}Federate-${idx}-out.txt" 2>&1 &
