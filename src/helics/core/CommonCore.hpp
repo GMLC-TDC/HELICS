@@ -480,6 +480,8 @@ class CommonCore: public Core, public BrokerBase {
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/
     void sendDisconnect();
+    /** broadcast a message to all federates*/
+    void broadcastToFederates(ActionMessage& cmd);
 
     friend class TimeoutMonitor;
 };

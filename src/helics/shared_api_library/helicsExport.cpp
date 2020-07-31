@@ -4,7 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
@@ -482,6 +481,24 @@ void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helic
     brk->setLogFile(AS_STRING(logFileName));
 }
 
+void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time barrierTime, helics_error* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->setTimeBarrier(barrierTime);
+}
+
+void helicsBrokerClearTimeBarrier(helics_broker broker)
+{
+    auto* brk = getBroker(broker, nullptr);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->clearTimeBarrier();
+}
+
 void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err)
 {
     auto* brk = getBroker(broker, err);
@@ -789,7 +806,7 @@ void helicsCloseLibrary(void)
     helics::BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(2000));
     ret.get();
 
-    helics::LoggerManager::closeLogger();
+    // helics::LoggerManager::closeLogger();
     // helics::cleanupHelicsLibrary();
 }
 
@@ -989,7 +1006,6 @@ MasterObjectHolder::~MasterObjectHolder()
         ZmqContextManager::closeContext();  // LCOV_EXCL_LINE
     }
 #endif
-    helics::LoggingCore::setFastShutdown();
     deleteAll();
     // std::cout << "end of master Object Holder destructor" << std::endl;
 }
