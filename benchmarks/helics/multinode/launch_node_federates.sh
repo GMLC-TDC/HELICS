@@ -18,7 +18,7 @@ echo "output_prefix"
 echo "start_index"
 
 for ((i = start_index; i < start_index + FEDS_PER_NODE; i++)); do
-    echo "Running: \"${helics_bm_fed_exe}\" \"${BM_FED}\" --index=${i} \"$@\" > \"${output_prefix}-${i}-out.txt\" 2>&1 &"
+    echo "Running: \"${helics_bm_fed_exe}\" \"${BM_FED}\" --index=${i} \"$*\" > \"${output_prefix}-${i}-out.txt\" 2>&1 &"
     "${helics_bm_fed_exe}" "${BM_FED}" --index="${i}" "$@" >"${output_prefix}-${i}-out.txt" 2>&1 &
 done
 
