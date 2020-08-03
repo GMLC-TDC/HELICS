@@ -23,7 +23,7 @@ if(SWIG_EXECUTABLE)
 
     swig_link_libraries(CShelics helicsSharedLib)
 
-    set_target_properties(${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES FOLDER interfaces)
+    set_target_properties(${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX "")
 
 else()
     message(SEND_ERROR "C# interface build requires swig")
