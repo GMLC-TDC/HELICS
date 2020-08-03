@@ -14,7 +14,7 @@ resource managers.
 We will define the term "orchestration" within HELICS as workflow and
 deployment. This will allow users to define a co-simulation workflow
 they would like to execute and deploy the co-simulation either on
-their own machine or in an HPC environemnt.
+their own machine or in an HPC environment.
 
 ## What you will need
 
@@ -27,6 +27,27 @@ a full guide on how to use merlin, please refer to the merlin
 [tutorial](https://merlin.readthedocs.io/en/latest/tutorial.html). 
 
 ### Merlin
+
+Merlin is a distributed task queuing system, designed to allow complex
+HPC workflows to scale to large numbers of simulations. It is designed
+to make building, running, and processing large scale HPC
+workflows. It is not limited to HPC, it can also be setup on a single
+machine.
+
+Merlin translates a command-line focused workflow into discrete tasks
+that it will queue up and launch. This workflow is called a
+specification, spec for short. The spec is separated into multiple
+sections that is used to describe how to execute the workflow. This
+workflow is then represented as a directed acyclic graph (DAG) which
+describes how the workflow executes.
+
+Once the Merlin spec has been created, the main execution logic is
+contained in the Study step. This step describes how the applications
+or scripts need to be executed in the commandline in order to execute
+your workflow. The study step is made up of multiple run steps that
+are represented as the nodes in the DAG.
+
+### Merlin Specification
 
 A merlin specification has multiple parts that control how a
 co-simulation may run. Below we describe how each part can be used in
@@ -138,7 +159,7 @@ this command will get executed for each index in ```FED```.
 ### Full Spec
 
 Below is the full Merlin spec that was created to make 8 pi-receivers
-and 8 pi-senders and execute it as a merlin work flow.
+and 8 pi-senders and execute it as a merlin workflow.
 
 ```
 description:
