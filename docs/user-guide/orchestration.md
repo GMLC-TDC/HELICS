@@ -21,10 +21,10 @@ their own machine or in an HPC environment.
 First you will need to build and install
 [merlin](https://github.com/LLNL/merlin). This guide will walk through
 a suggested co-simulation spec using merlin to launch a HELICS
-co-simulation. This is not a comprehsive guide on how to use merlin,
+co-simulation. This is not a comprehensive guide on how to use merlin,
 but a guide to use merlin for HELICS co-simulation orchestration. For
 a full guide on how to use merlin, please refer to the merlin
-[tutorial](https://merlin.readthedocs.io/en/latest/tutorial.html). 
+[tutorial](https://merlin.readthedocs.io/en/latest/tutorial.html).
 
 ### Merlin
 
@@ -46,6 +46,9 @@ contained in the Study step. This step describes how the applications
 or scripts need to be executed in the commandline in order to execute
 your workflow. The study step is made up of multiple run steps that
 are represented as the nodes in the DAG.
+
+For a more in-depth explanation on how Merlin works, take a look at
+their documentation [here](https://merlin.readthedocs.io/en/latest/index.html)
 
 ### Merlin Specification
 
@@ -212,7 +215,7 @@ only need to provide the number of nodes they need for their study.
 Another benefit of using Merlin for HELICS co-simulation is its
 flexibility to manage complex co-simulation. Another tool that you may
 have heard of is helics_cli. Helics_cli is a commandline tool to launch
-HELICS co-simulations. It currently as of this writting does not have
+HELICS co-simulations. It currently as of this writing does not have
 the ability to analyze the data and launch subsequent co-simulations
 if need. In this type of scenario a user could use Merlin to setup a
 specification that included an analyze step in the Study step of
