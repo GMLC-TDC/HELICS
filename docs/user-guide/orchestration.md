@@ -11,11 +11,10 @@ resource managers.
 
 # Definition of "Orchestration" in HELICS
 
-We will define the term "orchestration" within HELICS as a method to
-manage and execute a single co-simulation cycle or multiple
-co-simulation cycles. This includes managing output from 1
-co-simulation so that it can be used as input to subsequent
-co-simulation runs if needed.
+We will define the term "orchestration" within HELICS as workflow and
+deployment. This will allow users to define a co-simulation workflow
+they would like to execute and deploy the co-simulation either on
+their own machine or in an HPC environemnt.
 
 ## What you will need
 
@@ -29,18 +28,16 @@ a full guide on how to use merlin, please refer to the merlin
 
 ### Merlin
 
-A merlin specification has 2 main parts that control how a
-co-simulation may run. Some steps are not required so use the ones
-that are most appropriate for your co-simulation. Below we describe
-how you might use each step. We will be using the pi-exchange python
-example that can be found
+A merlin specification has multiple parts that control how a
+co-simulation may run. Below we describe how each part can be used in
+a HELICS co-simulation workflow. For the sake of simplicity we are
+using the the pi-exchange python example that can be found
 [here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/python/pi-exchange). The
 goal will be to have merlin launch multiple pi-senders and
 pi-recievers.
 
-#### Merlin Spec variables and description
-In addition to the main co-simulation launching steps, merlin also has
-description and and environment block. The description block,
+#### Merlin workflow description and environment
+Merlin has a description and and environment block. The description block,
 describes the name and a short description about the study.
 ```
 description:
@@ -59,6 +56,9 @@ env:
     N_SAMPLES: 8
 ```
 
+In the example above ```N_SAMPLES``` will be used to describe how many
+pi-senders and pi-receivers we want in our co-simulation.
+
 
 
 #### Merlin Step
@@ -66,7 +66,7 @@ env:
 The merlin step can simply be summarized as the input data generation
 step. This step describes how to create the initial inputs for the
 co-simulation so that subsquent steps can use this input to start the
-co-simulation. Below is how we might decribe the merlin step for our
+co-simulation. Below is how we might describe the merlin step for our
 pi-exchange study.
 
 ```
@@ -123,12 +123,56 @@ run segment is where you will tell merlin what commands need to be
 executed.
 
 ```
-    - name: start_federates <---- Name of the step
+    - name: start_federates <-- Name of the step
       description: say Hello 
       run:
         cmd: |
-          helics run --path=$(FED) <---- execute the helics_cli for
-      each column in samples.csv
+          helics run --path=$(FED) <-- execute the helics_cli for each column in samples.csv
           echo "DONE"
 
+```
+In the example snippet we ask Merlin to execute the json file that was
+created in the merlin step. Since the ```FED``` variable is a list,
+this command will get executed for each index in ```FED```.
+
+### Full Spec
+
+Below is the full Merlin spec that was created to make 8 pi-receivers
+and 8 pi-senders and execute it as a merlin work flow.
+
+```
+description:
+    name: Test helics 
+    description: Juggle helics data
+
+env:
+  variables:
+    OUTPUT_PATH: ./helics_juggle_output
+    N_SAMPLES: 8
+
+
+merlin:
+  samples:
+    generate:
+      cmd: |
+        python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
+        cp $(SPECROOT)/pireceiver.py $(MERLIN_INFO)
+        cp $(SPECROOT)/pisender.py $(MERLIN_INFO)
+    file: samples.csv
+    column_labels: [FED]
+
+
+study:
+    - name: start_federates
+      description: say Hello 
+      run:
+        cmd: |
+          spack load helics
+          /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
+          echo "DONE"
+    - name: cleanup
+      description: Clean up
+      run:
+        cmd: rm $(SPECROOT)/samples.csv
+        depends: [start_federates_*]
 ```
