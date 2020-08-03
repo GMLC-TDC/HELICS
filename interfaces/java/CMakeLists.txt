@@ -180,7 +180,9 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         endif()
     endif()
 
-    set_target_properties(${SWIG_MODULE_helicsJava_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX "")
+    set_target_properties(
+        ${SWIG_MODULE_helicsJava_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX ""
+    )
     add_library(helics::java ALIAS ${SWIG_MODULE_helicsJava_REAL_NAME})
     message(STATUS "java target is ${SWIG_MODULE_helicsJava_REAL_NAME}")
     set(HELICS_JAVA_TARGET ${SWIG_MODULE_helicsJava_REAL_NAME})

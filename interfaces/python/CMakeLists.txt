@@ -230,8 +230,10 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 
     message(STATUS "swig target is ${SWIG_MODULE_helics_REAL_NAME}")
 
-    set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX "")
-    
+    set_target_properties(
+        ${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX ""
+    )
+
     if(CMAKE_PROJECT_NAME STREQUAL "HELICS")
         set_target_properties(
             ${SWIG_MODULE_helics_REAL_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
