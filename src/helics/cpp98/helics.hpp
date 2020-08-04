@@ -46,5 +46,11 @@ void cleanupHelicsLibrary()
     helicsCleanupLibrary();
 }
 
+/** close the library and cleanup all open objects*/
+void closeLibrary()
+{
+    helicsCloseLibrary();
+}
+
 }  // namespace helicscpp
 #endif
