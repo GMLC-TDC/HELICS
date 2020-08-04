@@ -256,9 +256,6 @@ add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
 get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
-set(HELICS_BUILD_FLAGS_OUTPUT
-    "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_STATIC_LINKER_FLAGS} ${EXTRA_BUILD_FLAGS} "
-)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(NOT USE_LIBCXX)
