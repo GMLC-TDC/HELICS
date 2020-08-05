@@ -175,6 +175,7 @@ class BrokerBase {
     void generateLoggers();
     /** handle some configuration options for the base*/
     void baseConfigure(ActionMessage& command);
+
   protected:
     /** process a disconnect signal*/
     virtual void processDisconnect(bool skipUnregister = false) = 0;

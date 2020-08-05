@@ -149,12 +149,14 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                    "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
-    logging_group->add_flag_function("--force_logging_flush",
-                            [this](int64_t val){
-        if (val > 0) {
-            forceLoggingFlush = true;
-        }},
-                            "flush the log after every message");
+    logging_group->add_flag_function(
+        "--force_logging_flush",
+        [this](int64_t val) {
+            if (val > 0) {
+                forceLoggingFlush = true;
+            }
+        },
+        "flush the log after every message");
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
@@ -315,12 +317,11 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                     spdlog::warn("{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_error) {
                     spdlog::error("{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel == -10) {//dumplog
+                } else if (logLevel == -10) {  // dumplog
                     spdlog::trace("{}", message);
                 } else {
                     spdlog::critical("{} ({})::{}", name, federateID.baseValue(), message);
                 }
-                
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
                 if (logLevel >= helics_log_level_trace) {
@@ -339,11 +340,13 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                     fileLogger->log(
                         spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel == -10) {  // dumplog
-                    fileLogger->log(
-                        spdlog::level::trace, message);
+                    fileLogger->log(spdlog::level::trace, message);
                 } else {
-                    fileLogger->log(
-                        spdlog::level::critical, "{} ({})::{}", name, federateID.baseValue(), message);
+                    fileLogger->log(spdlog::level::critical,
+                                    "{} ({})::{}",
+                                    name,
+                                    federateID.baseValue(),
+                                    message);
                 }
 
                 if (forceLoggingFlush) {
