@@ -275,7 +275,10 @@ TEST(logging_tests, dumplog)
                            });
 
     Fed->enterExecutingMode();
-
+    /** We are setting the flag then clearing it
+    this will generate 1 and at most 2 messages in the log callback
+    Thus the check for this is that there is a least 2 and at most 3 messages
+    in the log block, to indicate that the set and clear was successful*/
     Fed->setFlagOption(helics_flag_dumplog);
     Fed->setFlagOption(helics_flag_dumplog, false);
 
@@ -285,4 +288,7 @@ TEST(logging_tests, dumplog)
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 2U);
     EXPECT_LE(llock->size(), 3U);
+    // this is to check that it has the correct level
+    EXPECT_EQ(llock->back().first, -10);  // the -10 should have a level enum value at some point in
+                                          // the future as part of the debugging improvements
 }
