@@ -772,6 +772,14 @@ int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t pro
 
 void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool flagValue)
 {
+    if (flag == defs::flags::dumplog || flag == defs::flags::force_logging_flush) {
+        ActionMessage cmd(CMD_BASE_CONFIGURE);
+        cmd.messageID = flag;
+        if (flagValue) {
+            setActionFlag(cmd, indicator_flag);
+        }
+        addActionMessage(cmd);
+    }
     if (federateID == local_core_id) {
         if (flag == defs::flags::delay_init_entry) {
             if (flagValue) {
