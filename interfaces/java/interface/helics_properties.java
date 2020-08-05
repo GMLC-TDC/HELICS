@@ -25,17 +25,18 @@ public final class helics_properties {
    */
   public final static helics_properties helics_property_time_offset = new helics_properties("helics_property_time_offset", helicsJNI.helics_property_time_offset_get());
   /**
-   *  the property controlling real time lag for a federate the max time a federate can lag real<br>
-   *        time
+   *  the property controlling real time lag for a federate the max time a federate can lag<br>
+   *        real time
    */
   public final static helics_properties helics_property_time_rt_lag = new helics_properties("helics_property_time_rt_lag", helicsJNI.helics_property_time_rt_lag_get());
   /**
-   *  the property controlling real time lead for a federate the max time a federate can be ahead<br>
-   *        of real time
+   *  the property controlling real time lead for a federate the max time a federate can be<br>
+   *        ahead of real time
    */
   public final static helics_properties helics_property_time_rt_lead = new helics_properties("helics_property_time_rt_lead", helicsJNI.helics_property_time_rt_lead_get());
   /**
-   *  the property controlling real time tolerance for a federate sets both rt_lag and rt_lead
+   *  the property controlling real time tolerance for a federate sets both rt_lag and<br>
+   *        rt_lead
    */
   public final static helics_properties helics_property_time_rt_tolerance = new helics_properties("helics_property_time_rt_tolerance", helicsJNI.helics_property_time_rt_tolerance_get());
   /**
