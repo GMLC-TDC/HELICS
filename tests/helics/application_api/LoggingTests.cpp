@@ -257,3 +257,31 @@ TEST(logging_tests, check_log_message_levels_high)
     }
     EXPECT_TRUE(found_low && found_high);
 }
+
+
+TEST(logging_tests, dumplog)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty(helics::defs::log_level, -1);
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto cr = Fed->getCorePointer();
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    cr->setLoggingCallback(helics::local_core_id,
+        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+
+    Fed->enterExecutingMode();
+
+    Fed->setFlagOption(helics_flag_dumplog);
+    Fed->setFlagOption(helics_flag_dumplog, false);
+    
+    Fed->finalize();
+    cr->waitForDisconnect();
+    cr.reset();
+    auto llock = mlog.lock();
+    EXPECT_GE(llock->size(),2U);
+    EXPECT_LE(llock->size(), 3U);
+}

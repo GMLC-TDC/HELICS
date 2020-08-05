@@ -72,7 +72,7 @@ class BrokerBase {
     std::atomic<bool> mainLoopIsRunning{
         false};  //!< flag indicating that the main processing loop is running
     bool dumplog{false};  //!< flag indicating the broker should capture a dump log
-    bool forceLoggingFlush{false};  //!< force the log to flush after every message
+    std::atomic<bool> forceLoggingFlush{false};  //!< force the log to flush after every message
     bool queueDisabled{
         false};  //!< flag indicating that the message queue should not be used and all functions
     //!< called directly instead of distinct thread
@@ -173,7 +173,8 @@ class BrokerBase {
     std::shared_ptr<helicsCLI11App> generateBaseCLI();
     /** generate the loggers for the broker*/
     void generateLoggers();
-
+    /** handle some configuration options for the base*/
+    void baseConfigure(ActionMessage& command);
   protected:
     /** process a disconnect signal*/
     virtual void processDisconnect(bool skipUnregister = false) = 0;
