@@ -4,6 +4,10 @@ This is a set of bash scripts and SLURM sbatch files for running multi-node HELI
 
 For running on the Quartz cluster at LLNL, and other clusters that use `pbatch` as the partition name that allow scheduling jobs with a time of up to 1 hour and 8 nodes, these scripts should work with the default settings. Otherwise, it *will* be necessary to go in and edit the default partition/times in the sbatch files, and alter the submitter bash scripts to use a number of nodes that is suitable for your cluster.
 
+Files are output from the directory that the job was submitted in. For the least painful experience with finding executables, it's best to run it from inside this folder of a git checkout, and a build folder in the root of the git repository called `build`.
+
+Some clusters may require a `--exclusive` argument getting added to the srun/sbatch commands in the scripts.
+
 ## \*-sbatch-submitter.sh Files
 
 The submitter bash scripts take care of submitting multiple jobs with different parameters (number of nodes, federates per node, etc) to SLURM quickly.
