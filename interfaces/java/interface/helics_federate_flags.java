@@ -87,6 +87,14 @@ public final class helics_federate_flags {
    *  specify that a federate error should terminate the federation
    */
   public final static helics_federate_flags helics_flag_terminate_on_error = new helics_federate_flags("helics_flag_terminate_on_error", helicsJNI.helics_flag_terminate_on_error_get());
+  /**
+   *  specify that the log files should be flushed on every log message
+   */
+  public final static helics_federate_flags helics_flag_force_logging_flush = new helics_federate_flags("helics_flag_force_logging_flush", helicsJNI.helics_flag_force_logging_flush_get());
+  /**
+   *  specify that a full log should be dumped into a file
+   */
+  public final static helics_federate_flags helics_flag_dumplog = new helics_federate_flags("helics_flag_dumplog", helicsJNI.helics_flag_dumplog_get());
 
   public final int swigValue() {
     return swigValue;
@@ -122,7 +130,7 @@ public final class helics_federate_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_restrictive_time_policy, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_slow_responding, helics_flag_delay_init_entry, helics_flag_enable_init_entry, helics_flag_ignore_time_mismatch_warnings, helics_flag_terminate_on_error };
+  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_restrictive_time_policy, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_slow_responding, helics_flag_delay_init_entry, helics_flag_enable_init_entry, helics_flag_ignore_time_mismatch_warnings, helics_flag_terminate_on_error, helics_flag_force_logging_flush, helics_flag_dumplog };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
