@@ -179,6 +179,10 @@ helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mism
 r""" used to not display warnings on mismatched requested times"""
 helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
 r""" specify that a federate error should terminate the federation"""
+helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush
+r""" specify that the log files should be flushed on every log message"""
+helics_flag_dumplog = _helics.helics_flag_dumplog
+r""" specify that a full log should be dumped into a file"""
 helics_log_level_no_print = _helics.helics_log_level_no_print
 r""" don't print anything except a few catastrophic errors"""
 helics_log_level_error = _helics.helics_log_level_error
@@ -188,7 +192,10 @@ r""" only print warnings and errors"""
 helics_log_level_summary = _helics.helics_log_level_summary
 r""" warning errors and summary level information"""
 helics_log_level_connections = _helics.helics_log_level_connections
-r""" summary+ notices about federate and broker connections +messages about network connections"""
+r"""
+    summary+ notices about federate and broker connections +messages about network
+                     connections
+    """
 helics_log_level_interfaces = _helics.helics_log_level_interfaces
 r""" connections+ interface definitions"""
 helics_log_level_timing = _helics.helics_log_level_timing
@@ -235,16 +242,19 @@ helics_property_time_offset = _helics.helics_property_time_offset
 r""" the property controlling time offset for the period of federate"""
 helics_property_time_rt_lag = _helics.helics_property_time_rt_lag
 r"""
-    the property controlling real time lag for a federate the max time a federate can lag real
-          time
+    the property controlling real time lag for a federate the max time a federate can lag
+          real time
     """
 helics_property_time_rt_lead = _helics.helics_property_time_rt_lead
 r"""
-    the property controlling real time lead for a federate the max time a federate can be ahead
-          of real time
+    the property controlling real time lead for a federate the max time a federate can be
+          ahead of real time
     """
 helics_property_time_rt_tolerance = _helics.helics_property_time_rt_tolerance
-r""" the property controlling real time tolerance for a federate sets both rt_lag and rt_lead"""
+r"""
+    the property controlling real time tolerance for a federate sets both rt_lag and
+          rt_lead
+    """
 helics_property_time_input_delay = _helics.helics_property_time_input_delay
 r""" the property controlling input delay for a federate"""
 helics_property_time_output_delay = _helics.helics_property_time_output_delay
@@ -305,7 +315,10 @@ r""" specify that the types should be checked strictly for pub/sub and filters""
 helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
 r""" specify that the mismatching units should be ignored"""
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
-r""" specify that an interface will only transmit on change(only applicable to publications)"""
+r"""
+    specify that an interface will only transmit on change(only applicable to
+          publications)
+    """
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
 r""" specify that an interface will only update if the value has actually changed"""
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
@@ -327,13 +340,16 @@ r""" a filter type that executes a random delay on the messages"""
 helics_filter_type_random_drop = _helics.helics_filter_type_random_drop
 r""" a filter type that randomly drops messages"""
 helics_filter_type_reroute = _helics.helics_filter_type_reroute
-r""" a filter type that reroutes a message to a different destination than originally specified"""
+r"""
+    a filter type that reroutes a message to a different destination than originally
+          specified
+    """
 helics_filter_type_clone = _helics.helics_filter_type_clone
 r""" a filter type that duplicates a message and sends the copy to a different destination"""
 helics_filter_type_firewall = _helics.helics_filter_type_firewall
 r"""
-    a customizable filter type that can perform different actions on a message based on firewall
-          like rules
+    a customizable filter type that can perform different actions on a message based on
+          firewall like rules
     """
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""

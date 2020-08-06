@@ -1,7 +1,7 @@
-function v = helics_error_system_failure()
+function v = helics_flag_dumplog()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 63);
+    vInitialized = helicsMEX(0, 45);
   end
   v = vInitialized;
 end
