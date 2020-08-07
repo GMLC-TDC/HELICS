@@ -28,7 +28,7 @@ The sbatch files are the script that runs when a SLURM allocates resources to a 
 
 The main things of interest in these files to change are the SBATCH directives at the top of the file. They are just SLURM command line arguments, see the SLURM documentation for details.
 
-```
+```shell
 #SBATCH -t 1:00:00
 #SBATCH -p pbatch
 ```
