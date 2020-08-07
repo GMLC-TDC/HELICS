@@ -102,6 +102,8 @@ TEST_P(vfed_type_tests, test_async_calls)
     EXPECT_EQ(f1time, 1.0);
     EXPECT_EQ(gtime, 1.0);
 
+    gtime = vFed1->getCurrentTime();
+    EXPECT_EQ(gtime, 1.0);
     // get the value
     auto s = subid.getString();
 
