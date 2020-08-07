@@ -586,6 +586,8 @@ TEST_P(valuefed_single_type, init_publish)
 
     EXPECT_EQ(gtime, 1.0);
 
+    gtime = vFed1->getCurrentTime();
+    EXPECT_EQ(gtime, 1.0);
     // get the value
     subid.getValue(val);
     // make sure the string is what we expect

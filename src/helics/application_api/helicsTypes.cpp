@@ -439,13 +439,15 @@ double getDoubleFromString(std::string_view val)
     }
     if (val.front() == 'v' || val.front() == '[') {
         auto V = helicsGetVector(val);
-        return vectorNorm(V);
+        return (V.size() != 1) ? vectorNorm(V) : V[0];
     }
     if (val.front() == 'c') {
         auto cv = helicsGetComplexVector(val);
-        return vectorNorm(cv);
+        return (cv.size() != 1) ? vectorNorm(cv) :
+                                  ((cv[0].imag() == 0.0) ? cv[0].real() : std::abs(cv[0]));
     }
-    return std::abs(helicsGetComplex(val));
+    auto cval = helicsGetComplex(val);
+    return (cval.imag() == 0.0) ? cval.real() : std::abs(cval);
 }
 
 void helicsGetVector(std::string_view val, std::vector<double>& data)

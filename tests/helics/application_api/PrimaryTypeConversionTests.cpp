@@ -72,6 +72,25 @@ TEST(type_conversion_tests, string_converstion_tests)
     EXPECT_TRUE(checkTypeConversion1(test1, NamedPoint{test1, std::nan("0")}));
 }
 
+TEST(type_conversion_tests, string_converstion_tests_negative)
+{
+    std::string vstr("-15.212");
+    double val = -15.212;
+    EXPECT_TRUE(checkTypeConversion1(vstr, vstr));
+    EXPECT_TRUE(checkTypeConversion1(vstr, val));
+    EXPECT_TRUE(checkTypeConversion1(vstr, static_cast<int64_t>(val)));
+    EXPECT_TRUE(checkTypeConversion1(vstr, static_cast<float>(val)));
+    EXPECT_TRUE(checkTypeConversion1(vstr, std::complex<double>(val, 0)));
+    EXPECT_TRUE(checkTypeConversion1(vstr, std::vector<double>{val}));
+    EXPECT_TRUE(
+        checkTypeConversion1(vstr,
+                             std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
+    EXPECT_TRUE(checkTypeConversion1(vstr, true));
+    EXPECT_TRUE(checkTypeConversion1(vstr, NamedPoint{"value", val}));
+    std::string test1("test1");
+    EXPECT_TRUE(checkTypeConversion1(test1, NamedPoint{test1, std::nan("0")}));
+}
+
 TEST(type_conversion_tests, double_type_tests)
 {
     EXPECT_TRUE(helicsType<double>() == data_type::helics_double);
@@ -83,6 +102,22 @@ TEST(type_conversion_tests, double_type_tests)
 TEST(type_conversion_tests, double_conversion_tests)
 {
     double val = 45.786;
+    EXPECT_TRUE(checkTypeConversion1(val, val));
+    EXPECT_TRUE(checkTypeConversion1(val, std::to_string(val)));
+    EXPECT_TRUE(checkTypeConversion1(val, static_cast<int64_t>(val)));
+    EXPECT_TRUE(checkTypeConversion1(val, static_cast<float>(val)));
+    EXPECT_TRUE(checkTypeConversion1(val, std::complex<double>(val, 0)));
+    EXPECT_TRUE(checkTypeConversion1(val, std::vector<double>{val}));
+    EXPECT_TRUE(
+        checkTypeConversion1(val,
+                             std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
+    EXPECT_TRUE(checkTypeConversion1(val, true));
+    EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", val}));
+}
+
+TEST(type_conversion_tests, double_conversion_tests3)
+{
+    double val = -17.786;
     EXPECT_TRUE(checkTypeConversion1(val, val));
     EXPECT_TRUE(checkTypeConversion1(val, std::to_string(val)));
     EXPECT_TRUE(checkTypeConversion1(val, static_cast<int64_t>(val)));
