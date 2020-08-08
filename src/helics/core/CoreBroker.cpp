@@ -108,7 +108,7 @@ const BasicBrokerInfo* CoreBroker::getBrokerById(global_broker_id brokerid) cons
 }
 
 void CoreBroker::setLoggingCallback(
-    const std::function<void(int, const std::string&, const std::string&)>& logFunction)
+    const std::function<void(int, std::string_view, std::string_view)>& logFunction)
 {
     ActionMessage loggerUpdate(CMD_BROKER_CONFIGURE);
     loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
@@ -501,7 +501,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     // generate an error message
                     LOG_ERROR(global_broker_id_local,
                               identifier,
-                              fmt::format("unable to register broker {}", command.payload));
+                              fmt::format("unable to register broker {}", command.payload.to_string()));
                     return;
                 }
 

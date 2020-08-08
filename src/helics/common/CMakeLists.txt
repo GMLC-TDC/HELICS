@@ -14,10 +14,10 @@ set(common_headers
     GuardedTypes.hpp
     fmt_format.h
     fmt_ostream.h
+    frozen_map.h
     addTargets.hpp
     configFileHelpers.hpp
     JsonGeneration.hpp
-    SmallBuffer.hpp
 )
 
 set(common_sources
@@ -26,7 +26,6 @@ set(common_sources
     TomlProcessingFunctions.cpp
     configFileHelpers.cpp
     addTargets.cpp
-    SmallBuffer.cpp
 )
 
 # headers that are part of the public interface

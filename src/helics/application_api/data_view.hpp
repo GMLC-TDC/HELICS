@@ -38,20 +38,22 @@ class data_view {
     data_view(const data_view& dt) noexcept = default;
     /** move constructor*/
     data_view(data_view&& dv) noexcept: dblock(dv.dblock), ref(std::move(dv.ref)) {}
-
-    /** construct from a string*/
-    data_view(const char* dt) noexcept: dblock(dt) {}  // NOLINT
+    template<typename U,
+             typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
+    data_view(U&& u) noexcept: dblock(std::forward<U>(u)) // NOLINT
+    {
+    }
     /** construct from a char Pointer and length*/
     data_view(const char* dt, size_t len) noexcept: dblock(dt, len) {}
     /** construct from a rValue to a string*/
-    data_view(std::string&& str):
-        data_view(std::make_shared<SmallBuffer>(std::move(str))) {}  // NOLINT
+    data_view(SmallBuffer&& sb):
+        data_view(std::make_shared<SmallBuffer>(std::move(sb))) {}  // NOLINT
     /** construct from a char vector*/
     data_view(const std::vector<char>& dvec) noexcept:
         dblock(dvec.data(), dvec.size()) {}  // NOLINT
-    /** construct from a string_view*/
-    data_view(const std::string_view& sview) noexcept:
-        dblock(sview){};  // NOLINT (intended implicit)
+
+    data_view(const std::vector<double>& dvec) noexcept:
+        dblock(reinterpret_cast<const char *>(dvec.data()), dvec.size()*sizeof(double)) {}  // NOLINT
     /** assignment operator from another ata_view*/
     data_view& operator=(const data_view& dv) noexcept = default;
 
@@ -101,6 +103,11 @@ class data_view {
     }
     /** get the data block*/
     const char* data() const noexcept { return dblock.data(); }
+    /** get the data as a std::byte array*/
+    const std::byte* bytes() const noexcept
+    {
+        return reinterpret_cast<const std::byte*>(dblock.data());
+    }
     /** get the length*/
     size_t size() const noexcept { return dblock.length(); }
     /** check if the view is empty*/
@@ -109,6 +116,8 @@ class data_view {
     @details this actually does a copy to a new string
     */
     std::string string() const { return std::string(dblock); }
+    /** get a string_view object*/
+    std::string_view string_view() const { return dblock; }
     /** random access operator*/
     char operator[](int index) const { return dblock[index]; }
     /** begin iterator*/
