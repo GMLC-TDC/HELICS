@@ -168,8 +168,8 @@ static inline std::uint8_t isLittleEndian()
 
 // action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8
 // bytes)+payload size(4 bytes)+1 byte for number of strings=45
-static constexpr int action_message_base_size = static_cast<int>(
-    7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1);
+static constexpr std::size_t action_message_base_size = 
+    7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1;
 
 int ActionMessage::toByteArray(std::byte * data, std::size_t buffer_size) const
 {
@@ -180,7 +180,7 @@ int ActionMessage::toByteArray(std::byte * data, std::size_t buffer_size) const
         0UL;
 
     if ((data == nullptr) || (buffer_size == 0) ||
-        buffer_size < static_cast<int>(action_message_base_size + ssize)) {
+        buffer_size < action_message_base_size + ssize) {
         return -1;
     }
 
@@ -242,7 +242,7 @@ int ActionMessage::toByteArray(std::byte * data, std::size_t buffer_size) const
     ssize += action_message_base_size;
     for (const auto& str : stringData) {
         auto strsize = static_cast<uint32_t>(str.size());
-        if (buffer_size < static_cast<int>(ssize)) {
+        if (buffer_size < ssize) {
             return -1;
         }
 
@@ -343,9 +343,9 @@ inline void swap_bytes(std::uint8_t* data)
     }
 }
 
-int ActionMessage::fromByteArray(const std::byte* data, std::size_t buffer_size)
+std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buffer_size)
 {
-    int tsize{action_message_base_size};
+    std::size_t tsize{action_message_base_size};
     static const uint8_t littleEndian = isLittleEndian();
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;
@@ -357,8 +357,8 @@ int ActionMessage::fromByteArray(const std::byte* data, std::size_t buffer_size)
             return static_cast<int>(res);
         }
     }
-    int sz = 256 * 256 * (static_cast<uint8_t>(data[1])) + 256 * static_cast<uint8_t>(data[2]) +
-        static_cast<uint8_t>(data[3]);
+    std::size_t sz = 256 * 256 * (std::to_integer<std::size_t>(data[1])) +
+        256 * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
     tsize += sz;
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;
@@ -426,7 +426,7 @@ int ActionMessage::fromByteArray(const std::byte* data, std::size_t buffer_size)
         payload.assign(data, sz);
         data += sz;
     }
-    int stringCount = static_cast<unsigned char>(*data);
+    auto stringCount = std::to_integer<std::size_t>(*data);
     ++data;
     if (stringCount != 0) {
         stringData.resize(stringCount);
@@ -436,7 +436,7 @@ int ActionMessage::fromByteArray(const std::byte* data, std::size_t buffer_size)
             return (0);
         }
 
-        for (int ii = 0; ii < stringCount; ++ii) {
+        for (std::size_t ii = 0; ii < stringCount; ++ii) {
             uint32_t ssize;
             memcpy(&ssize, data, sizeof(uint32_t));
             data += sizeof(uint32_t);
@@ -481,34 +481,35 @@ int ActionMessage::fromByteArray(const std::byte* data, std::size_t buffer_size)
     return tsize;
 }
 
-int ActionMessage::depacketize(const std::byte* data, std::size_t buffer_size)
+int ActionMessage::depacketize(const void* data, std::size_t buffer_size)
 {
-    if (data[0] != std::byte{LEADING_CHAR}) {
+    const std::byte* bytes = reinterpret_cast<const std::byte*>(data);
+    if (bytes[0] != std::byte(LEADING_CHAR)) {
         return 0;
     }
     if (buffer_size < 6) {
         return 0;
     }
-    unsigned int message_size = static_cast<unsigned char>(data[1]);
+    unsigned int message_size = std::to_integer<unsigned char>(bytes[1]);
     message_size <<= 8U;
-    message_size += static_cast<unsigned char>(data[2]);
+    message_size += static_cast<unsigned char>(bytes[2]);
     message_size <<= 8U;
-    message_size += static_cast<unsigned char>(data[3]);
-    if (buffer_size < static_cast<int>(message_size + 2)) {
+    message_size += static_cast<unsigned char>(bytes[3]);
+    if (buffer_size < static_cast<size_t>(message_size + 2)) {
         return 0;
     }
-    if (data[message_size] != std::byte{TAIL_CHAR1}) {
+    if (bytes[message_size] != std::byte(TAIL_CHAR1)) {
         return 0;
     }
-    if (data[message_size + 1] != std::byte{TAIL_CHAR2}) {
+    if (bytes[message_size + 1] != std::byte(TAIL_CHAR2)) {
         return 0;
     }
 
-    int bytesUsed = fromByteArray(data + 4, message_size - 4);
+    std::size_t bytesUsed = fromByteArray(bytes + 4, message_size - 4);
     return (bytesUsed > 0) ? message_size + 2 : 0;
 }
 
-void ActionMessage::from_string(const std::string& data)
+void ActionMessage::from_string(std::string_view data)
 {
     fromByteArray(reinterpret_cast<const std::byte *>(data.data()), data.size());
 }

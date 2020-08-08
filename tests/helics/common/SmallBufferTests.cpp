@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test SmallBuffer
  */
 
-#include "helics/common/SmallBuffer.hpp"
+#include "helics/core/SmallBuffer.hpp"
 
 using namespace helics;
 

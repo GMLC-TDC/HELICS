@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "ValueConverter.hpp"
 #include "fmt/format.h"
-#include "frozen/string.h"
-#include "frozen/unordered_map.h"
+#include "../common/frozen_map.h"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
@@ -646,7 +645,7 @@ SmallBuffer emptyBlock(data_type outputType, data_type inputType = data_type::he
         case data_type::helics_string:
             switch (inputType) {
                 default:
-                    return std::string();
+                    return SmallBuffer{};
                 case data_type::helics_vector:
                     return helicsVectorString(std::vector<double>());
                 case data_type::helics_complex_vector:

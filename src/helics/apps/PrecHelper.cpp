@@ -73,9 +73,10 @@ char typeCharacter(data_type type)
     }
 }
 
-bool isBinaryData(helics::data_block& data)
+bool isBinaryData(helics::SmallBuffer& data)
 {
-    return std::any_of(data.begin(), data.end(), [](const auto& c) {
+    auto str = data.to_string();
+    return std::any_of(str.begin(), str.end(), [](const auto& c) {
         return ((c < 32) || (c == 34) || (c > 126));
     });
 }

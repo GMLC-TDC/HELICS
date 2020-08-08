@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ActionMessageDefintions.hpp"
 #include "basic_core_types.hpp"
-#include "../common/SmallBuffer.hpp"
+#include "SmallBuffer.hpp"
 #include <memory>
 #include <string>
 #include <utility>
@@ -186,13 +186,13 @@ class ActionMessage {
     /** convert a command to a byte vector*/
     std::vector<char> to_vector() const;
     /** generate a command from a raw data stream*/
-    int fromByteArray(const std::byte * data, std::size_t buffer_size);
+   std::size_t fromByteArray(const std::byte * data, std::size_t buffer_size);
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
-    int depacketize(const std::byte* data, std::size_t buffer_size);
+    int depacketize(const void* data, std::size_t buffer_size);
     /** read a command from a string*/
-    void from_string(const std::string& data);
+    void from_string(std::string_view data);
     /** read a command from a char vector*/
     void from_vector(const std::vector<char>& data);
 

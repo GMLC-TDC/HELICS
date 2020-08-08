@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
-#include "helics/common/SmallBuffer.hpp"
+#include "SmallBuffer.hpp"
 #include <memory>
 #include <string>
 #include <utility>

@@ -49,7 +49,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
     mFed->sendMessage(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
@@ -98,7 +98,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
     mFed->sendMessage(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
@@ -165,7 +165,7 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
     mFed->sendMessage(p1, "endpt2", data);
 
     mFed->requestTimeAsync(1.0);
@@ -224,7 +224,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
     mFed->sendMessage(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
@@ -282,7 +282,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(100, 'a');
+    helics::SmallBuffer data(100, 'a');
 
     double timestep = 0.0;  // 1 second
     int max_iterations = 200;
@@ -341,7 +341,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(100, 'a');
+    helics::SmallBuffer data(100, 'a');
 
     double timestep = 0.0;  // 1 second
     int max_iterations = 150;
@@ -397,7 +397,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(100, 'a');
+    helics::SmallBuffer data(100, 'a');
 
     double timestep = 0.0;  // 1 second
     int max_iterations = 150;
@@ -457,7 +457,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
 
     double timestep = 0.0;  // 1 second
     int max_iterations = 150;
@@ -513,7 +513,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(100, 'a');
+    helics::SmallBuffer data(100, 'a');
     mFed->sendMessage(p1, "port2", data);
 
     double timestep = 0.0;  // 1 second
