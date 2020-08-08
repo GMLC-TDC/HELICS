@@ -1,14 +1,22 @@
 #!/bin/bash
-#SBATCH -t 0:20:00
+#SBATCH -t 1:00:00
 #SBATCH -p pbatch
 #SBATCH -N 1
 
 # the sbatch arguments set above can be changed by passing the same argument to the sbatch command (e.g. -N100 to use 100 nodes instead of 1)
 # see the https://slurm.schedmd.com/ website for docs
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+if [ -n "$SLURM_JOB_ID" ]; then
+    sbatch_orig_file="$(scontrol show job "$SLURM_JOBID" | awk -F= '/Command=/{print $2}')"
+    SCRIPT_DIR="$(cd "$(dirname "${sbatch_orig_file}")" >/dev/null 2>&1 && pwd)"
+fi
+echo "sbatch script location: $SCRIPT_DIR"
+
 # Give a way to override the name of the federate used... though things will likely break due to different benchmark federates using different arguments
 if [[ "${BM_FED}" == "" ]]; then
-    BM_FED="Phold"
+    echo "BM_FED must be provided"
+    exit 1
 fi
 
 # set coretype to other cores using --export=CORE_TYPE='<type>' argument to sbatch
@@ -51,16 +59,26 @@ command -v "${helics_bm_fed_exe}" || {
 output_folder="${BM_FED}Federate-${CORE_TYPE}-N${SLURM_JOB_NUM_NODES}-job-${SLURM_JOB_ID}"
 mkdir -p "${output_folder}"
 
+# output some basic info for this benchmark run
+sys_info=$("${helics_bm_fed_exe}" --print_systeminfo)
+echo "${sys_info}
+DATE: $(date --universal +"%Y-%m-%d %T")
+CLUSTER: ${SLURM_CLUSTER_NAME}
+NUM NODES: ${SLURM_JOB_NUM_NODES}
+FEDS PER NODE: ${FEDS_PER_NODE}
+TOPOLOGY: ${TOPOLOGY}" >"${output_folder}/summary.txt"
+
 # Run info and srun job launch
 echo "Running broker on $HOSTNAME"
-"${BUILD_PATH}/bin/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --coretype "${CORE_TYPE}" --loglevel=5 >"${output_folder}/helics-broker-out.txt" 2>&1 &
+num_feds=$((SLURM_JOB_NUM_NODES * FEDS_PER_NODE))
+"${BUILD_PATH}/bin/helics_broker" --all -f "${num_feds}" --coretype "${CORE_TYPE}" --loglevel=5 >"${output_folder}/helics-broker-out.txt" 2>&1 &
 
 # give some time for the broker to start up
 sleep 5
 
 for i in $(seq 1 "${SLURM_JOB_NUM_NODES}"); do
     ((idx = i - 1))
-    srun -N1 "${helics_bm_fed_exe}" "${BM_FED}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" >"${output_folder}/${BM_FED}Federate-${idx}-out.txt" 2>&1 &
+    srun -N1 "$SCRIPT_DIR/launch_node_federates.sh" "${helics_bm_fed_exe}" "${output_folder}/${BM_FED}Federate" $((idx * FEDS_PER_NODE)) --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" &
 done
 
 wait
