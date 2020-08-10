@@ -128,7 +128,7 @@ TEST(federateInfo, constructor4)
 
 TEST(federateInfo, constructor5)
 {
-    helics::FederateInfo f1{"--input_delay 50ms --brokerinit='--loglevel 3 --type=zmq'"};
+    helics::FederateInfo f1{"--input_delay 50ms --broker_init_string='--loglevel 3 --type=zmq'"};
     ASSERT_FALSE(f1.brokerInitString.empty());
     EXPECT_EQ(f1.brokerInitString.front(), ' ');
     EXPECT_EQ(f1.timeProps.size(), 1U);

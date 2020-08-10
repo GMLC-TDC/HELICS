@@ -50,7 +50,7 @@ static void BM_wattsStrogatz2_singleCore(benchmark::State& state)
         auto wcore = helics::CoreFactory::create(
             core_type::INPROC,
             std::string(
-                "--autobroker --federates=2 --restrictive_time_policy --brokerinit=\"--restrictive_time_policy\""));
+                "--autobroker --federates=2 --restrictive_time_policy --broker_init_string=\"--restrictive_time_policy\""));
 
         std::vector<WattsStrogatzFederate> links(feds);
         for (int ii = 0; ii < feds; ++ii) {

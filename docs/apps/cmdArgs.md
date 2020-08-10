@@ -27,18 +27,18 @@ configuration:
  Help for Interprocess Broker:
 
 configuration:
-  --queueloc arg         the named location of the shared queue
-  -b [ --broker ] arg    identifier for the broker
-  --broker_address arg   location of the broker i.e network address
-  --brokerinit arg       the initialization string for the broker
+  --queueloc arg            the named location of the shared queue
+  -b [ --broker ] arg       identifier for the broker
+  --broker_address arg      location of the broker i.e network address
+  --broker_init_string arg  the initialization string for the broker
 
  Help for Test Broker:
 
 configuration:
-  --brokername arg       identifier for the broker-same as broker
-  -b [ --broker ] arg    identifier for the broker
-  --broker_address arg   location of the broker i.e network address
-  --brokerinit arg       the initialization string for the broker
+  --brokername arg          identifier for the broker-same as broker
+  -b [ --broker ] arg       identifier for the broker
+  --broker_address arg      location of the broker i.e network address
+  --broker_init_string arg  the initialization string for the broker
 
  Help for UDP Broker:
 

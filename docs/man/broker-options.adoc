@@ -51,7 +51,9 @@ Network Connections
 --autobroker::
         Allow a broker to automatically be created if one is not available.
 
---brokerinit <init str>::
+--broker_init_string <init str>::
+--brokerinitstring <init str>::
+--brokerInitString <init str>::
         The initialization string for the broker.
 
 --client::

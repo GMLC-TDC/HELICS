@@ -140,7 +140,7 @@ TEST(InprocCore_tests, pubsub_value_test)
 TEST(InprocCore_tests, send_receive_test)
 {
     const char* initializationString =
-        "--autobroker --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
+        "--autobroker --broker=\"brk1\" --broker_init_string=\"--name=brk1\"";
     auto core = create(helics::core_type::INPROC, initializationString);
 
     ASSERT_TRUE(core != nullptr);
