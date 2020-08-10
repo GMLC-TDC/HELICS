@@ -132,7 +132,10 @@ TEST_F(mfed_tests, Message)
 
     auto M1 = epid2.getMessage();
     auto M2 = epid2.getMessage();
-    EXPECT_STREQ(M1.c_str(), M2.c_str());
+
+    std::string M1d(M1.c_str(), M1.size());
+    std::string M2d(M2.c_str(), M2.size());
+    EXPECT_EQ(M1d, M2d);
 
     M2.destination(M1.source()).messageID(45);
     epid2.sendMessage(std::move(M2));

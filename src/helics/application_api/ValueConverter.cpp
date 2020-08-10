@@ -121,7 +121,9 @@ namespace detail {
     size_t convertToBinary(std::byte* data, std::string_view val)
     {
         addCodeAndSize(data, stringCode, val.size());
-        std::memcpy(data + 8U, val.data(), val.size());
+        if (!val.empty()) {
+            std::memcpy(data + 8U, val.data(), val.size());
+        }
         return val.size() + 8U;
     }
 
@@ -129,7 +131,9 @@ namespace detail {
     {
         addCodeAndSize(data, npCode, val.name.size());
         std::memcpy(data + 8, &val.value, 8);
-        std::memcpy(data + 16, val.name.data(), val.name.size());
+        if (!val.name.empty()) {
+            std::memcpy(data + 16, val.name.data(), val.name.size());
+        }
         return val.name.size() + 16U;
     }
 
@@ -145,14 +149,18 @@ namespace detail {
     size_t convertToBinary(std::byte* data, const double* val, size_t size)
     {
         addCodeAndSize(data, vectorCode, size);
-        std::memcpy(data + 8, val, size * sizeof(double));
+        if (size>0) {
+            std::memcpy(data + 8, val, size * sizeof(double));
+        }
         return size * sizeof(double) + 8U;
     }
 
     size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val)
     {
         addCodeAndSize(data, cvCode, val.size());
-        std::memcpy(data + 8, val.data(), val.size() * sizeof(double) * 2);
+        if (val.size()>0) {
+            std::memcpy(data + 8, val.data(), val.size() * sizeof(double) * 2);
+        }
         return val.size() * sizeof(double) * 2U + 8U;
     }
 
@@ -268,7 +276,9 @@ namespace detail {
     {
         std::size_t size = getDataSize(data);
         val.resize(size);
-        std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
+        if (size>0) {
+            std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
+        }
         if ((data[0] & endianMask) != littleEndianCode) {
             for (auto& v : val) {
                 // making use of array oriented access for complex numbers
