@@ -147,7 +147,8 @@ class BrokerBase {
     the source name and a string with the message
     */
     void setLoggerFunction(
-        std::function<void(int level, std::string_view identifier, std::string_view message)> logFunction);
+        std::function<void(int level, std::string_view identifier, std::string_view message)>
+            logFunction);
     /** flush the loggers*/
     void logFlush();
     /** check if the main processing loop of a broker is running*/

@@ -35,10 +35,10 @@ TEST_P(flag_type_tests, optional_pub)
     std::atomic<int> warnings{0};
     vFed1->setLoggingCallback(
         [&warnings](int level, std::string_view /*unused*/, std::string_view /*unused*/) {
-        if (level == 1) {
-            ++warnings;
-        }
-    });
+            if (level == 1) {
+                ++warnings;
+            }
+        });
 
     vFed1->enterExecutingMode();
     EXPECT_EQ(warnings.load(), 2);
@@ -60,10 +60,10 @@ TEST_P(flag_type_tests, optional_sub)
 
     vFed1->setLoggingCallback(
         [&warnings](int level, std::string_view /*unused*/, std::string_view /*unused*/) {
-        if (level == 1) {
-            ++warnings;
-        }
-    });
+            if (level == 1) {
+                ++warnings;
+            }
+        });
 
     vFed1->enterExecutingMode();
     EXPECT_EQ(warnings.load(), 1);

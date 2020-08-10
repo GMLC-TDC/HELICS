@@ -58,11 +58,10 @@ ActionMessage::ActionMessage(const ActionMessage& act):
 
 ActionMessage::ActionMessage(std::unique_ptr<Message> message):
     messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), actionTime(message->time),
-    payload(std::move(message->data)),
-    stringData({std::move(message->dest),
-                std::move(message->source),
-                std::move(message->original_source),
-                std::move(message->original_dest)})
+    payload(std::move(message->data)), stringData({std::move(message->dest),
+                                                   std::move(message->source),
+                                                   std::move(message->original_source),
+                                                   std::move(message->original_dest)})
 {
 }
 
@@ -78,7 +77,7 @@ ActionMessage::ActionMessage(const std::vector<char>& bytes): ActionMessage()
 
 ActionMessage::ActionMessage(const void* data, size_t size): ActionMessage()
 {
-    fromByteArray(static_cast<const std::byte *>(data), size);
+    fromByteArray(static_cast<const std::byte*>(data), size);
 }
 
 ActionMessage::~ActionMessage() = default;
@@ -168,10 +167,10 @@ static inline std::uint8_t isLittleEndian()
 
 // action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8
 // bytes)+payload size(4 bytes)+1 byte for number of strings=45
-static constexpr std::size_t action_message_base_size = 
+static constexpr std::size_t action_message_base_size =
     7 * sizeof(uint32_t) + 2 * sizeof(uint16_t) + sizeof(Time::baseType) + sizeof(int32_t) + 1;
 
-int ActionMessage::toByteArray(std::byte * data, std::size_t buffer_size) const
+int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 {
     static const uint8_t littleEndian = isLittleEndian();
     // put the main string size in the first 4 bytes;
@@ -179,8 +178,7 @@ int ActionMessage::toByteArray(std::byte * data, std::size_t buffer_size) const
         static_cast<uint32_t>(payload.size() & 0x00FFFFFFUL) :
         0UL;
 
-    if ((data == nullptr) || (buffer_size == 0) ||
-        buffer_size < action_message_base_size + ssize) {
+    if ((data == nullptr) || (buffer_size == 0) || buffer_size < action_message_base_size + ssize) {
         return -1;
     }
 
@@ -281,7 +279,7 @@ std::string ActionMessage::to_string() const
     std::string data;
     auto sz = serializedByteCount();
     data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte *>(&(data[0])), sz);
+    toByteArray(reinterpret_cast<std::byte*>(&(data[0])), sz);
     return data;
 }
 
@@ -300,7 +298,7 @@ void ActionMessage::packetize(std::string& data) const
 {
     auto sz = serializedByteCount();
     data.resize(sizeof(uint32_t) + static_cast<size_t>(sz));
-    toByteArray(reinterpret_cast<std::byte *>(&(data[4])), sz);
+    toByteArray(reinterpret_cast<std::byte*>(&(data[4])), sz);
 
     data[0] = LEADING_CHAR;
     // now generate a length header
@@ -317,7 +315,7 @@ std::vector<char> ActionMessage::to_vector() const
     std::vector<char> data;
     auto sz = serializedByteCount();
     data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte *>(data.data()), sz);
+    toByteArray(reinterpret_cast<std::byte*>(data.data()), sz);
     return data;
 }
 
@@ -325,14 +323,14 @@ void ActionMessage::to_vector(std::vector<char>& data) const
 {
     auto sz = serializedByteCount();
     data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte *>(data.data()), sz);
+    toByteArray(reinterpret_cast<std::byte*>(data.data()), sz);
 }
 
 void ActionMessage::to_string(std::string& data) const
 {
     auto sz = serializedByteCount();
     data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte *>(&(data[0])), sz);
+    toByteArray(reinterpret_cast<std::byte*>(&(data[0])), sz);
 }
 
 template<std::size_t DataSize>
@@ -448,7 +446,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
                 messageAction = CMD_INVALID;
                 return (0);
             }
-            stringData[ii].assign(reinterpret_cast<const char *>(data), ssize);
+            stringData[ii].assign(reinterpret_cast<const char*>(data), ssize);
             data += ssize;
         }
     } else {
@@ -511,7 +509,7 @@ int ActionMessage::depacketize(const void* data, std::size_t buffer_size)
 
 void ActionMessage::from_string(std::string_view data)
 {
-    fromByteArray(reinterpret_cast<const std::byte *>(data.data()), data.size());
+    fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
 }
 
 void ActionMessage::from_vector(const std::vector<char>& data)

@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/frozen_map.h"
 #include "ValueConverter.hpp"
 #include "fmt/format.h"
-#include "../common/frozen_map.h"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"

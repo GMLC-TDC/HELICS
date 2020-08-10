@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #ifdef _MSC_VER
 #    pragma warning(push, 0)
-#include <frozen/string.h>
-#include <frozen/unordered_map.h>
+#    include <frozen/string.h>
+#    include <frozen/unordered_map.h>
 #    pragma warning(pop)
 #else
 #    ifdef __GNUC__
 #        pragma GCC system_header
 #    endif
-#include <frozen/string.h>
-#include <frozen/unordered_map.h>
+#    include <frozen/string.h>
+#    include <frozen/unordered_map.h>
 #endif

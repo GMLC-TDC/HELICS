@@ -165,7 +165,7 @@ void Publication::publishString(std::string_view val)
 
 void Publication::publish(const std::vector<std::string>& val)
 {
-    auto buffer=ValueConverter<std::vector<std::string>>::convert(val);
+    auto buffer = ValueConverter<std::vector<std::string>>::convert(val);
     publishString(buffer.to_string());
 }
 

@@ -1264,7 +1264,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
 }
 
 const std::shared_ptr<const SmallBuffer>& CommonCore::getValue(interface_handle handle,
-                                                              uint32_t* inputIndex)
+                                                               uint32_t* inputIndex)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -2386,7 +2386,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_REG_FED:
             // this one in the core needs to be the thread-safe version of getFederate
-            loopFederates.insert(std::string(command.name()), no_search, getFederate(std::string(command.name())));
+            loopFederates.insert(std::string(command.name()),
+                                 no_search,
+                                 getFederate(std::string(command.name())));
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
@@ -2505,7 +2507,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = command.messageID;
                     queryResp.counter = command.counter;
-                    std::get<1>(mapBuilders[mapIndex.at(std::string(command.payload.to_string())).first])
+                    std::get<1>(
+                        mapBuilders[mapIndex.at(std::string(command.payload.to_string())).first])
                         .push_back(queryResp);
                 }
 
@@ -2924,7 +2927,8 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
                     command.source_id == parent_broker_id || command.source_id == root_broker_id) {
-                    sendErrorToFederates(command.messageID, std::string(command.payload.to_string()));
+                    sendErrorToFederates(command.messageID,
+                                         std::string(command.payload.to_string()));
                     setErrorState(command.messageID, std::string(command.payload.to_string()));
 
                 } else {
@@ -3802,9 +3806,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             } else {
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
-                    auto M = std::any_cast<
-                        std::function<void(int, std::string_view, std::string_view)>>(
-                        std::move(*op));
+                    auto M =
+                        std::any_cast<std::function<void(int, std::string_view, std::string_view)>>(
+                            std::move(*op));
                     M(0, identifier, "logging callback activated");
                     setLoggerFunction(std::move(M));
                 }

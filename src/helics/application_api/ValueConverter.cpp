@@ -6,10 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueConverter.hpp"
+
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/frozen_map.h"
 
 #include <complex>
-#include "../common/frozen_map.h"
 #include <vector>
 
 namespace helics {
@@ -135,7 +136,7 @@ namespace detail {
     size_t convertToBinary(std::byte* data, const std::vector<double>& val)
     {
         addCodeAndSize(data, vectorCode, val.size());
-        if (val.size()>0) {
+        if (val.size() > 0) {
             std::memcpy(data + 8, val.data(), val.size() * sizeof(double));
         }
         return val.size() * sizeof(double) + 8U;
@@ -155,11 +156,12 @@ namespace detail {
         return val.size() * sizeof(double) * 2U + 8U;
     }
 
-    size_t convertToBinary(std::byte* data, const std::complex<double>* val, size_t size) {
+    size_t convertToBinary(std::byte* data, const std::complex<double>* val, size_t size)
+    {
         addCodeAndSize(data, cvCode, size);
         std::memcpy(data + 8, val, size * sizeof(double) * 2);
         return size * sizeof(double) * 2U + 8U;
-     }
+    }
 
     size_t getDataSize(const std::byte* data)
     {
@@ -237,7 +239,7 @@ namespace detail {
     {
         std::size_t size = getDataSize(data);
         val.resize(size);
-        if (size>0) {
+        if (size > 0) {
             std::memcpy(val.data(), data + 8, size * sizeof(double));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
@@ -250,7 +252,7 @@ namespace detail {
     void convertFromBinary(const std::byte* data, double* val)
     {
         std::size_t size = getDataSize(data);
-        if (val!=nullptr && size>0) {
+        if (val != nullptr && size > 0) {
             std::memcpy(val, data + 8, size * sizeof(double));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
@@ -279,20 +281,20 @@ namespace detail {
 }  // namespace detail
 
 void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::string>& val,
-                                                      SmallBuffer& store)
+                                                       SmallBuffer& store)
 {
     Json::Value V(Json::arrayValue);
-    for (auto &str:val) {
+    for (auto& str : val) {
         V.append(str);
     }
     auto strgen = generateJsonString(V);
     store.resize(detail::getBinaryLength(strgen));
-    detail::convertToBinary(store.data(),strgen);
+    detail::convertToBinary(store.data(), strgen);
 }
 
 /** interpret a view of the data block and store to the specified value*/
 void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
-                                                               std::vector<std::string>& val)
+                                                         std::vector<std::string>& val)
 {
     val.clear();
     std::string str;
@@ -300,13 +302,12 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
     Json::Value V = loadJsonStr(str);
     if (V.isArray()) {
         val.reserve(V.size());
-        for (auto &av:V) {
+        for (auto& av : V) {
             val.emplace_back(av.asString());
         }
     } else {
         val.push_back(block.string());
     }
-   
 }
 
 }  // namespace helics

@@ -872,7 +872,7 @@ void valueExtract(const data_view& dv, data_type baseType, bool& val)
 }
 void valueExtract(const data_view& dv, data_type baseType, defV& val)
 {
-    if (baseType==data_type::helics_any||baseType==data_type::helics_unknown) {
+    if (baseType == data_type::helics_any || baseType == data_type::helics_unknown) {
         baseType = detail::detectType(dv.bytes());
     }
     switch (baseType) {
