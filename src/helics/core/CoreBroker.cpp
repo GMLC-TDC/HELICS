@@ -488,7 +488,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 routing_table.emplace(fed->global_id, route);
             } else {
                 // this means we haven't seen this federate before for some reason
-                _federates.insert(std::string(command.name()), command.dest_id, std::string(command.name()));
+                _federates.insert(std::string(command.name()),
+                                  command.dest_id,
+                                  std::string(command.name()));
                 _federates.back().route = getRoute(command.source_id);
                 _federates.back().global_id = command.dest_id;
                 routing_table.emplace(fed->global_id, _federates.back().route);
@@ -501,7 +503,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     // generate an error message
                     LOG_ERROR(global_broker_id_local,
                               identifier,
-                              fmt::format("unable to register broker {}", command.payload.to_string()));
+                              fmt::format("unable to register broker {}",
+                                          command.payload.to_string()));
                     return;
                 }
 
@@ -538,7 +541,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                                                              // change the source_id
                 transmit(route, command);
             } else {
-                _brokers.insert(std::string(command.name()), global_broker_id(command.dest_id), command.name());
+                _brokers.insert(std::string(command.name()),
+                                global_broker_id(command.dest_id),
+                                command.name());
                 _brokers.back().route = getRoute(command.source_id);
                 _brokers.back().global_id = global_broker_id(command.dest_id);
                 routing_table.emplace(broker->global_id, _brokers.back().route);
@@ -1181,9 +1186,9 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
             } else {
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
-                    auto M = std::any_cast<
-                        std::function<void(int, std::string_view, std::string_view)>>(
-                        std::move(*op));
+                    auto M =
+                        std::any_cast<std::function<void(int, std::string_view, std::string_view)>>(
+                            std::move(*op));
                     M(0, identifier, "logging callback activated");
                     setLoggerFunction(std::move(M));
                 }
@@ -1477,7 +1482,7 @@ void CoreBroker::addPublication(ActionMessage& m)
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
-        eret.payload = fmt::format("Duplicate publication names ({})",m.name() );
+        eret.payload = fmt::format("Duplicate publication names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
@@ -1502,12 +1507,16 @@ void CoreBroker::addInput(ActionMessage& m)
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
-        eret.payload = fmt::format("Duplicate input names ({})",m.name());
+        eret.payload = fmt::format("Duplicate input names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
-    auto& inp = handles.addHandle(
-        m.source_id, m.source_handle, handle_type::input, std::string(m.name()), m.getString(0), m.getString(1));
+    auto& inp = handles.addHandle(m.source_id,
+                                  m.source_handle,
+                                  handle_type::input,
+                                  std::string(m.name()),
+                                  m.getString(0),
+                                  m.getString(1));
 
     addLocalInfo(inp, m);
     if (!isRootc) {
@@ -1524,7 +1533,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
-        eret.payload = fmt::format("Duplicate endpoint names ({})",m.name());
+        eret.payload = fmt::format("Duplicate endpoint names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
@@ -1941,50 +1950,40 @@ void CoreBroker::executeInitializationOperations()
             ActionMessage wMiss(CMD_WARNING);
             wMiss.source_id = global_broker_id_local;
             wMiss.messageID = defs::errors::connection_failure;
-            unknownHandles.processNonOptionalUnknowns(
-                [this, &wMiss](const std::string& target, char type, global_handle handle) {
-                    switch (type) {
-                        case 'p':
-                            wMiss.payload =
-                                fmt::format("Unable to connect to publication target {}", target);
-                            LOG_WARNING(parent_broker_id,
-                                        getIdentifier(),
-                                        wMiss.payload.to_string());
-                            break;
-                        case 'i':
-                            wMiss.payload =
-                                fmt::format("Unable to connect to input target {}", target);
-                            LOG_WARNING(parent_broker_id,
-                                        getIdentifier(),
-                                        wMiss.payload.to_string());
-                            break;
-                        case 'f':
-                            wMiss.payload =
-                                fmt::format("Unable to connect to filter target {}", target);
-                            LOG_WARNING(parent_broker_id,
-                                        getIdentifier(),
-                                        wMiss.payload.to_string());
-                            break;
-                        case 'e':
-                            wMiss.payload =
-                                fmt::format("Unable to connect to endpoint target {}", target);
-                            LOG_WARNING(parent_broker_id,
-                                        getIdentifier(),
-                                        wMiss.payload.to_string());
-                            break;
-                        default:
-                            // LCOV_EXCL_START
-                            wMiss.payload =
-                                fmt::format("Unable to connect to undefined target {}", target);
-                            LOG_WARNING(parent_broker_id,
-                                        getIdentifier(),
-                                        wMiss.payload.to_string());
-                            break;
-                            // LCOV_EXCL_STOP
-                    }
-                    wMiss.setDestination(handle);
-                    routeMessage(wMiss);
-                });
+            unknownHandles.processNonOptionalUnknowns([this, &wMiss](const std::string& target,
+                                                                     char type,
+                                                                     global_handle handle) {
+                switch (type) {
+                    case 'p':
+                        wMiss.payload =
+                            fmt::format("Unable to connect to publication target {}", target);
+                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
+                        break;
+                    case 'i':
+                        wMiss.payload = fmt::format("Unable to connect to input target {}", target);
+                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
+                        break;
+                    case 'f':
+                        wMiss.payload =
+                            fmt::format("Unable to connect to filter target {}", target);
+                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
+                        break;
+                    case 'e':
+                        wMiss.payload =
+                            fmt::format("Unable to connect to endpoint target {}", target);
+                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
+                        break;
+                    default:
+                        // LCOV_EXCL_START
+                        wMiss.payload =
+                            fmt::format("Unable to connect to undefined target {}", target);
+                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
+                        break;
+                        // LCOV_EXCL_STOP
+                }
+                wMiss.setDestination(handle);
+                routeMessage(wMiss);
+            });
         }
     }
 

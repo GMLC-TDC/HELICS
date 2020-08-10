@@ -7,8 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "ActionMessageDefintions.hpp"
-#include "basic_core_types.hpp"
 #include "SmallBuffer.hpp"
+#include "basic_core_types.hpp"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -70,7 +71,7 @@ class ActionMessage {
     /** construct from a data vector*/
     explicit ActionMessage(const std::vector<char>& bytes);
     /** construct from a data pointer and size*/
-    ActionMessage(const void * data, size_t size);
+    ActionMessage(const void* data, size_t size);
     /** destructor*/
     ~ActionMessage();
     /** copy constructor*/
@@ -172,7 +173,7 @@ class ActionMessage {
     @param buffer_size  the size of the buffer
     @return the size of the buffer actually used
     */
-    int toByteArray(std::byte * data, std::size_t buffer_size) const;
+    int toByteArray(std::byte* data, std::size_t buffer_size) const;
     /** convert to a string using a reference*/
     void to_string(std::string& data) const;
     /** convert to a byte string*/
@@ -186,7 +187,7 @@ class ActionMessage {
     /** convert a command to a byte vector*/
     std::vector<char> to_vector() const;
     /** generate a command from a raw data stream*/
-   std::size_t fromByteArray(const std::byte * data, std::size_t buffer_size);
+    std::size_t fromByteArray(const std::byte* data, std::size_t buffer_size);
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */

@@ -12,10 +12,10 @@ the purpose of these objects are to convert a specific type into a data block fo
 algorithms
 */
 
-#include "helics_cxx_export.h"
 #include "../core/SmallBuffer.hpp"
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
+#include "helics_cxx_export.h"
 
 #include <cstddef>
 #include <string>
@@ -64,10 +64,11 @@ namespace detail {
     HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, const double* val, size_t size);
 
     HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data,
-                                            const std::vector<std::complex<double>>& val);
+                                             const std::vector<std::complex<double>>& val);
 
-    HELICS_CXX_EXPORT size_t
-        convertToBinary(std::byte* data, const std::complex<double>* val, size_t size);
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data,
+                                             const std::complex<double>* val,
+                                             size_t size);
 
     /** detect the contained data type,  assumes data is at least 1 byte long*/
     HELICS_CXX_EXPORT data_type detectType(const std::byte* data);
@@ -83,7 +84,7 @@ namespace detail {
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, double* val);
 
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data,
-                                            std::vector<std::complex<double>>& val);
+                                             std::vector<std::complex<double>>& val);
 
     /** get the size of the data from the data stream for a specific type
     @details this returns the number of elements of the specific data type  it is NOT in bytes
@@ -105,17 +106,17 @@ class ValueConverter {
     }
 
     /** convert the value and store to a specific block of data*/
-    static void convert(const X& val, SmallBuffer& store) {
+    static void convert(const X& val, SmallBuffer& store)
+    {
         store.resize(detail::getBinaryLength(val));
-        detail::convertToBinary(store.data(),val);
+        detail::convertToBinary(store.data(), val);
     }
-    
 
     /** convert a raw vector of objects and store to a specific block*/
     static void convert(const X* vals, size_t size, SmallBuffer& store)
     {
-        store.resize(detail::getBinaryLength(vals,size));
-        detail::convertToBinary(store.data(),vals, size);
+        store.resize(detail::getBinaryLength(vals, size));
+        detail::convertToBinary(store.data(), vals, size);
     }
 
     /** convert a raw vector of objects and store to a specific block*/
@@ -127,7 +128,8 @@ class ValueConverter {
     }
 
     /** interpret a view of the data and convert back to a val*/
-    static X interpret(const data_view& block) {
+    static X interpret(const data_view& block)
+    {
         X val;
         detail::convertFromBinary(block.bytes(), val);
         return val;
@@ -158,7 +160,7 @@ class ValueConverter<std::vector<std::string>> {
     /** convert the value and store to a specific block of data*/
     static void convert(const std::vector<std::string>& val, SmallBuffer& store);
 
-     /** interpret a view of the data block and store to the specified value*/
+    /** interpret a view of the data block and store to the specified value*/
     static void interpret(const data_view& block, std::vector<std::string>& val);
 
     /** interpret a view of the data and convert back to a val*/
@@ -168,8 +170,6 @@ class ValueConverter<std::vector<std::string>> {
         interpret(block, val);
         return val;
     }
-
-   
 
     /** get the type of the value*/
     static std::string type() { return "string_vector"; }

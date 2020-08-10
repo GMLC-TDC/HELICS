@@ -30,7 +30,8 @@ class HandleManager {
     std::deque<BasicHandleInfo> handles;  //!< local handle information
     std::unordered_map<std::string_view, interface_handle>
         publications;  //!< map of all local publications
-    std::unordered_map<std::string_view, interface_handle> endpoints;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, interface_handle>
+        endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string_view, interface_handle> inputs;  //!< map of all local endpoints
     std::unordered_map<std::string_view, interface_handle> filters;  //!< map of all local endpoints
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers

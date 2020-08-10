@@ -137,7 +137,7 @@ namespace udp {
                     break;
                 }
             }
-            ActionMessage M(reinterpret_cast<std::byte *>(data.data()), len);
+            ActionMessage M(reinterpret_cast<std::byte*>(data.data()), len);
             if (!isValidCommand(M)) {
                 logWarning("invalid command received udp");
                 continue;

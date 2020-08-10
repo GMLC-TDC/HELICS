@@ -175,7 +175,8 @@ namespace inproc {
                                 }
                             }
                             if (!foundRoute) {
-                                logError(std::string("unable to establish Route to ") + std::string(newroute));
+                                logError(std::string("unable to establish Route to ") +
+                                         std::string(newroute));
                             }
                             processed = true;
                         } break;

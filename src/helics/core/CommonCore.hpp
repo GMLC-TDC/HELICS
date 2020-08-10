@@ -152,7 +152,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::string& getExtractionType(interface_handle handle) const override final;
     virtual void setValue(interface_handle handle, const char* data, uint64_t len) override final;
     virtual const std::shared_ptr<const SmallBuffer>& getValue(interface_handle handle,
-                                                              uint32_t* inputIndex) override final;
+                                                               uint32_t* inputIndex) override final;
     virtual const std::vector<std::shared_ptr<const SmallBuffer>>&
         getAllValues(interface_handle handle) override final;
     virtual const std::vector<interface_handle>&
@@ -210,9 +210,9 @@ class CommonCore: public Core, public BrokerBase {
 
     /** set the core logging level*/
     virtual void setLoggingLevel(int logLevel) override;
-    virtual void setLoggingCallback(local_federate_id federateID,
-                                    std::function<void(int, std::string_view, std::string_view)>
-                                        logFunction) override final;
+    virtual void setLoggingCallback(
+        local_federate_id federateID,
+        std::function<void(int, std::string_view, std::string_view)> logFunction) override final;
 
     virtual void setLogFile(const std::string& lfile) override final;
 

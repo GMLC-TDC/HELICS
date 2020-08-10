@@ -454,7 +454,8 @@ namespace zeromq {
                             break;
                         case NEW_ROUTE: {
                             try {
-                                auto interfaceAndPort = extractInterfaceandPort(std::string(cmd.payload.to_string()));
+                                auto interfaceAndPort =
+                                    extractInterfaceandPort(std::string(cmd.payload.to_string()));
 
                                 auto zsock = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);
                                 zsock.setsockopt(ZMQ_LINGER, 100);
@@ -464,8 +465,8 @@ namespace zeromq {
                             }
                             catch (const zmq::error_t& e) {
                                 // TODO(PT): do something???
-                                logError(std::string("unable to connect route") + std::string(cmd.payload.to_string()) +
-                                         "::" + e.what());
+                                logError(std::string("unable to connect route") +
+                                         std::string(cmd.payload.to_string()) + "::" + e.what());
                             }
                             processed = true;
                         } break;

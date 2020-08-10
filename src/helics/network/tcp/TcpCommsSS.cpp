@@ -89,8 +89,8 @@ namespace tcp {
         size_t used_total = 0;
         while (used_total < bytes_received) {
             ActionMessage m;
-            auto used =
-                m.depacketize(reinterpret_cast<const std::byte*>(data) + used_total, bytes_received - used_total);
+            auto used = m.depacketize(reinterpret_cast<const std::byte*>(data) + used_total,
+                                      bytes_received - used_total);
             if (used == 0) {
                 break;
             }
@@ -272,7 +272,8 @@ namespace tcp {
                                         }
                                     }
                                     if (conn) {
-                                        made_connections.emplace_back(cmd.payload.to_string(), std::move(conn));
+                                        made_connections.emplace_back(cmd.payload.to_string(),
+                                                                      std::move(conn));
                                     }
                                 } else {
                                     logWarning("(tcpss) unable to locate socket");
@@ -291,7 +292,8 @@ namespace tcp {
                                 }
                             }
                             if (!established) {
-                                auto efind = established_routes.find(std::string(cmd.payload.to_string()));
+                                auto efind =
+                                    established_routes.find(std::string(cmd.payload.to_string()));
                                 if (efind != established_routes.end()) {
                                     established = true;
                                     if (efind->second == parent_route_id) {
@@ -306,7 +308,9 @@ namespace tcp {
 
                             if (!established) {
                                 if (outgoingConnectionsAllowed) {
-                                    auto new_connect = generateConnection(ioctx, std::string(cmd.payload.to_string()));
+                                    auto new_connect =
+                                        generateConnection(ioctx,
+                                                           std::string(cmd.payload.to_string()));
                                     if (new_connect) {
                                         new_connect->setDataCall(dataCall);
                                         new_connect->setErrorCall(errorCall);

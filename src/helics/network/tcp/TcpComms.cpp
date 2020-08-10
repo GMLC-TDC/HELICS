@@ -71,8 +71,8 @@ namespace tcp {
         size_t used_total = 0;
         while (used_total < bytes_received) {
             ActionMessage m;
-            auto used =
-                m.depacketize(reinterpret_cast<const std::byte *>(data) + used_total, bytes_received - used_total);
+            auto used = m.depacketize(reinterpret_cast<const std::byte*>(data) + used_total,
+                                      bytes_received - used_total);
             if (used == 0) {
                 break;
             }
@@ -188,7 +188,7 @@ namespace tcp {
                              const std::string& errorMessage)
     {
         if (errorMessage.empty()) {
-            ActionMessage m(reinterpret_cast<const std::byte *>(data), bytes_received);
+            ActionMessage m(reinterpret_cast<const std::byte*>(data), bytes_received);
             if (isProtocolCommand(m)) {
                 txQueue.emplace(control_route, m);
             }

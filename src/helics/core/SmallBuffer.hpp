@@ -8,12 +8,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <array>
 #include <cstddef>
+#include <cstring>
+#include <new>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
-#include <cstring>
-#include <new>
 
 namespace helics {
 class SmallBuffer {
@@ -44,7 +44,8 @@ class SmallBuffer {
         sb.bufferSize = 0;
     }
 
-    template<typename U, typename T=std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
+    template<typename U,
+             typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
     SmallBuffer(U&& u): heap(buffer.data())
     {
         std::string_view val(std::forward<U>(u));
@@ -63,7 +64,10 @@ class SmallBuffer {
     /** create a buffer with a specific size and contents*/
     SmallBuffer(std::size_t size, std::byte val): heap(buffer.data()) { resize(size, val); }
     /** create a buffer with a specific size and contents*/
-    SmallBuffer(std::size_t size, unsigned char val): heap(buffer.data()) { resize(size, std::byte{val}); }
+    SmallBuffer(std::size_t size, unsigned char val): heap(buffer.data())
+    {
+        resize(size, std::byte{val});
+    }
     /** destructor*/
     ~SmallBuffer()
     {

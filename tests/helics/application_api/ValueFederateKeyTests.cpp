@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/core/helics_definitions.hpp"
 #include "helics/core/Core.hpp"
+#include "helics/core/helics_definitions.hpp"
 #include "helics/helics_enums.h"
 
 #include <future>

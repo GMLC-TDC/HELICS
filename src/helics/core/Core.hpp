@@ -468,7 +468,7 @@ class Core {
      * source)
      */
     virtual const std::shared_ptr<const SmallBuffer>& getValue(interface_handle handle,
-                                                              uint32_t* inputIndex = nullptr) = 0;
+                                                               uint32_t* inputIndex = nullptr) = 0;
 
     /**
      * Return all the available data for the specified handle or the latest input

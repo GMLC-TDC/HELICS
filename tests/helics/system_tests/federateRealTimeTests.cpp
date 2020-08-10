@@ -82,10 +82,10 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
     std::atomic<int> warnCounter{0};
     fed->setLoggingCallback(
         [&warnCounter](int logLevel, std::string_view /*unused*/, std::string_view /*unused*/) {
-        if (logLevel == 1) {
-            ++warnCounter;
-        }
-    });
+            if (logLevel == 1) {
+                ++warnCounter;
+            }
+        });
     fed->registerSubscription("pub1");
     fed2->enterExecutingModeAsync();
     fed->enterExecutingMode();
