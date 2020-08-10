@@ -107,7 +107,7 @@ class ActionMessage {
     /** set the string name associated with a actionMessage*/
     void name(std::string_view name) { payload = name; }
     /** get the string name associated with an action Message*/
-    std::string_view name() const { return payload.to_string(); };
+    std::string_view name() const { return payload.to_string(); }
     void clearStringData() { stringData.clear(); }
     // most use cases for this involve short strings, or already have references that need to be
     // copied so supporting move isn't  going to be that useful here, the long strings are going in

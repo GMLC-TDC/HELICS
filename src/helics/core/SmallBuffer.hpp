@@ -130,7 +130,9 @@ class SmallBuffer {
             return *this;
         }
         resize(val.size());
-        std::memcpy(heap, val.data(), val.size());
+        if (val.size()>0) {
+            std::memcpy(heap, val.data(), val.size());
+        }
         return *this;
     }
     /** return a pointer to the data location*/
