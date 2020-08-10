@@ -254,13 +254,13 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
     return nullptr;
 }
 
-const std::shared_ptr<const data_block>& FederateState::getValue(interface_handle handle,
+const std::shared_ptr<const SmallBuffer>& FederateState::getValue(interface_handle handle,
                                                                  uint32_t* inputIndex)
 {
     return interfaces().getInput(handle)->getData(inputIndex);
 }
 
-const std::vector<std::shared_ptr<const data_block>>&
+const std::vector<std::shared_ptr<const SmallBuffer>>&
     FederateState::getAllValues(interface_handle handle)
 {
     return interfaces().getInput(handle)->getAllData();
@@ -824,9 +824,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_LOG: {
             if (cmd.getStringData().empty()) {
-                logMessage(cmd.messageID, emptyStr, cmd.payload);
+                logMessage(cmd.messageID, emptyStr, cmd.payload.to_string());
             } else {
-                logMessage(cmd.messageID, cmd.getStringData()[0], cmd.payload);
+                logMessage(cmd.messageID, cmd.getStringData()[0], cmd.payload.to_string());
             }
         }
 
@@ -1074,7 +1074,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                     subI->addData(src,
                                   cmd.actionTime,
                                   cmd.counter,
-                                  std::make_shared<const data_block>(std::move(cmd.payload)));
+                                  std::make_shared<const SmallBuffer>(std::move(cmd.payload)));
                     if (!subI->not_interruptible) {
                         timeCoord->updateValueTime(cmd.actionTime);
                         LOG_TRACE(timeCoord->printTimeStatus());
@@ -1086,11 +1086,12 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_WARNING:
             if (cmd.payload.empty()) {
                 cmd.payload = commandErrorString(cmd.messageID);
-                if (cmd.payload == "unknown") {
-                    cmd.payload += " code:" + std::to_string(cmd.messageID);
+                if (cmd.payload.to_string() == "unknown") {
+                    cmd.payload.append(" code:");
+                    cmd.payload.append(std::to_string(cmd.messageID));
                 }
             }
-            LOG_WARNING(cmd.payload);
+            LOG_WARNING(cmd.payload.to_string());
             break;
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
@@ -1109,7 +1110,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                             errorString += " code:" + std::to_string(cmd.messageID);
                         }
                     } else {
-                        errorString = cmd.payload;
+                        errorString = cmd.payload.to_string();
                     }
                     errorCode = cmd.messageID;
                     LOG_ERROR(errorString);
@@ -1144,7 +1145,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
                 subI->addSource(cmd.getSource(),
-                                cmd.name,
+                                std::string(cmd.name()),
                                 cmd.getString(typeStringLoc),
                                 cmd.getString(unitStringLoc));
                 addDependency(cmd.source_id);
@@ -1171,7 +1172,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_REMOVE_NAMED_PUBLICATION: {
             auto* subI = interfaceInformation.getInput(cmd.source_handle);
             if (subI != nullptr) {
-                subI->removeSource(cmd.name,
+                subI->removeSource(std::string(cmd.name()),
                                    (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
             }
             break;
@@ -1196,7 +1197,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             if (state != HELICS_CREATED) {
                 break;
             }
-            if (cmd.name == name) {
+            if (cmd.name() == name) {
                 if (checkActionFlag(cmd, error_flag)) {
                     setState(HELICS_ERROR);
                     errorString = commandErrorString(cmd.messageID);
@@ -1228,7 +1229,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             queryResp.messageID = cmd.messageID;
             queryResp.counter = cmd.counter;
 
-            queryResp.payload = processQueryActual(cmd.payload);
+            queryResp.payload = processQueryActual(cmd.payload.to_string());
             routeMessage(queryResp);
         } break;
     }
@@ -1634,8 +1635,8 @@ void FederateState::setCoreObject(CommonCore* parent)
 }
 
 void FederateState::logMessage(int level,
-                               const std::string& logMessageSource,
-                               const std::string& message) const
+                               std::string_view logMessageSource,
+                               std::string_view message) const
 {
     if ((loggerFunction) && (level <= logLevel)) {
         loggerFunction(level,
@@ -1646,7 +1647,7 @@ void FederateState::logMessage(int level,
     }
 }
 
-std::string FederateState::processQueryActual(const std::string& query) const
+std::string FederateState::processQueryActual(std::string_view query) const
 {
     if (query == "publications") {
         return generateStringVector(interfaceInformation.getPublications(),

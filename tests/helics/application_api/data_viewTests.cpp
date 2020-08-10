@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include <gtest/gtest.h>
 
-/** these test cases test data_block and data_view objects
+/** these test cases test SmallBuffer and data_view objects
  */
 
 #include "helics/application_api/data_view.hpp"
@@ -56,7 +56,7 @@ TEST(data_view_tests, constructor_tests)
 
 TEST(data_view_tests, assignment_tests)
 {
-    data_block db(3, 't');
+    SmallBuffer db(3, 't');
 
     data_view dv1(db);
     const char* str = "this is a test string";
@@ -65,9 +65,9 @@ TEST(data_view_tests, assignment_tests)
     EXPECT_EQ(dv1.size(), strlen(str));
 
     // assign the partial string
-    data_block db3(str, 7);
+    SmallBuffer db3(str, 7);
 
-    data_block db4(400, 'r');
+    SmallBuffer db4(400, 'r');
     data_view dv4(db4);
     data_view dv5;
     // test move constructor
@@ -77,7 +77,7 @@ TEST(data_view_tests, assignment_tests)
 
 TEST(data_view_tests, range_for_ops)
 {
-    data_block test1(300, 25);
+    SmallBuffer test1(300, 25);
     data_view testv1(test1);
 
     int sum = 0;
@@ -90,10 +90,10 @@ TEST(data_view_tests, range_for_ops)
 /** test the swap function*/
 TEST(data_view_tests, swap)
 {
-    data_block test1(300, 23);
+    SmallBuffer test1(300, 23);
 
     data_view v1(test1);
-    data_block test2(100, 45);
+    SmallBuffer test2(100, 45);
     data_view v2(test2);
     EXPECT_EQ(v1.size(), 300U);
     EXPECT_EQ(v2.size(), 100U);
@@ -105,17 +105,17 @@ TEST(data_view_tests, swap)
 /** test the swap function*/
 TEST(data_view_tests, shared_ptr)
 {
-    auto db = std::make_shared<data_block>(400, 'r');
+    auto db = std::make_shared<SmallBuffer>(400, 'r');
     data_view dv1(db);
 
     auto sz1 = db->size();
     auto checkel = (*db)[67];
     EXPECT_EQ(dv1.size(), sz1);
-    EXPECT_EQ(dv1[67], checkel);
+    EXPECT_EQ(dv1[67], std::to_integer<char>(checkel));
 
     EXPECT_EQ(db.use_count(), 2);
     db = nullptr;
     // should keep a valid memory
     EXPECT_EQ(dv1.size(), sz1);
-    EXPECT_EQ(dv1[67], checkel);
+    EXPECT_EQ(dv1[67], std::to_integer<char>(checkel));
 }

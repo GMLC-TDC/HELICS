@@ -553,7 +553,7 @@ TEST(ZMQCore, zmqCore_initialization)
     EXPECT_GT(rxmsg.size(), 32U);
     helics::ActionMessage rM(static_cast<char*>(rxmsg.data()), rxmsg.size());
 
-    EXPECT_EQ(rM.name, "core1");
+    EXPECT_EQ(rM.name(), "core1");
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
 
     repSocket.close();

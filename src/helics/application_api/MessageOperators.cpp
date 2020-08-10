@@ -43,7 +43,7 @@ std::unique_ptr<Message> MessageDataOperator::process(std::unique_ptr<Message> m
 {
     if (dataFunction) {
         auto dv = dataFunction(data_view(message->data));
-        message->data = dv.to_data_block();
+        message->data = dv.to_buffer();
     }
     return message;
 }

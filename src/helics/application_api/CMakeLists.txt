@@ -19,7 +19,6 @@ set(application_api_headers
     MessageFederate.hpp
     MessageOperators.hpp
     ValueConverter.hpp
-    ValueConverter_impl.hpp
     ValueFederate.hpp
     HelicsPrimaryTypes.hpp
     queryFunctions.hpp

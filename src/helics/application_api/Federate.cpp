@@ -421,7 +421,7 @@ int32_t Federate::getIntegerProperty(int32_t option) const
 }
 
 void Federate::setLoggingCallback(
-    const std::function<void(int, const std::string&, const std::string&)>& logFunction)
+    const std::function<void(int, std::string_view, std::string_view)>& logFunction)
 {
     coreObject->setLoggingCallback(fedID, logFunction);
 }

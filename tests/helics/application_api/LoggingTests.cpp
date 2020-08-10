@@ -32,7 +32,7 @@ TEST(logging_tests, basic_logging)
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
-        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
             mlog.lock()->emplace_back(level, message);
         });
     Fed->logMessage(3, "test log message");
@@ -123,7 +123,7 @@ TEST(logging_tests, check_log_message)
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
-        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
             mlog.lock()->emplace_back(level, message);
         });
 
@@ -152,7 +152,7 @@ TEST(logging_tests, check_log_message_functions)
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
-        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
             mlog.lock()->emplace_back(level, message);
         });
 
@@ -200,7 +200,7 @@ TEST(logging_tests, check_log_message_levels)
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
-        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
             mlog.lock()->emplace_back(level, message);
         });
 
@@ -234,7 +234,7 @@ TEST(logging_tests, check_log_message_levels_high)
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     Fed->setLoggingCallback(
-        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
             mlog.lock()->emplace_back(level, message);
         });
 

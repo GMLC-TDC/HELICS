@@ -31,11 +31,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** encode the string in base64 if needed otherwise just return the string*/
-static std::string encode(const std::string& str2encode)
+static std::string encode(std::string_view str2encode)
 {
     return std::string("b64[") +
-        gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(str2encode.c_str()),
-                                       static_cast<int>(str2encode.size())) +
+        gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(str2encode.data()),
+                                       str2encode.size()) +
         ']';
 }
 
@@ -264,9 +264,9 @@ namespace apps {
                 }
                 if (isBinaryData(mess->data)) {
                     message["encoding"] = "base64";
-                    message["message"] = encode(mess->data.to_string());
+                    message["message"] = encode(std::string(mess->data.to_string()));
                 } else {
-                    message["message"] = mess->data.to_string();
+                    message["message"] = std::string(mess->data.to_string());
                 }
                 doc["messages"].append(message);
             }

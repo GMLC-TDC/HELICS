@@ -16,7 +16,7 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD "pre-alpha")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-06-05")
+set(HELICS_DATE "2020-08-07")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -815,8 +815,6 @@ endif(NOT HELICS_BINARY_ONLY_INSTALL)
 # combine 3rd party license files for install package
 include(combineLicenses)
 set(LICENSE_LIST
-    "cereal"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/helics/external/cereal/LICENSE"
     "GMLC Concurrency"
     "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/LICENSE"
     "libGuarded"
