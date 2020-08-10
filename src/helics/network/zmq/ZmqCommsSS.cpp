@@ -82,7 +82,7 @@ namespace zeromq {
                 return (-1);
             }
         }
-        ActionMessage M(static_cast<std::byte *>(msg.data()), msg.size());
+        ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
 
         if (!isValidCommand(M)) {
             std::cerr << "invalid command received" << M.action() << std::endl;

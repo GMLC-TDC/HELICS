@@ -255,7 +255,7 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
 }
 
 const std::shared_ptr<const SmallBuffer>& FederateState::getValue(interface_handle handle,
-                                                                 uint32_t* inputIndex)
+                                                                  uint32_t* inputIndex)
 {
     return interfaces().getInput(handle)->getData(inputIndex);
 }

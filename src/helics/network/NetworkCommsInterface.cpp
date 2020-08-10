@@ -192,7 +192,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
             case REQUEST_PORTS: {
                 int cnt = (cmd.counter == 0) ? 2 : cmd.counter;
                 auto openPort = (cmd.name().empty()) ? findOpenPort(cnt, localHostString) :
-                                                     findOpenPort(cnt, std::string(cmd.name()));
+                                                       findOpenPort(cnt, std::string(cmd.name()));
                 ActionMessage portReply(CMD_PROTOCOL);
                 portReply.messageID = PORT_DEFINITIONS;
                 portReply.source_id = global_federate_id(PortNumber);

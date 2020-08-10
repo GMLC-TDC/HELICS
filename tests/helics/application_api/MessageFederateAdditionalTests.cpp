@@ -274,8 +274,8 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 
     helics::SmallBuffer data1(500, std::byte{'a'});
     helics::SmallBuffer data2(400, std::byte{'b'});
-        helics::SmallBuffer data3(300, std::byte{'c'});
-            helics::SmallBuffer data4(200, std::byte{'d'});
+    helics::SmallBuffer data3(300, std::byte{'c'});
+    helics::SmallBuffer data4(200, std::byte{'d'});
     mFed1->sendMessage(epid, "ep2", data1);
     mFed1->sendMessage(epid, "ep2", data2);
     mFed1->sendMessage(epid, "ep2", data3);

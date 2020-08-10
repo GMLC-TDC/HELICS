@@ -169,7 +169,7 @@ class FederateState {
      * Return the data for the specified handle or the latest input
      */
     const std::shared_ptr<const SmallBuffer>& getValue(interface_handle handle,
-                                                      uint32_t* inputIndex);
+                                                       uint32_t* inputIndex);
 
     /**
      * Return all the available data for the specified handle or the latest input
@@ -345,9 +345,7 @@ class FederateState {
     @param logMessageSource the name of the object that sent the message
     @param message the message to log
     */
-    void logMessage(int level,
-                    std::string_view logMessageSource,
-                    std::string_view message) const;
+    void logMessage(int level, std::string_view logMessageSource, std::string_view message) const;
 
     /** set the logging function
     @details function must have signature void(int level, const std::string &sourceName, const

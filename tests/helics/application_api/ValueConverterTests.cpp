@@ -64,20 +64,20 @@ using compd = std::complex<double>;
 TEST(valueConverter_tests, basic)
 {
     converterTests(45.54, 23.7e-7, sizeof(double) + 8, sizeof(double) + 8, "double");
-//    converterTests<int>(45, -234252, sizeof(int) + 1, sizeof(int) + 1, "int32");
-    converterTests<int64_t>(
-        352, 0x2323427FA, sizeof(int64_t) + 8, sizeof(int64_t) + 8, "int64");
+    //    converterTests<int>(45, -234252, sizeof(int) + 1, sizeof(int) + 1, "int32");
+    converterTests<int64_t>(352, 0x2323427FA, sizeof(int64_t) + 8, sizeof(int64_t) + 8, "int64");
 
-   // converterTests('r', 't', 2, 2, "char");
+    // converterTests('r', 't', 2, 2, "char");
 
-   // converterTests(static_cast<unsigned char>(223), static_cast<unsigned char>(46), 2, 2, "uchar");
+    // converterTests(static_cast<unsigned char>(223), static_cast<unsigned char>(46), 2, 2,
+    // "uchar");
 
     compd v1{1.7, 0.9};
     compd v2{-34e5, 0.345};
     converterTests(v1, v2, sizeof(compd) + 8, sizeof(compd) + 8, "complex");
     std::string testValue1 = "this is a long string test";
     std::string test2;
-    converterTests(testValue1, test2, testValue1.size()+8, test2.size()+8, "string");
+    converterTests(testValue1, test2, testValue1.size() + 8, test2.size() + 8, "string");
     // test a vector
     using vecd = std::vector<double>;
     vecd vec1 = {45.4, 23.4, -45.2, 34.2234234};
@@ -94,7 +94,6 @@ TEST(valueConverter_tests, named_point)
     helics::NamedPoint D{"0", 99.345345};
     converterTests<helics::NamedPoint>(C, D, C.name.size() + 16, D.name.size() + 16, "named_point");
 }
-
 
 /** this one is a bit annoying to use the template so it gets its own case
 we are testing vectors of strings
@@ -130,18 +129,17 @@ TEST(valueConverter_tests, vector_string)
     EXPECT_TRUE(val3 == test2);
 }
 
-
 /** check that the converters do actually throw on invalid sizes*/
 TEST(valueConverter_tests, errors)
 {
     auto vb1 = helics::ValueConverter<double>::convert(3.1415);
     auto vb2 = helics::ValueConverter<std::complex<double>>::convert(10);
 
- //   EXPECT_THROW(helics::ValueConverter<double>::interpret(vb2), std::invalid_argument);
+    //   EXPECT_THROW(helics::ValueConverter<double>::interpret(vb2), std::invalid_argument);
     EXPECT_EQ(vb2.size(), 24U);
 
- //   EXPECT_THROW(helics::ValueConverter<std::complex<double>>::interpret(vb1),
-   //              std::invalid_argument);
+    //   EXPECT_THROW(helics::ValueConverter<std::complex<double>>::interpret(vb1),
+    //              std::invalid_argument);
     EXPECT_EQ(vb1.size(), 16U);
 }
 

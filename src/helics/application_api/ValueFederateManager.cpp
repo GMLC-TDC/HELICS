@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederateManager.hpp"
 
-#include "../core/Core.hpp"
 #include "../common/JsonBuilder.hpp"
+#include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"

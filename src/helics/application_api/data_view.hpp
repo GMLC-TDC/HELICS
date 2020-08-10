@@ -40,7 +40,7 @@ class data_view {
     data_view(data_view&& dv) noexcept: dblock(dv.dblock), ref(std::move(dv.ref)) {}
     template<typename U,
              typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
-    data_view(U&& u) noexcept: dblock(std::forward<U>(u)) // NOLINT
+    data_view(U&& u) noexcept: dblock(std::forward<U>(u))  // NOLINT
     {
     }
     /** construct from a char Pointer and length*/
@@ -53,7 +53,9 @@ class data_view {
         dblock(dvec.data(), dvec.size()) {}  // NOLINT
 
     data_view(const std::vector<double>& dvec) noexcept:
-        dblock(reinterpret_cast<const char *>(dvec.data()), dvec.size()*sizeof(double)) {}  // NOLINT
+        dblock(reinterpret_cast<const char*>(dvec.data()), dvec.size() * sizeof(double))
+    {
+    }  // NOLINT
     /** assignment operator from another ata_view*/
     data_view& operator=(const data_view& dv) noexcept = default;
 
