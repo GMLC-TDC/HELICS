@@ -29,9 +29,6 @@ Which method you use to configure your federate and co-simulation significantly 
 * **Command-line configuration (where possible) allows for small, quick changes to the configuration** - Because the command line doesn't provide comprehensive access to the necessary configuration, it will never be a stand-alone configuration option but it does have the advantage of providing quick access right as a user is instantiating the federate. This is an ideal place to make small changes to the configuration (e.g. changing the minimum time step) without having to edit any files. 
 * **API configuration is most useful for dynamic configuration** - If there is a need to change the configuration of a given federate dynamically, the API is the only way to do that. Such needs are not common but there are cases where, for example, it may be necessary to define the configuration based on the participants in the federation (_e.g._ publications, subscriptions, timing). It's possible to use [queries](./user_guide/queries.md) to understand the composition and configuration of the federation and then use the APIs to define the configuration of the federate in question. 
 
-### Precedence
-xxxxxxx - What happens if an option is defined on the JSON config, command line, and with a specific API call? Who wins?
-
 ### How to Use This Reference
 The remainder of this reference lists the configuration options that are supported in the JSON configuration file. Where possible, the corresponding C++ API calls and the links to that documentation will be provided. Generally, the command-line options use the exact same syntax as the JSON configuration options preceded by a `--` and followed by either an `=` or a space and then the parameter value (_i.e._ `--name testname`). In the cases where a single letter switch is available, that will be listed (_i.e._ `-n testname`).
 
@@ -183,15 +180,9 @@ An example of one publication, subscription, named input, endpoint, and filter i
     }
   ] 
 }
-
-
-
-  
-
-  
- 
-  
 ```
+
+
 
 ## General Federate Options
 
@@ -206,7 +197,7 @@ _API:_ `helicsFederateInfoSetCoreName`
 
 Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 
-
+---
 ### `core_type` | `coretype` | `coreType` | `-t` ["zmq"]
 _API:_ `helicsFederateInfoSetCoreTypeFromString`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)
@@ -219,8 +210,6 @@ There are a number of technologies or message buses that can be used to send HEL
 
 
 ### `core_name` | `corename` | `coreName` []
-_command line:_ xxxxxxx
-
 _API:_ helicsFederateInfoSetCoreName
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a1fc4b4563bd06ac54d9569d1df5f8d0c)
  | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
@@ -276,6 +265,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
  | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
  | [Python](https://python.helics.org/api/#helicsFederateInfoSetFlagOption)
  | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
+
 _Property's enumerated name:_ `helics_flag_terminate_on_error` [72]
 
 If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions.
