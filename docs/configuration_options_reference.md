@@ -199,8 +199,9 @@ There are a number of flags which control how a federate acts with respect to ti
 ### `name` | `-n` (required)
 _API:_ `helicsFederateInfoSetCoreName` 
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a1fc4b4563bd06ac54d9569d1df5f8d0c)
-[C/Python](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
-[Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/#Functions)
+ | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+ | [Python](https://python.helics.org/api/#helicsFederateInfoSetCoreName)
+ | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreName-Tuple{HELICS.FederateInfo,String})
 
 Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 
