@@ -252,3 +252,4 @@ tags
 ### MATLAB ###
 *.mex*
 HELICS/HELICS.xcodeproj
+HELICS
