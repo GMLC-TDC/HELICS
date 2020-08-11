@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "helics/helics_enums.h"
 
@@ -617,7 +618,7 @@ TEST_P(valuefed_single_type, block_send_receive)
 
     auto& sub1 = vFed1->registerSubscription("fed0/pub3", "");
 
-    helics::data_block db(547, ';');
+    helics::SmallBuffer db(547, ';');
 
     vFed1->enterExecutingMode();
     vFed1->publishRaw(pubid3, db);
@@ -644,7 +645,7 @@ TEST_P(valuefed_single_type, all_callback)
     auto& sub2 = vFed1->registerSubscription("pub2", "");
     auto& sub3 = vFed1->registerSubscription("fed0/pub3", "");
 
-    helics::data_block db(547, ';');
+    helics::SmallBuffer db(547, ';');
     helics::interface_handle lastId;
     helics::Time lastTime;
     vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {

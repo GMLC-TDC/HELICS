@@ -16,14 +16,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-const std::vector<std::shared_ptr<const data_block>>& InputInfo::getAllData() const
+const std::vector<std::shared_ptr<const SmallBuffer>>& InputInfo::getAllData() const
 {
     return current_data;
 }
 
-static const std::shared_ptr<const data_block> NullData{nullptr};
+static const std::shared_ptr<const SmallBuffer> NullData{nullptr};
 
-const std::shared_ptr<const data_block>& InputInfo::getData(int index) const
+const std::shared_ptr<const SmallBuffer>& InputInfo::getData(int index) const
 {
     if (isValidIndex(index, current_data)) {
         return current_data[index];
@@ -45,7 +45,7 @@ static bool priorityCheck(int32_t index1, int32_t index2, const std::vector<int3
     return false;
 }
 
-const std::shared_ptr<const data_block>& InputInfo::getData(uint32_t* inputIndex) const
+const std::shared_ptr<const SmallBuffer>& InputInfo::getData(uint32_t* inputIndex) const
 {
     int ind{0};
     int mxind{-1};
@@ -83,7 +83,7 @@ static auto recordComparison = [](const InputInfo::dataRecord& rec1,
 void InputInfo::addData(global_handle source_id,
                         Time valueTime,
                         unsigned int iteration,
-                        std::shared_ptr<const data_block> data)
+                        std::shared_ptr<const SmallBuffer> data)
 {
     int index;
     bool found = false;

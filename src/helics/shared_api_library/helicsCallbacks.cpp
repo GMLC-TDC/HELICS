@@ -31,8 +31,10 @@ void helicsBrokerSetLoggingCallback(helics_broker broker,
         if (logger == nullptr) {
             brk->setLoggingCallback({});
         } else {
-            brk->setLoggingCallback([logger, userdata](int loglevel, const std::string& ident, const std::string& message) {
-                logger(loglevel, ident.c_str(), message.c_str(), userdata);
+            brk->setLoggingCallback([logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
+                const std::string id(ident);
+                const std::string mess(message);
+                logger(loglevel, id.c_str(), mess.c_str(), userdata);
             });
         }
     }
@@ -55,8 +57,10 @@ void helicsCoreSetLoggingCallback(helics_core core,
             cr->setLoggingCallback(helics::local_core_id, {});
         } else {
             cr->setLoggingCallback(helics::local_core_id,
-                                   [logger, userdata](int loglevel, const std::string& ident, const std::string& message) {
-                                       logger(loglevel, ident.c_str(), message.c_str(), userdata);
+                                   [logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
+                                       const std::string ID(ident);
+                                       const std::string mess(message);
+                                       logger(loglevel, ID.c_str(), mess.c_str(), userdata);
                                    });
         }
     }
@@ -79,8 +83,10 @@ void helicsFederateSetLoggingCallback(helics_federate fed,
         if (logger == nullptr) {
             fedptr->setLoggingCallback({});
         } else {
-            fedptr->setLoggingCallback([logger, userdata](int loglevel, const std::string& ident, const std::string& message) {
-                logger(loglevel, ident.c_str(), message.c_str(), userdata);
+            fedptr->setLoggingCallback([logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
+                const std::string id(ident);
+                const std::string mess(message);
+                logger(loglevel, id.c_str(), mess.c_str(), userdata);
             });
         }
     }

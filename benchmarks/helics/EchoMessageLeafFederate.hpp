@@ -45,8 +45,7 @@ class EchoMessageLeaf: public BenchmarkFederate {
             }
             while (ept.hasMessage()) {
                 auto m = ept.getMessage();
-                auto& nstring = m->data.to_string();
-                if (nstring != txstring) {
+                if (m->data.to_string() != txstring) {
                     throw("incorrect string");
                 }
             }

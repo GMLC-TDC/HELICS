@@ -12,9 +12,10 @@ the purpose of these objects are to convert a specific type into a data block fo
 algorithms
 */
 
-#include "../core/Core.hpp"
+#include "../core/SmallBuffer.hpp"
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
+#include "helics_cxx_export.h"
 
 #include <cstddef>
 #include <string>
@@ -22,97 +23,155 @@ algorithms
 #include <vector>
 
 namespace helics {
+
+namespace detail {
+    constexpr size_t getBinaryLength(double /*val*/) { return 16; }
+    constexpr size_t getBinaryLength(std::int64_t /*val*/) { return 16; }
+    constexpr size_t getBinaryLength(std::complex<double> /*val*/) { return 24; }
+    inline size_t getBinaryLength(std::string_view val) { return val.size() + 8; }
+    inline size_t getBinaryLength(const std::vector<double>& val)
+    {
+        return val.size() * sizeof(double) + 8;
+    }
+    inline size_t getBinaryLength(const double* /*val*/, size_t size)
+    {
+        return size * sizeof(double) + 8;
+    }
+
+    inline size_t getBinaryLength(const NamedPoint& np) { return np.name.size() + 16; }
+
+    inline size_t getBinaryLength(const std::vector<std::complex<double>>& cv)
+    {
+        return cv.size() * sizeof(double) * 2 + 8;
+    }
+    inline size_t getBinaryLength(const std::complex<double>* /*unused*/, size_t size)
+    {
+        return size * sizeof(double) * 2 + 8;
+    }
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, double val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, std::int64_t val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, std::complex<double> val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, std::string_view val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, const NamedPoint& val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, const std::vector<double>& val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data, const double* val, size_t size);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data,
+                                             const std::vector<std::complex<double>>& val);
+
+    HELICS_CXX_EXPORT size_t convertToBinary(std::byte* data,
+                                             const std::complex<double>* val,
+                                             size_t size);
+
+    /** detect the contained data type,  assumes data is at least 1 byte long*/
+    HELICS_CXX_EXPORT data_type detectType(const std::byte* data);
+
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, double& val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::int64_t& val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::complex<double>& val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, char* val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::string& val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, NamedPoint& val);
+
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::vector<double>& val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, double* val);
+
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data,
+                                             std::vector<std::complex<double>>& val);
+
+    /** get the size of the data from the data stream for a specific type
+    @details this returns the number of elements of the specific data type  it is NOT in bytes
+    */
+    HELICS_CXX_EXPORT size_t getDataSize(const std::byte* data);
+}  // namespace detail
+
 /** converter for a basic value*/
 template<class X>
 class ValueConverter {
   public:
     using baseType = X;
     /** convert the value to a block of data*/
-    static data_block convert(const X& val);
+    static SmallBuffer convert(const X& val)
+    {
+        auto dv = SmallBuffer();
+        convert(val, dv);
+        return dv;
+    }
 
     /** convert the value and store to a specific block of data*/
-    static void convert(const X& val, data_block& store);
+    static void convert(const X& val, SmallBuffer& store)
+    {
+        store.resize(detail::getBinaryLength(val));
+        detail::convertToBinary(store.data(), val);
+    }
 
     /** convert a raw vector of objects and store to a specific block*/
-    static void convert(const X* vals, size_t size, data_block& store);
+    static void convert(const X* vals, size_t size, SmallBuffer& store)
+    {
+        store.resize(detail::getBinaryLength(vals, size));
+        detail::convertToBinary(store.data(), vals, size);
+    }
 
     /** convert a raw vector of objects and store to a specific block*/
-    static data_block convert(const X* vals, size_t size);
+    static SmallBuffer convert(const X* vals, size_t size)
+    {
+        auto dv = SmallBuffer();
+        convert(vals, size, dv);
+        return dv;
+    }
 
     /** interpret a view of the data and convert back to a val*/
-    static X interpret(const data_view& block);
+    static X interpret(const data_view& block)
+    {
+        X val;
+        detail::convertFromBinary(block.bytes(), val);
+        return val;
+    }
 
     /** interpret a view of the data block and store to the specified value*/
-    static void interpret(const data_view& block, X& val);
+    static void interpret(const data_view& block, X& val)
+    {
+        detail::convertFromBinary(block.bytes(), val);
+    }
 
     /** get the type of the value*/
     static std::string type() { return typeNameString<X>(); }
 };
 
-/** converter for a single string value*/
 template<>
-class ValueConverter<std::string> {
+class ValueConverter<std::vector<std::string>> {
   public:
-    using baseType = std::string;
-    static data_block convert(std::string&& val) { return data_block(std::move(val)); }
-    static data_block convert(const std::string& val) { return data_block(val); }
-    static void convert(const std::string& val, data_block& store) { store = val; }
-    static std::string interpret(const data_view& block) { return block.string(); }
-    static void interpret(const data_view& block, std::string& val) { val = interpret(block); }
-    static std::string type() { return "string"; }
+    using baseType = std::vector<std::string>;
+    /** convert the value to a block of data*/
+    static SmallBuffer convert(const std::vector<std::string>& val)
+    {
+        auto dv = SmallBuffer();
+        convert(val, dv);
+        return dv;
+    }
+
+    /** convert the value and store to a specific block of data*/
+    static void convert(const std::vector<std::string>& val, SmallBuffer& store);
+
+    /** interpret a view of the data block and store to the specified value*/
+    static void interpret(const data_view& block, std::vector<std::string>& val);
+
+    /** interpret a view of the data and convert back to a val*/
+    static std::vector<std::string> interpret(const data_view& block)
+    {
+        std::vector<std::string> val;
+        interpret(block, val);
+        return val;
+    }
+
+    /** get the type of the value*/
+    static std::string type() { return "string_vector"; }
 };
 }  // namespace helics
-
-// This should be at the end since it depends on the definitions in here
-#ifndef HELICS_CXX_STATIC_DEFINE
-#    include "ValueConverter_impl.hpp"
-#endif
-
-namespace helics::detail {
-size_t getBinaryLength(double val);
-size_t getBinaryLength(std::int64_t val);
-size_t getBinaryLength(std::complex<double> val);
-size_t getBinaryLength(std::string_view val);
-size_t getBinaryLength(const std::vector<double>& val);
-size_t getBinaryLength(const double* val, size_t size);
-
-size_t getBinaryLength(const NamedPoint& np);
-
-size_t getBinaryLength(const std::vector<std::complex<double>>& cv);
-
-size_t convertToBinary(std::byte* data, double val);
-
-size_t convertToBinary(std::byte* data, std::int64_t val);
-
-size_t convertToBinary(std::byte* data, const std::complex<double>& val);
-
-size_t convertToBinary(std::byte* data, std::string_view val);
-
-size_t convertToBinary(std::byte* data, const NamedPoint& val);
-
-size_t convertToBinary(std::byte* data, const std::vector<double>& val);
-
-size_t convertToBinary(std::byte* data, const double* val, size_t size);
-
-size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val);
-
-/** detect the contained data type,  assumes data is at least 1 byte long*/
-data_type detectType(const std::byte* data);
-
-void convertFromBinary(const std::byte* data, double& val);
-void convertFromBinary(const std::byte* data, std::int64_t& val);
-void convertFromBinary(const std::byte* data, std::complex<double>& val);
-void convertFromBinary(const std::byte* data, char* val);
-void convertFromBinary(const std::byte* data, std::string& val);
-void convertFromBinary(const std::byte* data, NamedPoint& val);
-
-void convertFromBinary(const std::byte* data, std::vector<double>& val);
-void convertFromBinary(const std::byte* data, double* val);
-
-void convertFromBinary(const std::byte* data, std::vector<std::complex<double>>& val);
-
-/** get the size of the data from the data stream for a specific type
-@details this returns the number of elements of the specific data type  it is NOT in bytes
-*/
-size_t getDataSize(const std::byte* data);
-}  // namespace helics::detail

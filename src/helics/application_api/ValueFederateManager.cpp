@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederateManager.hpp"
 
 #include "../common/JsonBuilder.hpp"
+#include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
@@ -158,7 +159,7 @@ void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& bl
         auto* info = static_cast<input_info*>(inp.dataReference);
 
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
-        info->lastData = data_view(std::make_shared<data_block>(block.data(), block.size()));
+        info->lastData = data_view(std::make_shared<SmallBuffer>(block.data(), block.size()));
         info->lastUpdate = CurrentTime;
     } else {
         throw(InvalidIdentifier("Input id is invalid"));

@@ -285,7 +285,7 @@ class HELICS_CXX_EXPORT Federate {
     A string indicating the source of the message and another string with the actual message
     */
     void setLoggingCallback(
-        const std::function<void(int, const std::string&, const std::string&)>& logFunction);
+        const std::function<void(int, std::string_view, std::string_view)>& logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending

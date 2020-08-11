@@ -155,9 +155,9 @@ namespace inproc {
                 if (rid == control_route) {
                     switch (cmd.messageID) {
                         case NEW_ROUTE: {
-                            auto& newroute = cmd.payload;
+                            auto newroute = cmd.payload.to_string();
                             bool foundRoute = false;
-                            auto core = CoreFactory::findCore(newroute);
+                            auto core = CoreFactory::findCore(std::string(newroute));
                             if (core) {
                                 auto tcore = std::dynamic_pointer_cast<CommonCore>(core);
                                 if (tcore) {
@@ -165,7 +165,7 @@ namespace inproc {
                                     foundRoute = true;
                                 }
                             }
-                            auto brk = BrokerFactory::findBroker(newroute);
+                            auto brk = BrokerFactory::findBroker(std::string(newroute));
 
                             if (brk) {
                                 auto cbrk = std::dynamic_pointer_cast<CoreBroker>(brk);
@@ -175,7 +175,8 @@ namespace inproc {
                                 }
                             }
                             if (!foundRoute) {
-                                logError(std::string("unable to establish Route to ") + newroute);
+                                logError(std::string("unable to establish Route to ") +
+                                         std::string(newroute));
                             }
                             processed = true;
                         } break;

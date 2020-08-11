@@ -383,7 +383,7 @@ static bool changeDetected(const defV& prevValue, const defV& newVal, double del
     return std::visit(visitor, newVal);
 }
 
-bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block>>& dataV)
+bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffer>>& dataV)
 {
     if (injectionType == data_type::helics_unknown ||
         static_cast<int32_t>(dataV.size()) != prevInputCount) {

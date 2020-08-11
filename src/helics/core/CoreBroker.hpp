@@ -78,7 +78,7 @@ class BasicBrokerInfo {
     bool _disable_ping{false};  //!< indicator that the broker doesn't respond to pings
     // 1 byte gap
     std::string routeInfo;  //!< string describing the connection information for the route
-    explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName) {}
+    explicit BasicBrokerInfo(std::string_view brokerName): name(brokerName) {}
 };
 
 class TimeCoordinator;
@@ -204,7 +204,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual bool isOpenToNewFederates() const override;
 
     virtual void
-        setLoggingCallback(const std::function<void(int, const std::string&, const std::string&)>&
+        setLoggingCallback(const std::function<void(int, std::string_view, std::string_view)>&
                                logFunction) override final;
 
     virtual bool waitForDisconnect(
@@ -326,7 +326,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** generate an answer to a local query*/
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer(const std::string& request);
+    std::string generateQueryAnswer(std::string_view request);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;
     /** locate the route to take to a particular federate*/

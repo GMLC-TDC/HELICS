@@ -137,7 +137,7 @@ namespace udp {
                     break;
                 }
             }
-            ActionMessage M(data.data(), len);
+            ActionMessage M(reinterpret_cast<std::byte*>(data.data()), len);
             if (!isValidCommand(M)) {
                 logWarning("invalid command received udp");
                 continue;
@@ -248,7 +248,7 @@ namespace udp {
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    m = ActionMessage(rx.data(), len);
+                    m = ActionMessage(reinterpret_cast<std::byte*>(rx.data()), len);
                     if (isProtocolCommand(m)) {
                         if (m.messageID == PORT_DEFINITIONS) {
                             loadPortDefinitions(m);
@@ -332,7 +332,7 @@ namespace udp {
                     switch (cmd.messageID) {
                         case NEW_ROUTE: {
                             try {
-                                auto& newroute = cmd.payload;
+                                std::string newroute(cmd.payload.to_string());
                                 std::string interface;
                                 std::string port;
                                 std::tie(interface, port) = extractInterfaceandPortString(newroute);

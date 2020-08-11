@@ -21,7 +21,6 @@ set(helics_shared_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/MessageFederate.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/MessageOperators.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/ValueConverter.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/ValueConverter_impl.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/ValueFederate.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/HelicsPrimaryTypes.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/queryFunctions.hpp
@@ -54,6 +53,7 @@ set(basic_app_headers ${HELICS_LIBRARY_SOURCE_DIR}/helics_apps.hpp)
 
 set(core_include_files
     ${HELICS_LIBRARY_SOURCE_DIR}/core/helics-time.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/core/SmallBuffer.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/core-data.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/core-types.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/federate_id.hpp

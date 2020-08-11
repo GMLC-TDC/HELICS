@@ -157,8 +157,8 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data(500, 'a');
-    helics::data_block data2(400, 'b');
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
 
     mFed1->sendMessage(epid, "ep2", data);
     mFed2->sendMessage(epid2, "fed0/ep1", data2);
@@ -218,8 +218,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
     EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data(500, 'a');
-    helics::data_block data2(400, 'b');
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
 
     cFed1->sendMessage(epid, "ep2", data);
     cFed2->sendMessage(epid2, "fed0/ep1", data2);

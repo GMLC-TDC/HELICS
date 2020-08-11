@@ -214,7 +214,8 @@ namespace ipc {
                     switch (cmd.messageID) {
                         case NEW_ROUTE: {
                             SendToQueue newQueue;
-                            bool newQconnected = newQueue.connect(cmd.payload, false, 3);
+                            bool newQconnected =
+                                newQueue.connect(std::string(cmd.payload.to_string()), false, 3);
                             if (newQconnected) {
                                 routes.emplace(route_id{cmd.getExtraData()}, std::move(newQueue));
                             }

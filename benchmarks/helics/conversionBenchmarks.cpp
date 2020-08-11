@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/ValueConverter.hpp"
-#include "helics/application_api/ValueConverter_impl.hpp"
 #include "helics_benchmark_main.h"
 
 #include <benchmark/benchmark.h>
@@ -15,7 +14,7 @@ template<class T>
 static void BMconversion(benchmark::State& state, const T& arg)
 {
     T val{arg};
-    helics::data_block store;
+    helics::SmallBuffer store;
     for (auto _ : state) {
         helics::ValueConverter<T>::convert(val, store);
     }
@@ -24,9 +23,6 @@ static void BMconversion(benchmark::State& state, const T& arg)
 BENCHMARK_CAPTURE(BMconversion, double_conv, -356.56e-27);
 
 BENCHMARK_CAPTURE(BMconversion, int64_conv, int64_t{-12351341});
-BENCHMARK_CAPTURE(BMconversion, uint64_conv, uint64_t{12351341});
-
-BENCHMARK_CAPTURE(BMconversion, int_conv, int32_t{123541});
 
 BENCHMARK_CAPTURE(BMconversion, complex_conv, std::complex<double>{45.7, -19.5});
 
@@ -45,7 +41,7 @@ template<class T>
 static void BMinterpret(benchmark::State& state, const T& arg)
 {
     T val{arg};
-    helics::data_block store;
+    helics::SmallBuffer store;
     helics::ValueConverter<T>::convert(val, store);
     helics::data_view stv{store};
     T val2;
@@ -57,9 +53,6 @@ static void BMinterpret(benchmark::State& state, const T& arg)
 BENCHMARK_CAPTURE(BMinterpret, double_interp, -356.56e-27);
 
 BENCHMARK_CAPTURE(BMinterpret, int64_interp, int64_t{-12351341});
-BENCHMARK_CAPTURE(BMinterpret, uint64_interp, uint64_t{12351341});
-
-BENCHMARK_CAPTURE(BMinterpret, int_interp, int32_t{123541});
 
 BENCHMARK_CAPTURE(BMinterpret, complex_interp, std::complex<double>{45.7, -19.5});
 

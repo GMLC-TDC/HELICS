@@ -382,7 +382,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, vector_callback_lists)
     auto sub2 = vFed1->registerSubscription("pub2", "");
     auto sub3 = vFed1->registerSubscription("fed0/pub3", "");
 
-    helics::data_block db(547, ';');
+    helics::SmallBuffer db(547, ';');
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
     vFed1->setInputNotificationCallback(sub1,

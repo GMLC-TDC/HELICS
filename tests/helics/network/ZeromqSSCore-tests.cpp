@@ -207,7 +207,7 @@ TEST(ZMQSSCore, initialization)
         if (!msgs.empty()) {
             auto rM2 = msgs.at(0);
             mLock.unlock();
-            EXPECT_EQ(rM2.name, "core1");
+            EXPECT_EQ(rM2.name(), "core1");
             // std::cout << "rM.name: " << rM2.name << std::endl;
             EXPECT_TRUE(rM2.action() == helics::action_message_def::action_t::cmd_reg_broker);
         } else {
