@@ -517,12 +517,12 @@ void runFederateTestComplex(const char* core,
 }
 
 void runFederateTestComplex2(const char* core,
-                            double defaultValue_r,
-                            double defaultValue_i,
-                            double testValue1_r,
-                            double testValue1_i,
-                            double testValue2_r,
-                            double testValue2_i)
+                             double defaultValue_r,
+                             double defaultValue_i,
+                             double testValue1_r,
+                             double testValue1_i,
+                             double testValue2_r,
+                             double testValue2_i)
 {
     helics_time gtime;
     double val1_r = 0.0;
@@ -533,8 +533,7 @@ void runFederateTestComplex2(const char* core,
     auto vFed = fixture.GetFederateAt(0);
 
     // register the publications
-    auto pubid =
-        helicsFederateRegisterGlobalTypePublication(vFed, "pub1", "complex", "", &err);
+    auto pubid = helicsFederateRegisterGlobalTypePublication(vFed, "pub1", "complex", "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "complex", &err);
     CE(helicsInputSetDefaultComplex(subid, defaultValue_r, defaultValue_i, &err));
 
