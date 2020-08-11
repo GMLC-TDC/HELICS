@@ -149,7 +149,7 @@ namespace detail {
     size_t convertToBinary(std::byte* data, const double* val, size_t size)
     {
         addCodeAndSize(data, vectorCode, size);
-        if (size>0) {
+        if (size > 0) {
             std::memcpy(data + 8, val, size * sizeof(double));
         }
         return size * sizeof(double) + 8U;
@@ -158,7 +158,7 @@ namespace detail {
     size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val)
     {
         addCodeAndSize(data, cvCode, val.size());
-        if (val.size()>0) {
+        if (val.size() > 0) {
             std::memcpy(data + 8, val.data(), val.size() * sizeof(double) * 2);
         }
         return val.size() * sizeof(double) * 2U + 8U;
@@ -276,7 +276,7 @@ namespace detail {
     {
         std::size_t size = getDataSize(data);
         val.resize(size);
-        if (size>0) {
+        if (size > 0) {
             std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
         }
         if ((data[0] & endianMask) != littleEndianCode) {

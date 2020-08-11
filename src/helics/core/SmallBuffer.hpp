@@ -130,7 +130,7 @@ class SmallBuffer {
             return *this;
         }
         resize(val.size());
-        if (val.size()>0) {
+        if (val.size() > 0) {
             std::memcpy(heap, val.data(), val.size());
         }
         return *this;
