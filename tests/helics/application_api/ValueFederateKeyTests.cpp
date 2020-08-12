@@ -1054,7 +1054,7 @@ TEST_F(valuefed_tests, empty_get_default)
     sub.setOption(helics::defs::options::connection_optional);
     vFed1->enterExecutingMode();
     vFed1->requestTime(10.0);
-    double val1;
+    double val1{0.0};
     EXPECT_NO_THROW(val1 = sub.getValue<double>());
     EXPECT_EQ(val1, helics::invalidDouble);
 
