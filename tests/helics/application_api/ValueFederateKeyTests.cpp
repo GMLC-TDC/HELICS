@@ -1044,3 +1044,45 @@ INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_all_type_tests,
                          ::testing::ValuesIn(core_types_all));
+
+TEST_F(valuefed_tests, empty_get_default)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto& sub = vFed1->registerSubscription("test1");
+    sub.setOption(helics::defs::options::connection_optional);
+    vFed1->enterExecutingMode();
+    vFed1->requestTime(10.0);
+    double val1{0.0};
+    EXPECT_NO_THROW(val1 = sub.getValue<double>());
+    EXPECT_EQ(val1, helics::invalidDouble);
+
+    std::complex<double> valc;
+    EXPECT_NO_THROW(valc = sub.getValue<std::complex<double>>());
+    EXPECT_EQ(valc, std::complex<double>(helics::invalidDouble, 0));
+
+    vFed1->finalize();
+}
+
+TEST_F(valuefed_tests, empty_get_complex)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto& ipt = vFed1->registerInput("I1", "complex");
+    ipt.setOption(helics::defs::connections_optional);
+    ipt.addTarget("test_target");
+    vFed1->enterExecutingMode();
+    vFed1->requestTime(10.0);
+
+    std::complex<double> valc;
+    EXPECT_NO_THROW(valc = ipt.getValue<std::complex<double>>());
+    EXPECT_EQ(valc, std::complex<double>(helics::invalidDouble, 0));
+
+    double val1;
+    EXPECT_NO_THROW(val1 = ipt.getValue<double>());
+    EXPECT_EQ(val1, helics::invalidDouble);
+
+    vFed1->finalize();
+}
