@@ -41,7 +41,7 @@ xxxxxxx is this the place to talk about how the JSON config is invoked?
 ## Sample Configurations
 The JSON configuration file below shows all the configuration options in a single file along with their default values and shows what section of the file they should be placed in. Most JSON configuration files will require far fewer options than shown here; items marked with "**" are required. Many items have alternative names that are 
 
-Many of the configuration parameters have alternate names that provide the same functionality. These sets of names are shown in the example below with each one quoted and separated by a "|".
+Many of the configuration parameters have alternate names that provide the same functionality. Only one of the names is shown in this configuration file but the alternative names are listed in the reference below. Generally, the supported names are the same string in nocase, camelCase, and snake_case.
 
 An example of one publication, subscription, named input, endpoint, and filter is also shown. The values for each of these options is arbitrary and in the case of filters, many more values are supported and a description of each is provided.
 
@@ -51,51 +51,48 @@ An example of one publication, subscription, named input, endpoint, and filter i
 {
   // General
   **"name": "arbitrary federate name",**
-  "coreType" | "coretype": "zmq",
-  "corename": "core name",
-  "coreinit" | "coreinitstring" : "",
+  "core_type": "zmq",
+  "core_name": "core name",
+  "core_init_string" : "",
   "autobroker": false,
-  "connections_required": false,
-  "connections_optional": false,
+  "connection_required": false,
+  "connection_optional": false,
   "strict_input_type_checking": false,
-  "terminate_on_error" | "terminateOnError" | "terminateonerror": false,
-  "source_only" | "sourceonly" | "sourceOnly" | "source": false,
+  "terminate_on_error": false,
+  "source_only": false,
   "observer": false,
   "only_update_on_change": false,
   "only_transmit_on_change": false,
   
   //Logging
   "logfile": "output.log"
-  "log_level" | "loglevel" | "logLevel": 5,
+  "log_level": 5,
   "force_logging_flush": false,
   "file_log_level": "",
   "console_log_level": "",
-  "dumplog": false,
+  "dump_log": false,
   
   //Timing
   "ignore_time_mismatch_warnings": false,
-  "uninterruptible" | "ignore_interrupts" | "ignoreinterrupts" | "nointerrupts" | "no_interrupts": false,
+  "uninterruptible": false,
   "period": 0,
   "offset": 0,
-  "time_delta" | "timedelta" | "timeDelta" | "delta": 0,
+  "time_delta": 0,
   "minTimeDelta": 0,
-  "input_delay" | "inputdelay" | "inputDelay": 0,
-  "output_delay" | "outputdelay" | "outputDelay": 0,
-  "real_time" | "realTime": false,
-  "rt_tolerance" | "rttolerance" | "rtTolerance": 0.2,
-  "rt_lag" | "rtlag" | "rtLag": 0.2,
-  "rt_lead" | "rtlead" | "rtLead": 0.2,
-  "wait_for_current_time_update" | "wait_for_current_time" | "waitforcurrenttimeupdate" | "waitforcurrenttime": false,
-  "restrictive_time_policy" | "conservative_time_policy" | "restrictive_time" | "conservative_time" | "restrictiveTime" | "conservativeTime": false,
-  "slow_responding" | "slow_response" | "slowResponding" | "slow" | "no_ping" | "disable_ping": false,
-  "forward_compute": false,
-  "delayed_update" | "delayedUpdate": false,
-  
-  
+  "input_delay": 0,
+  "output_delay": 0,
+  "real_time": false,
+  "rt_tolerance": 0.2,
+  "rt_lag": 0.2,
+  "rt_lead": 0.2,
+  "wait_for_current_time_update": false,
+  "restrictive_time_policy": false,
+  "slow_responding": false,
 
   //Iteration
   "rollback": false,
-  "max_iterations" | "maxiterations" | "maxIteration" | "iterations": 10,
+  "max_iterations": 10,
+  "forward_compute": false,
   
   
   //Network
@@ -122,14 +119,14 @@ An example of one publication, subscription, named input, endpoint, and filter i
       "type": xxxxxxx, Required or has a default value?
       "unit": "m",
       "global": false,
-      "optional" | "connectionoptional" | "connection_optional": true, 
-      "required" | "connectionrequired" | "connection_required": false,
+      "connection_optional": true, 
+      "connection_required": false,
       "tolerance": -1,
       "targets": xxxxxxx, (I'm not sure I'm reading the code correctly; this may not be a flag)
-      "buffer_data" | "bufferdata" | "bufferData":  false, indication the publication should buffer data
-      "strict_type_matching" | "strict_type_checking" | "strict_input_type_matching" | "strict_input_type_checking" | "strictinputtypechecking" | "strictinputtypematching" | "stricttypechecking" | "stricttypematching" | "strict": false, Requires data types on pubs and corresponding subs to match
-      "shortcut" | "alias": xxxxxxx, (What does this mean?)
-      "ignore_unit_mismatch" | "ignore_units": false,
+      "buffer_data":  false, indication the publication should buffer data
+      "strict_input_type_checking": false,
+      "alias": xxxxxxx, (What does this mean?)
+      "ignore_unit_mismatch": false,
       "info": xxxxxxx (supported in pubs?)
     },
   ],
@@ -198,6 +195,7 @@ _API:_ `helicsFederateInfoSetCoreName`
 Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 
 ---
+	
 ### `core_type` | `coretype` | `coreType` | `-t` ["zmq"]
 _API:_ `helicsFederateInfoSetCoreTypeFromString`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)
@@ -208,6 +206,8 @@ _API:_ `helicsFederateInfoSetCoreTypeFromString`
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). (xxxxxxxx add link to core type pages)
 
 
+---
+	
 
 ### `core_name` | `corename` | `coreName` []
 _API:_ helicsFederateInfoSetCoreName
@@ -219,6 +219,8 @@ _API:_ helicsFederateInfoSetCoreName
 Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
 
 
+---
+	
 
 ### `core_init_string` | `coreinitstring` | `coreInitString` | `-i` []
 _API:_ `helicsFederateInfoSetCoreInitString`
@@ -241,12 +243,16 @@ xxxxxxxx Figure out how to represent all the options shown in BrokerBase.cpp
 
 
 
+---
+	
 
 ### `autobroker` [false]
 _API:_ (none)
 
 Automatically generate a broker if one cannot be connected to. xxxxxxxx Need more information.
 
+---
+	
 
 ### `broker_init_string` | `brokerinitstring` | `brokerInitString` [""]
 _API:_ `helicsFederateInfoSetBrokerInitString`
@@ -258,6 +264,8 @@ _API:_ `helicsFederateInfoSetBrokerInitString`
 String used to define the configuration of the broker if one is autogenerated. xxxxxxxx Need more information.
 
 
+---
+	
 
 ### `terminate_on_error` | `terminateonerror` | `terminateOnError` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -271,6 +279,8 @@ _Property's enumerated name:_ `helics_flag_terminate_on_error` [72]
 If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions.
 
 
+---
+	
 
 ### `source_only` | `sourceonly` | `sourceOnly` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -284,6 +294,8 @@ _Property's enumerated name:_ `helics_flag_source_only` [4]
 Used to indicate to the federation that this federate is only producing data and has no inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
 
 
+---
+	
 
 ### `observer` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -310,6 +322,8 @@ _API:_ `helicsFederateSetLogFile`
 Specifies the name of the log file where logging messages will be written.
 
 
+---
+	
 
 ### `log_level` | `loglevel` | `logLevel` [0]
 _API:_ `helicsFederateInfoSetIntegerProperty`
@@ -335,6 +349,8 @@ _Valid values:_
 Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid levels and their corresponding enumerations are shown below.
 
 
+---
+	
 
 ### `file_log_level` | `fileloglevel` | `fileLogLevel` [null]
 _API:_ `helicsFederateInfoSetIntegerProperty`
@@ -351,6 +367,8 @@ Allows a distinct log level for the written log file to be specified. By default
 
 
 
+---
+	
 
 ### `console_log_level` | `consoleloglevel` | `consoleLogLevel` [null]
 _API:_ `helicsFederateInfoSetIntegerProperty`
@@ -367,6 +385,8 @@ Allows a distinct log level for the written log file to be specified. By default
 
 
 
+---
+	
 
 ### `force_logging_flush` | `forceloggingflush` | `forceLoggingFlush` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -380,6 +400,8 @@ _Property's enumerated name:_ xxxxxxxx
 Setting this option forces HELICS logging messages to be flushed to file after each one is written. This prevents the buffered IO most OSs implement to be bypassed such that all messages appear in the log file immediately after being written at the cost of slower simulation times due to more time spent writing to file.
 
 
+---
+	
 
 ### `dump_log` | `dumplog` | `dumpLog` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -409,6 +431,8 @@ If certain timing options (_i.e._ `period`, or `minTimeDelta`) are used it is po
 
 
 
+---
+	
 
 ### `uninterruptible` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -422,6 +446,8 @@ _Property's enumerated name:_ `helics_flag_uninterruptible` [1]
 Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag will prevent premature time grants.
 
 
+---
+	
 
 
 ### `period` [0]
@@ -436,6 +462,8 @@ _Property's enumerated name:_ `helics_property_time_period` [140]
 Many time-based simulators have a minimum time-resolution or a user-configurable step size. The `period` parameter can be used to effectively synchronize the times that are granted with the defined simulation period. The default units for `period` are in seconds but the string for this parameter can include its own units (e.g. "2 ms" or "1 hour"). Setting `period` will force all time grants to occur at times of `n*period` even if subscriptions are updated, messages arrive, or the federate requests a time between periods. This value effectively makes the federates `uninterruptible` during the times between periods. Relatedly...
 
 
+---
+	
 
 ### `offset` [0]
 _API:_ `helicsFederateInfoSetTimeProperty`
@@ -449,6 +477,8 @@ _Property's enumerated name:_ `helics_property_time_offset` [141]
 There may be cases where it is preferable to have a simulator receive time grants that are offset slightly in time to one or more other federates. Defining an `offset` value allows this to take place; units are handled the same as in `period`. Setting both `period` and `offset`, will result in the all times granted to the federate in question being constrained to `n*period + offset`.
 
 
+---
+	
 
 ### `time_delta` | `timeDelta` | `timedelta` [1ns]
 _API:_ `helicsFederateInfoSetTimeProperty`
@@ -463,6 +493,8 @@ timeDelta has some similarities to `period`; where `period` constrained the gran
 
 
 
+---
+	
 
 ### `input_delay` | `inputdelay` | `inputDelay` [0]
 _API:_ `helicsFederateInfoSetTimeProperty`
@@ -476,6 +508,8 @@ _Property's enumerated name:_ `helics_property_time_input_delay` [148]
 `inputDelay` specifies a delay in simulated time between when a signal arrives at a federate and when that federate is notified that a new value is available. `outputDelay` is similar but applies to signals being sent by a federate. Note that this applies to both value signals and message signals. (xxxxxxx - Need to clarify with developers if messages are delayed t_filter + t_outputDelay or max(t_filter, t_outputDelay)
 
 
+---
+	
 
 ### `output_delay` | `outputdelay` | `outputDelay` [0]
 _API:_ `helicsFederateInfoSetTimeProperty`
@@ -489,6 +523,8 @@ _Property's enumerated name:_ `helics_property_time_output_delay` [150]
 `outputDelay` is similar to `input_delay` but applies to signals being sent by a federate. Note that this applies to both value signals and message signals. (xxxxxxx - Need to clarify with developers if messages are delayed t_filter + t_outputDelay or max(t_filter, t_outputDelay)
 
 
+---
+	
 
 
 ### `real_time` | `realtime` | `realTime` [false]
@@ -504,6 +540,8 @@ If set to true the federate uses `rt_lag` and `rt_lead` to match the time grants
 If the federate is running faster than real time this will insert additional delays. If the federate is running slower than real time this will cause a force grant, which can lead to non-deterministic behavior. `rt_lag` can be set to maxVal to disable force grant
 
 
+---
+	
 ### `rt_lag`| `rtlag` | `rtLag` [0.2] and `rt_lead` | `rtlead` | `rtLead` [0.2]
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
@@ -516,6 +554,8 @@ _Property's enumerated name:_ `helics_property_time_rt_lag` [143] and `helics_pr
 Defines "real-time" for HELICS by setting tolerances for HELICS to use when running a real-time co-simulation. HELICS is forced to keep simulated time within this window of wall-clock time. Most general purpose OSes do not provide guarantees of execution timing and thus very small values of `rt_lag` and `rt_lead` (less than 0.005) are not likely to be achievable.
 
 
+---
+	
 
 ### `rt_tolerance` | `rttolerance` | `rtTolerance` [0.2]
 _API:_ `helicsFederateInfoSetTimeProperty`
@@ -529,6 +569,8 @@ _Property's enumerated name:_ `helics_property_time_rt_tolerance` [145]
 Implements the same functionality of `rt_lag` and `rt_lead` but does so by using a single value to set symmetrical lead and lag constraints. 
 
 
+---
+	
 
 
 ### `wait_for_current_time_update` |`waitforcurrenttimeupdate` | `waitForCurrentTimeUpdate` [false]
@@ -544,6 +586,8 @@ If set to true, a federate will not be granted the requested time until all othe
 
 
 
+---
+	
 
 ### `restrictive_time_policy` | `restrictivetimepolicy` | `restrictiveTimePolicy` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -562,6 +606,8 @@ Only applicable to Named Input interfaces ([see section on value federate interf
 
 
 
+---
+	
 
 ### `slow_responding` | `slowresponsing` | `slowResponding` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -575,6 +621,7 @@ _Property's enumerated name:_ `helics_flag_slow_responding` [29]
 If specified on a federate, setting this flag indicates the federate may be slow in responding, and to not forcibly eject the federate from the federation for the slow response. This is an uncommon scenario.
 
 If applied to a core or broker (xxxxxxx need examples of this syntax), it is indicative that the broker doesn't respond to internal pings quickly and should not be disconnected from the federation for the slow response.
+
 
 
 
@@ -600,6 +647,8 @@ _Property's enumerated name:_ `helics_flag_forward_compute [14]
 Indicates to the broker and the rest of the federation that this federate computes ahead of its granted time and can/does roll back when necessary. xxxxxxx - How does this affect co-simulation operation?
 
 
+---
+	
 
 
 ### `rollback` [false]
@@ -614,6 +663,8 @@ _Property's enumerated name:_ `helics_flag_rollback` [12]
 Indicates to the broker and the rest of the federation that this federate can/does roll back when necessary. xxxxxxx - How does this affect co-simulation operation?
 
 
+---
+	
 
 ### `max_iterations` | `maxiterations` | `maxIteration` [50]
 _API:_ `helicsFederateInfoSetIntegerProperty`
@@ -641,6 +692,8 @@ xxxxxxxx Most of the information missing here is context. The options are more o
 ### `interface_network` | `interfacenetwork` | `interfaceNetwork` [local interface]
 
 
+---
+	
 
 ### `reuse_address` | `reuseaddress` | `reuseAddress` [false]
 _API:_ (none)
@@ -648,6 +701,8 @@ _API:_ (none)
 allow the server to reuse a bound address, mostly useful for tcp cores. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `noack_connect` | `noackconnect` | `noackConnect` [false]
 _API:_ `noAckConnection`
@@ -656,6 +711,8 @@ _API:_ `noAckConnection`
 specify that a connection_ack message is not required to be connected with a broker. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `max_size` | `maxsize` | `maxSize`[4096]
 _API:_ (none)
@@ -663,6 +720,8 @@ _API:_ (none)
 Message buffer size. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `max_count` | `maxcount` | `maxCount` [256]
 _API:_ (none)
@@ -670,34 +729,46 @@ _API:_ (none)
 Maximum number of messages in queue. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `network_retries` | `networkretries` | `networkRetries` [5]
 _API:_ (none)
 Maximum number of network retry attempts. xxxxxxx Need more information here.
 
+---
+	
 
 ### `use_os_port` | `useosport` | `useOsPort` [false]
 _API:_ (none)
 Setting this flag specifies that the OS should set the port for the HELICS message bus. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `client` or `server` [null]
 _API:_ (none)
 specify that the network connection should be a server or client. By default neither option is enabled. xxxxxxx Need more information here. Are these just flags?
 
 
+---
+	
 ### `local_interface` | `localinterface` | `localInterface` [local address]
 _API:_ (none)
 the local interface to use for the receive ports. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `port` | `-p` []
 _API:_ (none)
 Port number to use. xxxxxxx Need more information here. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `broker_port` | `brokerport` | `brokerPort` []
 _API:_ (none)
@@ -705,12 +776,16 @@ _API:_ (none)
 The port to use to connect to the broker. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `local_port` | `localport` | `localPort` []
 _API:_ (none)
 port number for the local receive port. xxxxxxx Need more information here.
 
 
+---
+	
 
 ### `port_start` | `portstart` | `portStart` []
 _API:_ (none)
@@ -726,7 +801,7 @@ starting port for automatic port definitions. xxxxxxx Need more information here
 ## General and Per Subscription, Input, or Publication
 These options can be set globally for all subscriptions, inputs and publications for a given federate. Even after setting them globally, they can be included in the configuration for an individual subscription, input, or publication, over-riding the global setting.
 
-
+xxxxxxxx - different API when doing this on a per-pub/sub basis?
 
 ### `only_update_on_change` | `onlyupdateonchange` | `onlyUpdateOnChange` [false] and `only_transmit_on_change` | `onlytransmitonchange` | `onlyTransmitOnChange` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -740,6 +815,9 @@ _Property's enumerated name:_ `helics_flag_only_update_on_change` [454] and `hel
 Setting these flags prevents new value signals with the same value from being received by the federate or sent by the federate. Setting these flags will reduce the amount of traffic on the HELICS bus and can provide performance improvements in co-simulations with large numbers of messages.
 
 
+---
+	
+
 ### `tolerance`
 _API:_ `helicsPublicationSetMinimumChange` and `helicsInputSetMinimumChange`
 [C++ input](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a55056ac9dd2895270f575827dd9951c7) and [C++ publication](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Publication.html#ab66f5680bb4a5e062314f6f8e5dea846)
@@ -751,6 +829,8 @@ This option allows the specific numerical definition of "change" when using the 
 
 
 
+---
+	
 
 ### `connection_required` | `connectionrequired` | `connectionRequired` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
@@ -768,7 +848,10 @@ When a federate is initialized, one of its tasks is to make sure the recipients 
 - `subscriptions` - The message being subscribed to must be provided by some other publisher in the federation.
 
 
-### `connection_optional` | `connectionoptional` | `connectioOptional` [false]
+---
+	
+
+### `connection_optional` | `connectionoptional` | `connectionOptional` [false]
 _API:_ `helicsFederateInfoSetFlagOption` 
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
  | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
@@ -778,6 +861,10 @@ _API:_ `helicsFederateInfoSetFlagOption`
 _Property's enumerated name:_ `helics_handle_option_connection_optional` [402]
 
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.
+
+
+
+
 
 
 
@@ -817,11 +904,18 @@ xxxxxxx add global and/or type APIs?
 - `publications` - The string in this field is the unique identifier (at the federate level) for the value that will be published to the federation. If `global` is set (see below) it must be unique to the entire federation.
 - `subscriptions` - This string identifies the federation-unique value that this federate wishes to receive. Unless `global` has been set to `true` in the publishings JSON configuration file, the name of the value is formatted as `<federate name>/<publication key>`. Both of these strings can be found in the publishing federate's JSON configuration file as the `name` and `key` strings, respectively. If `global` is `true` the string is just the `key` value.
 - `input` - xxxxxxx
-- 
+
+
+---
+	
 
 ### `type` [null]
 
 HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)).
+
+
+---
+	
 
 
 ### `unit` [null]
@@ -829,13 +923,22 @@ HELICS supports data types and data type conversion ([as best it can](https://ww
 HELICS is able to do some levels of unit conversion, currently only on double type publications but more may be added in the future. The units can be any sort of unit string, a wide assortment is supported and can be compound units such as m/s^2 and the conversion will convert as long as things are convertible. The unit match is also checked for other types and an error if mismatching units are detected. A warning is also generated if the units are not understood and not matching. The unit checking and conversion is only active if both the publication and subscription specify units.
 
 
+---
+	
 
 ### `global` [false]
 
 (publications only) `global` is used to indicate that the value in `key` will be used as a global name when other federates are subscribing to the message. This requires that the user ensure that the name is used only once across all federates. Setting `global` to `true` is handy for federations with a small number of federates and a small number of message exchanges as it allows the `key` string to be short and simple. For larger federations, it is likely to be easier to set the flag to `false` and accept the extra naming
 
 
+---
+	
+
 ### `targets` []
+
+
+---
+	
 
 
 ### `buffer_data` | `bufferdata` | `bufferData` [false]
@@ -850,9 +953,25 @@ _Property's enumerated name:_ `helics_handle_option_buffer_data` [411]
 (only valid for inputs and subscriptions) last data should be buffered and sent on subscriptions after init
 
 
+---
+	
+
+
 ### `alias` [null]
 _API:_ `addAlias` 
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1ValueFederate.html#a20c16a539dc6582573b50e4fc9dfb766)
+
+
+---
+	
+
+
+### `ignore_units_mismatch | ignoreunitmismatch | ignoreUnitMismatch` [null]
+_API:_ 
+
+
+---
+	
 
 
 ### `info` [""]
@@ -864,6 +983,20 @@ _API:_ `helicsInputSetInfo`
 The `info` field is entirely ignored by HELICS and is used as a mechanism to pass configuration information to the federate so that it can properly integrate into the federation. Thus, there is no standard content or format for this field; it is entirely up to the individual simulators to decide how the data in this field (if any) should be used. Often it is used by simulators to map the HELICS names into internal variable names as shown in the above example.
 
 
+---
+	
+
+### `strict_input_type_checking` | `strictinputtypechecking` | `strictInputTypeChecking` [false]
+_API:_ `helicsFederateInfoSetFlagOption` 
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+ | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+ | [Python](https://python.helics.org/api/#helicsFederateInfoSetFlagOption)
+ | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
+
+_Property's enumerated name:_ `helics_handle_option_strict_type_checking` [414]
+
+When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.x
+
 
 
 ## Input-only Options
@@ -871,6 +1004,8 @@ The `info` field is entirely ignored by HELICS and is used as a mechanism to pas
 ### `connections` []
 
 
+---
+	
 
 ### `input_priority_location` | `inputprioritylocation` | `inputPriorityLocation` []
 _API:_ `helicsInputSetOption` 
@@ -881,6 +1016,10 @@ _API:_ `helicsInputSetOption`
  
  _Property's enumerated name:_ `helics_handle_option_input_priority_location` [510] 
 
+
+
+---
+	
 
 ### `clear_priority_list` | `clearprioritylist` | `clearPriorityList` [false]
 _API:_ `helicsInputSetOption` 
@@ -893,6 +1032,9 @@ _API:_ `helicsInputSetOption`
 
 
 
+---
+	
+
 
 ### `single_connection_only` | `singleconnectiononly` |`singleConnectionOnly` [false]
 _API:_ `helicsInputSetOption` 
@@ -904,6 +1046,9 @@ _API:_ `helicsInputSetOption`
  _Property's enumerated name:_ `helics_handle_option_single_connection_only ` [407] 
  
  
+ 
+---
+	
 
 ### `multiple_connections_allowed` | `multipleconnectionsallowed` | `multipleConnectionsAllowed` [true]
 _API:_ `helicsInputSetOption` 
@@ -915,6 +1060,9 @@ _API:_ `helicsInputSetOption`
 _Property's enumerated name:_ `helics_handle_option_multiple_connections_allowed` [409] 
 
 
+
+---
+	
 
 
 ### `multi_input_handling_method` | `multiinputhandlingmethod` | `multiInputHandlingMethod` [`none`]
@@ -936,6 +1084,10 @@ _Property values:_
 * `vectorize`
 * `diff`
 
+
+---
+	
+
 ### `targets` []
 
 
@@ -953,7 +1105,15 @@ _API:_ `helicsFederateRegisterEndpoint`
 
 ### `name` (required)
 
+
+---
+	
+
 ### `type` []
+
+
+---
+	
 
 ### `destination` | `target` []
 _API:_ `helicsEndpointSetDefaultDestination` 
@@ -962,7 +1122,15 @@ _API:_ `helicsEndpointSetDefaultDestination`
  | [Python](https://python.helics.org/api/#helicsEndpointSetDefaultDestination)
  | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsEndpointSetDefaultDestination-Tuple{HELICS.Endpoint,String})
 
+
+---
+	
+
 ### `alias` []
+
+
+---
+	
 
 ### `subscriptions` []
 _API:_ `helicsEndpointSubscribe` 
@@ -971,7 +1139,15 @@ _API:_ `helicsEndpointSubscribe`
  | [Python](https://python.helics.org/api/#helicsEndpointSubscribe)
  | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsEndpointSubscribe-Tuple{HELICS.Endpoint,String})
 
+
+---
+	
+
 ### `filters` [null]
+
+
+---
+	
 
 ### `info` [""]
 _API:_ `helicsEndpointSetInfo` 
@@ -1001,9 +1177,21 @@ _API:_ `helicsFederateRegisterFilter`
 
 ### `name` (required)
 
+
+---
+	
+
 ### `source_targets`, `sourcetargets`, `sourceTargets` []
 
+
+---
+	
+
 ### `destination_targets`, `destinationtargets`, `destinationtargets` []
+
+
+---
+	
 
 ### `info` [""]
 _API:_ `helicsFilterSetInfo` 
@@ -1012,6 +1200,10 @@ _API:_ `helicsFilterSetInfo`
  | [Python](https://python.helics.org/api/#helicsFilterSetInfo)
  | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterSetInfo-Tuple{HELICS.Filter,String}})
 
+
+
+---
+	
 ### `operation` []
 Filters have a predefined set of operations they can perform.  The following list defines the valid operations for filters. Most filters require additional specifications in properties data structure, an example of which is shown for each filter type.
 
