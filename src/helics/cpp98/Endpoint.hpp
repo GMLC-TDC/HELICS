@@ -383,7 +383,7 @@ class Endpoint {
     /** get the name of the endpoint*/
     const char* getName() const { return helicsEndpointGetName(ep); }
     /** get the specified type of the endpoint*/
-    std::string getType() { return helicsEndpointGetType(ep); }
+    const char* getType() { return helicsEndpointGetType(ep); }
 
     /** get the interface information field of the filter*/
     const char* getInfo() const { return helicsEndpointGetInfo(ep); }
