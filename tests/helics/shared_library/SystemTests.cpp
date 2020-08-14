@@ -214,7 +214,7 @@ TEST(other_tests, federate_add_dependency)
 
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoLoadFromArgs(fi, 4, argv, &err);
-    helicsFederateInfoSetFlagOption(fi, helics_flag_source_only, true, &err);
+    helicsFederateInfoSetFlagOption(fi, helics_flag_source_only, helics_true, &err);
 
     auto fed1 = helicsCreateMessageFederate("fed1", fi, &err);
     EXPECT_EQ(err.error_code, 0);
@@ -341,7 +341,6 @@ TEST(federate_tests, federateGeneratedGlobalError)
 
     helicsFederateDestroy(fed1);
 }
-
 
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_after_close)
