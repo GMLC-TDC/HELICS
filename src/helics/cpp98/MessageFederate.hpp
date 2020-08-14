@@ -110,5 +110,21 @@ class MessageFederate: public virtual Federate {
   private:
     std::vector<helics_endpoint> local_endpoints;
 };
+//this code needs the definition of federate before it can de defined
+inline Message::Message(const Federate& fed):
+    mo(helicsFederateCreateMessageObject(fed.getObject(), hThrowOnError()))
+{
+}
+
+inline Message& Message::newMessageObject(const Federate& fed)
+{
+    helics_message_object newmo =
+        helicsFederateCreateMessageObject(fed.getObject(), hThrowOnError());
+    if (mo != HELICS_NULL_POINTER) {
+        helicsMessageFree(mo);
+    }
+    mo = newmo;
+    return *this;
+    }
 }  // namespace helicscpp
 #endif
