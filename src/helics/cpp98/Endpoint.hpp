@@ -185,8 +185,9 @@ class Message {
     /** generate a new message in a federate*/
     Message& newMessageObject(const Federate& fed);
 
-     /** generate a new message in a federate*/
+    /** generate a new message in a federate*/
     Message& newMessageObject(const Endpoint& ept);
+
   private:
     helics_message_object mo;  //!< C shared library message_object
 };
@@ -407,14 +408,14 @@ class Endpoint {
 };
 
 inline Message::Message(const Endpoint& ept):
-    mo(helicsEndpointCreateMessageObject(ept.baseObject(),hThrowOnError()))
+    mo(helicsEndpointCreateMessageObject(ept.baseObject(), hThrowOnError()))
 {
 }
 
-
 inline Message& Message::newMessageObject(const Endpoint& ept)
 {
-    helics_message_object newmo = helicsEndpointCreateMessageObject(ept.baseObject(), hThrowOnError());
+    helics_message_object newmo =
+        helicsEndpointCreateMessageObject(ept.baseObject(), hThrowOnError());
     if (mo != HELICS_NULL_POINTER) {
         helicsMessageFree(mo);
     }

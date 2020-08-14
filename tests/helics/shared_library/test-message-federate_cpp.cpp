@@ -156,7 +156,6 @@ TEST_F(mfed_tests, Message)
     mFed1->finalize();
 }
 
-
 TEST_F(mfed_tests, message_create_from_fed)
 {
     SetupTest<helicscpp::MessageFederate>("test", 1, 1.0);
@@ -168,7 +167,7 @@ TEST_F(mfed_tests, message_create_from_fed)
     mFed1->enterExecutingMode();
 
     helicscpp::Message mess(*mFed1);
-    
+
     std::string data(500, 'a');
 
     mess.destination("ep2");
@@ -240,8 +239,6 @@ TEST_F(mfed_tests, message_create_from_ept)
     auto mFed1State = mFed1->getCurrentMode();
     EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
 }
-
-
 
 TEST_F(mfed_tests, message_create_from_fed_after)
 {
