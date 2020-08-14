@@ -37,6 +37,7 @@ Motivation: Energy systems and their associated information and communication te
    developer-guide/index
    doxygen/index
    c-api-reference/index
+   Python API
    Julia API
    ROADMAP
 ```
