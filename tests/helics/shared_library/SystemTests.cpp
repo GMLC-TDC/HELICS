@@ -341,3 +341,27 @@ TEST(federate_tests, federateGeneratedGlobalError)
 
     helicsFederateDestroy(fed1);
 }
+
+
+// test generating a global from a broker and some of its error pathways
+TEST(other_tests, broker_after_close)
+{
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbroker_test", "--root", &err);
+    std::string globalVal = "this is a string constant that functions as a global";
+    std::string globalVal2 = "this is a second string constant that functions as a global";
+    helicsBrokerSetGlobal(brk, "testglobal", globalVal.c_str(), &err);
+    auto q = helicsCreateQuery("global", "testglobal");
+    auto res = helicsQueryBrokerExecute(q, brk, &err);
+    EXPECT_EQ(res, globalVal);
+    helicsBrokerSetGlobal(brk, "testglobal2", globalVal2.c_str(), &err);
+    helicsQueryFree(q);
+    helicsCloseLibrary();
+
+    EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
+    helicsBrokerDestroy(brk);
+    EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
+    EXPECT_EQ(helicsBrokerIsValid(brk), helics_false);
+    helicsBrokerFree(brk);
+    EXPECT_EQ(helicsBrokerIsValid(brk), helics_false);
+}
