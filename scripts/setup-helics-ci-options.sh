@@ -32,7 +32,16 @@ if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
     OPTION_FLAGS_ARR+=("-DBUILD_JAVA_INTERFACE=ON")
 fi
 if [[ "${DISABLE_INTERFACES}" != *"Python"* ]]; then
-    OPTION_FLAGS_ARR+=("-DBUILD_PYTHON_INTERFACE=ON" "-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH} -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
+    OPTION_FLAGS_ARR+=("-DBUILD_PYTHON_INTERFACE=ON")
+    if [[ "$PYTHON_LIB_PATH" ]]; then
+        OPTION_FLAGS_ARR+=("-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}")
+    fi
+    if [[ "$PYTHON_INCLUDE_PATH" ]]; then
+        OPTION_FLAGS_ARR+=("-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
+    fi
+    if [[ "$PYTHON_EXECUTABLE" ]]; then
+        OPTION_FLAGS_ARR+=("-DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
+    fi
 fi
 if [[ "$USE_SWIG" == 'true' ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SWIG=ON")
@@ -67,9 +76,9 @@ fi
 # MPI options
 if [[ "$USE_MPI" ]]; then
     OPTION_FLAGS_ARR+=("-DENABLE_MPI_CORE=ON")
-    CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc
+    CC=mpicc
     export CC
-    CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++
+    CXX=mpic++
     export CXX
 fi
 
