@@ -24,7 +24,7 @@ class Message {
     Message() HELICS_NOTHROW: mo(HELICS_NULL_POINTER) {}
     /** create a message associated with a federate*/
     explicit Message(const Federate& fed);
-    /** create a message associated with a federate*/
+    /** create a message associated with an endpoint*/
     explicit Message(const Endpoint& ept);
     /** construct from a helics_message object*/
     explicit Message(helics_message_object hmo) HELICS_NOTHROW: mo(hmo) {}
@@ -101,7 +101,7 @@ class Message {
         helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
         return *this;
     }
-    /** get the original message destination if a filtered altered it*/
+    /** get the original message destination if a filter altered it*/
     const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
     /** set the original destination field*/
     Message& originalDestination(const std::string& odest)
