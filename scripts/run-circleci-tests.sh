@@ -5,7 +5,7 @@ tests=(
     "/root/project/build/bin/system-tests --gtest_filter=-*realtime*"
     /root/project/build/bin/helics_apps-tests
     /root/project/build/bin/shared-library-tests-cpp
-    "/root/project/build/bin/shared-library-tests --gtest_filter=-*bad_input*:*evil*"
+    "/root/project/build/bin/shared-library-tests --gtest_filter=-*bad_input*:*evil*:*after_close*"
     "/root/project/build/bin/application-api-tests --gtest_filter=-*ci_skip*"
 )
 
