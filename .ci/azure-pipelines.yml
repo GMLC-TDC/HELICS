@@ -2,7 +2,7 @@ trigger:
   branches:
     exclude:
       - pre-commit/*
-      
+
 jobs:
   - job: Linux
     strategy:
@@ -19,12 +19,12 @@ jobs:
         clang5:
           containerImage: 'helics/buildenv:clang5-builder'
           test_config: 'ci'
-          
+
     pool:
       vmImage: 'ubuntu-latest'
     container: $[ variables['containerImage'] ]
     timeoutInMinutes: 90
-    
+
     steps:
       - bash: |
           source scripts/setup-helics-ci-options.sh
@@ -38,7 +38,7 @@ jobs:
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
         displayName: 'Build HELICS'
-        
+
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
@@ -58,7 +58,7 @@ jobs:
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 90
-    
+
     steps:
       - bash: sudo xcode-select --switch "${XCODE_PATH}/Contents/Developer"
         env:
@@ -76,7 +76,7 @@ jobs:
           CMAKE_GENERATOR: 'Unix Makefiles'
           USE_SWIG: 'true'
         displayName: 'Build HELICS'
-        
+
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
