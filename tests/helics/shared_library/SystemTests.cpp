@@ -342,7 +342,6 @@ TEST(federate_tests, federateGeneratedGlobalError)
     helicsFederateDestroy(fed1);
 }
 
-
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_after_close)
 {
