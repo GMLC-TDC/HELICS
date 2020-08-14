@@ -109,9 +109,9 @@ def test_message_federate_send(mFed):
 
     message = h.helicsEndpointGetMessage(epid2)
 
-    assert message.data == "random-data"
-    assert message.length == 11
-    assert message.original_dest == ""
-    assert message.original_source == "TestA Federate/ep1"
-    assert message.source == "TestA Federate/ep1"
-    assert message.time == 1.0
+    assert h.helicsMessageGetString(message) == "random-data"
+    assert h.helicsMessageGetRawDataSize(message) == 11
+    assert h.helicsMessageGetOriginalDestination(message) == ""
+    assert h.helicsMessageGetOriginalSource(message) == "TestA Federate/ep1"
+    assert h.helicsMessageGetSource(message) == "TestA Federate/ep1"
+    assert h.helicsMessageGetTime(message) == 1.0

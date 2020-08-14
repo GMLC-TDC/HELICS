@@ -342,16 +342,23 @@ public class JavaHelicsApiTests {
             helics.helicsFederateEnterInitializingModeComplete(fed1);
             helics.helicsFederateEnterExecutingModeAsync(fed1);
             helics.helicsFederateEnterExecutingModeComplete(fed1);
-            helics_message mesg1 = new helics_message();
-            mesg1.setData("Hello");
-            mesg1.setDest("Ep2");
-            mesg1.setLength(5);
-            mesg1.setOriginal_dest("Ep2");
-            mesg1.setOriginal_source("fed1/Ep1");
-            mesg1.setSource("fed1/Ep1");
-            mesg1.setTime(0.0);
+            
+            // Create a message object
+            SWIGTYPE_p_void mesg1 = helics.helicsFederateCreateMessage(fed1);
+            
+            // Set message contents and properties
+            helics.helicsMessageSetString(mesg1, "Hello");
+            helics.helicsMessageSetDestination(mesg1, "Ep2");
+            helics.helicsMessageSetOriginalDestination(mesg1, "Ep2");
+            helics.helicsMessageSetOriginalSource(mesg1, "fed1/Ep1");
+            helics.helicsMessageSetSource(mesg1, "fed1/Ep1");
+            helics.helicsMessageSetTime(mesg1, 0.0);
+            
+            // Send the message
             helics.helicsEndpointSendMessage(ep1, mesg1);
-            mesg1.setData("There");
+            
+            // Change the message contents and send it again
+            helics.helicsMessageSetString(mesg1, "There");
             helics.helicsEndpointSendMessage(ep1, mesg1);
             helics.helicsEndpointSetDefaultDestination(ep2, "fed1/Ep1");
 
@@ -421,37 +428,37 @@ public class JavaHelicsApiTests {
             if (ep2HasMsg != 1) {
                 javaHelicsApiTests.helicsAssert("ep2HasMsg != 1");
             }
-            helics_message msg2 = helics.helicsEndpointGetMessage(ep2);
-            double msg2Time = msg2.getTime();
+            SWIGTYPE_p_void msg2 = helics.helicsEndpointGetMessage(ep2);
+            double msg2Time = helics.helicsMessageGetTime(msg2);
             if (msg2Time != 0.0) {
                System.out.println(msg2Time);
                 javaHelicsApiTests.helicsAssert("msg2Time != 1.0");
             }
-            String msg2Data = msg2.getData();
+            String msg2Data = helics.helicsMessageGetString(msg2);
             if (!"Hello".equals(msg2Data)) {
              System.out.println(msg2Data);
                 javaHelicsApiTests.helicsAssert("!msg2Data.equals(\"Hello\")");
             }
-            long msg2Length = msg2.getLength();
+            long msg2Length = helics.helicsMessageGetRawDataSize(msg2);
             if (msg2Length != 5) {
                 javaHelicsApiTests.helicsAssert("msg2Length != 5");
             }
-            String msg2OriginalSource = msg2.getOriginal_source();
+            String msg2OriginalSource = helics.helicsMessageGetOriginalSource(msg2);
             if (!"fed1/Ep1".equals(msg2OriginalSource)) {
                 javaHelicsApiTests.helicsAssert("!msg2OriginalSource.equals(\"fed1/Ep1\")");
             }
-            String msg2Source = msg2.getSource();
+            String msg2Source = helics.helicsMessageGetSource(msg2);
             if (!"fed1/Ep1".equals(msg2Source)) {
                 javaHelicsApiTests.helicsAssert("!msg2Source.equals(\"fed1/Ep1\")");
             }
-            String msg2Destination = msg2.getDest();
+            String msg2Destination = helics.helicsMessageGetDestination(msg2);
             if (!"Ep2".equals(msg2Destination)) {
                 System.out.println(msg2Destination);
                 javaHelicsApiTests.helicsAssert("!msg2Destination.equals(\"Ep2\")");
             }
-            String msg2OriginalDestination = msg2.getOriginal_dest();
-            if (!"".equals(msg2OriginalDestination)) {
-                javaHelicsApiTests.helicsAssert("!msg2OriginalDestination.equals(\"\")");
+            String msg2OriginalDestination = helics.helicsMessageGetOriginalDestination(msg2);
+            if (!"Ep2".equals(msg2OriginalDestination)) {
+                javaHelicsApiTests.helicsAssert("!msg2OriginalDestination.equals(\"Ep2\")");
             }
             int fed1MsgCount = helics.helicsFederatePendingMessages(fed1);
             if (fed1MsgCount != 1) {
@@ -461,35 +468,35 @@ public class JavaHelicsApiTests {
             if (fed1HasMsg != 1) {
                 javaHelicsApiTests.helicsAssert("fed1HasMsg != 1");
             }
-            helics_message msg3 = helics.helicsFederateGetMessage(fed1);
-            double msg3Time = msg3.getTime();
+            SWIGTYPE_p_void msg3 = helics.helicsFederateGetMessage(fed1);
+            double msg3Time = helics.helicsMessageGetTime(msg3);
             if (msg3Time != 0.0) {
                 javaHelicsApiTests.helicsAssert("msg3Time != 0.0");
             }
-            String msg3Data = msg3.getData();
+            String msg3Data = helics.helicsMessageGetString(msg3);
             if (!"There".equals(msg3Data)) {
                 javaHelicsApiTests.helicsAssert("!msg3Data.equals(\"There\")");
             }
-            long msg3Length = msg3.getLength();
+            long msg3Length = helics.helicsMessageGetRawDataSize(msg3);
             if (msg3Length != 5) {
                 javaHelicsApiTests.helicsAssert("msg3Length != 5");
             }
 
-            String msg3OriginalSource = msg3.getOriginal_source();
+            String msg3OriginalSource = helics.helicsMessageGetOriginalSource(msg3);
             if (!"fed1/Ep1".equals(msg3OriginalSource)) {
                 javaHelicsApiTests.helicsAssert("!msg3OriginalSource.equals(\"fed1/Ep1\")");
             }
-            String msg3Source = msg3.getSource();
+            String msg3Source = helics.helicsMessageGetSource(msg3);
             if (!"fed1/Ep1".equals(msg3Source)) {
                 javaHelicsApiTests.helicsAssert("!msg3Source.equals(\"fed1/Ep1\")");
             }
-            String msg3Destination = msg3.getDest();
+            String msg3Destination = helics.helicsMessageGetDestination(msg3);
             if (!"Ep2".equals(msg3Destination)) {
                 javaHelicsApiTests.helicsAssert("!msg3Destination.equals(\"Ep2\")");
             }
-            String msg3OriginalDestination = msg3.getOriginal_dest();
-            if (!"".equals(msg3OriginalDestination)) {
-                javaHelicsApiTests.helicsAssert("!msg3OriginalDestination.equals(\"\")");
+            String msg3OriginalDestination = helics.helicsMessageGetOriginalDestination(msg3);
+            if (!"Ep2".equals(msg3OriginalDestination)) {
+                javaHelicsApiTests.helicsAssert("!msg3OriginalDestination.equals(\"Ep2\")");
             }
 
 //            String sub1TypeString = "";
