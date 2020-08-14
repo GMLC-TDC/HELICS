@@ -7,7 +7,7 @@ This document contains tentative plans for changes and improvements of note in u
 This will be the last of the 2.X series releases, there will likely be at least one patch release after this before fully moving to 3.0
 
 - Internal text based (probably JSON) message format option for general backwards compatibility
-- function deprecations to prepare people to move to 3.0
+- Function deprecations to prepare people to move to 3.0
 
 ## \[3.0\] ~ 2020-08-30 Beta, Final release in September
 
@@ -27,7 +27,7 @@ Mostly things that didn't quite make it into the 3.0 release and a number of bug
 
 - SSL capable core (unlikely in 3.1 but someday)
 - Full Dynamic Federation support
-- Single thread cores(partial at release)
+- Single thread cores (partial at release)
 - Plugin architecture for user defined cores
 - xSDK compatibility
 - Much more general debugging support
