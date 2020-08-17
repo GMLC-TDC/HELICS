@@ -604,6 +604,8 @@ class Federate {
     }
     /** get a Core Object*/
     helics_core getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
+    /** get the C object for use in the C library*/
+    helics_federate getObject() const { return fed; }
 
   protected:
     helics_federate fed;  //!< underlying helics_federate object
