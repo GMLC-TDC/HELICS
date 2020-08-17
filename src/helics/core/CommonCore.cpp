@@ -3813,9 +3813,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                         M(0, identifier, "logging callback activated");
                         setLoggerFunction(std::move(M));
                     }
-                    catch (const std::bad_any_cast&)
-                    {
-                        // This shouldn't really happen unless someone is being malicious so just ignore it for now. 
+                    catch (const std::bad_any_cast&) {
+                        // This shouldn't really happen unless someone is being malicious so just
+                        // ignore it for now.
                     }
                 }
             }
@@ -3829,8 +3829,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                     auto M = std::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
                     FiltI->filterOp = std::move(M);
                 }
-                catch (const std::bad_any_cast &) {
-                    // This shouldn't really happen unless someone is being malicious so just ignore it for now. 
+                catch (const std::bad_any_cast&) {
+                    // This shouldn't really happen unless someone is being malicious so just ignore
+                    // it for now.
                 }
             }
         } break;

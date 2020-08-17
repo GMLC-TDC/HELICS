@@ -1193,9 +1193,9 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
                         M(0, identifier, "logging callback activated");
                         setLoggerFunction(std::move(M));
                     }
-                    catch (const std::bad_any_cast &) {
+                    catch (const std::bad_any_cast&) {
                         // This shouldn't really happen unless someone is being malicious so just
-                        // ignore it for now. 
+                        // ignore it for now.
                     }
                 }
             }

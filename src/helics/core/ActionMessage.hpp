@@ -45,8 +45,7 @@ class ActionMessage {
     Time Te{timeZero};  //!< 48 event time
     Time Tdemin{timeZero};  //!< 56 min dependent event time
     Time Tso{timeZero};  //!< 64 the second order dependent time
-    SmallBuffer payload;  //!< string containing the data    //96 std::string is 32 bytes on most
-                          //!< platforms (except libc++)
+    SmallBuffer payload;  //!< buffer to contain the data payload
   private:
     std::vector<std::string> stringData;  //!< container for extra string data
   public:
