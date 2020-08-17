@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "SmallBuffer.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
@@ -23,107 +24,6 @@ SPDX-License-Identifier: BSD-3-Clause
 all user functions are found in this namespace along with many other functions in the Core API
  */
 namespace helics {
-/** basic data object for use in the user API layer
-@details An adapter over a string,  many objects will be strings actually so this is just a wrapper
-for that common use case, and many other objects are small, so the small string optimization takes
-advantage of that
-*/
-class data_block {
-  private:
-    std::string m_data;  //!< using a string to represent the data
-    friend class data_view;  //!< let data view access the string directly
-    friend class ActionMessage;  //!< let action Message access the string directly
-  public:
-    /** default constructor */
-    data_block() = default;
-    template<typename T,
-             typename = typename std::enable_if_t<std::is_constructible_v<std::string, T>>>
-    data_block(T&& val) noexcept(std::is_nothrow_constructible_v<std::string, T>):
-        m_data(std::forward<T>(val))
-    {
-    }
-    template<typename ARG1,
-             typename ARG2,
-             typename = typename std::enable_if_t<std::is_constructible_v<std::string, ARG1, ARG2>>>
-    data_block(const ARG1& val1,
-               const ARG2& val2) noexcept(std::is_nothrow_constructible_v<std::string, ARG1, ARG2>):
-        m_data(val1, val2)
-    {
-    }
-    /** size allocation constructor */
-    explicit data_block(size_t blockSize) { m_data.resize(blockSize); }
-
-    /** construct from a vector object */
-    // NOLINTNEXTLINE
-    /* implicit */ data_block(const std::vector<char>& vdata): m_data(vdata.data(), vdata.size()) {}
-    /** construct from an arbitrary vector*/
-    template<class X>
-    // NOLINTNEXTLINE
-    /* implicit */ data_block(const std::vector<X>& vdata):
-        m_data(reinterpret_cast<const char*>(vdata.data()), vdata.size() * sizeof(X))
-    {
-    }
-    template<typename T, typename = typename std::enable_if_t<std::is_assignable_v<std::string, T>>>
-    data_block& operator=(T&& str) noexcept(std::is_nothrow_assignable_v<std::string, T>)
-    {
-        m_data.operator=(std::forward<T>(str));
-        return *this;
-    }
-    /** swap function */
-    void swap(data_block& db2) noexcept { m_data.swap(db2.m_data); }
-    /** append the existing data with a additional data*/
-    void append(std::string_view str) { m_data.append(str.data(), str.length()); }
-    /** append the existing data with additional data*/
-    void append(const void* data, int length)
-    {
-        m_data.append(static_cast<const char*>(data), length);
-    }
-    /** equality operator with another data block*/
-    bool operator==(const data_block& db) const { return m_data == db.m_data; }
-    /** equality operator with a string*/
-    bool operator==(std::string_view str) const { return str == m_data; }
-    /** less then operator to order the data_blocks if need be*/
-    bool operator<(const data_block& db) const { return (m_data < db.m_data); }
-    /** less then operator to order the data_blocks if need be*/
-    bool operator>(const data_block& db) const { return (m_data > db.m_data); }
-    /** return a pointer to the data*/
-    char* data() { return &(m_data.front()); }
-    /** if the object is const return a const pointer*/
-    const char* data() const { return &(m_data.front()); }
-
-    /** check if the block is empty*/
-    bool empty() const noexcept { return m_data.empty(); }
-    /** get the size of the data block*/
-    size_t size() const { return m_data.length(); }
-    /** resize the data storage*/
-    void resize(size_t newSize) { m_data.resize(newSize); }
-    /** resize the data storage*/
-    void resize(size_t newSize, char T) { m_data.resize(newSize, T); }
-    /** reserve space in a data_block*/
-    void reserve(size_t space) { m_data.reserve(space); }
-    /** get a string reference*/
-    const std::string& to_string() const { return m_data; }
-    /** bracket operator to get a character value*/
-    char& operator[](int index) { return m_data[index]; }
-    /** bracket operator to get a character value*/
-    char operator[](int index) const { return m_data[index]; }
-    /** non const iterator*/
-    auto begin() { return m_data.begin(); }
-    /** non const iterator end*/
-    auto end() { return m_data.end(); }
-    /** const iterator*/
-    auto cbegin() const { return m_data.cbegin(); }
-    /** const iterator end*/
-    auto cend() const { return m_data.cend(); }
-    /** add a character to the data*/
-    void push_back(char newchar) { m_data.push_back(newchar); }
-};
-
-/** operator to check if two data blocks are not equal to each other*/
-inline bool operator!=(const data_block& db1, const data_block& db2)
-{
-    return !(db1 == db2);
-}
 
 /** class containing a message structure*/
 class Message {
@@ -132,7 +32,7 @@ class Message {
     std::uint16_t flags{0};  //!< message flags
     std::uint16_t messageValidation{0U};  //!< extra field for user object usage, not used by HELICS
     std::int32_t messageID{0};  //!< the messageID for a message
-    data_block data;  //!< the data packet for the message
+    SmallBuffer data;  //!< the data packet for the message
     std::string dest;  //!< the destination of the message
     std::string source;  //!< the most recent source of the message
     std::string original_source;  //!< the original source of the message
@@ -161,7 +61,7 @@ class Message {
         return (!data.empty()) ? true : ((!source.empty()) ? true : (!dest.empty()));
     }
     /** get the payload as a string*/
-    const std::string& to_string() const { return data.to_string(); }
+    std::string_view to_string() const { return data.to_string(); }
 };
 
 /**

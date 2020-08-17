@@ -16,7 +16,6 @@ set(core_test_sources
     ActionMessage-tests.cpp
     BrokerClassTests.cpp
     CoreFactory-tests.cpp
-    data-block-tests.cpp
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
     CoreConfigureTests.cpp

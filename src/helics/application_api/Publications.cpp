@@ -163,6 +163,12 @@ void Publication::publishString(std::string_view val)
     }
 }
 
+void Publication::publish(const std::vector<std::string>& val)
+{
+    auto buffer = ValueConverter<std::vector<std::string>>::convert(val);
+    publishString(buffer.to_string());
+}
+
 void Publication::publish(const std::vector<double>& val)
 {
     bool doPublish = true;
@@ -281,7 +287,7 @@ void Publication::publish(double val, const units::precise_unit& units)
     }
 }
 
-data_block typeConvert(data_type type, const defV& val)
+SmallBuffer typeConvert(data_type type, const defV& val)
 {
     switch (val.index()) {
         case double_loc:  // double

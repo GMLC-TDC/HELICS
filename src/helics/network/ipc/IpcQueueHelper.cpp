@@ -96,7 +96,7 @@ namespace ipc {
             if (rx_size < 8) {
                 continue;
             }
-            ActionMessage cmd(buffer.data(), rx_size);
+            ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
             if (!isValidCommand(cmd)) {
                 std::cerr << "invalid command received ipc" << std::endl;
                 continue;
@@ -132,7 +132,7 @@ namespace ipc {
             if (rx_size < 8) {
                 continue;
             }
-            ActionMessage cmd(buffer.data(), rx_size);
+            ActionMessage cmd(reinterpret_cast<std::byte*>(buffer.data()), rx_size);
             if (!isValidCommand(cmd)) {
                 std::cerr << "invalid command received ipc" << std::endl;
                 continue;

@@ -9,10 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/frozen_map.h"
 #include "ValueConverter.hpp"
 #include "fmt/format.h"
-#include "frozen/string.h"
-#include "frozen/unordered_map.h"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
@@ -629,7 +628,7 @@ bool helicsBoolValue(std::string_view val)
     return true;
 }
 
-data_block emptyBlock(data_type outputType, data_type inputType = data_type::helics_any)
+SmallBuffer emptyBlock(data_type outputType, data_type inputType = data_type::helics_any)
 {
     switch (outputType) {
         case data_type::helics_double:
@@ -646,7 +645,7 @@ data_block emptyBlock(data_type outputType, data_type inputType = data_type::hel
         case data_type::helics_string:
             switch (inputType) {
                 default:
-                    return std::string();
+                    return SmallBuffer{};
                 case data_type::helics_vector:
                     return helicsVectorString(std::vector<double>());
                 case data_type::helics_complex_vector:
@@ -662,7 +661,7 @@ data_block emptyBlock(data_type outputType, data_type inputType = data_type::hel
             return ValueConverter<std::vector<double>>::convert(std::vector<double>());
     }
 }
-data_block typeConvert(data_type type, double val)
+SmallBuffer typeConvert(data_type type, double val)
 {
     switch (type) {
         case data_type::helics_double:
@@ -686,7 +685,7 @@ data_block typeConvert(data_type type, double val)
             return ValueConverter<double>::convert(&val, 1);
     }
 }
-data_block typeConvert(data_type type, int64_t val)
+SmallBuffer typeConvert(data_type type, int64_t val)
 {
     switch (type) {
         case data_type::helics_double:
@@ -723,7 +722,7 @@ data_block typeConvert(data_type type, int64_t val)
     }
 }
 
-data_block typeConvert(data_type type, std::string_view val)
+SmallBuffer typeConvert(data_type type, std::string_view val)
 {
     if (val.empty()) {
         return emptyBlock(type);
@@ -751,7 +750,7 @@ data_block typeConvert(data_type type, std::string_view val)
     }
 }
 
-data_block typeConvert(data_type type, const std::vector<double>& val)
+SmallBuffer typeConvert(data_type type, const std::vector<double>& val)
 {
     if (val.empty()) {
         return emptyBlock(type, data_type::helics_vector);
@@ -792,7 +791,7 @@ data_block typeConvert(data_type type, const std::vector<double>& val)
     }
 }
 
-data_block typeConvert(data_type type, const double* vals, size_t size)
+SmallBuffer typeConvert(data_type type, const double* vals, size_t size)
 {
     if ((vals == nullptr) || (size == 0)) {
         return emptyBlock(type, data_type::helics_vector);
@@ -839,7 +838,7 @@ data_block typeConvert(data_type type, const double* vals, size_t size)
     }
 }
 
-data_block typeConvert(data_type type, const std::vector<std::complex<double>>& val)
+SmallBuffer typeConvert(data_type type, const std::vector<std::complex<double>>& val)
 {
     if (val.empty()) {
         return emptyBlock(type, data_type::helics_complex_vector);
@@ -873,7 +872,7 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
         }
     }
 }
-data_block typeConvert(data_type type, const std::complex<double>& val)
+SmallBuffer typeConvert(data_type type, const std::complex<double>& val)
 {
     switch (type) {
         case data_type::helics_double:
@@ -903,7 +902,7 @@ data_block typeConvert(data_type type, const std::complex<double>& val)
     }
 }
 
-data_block typeConvert(data_type type, const NamedPoint& val)
+SmallBuffer typeConvert(data_type type, const NamedPoint& val)
 {
     if (type == data_type::helics_named_point) {
         return ValueConverter<NamedPoint>::convert(val);
@@ -936,7 +935,7 @@ data_block typeConvert(data_type type, const NamedPoint& val)
     }
 }
 
-data_block typeConvert(data_type type, std::string_view str, double val)
+SmallBuffer typeConvert(data_type type, std::string_view str, double val)
 {
     if (type == data_type::helics_named_point) {
         return ValueConverter<NamedPoint>::convert(NamedPoint(str, val));
@@ -968,7 +967,7 @@ data_block typeConvert(data_type type, std::string_view str, double val)
     }
 }
 
-data_block typeConvert(data_type type, bool val)
+SmallBuffer typeConvert(data_type type, bool val)
 {
     switch (type) {
         case data_type::helics_double:

@@ -147,16 +147,16 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
-    helics::data_block n5(256);
+    helics::SmallBuffer n5(256);
     for (int ii = 0; ii < 256; ++ii) {
-        n5[ii] = ii;
+        n5[ii] = std::byte(ii);
     }
     e1.send("d2", n5);
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
-    helics::data_block n6(256);
+    helics::SmallBuffer n6(256);
     for (int ii = 0; ii < 256; ++ii) {
-        n6[ii] = 255 - ii;
+        n6[ii] = std::byte(255 - ii);
     }
     e2.send("d1", n6);
 
@@ -200,16 +200,16 @@ static void useFileBinary(const std::string& corename, const std::string& file)
     EXPECT_EQ(play1.endpointCount(), 2u);
 
     auto& b1 = play1.getMessage(0);
-    helics::data_block n5(256);
+    helics::SmallBuffer n5(256);
     for (int ii = 0; ii < 256; ++ii) {
-        n5[ii] = ii;
+        n5[ii] = std::byte(ii);
     }
     EXPECT_EQ(b1.mess.data.to_string(), n5.to_string());
 
     auto& b2 = play1.getMessage(1);
-    helics::data_block n6(256);
+    helics::SmallBuffer n6(256);
     for (int ii = 0; ii < 256; ++ii) {
-        n6[ii] = 255 - ii;
+        n6[ii] = std::byte(255 - ii);
     }
     EXPECT_EQ(b2.mess.data.to_string(), n6.to_string());
     play1.finalize();

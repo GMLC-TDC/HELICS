@@ -155,7 +155,7 @@ namespace testcore {
                 if (rid == control_route) {
                     switch (cmd.messageID) {
                         case NEW_ROUTE: {
-                            auto& newroute = cmd.payload;
+                            auto newroute = std::string(cmd.payload.to_string());
                             bool foundRoute = false;
                             auto core = CoreFactory::findCore(newroute);
                             if (core) {

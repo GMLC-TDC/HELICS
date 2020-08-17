@@ -285,8 +285,8 @@ void BrokerBase::configureBase()
 
 bool BrokerBase::sendToLogger(global_federate_id federateID,
                               int logLevel,
-                              const std::string& name,
-                              const std::string& message) const
+                              std::string_view name,
+                              std::string_view message) const
 {
     bool alwaysLog{false};
     if (logLevel > log_level::fed - 100) {
@@ -348,9 +348,9 @@ void BrokerBase::generateNewIdentifier()
     uuid_like = false;
 }
 
-void BrokerBase::setErrorState(int eCode, const std::string& estring)
+void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
-    lastErrorString = estring;
+    lastErrorString = std::string(estring);
     lastErrorCode = eCode;
     if (brokerState.load() != broker_state_t::errored) {
         brokerState.store(broker_state_t::errored);
@@ -382,7 +382,7 @@ void BrokerBase::setLoggingFile(const std::string& lfile)
 }
 
 void BrokerBase::setLoggerFunction(
-    std::function<void(int, const std::string&, const std::string&)> logFunction)
+    std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
     loggerFunction = std::move(logFunction);
 }

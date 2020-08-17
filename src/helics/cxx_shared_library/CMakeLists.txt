@@ -29,6 +29,7 @@ set(helics_shared_sources
     ../application_api/CoreApp.cpp
     ../application_api/timeOperations.cpp
     ../application_api/typeOperations.cpp
+    ../application_api/ValueConverter.cpp
 )
 
 set(HELICS_LIBRARY_SOURCE_DIR ${HELICS_SOURCE_DIR}/src/helics)

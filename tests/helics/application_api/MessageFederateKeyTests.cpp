@@ -55,7 +55,7 @@ TEST_P(mfed_single_type_tests, send_receive)
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
 
     mFed1->sendMessage(epid, "ep2", data);
 
@@ -93,7 +93,7 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
 
     epid.send("ep2", data);
 
@@ -136,8 +136,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data(500, 'a');
-    helics::data_block data2(400, 'b');
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
 
     mFed1->sendMessage(epid, "ep2", data);
     mFed2->sendMessage(epid2, "fed0/ep1", data2);
@@ -189,8 +189,8 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data(500, 'a');
-    helics::data_block data2(400, 'b');
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
 
     mFed1->sendMessage(epid, "ep2", data);
     mFed2->sendMessage(epid2, "fed0/ep1", data2);
@@ -247,8 +247,8 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data(500, 'a');
-    helics::data_block data2(400, 'b');
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
 
     epid.send("ep2", data);
     epid2.send("fed0/ep1", data2);
@@ -304,10 +304,10 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data1(500, 'a');
-    helics::data_block data2(400, 'b');
-    helics::data_block data3(300, 'c');
-    helics::data_block data4(200, 'd');
+    helics::SmallBuffer data1(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
+    helics::SmallBuffer data3(300, 'c');
+    helics::SmallBuffer data4(200, 'd');
     epid.setDefaultDestination("ep2");
     mFed1->sendMessage(epid, "ep2", data1);
     mFed1->sendMessage(epid, "ep2", data2);
@@ -378,8 +378,8 @@ TEST_P(mfed_all_type_tests, time_interruptions)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data(500, 'a');
-    helics::data_block data2(400, 'b');
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
 
     mFed1->sendMessage(epid, "ep2", data);
     mFed2->sendMessage(epid2, "fed0/ep1", data2);

@@ -353,17 +353,17 @@ HELICS_CXX_EXPORT double vectorNorm(const std::vector<std::complex<double>>& vec
 @param type the type used for the data conversion
 @param val a double to convert
 */
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, double val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, int64_t val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, std::string_view val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::vector<double>& val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const double* vals, size_t size);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type,
-                                         const std::vector<std::complex<double>>& val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const std::complex<double>& val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, const NamedPoint& val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, std::string_view str, double val);
-HELICS_CXX_EXPORT data_block typeConvert(data_type type, bool val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, double val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, int64_t val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, std::string_view val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, const std::vector<double>& val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, const double* vals, size_t size);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type,
+                                          const std::vector<std::complex<double>>& val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, const std::complex<double>& val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, const NamedPoint& val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, std::string_view str, double val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(data_type type, bool val);
 
 /** template function for generating a known name of a type*/
 template<class X>

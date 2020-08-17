@@ -89,8 +89,8 @@ namespace tcp {
         size_t used_total = 0;
         while (used_total < bytes_received) {
             ActionMessage m;
-            auto used =
-                m.depacketize(data + used_total, static_cast<int>(bytes_received - used_total));
+            auto used = m.depacketize(reinterpret_cast<const std::byte*>(data) + used_total,
+                                      bytes_received - used_total);
             if (used == 0) {
                 break;
             }
@@ -265,14 +265,15 @@ namespace tcp {
                                 if (conn) {
                                     if (!brokerConnection) {  // check if the connection matches the
                                                               // broker
-                                        if ((cmd.payload == brokerName) ||
-                                            (cmd.payload ==
+                                        if ((cmd.payload.to_string() == brokerName) ||
+                                            (cmd.payload.to_string() ==
                                              makePortAddress(brokerTargetAddress, brokerPort))) {
                                             brokerConnection = std::move(conn);
                                         }
                                     }
                                     if (conn) {
-                                        made_connections.emplace_back(cmd.payload, std::move(conn));
+                                        made_connections.emplace_back(cmd.payload.to_string(),
+                                                                      std::move(conn));
                                     }
                                 } else {
                                     logWarning("(tcpss) unable to locate socket");
@@ -283,7 +284,7 @@ namespace tcp {
                             bool established = false;
 
                             for (auto& mc : made_connections) {
-                                if ((mc.second) && (cmd.payload == mc.first)) {
+                                if ((mc.second) && (cmd.payload.to_string() == mc.first)) {
                                     routes.emplace(route_id{cmd.getExtraData()},
                                                    std::move(mc.second));
                                     established = true;
@@ -291,7 +292,8 @@ namespace tcp {
                                 }
                             }
                             if (!established) {
-                                auto efind = established_routes.find(cmd.payload);
+                                auto efind =
+                                    established_routes.find(std::string(cmd.payload.to_string()));
                                 if (efind != established_routes.end()) {
                                     established = true;
                                     if (efind->second == parent_route_id) {
@@ -306,7 +308,9 @@ namespace tcp {
 
                             if (!established) {
                                 if (outgoingConnectionsAllowed) {
-                                    auto new_connect = generateConnection(ioctx, cmd.payload);
+                                    auto new_connect =
+                                        generateConnection(ioctx,
+                                                           std::string(cmd.payload.to_string()));
                                     if (new_connect) {
                                         new_connect->setDataCall(dataCall);
                                         new_connect->setErrorCall(errorCall);
@@ -314,12 +318,12 @@ namespace tcp {
                                         new_connect->startReceive();
                                         routes.emplace(route_id{cmd.getExtraData()},
                                                        std::move(new_connect));
-                                        established_routes[cmd.payload] =
+                                        established_routes[std::string(cmd.payload.to_string())] =
                                             route_id{cmd.getExtraData()};
                                     }
                                 } else {
                                     logWarning(std::string("unable to make connection ") +
-                                               cmd.payload);
+                                               std::string(cmd.payload.to_string()));
                                 }
                             }
                         } break;
