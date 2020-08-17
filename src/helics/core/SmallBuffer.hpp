@@ -214,6 +214,12 @@ class SmallBuffer {
     {
         return std::string_view{reinterpret_cast<const char*>(heap), bufferSize};
     }
+
+    /** get a pointer to the data as a `char *`*/
+    const char *char_data() const
+    {
+        return reinterpret_cast<const char*>(heap);
+    }
     /** move raw memory into the buffer and give it a preallocated buffer*/
     void moveAssign(void* data, std::size_t size, std::size_t capacity)
     {

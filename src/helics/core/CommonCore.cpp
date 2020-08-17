@@ -3806,11 +3806,17 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             } else {
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
-                    auto M =
-                        std::any_cast<std::function<void(int, std::string_view, std::string_view)>>(
+                    try {
+                        auto M = std::any_cast<
+                            std::function<void(int, std::string_view, std::string_view)>>(
                             std::move(*op));
-                    M(0, identifier, "logging callback activated");
-                    setLoggerFunction(std::move(M));
+                        M(0, identifier, "logging callback activated");
+                        setLoggerFunction(std::move(M));
+                    }
+                    catch (const std::bad_any_cast&)
+                    {
+                        // This shouldn't really happen unless someone is being malicious so just ignore it for now. 
+                    }
                 }
             }
             break;
@@ -3819,8 +3825,13 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             int ii = cmd.counter;
             auto op = dataAirlocks[ii].try_unload();
             if (op) {
-                auto M = std::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
-                FiltI->filterOp = std::move(M);
+                try {
+                    auto M = std::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
+                    FiltI->filterOp = std::move(M);
+                }
+                catch (const std::bad_any_cast &) {
+                    // This shouldn't really happen unless someone is being malicious so just ignore it for now. 
+                }
             }
         } break;
         default:
