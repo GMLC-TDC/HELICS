@@ -39,7 +39,7 @@ def destroy_federate(fed):
     h.helicsCloseLibrary()
     print("EVController: Federate finalized")
 
-def create_message_federate(fedinitstring,name,deltat):
+def create_message_federate(fedinitstring,name,period):
     # Create Federate Info object that describes the federate properties
     fedinfo = h.helicsCreateFederateInfo()
     # Set core type from string
@@ -50,10 +50,11 @@ def create_message_federate(fedinitstring,name,deltat):
     h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
     #assert status == 0
     # Set one second message interval
-    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, deltat)
+    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_period, period)
     #assert status == 0
     # set wait for current time update to true
-    h.helicsFederateInfoSetFlagOption(fedinfo, h.helics_flag_wait_for_current_time_update, True)
+    h.helicsFederateInfoSetFlagOption(fedinfo, h.helics_flag_uninterruptible, True)
+    # h.helics_flag_uninterruptible should have integer value of 1
     #assert status == 0
     # see 'helics_federate_flags' in
     # https://docs.helics.org/en/latest/doxygen/helics__enums_8h_source.html
@@ -84,8 +85,8 @@ if __name__ == "__main__":
     name = 'EVController_federate'
     # assume the EV Controller needs 1 minute to determine whether or not to charge
     # the vehicles
-    deltat = 60*60 # 60 seconds
-    fed = create_message_federate(fedinitstring,name,deltat)
+    period = 15*60 # 15 min
+    fed = create_message_federate(fedinitstring,name,period)
 
     #### Register interfaces #####
 # Register the endpoints and their destinations
@@ -121,95 +122,49 @@ if __name__ == "__main__":
     h.helicsFederateEnterExecutingMode(fed)
 
 
-    hours = 24*7
+    hours = 24*7 # one week
     total_interval = int(60 * 60 * hours)
-    update_interval = 60*60 # updates every 10 minutes
+    update_interval = 30*60 # updates every 10 minutes
     grantedtime = -1
 #
 ## Step through each time period starting from t = 0
     time_sim = [];  instructions = []
     #for t in range(0, total_interval, update_interval): #
 
-    t = 10; query_fleet = 1
+    # the EV sent its first message at 15min
+    # start the controller at 15min + 7.5min
+    grantedtime = h.helicsFederateRequestTime (fed, 22.5*60)
+    #print('EV time: ',grantedtime/3600)
+
+    t = grantedtime
     while t < total_interval:
 
-        #while grantedtime < t:
-        # if t is 10 minutes, grantedtime could be 5 minutes
-        grantedtime = h.helicsFederateRequestTime (fed, t)
-        # default minimum timestep is very very small
-        print('NEXT TIME WILL BE: ',grantedtime/3600)
-
-        # current minute
-        time_sim.append(t/3600)
-        print('CURRENT TIME in HOURS: ',t/3600)
-        if query_fleet:
-            #  get SOC from each EV in the fleet
-            # if we're querying the fleet, then
-            # we need to respond to the fleet
-            # in ~ 1 minute
-            currentsoc = []
-            for j in range(0,len(enddest_EVsoc)):
-                # log the source of the message
-                print('endpt name: ',h.helicsEndpointGetName(end_EVsoc[j]))
-                if h.helicsEndpointHasMessage(end_EVsoc[j]):
-                    msg = h.helicsEndpointGetMessageObject(end_EVsoc[j])
-                #test = h.helicsMessageGetString(msg)
-                    currentsoc.append(
-                        h.helicsMessageGetString(msg)
-                    )
-                    print('msg: ',h.helicsMessageGetString(msg),h.helicsMessageIsValid(msg))
-                #else:
-
-                    #continue
-                    query_fleet = 0
-                else:
-                    print('NO MESSAGE RECEIVED AT TIME ',t)
-            t = grantedtime
-
-            #if currentsoc:
-            #    # in 1 minute,
-            #    t = grantedtime
-            #    # don't query the fleet, rather,
-            #    # tell them whether or not to continue charging
-            #    query_fleet = 0
-            #else:
-            #    # otherwise, increment time by update_interval = 10 min
-            #    t += update_interval
-
-        else:
-            # the most recent soc is known, send instructions to EVs
-            for j in range(0,len(enddest_EVsoc)):
-                print(' soc: ',currentsoc[j],type(currentsoc[j]))
-                # log the source of the message
-                end_name = str(h.helicsEndpointGetName(end_EVsoc[j]))
-                # this is the name of the source endpoint
-                print('Sending endpoint name: ',end_name)
-                destination_name = str(h.helicsEndpointGetDefaultDestination(end_EVsoc[j]))
-                print('destination endpoint name: ',destination_name)
-                #destination_federate = str(destination_name.split('/EV')[0])
-                #print('Endpoint destination federate: ',destination_federate)
-                print('currentsoc: ',currentsoc[j])
-                if float(currentsoc[j]) <= 0.9:
+        for j in range(0,len(enddest_EVsoc)):
+            # 1. Receive SOC
+            #print('endpt name: ',h.helicsEndpointGetName(end_EVsoc[j]))
+            if h.helicsEndpointHasMessage(end_EVsoc[j]):
+                msg = h.helicsEndpointGetMessageObject(end_EVsoc[j])
+                currentsoc = h.helicsMessageGetString(msg)
+                #print('currentsoc: ',currentsoc)
+                # 2. Send instructions
+                #destination_name = str(h.helicsEndpointGetDefaultDestination(end_EVsoc[j]))
+                print(t/3600,currentsoc)
+                if float(currentsoc) <= 0.9:
                     instructions = 1
                 else:
                     instructions = 0
-                h.helicsEndpointSendMessageRaw(end_EVsoc[j], "", str(instructions)) #
-
-                print('Sent instructions: {}'.format(instructions))
-
-
-            # query the EV fleet again
-            query_fleet = 1
-            # after 10 minutes
-            t = grantedtime
+                message = str(instructions)
+                h.helicsEndpointSendMessageRaw(end_EVsoc[j], "", message) #
+                #print('Sent instructions: {}'.format(instructions))
+            else:
+                print('NO MESSAGE RECEIVED AT TIME ',t/3600)
 
 
+        grantedtime = h.helicsFederateRequestTime (fed, (t+update_interval))
+        #print('EV time: ',grantedtime/3600)
 
+        t = grantedtime
 
-        # set t to 5 minutes
-        # if there is something you need to deal with, then you want
-        # t to be equal to granted time plus min timestep
-        #t = grantedtime #+ update_interval
 
     #logger.info("Destroying federate")
     destroy_federate(fed)
