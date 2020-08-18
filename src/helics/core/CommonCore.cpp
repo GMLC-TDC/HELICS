@@ -1611,12 +1611,14 @@ void CommonCore::sendMessage(interface_handle sourceHandle, std::unique_ptr<Mess
     if (m.actionTime < minTime) {
         m.actionTime = minTime;
     }
-    
-    if (fed->loggingLevel()>=helics_log_level_data) {
-        fed->logMessage(helics_log_level_data,"",fmt::format("receive_message {}", prettyPrintString(m)));
+
+    if (fed->loggingLevel() >= helics_log_level_data) {
+        fed->logMessage(helics_log_level_data,
+                        "",
+                        fmt::format("receive_message {}", prettyPrintString(m)));
     }
     addActionMessage(std::move(m));
-    }
+}
 
 void CommonCore::deliverMessage(ActionMessage& message)
 {
