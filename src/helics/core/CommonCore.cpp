@@ -1303,10 +1303,11 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
     }
     auto* fed = getFederateAt(handleInfo->local_fed_id);
     if (fed->checkAndSetValue(handle, data, len)) {
-        LOG_DATA_MESSAGES(parent_broker_id,
-                          fed->getIdentifier(),
-                          fmt::format("setting Value for {} size {}", handleInfo->key, len));
-
+        if (fed->loggingLevel() >= helics_log_level_data) {
+            fed->logMessage(helics_log_level_data,
+                            fed->getIdentifier(),
+                            fmt::format("setting value for {} size {}", handleInfo->key, len));
+        }
         auto subs = fed->getSubscribers(handle);
         if (subs.empty()) {
             return;
@@ -1809,9 +1810,16 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     if (m.messageID == 0) {
         m.messageID = ++messageCounter;
     }
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    auto* fed = getFederateAt(hndl->local_fed_id);
+    auto minTime = fed->nextAllowedSendTime();
     if (m.actionTime < minTime) {
         m.actionTime = minTime;
+    }
+
+    if (fed->loggingLevel() >= helics_log_level_data) {
+        fed->logMessage(helics_log_level_data,
+                        "",
+                        fmt::format("receive_message {}", prettyPrintString(m)));
     }
     addActionMessage(std::move(m));
 }
