@@ -224,10 +224,10 @@ void BrokerBase::generateLoggers()
         consoleLogger = spdlog::get("console");
         if (!consoleLogger) {
             try {
-            consoleLogger = spdlog::stdout_color_mt("console");
+                consoleLogger = spdlog::stdout_color_mt("console");
                 consoleLogger->flush_on(spdlog::level::info);
             }
-            catch (const spdlog::spdlog_ex &) {
+            catch (const spdlog::spdlog_ex&) {
                 consoleLogger = spdlog::get("console");
             }
         }
@@ -337,8 +337,11 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
                 } else if (logLevel == -10) {  // dumplog
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    consoleLogger->log(
-                        spdlog::level::critical, "{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(spdlog::level::critical,
+                                       "{} ({})::{}",
+                                       name,
+                                       federateID.baseValue(),
+                                       message);
                 }
                 if (forceLoggingFlush) {
                     consoleLogger->flush();
