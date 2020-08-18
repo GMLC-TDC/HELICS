@@ -1606,7 +1606,7 @@ void CommonCore::sendMessage(interface_handle sourceHandle, std::unique_ptr<Mess
     if (m.messageID == 0) {
         m.messageID = ++messageCounter;
     }
-    auto fed = getFederateAt(hndl->local_fed_id);
+    auto* fed = getFederateAt(hndl->local_fed_id);
     auto minTime = fed->nextAllowedSendTime();
     if (m.actionTime < minTime) {
         m.actionTime = minTime;
