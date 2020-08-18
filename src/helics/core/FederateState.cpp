@@ -1081,7 +1081,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                         timeCoord->updateValueTime(cmd.actionTime);
                         LOG_TRACE(timeCoord->printTimeStatus());
                     }
-                    LOG_DATA(fmt::format("receive publication {} from {}", prettyPrintString(cmd), subI->getSourceName(src)));
+                    LOG_DATA(fmt::format("receive publication {} from {}",
+                                         prettyPrintString(cmd),
+                                         subI->getSourceName(src)));
                 }
             }
         } break;
