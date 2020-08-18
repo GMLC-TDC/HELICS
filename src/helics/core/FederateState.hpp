@@ -240,6 +240,7 @@ class FederateState {
     void unlock() const { processing.clear(std::memory_order_release); }
     /** get the current logging level*/
     int loggingLevel() const { return logLevel; }
+
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
