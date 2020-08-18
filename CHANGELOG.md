@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.6.0][] ~ 2020-08-14
+## [2.6.0][] ~ 2020-08-20
 
 Bug fixes and major logging update
 
@@ -20,6 +20,7 @@ Bug fixes and major logging update
 - CMake will now error if the install directory is set to the build directory
 - Some argument names in the C API have been changed for consistency
 - Output a more descriptive error message for mismatched data sizes when converting types #1521
+- Some C++98 API functions were added and changed for consistency, specifically endpoint get type no returns a `char *` instead of std::string
 
 ### Fixed
 
@@ -27,6 +28,7 @@ Bug fixes and major logging update
 - Config file parsing was not acknowledging "unit" string #1512
 - A performance issue with the tcpss and tcp cores in some cases has been resolved by setting the no_delay option
 - Inconsistency in type returned by endpoint getType in C++98 API #1523
+- a potential segmentation fault when calling some methods in the C shared library after calling helicsCloseLibrary
 
 ### Added
 
@@ -35,6 +37,7 @@ Bug fixes and major logging update
 - Added `closeLibrary` function to the C++98 API
 - Added a Python benchmark file
 - An option to install the benchmark executables has been added
+- Data logging output for both send and receive of messages
 - A GitHub Actions workflow to build packages for Linux with the benchmark executables
 
 ### Removed
