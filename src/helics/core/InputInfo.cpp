@@ -197,13 +197,14 @@ const std::string& InputInfo::getInjectionType() const
 
 const std::string& InputInfo::getSourceName(global_handle source) const
 {
+    static const std::string empty{};
     size_t ii{0};
     while (ii < input_sources.size()) {
         if (source == input_sources[ii]) {
             return source_info[ii].key;
         }
     }
-    return
+    return empty;
 }
 
 const std::string& InputInfo::getInjectionUnits() const
