@@ -1,0 +1,41 @@
+schedules:
+  - cron: '0 10 * * *'
+    displayName: Daily late night PST (GMT-8)
+    branches:
+      include:
+        - helics3
+
+jobs:
+  - job: Daily Linux
+    strategy:
+      matrix:
+        all-tests:
+          containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
+          test_config: 'daily'
+        zmq-subproject:
+          containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
+          test_config: 'ci'
+          zmq_subproject: true
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: $[ variables['containerImage'] ]
+    timeoutInMinutes: 90
+
+    steps:
+      - bash: |
+          source scripts/setup-helics-ci-options.sh
+          mkdir -p build && cd build
+          ../scripts/ci-build.sh
+        env:
+          MAKEFLAGS: '-j 4'
+          CMAKE_GENERATOR: 'Unix Makefiles'
+          USE_SWIG: 'true'
+          ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
+          ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
+        displayName: 'Build HELICS'
+
+      - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
+        env:
+          TEST_CONFIG: $[variables['test_config']]
+        workingDirectory: 'build'
+        displayName: 'Test HELICS'

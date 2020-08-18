@@ -4,6 +4,85 @@ trigger:
       - pre-commit/*
 
 jobs:
+  - job: Linux
+    strategy:
+      matrix:
+        ubuntuDefault:
+          containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
+          test_config: 'ci'
+        gcc10:
+          containerImage: 'helics/buildenv:gcc10-builder'
+          test_config: 'ci'
+        clang10:
+          containerImage: 'helics/buildenv:clang10-builder'
+          test_config: 'ci'
+        clang5:
+          containerImage: 'helics/buildenv:clang5-builder'
+          test_config: 'ci'
+
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: $[ variables['containerImage'] ]
+    timeoutInMinutes: 90
+
+    steps:
+      - bash: |
+          source scripts/setup-helics-ci-options.sh
+          mkdir -p build && cd build
+          ../scripts/ci-build.sh
+        env:
+          MAKEFLAGS: '-j 4'
+          CMAKE_GENERATOR: 'Unix Makefiles'
+          USE_SWIG: 'true'
+          USE_MPI: 'true'
+          ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
+          ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
+        displayName: 'Build HELICS'
+
+      - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
+        env:
+          TEST_CONFIG: $[variables['test_config']]
+        workingDirectory: 'build'
+        displayName: 'Test HELICS'
+
+  - job: macOS
+    strategy:
+      matrix:
+        XCode-latest:
+          test_config: 'ci'
+          vmImage: 'macOS-latest'
+        XCode-oldest:
+          test_config: 'ci'
+          vmImage: 'macOS-10.14'
+          xcode_path: '/Applications/Xcode_10.1.app'
+    pool:
+      vmImage: $[ variables['vmImage'] ]
+    timeoutInMinutes: 90
+
+    steps:
+      - bash: sudo xcode-select --switch "${XCODE_PATH}/Contents/Developer"
+        env:
+          XCODE_PATH: $[variables['xcode_path']]
+        displayName: 'Set XCode Path'
+        condition: ne(variables['xcode_path'],'')
+      - bash: brew install swig zeromq boost
+        displayName: 'Install dependencies'
+      - bash: |
+          source scripts/setup-helics-ci-options.sh
+          mkdir -p build && cd build
+          ../scripts/ci-build.sh
+        env:
+          MAKEFLAGS: '-j 4'
+          CMAKE_GENERATOR: 'Unix Makefiles'
+          USE_SWIG: 'true'
+        displayName: 'Build HELICS'
+
+      - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
+        env:
+          TEST_CONFIG: $[variables['test_config']]
+        workingDirectory: 'build'
+        displayName: 'Test HELICS'
+
   - job: Windows
     strategy:
       matrix:
