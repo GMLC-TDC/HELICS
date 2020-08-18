@@ -15,6 +15,7 @@ import logging
 import numpy as np
 import sys
 
+
 #logging.basicConfig(filename='cosim.log')
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
@@ -63,7 +64,8 @@ def get_new_EV(numEVs):
 
 
 if __name__ == "__main__":
-    random.seed(8675309)
+    np.random.seed(8675309)
+    print('test seed: ',get_new_EV(2))
     fedinitstring = " --federates=1"# --broker="+broker
     name = 'EV_federate'
     period = 15*60  # 15 min  # this is the default time step for the EV federate
