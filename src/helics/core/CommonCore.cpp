@@ -1226,7 +1226,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
         if (fed->loggingLevel() >= helics_log_level_data) {
             fed->logMessage(helics_log_level_data,
                             fed->getIdentifier(),
-                            fmt::format("setting Value for {} size {}", handleInfo->key, len));
+                            fmt::format("setting value for {} size {}", handleInfo->key, len));
         }
         auto subs = fed->getSubscribers(handle);
         if (subs.empty()) {
