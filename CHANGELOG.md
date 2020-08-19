@@ -20,7 +20,8 @@ Bug fixes and major logging update
 - CMake will now error if the install directory is set to the build directory
 - Some argument names in the C API have been changed for consistency
 - Output a more descriptive error message for mismatched data sizes when converting types #1521
-- Some C++98 API functions were added and changed for consistency, specifically endpoint get type no returns a `char *` instead of std::string
+- Some C++98 API functions were added and changed for consistency, specifically endpoint get type no returns a `char *` instead of std::string, and a getCurrentTime function was added to `Federate`
+- logging level properties from a federateInfo structure will be inherited by a core for the first registered federate
 
 ### Fixed
 
@@ -770,3 +771,4 @@ This is a major revision so this changelog will not capture all the changes that
 [2.5.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.0
 [2.5.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.1
 [2.5.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.2
+[2.5.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.6.0
