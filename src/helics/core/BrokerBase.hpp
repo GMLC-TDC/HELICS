@@ -57,6 +57,8 @@ class BrokerBase {
     // constant function
     mutable std::string address;  //!< network location of the broker
     std::shared_ptr<spdlog::logger>
+        consoleLogger;  //!< default logging object to use if the logging callback is not specified
+    std::shared_ptr<spdlog::logger>
         fileLogger;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
