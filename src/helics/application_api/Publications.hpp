@@ -223,7 +223,7 @@ class HELICS_CXX_EXPORT Publication {
     /** send a value for publication
     @param val the value to publish*/
     void publish(double val);
-
+    void publish(const std::vector<std::string>& val);
     void publish(const std::vector<double>& val);
     void publish(const std::vector<std::complex<double>>& val);
     void publish(const double* vals, int size);
@@ -264,18 +264,6 @@ class HELICS_CXX_EXPORT Publication {
         publishInt(static_cast<int64_t>(val));
     }
 
-    /** publish anything not previously covered*/
-    template<class X>
-    std::enable_if_t<((typeCategory<X>::value == nonConvertibleType) &&
-                      (!std::is_constructible_v<std::string_view, X>)&&(!std::is_same_v<X, defV>)&&(
-                          !std::is_convertible_v<X, Time>)),
-                     void>
-        publish(const X& val)
-    {
-        if ((pubType == data_type::helics_custom) || (pubType == data_type::helics_any)) {
-            fed->publishRaw(*this, ValueConverter<X>::convert(val));
-        }
-    }
     /** set the level by which a value must have changed to actually publish the value
      */
     void setMinimumChange(double deltaV) noexcept

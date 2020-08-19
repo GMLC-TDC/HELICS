@@ -81,7 +81,7 @@ namespace zeromq {
             if ((active_routes[ii].revents & ZMQ_POLLIN) > 0) {
                 routes[active_messages[ii].route]->recv(msg);
                 active_routes[ii].events = 0;
-                Responses.emplace_back(static_cast<char*>(msg.data()),
+                Responses.emplace_back(static_cast<std::byte*>(msg.data()),
                                        msg.size());  // convert to an ActionMessage here
                 routes_waiting[active_messages[ii].route] = false;
                 active_messages[ii].waiting = false;

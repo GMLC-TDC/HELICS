@@ -405,10 +405,10 @@ TEST(TcpSSCore, tcpSSCore_initialization)
             }
             rM2.depacketize(data.data() + used, static_cast<int>(len.load() - used));
         }
-        EXPECT_EQ(rM.name, "core1");
+        EXPECT_EQ(rM.name(), "core1");
         EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_protocol);
 
-        EXPECT_EQ(rM2.name, "core1");
+        EXPECT_EQ(rM2.name(), "core1");
         EXPECT_TRUE(rM2.action() == helics::action_message_def::action_t::cmd_reg_broker);
     }
     core->disconnect();

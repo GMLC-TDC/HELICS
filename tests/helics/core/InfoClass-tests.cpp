@@ -282,7 +282,7 @@ TEST(InfoClass_tests, inputinfo_test)
 {
     // SubscriptionInfo is still a WPI, nothing moves data from the queue to current_data
 
-    std::shared_ptr<const helics::data_block> ret_data;
+    std::shared_ptr<const helics::SmallBuffer> ret_data;
 
     helics::InputInfo subI(helics::global_handle(helics::global_federate_id(5),
                                                  helics::interface_handle(13)),
@@ -302,7 +302,7 @@ TEST(InfoClass_tests, inputinfo_test)
     ret_data = subI.getData(0);
     EXPECT_TRUE(!ret_data);
 
-    auto hello_data = std::make_shared<helics::data_block>("hello world");
+    auto hello_data = std::make_shared<helics::SmallBuffer>("hello world");
     subI.addData(testHandle, helics::timeZero, 0, hello_data);
     subI.updateTimeInclusive(helics::timeZero);
     ret_data = subI.getData(0);
@@ -310,8 +310,8 @@ TEST(InfoClass_tests, inputinfo_test)
     EXPECT_EQ(ret_data->size(), 11U);
     EXPECT_EQ(ret_data->to_string(), hello_data->to_string());
 
-    auto time_one_data = std::make_shared<helics::data_block>("time one");
-    auto time_one_repeat_data = std::make_shared<helics::data_block>("time one repeat");
+    auto time_one_data = std::make_shared<helics::SmallBuffer>("time one");
+    auto time_one_repeat_data = std::make_shared<helics::SmallBuffer>("time one repeat");
     subI.addData(testHandle, 1, 0, time_one_data);
     subI.addData(testHandle, 1, 0, time_one_repeat_data);
 

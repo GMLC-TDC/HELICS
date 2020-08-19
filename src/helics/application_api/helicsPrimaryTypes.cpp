@@ -815,18 +815,9 @@ void valueExtract(const data_view& dv, data_type baseType, bool& val)
 {
     switch (baseType) {
         case data_type::helics_any: {
-            if (dv.size() == 9) {
-                auto Vint = ValueConverter<int64_t>::interpret(dv);
-                val = (Vint != 0);
-            } else if (dv.size() == 17) {
-                auto V = ValueConverter<std::complex<double>>::interpret(dv);
-                val = (std::abs(V) != 0);
-            } else if (dv.size() == 5) {
-                auto Vint = ValueConverter<int32_t>::interpret(dv);
-                val = (Vint == 0);
-            } else {
-                val = helicsBoolValue(dv.string());
-            }
+            defV val_dv;
+            valueExtract(dv, baseType, val_dv);
+            valueExtract(val_dv, val);
             break;
         }
         case data_type::helics_string:
@@ -881,6 +872,9 @@ void valueExtract(const data_view& dv, data_type baseType, bool& val)
 }
 void valueExtract(const data_view& dv, data_type baseType, defV& val)
 {
+    if (baseType == data_type::helics_any || baseType == data_type::helics_unknown) {
+        baseType = detail::detectType(dv.bytes());
+    }
     switch (baseType) {
         case data_type::helics_double:
             val = ValueConverter<double>::interpret(dv);

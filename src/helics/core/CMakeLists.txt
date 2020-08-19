@@ -46,6 +46,7 @@ set(PUBLIC_INCLUDE_FILES
     federate_id.hpp
     helics_definitions.hpp
     helicsCLI11.hpp
+    SmallBuffer.hpp
 )
 
 set(INCLUDE_FILES

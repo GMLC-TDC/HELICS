@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <deque>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 namespace helics {
@@ -27,11 +28,12 @@ class HandleManager {
     otherwise we would need two classes that do basically the same thing just with different
     container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
-    std::unordered_map<std::string, interface_handle>
+    std::unordered_map<std::string_view, interface_handle>
         publications;  //!< map of all local publications
-    std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
-    std::unordered_map<std::string, interface_handle> inputs;  //!< map of all local endpoints
-    std::unordered_map<std::string, interface_handle> filters;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, interface_handle>
+        endpoints;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, interface_handle> inputs;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, interface_handle> filters;  //!< map of all local endpoints
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
@@ -72,9 +74,9 @@ class HandleManager {
 
     int32_t getHandleOption(interface_handle handle, int32_t option) const;
     /** get an endpoint from its name*/
-    BasicHandleInfo* getEndpoint(const std::string& name);
+    BasicHandleInfo* getEndpoint(std::string_view name);
     /** get an endpoint from its name*/
-    const BasicHandleInfo* getEndpoint(const std::string& name) const;
+    const BasicHandleInfo* getEndpoint(std::string_view name) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
     BasicHandleInfo* getEndpoint(interface_handle handle);
@@ -82,19 +84,19 @@ class HandleManager {
     @return nullptr if the index doesn't point to a valid endpoint*/
     const BasicHandleInfo* getEndpoint(interface_handle handle) const;
     /** get a const filter by name*/
-    const BasicHandleInfo* getFilter(const std::string& name) const;
-    BasicHandleInfo* getFilter(const std::string& name);
+    const BasicHandleInfo* getFilter(std::string_view name) const;
+    BasicHandleInfo* getFilter(std::string_view name);
     // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
     BasicHandleInfo* getFilter(interface_handle handle);
-    BasicHandleInfo* getPublication(const std::string& name);
-    const BasicHandleInfo* getPublication(const std::string& name) const;
+    BasicHandleInfo* getPublication(std::string_view name);
+    const BasicHandleInfo* getPublication(std::string_view name) const;
     /** get a publication by index
     @return nullptr if the index doesn't point to a valid publication*/
     BasicHandleInfo* getPublication(interface_handle handle);
-    BasicHandleInfo* getInput(const std::string& name);
-    const BasicHandleInfo* getInput(const std::string& name) const;
+    BasicHandleInfo* getInput(std::string_view name);
+    const BasicHandleInfo* getInput(std::string_view name) const;
     local_federate_id getLocalFedID(interface_handle handle) const;
 
     BasicHandleInfo& operator[](size_t index) { return handles[index]; }

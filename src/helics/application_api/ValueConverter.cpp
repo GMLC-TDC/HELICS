@@ -7,27 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ValueConverter.hpp"
 
-#include "ValueConverter_impl.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../common/frozen_map.h"
 
 #include <complex>
-#include <frozen/unordered_map.h>
 #include <vector>
 
 namespace helics {
-template class ValueConverter<int64_t>;
-template class ValueConverter<uint64_t>;
-template class ValueConverter<char>;
-template class ValueConverter<bool>;
-template class ValueConverter<std::complex<double>>;
-template class ValueConverter<double>;
-template class ValueConverter<float>;
-template class ValueConverter<int16_t>;
-template class ValueConverter<uint32_t>;
-template class ValueConverter<int32_t>;
-template class ValueConverter<std::vector<double>>;
-template class ValueConverter<std::vector<std::string>>;
-template class ValueConverter<std::vector<std::complex<double>>>;
-template class ValueConverter<NamedPoint>;
 
 namespace detail {
     namespace checks {
@@ -100,23 +86,6 @@ namespace detail {
     static constexpr const std::byte littleEndianCode{0x0};
     static constexpr const std::byte bigEndianCode{0x01};
 
-    size_t getBinaryLength(double /*val*/) { return 16; }
-    size_t getBinaryLength(std::int64_t /*val*/) { return 16; }
-    size_t getBinaryLength(std::complex<double> /*val*/) { return 24; }
-    size_t getBinaryLength(std::string_view val) { return val.size() + 8; }
-    size_t getBinaryLength(const std::vector<double>& val)
-    {
-        return val.size() * sizeof(double) + 8;
-    }
-    size_t getBinaryLength(const double* /*val*/, size_t size) { return size * sizeof(double) + 8; }
-
-    size_t getBinaryLength(const NamedPoint& np) { return np.name.size() + 16; }
-
-    size_t getBinaryLength(const std::vector<std::complex<double>>& cv)
-    {
-        return cv.size() * sizeof(double) * 2 + 8;
-    }
-
     static inline void addCodeAndSize(std::byte* data, std::byte code, size_t size)
     {
         std::memset(data, 0, 8);
@@ -142,7 +111,7 @@ namespace detail {
         return 16;
     }
 
-    size_t convertToBinary(std::byte* data, const std::complex<double>& val)
+    size_t convertToBinary(std::byte* data, std::complex<double> val)
     {
         addCodeAndSize(data, complexCode, 2);
         std::memcpy(data + 8, &val, 16);
@@ -152,7 +121,9 @@ namespace detail {
     size_t convertToBinary(std::byte* data, std::string_view val)
     {
         addCodeAndSize(data, stringCode, val.size());
-        std::memcpy(data + 8U, val.data(), val.size());
+        if (!val.empty()) {
+            std::memcpy(data + 8U, val.data(), val.size());
+        }
         return val.size() + 8U;
     }
 
@@ -160,29 +131,44 @@ namespace detail {
     {
         addCodeAndSize(data, npCode, val.name.size());
         std::memcpy(data + 8, &val.value, 8);
-        std::memcpy(data + 16, val.name.data(), val.name.size());
+        if (!val.name.empty()) {
+            std::memcpy(data + 16, val.name.data(), val.name.size());
+        }
         return val.name.size() + 16U;
     }
 
     size_t convertToBinary(std::byte* data, const std::vector<double>& val)
     {
         addCodeAndSize(data, vectorCode, val.size());
-        std::memcpy(data + 8, val.data(), val.size() * sizeof(double));
+        if (val.size() > 0) {
+            std::memcpy(data + 8, val.data(), val.size() * sizeof(double));
+        }
         return val.size() * sizeof(double) + 8U;
     }
 
     size_t convertToBinary(std::byte* data, const double* val, size_t size)
     {
         addCodeAndSize(data, vectorCode, size);
-        std::memcpy(data + 8, val, size * sizeof(double));
+        if (size > 0) {
+            std::memcpy(data + 8, val, size * sizeof(double));
+        }
         return size * sizeof(double) + 8U;
     }
 
     size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val)
     {
         addCodeAndSize(data, cvCode, val.size());
-        std::memcpy(data + 8, val.data(), val.size() * sizeof(double) * 2);
+        if (val.size() > 0) {
+            std::memcpy(data + 8, val.data(), val.size() * sizeof(double) * 2);
+        }
         return val.size() * sizeof(double) * 2U + 8U;
+    }
+
+    size_t convertToBinary(std::byte* data, const std::complex<double>* val, size_t size)
+    {
+        addCodeAndSize(data, cvCode, size);
+        std::memcpy(data + 8, val, size * sizeof(double) * 2);
+        return size * sizeof(double) * 2U + 8U;
     }
 
     size_t getDataSize(const std::byte* data)
@@ -261,7 +247,9 @@ namespace detail {
     {
         std::size_t size = getDataSize(data);
         val.resize(size);
-        std::memcpy(val.data(), data + 8, size * sizeof(double));
+        if (size > 0) {
+            std::memcpy(val.data(), data + 8, size * sizeof(double));
+        }
         if ((data[0] & endianMask) != littleEndianCode) {
             for (auto& v : val) {
                 checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v));
@@ -272,7 +260,9 @@ namespace detail {
     void convertFromBinary(const std::byte* data, double* val)
     {
         std::size_t size = getDataSize(data);
-        std::memcpy(val, data + 8, size * sizeof(double));
+        if (val != nullptr && size > 0) {
+            std::memcpy(val, data + 8, size * sizeof(double));
+        }
         if ((data[0] & endianMask) != littleEndianCode) {
             double* v = val;
             double* end = val + size;
@@ -286,7 +276,9 @@ namespace detail {
     {
         std::size_t size = getDataSize(data);
         val.resize(size);
-        std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
+        if (size > 0) {
+            std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
+        }
         if ((data[0] & endianMask) != littleEndianCode) {
             for (auto& v : val) {
                 // making use of array oriented access for complex numbers
@@ -297,5 +289,35 @@ namespace detail {
         }
     }
 }  // namespace detail
+
+void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::string>& val,
+                                                       SmallBuffer& store)
+{
+    Json::Value V(Json::arrayValue);
+    for (auto& str : val) {
+        V.append(str);
+    }
+    auto strgen = generateJsonString(V);
+    store.resize(detail::getBinaryLength(strgen));
+    detail::convertToBinary(store.data(), strgen);
+}
+
+/** interpret a view of the data block and store to the specified value*/
+void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
+                                                         std::vector<std::string>& val)
+{
+    val.clear();
+    std::string str;
+    detail::convertFromBinary(block.bytes(), str);
+    Json::Value V = loadJsonStr(str);
+    if (V.isArray()) {
+        val.reserve(V.size());
+        for (auto& av : V) {
+            val.emplace_back(av.asString());
+        }
+    } else {
+        val.push_back(block.string());
+    }
+}
 
 }  // namespace helics

@@ -236,7 +236,7 @@ TEST(IPCCore, ipccore_initialization)
     ASSERT_TRUE(crConn);
 
     helics::ActionMessage rM = mq.getMessage();
-    EXPECT_EQ(rM.name, "core1");
+    EXPECT_EQ(rM.name(), "core1");
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
     core->disconnect();
     core = nullptr;

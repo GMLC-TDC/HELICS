@@ -129,7 +129,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
 
     mFed1->sendMessage(epid, "ep2", data);
 
@@ -177,7 +177,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
 
     ep1.send("ep2", data);
 
@@ -223,7 +223,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    helics::data_block data(500, 'a');
+    helics::SmallBuffer data(500, 'a');
 
     ep1.send("ep2", data);
 
@@ -272,10 +272,10 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
 
-    helics::data_block data1(500, 'a');
-    helics::data_block data2(400, 'b');
-    helics::data_block data3(300, 'c');
-    helics::data_block data4(200, 'd');
+    helics::SmallBuffer data1(500, std::byte{'a'});
+    helics::SmallBuffer data2(400, std::byte{'b'});
+    helics::SmallBuffer data3(300, std::byte{'c'});
+    helics::SmallBuffer data4(200, std::byte{'d'});
     mFed1->sendMessage(epid, "ep2", data1);
     mFed1->sendMessage(epid, "ep2", data2);
     mFed1->sendMessage(epid, "ep2", data3);

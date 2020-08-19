@@ -13,7 +13,7 @@ using namespace helics;  // NOLINT
 static void BMtoString(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
-    obj.name = "the name of the federate is really long";
+    obj.name("the name of the federate is really long");
     obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
@@ -27,7 +27,7 @@ BENCHMARK(BMtoString);
 static void BMfromString(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
-    obj.name = "the name of the federate is really long";
+    obj.name("the name of the federate is really long");
     obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
@@ -71,7 +71,7 @@ BENCHMARK(BMfromStringTime);
 static void BMpacketize(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
-    obj.name = "the name of the federate is really long";
+    obj.name("the name of the federate is really long");
     obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
@@ -85,7 +85,7 @@ BENCHMARK(BMpacketize);
 static void BMdepacketize(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
-    obj.name = "the name of the federate is really long";
+    obj.name("the name of the federate is really long");
     obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
@@ -102,7 +102,7 @@ BENCHMARK(BMdepacketize);
 static void BMpacketizeStrings(benchmark::State& state)
 {
     ActionMessage obj(CMD_MULTI_MESSAGE);
-    obj.name = "sstring";
+    obj.name("sstring");
     for (int ii = 0; ii < 100; ++ii) {
         obj.setString(ii, ActionMessage(CMD_PING_REPLY).to_string());
     }
@@ -118,7 +118,7 @@ BENCHMARK(BMpacketizeStrings);
 static void BMdepacketizeStrings(benchmark::State& state)
 {
     ActionMessage obj(CMD_MULTI_MESSAGE);
-    obj.name = "sstring";
+    obj.name("sstring");
     for (int ii = 0; ii < 100; ++ii) {
         obj.setString(ii, ActionMessage(CMD_PING_REPLY).to_string());
     }

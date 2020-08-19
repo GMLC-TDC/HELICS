@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "ActionMessageDefintions.hpp"
+#include "SmallBuffer.hpp"
 #include "basic_core_types.hpp"
 
 #include <memory>
@@ -39,19 +40,17 @@ class ActionMessage {
     interface_handle dest_handle{};  //!< 24 local handle for a targeted message
     uint16_t counter{0};  //!< 26 counter for filter tracking or message counter
     uint16_t flags{0};  //!<  28 set of messageFlags
-    uint32_t sequenceID{0};  //!< a sequence number for ordering
+    uint32_t sequenceID{0};  //!< 32 a sequence number for ordering
     Time actionTime{timeZero};  //!< 40 the time an action took place or will take place    //32
-    std::string payload;  //!< string containing the data    //96 std::string is 32 bytes on most
-                          //!< platforms (except libc++)
-    std::string& name;  //!< alias payload to a name reference for registration functions
     Time Te{timeZero};  //!< 48 event time
     Time Tdemin{timeZero};  //!< 56 min dependent event time
     Time Tso{timeZero};  //!< 64 the second order dependent time
+    SmallBuffer payload;  //!< buffer to contain the data payload
   private:
     std::vector<std::string> stringData;  //!< container for extra string data
   public:
     /** default constructor*/
-    ActionMessage() noexcept: name(payload) {}
+    ActionMessage() noexcept {}
     /** construct from an action type
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
@@ -71,7 +70,7 @@ class ActionMessage {
     /** construct from a data vector*/
     explicit ActionMessage(const std::vector<char>& bytes);
     /** construct from a data pointer and size*/
-    explicit ActionMessage(const char* data, size_t size);
+    ActionMessage(const void* data, size_t size);
     /** destructor*/
     ~ActionMessage();
     /** copy constructor*/
@@ -104,7 +103,10 @@ class ActionMessage {
     }
     /** get the reference to the string data vector*/
     const std::vector<std::string>& getStringData() const { return stringData; }
-
+    /** set the string name associated with a actionMessage*/
+    void name(std::string_view name) { payload = name; }
+    /** get the string name associated with an action Message*/
+    std::string_view name() const { return payload.to_string(); }
     void clearStringData() { stringData.clear(); }
     // most use cases for this involve short strings, or already have references that need to be
     // copied so supporting move isn't  going to be that useful here, the long strings are going in
@@ -170,7 +172,7 @@ class ActionMessage {
     @param buffer_size  the size of the buffer
     @return the size of the buffer actually used
     */
-    int toByteArray(char* data, int buffer_size) const;
+    int toByteArray(std::byte* data, std::size_t buffer_size) const;
     /** convert to a string using a reference*/
     void to_string(std::string& data) const;
     /** convert to a byte string*/
@@ -184,13 +186,13 @@ class ActionMessage {
     /** convert a command to a byte vector*/
     std::vector<char> to_vector() const;
     /** generate a command from a raw data stream*/
-    int fromByteArray(const char* data, int buffer_size);
+    std::size_t fromByteArray(const std::byte* data, std::size_t buffer_size);
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
-    int depacketize(const char* data, int buffer_size);
+    int depacketize(const void* data, std::size_t buffer_size);
     /** read a command from a string*/
-    void from_string(const std::string& data);
+    void from_string(std::string_view data);
     /** read a command from a char vector*/
     void from_vector(const std::vector<char>& data);
 

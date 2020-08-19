@@ -182,8 +182,8 @@ TEST(ActionMessage_tests, copy_constructor_test)
     EXPECT_EQ(cmd_copy.dest_handle.baseValue(), 4);
     EXPECT_EQ(cmd_copy.flags, 0x1a2F);
     EXPECT_EQ(cmd_copy.actionTime, helics::Time::maxVal());
-    EXPECT_EQ(cmd_copy.payload, "hello world");
-    EXPECT_EQ(cmd_copy.name, "hello world");  // aliased to payload
+    EXPECT_EQ(cmd_copy.payload.to_string(), "hello world");
+    EXPECT_EQ(cmd_copy.name(), "hello world");  // aliased to payload
 
     EXPECT_EQ(cmd_copy.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_copy.Tdemin, helics::Time::minVal());
@@ -220,8 +220,8 @@ TEST(ActionMessage_tests, assignment_test)
     EXPECT_TRUE(checkActionFlag(cmd_assign, required_flag));
     EXPECT_TRUE(checkActionFlag(cmd_assign, error_flag));
     EXPECT_EQ(cmd_assign.actionTime, helics::Time::maxVal());
-    EXPECT_EQ(cmd_assign.payload, "hello world");
-    EXPECT_EQ(cmd_assign.name, "hello world");  // aliased to payload
+    EXPECT_EQ(cmd_assign.payload.to_string(), "hello world");
+    EXPECT_EQ(cmd_assign.name(), "hello world");  // aliased to payload
 
     EXPECT_EQ(cmd_assign.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.Tdemin, helics::Time::minVal());
@@ -367,12 +367,14 @@ TEST(ActionMessage_tests, check_conversions)
     auto testBuffer1 = std::make_unique<char[]>(cmdStr.size() + 20);
     auto testBuffer2 = std::make_unique<char[]>(cmdStr.size() >> 2U);  // make a too small buffer
 
-    auto res = cmd.toByteArray(testBuffer1.get(), static_cast<int>(cmdStr.size() + 20));
+    auto res = cmd.toByteArray(reinterpret_cast<std::byte*>(testBuffer1.get()),
+                               static_cast<int>(cmdStr.size() + 20));
     EXPECT_EQ(res, static_cast<int>(cmdStr.size()));
     // just check to make sure the same string was written
     EXPECT_EQ(cmdStr, std::string(testBuffer1.get(), res));
     // this should return -1
-    res = cmd.toByteArray(testBuffer2.get(), static_cast<int>(cmdStr.size() >> 2U));
+    res = cmd.toByteArray(reinterpret_cast<std::byte*>(testBuffer2.get()),
+                          static_cast<int>(cmdStr.size() >> 2U));
     EXPECT_EQ(res, -1);
 }
 
@@ -395,7 +397,7 @@ TEST(ActionMessage_tests, check_packetization)
     auto cmdString = cmd.packetize();
     EXPECT_GE(cmdStringNormal.size() + 6, cmdString.size());
     helics::ActionMessage cmd2;
-    auto res = cmd2.depacketize(cmdString.data(), static_cast<int>(cmdString.size()));
+    auto res = cmd2.depacketize(reinterpret_cast<std::byte*>(cmdString.data()), cmdString.size());
     EXPECT_EQ(res, static_cast<int>(cmdString.size()));
     EXPECT_TRUE(cmd.action() == cmd2.action());
     EXPECT_EQ(cmd.actionTime, cmd2.actionTime);

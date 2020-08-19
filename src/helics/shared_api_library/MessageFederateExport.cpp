@@ -702,7 +702,7 @@ const char* helicsMessageGetString(helics_message message)
     if (mess == nullptr) {
         return nullcstr;
     }
-    return mess->data.data();
+    return mess->data.char_data();
 }
 
 int helicsMessageGetRawDataSize(helics_message message)

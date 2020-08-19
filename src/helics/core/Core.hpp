@@ -467,14 +467,14 @@ class Core {
      * @param[out] inputIndex return the index of input (always 1 for inputs with only a single
      * source)
      */
-    virtual const std::shared_ptr<const data_block>& getValue(interface_handle handle,
-                                                              uint32_t* inputIndex = nullptr) = 0;
+    virtual const std::shared_ptr<const SmallBuffer>& getValue(interface_handle handle,
+                                                               uint32_t* inputIndex = nullptr) = 0;
 
     /**
      * Return all the available data for the specified handle or the latest input
      *
      */
-    virtual const std::vector<std::shared_ptr<const data_block>>&
+    virtual const std::vector<std::shared_ptr<const SmallBuffer>>&
         getAllValues(interface_handle handle) = 0;
 
     /**
@@ -698,7 +698,7 @@ class Core {
     */
     virtual void setLoggingCallback(
         local_federate_id federateID,
-        std::function<void(int, const std::string&, const std::string&)> logFunction) = 0;
+        std::function<void(int, std::string_view, std::string_view)> logFunction) = 0;
 
     /** set the core logging level*/
     virtual void setLoggingLevel(int logLevel) = 0;
@@ -732,7 +732,7 @@ class Core {
     be answered that directed at a particular federate
     */
     virtual void setQueryCallback(local_federate_id federateID,
-                                  std::function<std::string(const std::string&)> queryFunction) = 0;
+                                  std::function<std::string(std::string_view)> queryFunction) = 0;
     /**
      * setter for the interface information
      * @param handle the identifiers for the interface to set the info data on

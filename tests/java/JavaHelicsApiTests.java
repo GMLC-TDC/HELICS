@@ -342,10 +342,10 @@ public class JavaHelicsApiTests {
             helics.helicsFederateEnterInitializingModeComplete(fed1);
             helics.helicsFederateEnterExecutingModeAsync(fed1);
             helics.helicsFederateEnterExecutingModeComplete(fed1);
-            
+
             // Create a message object
             SWIGTYPE_p_void mesg1 = helics.helicsFederateCreateMessage(fed1);
-            
+
             // Set message contents and properties
             helics.helicsMessageSetString(mesg1, "Hello");
             helics.helicsMessageSetDestination(mesg1, "Ep2");
@@ -353,10 +353,10 @@ public class JavaHelicsApiTests {
             helics.helicsMessageSetOriginalSource(mesg1, "fed1/Ep1");
             helics.helicsMessageSetSource(mesg1, "fed1/Ep1");
             helics.helicsMessageSetTime(mesg1, 0.0);
-            
+
             // Send the message
             helics.helicsEndpointSendMessage(ep1, mesg1);
-            
+
             // Change the message contents and send it again
             helics.helicsMessageSetString(mesg1, "There");
             helics.helicsEndpointSendMessage(ep1, mesg1);

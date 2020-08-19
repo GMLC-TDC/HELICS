@@ -82,7 +82,7 @@ namespace zeromq {
                 return (-1);
             }
         }
-        ActionMessage M(static_cast<char*>(msg.data()), msg.size());
+        ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
 
         if (!isValidCommand(M)) {
             std::cerr << "invalid command received" << M.action() << std::endl;
@@ -124,9 +124,9 @@ namespace zeromq {
                     if (serverMode) {
                         auto sdata = M.getStringData();
                         if (sdata.size() == 3) {
-                            connection_info.emplace(M.name, sdata[2]);
+                            connection_info.emplace(M.name(), sdata[2]);
                         } else {
-                            connection_info.emplace(M.name, M.payload);
+                            connection_info.emplace(M.name(), M.payload.to_string());
                         }
                         status = 3;
                     }
@@ -157,7 +157,7 @@ namespace zeromq {
 
     int ZmqCommsSS::replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock)
     {
-        ActionMessage M(static_cast<char*>(msg.data()), msg.size());
+        ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
         if (isProtocolCommand(M)) {
             if (M.messageID == CLOSE_RECEIVER) {
                 return (-1);
@@ -197,7 +197,7 @@ namespace zeromq {
         // generate a local protocol connection string to send it's identity
         ActionMessage cmessage(CMD_PROTOCOL);
         cmessage.messageID = CONNECTION_INFORMATION;
-        cmessage.name = name;
+        cmessage.name(name);
         cmessage.setStringData(brokerName, brokerInitString, getAddress());
         cmessage.to_vector(buffer);
         brokerConnection.send(zmq::const_buffer(buffer.data(), buffer.size()),
@@ -243,12 +243,12 @@ namespace zeromq {
             case CONNECTION_INFORMATION:
                 // Shouldn't reach here ideally
                 if (serverMode) {
-                    connection_info.emplace(cmd.name, cmd.payload);
+                    connection_info.emplace(cmd.name(), cmd.payload.to_string());
                 }
                 break;
             case NEW_ROUTE:
                 for (auto& mc : connection_info) {
-                    if (mc.second == cmd.payload) {
+                    if (mc.second == cmd.payload.to_string()) {
                         routes.emplace(route_id(cmd.getExtraData()), mc.first);
                         break;
                     }

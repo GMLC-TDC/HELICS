@@ -214,7 +214,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     cmd.setAction(helics::CMD_FED_ACK);
     global_federate_id fed22(22);
     cmd.dest_id = fed22;
-    cmd.name = "fed_name";
+    cmd.name("fed_name");
     clearActionFlag(cmd, error_flag);
     fs_process = std::async(std::launch::async, [&]() { return fs->waitSetup(); });
     fs->addAction(cmd);

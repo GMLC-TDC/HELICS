@@ -201,7 +201,7 @@ int32_t HandleManager::getHandleOption(interface_handle handle, int32_t option) 
     return rvalue;
 }
 
-BasicHandleInfo* HandleManager::getEndpoint(const std::string& name)
+BasicHandleInfo* HandleManager::getEndpoint(std::string_view name)
 {
     auto fnd = endpoints.find(name);
     if (fnd != endpoints.end()) {
@@ -210,7 +210,7 @@ BasicHandleInfo* HandleManager::getEndpoint(const std::string& name)
     return nullptr;
 }
 
-const BasicHandleInfo* HandleManager::getEndpoint(const std::string& name) const
+const BasicHandleInfo* HandleManager::getEndpoint(std::string_view name) const
 {
     auto fnd = endpoints.find(name);
     if (fnd != endpoints.end()) {
@@ -245,7 +245,7 @@ const BasicHandleInfo* HandleManager::getEndpoint(interface_handle handle) const
     return nullptr;
 }
 
-BasicHandleInfo* HandleManager::getPublication(const std::string& name)
+BasicHandleInfo* HandleManager::getPublication(std::string_view name)
 {
     auto fnd = publications.find(name);
     if (fnd != publications.end()) {
@@ -254,7 +254,7 @@ BasicHandleInfo* HandleManager::getPublication(const std::string& name)
     return nullptr;
 }
 
-const BasicHandleInfo* HandleManager::getPublication(const std::string& name) const
+const BasicHandleInfo* HandleManager::getPublication(std::string_view name) const
 {
     auto fnd = publications.find(name);
     if (fnd != publications.end()) {
@@ -276,7 +276,7 @@ BasicHandleInfo* HandleManager::getPublication(interface_handle handle)
     return nullptr;
 }
 
-BasicHandleInfo* HandleManager::getInput(const std::string& name)
+BasicHandleInfo* HandleManager::getInput(std::string_view name)
 {
     auto fnd = inputs.find(name);
     if (fnd != inputs.end()) {
@@ -285,7 +285,7 @@ BasicHandleInfo* HandleManager::getInput(const std::string& name)
     return nullptr;
 }
 
-const BasicHandleInfo* HandleManager::getInput(const std::string& name) const
+const BasicHandleInfo* HandleManager::getInput(std::string_view name) const
 {
     auto fnd = inputs.find(name);
     if (fnd != inputs.end()) {
@@ -294,7 +294,7 @@ const BasicHandleInfo* HandleManager::getInput(const std::string& name) const
     return nullptr;
 }
 
-BasicHandleInfo* HandleManager::getFilter(const std::string& name)
+BasicHandleInfo* HandleManager::getFilter(std::string_view name)
 {
     auto ar = filters.equal_range(name);
     if (ar.first == ar.second) {
@@ -303,7 +303,7 @@ BasicHandleInfo* HandleManager::getFilter(const std::string& name)
     return &(handles[ar.first->second.baseValue()]);
 }
 
-const BasicHandleInfo* HandleManager::getFilter(const std::string& name) const
+const BasicHandleInfo* HandleManager::getFilter(std::string_view name) const
 {
     auto ar = filters.equal_range(name);
     if (ar.first == ar.second) {

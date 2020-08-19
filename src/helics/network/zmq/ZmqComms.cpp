@@ -64,10 +64,10 @@ namespace zeromq {
                 return (-1);
             }
         }
-        ActionMessage M(static_cast<char*>(msg.data()), msg.size());
+        ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
         if (!isValidCommand(M)) {
             logError("invalid command received");
-            ActionMessage Q(static_cast<char*>(msg.data()), msg.size());
+            ActionMessage Q(static_cast<std::byte*>(msg.data()), msg.size());
             return 0;
         }
         if (isProtocolCommand(M)) {
@@ -87,7 +87,7 @@ namespace zeromq {
 
     int ZmqComms::replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock)
     {
-        ActionMessage M(static_cast<char*>(msg.data()), msg.size());
+        ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
         if (isProtocolCommand(M)) {
             if (M.messageID == CLOSE_RECEIVER) {
                 return (-1);
@@ -134,7 +134,7 @@ namespace zeromq {
             if (msg.size() < 10) {
                 continue;
             }
-            ActionMessage M(static_cast<char*>(msg.data()), msg.size());
+            ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
 
             if (isProtocolCommand(M)) {
                 if (M.messageID == PORT_DEFINITIONS) {
@@ -326,7 +326,7 @@ namespace zeromq {
                     if (rc > 0) {
                         brokerReq.recv(msg);
 
-                        ActionMessage rxcmd(static_cast<char*>(msg.data()), msg.size());
+                        ActionMessage rxcmd(static_cast<std::byte*>(msg.data()), msg.size());
                         if (isProtocolCommand(rxcmd)) {
                             if (rxcmd.messageID == PORT_DEFINITIONS) {
                                 controlSocket.send(msg, zmq::send_flags::none);
@@ -447,14 +447,15 @@ namespace zeromq {
                             brokerPushSocket.close();
                             brokerPushSocket = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);
                             brokerPushSocket.setsockopt(ZMQ_LINGER, 200);
-                            brokerTargetAddress = cmd.payload;
+                            brokerTargetAddress = cmd.payload.to_string();
                             brokerPort = cmd.getExtraData();
                             brokerPushSocket.connect(
                                 makePortAddress(brokerTargetAddress, brokerPort));
                             break;
                         case NEW_ROUTE: {
                             try {
-                                auto interfaceAndPort = extractInterfaceandPort(cmd.payload);
+                                auto interfaceAndPort =
+                                    extractInterfaceandPort(std::string(cmd.payload.to_string()));
 
                                 auto zsock = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);
                                 zsock.setsockopt(ZMQ_LINGER, 100);
@@ -464,8 +465,8 @@ namespace zeromq {
                             }
                             catch (const zmq::error_t& e) {
                                 // TODO(PT): do something???
-                                logError(std::string("unable to connect route") + cmd.payload +
-                                         "::" + e.what());
+                                logError(std::string("unable to connect route") +
+                                         std::string(cmd.payload.to_string()) + "::" + e.what());
                             }
                             processed = true;
                         } break;
