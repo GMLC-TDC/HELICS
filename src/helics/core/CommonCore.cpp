@@ -556,6 +556,7 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
     FederateState* fed = nullptr;
+    bool checkProperties{false};
     local_federate_id local_id;
     {
         auto feds = federates.lock();
@@ -566,6 +567,9 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
         } else {
             throw(RegistrationFailure("duplicate names " + name +
                                       "detected multiple federates with the same name"));
+        }
+        if (feds->size() == 1) {
+            checkProperties = true;
         }
     }
     if (fed == nullptr) {
@@ -585,6 +589,22 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     ActionMessage m(CMD_REG_FED);
     m.name = name;
     addActionMessage(m);
+    // check some properties that should be inherited from the federate if it is the first one
+    if (checkProperties) {
+        // if this is the first federate then the core should inherit the logging level properties
+        for (const auto& prop : info.intProps) {
+            switch (prop.first) {
+                case defs::properties::log_level:
+                case defs::properties::file_log_level:
+                case defs::properties::console_log_level:
+                    setIntegerProperty(local_core_id,
+                                       prop.first,
+                                       static_cast<int16_t>(prop.second));
+                default:
+                    break;
+            }
+        }
+    }
     // now wait for the federateQueue to get the response
     auto valid = fed->waitSetup();
     if (valid == iteration_result::next_step) {
