@@ -226,6 +226,7 @@ void BrokerBase::generateLoggers()
             try {
                 consoleLogger = spdlog::stdout_color_mt("console");
                 consoleLogger->flush_on(spdlog::level::info);
+                consoleLogger->set_level(spdlog::level::trace);
             }
             catch (const spdlog::spdlog_ex&) {
                 consoleLogger = spdlog::get("console");
@@ -237,6 +238,10 @@ void BrokerBase::generateLoggers()
 #endif
         } else if (!logFile.empty()) {
             fileLogger = spdlog::basic_logger_mt(identifier, logFile);
+        }
+        if (fileLogger) {
+            fileLogger->flush_on(spdlog::level::info);
+            fileLogger->set_level(spdlog::level::trace);
         }
     }
     catch (const spdlog::spdlog_ex& ex) {
