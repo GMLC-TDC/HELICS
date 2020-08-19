@@ -568,8 +568,7 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
             throw(RegistrationFailure("duplicate names " + name +
                                       "detected multiple federates with the same name"));
         }
-        if (feds->size() == 1)
-        {
+        if (feds->size() == 1) {
             checkProperties = true;
         }
     }
@@ -591,20 +590,19 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     m.name = name;
     addActionMessage(m);
     // check some properties that should be inherited from the federate if it is the first one
-    if (checkProperties)
-    {
-        //if this is the first federate then the core should inherit the logging level properties
+    if (checkProperties) {
+        // if this is the first federate then the core should inherit the logging level properties
         for (const auto& prop : info.intProps) {
-            switch (prop.first)
-            {
+            switch (prop.first) {
                 case defs::properties::log_level:
                 case defs::properties::file_log_level:
                 case defs::properties::console_log_level:
-                    setIntegerProperty(local_core_id, prop.first, static_cast<int16_t>(prop.second));
+                    setIntegerProperty(local_core_id,
+                                       prop.first,
+                                       static_cast<int16_t>(prop.second));
                 default:
                     break;
             }
-            
         }
     }
     // now wait for the federateQueue to get the response
