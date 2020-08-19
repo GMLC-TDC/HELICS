@@ -48,9 +48,9 @@ def create_message_federate(fedinitstring,name,period):
 def get_new_EV(numEVs):
     # numEVs is the number of EVs to return to the main program
 
-    lvl2 = np.random.lognormal(np.random.normal(5,1),np.random.uniform(0,2),1)
-    lvl1 = np.random.lognormal(np.random.normal(3,1),np.random.uniform(0,10),1)
-    lvl3 = np.random.lognormal(np.random.normal(2,1),np.random.uniform(0,.1),1)
+    lvl1 = np.random.poisson(np.random.normal(30,np.random.uniform(1,3)),1)
+    lvl2 = np.random.poisson(np.random.normal(50,np.random.uniform(1,2)),1)
+    lvl3 = np.random.poisson(np.random.normal(20,np.random.uniform(.05,.25)),1)
     total = lvl1+lvl2+lvl3
     #print(lvl1,lvl2,lvl3,total)
     p1,p2,p3 = lvl1/total,lvl2/total,lvl3/total
