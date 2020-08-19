@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
 #if !defined(WIN32)
 #    include "spdlog/sinks/syslog_sink.h"
@@ -65,6 +66,7 @@ BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
 
 BrokerBase::~BrokerBase()
 {
+    consoleLogger.reset();
     if (fileLogger) {
         spdlog::drop(identifier);
     }
@@ -219,6 +221,16 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 void BrokerBase::generateLoggers()
 {
     try {
+        consoleLogger = spdlog::get("console");
+        if (!consoleLogger) {
+            try {
+                consoleLogger = spdlog::stdout_color_mt("console");
+                consoleLogger->flush_on(spdlog::level::info);
+            }
+            catch (const spdlog::spdlog_ex&) {
+                consoleLogger = spdlog::get("console");
+            }
+        }
         if (logFile == "syslog") {
 #if !defined(WIN32)
             fileLogger = spdlog::syslog_logger_mt("syslog", identifier);
@@ -308,19 +320,31 @@ bool BrokerBase::sendToLogger(global_federate_id federateID,
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
                 if (logLevel >= helics_log_level_trace) {
-                    spdlog::trace("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_timing) {
-                    spdlog::debug("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_summary) {
-                    spdlog::info("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_warning) {
-                    spdlog::warn("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_error) {
-                    spdlog::error("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel == -10) {  // dumplog
-                    spdlog::trace("{}", message);
+                    consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    spdlog::critical("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(spdlog::level::critical,
+                                       "{} ({})::{}",
+                                       name,
+                                       federateID.baseValue(),
+                                       message);
+                }
+                if (forceLoggingFlush) {
+                    consoleLogger->flush();
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
@@ -411,6 +435,9 @@ void BrokerBase::setLogLevel(int32_t level)
 
 void BrokerBase::logFlush()
 {
+    if (consoleLogger) {
+        consoleLogger->flush();
+    }
     if (fileLogger) {
         fileLogger->flush();
     }
