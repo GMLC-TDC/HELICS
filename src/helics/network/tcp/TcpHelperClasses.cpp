@@ -238,6 +238,7 @@ namespace tcp {
     {
         if (!error) {
             connected.activate();
+            socket_.set_option(asio::ip::tcp::no_delay(true));
         } else {
             std::cerr << "connection error " << error.message() << ": code =" << error.value()
                       << '\n';
@@ -661,6 +662,7 @@ namespace tcp {
         /*setting linger to 1 second*/
         asio::socket_base::linger optionLinger(true, 0);
         new_connection->socket().set_option(optionLinger);
+        new_connection->socket().set_option(asio::ip::tcp::no_delay(true));
         // Set options here
         if (halted.load()) {
             new_connection->close();

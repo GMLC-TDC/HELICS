@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/logger.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -557,6 +556,7 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
     FederateState* fed = nullptr;
+    bool checkProperties{false};
     local_federate_id local_id;
     {
         auto feds = federates.lock();
@@ -568,6 +568,9 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
             throw(RegistrationFailure("duplicate names " + name +
                                       "detected multiple federates with the same name"));
         }
+        if (feds->size() == 1) {
+            checkProperties = true;
+        }
     }
     if (fed == nullptr) {
         throw(RegistrationFailure("unknown allocation error occurred"));
@@ -576,8 +579,8 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control
     // the level*/
-    fed->setLogger([this](int /*level*/, const std::string& ident, const std::string& message) {
-        sendToLogger(parent_broker_id, log_level::error - 2, ident, message);
+    fed->setLogger([this](int level, const std::string& ident, const std::string& message) {
+        sendToLogger(parent_broker_id, log_level::fed + level, ident, message);
     });
 
     fed->local_id = local_id;
@@ -586,6 +589,22 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     ActionMessage m(CMD_REG_FED);
     m.name = name;
     addActionMessage(m);
+    // check some properties that should be inherited from the federate if it is the first one
+    if (checkProperties) {
+        // if this is the first federate then the core should inherit the logging level properties
+        for (const auto& prop : info.intProps) {
+            switch (prop.first) {
+                case defs::properties::log_level:
+                case defs::properties::file_log_level:
+                case defs::properties::console_log_level:
+                    setIntegerProperty(local_core_id,
+                                       prop.first,
+                                       static_cast<int16_t>(prop.second));
+                default:
+                    break;
+            }
+        }
+    }
     // now wait for the federateQueue to get the response
     auto valid = fed->waitSetup();
     if (valid == iteration_result::next_step) {
@@ -773,6 +792,14 @@ int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t pro
 
 void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool flagValue)
 {
+    if (flag == defs::flags::dumplog || flag == defs::flags::force_logging_flush) {
+        ActionMessage cmd(CMD_BASE_CONFIGURE);
+        cmd.messageID = flag;
+        if (flagValue) {
+            setActionFlag(cmd, indicator_flag);
+        }
+        addActionMessage(cmd);
+    }
     if (federateID == local_core_id) {
         if (flag == defs::flags::delay_init_entry) {
             if (flagValue) {
@@ -1216,10 +1243,11 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
     }
     auto* fed = getFederateAt(handleInfo->local_fed_id);
     if (fed->checkAndSetValue(handle, data, len)) {
-        LOG_DATA_MESSAGES(parent_broker_id,
-                          fed->getIdentifier(),
-                          fmt::format("setting Value for {} size {}", handleInfo->key, len));
-
+        if (fed->loggingLevel() >= helics_log_level_data) {
+            fed->logMessage(helics_log_level_data,
+                            fed->getIdentifier(),
+                            fmt::format("setting value for {} size {}", handleInfo->key, len));
+        }
         auto subs = fed->getSubscribers(handle);
         if (subs.empty()) {
             return;
@@ -1598,9 +1626,16 @@ void CommonCore::sendMessage(interface_handle sourceHandle, std::unique_ptr<Mess
     if (m.messageID == 0) {
         m.messageID = ++messageCounter;
     }
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    auto* fed = getFederateAt(hndl->local_fed_id);
+    auto minTime = fed->nextAllowedSendTime();
     if (m.actionTime < minTime) {
         m.actionTime = minTime;
+    }
+
+    if (fed->loggingLevel() >= helics_log_level_data) {
+        fed->logMessage(helics_log_level_data,
+                        "",
+                        fmt::format("receive_message {}", prettyPrintString(m)));
     }
     addActionMessage(std::move(m));
 }
@@ -2632,6 +2667,16 @@ void CommonCore::sendErrorToFederates(int error_code, const std::string& message
     });
 }
 
+void CommonCore::broadcastToFederates(ActionMessage& cmd)
+{
+    loopFederates.apply([&cmd](auto& fed) {
+        if ((fed) && (fed.state == operation_state::operating)) {
+            cmd.dest_id = fed->global_id;
+            fed->addAction(cmd);
+        }
+    });
+}
+
 void CommonCore::transmitDelayedMessages(global_federate_id source)
 {
     std::vector<ActionMessage> buffer;
@@ -2704,6 +2749,10 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            break;
+        case CMD_TIME_BARRIER:
+        case CMD_TIME_BARRIER_CLEAR:
+            broadcastToFederates(command);
             break;
         case CMD_CHECK_CONNECTIONS: {
             auto res = checkAndProcessDisconnect();

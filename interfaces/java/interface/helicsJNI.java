@@ -53,6 +53,8 @@ public class helicsJNI {
   public final static native int helics_flag_enable_init_entry_get();
   public final static native int helics_flag_ignore_time_mismatch_warnings_get();
   public final static native int helics_flag_terminate_on_error_get();
+  public final static native int helics_flag_force_logging_flush_get();
+  public final static native int helics_flag_dumplog_get();
   public final static native int helics_log_level_no_print_get();
   public final static native int helics_log_level_error_get();
   public final static native int helics_log_level_warning_get();
@@ -268,6 +270,8 @@ public class helicsJNI {
   public final static native void helicsBrokerSetGlobal(long jarg1, String jarg2, String jarg3);
   public final static native void helicsCoreSetLogFile(long jarg1, String jarg2);
   public final static native void helicsBrokerSetLogFile(long jarg1, String jarg2);
+  public final static native void helicsBrokerSetTimeBarrier(long jarg1, double jarg2);
+  public final static native void helicsBrokerClearTimeBarrier(long jarg1);
   public final static native long helicsCreateQuery(String jarg1, String jarg2);
   public final static native String helicsQueryExecute(long jarg1, long jarg2);
   public final static native String helicsQueryCoreExecute(long jarg1, long jarg2);

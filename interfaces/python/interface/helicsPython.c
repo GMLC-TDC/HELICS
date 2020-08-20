@@ -8970,6 +8970,73 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsBrokerSetTimeBarrier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsBrokerSetTimeBarrier", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerSetTimeBarrier" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsBrokerSetTimeBarrier" "', argument " "2"" of type '" "helics_time""'");
+  } 
+  arg2 = (helics_time)(val2);
+  helicsBrokerSetTimeBarrier(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsBrokerClearTimeBarrier(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerClearTimeBarrier" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  helicsBrokerClearTimeBarrier(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCreateQuery(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -17241,6 +17308,20 @@ static PyMethodDef SwigMethods[] = {
 		":type logFileName: string\n"
 		":param logFileName: The name of the file to log to.\n"
 		""},
+	 { "helicsBrokerSetTimeBarrier", _wrap_helicsBrokerSetTimeBarrier, METH_VARARGS, "\n"
+		"Set a broker time barrier.\n"
+		"\n"
+		":type broker: void\n"
+		":param broker: The broker to set the time barrier for.\n"
+		":type barrierTime: float\n"
+		":param barrierTime: The time to set the barrier at.\n"
+		""},
+	 { "helicsBrokerClearTimeBarrier", _wrap_helicsBrokerClearTimeBarrier, METH_O, "\n"
+		"Clear any time barrier on a broker.\n"
+		"\n"
+		":type broker: void\n"
+		":param broker: The broker to clear the barriers on.\n"
+		""},
 	 { "helicsCreateQuery", _wrap_helicsCreateQuery, METH_VARARGS, "\n"
 		"Create a query object.\n"
 		"\n"
@@ -18224,8 +18305,8 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":type endpoint: void\n"
 		":param endpoint: The endpoint to set the destination for.\n"
-		":type dest: string\n"
-		":param dest: A string naming the desired default endpoint.\n"
+		":type dst: string\n"
+		":param dst: A string naming the desired default endpoint.\n"
 		""},
 	 { "helicsEndpointGetDefaultDestination", _wrap_helicsEndpointGetDefaultDestination, METH_O, "\n"
 		"Get the default destination for an endpoint.\n"
@@ -18241,8 +18322,8 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":type endpoint: void\n"
 		":param endpoint: The endpoint to send the data from.\n"
-		":type dest: string\n"
-		":param dest: The target destination.\n"
+		":type dst: string\n"
+		":param dst: The target destination.\n"
 		"\n"
 		"\n"
 		"            \"\" to use the default destination.\n"
@@ -18255,8 +18336,8 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":type endpoint: void\n"
 		":param endpoint: The endpoint to send the data from.\n"
-		":type dest: string\n"
-		":param dest: The target destination.\n"
+		":type dst: string\n"
+		":param dst: The target destination.\n"
 		"\n"
 		"\n"
 		"            \"\" to use the default destination.\n"
@@ -18453,7 +18534,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsEndpointSetInfo", _wrap_helicsEndpointSetInfo, METH_VARARGS, "\n"
 		"Set the data in the info field for a filter.\n"
 		"\n"
-		":type end: void\n"
 		":param end: The endpoint to query.\n"
 		":type info: string\n"
 		":param info: The string to set.\n"
@@ -18461,7 +18541,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsEndpointSetOption", _wrap_helicsEndpointSetOption, METH_VARARGS, "\n"
 		"Set a handle option on an endpoint.\n"
 		"\n"
-		":type end: void\n"
 		":param end: The endpoint to modify.\n"
 		":type option: int\n"
 		":param option: Integer code for the option to set /ref helics_handle_options.\n"
@@ -18471,7 +18550,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsEndpointGetOption", _wrap_helicsEndpointGetOption, METH_VARARGS, "\n"
 		"Set a handle option on an endpoint.\n"
 		"\n"
-		":type end: void\n"
 		":param end: The endpoint to modify.\n"
 		":type option: int\n"
 		":param option: Integer code for the option to set /ref helics_handle_options.\n"
@@ -18594,8 +18672,8 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":type message: void\n"
 		":param message: The message object in question.\n"
-		":type dest: string\n"
-		":param dest: A string containing the new destination.\n"
+		":type dst: string\n"
+		":param dst: A string containing the new destination.\n"
 		""},
 	 { "helicsMessageSetOriginalSource", _wrap_helicsMessageSetOriginalSource, METH_VARARGS, "\n"
 		"Set the original source of a message.\n"
@@ -18610,8 +18688,8 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		":type message: void\n"
 		":param message: The message object in question.\n"
-		":type dest: string\n"
-		":param dest: A string containing the new original source.\n"
+		":type dst: string\n"
+		":param dst: A string containing the new original source.\n"
 		""},
 	 { "helicsMessageSetTime", _wrap_helicsMessageSetTime, METH_VARARGS, "\n"
 		"Set the delivery time for a message.\n"
@@ -18688,10 +18766,10 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsMessageCopy", _wrap_helicsMessageCopy, METH_VARARGS, "\n"
 		"Copy a message object.\n"
 		"\n"
-		":type source_message: void\n"
-		":param source_message: The message object to copy from.\n"
-		":type dest_message: void\n"
-		":param dest_message: The message object to copy to.\n"
+		":type src_message: void\n"
+		":param src_message: The message object to copy from.\n"
+		":type dst_message: void\n"
+		":param dst_message: The message object to copy to.\n"
 		""},
 	 { "helicsMessageClone", _wrap_helicsMessageClone, METH_O, "\n"
 		"Clone a message object.\n"
@@ -18879,8 +18957,8 @@ static PyMethodDef SwigMethods[] = {
 		"All messages going to a destination are copied to the delivery address(es).\n"
 		":type filt: void\n"
 		":param filt: The given filter to add a destination target to.\n"
-		":type dest: string\n"
-		":param dest: The name of the endpoint to add as a destination target.\n"
+		":type dst: string\n"
+		":param dst: The name of the endpoint to add as a destination target.\n"
 		""},
 	 { "helicsFilterAddSourceTarget", _wrap_helicsFilterAddSourceTarget, METH_VARARGS, "\n"
 		"Add a source target to a filter.\n"
@@ -19835,6 +19913,8 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_flag_enable_init_entry",SWIG_From_int((int)(helics_flag_enable_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_ignore_time_mismatch_warnings",SWIG_From_int((int)(helics_flag_ignore_time_mismatch_warnings)));
   SWIG_Python_SetConstant(d, "helics_flag_terminate_on_error",SWIG_From_int((int)(helics_flag_terminate_on_error)));
+  SWIG_Python_SetConstant(d, "helics_flag_force_logging_flush",SWIG_From_int((int)(helics_flag_force_logging_flush)));
+  SWIG_Python_SetConstant(d, "helics_flag_dumplog",SWIG_From_int((int)(helics_flag_dumplog)));
   SWIG_Python_SetConstant(d, "helics_log_level_no_print",SWIG_From_int((int)(helics_log_level_no_print)));
   SWIG_Python_SetConstant(d, "helics_log_level_error",SWIG_From_int((int)(helics_log_level_error)));
   SWIG_Python_SetConstant(d, "helics_log_level_warning",SWIG_From_int((int)(helics_log_level_warning)));

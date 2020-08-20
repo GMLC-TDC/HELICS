@@ -157,6 +157,12 @@ class Broker {
         return result;
     }
 
+    void setTimeBarrier(helics_time barrierTime)
+    {
+        helicsBrokerSetTimeBarrier(broker, barrierTime, HELICS_IGNORE_ERROR);
+    }
+    void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
+
   protected:
     helics_broker broker;  //!< underlying broker information
 };

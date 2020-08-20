@@ -179,6 +179,10 @@ helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mism
 r""" used to not display warnings on mismatched requested times"""
 helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
 r""" specify that a federate error should terminate the federation"""
+helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush
+r""" specify that the log files should be flushed on every log message"""
+helics_flag_dumplog = _helics.helics_flag_dumplog
+r""" specify that a full log should be dumped into a file"""
 helics_log_level_no_print = _helics.helics_log_level_no_print
 r""" don't print anything except a few catastrophic errors"""
 helics_log_level_error = _helics.helics_log_level_error
@@ -188,7 +192,10 @@ r""" only print warnings and errors"""
 helics_log_level_summary = _helics.helics_log_level_summary
 r""" warning errors and summary level information"""
 helics_log_level_connections = _helics.helics_log_level_connections
-r""" summary+ notices about federate and broker connections +messages about network connections"""
+r"""
+    summary+ notices about federate and broker connections +messages about network
+                     connections
+    """
 helics_log_level_interfaces = _helics.helics_log_level_interfaces
 r""" connections+ interface definitions"""
 helics_log_level_timing = _helics.helics_log_level_timing
@@ -235,16 +242,19 @@ helics_property_time_offset = _helics.helics_property_time_offset
 r""" the property controlling time offset for the period of federate"""
 helics_property_time_rt_lag = _helics.helics_property_time_rt_lag
 r"""
-    the property controlling real time lag for a federate the max time a federate can lag real
-          time
+    the property controlling real time lag for a federate the max time a federate can lag
+          real time
     """
 helics_property_time_rt_lead = _helics.helics_property_time_rt_lead
 r"""
-    the property controlling real time lead for a federate the max time a federate can be ahead
-          of real time
+    the property controlling real time lead for a federate the max time a federate can be
+          ahead of real time
     """
 helics_property_time_rt_tolerance = _helics.helics_property_time_rt_tolerance
-r""" the property controlling real time tolerance for a federate sets both rt_lag and rt_lead"""
+r"""
+    the property controlling real time tolerance for a federate sets both rt_lag and
+          rt_lead
+    """
 helics_property_time_input_delay = _helics.helics_property_time_input_delay
 r""" the property controlling input delay for a federate"""
 helics_property_time_output_delay = _helics.helics_property_time_output_delay
@@ -305,7 +315,10 @@ r""" specify that the types should be checked strictly for pub/sub and filters""
 helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
 r""" specify that the mismatching units should be ignored"""
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
-r""" specify that an interface will only transmit on change(only applicable to publications)"""
+r"""
+    specify that an interface will only transmit on change(only applicable to
+          publications)
+    """
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
 r""" specify that an interface will only update if the value has actually changed"""
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
@@ -327,13 +340,16 @@ r""" a filter type that executes a random delay on the messages"""
 helics_filter_type_random_drop = _helics.helics_filter_type_random_drop
 r""" a filter type that randomly drops messages"""
 helics_filter_type_reroute = _helics.helics_filter_type_reroute
-r""" a filter type that reroutes a message to a different destination than originally specified"""
+r"""
+    a filter type that reroutes a message to a different destination than originally
+          specified
+    """
 helics_filter_type_clone = _helics.helics_filter_type_clone
 r""" a filter type that duplicates a message and sends the copy to a different destination"""
 helics_filter_type_firewall = _helics.helics_filter_type_firewall
 r"""
-    a customizable filter type that can perform different actions on a message based on firewall
-          like rules
+    a customizable filter type that can perform different actions on a message based on
+          firewall like rules
     """
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
@@ -1814,6 +1830,26 @@ def helicsBrokerSetLogFile(broker: "helics_broker", logFileName: "char const *")
     """
     return _helics.helicsBrokerSetLogFile(broker, logFileName)
 
+def helicsBrokerSetTimeBarrier(broker: "helics_broker", barrierTime: "helics_time") -> "void":
+    r"""
+    Set a broker time barrier.
+
+    :type broker: void
+    :param broker: The broker to set the time barrier for.
+    :type barrierTime: float
+    :param barrierTime: The time to set the barrier at.
+    """
+    return _helics.helicsBrokerSetTimeBarrier(broker, barrierTime)
+
+def helicsBrokerClearTimeBarrier(broker: "helics_broker") -> "void":
+    r"""
+    Clear any time barrier on a broker.
+
+    :type broker: void
+    :param broker: The broker to clear the barriers on.
+    """
+    return _helics.helicsBrokerClearTimeBarrier(broker)
+
 def helicsCreateQuery(target: "char const *", query: "char const *") -> "helics_query":
     r"""
     Create a query object.
@@ -3080,16 +3116,16 @@ def helicsEndpointIsValid(endpoint: "helics_endpoint") -> "helics_bool":
     """
     return _helics.helicsEndpointIsValid(endpoint)
 
-def helicsEndpointSetDefaultDestination(endpoint: "helics_endpoint", dest: "char const *") -> "void":
+def helicsEndpointSetDefaultDestination(endpoint: "helics_endpoint", dst: "char const *") -> "void":
     r"""
     Set the default destination for an endpoint if no other endpoint is given.
 
     :type endpoint: void
     :param endpoint: The endpoint to set the destination for.
-    :type dest: string
-    :param dest: A string naming the desired default endpoint.
+    :type dst: string
+    :param dst: A string naming the desired default endpoint.
     """
-    return _helics.helicsEndpointSetDefaultDestination(endpoint, dest)
+    return _helics.helicsEndpointSetDefaultDestination(endpoint, dst)
 
 def helicsEndpointGetDefaultDestination(endpoint: "helics_endpoint") -> "char const *":
     r"""
@@ -3103,14 +3139,14 @@ def helicsEndpointGetDefaultDestination(endpoint: "helics_endpoint") -> "char co
     """
     return _helics.helicsEndpointGetDefaultDestination(endpoint)
 
-def helicsEndpointSendMessageRaw(endpoint: "helics_endpoint", dest: "char const *", data: "void const *") -> "int":
+def helicsEndpointSendMessageRaw(endpoint: "helics_endpoint", dst: "char const *", data: "void const *") -> "int":
     r"""
     Send a message to the specified destination.
 
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
-    :type dest: string
-    :param dest: The target destination.
+    :type dst: string
+    :param dst: The target destination.
 
 
                 "" to use the default destination.
@@ -3118,16 +3154,16 @@ def helicsEndpointSendMessageRaw(endpoint: "helics_endpoint", dest: "char const 
     :type data: void
     :param data: The data to send.
     """
-    return _helics.helicsEndpointSendMessageRaw(endpoint, dest, data)
+    return _helics.helicsEndpointSendMessageRaw(endpoint, dst, data)
 
-def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dest: "char const *", data: "void const *", time: "helics_time") -> "int":
+def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dst: "char const *", data: "void const *", time: "helics_time") -> "int":
     r"""
     Send a message at a specific time to the specified destination.
 
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
-    :type dest: string
-    :param dest: The target destination.
+    :type dst: string
+    :param dst: The target destination.
 
 
                 "" to use the default destination.
@@ -3138,7 +3174,7 @@ def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dest: "char const *"
     :type time: float
     :param time: The time the message should be sent.
     """
-    return _helics.helicsEndpointSendEventRaw(endpoint, dest, data, time)
+    return _helics.helicsEndpointSendEventRaw(endpoint, dst, data, time)
 
 def helicsEndpointSendMessage(endpoint: "helics_endpoint", message: "helics_message") -> "void":
     r"""
@@ -3383,42 +3419,39 @@ def helicsEndpointGetInfo(end: "helics_endpoint") -> "char const *":
     """
     return _helics.helicsEndpointGetInfo(end)
 
-def helicsEndpointSetInfo(end: "helics_endpoint", info: "char const *") -> "void":
+def helicsEndpointSetInfo(endpoint: "helics_endpoint", info: "char const *") -> "void":
     r"""
     Set the data in the info field for a filter.
 
-    :type end: void
     :param end: The endpoint to query.
     :type info: string
     :param info: The string to set.
     """
-    return _helics.helicsEndpointSetInfo(end, info)
+    return _helics.helicsEndpointSetInfo(endpoint, info)
 
-def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "int") -> "void":
+def helicsEndpointSetOption(endpoint: "helics_endpoint", option: "int", value: "int") -> "void":
     r"""
     Set a handle option on an endpoint.
 
-    :type end: void
     :param end: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :type value: int
     :param value: The value to set the option to.
     """
-    return _helics.helicsEndpointSetOption(end, option, value)
+    return _helics.helicsEndpointSetOption(endpoint, option, value)
 
-def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "int":
+def helicsEndpointGetOption(endpoint: "helics_endpoint", option: "int") -> "int":
     r"""
     Set a handle option on an endpoint.
 
-    :type end: void
     :param end: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :rtype: int
     :return: the value of the option, for boolean options will be 0 or 1
     """
-    return _helics.helicsEndpointGetOption(end, option)
+    return _helics.helicsEndpointGetOption(endpoint, option)
 
 def helicsMessageGetSource(message: "helics_message_object") -> "char const *":
     r"""
@@ -3567,16 +3600,16 @@ def helicsMessageSetSource(message: "helics_message_object", src: "char const *"
     """
     return _helics.helicsMessageSetSource(message, src)
 
-def helicsMessageSetDestination(message: "helics_message_object", dest: "char const *") -> "void":
+def helicsMessageSetDestination(message: "helics_message_object", dst: "char const *") -> "void":
     r"""
     Set the destination of a message.
 
     :type message: void
     :param message: The message object in question.
-    :type dest: string
-    :param dest: A string containing the new destination.
+    :type dst: string
+    :param dst: A string containing the new destination.
     """
-    return _helics.helicsMessageSetDestination(message, dest)
+    return _helics.helicsMessageSetDestination(message, dst)
 
 def helicsMessageSetOriginalSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
@@ -3589,16 +3622,16 @@ def helicsMessageSetOriginalSource(message: "helics_message_object", src: "char 
     """
     return _helics.helicsMessageSetOriginalSource(message, src)
 
-def helicsMessageSetOriginalDestination(message: "helics_message_object", dest: "char const *") -> "void":
+def helicsMessageSetOriginalDestination(message: "helics_message_object", dst: "char const *") -> "void":
     r"""
     Set the original destination of a message.
 
     :type message: void
     :param message: The message object in question.
-    :type dest: string
-    :param dest: A string containing the new original source.
+    :type dst: string
+    :param dst: A string containing the new original source.
     """
-    return _helics.helicsMessageSetOriginalDestination(message, dest)
+    return _helics.helicsMessageSetOriginalDestination(message, dst)
 
 def helicsMessageSetTime(message: "helics_message_object", time: "helics_time") -> "void":
     r"""
@@ -3696,16 +3729,16 @@ def helicsMessageAppendData(message: "helics_message_object", data: "void const 
     """
     return _helics.helicsMessageAppendData(message, data)
 
-def helicsMessageCopy(source_message: "helics_message_object", dest_message: "helics_message_object") -> "void":
+def helicsMessageCopy(src_message: "helics_message_object", dst_message: "helics_message_object") -> "void":
     r"""
     Copy a message object.
 
-    :type source_message: void
-    :param source_message: The message object to copy from.
-    :type dest_message: void
-    :param dest_message: The message object to copy to.
+    :type src_message: void
+    :param src_message: The message object to copy from.
+    :type dst_message: void
+    :param dst_message: The message object to copy to.
     """
-    return _helics.helicsMessageCopy(source_message, dest_message)
+    return _helics.helicsMessageCopy(src_message, dst_message)
 
 def helicsMessageClone(message: "helics_message_object") -> "helics_message_object":
     r"""
@@ -3932,17 +3965,17 @@ def helicsFilterSetString(filt: "helics_filter", prop: "char const *", val: "cha
     """
     return _helics.helicsFilterSetString(filt, prop, val)
 
-def helicsFilterAddDestinationTarget(filt: "helics_filter", dest: "char const *") -> "void":
+def helicsFilterAddDestinationTarget(filt: "helics_filter", dst: "char const *") -> "void":
     r"""
     Add a destination target to a filter.
 
     All messages going to a destination are copied to the delivery address(es).
     :type filt: void
     :param filt: The given filter to add a destination target to.
-    :type dest: string
-    :param dest: The name of the endpoint to add as a destination target.
+    :type dst: string
+    :param dst: The name of the endpoint to add as a destination target.
     """
-    return _helics.helicsFilterAddDestinationTarget(filt, dest)
+    return _helics.helicsFilterAddDestinationTarget(filt, dst)
 
 def helicsFilterAddSourceTarget(filt: "helics_filter", source: "char const *") -> "void":
     r"""

@@ -17,14 +17,14 @@ else()
     cmake_policy(VERSION 3.17)
 endif()
 
-project(HELICS VERSION 2.5.2)
+project(HELICS VERSION 2.6.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-06-14")
+set(HELICS_DATE "2020-08-20")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -98,6 +98,18 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL P
             set(CMAKE_INSTALL_PREFIX ${path_install} CACHE PATH "default install path" FORCE)
         endif(MSVC)
     endif(WIN32)
+endif()
+
+# Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
+get_filename_component(tmp_install_prefix ${CMAKE_INSTALL_PREFIX} REALPATH)
+get_filename_component(tmp_proj_bindir ${PROJECT_BINARY_DIR} REALPATH)
+# Windows paths are case insensitive
+if(WIN32)
+    string(TOLOWER "${tmp_install_prefix}" tmp_install_prefix)
+    string(TOLOWER "${tmp_proj_bindir}" tmp_proj_bindir)
+endif()
+if(tmp_install_prefix STREQUAL tmp_proj_bindir)
+    message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must not be set to the build folder")
 endif()
 
 if(MSYS
@@ -244,9 +256,6 @@ add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
 get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
-set(HELICS_BUILD_FLAGS_OUTPUT
-    "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_STATIC_LINKER_FLAGS} ${EXTRA_BUILD_FLAGS} "
-)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(NOT USE_LIBCXX)
@@ -380,6 +389,9 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/netif)
     endif()
 
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
+        submod_update(ThirdParty/spdlog)
+    endif()
     check_submodule_status()
 
 endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
@@ -648,6 +660,12 @@ include(addfmt)
 # -----------------------------------------------------------
 include(addJsoncpp)
 add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
+
+# --------------------------------------------------------------
+# Create the target for spdlog
+# -----------------------------------------------------------
+include(addSpdlog)
+add_library(HELICS::spdlog ALIAS spdlog)
 
 # --------------------------------------------------------------
 # Create the target for unitslib
@@ -980,6 +998,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+        benchmarks
         cereal
     )
     if(WIN32)
@@ -994,6 +1013,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
     set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
     set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
+    set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
     set(CPACK_COMPONENT_PYTHON_DISPLAY_NAME "Python")
@@ -1021,6 +1041,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_LIBS_DESCRIPTION "Libraries for compiling and linking with HELICS")
     set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
+    set(CPACK_COMPONENT_BENCHMARKS_DESCRIPTION "Benchmark applications for HELICS")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION
         "cereal C++11 serialization library [no support for other language interfaces]"
     )

@@ -345,14 +345,14 @@ NamedPoint helicsGetNamedPoint(const std::string& val)
     if (loc == std::string::npos) {
         auto fb = val.find_first_of('[');
         if (fb != std::string::npos) {
-            return {val, std::nan("0")};
+            return {val, getDoubleFromString(val)};
         }
         auto V = helicsGetComplex(val);
         if (V.real() <= invalidDouble) {
             return {val, std::nan("0")};
         }
         if (V.imag() == 0) {
-            return {"value", std::abs(V)};
+            return {"value", V.real()};
         }
         return {val, V.real()};
     }
@@ -414,13 +414,15 @@ double getDoubleFromString(const std::string& val)
     }
     if (val.front() == 'v' || val.front() == '[') {
         auto V = helicsGetVector(val);
-        return vectorNorm(V);
+        return (V.size() != 1) ? vectorNorm(V) : V[0];
     }
     if (val.front() == 'c') {
         auto cv = helicsGetComplexVector(val);
-        return vectorNorm(cv);
+        return (cv.size() != 1) ? vectorNorm(cv) :
+                                  ((cv[0].imag() == 0.0) ? cv[0].real() : std::abs(cv[0]));
     }
-    return std::abs(helicsGetComplex(val));
+    auto cval = helicsGetComplex(val);
+    return (cval.imag() == 0.0) ? cval.real() : std::abs(cval);
 }
 
 void helicsGetVector(const std::string& val, std::vector<double>& data)

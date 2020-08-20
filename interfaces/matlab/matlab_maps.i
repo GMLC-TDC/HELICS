@@ -61,20 +61,20 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 //typemap for large string output with a length return in C
-%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
+%typemap(in, numinputs=0) (char *outputString, int maxStringLength, int *actualLength) {
   $3=&($2);
 }
 
-%typemap(freearg) (char *outputString, int maxStringLen, int *actualLength) {
+%typemap(freearg) (char *outputString, int maxStringLength, int *actualLength) {
    if ($1) free($1);
 }
 
-%typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
+%typemap(check)(char *outputString, int maxStringLength, int *actualLength) {
     $2=helicsInputGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 
-%typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
+%typemap(argout) (char *outputString, int maxStringLength, int *actualLength) {
 
   if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3-1);
 }
@@ -242,39 +242,39 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 
 // typemap for raw data output function
-%typemap(in, numinputs=0) (void *data, int maxDatalen, int *actualSize) {
+%typemap(in, numinputs=0) (void *data, int maxDataLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (void *data, int maxDatalen, int *actualSize) {
+%typemap(freearg) (void *data, int maxDataLength, int *actualSize) {
    if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(void *data, int maxDatalen, int *actualSize) {
+%typemap(check)(void *data, int maxDataLength, int *actualSize) {
     $2 = helicsInputGetRawValueSize(arg1) + 2;
     $1 =  malloc($2);
 }
 
-%typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+%typemap(argout) (void *data, int maxDataLength, int *actualSize) {
  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize((char*)$1,*$3);
 }
 
 // typemap for raw message data functions
-%typemap(in, numinputs=0) (void *data, int maxMessagelen, int *actualSize) {
+%typemap(in, numinputs=0) (void *data, int maxMessageLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (void *data, int maxMessagelen, int *actualSize) {
+%typemap(freearg) (void *data, int maxMessageLength, int *actualSize) {
    if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(void *data, int maxMessagelen, int *actualSize) {
+%typemap(check)(void *data, int maxMessageLength, int *actualSize) {
     $2=helicsMessageGetRawDataSize(arg1)+2;
     $1 =  malloc($2);
 }
 
-%typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
+%typemap(argout) (void *data, int maxMessageLength, int *actualSize) {
  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize((char*)$1,*$3);
 }

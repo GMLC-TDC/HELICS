@@ -153,7 +153,7 @@ class helicsCLI11App: public CLI::App {
             ->default_str("(" + to_string(coreType) + ")");
     }
     core_type getCoreType() const { return coreType; }
-    /** set default core core type*/
+    /** set default core type*/
     void setDefaultCoreType(core_type type) { coreType = type; }
 
   private:

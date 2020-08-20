@@ -749,6 +749,30 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1force_1logging_1flush_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_federate_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_federate_flags)helics_flag_force_logging_flush;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1dumplog_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_federate_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_federate_flags)helics_flag_dumplog;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1log_1level_1no_1print_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_log_levels result;
@@ -5116,6 +5140,41 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerSetLogFile(JN
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerSetTimeBarrier(JNIEnv *jenv, jclass jcls, jlong jarg1, jdouble jarg2) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_broker *)&jarg1; 
+  arg2 = (helics_time)jarg2; 
+  helicsBrokerSetTimeBarrier(arg1,arg2,arg3);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerClearTimeBarrier(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_broker *)&jarg1; 
+  helicsBrokerClearTimeBarrier(arg1);
 }
 
 

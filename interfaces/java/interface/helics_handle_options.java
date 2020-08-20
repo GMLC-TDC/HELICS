@@ -43,7 +43,8 @@ public final class helics_handle_options {
    */
   public final static helics_handle_options helics_handle_option_ignore_unit_mismatch = new helics_handle_options("helics_handle_option_ignore_unit_mismatch", helicsJNI.helics_handle_option_ignore_unit_mismatch_get());
   /**
-   *  specify that an interface will only transmit on change(only applicable to publications)
+   *  specify that an interface will only transmit on change(only applicable to<br>
+   *        publications)
    */
   public final static helics_handle_options helics_handle_option_only_transmit_on_change = new helics_handle_options("helics_handle_option_only_transmit_on_change", helicsJNI.helics_handle_option_only_transmit_on_change_get());
   /**

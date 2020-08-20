@@ -230,7 +230,9 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 
     message(STATUS "swig target is ${SWIG_MODULE_helics_REAL_NAME}")
 
-    set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces)
+    set_target_properties(
+        ${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX ""
+    )
 
     if(CMAKE_PROJECT_NAME STREQUAL "HELICS")
         set_target_properties(
@@ -259,7 +261,7 @@ else()
     endif()
 
     # Set the output library name to _helics
-    set_target_properties(helicsPYTHON PROPERTIES PREFIX "_" OUTPUT_NAME "helics")
+    set_target_properties(helicsPYTHON PROPERTIES PREFIX "_" OUTPUT_NAME "helics" DEBUG_POSTFIX "")
 
     target_link_libraries(helicsPYTHON PUBLIC HELICS::helicsSharedLib)
     set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)

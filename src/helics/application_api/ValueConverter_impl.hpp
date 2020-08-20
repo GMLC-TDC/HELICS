@@ -299,7 +299,9 @@ template<class X>
 void ValueConverter<X>::interpret(const data_view& block, X& val)
 {
     if (block.size() < getMinSize<X>()) {
-        throw std::invalid_argument("invalid data size");
+        std::string arg = std::string("invalid data size: expected ") +
+            std::to_string(getMinSize<X>()) + ", received " + std::to_string(block.size());
+        throw std::invalid_argument(arg);
     }
     detail::imemstream s(block.data(), block.size());
     retriever ia(s);
