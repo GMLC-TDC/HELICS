@@ -16,7 +16,7 @@ Generally, there are three ways in which a co-simulation can be configured and a
 2. Using command-line switches/flags which beginning execution of the federate
 3. Using a JSON configuration file (and calling helicsCreateValueFederateFromConfig, helicsCreateMessageFederateFromConfig, or helicsCreateComboFederateFromConfig)
 
-Not all configuration options are available in all three forms but often they are. For example, it is not possible (nor convenient) to configure a publication for a federate from the command line but it is possible to do so with the JSON config file and with API calls. 
+Not all configuration options are available in all three sforms but often they are. For example, it is not possible (nor convenient) to configure a publication for a federate from the command line but it is possible to do so with the JSON config file and with API calls. 
 
 ### Choosing configuration method
 Which method you use to configure your federate and co-simulation significantly depends on the circumstances of the co-simulation and details of any existing code-base being used. Here is some guidance, though, to help in guiding you're decision in how to do this:
@@ -121,10 +121,10 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "brokerinit": "",
   "server_mode": "",
   "interface": (local IP address),
-  "port": ""
-  "brokerport": ""
-  "localport": ""
-  "portstart": ""
+  "port": 1234,
+  "brokerport": 22608,
+  "localport": 8080,
+  "portstart": 22608,
    
   
   "publications" | "subscriptions" | "inputs": [
@@ -180,8 +180,8 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "filters": [
     {
       "name": "filter name",
-      "targets" | "sourcetargets" | "sourceTargets": "endpoint name",
-      "desttargets" | "destTargets": "endpoint name",
+      "source_targets": "endpoint name",
+      "destination_targets": "endpoint name",
       "info": "",
       "operation": "randomdelay",
       "properties": {
