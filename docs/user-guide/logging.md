@@ -22,6 +22,8 @@ helicsFederateInfoSetIntegerProperty(fi,helics_property_int_log_level, helics_lo
 h.helicsFederateInfoSetIntegerProperty(fi,h.helics_property_int_log_level, h.helics_log_level_data)
 ```
 
+NOTE: logging level properties set in a federateInfo will apply to a core as well if it is the first federate registered in the core. After registration log level properties must be set separately for the core and federate.
+
 There are several levels used inside HELICS for logging
 
 - `helics_log_level_no_print` Don't print anything

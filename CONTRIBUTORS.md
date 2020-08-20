@@ -16,6 +16,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Jacob Hansen](https://github.com/Jacobhansens)
 - [Marc Eberlein](https://github.com/eberleim)
 - [Shrirang Abhyankar](https://github.com/abhyshr)
+- [Corrine Roth](https://github.com/corinnegroth)
 
 ### Lawrence Livermore National Lab
 
