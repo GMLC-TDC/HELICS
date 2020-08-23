@@ -394,7 +394,7 @@ class Core {
      *@param handle the handle from the publication, input, endpoint or filter
      *@param targetToRemove the name of the target to remove
      */
-    virtual void removeTarget(interface_handle handle, const std::string& targetToRemove) = 0;
+    virtual void removeTarget(interface_handle handle, std::string_view targetToRemove) = 0;
 
     /**
      * @return the unit string for the specified handle.
@@ -557,7 +557,7 @@ class Core {
     @param handle an interface to add the target to
     @param dest the target endpoint for the filter
     */
-    virtual void addDestinationTarget(interface_handle handle, const std::string& dest) = 0;
+    virtual void addDestinationTarget(interface_handle handle, std::string_view dest) = 0;
 
     /** add a source target,  the handle can be a subscription, input, filter or endpoint
     @details for subscriptions and inputs this establishes a link from a publication, for endpoints
@@ -566,7 +566,7 @@ class Core {
     @param handle the identifier of the interface
     @param name the name of the filter or its target
     */
-    virtual void addSourceTarget(interface_handle handle, const std::string& name) = 0;
+    virtual void addSourceTarget(interface_handle handle, std::string_view name) = 0;
 
     /** get a destination filter Handle from its name or target(this may not be unique so it will
     only find the first one)
@@ -627,7 +627,7 @@ class Core {
      * a communications model present.
      */
     virtual void send(interface_handle sourceHandle,
-                        const char* data,
+                        const void* data,
                         uint64_t length) = 0;
     /**
      * Send data from source to destination.
@@ -642,8 +642,8 @@ class Core {
      * a communications model present.
      */
     virtual void sendTo(interface_handle sourceHandle,
-                      const std::string& destination,
-                      const char* data,
+                      std::string_view destination,
+                      const void* data,
                       uint64_t length) = 0;
 
     /**
@@ -664,7 +664,7 @@ class Core {
      */
     virtual void sendAt(interface_handle sourceHandle,
                         Time time,
-                           const char* data,
+                           const void* data,
                            uint64_t length) = 0;
 
      /**
@@ -684,9 +684,9 @@ class Core {
     @param length the record length of the event
     */
     virtual void sendToAt(interface_handle sourceHandle,
-                          const std::string& destination,
+                          std::string_view destination,
                           Time time,
-                          const char* data,
+                          const void* data,
                           uint64_t length) = 0;
 
     /**

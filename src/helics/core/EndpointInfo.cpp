@@ -64,4 +64,58 @@ int32_t EndpointInfo::queueSize(Time maxTime) const
     }
     return cnt;
 }
+
+void EndpointInfo::addDestinationTarget(global_handle dest,
+                          const std::string& destName,
+                          const std::string& destType)
+{
+    for (const auto &ti:targetInformation) {
+        if (ti.id==dest) {
+            return;
+        }
+    }
+    targetInformation.emplace_back(dest, destName, destType);
+    /** now update the target information*/
+    targets.reserve(targetInformation.size());
+    targets.clear();
+    for (const auto &ti:targetInformation) {
+        targets.emplace_back(ti.id, ti.key);
+    }
+}
+
+/** add a source to an endpoint*/
+void EndpointInfo::addSourceTarget(global_handle dest,
+                     const std::string& sourceName,
+                     const std::string& sourceType)
+{
+    for (const auto& si : sourceInformation) {
+        if (si.id == dest) {
+            return;
+        }
+    }
+    sourceInformation.emplace_back(dest, sourceName,sourceType);
+}
+
+/** remove a target from connection*/
+void EndpointInfo::removeTarget(global_handle targetId) {
+    auto ti = targetInformation.begin();
+    while (ti!=targetInformation.end()) {
+        if (ti->id==targetId) {
+            targetInformation.erase(ti);
+            targets.clear();
+            for (const auto& tim : targetInformation) {
+                targets.emplace_back(tim.id, tim.key);
+            }
+            break;
+        }
+    }
+    auto si = sourceInformation.begin();
+    while (si != sourceInformation.end()) {
+        if (si->id == targetId) {
+            sourceInformation.erase(si);
+            return;
+        }
+    }
+}
+
 }  // namespace helics

@@ -111,30 +111,29 @@ class ActionMessage {
     // most use cases for this involve short strings, or already have references that need to be
     // copied so supporting move isn't  going to be that useful here, the long strings are going in
     // the payload
-    void setStringData(const std::string& string1)
+    void setStringData(std::string_view string1)
     {
         stringData.resize(1);
         stringData[0] = string1;
     }
-    void setStringData(const std::string& string1, const std::string& string2)
+    void setStringData(std::string_view string1, std::string_view string2)
     {
         stringData.resize(2);
         stringData[0] = string1;
         stringData[1] = string2;
     }
-    void setStringData(const std::string& string1,
-                       const std::string& string2,
-                       const std::string& string3)
+    void setStringData(std::string_view string1,
+                       std::string_view string2, std::string_view string3)
     {
         stringData.resize(3);
         stringData[0] = string1;
         stringData[1] = string2;
         stringData[2] = string3;
     }
-    void setStringData(const std::string& string1,
-                       const std::string& string2,
-                       const std::string& string3,
-                       const std::string& string4)
+    void setStringData(std::string_view string1,
+                       std::string_view string2,
+                       std::string_view string3,
+                       std::string_view string4)
     {
         stringData.resize(4);
         stringData[0] = string1;
@@ -144,7 +143,7 @@ class ActionMessage {
     }
     const std::string& getString(int index) const;
 
-    void setString(int index, const std::string& str);
+    void setString(int index, std::string_view str);
     /** get the source global_handle*/
     global_handle getSource() const { return global_handle{source_id, source_handle}; }
     /** get the global destination handle*/

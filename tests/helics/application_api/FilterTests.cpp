@@ -54,10 +54,10 @@ TEST_P(filter_single_type_test, message_filter_registration)
     mFed->registerGlobalEndpoint("port2");
 
     auto& f1 = fFed->registerFilter("filter1");
-    fFed->addSourceTarget(f1, "port1");
+    f1.addSourceTarget("port1");
     EXPECT_TRUE(f1.getHandle().isValid());
     auto& f2 = fFed->registerFilter("filter2");
-    fFed->addDestinationTarget(f2, "port2");
+    f2.addDestinationTarget("port2");
     EXPECT_TRUE(f2.getHandle().isValid());
     auto& ep1 = fFed->registerEndpoint("fout");
     EXPECT_TRUE(ep1.getHandle().isValid());
@@ -108,7 +108,7 @@ TEST_P(filter_single_type_test, message_filter_function)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -173,7 +173,7 @@ TEST_P(filter_single_type_test, message_filter_object)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -237,7 +237,7 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTime(1.0);
 
@@ -299,7 +299,7 @@ TEST_P(filter_all_type_test, message_dest_filter_function_t2)
 
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed1->sendMessage(p1, "port2", data);
+    mFed1->sendTo(p1, "port2", data);
 
     mFed1->requestTimeAsync(1.0);
     mFed2->requestTime(1.0);
@@ -357,7 +357,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -420,7 +420,7 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     auto& p2Name = mFed->getInterfaceName(p2);
     EXPECT_TRUE(fFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, p2Name, data);
+    mFed->sendTo(p1, p2Name, data);
 
     mFed->requestTimeAsync(1.0);
     fFed1->requestTimeAsync(1.0);
@@ -770,7 +770,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTimeAsync(1.0);
@@ -849,7 +849,7 @@ TEST_P(filter_single_type_test, message_filter_function2)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -857,7 +857,7 @@ TEST_P(filter_single_type_test, message_filter_function2)
 
     auto res = mFed->hasMessage();
     EXPECT_TRUE(!res);
-    mFed->sendMessage(p2, "port1", data);
+    mFed->sendTo(p2, "port1", data);
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
     mFed->requestTimeComplete();
@@ -912,7 +912,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -920,7 +920,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
 
     auto res = mFed->hasMessage();
     EXPECT_TRUE(!res);
-    mFed->sendMessage(p2, "port1", data);
+    mFed->sendTo(p2, "port1", data);
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
     mFed->requestTimeComplete();
@@ -945,7 +945,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
     mFed->requestTimeAsync(5.0);
     fFed->requestTime(5.0);
     mFed->requestTimeComplete();
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(6.0);
     fFed->requestTime(6.0);
@@ -988,7 +988,7 @@ TEST_F(filter_test, message_clone_test)
 
     EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    sFed->sendMessage(p1, "dest", data);
+    sFed->sendTo(p1, "dest", data);
 
     sFed->requestTimeAsync(1.0);
     dcFed->requestTimeAsync(1.0);
@@ -1061,8 +1061,8 @@ TEST_F(filter_test, message_multi_clone_test)
     EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
-    sFed->sendMessage(p1, "dest", data);
-    sFed2->sendMessage(p2, "dest", data2);
+    sFed->sendTo(p1, "dest", data);
+    sFed2->sendTo(p2, "dest", data2);
     sFed->requestTimeAsync(1.0);
     sFed2->requestTimeAsync(1.0);
     dcFed->requestTimeAsync(1.0);
@@ -1158,7 +1158,7 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -1171,7 +1171,7 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
     ASSERT_TRUE(!mFed->hasMessage(p2));
     EXPECT_TRUE(c2->isConnected());
     mFed->requestTime(3.0);
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
     ASSERT_TRUE(mFed->hasMessage(p2));
 
     auto m2 = mFed->getMessage(p2);

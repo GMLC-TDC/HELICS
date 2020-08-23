@@ -21,8 +21,8 @@ Input::Input(ValueFederate* valueFed,
              interface_handle id,
              const std::string& actName,
              const std::string& unitsOut):
-    fed(valueFed),
-    handle(id), actualName(actName)
+    Interface(valueFed,id,actName),
+    fed(valueFed)
 {
     if (!unitsOut.empty()) {
         outputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(unitsOut));
@@ -546,7 +546,7 @@ void Input::setOption(int32_t option, int32_t value)
     if (option == helics_handle_option_multi_input_handling_method) {
         inputVectorOp = static_cast<multi_input_handling_method>(value);
     } else {
-        fed->setInterfaceOption(handle, option, value);
+        Interface::setOption(option, value);
     }
 }
 
@@ -556,7 +556,7 @@ int32_t Input::getOption(int32_t option) const
     if (option == helics_handle_option_multi_input_handling_method) {
         return static_cast<int32_t>(inputVectorOp);
     }
-    return fed->getInterfaceOption(handle, option);
+    return Interface::getOption(option);
 }
 
 bool Input::isUpdated()
@@ -659,11 +659,11 @@ size_t Input::getVectorSize()
 void Input::loadSourceInformation()
 {
     if (targetType == data_type::helics_unknown) {
-        targetType = getTypeFromString(fed->getExtractionType(*this));
+        targetType = getTypeFromString(getExtractionType());
     }
     multiUnits = false;
-    const auto& iType = fed->getInjectionType(*this);
-    const auto& iUnits = fed->getInjectionUnits(*this);
+    const auto& iType = getInjectionType();
+    const auto& iUnits = getInjectionUnits();
     injectionType = getTypeFromString(iType);
     if ((injectionType == data_type::helics_multi) || (!iUnits.empty() && iUnits.front() == '[')) {
         sourceTypes.clear();

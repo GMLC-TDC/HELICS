@@ -59,17 +59,6 @@ Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, cons
     throw(RegistrationFailure("Unable to register Endpoint"));
 }
 
-void MessageFederateManager::registerKnownCommunicationPath(const Endpoint& localEndpoint,
-                                                            const std::string& remoteEndpoint)
-{
-    coreObject->registerFrequentCommunicationsPair(localEndpoint.getName(), remoteEndpoint);
-}
-
-void MessageFederateManager::subscribe(const Endpoint& ept, const std::string& name)
-{
-    coreObject->addSourceTarget(ept.handle, name);
-}
-
 bool MessageFederateManager::hasMessage() const
 {
     auto eptDat = eptData.lock_shared();
@@ -143,25 +132,6 @@ std::unique_ptr<Message> MessageFederateManager::getMessage()
     return nullptr;
 }
 
-void MessageFederateManager::sendMessage(const Endpoint& source,
-                                         const std::string& dest,
-                                         const data_view& message)
-{
-    coreObject->send(source.handle, dest, message.data(), message.size());
-}
-
-void MessageFederateManager::sendMessage(const Endpoint& source,
-                                         const std::string& dest,
-                                         const data_view& message,
-                                         Time sendTime)
-{
-    coreObject->sendEvent(sendTime, source.handle, dest, message.data(), message.size());
-}
-
-void MessageFederateManager::sendMessage(const Endpoint& source, std::unique_ptr<Message> message)
-{
-    coreObject->sendMessage(source.handle, std::move(message));
-}
 
 void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
@@ -217,8 +187,8 @@ std::string MessageFederateManager::localQuery(const std::string& queryStr) cons
     if (queryStr == "endpoints") {
         ret = generateStringVector_if(
             local_endpoints.lock_shared(),
-            [](const auto& info) { return info.actualName; },
-            [](const auto& info) { return (!info.actualName.empty()); });
+            [](const auto& info) { return info.getName(); },
+            [](const auto& info) { return (!info.getName().empty()); });
     }
     return ret;
 }
@@ -259,18 +229,6 @@ const Endpoint& MessageFederateManager::getEndpoint(int index) const
 int MessageFederateManager::getEndpointCount() const
 {
     return static_cast<int>(local_endpoints.lock_shared()->size());
-}
-
-void MessageFederateManager::addSourceFilter(const Endpoint& ept, const std::string& filterName)
-{
-    coreObject->addSourceTarget(ept.handle, filterName);
-}
-
-/** add a named filter to an endpoint for all message going to the endpoint*/
-void MessageFederateManager::addDestinationFilter(const Endpoint& ept,
-                                                  const std::string& filterName)
-{
-    coreObject->addDestinationTarget(ept.handle, filterName);
 }
 
 void MessageFederateManager::setEndpointNotificationCallback(

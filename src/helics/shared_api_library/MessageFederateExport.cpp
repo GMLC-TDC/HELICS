@@ -189,13 +189,13 @@ void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, co
             if ((dest == nullptr) || (std::string(dest).empty())) {
                 endObj->endPtr->send(emptyStr);
             } else {
-                endObj->endPtr->send(dest, emptyStr);
+                endObj->endPtr->sendTo(dest, emptyStr);
             }
         } else {
             if ((dest == nullptr) || (std::string(dest).empty())) {
                 endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
             } else {
-                endObj->endPtr->send(dest, reinterpret_cast<const char*>(data), inputDataLength);
+                endObj->endPtr->sendTo(dest, reinterpret_cast<const char*>(data), inputDataLength);
             }
         }
     }
@@ -218,15 +218,15 @@ void helicsEndpointSendEventRaw(helics_endpoint endpoint,
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
             if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(emptyStr, time);
+                endObj->endPtr->sendAt(time,emptyStr);
             } else {
-                endObj->endPtr->send(dest, emptyStr, time);
+                endObj->endPtr->sendToAt(dest, time, emptyStr);
             }
         } else {
             if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength, time);
+                endObj->endPtr->sendAt(time, reinterpret_cast<const char*>(data), inputDataLength);
             } else {
-                endObj->endPtr->send(dest, reinterpret_cast<const char*>(data), inputDataLength, time);
+                endObj->endPtr->sendToAt(dest, time, reinterpret_cast<const char*>(data), inputDataLength );
             }
         }
     }

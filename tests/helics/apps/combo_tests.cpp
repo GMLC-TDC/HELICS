@@ -55,11 +55,11 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.send("d2", "this is a test message");
+    e1.sendTo("d2", "this is a test message");
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
 
-    e2.send("d1", "this is a test message2");
+    e2.sendTo("d1", "this is a test message2");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -151,14 +151,14 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     for (int ii = 0; ii < 256; ++ii) {
         n5[ii] = std::byte(ii);
     }
-    e1.send("d2", n5);
+    e1.sendTo("d2", n5);
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
     helics::SmallBuffer n6(256);
     for (int ii = 0; ii < 256; ++ii) {
         n6[ii] = std::byte(255 - ii);
     }
-    e2.send("d1", n6);
+    e2.sendTo("d1", n6);
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);

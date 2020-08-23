@@ -731,6 +731,13 @@ void Federate::initializeToExecuteStateTransition()
     // child classes may do something with this
 }
 
+void Federate::disconnectTransition()
+{
+    if (fManager) {
+        fManager->closeAllFilters();
+    }
+}
+
 void Federate::registerInterfaces(const std::string& configString)
 {
     registerFilterInterfaces(configString);
@@ -794,7 +801,7 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
-        fed->setInfo(filt.getHandle(), info);
+        filt.setInfo(info);
     }
     auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
     auto adest = [&filt](const std::string& target) { filt.addDestinationTarget(target); };
@@ -1138,51 +1145,6 @@ CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterNa
     return fManager->registerCloningFilter(filterName, inputType, outputType);
 }
 
-void Federate::addSourceTarget(const Filter& filt, const std::string& targetEndpoint)
-{
-    if (coreObject) {
-        coreObject->addSourceTarget(filt.getHandle(), targetEndpoint);
-    } else {
-        throw(InvalidFunctionCall(
-            "add source target cannot be called on uninitialized federate or after finalize call"));
-    }
-}
-
-void Federate::addDestinationTarget(const Filter& filt, const std::string& targetEndpoint)
-{
-    if (coreObject) {
-        coreObject->addDestinationTarget(filt.getHandle(), targetEndpoint);
-    } else {
-        throw(InvalidFunctionCall(
-            "add destination target cannot be called on uninitialized federate or after finalize call"));
-    }
-}
-
-const std::string& Federate::getInterfaceName(interface_handle handle) const
-{
-    return (coreObject) ? (coreObject->getHandleName(handle)) : emptyStr;
-}
-
-const std::string& Federate::getInjectionType(interface_handle handle) const
-{
-    return (coreObject) ? (coreObject->getInjectionType(handle)) : emptyStr;
-}
-
-const std::string& Federate::getExtractionType(interface_handle handle) const
-{
-    return (coreObject) ? (coreObject->getExtractionType(handle)) : emptyStr;
-}
-
-const std::string& Federate::getInjectionUnits(interface_handle handle) const
-{
-    return (coreObject) ? (coreObject->getInjectionUnits(handle)) : emptyStr;
-}
-
-const std::string& Federate::getExtractionUnits(interface_handle handle) const
-{
-    return (coreObject) ? (coreObject->getExtractionUnits(handle)) : emptyStr;
-}
-
 const Filter& Federate::getFilter(const std::string& filterName) const
 {
     const Filter& filt = fManager->getFilter(filterName);
@@ -1216,45 +1178,6 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
     }
 }
 
-void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value)
-{
-    if (coreObject) {
-        coreObject->setHandleOption(handle, option, option_value);
-    } else {
-        throw(InvalidFunctionCall(
-            "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
-    }
-}
-
-/** get the current value for an interface option*/
-int32_t Federate::getInterfaceOption(interface_handle handle, int32_t option)
-{
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : 0;
-}
-
-void Federate::closeInterface(interface_handle handle)
-{
-    if (coreObject) {
-        coreObject->closeHandle(handle);
-    }
-    // well if there is no core object it already is closed
-}
-
-void Federate::setInfo(interface_handle handle, const std::string& info)
-{
-    if (coreObject) {
-        coreObject->setInterfaceInfo(handle, info);
-    } else {
-        throw(
-            InvalidFunctionCall("cannot call set info on uninitialized or disconnected federate"));
-    }
-}
-
-std::string const& Federate::getInfo(interface_handle handle)
-{
-    return (coreObject) ? coreObject->getInterfaceInfo(handle) : emptyStr;
-}
-
 void Federate::logMessage(int level, const std::string& message) const
 {
     if (coreObject) {
@@ -1264,6 +1187,111 @@ void Federate::logMessage(int level, const std::string& message) const
     } else {
         std::cout << message << std::endl;
     }
+}
+
+
+Interface::Interface(Federate* federate, interface_handle id, std::string_view actName):
+    handle(id), name(actName)
+{
+    if (federate != nullptr) {
+        cr=federate->getCorePointer().get();
+    }
+}
+
+
+const std::string& Interface::getKey() const {
+    return (cr!=nullptr) ? (cr->getHandleName(handle)) : emptyStr;
+}
+
+const std::string& Interface::getTarget() const {
+    return emptyStr;
+}
+
+void Interface::addSourceTarget(std::string_view newTarget) {
+    if (cr!=nullptr) {
+        cr->addSourceTarget(handle, newTarget);
+    } else {
+        throw(InvalidFunctionCall(
+            "add source target cannot be called on uninitialized federate or after finalize call"));
+    }
+}
+
+void Interface::addDestinationTarget(std::string_view newTarget) {
+    if (cr!=nullptr) {
+        cr->addDestinationTarget(handle, newTarget);
+    } else {
+        throw(InvalidFunctionCall(
+            "add destination target cannot be called on a closed or uninitialized interface"));
+    }
+}
+
+void Interface::removeTarget(std::string_view targetToRemove) {
+    if (cr != nullptr) {
+        cr->removeTarget(handle, targetToRemove);
+    } else {
+        throw(InvalidFunctionCall(
+            "remove target cannot be called on a closed or uninitialized interface"));
+    }
+}
+
+
+const std::string& Interface::getInfo() const
+{
+    return (cr!=nullptr) ? cr->getInterfaceInfo(handle) : emptyStr;
+}
+
+void Interface::setInfo(const std::string& info) {
+    if (cr!=nullptr) {
+        cr->setInterfaceInfo(handle, info);
+    } else {
+        throw(
+            InvalidFunctionCall("cannot call set info on uninitialized or disconnected interface"));
+    }
+}
+
+void Interface::setOption(int32_t option, int32_t value) {
+    if (cr!=nullptr) {
+        cr->setHandleOption(handle, option, value);
+    } else {
+        throw(InvalidFunctionCall(
+            "set Option cannot be called on uninitialized interface or after close/disconnect"));
+    }
+}
+
+
+int32_t Interface::getOption(int32_t option) const {
+    return (cr!=nullptr) ? cr->getHandleOption(handle, option) : 0;
+}
+
+const std::string& Interface::getInjectionType() const {
+    return (cr!=nullptr) ? (cr->getInjectionType(handle)) : emptyStr;
+}
+
+const std::string& Interface::getExtractionType() const {
+    return (cr!=nullptr) ? (cr->getExtractionType(handle)) : emptyStr;
+}
+
+const std::string& Interface::getInjectionUnits() const {
+    return (cr!=nullptr) ? (cr->getInjectionUnits(handle)) : emptyStr;
+}
+
+const std::string& Interface::getExtractionUnits() const {
+    return (cr != nullptr) ? (cr->getExtractionUnits(handle)) : emptyStr;
+}
+
+const std::string& Interface::getDisplayName() const {}
+
+void Interface::close() {
+    if (cr!=nullptr) {
+        cr->closeHandle(handle);
+        cr = nullptr;
+    }
+    
+}
+
+void Interface::disconnectFromCore()
+{
+    cr = nullptr;
 }
 
 }  // namespace helics

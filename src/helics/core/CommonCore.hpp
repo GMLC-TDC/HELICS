@@ -142,10 +142,10 @@ class CommonCore: public Core, public BrokerBase {
     virtual int32_t getHandleOption(interface_handle handle, int32_t option) const override final;
     virtual void closeHandle(interface_handle handle) override final;
     virtual void removeTarget(interface_handle handle,
-                              const std::string& targetToRemove) override final;
+                              std::string_view targetToRemove) override final;
     virtual void addDestinationTarget(interface_handle handle,
-                                      const std::string& dest) override final;
-    virtual void addSourceTarget(interface_handle handle, const std::string& name) override final;
+                                      std::string_view dest) override final;
+    virtual void addSourceTarget(interface_handle handle, std::string_view name) override final;
     virtual const std::string& getInjectionUnits(interface_handle handle) const override final;
     virtual const std::string& getExtractionUnits(interface_handle handle) const override final;
     virtual const std::string& getInjectionType(interface_handle handle) const override final;
@@ -184,18 +184,18 @@ class CommonCore: public Core, public BrokerBase {
     virtual void addDestinationFilterToEndpoint(const std::string& filter,
                                                 const std::string& endpoint) override final;
     virtual void send(interface_handle sourceHandle,
-                      const char* data,
+                      const void* data,
                       uint64_t length) override final;
     virtual void sendAt(interface_handle sourceHandle,
                         Time time,
-                           const char* data,
+                           const void* data,
                            uint64_t length) override final;
     virtual void
-        sendTo(interface_handle sourceHandle, const std::string &destination, const char* data, uint64_t length) override final;
+        sendTo(interface_handle sourceHandle, std::string_view destination, const void* data, uint64_t length) override final;
     virtual void sendToAt(interface_handle sourceHandle,
-                          const std::string& destination,
+                          std::string_view destination,
                           Time time,
-                        const char* data,
+                        const void* data,
                         uint64_t length) override final;
     virtual void sendMessage(interface_handle sourceHandle,
                              std::unique_ptr<Message> message) override final;
@@ -428,6 +428,9 @@ class CommonCore: public Core, public BrokerBase {
   private:
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration();
+    /** generate the messages to a set of destinations*/
+    void generateMessages(ActionMessage& message,
+                          const std::vector<std::pair<global_handle, std::string_view>>& targets);
     /** deliver a message to the appropriate location*/
     void deliverMessage(ActionMessage& message);
     /** function to deal with a source filters*/

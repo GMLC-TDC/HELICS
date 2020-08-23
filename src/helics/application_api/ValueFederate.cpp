@@ -208,7 +208,7 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
     }
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
-        fed->setInfo(objUpdate.getHandle(), info);
+        objUpdate.setInfo(info);
     }
     addTargets(data, "targets", [&objUpdate](const std::string& target) {
         objUpdate.addTarget(target);

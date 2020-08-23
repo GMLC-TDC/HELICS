@@ -161,19 +161,12 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfacesToml(const std::string& tomlString);
 
   public:
-    /** give the core a hint for known communication paths
-    @details the function will generate an error in the core if a communication path is not present
-    once the simulation is initialized
-    @param localEndpoint the local endpoint of a known communication pair
-    @param remoteEndpoint of a communication pair
-    */
-    void registerKnownCommunicationPath(const Endpoint& localEndpoint,
-                                        const std::string& remoteEndpoint);
+
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
     @param ept the specified endpoint to deliver the values
     @param key the name of the publication to subscribe
     */
-    void subscribe(const Endpoint& ept, const std::string& key);
+    void subscribe(const Endpoint& ept, std::string_view key);
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
     /* check if a given endpoint has any unread messages*/
@@ -200,24 +193,58 @@ class HELICS_CXX_EXPORT MessageFederate:
     /** send a message
     @details send a message to a specific destination
     @param source the source endpoint
+    @param data a buffer containing the data
+    @param dataLength the length of the data buffer
+    */
+    void send(const Endpoint& source, const void* data, std::size_t dataLength);
+    
+    /** send a message
+    @details send a message to a specific destination
+    @param source the source endpoint
+    @param message a data_view of the message
+    */
+    void send(const Endpoint& source, const data_view& message)
+    {
+        send(source, message.data(), message.size());
+    }
+    /** send a message
+    @details send a message to a specific destination
+    @param source the source endpoint
     @param dest a string naming the destination
     @param data a buffer containing the data
     @param dataLength the length of the data buffer
     */
-    void sendMessageTo(const Endpoint& source,
-                     const std::string& dest,
-                     const char* data,
-                     size_t dataLength)
-    {
-        sendMessageTo(source, dest, data_view(data, dataLength));
-    }
+    void sendTo(const Endpoint& source, std::string_view dest, const void* data, std::size_t dataLength);
+    
     /** send a message
     @details send a message to a specific destination
     @param source the source endpoint
     @param dest a string naming the destination
     @param message a data_view of the message
     */
-    void sendMessageTo(const Endpoint& source, const std::string& dest, const data_view& message);
+    void sendTo(const Endpoint& source, std::string_view dest, const data_view& message)
+    {
+        sendTo(source, dest, message.data(),message.size());
+    }
+    /** send a message
+   @details send a message to a specific destination
+   @param source the source endpoint
+   @param data a buffer containing the data
+   @param dataLength the length of the data buffer
+   @param sendTime the time the message should be sent
+   */
+    void sendAt(const Endpoint& source, Time sendTime, const void* data, std::size_t dataLength);
+    
+    /** send a message at a particular time
+    @details send a message to a specific destination
+    @param source the source endpoint
+    @param dest a string naming the destination
+    @param message a data_view of the message
+    */
+    void sendAt(const Endpoint& source, Time sendTime, const data_view& message)
+    {
+        sendAt(source, sendTime, message.data(),message.size());
+    }
     /** send an event message at a particular time
     @details send a message to a specific destination
     @param source the source endpoint
@@ -226,14 +253,12 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param dataLength the length of the data buffer
     @param sendTime the time the message should be sent
     */
-    void sendMessage(const Endpoint& source,
-                     const std::string& dest,
-                     const char* data,
-                     size_t dataLength,
-                     Time sendTime)
-    {
-        sendMessage(source, dest, data_view(data, dataLength), sendTime);
-    }
+    void sendToAt(const Endpoint& source,
+                  std::string_view dest,
+                  Time sendTime,
+                  const void* data,
+                  std::size_t dataLength);
+    
     /** send an event message at a particular time
     @details send a message to a specific destination
     @param source the source endpoint
@@ -241,10 +266,13 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param message a data_view of the message data to send
     @param sendTime the time the message should be sent
     */
-    void sendMessage(const Endpoint& source,
-                     const std::string& dest,
-                     const data_view& message,
-                     Time sendTime);
+    void sendToAt(const Endpoint& source,
+                  std::string_view dest,
+                  Time sendTime,
+                     const data_view& message)
+    {
+        sendToAt(source, dest, sendTime, message.data(), message.size());
+    }
     /** send an event message at a particular time
     @details send a message to a specific destination
     @param source the source endpoint
@@ -281,9 +309,9 @@ class HELICS_CXX_EXPORT MessageFederate:
                                         const std::function<void(Endpoint&, Time)>& callback);
 
     /** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter(const Endpoint& ept, const std::string& filterName);
+    void addSourceFilter(const Endpoint& ept, std::string_view filterName);
     /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter(const Endpoint& ept, const std::string& filterName);
+    void addDestinationFilter(const Endpoint& ept, std::string_view filterName);
 
     virtual void disconnect() override;
 

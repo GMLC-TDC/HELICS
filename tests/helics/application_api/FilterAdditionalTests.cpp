@@ -50,7 +50,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -99,7 +99,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -115,7 +115,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     EXPECT_EQ(m2->data.size(), data.size());
 
     Filt.close();
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     fFed->requestTimeAsync(2.0);
     mFed->requestTime(2.0);
@@ -166,7 +166,7 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "endpt2", data);
+    mFed->sendTo(p1, "endpt2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -225,7 +225,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
@@ -234,7 +234,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     ASSERT_TRUE(mFed->hasMessage(p2));
 
     // this message should be delivered to the rerouted destination
-    mFed->sendMessage(p1, "test324525", data);
+    mFed->sendTo(p1, "test324525", data);
 
     mFed->requestTimeAsync(2.0);
     fFed->requestTime(2.0);
@@ -288,7 +288,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     int max_iterations = 200;
     int dropped = 0;
     for (int i = 0; i < max_iterations; i++) {
-        mFed->sendMessage(p1, "port2", data);
+        mFed->sendTo(p1, "port2", data);
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
@@ -347,7 +347,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     int max_iterations = 150;
     int count = 0;
     for (int i = 0; i < max_iterations; i++) {
-        mFed->sendMessage(p1, "port2", data);
+        mFed->sendTo(p1, "port2", data);
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
@@ -403,7 +403,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     int max_iterations = 150;
     int dropped = 0;
     for (int i = 0; i < max_iterations; i++) {
-        mFed->sendMessage(p1, "port2", data);
+        mFed->sendTo(p1, "port2", data);
         timestep += 1.0;
         mFed->requestTime(timestep);
         // Check if message is received
@@ -463,7 +463,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
     int max_iterations = 150;
     int count = 0;
     for (int i = 0; i < max_iterations; i++) {
-        mFed->sendMessage(p1, "port2", data);
+        mFed->sendTo(p1, "port2", data);
         timestep++;
         mFed->requestTime(timestep);
         if (mFed->hasMessage(p2)) {
@@ -514,7 +514,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(100, 'a');
-    mFed->sendMessage(p1, "port2", data);
+    mFed->sendTo(p1, "port2", data);
 
     double timestep = 0.0;  // 1 second
     int max_iterations = 4;

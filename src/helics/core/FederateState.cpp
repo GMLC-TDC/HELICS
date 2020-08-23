@@ -524,6 +524,16 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
     return {};
 }
 
+std::vector<std::pair<global_handle, std::string_view>>
+    FederateState::getMessageDestinations(interface_handle handle)
+{
+    std::lock_guard<FederateState> fedlock(*this);
+    const auto* eptInfo = interfaceInformation.getEndpoint(handle);
+    if (eptInfo != nullptr) {
+        return eptInfo->getTargets();
+    }
+    return {};
+}
 iteration_time FederateState::requestTime(Time nextTime, iteration_request iterate)
 {
     if (try_lock()) {  // only enter this loop once per federate
