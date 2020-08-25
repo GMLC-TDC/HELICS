@@ -115,11 +115,12 @@ namespace mpi {
                     switch (cmd.messageID) {
                         case NEW_ROUTE: {
                             // cmd.payload would be the MPI rank of the destination
+                            std::string newroute(cmd.payload.to_string());
                             std::pair<int, int> routeLoc;
-                            auto addr_delim_pos = cmd.payload.find_last_of(':');
-                            routeLoc.first = std::stoi(cmd.payload.substr(0, addr_delim_pos));
-                            routeLoc.second = std::stoi(
-                                cmd.payload.substr(addr_delim_pos + 1, cmd.payload.length()));
+                            auto addr_delim_pos = newroute.find_last_of(':');
+                            routeLoc.first = std::stoi(newroute.substr(0, addr_delim_pos));
+                            routeLoc.second =
+                                std::stoi(newroute.substr(addr_delim_pos + 1, newroute.length()));
 
                             routes.emplace(route_id{cmd.getExtraData()}, routeLoc);
                             processed = true;
