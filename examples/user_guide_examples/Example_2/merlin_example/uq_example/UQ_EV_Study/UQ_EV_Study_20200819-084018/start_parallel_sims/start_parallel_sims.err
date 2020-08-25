@@ -1,0 +1,12 @@
+==> Error: helics matches multiple packages.
+  Matching packages:
+    r46rk6m helics@2.5.0%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    t47e7zt helics@2.5.0%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    abajvzu helics@2.5.0%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    mn5ws3p helics@2.5.0%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    5vn3x24 helics@2.5.1%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    2awak24 helics@2.5.1%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    xi6yxoq helics@2.5.2%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    7ryxajo helics@2.5.2%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+    jhq5uvd helics@2.5.2%gcc@9.2.0 arch=linux-rhel7-skylake_avx512
+  Use a more specific spec.

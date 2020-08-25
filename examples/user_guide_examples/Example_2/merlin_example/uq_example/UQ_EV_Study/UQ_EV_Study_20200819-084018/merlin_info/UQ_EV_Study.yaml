@@ -1,0 +1,66 @@
+description:
+  name: UQ EV Study
+  description: UQ toy attempts to identify the joint distribution of EVs, without
+    direct knowledge of which type of EV will request to be connected.
+
+batch:
+  type: local
+  dry_run: false
+  shell: /bin/bash
+
+env:
+  variables:
+    OUTPUT_PATH: ./UQ_EV_Study
+    N_SAMPLES: 1
+
+study:
+- name: start_parallel_sims
+  description: Run a bunch of UQ sims in parallel
+  run:
+    cmd: 'spack load helics
+
+      /home/yee29/projects/helics/helics-cli/bin/helics run --path=/home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info/$(FED)
+
+      echo "DONE"
+
+      '
+    task_queue: merlin
+    shell: /bin/bash
+    max_retries: 30
+- name: cleanup
+  description: Clean up
+  run:
+    cmd: rm /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info/samples.csv
+    depends:
+    - start_parallel_sims_*
+    task_queue: merlin
+    shell: /bin/bash
+    max_retries: 30
+
+global.parameters: {}
+
+merlin:
+  samples:
+    generate:
+      cmd: 'python3 /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/make_samples.py 1 /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info
+
+        cp /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/EVMsgrunner.json /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info
+
+        cp /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/EVMsgFed.py /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info
+
+        cp /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/EVControllerMsgFed.py /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info
+
+        '
+    file: /home/yee29/projects/helics/HELICS/examples/user_guide_examples/Example_2/merlin_example/uq_example/UQ_EV_Study/UQ_EV_Study_20200819-084018/merlin_info/samples.csv
+    column_labels:
+    - FED
+    level_max_dirs: 25
+  resources:
+    task_server: celery
+    overlap: false
+    workers:
+      default_worker:
+        steps:
+        - all
+        nodes:
+        batch:
