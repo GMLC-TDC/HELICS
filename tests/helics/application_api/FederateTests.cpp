@@ -961,22 +961,18 @@ TEST(federate_tests, error_after_disconnect)
     auto& fb2 = Fedref.getFilter("filt1");
     auto& fb3 = Fedref.getFilter("notafilter");
     auto& fb4 = Fed1->getFilter("filt1");
-    EXPECT_EQ(Fed1->getInterfaceName(fb), Fed1->getInterfaceName(f1));
-    EXPECT_EQ(Fed1->getInterfaceName(fb2), Fed1->getInterfaceName(f1));
-    EXPECT_EQ(Fed1->getInterfaceName(fb4), Fed1->getInterfaceName(f1));
+    EXPECT_EQ(fb.getKey(), f1.getKey());
+    EXPECT_EQ(fb2.getKey(), f1.getKey());
+    EXPECT_EQ(fb4.getKey(), f1.getKey());
     EXPECT_FALSE(fb3.isValid());
 
     EXPECT_THROW(Fed1->setGlobal("global1", "global1"), helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->addSourceTarget(f1, "ept"), helics::InvalidFunctionCall);
+    EXPECT_THROW(f1.addSourceTarget("ept"), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->addDependency("otherFed"), helics::InvalidFunctionCall);
 
-    EXPECT_THROW(Fed1->addDestinationTarget(f1, "ept"), helics::InvalidFunctionCall);
+    EXPECT_THROW(f1.addDestinationTarget( "ept"), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->setFilterOperator(f1, {}), helics::InvalidFunctionCall);
 
-    EXPECT_THROW(Fed1->setInterfaceOption(helics::interface_handle{0}, 0, false),
-                 helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->setInfo(helics::interface_handle{0}, "information"),
-                 helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->localError(99), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->globalError(99), helics::InvalidFunctionCall);
 }

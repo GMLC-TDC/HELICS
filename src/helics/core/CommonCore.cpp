@@ -1199,6 +1199,71 @@ void CommonCore::addSourceTarget(interface_handle handle, std::string_view targe
     addActionMessage(std::move(cmd));
 }
 
+const std::string& CommonCore::getDestinationTargets(interface_handle handle) const
+{
+    const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr) {
+        switch (handleInfo->handleType) {
+            case handle_type::input: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* inpInfo = fed->interfaces().getInput(handle);
+                if (inpInfo != nullptr) {
+                    return inpInfo->getTargets();
+                }
+                break;
+            }
+            case handle_type::publication:
+                return emptyStr;
+            case handle_type::endpoint: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* eptInfo = fed->interfaces().getEndpoint(handle);
+                if (eptInfo != nullptr) {
+                    return eptInfo->getDestinationTargets();
+                }
+                break;
+            }
+            case handle_type::filter:
+                return emptyStr;
+            default:
+                return emptyStr;
+        }
+    }
+    return emptyStr;
+}
+
+const std::string& CommonCore::getSourceTargets(interface_handle handle) const
+{
+    const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr) {
+        switch (handleInfo->handleType) {
+            case handle_type::input: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* inpInfo = fed->interfaces().getInput(handle);
+                if (inpInfo != nullptr) {
+                    return inpInfo->getTargets();
+                }
+                break;
+            }
+            case handle_type::publication:
+                return emptyStr;
+            case handle_type::endpoint: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* eptInfo = fed->interfaces().getEndpoint(handle);
+                if (eptInfo != nullptr) {
+                    return eptInfo->getSourceTargets();
+                }
+                break;
+            }
+            case handle_type::filter: {
+                break;
+            }
+            default:
+                return emptyStr;
+        }
+    }
+    return emptyStr;
+ }
+
 void CommonCore::setValue(interface_handle handle, const char* data, uint64_t len)
 {
     const auto* handleInfo = getHandleInfo(handle);
@@ -2648,6 +2713,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             } else {
                 routeMessage(std::move(command));
             }
+            break;
+        case CMD_INTERFACE_QUERY:
             break;
         case CMD_QUERY: {
             if (command.dest_id == parent_broker_id) {

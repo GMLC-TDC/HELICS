@@ -71,6 +71,8 @@ class HELICS_CXX_EXPORT Filter:public Interface {
     /** set a message operator to process the message*/
     void setOperator(std::shared_ptr<FilterOperator> mo);
 
+    virtual const std::string& getDisplayName() const override { return getName(); }
+
     /** set a property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property

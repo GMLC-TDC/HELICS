@@ -784,7 +784,7 @@ static Filter& generateFilter(Federate* fed,
 const std::string emptyStr;
 
 template<class Inp>
-static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
+static void loadOptions(const Inp& data, Filter& filt)
 {
     addTargets(data, "flags", [&filt](const std::string& target) {
         if (target.front() != '-') {
@@ -839,7 +839,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             }
             auto& filter =
                 generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
-            loadOptions(this, filt, filter);
+            loadOptions(filt, filter);
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
@@ -927,7 +927,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             auto& filter =
                 generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
 
-            loadOptions(this, filt, filter);
+            loadOptions(filt, filter);
 
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
@@ -1194,7 +1194,10 @@ Interface::Interface(Federate* federate, interface_handle id, std::string_view a
     handle(id), name(actName)
 {
     if (federate != nullptr) {
-        cr=federate->getCorePointer().get();
+        const auto& crp = federate->getCorePointer();
+        if (crp) {
+            cr = crp.get();
+        }
     }
 }
 
@@ -1279,7 +1282,18 @@ const std::string& Interface::getExtractionUnits() const {
     return (cr != nullptr) ? (cr->getExtractionUnits(handle)) : emptyStr;
 }
 
-const std::string& Interface::getDisplayName() const {}
+const std::string& Interface::getSourceTargets() const
+{
+    return (cr != nullptr) ? (cr->getSourceTargets(handle)) : emptyStr;
+}
+
+const std::string& Interface::getDestinationTargets() const {
+    return (cr != nullptr) ? (cr->getDestinationTargets(handle)) : emptyStr;
+}
+
+const std::string& Interface::getDisplayName() const {
+    return (name.empty() ? getTarget() : name);
+}
 
 void Interface::close() {
     if (cr!=nullptr) {

@@ -568,7 +568,18 @@ class Core {
     */
     virtual void addSourceTarget(interface_handle handle, std::string_view name) = 0;
 
-    /** get a destination filter Handle from its name or target(this may not be unique so it will
+    /**
+    * get the destination targets for an interface
+    @param handle an interface get the destination targets for
+    */
+    virtual const std::string& getDestinationTargets(interface_handle handle) const = 0;
+
+    /** get the source targets for an interface
+    @param handle the identifier of the interface
+    */
+    virtual const std::string& getSourceTargets(interface_handle handle) const = 0;
+
+    /** get a filter Handle from its name or target(this may not be unique so it will
     only find the first one)
     @param name the name of the filter or its target
     @return a handle to identify the filter*/

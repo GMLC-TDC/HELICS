@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "EndpointInfo.hpp"
+#include "../common/JsonGeneration.hpp"
 //#include "core/core-data.hpp"
 
 #include <algorithm>
@@ -116,6 +117,42 @@ void EndpointInfo::removeTarget(global_handle targetId) {
             return;
         }
     }
+}
+
+const std::string& EndpointInfo::getSourceTargets() const {
+    if (sourceTargets.empty()) {
+        if (!sourceInformation.empty()) {
+            if (sourceInformation.size() == 1) {
+                sourceTargets = sourceInformation.front().key;
+            } else {
+                sourceTargets.push_back('[');
+                for (const auto& src : sourceInformation) {
+                    sourceTargets.append(generateJsonQuotedString(src.key));
+                    sourceTargets.push_back(',');
+                }
+                sourceTargets.back() = ']';
+            }
+        }
+    }
+    return sourceTargets;
+ }
+/** get a string with the names of the destination endpoints*/
+const std::string& EndpointInfo::getDestinationTargets() const {
+    if (destinationTargets.empty()) {
+        if (!targetInformation.empty()) {
+            if (targetInformation.size() == 1) {
+                destinationTargets = targetInformation.front().key;
+            } else {
+                destinationTargets.push_back('[');
+                for (const auto& trgt : targetInformation) {
+                    destinationTargets.append(generateJsonQuotedString(trgt.key));
+                    destinationTargets.push_back(',');
+                }
+                destinationTargets.back() = ']';
+            }
+        }
+    }
+    return destinationTargets;
 }
 
 }  // namespace helics

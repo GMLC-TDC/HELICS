@@ -7,9 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "HelicsPrimaryTypes.hpp"
-#include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
-
+#include "Federate.hpp"
 #include <memory>
 #include <string>
 #include <utility>
@@ -21,6 +20,7 @@ class precise_unit;
 
 namespace helics {
 
+    class ValueFederate;
 enum multi_input_handling_method : uint16_t {
     no_op = helics_multi_input_no_op,
     vectorize_operation = helics_multi_input_vectorize_operation,
@@ -172,7 +172,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     /** get the time of the last update
     @return the time of the last update
     */
-    Time getLastUpdate() const { return fed->getLastUpdateTime(*this); }
+    Time getLastUpdate() const;
   
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
@@ -180,15 +180,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     time is the time the value was updated  This callback is a notification callback and doesn't
     return the value
     */
-    void registerNotificationCallback(std::function<void(Time)> callback)
-    {
-        fed->setInputNotificationCallback(
-            *this, [this, callback = std::move(callback)](const Input& /*inp*/, Time time) {
-                if (isUpdated()) {
-                    callback(time);
-                }
-            });
-    }
+    void registerNotificationCallback(std::function<void(Time)> callback);
 
     /** get the type of the data coming from the publication*/
     const std::string& getPublicationType() const
@@ -401,6 +393,8 @@ class HELICS_CXX_EXPORT Input:public Interface {
     multi_input_handling_method getMultiInputMode() const { return inputVectorOp; }
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffer>>& dataV);
+
+    virtual const std::string& getDisplayName() const override { return (name.empty())?getSourceTargets():getName(); }
 
   private:
     /** load some information about the data source such as type and units*/

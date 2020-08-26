@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Publications.hpp"
 
+#include "ValueFederate.hpp"
 #include "../core/core-exceptions.hpp"
 #include "units/units/units.hpp"
 
@@ -249,11 +250,11 @@ void Publication::publish(const NamedPoint& np)
     }
 }
 
-void Publication::publish(std::string_view name, double val)
+void Publication::publish(std::string_view field, double val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled) {
-        NamedPoint np(name, val);
+        NamedPoint np(field, val);
         if (changeDetected(prevValue, np, delta)) {
             prevValue = std::move(np);
         } else {
@@ -261,7 +262,7 @@ void Publication::publish(std::string_view name, double val)
         }
     }
     if (doPublish) {
-        auto db = typeConvert(pubType, name, val);
+        auto db = typeConvert(pubType, field, val);
         fed->publishRaw(*this, db);
     }
 }

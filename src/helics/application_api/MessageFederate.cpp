@@ -275,75 +275,6 @@ std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
     return nullptr;
 }
 
-void MessageFederate::send(const Endpoint& source, const void* data, std::size_t size)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        coreObject->send(source.getHandle(), data,size);
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendTo(const Endpoint& source,
-                                  std::string_view dest,
-                                  const void* data,
-    std::size_t size)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        coreObject->sendTo(source.getHandle(), dest, data,size);
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendAt(const Endpoint& source, Time sendTime,
-                             const void* data,
-                             std::size_t size)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        coreObject->sendAt(source.getHandle(), sendTime, data,size);
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendToAt(const Endpoint& source,
-                               std::string_view dest,
-                               Time sendTime,
-                               const void* data,
-                               std::size_t size)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        coreObject->sendToAt(source, dest, sendTime, data,size);
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendMessage(const Endpoint& source, std::unique_ptr<Message> message)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        coreObject->sendMessage(source.getHandle(), std::move(message));
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendMessage(const Endpoint& source, const Message& message)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        coreObject->sendMessage(source.getHandle(), std::make_unique<Message>(message));
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
 Endpoint& MessageFederate::getEndpoint(const std::string& eptName) const
 {
     auto& id = mfManager->getEndpoint(eptName);
@@ -374,16 +305,6 @@ void MessageFederate::setMessageNotificationCallback(
 int MessageFederate::getEndpointCount() const
 {
     return mfManager->getEndpointCount();
-}
-
-void MessageFederate::addSourceFilter(const Endpoint& ept, std::string_view filterName)
-{
-    coreObject->addSourceTarget(ept.getHandle(), filterName);
-}
-
-void MessageFederate::addDestinationFilter(const Endpoint& ept, std::string_view filterName)
-{
-    coreObject->addDestinationTarget(ept.getHandle(), filterName);
 }
 
 

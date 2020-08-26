@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "ValueConverter.hpp"
 #include "data_view.hpp"
+#include "Publications.hpp"
+#include "Inputs.hpp"
 
 #include <functional>
 #include <memory>
@@ -17,8 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-class Publication;
-class Input;
 /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
 class ValueFederateManager;
 /** class defining the value based interface */

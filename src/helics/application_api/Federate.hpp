@@ -419,29 +419,6 @@ class HELICS_CXX_EXPORT Federate {
         return registerGlobalCloningFilter(std::string(), std::string(), std::string());
     }
 
-    /** add a source target to a filter
-   @param filt the filter object to add a source endpoint to
-   @param targetEndpoint the name of the endpoint to filter the data from
-   */
-    void addSourceTarget(interface_handle handle, std::string_view target);
-    /** add a destination target to a filter
-  @param filt a filter object
-  @param targetEndpoint the name of the endpoint to filter the data going to
-  */
-    void addDestinationTarget(interface_handle handle, std::string_view target);
-
-    /** remove a target from an interface*/
-    void removeTarget(interface_handle handle, std::string_view target);
-
-    /** get the targets of an interface*/
-    std::string getTarget(interface_handle handle) const;
-
-    /** get the name/key associated with an interface
-    @param handle the interface handle to query
-    @return empty string if an invalid id is passed otherwise the interface name or key (could be
-    empty if the interface was nameless*/
-    const std::string& getInterfaceName(interface_handle handle) const;
-
     /** get a filter from its name
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
@@ -649,7 +626,11 @@ class HELICS_CXX_EXPORT Interface {
     const std::string& getExtractionUnits() const;
     /** get the display name for an input
     @details the name is the given local name or if empty the name of the target*/
-const std::string& getDisplayName() const;
+    virtual const std::string& getDisplayName() const = 0;
+
+    const std::string& getSourceTargets() const;
+
+    const std::string& getDestinationTargets() const;
     /** close the interface*/
     void close();
     /** disconnect the object from the core*/

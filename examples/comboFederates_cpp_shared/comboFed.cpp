@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     for (int i = 1; i < 10; ++i) {
         std::string message =
             "message sent from " + name + " to " + etarget + " at time " + std::to_string(i);
-        cFed->sendMessage(id, etarget, message.data(), message.size());
+        id.sendTo(etarget, message.data(), message.size());
         pubid.publish(i);
         std::cout << message << std::endl;
         auto newTime = cFed->requestTime(i);

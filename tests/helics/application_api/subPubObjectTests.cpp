@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters
  */
 
-#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "units/units/units.hpp"
 

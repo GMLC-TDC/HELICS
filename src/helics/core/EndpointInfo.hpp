@@ -42,6 +42,8 @@ class EndpointInfo {
     std::vector<EndpointInformation> sourceInformation;
     std::vector<EndpointInformation> targetInformation;
     std::vector<std::pair<global_handle, std::string_view>> targets;
+    mutable std::string sourceTargets;
+    mutable std::string destinationTargets;
   public:
     bool hasFilter{false};  //!< indicator that the message has a filter
     bool targettedEndpoint{false}; //!< indicator that the endpoint is a targetted endpoint only
@@ -70,5 +72,9 @@ class EndpointInfo {
     {
         return targets;
     }
+    /** get a string with the names of the source endpoints*/
+    const std::string& getSourceTargets() const;
+    /** get a string with the names of the destination endpoints*/
+    const std::string& getDestinationTargets() const;
 };
 }  // namespace helics

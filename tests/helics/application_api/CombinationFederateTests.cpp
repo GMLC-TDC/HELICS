@@ -57,15 +57,15 @@ TEST_P(combofed_single_type_tests, publication_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto& sv = vFed1->getInterfaceName(pubid);
-    auto& sv2 = vFed1->getInterfaceName(pubid2);
+    auto& sv = pubid.getKey();
+    auto& sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto& pub3name = vFed1->getInterfaceName(pubid3);
+    auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
-    EXPECT_EQ(vFed1->getExtractionType(pubid3), "double");
-    EXPECT_EQ(vFed1->getInterfaceUnits(pubid3), "V");
+    EXPECT_EQ(pubid3.getExtractionType(), "double");
+    EXPECT_EQ(pubid3.getUnits(), "V");
 
     EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pubid.getHandle());
     EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pubid2.getHandle());
@@ -122,13 +122,13 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto& sv = mFed1->getInterfaceName(epid);
-    auto& sv2 = mFed1->getInterfaceName(epid2);
+    auto& sv = epid.getKey();
+    auto& sv2 = epid2.getKey();
     EXPECT_EQ(sv, "fed0/ep1");
     EXPECT_EQ(sv2, "ep2");
 
-    EXPECT_EQ(mFed1->getExtractionType(epid), "");
-    EXPECT_EQ(mFed1->getInjectionType(epid2), "random");
+    EXPECT_EQ(epid.getExtractionType(), "");
+    EXPECT_EQ(epid.getInjectionType(), "random");
 
     EXPECT_TRUE(mFed1->getEndpoint("ep1").getHandle() == epid.getHandle());
     EXPECT_TRUE(mFed1->getEndpoint("fed0/ep1").getHandle() == epid.getHandle());
@@ -160,8 +160,8 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    mFed1->sendTo(epid, "ep2", data);
-    mFed2->sendTo(epid2, "fed0/ep1", data2);
+    epid.sendTo("ep2", data);
+    epid2.sendTo("fed0/ep1", data2);
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -221,8 +221,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    cFed1->sendTo(epid, "ep2", data);
-    cFed2->sendTo(epid2, "fed0/ep1", data2);
+    epid.sendTo("ep2", data);
+    epid2.sendTo("fed0/ep1", data2);
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return cFed1->requestTime(1.0); });
     auto gtime = cFed2->requestTime(1.0);
@@ -298,7 +298,7 @@ TEST_P(combofed_file_load_tests, test_file_load)
 
     EXPECT_EQ(cFed.getEndpointCount(), 2);
     auto& id = cFed.getEndpoint("ept1");
-    EXPECT_EQ(cFed.getExtractionType(id), "genmessage");
+    EXPECT_EQ(id.getExtractionType(), "genmessage");
 
     EXPECT_EQ(cFed.getInputCount(), 2);
     EXPECT_EQ(cFed.getPublicationCount(), 2);

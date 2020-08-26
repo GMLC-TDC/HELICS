@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
 #include "units/units/units.hpp"
+#include "ValueFederate.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -579,6 +580,28 @@ void Input::clearUpdate()
 {
     hasUpdate = false;
     fed->clearUpdate(*this);
+}
+
+Time Input::getLastUpdate() const
+{
+    return fed->getLastUpdateTime(*this);
+}
+
+/** register a callback for an update notification
+@details the callback is called in the just before the time request function returns
+@param callback a function with signature void( Time time)
+time is the time the value was updated  This callback is a notification callback and doesn't
+return the value
+*/
+void Input::registerNotificationCallback(std::function<void(Time)> callback)
+{
+    fed->setInputNotificationCallback(*this,
+                                      [this, callback = std::move(callback)](const Input& /*inp*/,
+                                                                             Time time) {
+                                          if (isUpdated()) {
+                                              callback(time);
+                                          }
+                                      });
 }
 
 size_t Input::getRawSize()

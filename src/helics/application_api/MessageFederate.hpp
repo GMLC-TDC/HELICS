@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "Federate.hpp"
+#include "Endpoints.hpp"
 #include "data_view.hpp"
 
 #include <functional>
@@ -190,103 +191,6 @@ class HELICS_CXX_EXPORT MessageFederate:
     @return a unique_ptr to a Message object containing the message data*/
     std::unique_ptr<Message> getMessage();
 
-    /** send a message
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param data a buffer containing the data
-    @param dataLength the length of the data buffer
-    */
-    void send(const Endpoint& source, const void* data, std::size_t dataLength);
-    
-    /** send a message
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param message a data_view of the message
-    */
-    void send(const Endpoint& source, const data_view& message)
-    {
-        send(source, message.data(), message.size());
-    }
-    /** send a message
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param data a buffer containing the data
-    @param dataLength the length of the data buffer
-    */
-    void sendTo(const Endpoint& source, std::string_view dest, const void* data, std::size_t dataLength);
-    
-    /** send a message
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param message a data_view of the message
-    */
-    void sendTo(const Endpoint& source, std::string_view dest, const data_view& message)
-    {
-        sendTo(source, dest, message.data(),message.size());
-    }
-    /** send a message
-   @details send a message to a specific destination
-   @param source the source endpoint
-   @param data a buffer containing the data
-   @param dataLength the length of the data buffer
-   @param sendTime the time the message should be sent
-   */
-    void sendAt(const Endpoint& source, Time sendTime, const void* data, std::size_t dataLength);
-    
-    /** send a message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param message a data_view of the message
-    */
-    void sendAt(const Endpoint& source, Time sendTime, const data_view& message)
-    {
-        sendAt(source, sendTime, message.data(),message.size());
-    }
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param data a buffer containing the data
-    @param dataLength the length of the data buffer
-    @param sendTime the time the message should be sent
-    */
-    void sendToAt(const Endpoint& source,
-                  std::string_view dest,
-                  Time sendTime,
-                  const void* data,
-                  std::size_t dataLength);
-    
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param message a data_view of the message data to send
-    @param sendTime the time the message should be sent
-    */
-    void sendToAt(const Endpoint& source,
-                  std::string_view dest,
-                  Time sendTime,
-                     const data_view& message)
-    {
-        sendToAt(source, dest, sendTime, message.data(), message.size());
-    }
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param message a pointer to the message
-    */
-    void sendMessage(const Endpoint& source, std::unique_ptr<Message> message);
-
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param message a message object
-    */
-    void sendMessage(const Endpoint& source, const Message& message);
-
     /** get an endpoint by its name
     @param name the Endpoint
     @return an Endpoint*/
@@ -307,11 +211,6 @@ class HELICS_CXX_EXPORT MessageFederate:
     */
     void setMessageNotificationCallback(const Endpoint& ept,
                                         const std::function<void(Endpoint&, Time)>& callback);
-
-    /** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter(const Endpoint& ept, std::string_view filterName);
-    /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter(const Endpoint& ept, std::string_view filterName);
 
     virtual void disconnect() override;
 

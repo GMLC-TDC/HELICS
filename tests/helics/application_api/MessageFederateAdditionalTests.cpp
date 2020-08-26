@@ -64,13 +64,13 @@ TEST_F(mfed_tests, endpoint_registration)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto& sv = mFed1->getInterfaceName(epid);
-    auto& sv2 = mFed1->getInterfaceName(epid2);
+    auto& sv = epid.getKey();
+    auto& sv2 = epid.getKey();
     EXPECT_EQ(sv, "fed0/ep1");
     EXPECT_EQ(sv2, "ep2");
 
-    EXPECT_EQ(mFed1->getExtractionType(epid), "");
-    EXPECT_EQ(mFed1->getExtractionType(epid2), "random");
+    EXPECT_EQ(epid.getExtractionType(), "");
+    EXPECT_EQ(epid2.getExtractionType(), "random");
 
     EXPECT_TRUE(mFed1->getEndpoint("ep1").getHandle() == epid.getHandle());
     EXPECT_TRUE(mFed1->getEndpoint("fed0/ep1").getHandle() == epid.getHandle());
@@ -131,7 +131,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    mFed1->sendMessage(epid, "ep2", data);
+    epid.sendTo("ep2", data);
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -179,7 +179,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    ep1.send("ep2", data);
+    ep1.sendTo("ep2", data);
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -225,7 +225,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    ep1.send("ep2", data);
+    ep1.sendTo("ep2", data);
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -276,10 +276,10 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     helics::SmallBuffer data2(400, std::byte{'b'});
     helics::SmallBuffer data3(300, std::byte{'c'});
     helics::SmallBuffer data4(200, std::byte{'d'});
-    mFed1->sendMessage(epid, "ep2", data1);
-    mFed1->sendMessage(epid, "ep2", data2);
-    mFed1->sendMessage(epid, "ep2", data3);
-    mFed1->sendMessage(epid, "ep2", data4);
+    epid.sendTo("ep2", data1);
+    epid.sendTo("ep2", data2);
+    epid.sendTo("ep2", data3);
+    epid.sendTo("ep2", data4);
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -386,7 +386,7 @@ class PingPongFed {
                 mess->source = name;
                 mess->original_source = mess->source;
                 mess->time = currentTime;
-                mFed->sendMessage(*ep, std::move(mess));
+                ep->send(std::move(mess));
                 pings++;
             } else if (messString == "pong") {
                 pongs++;
@@ -408,7 +408,7 @@ class PingPongFed {
                     std::cout << name << ": send ping to " << triggers[index].second << " at time "
                               << static_cast<double>(nextTime) << '\n';
 #endif
-                    mFed->sendMessage(*ep, triggers[index].second, "ping");
+                    ep->sendTo(triggers[index].second, "ping");
                     ++index;
                     if (index >= static_cast<int>(triggers.size())) {
                         break;
@@ -495,7 +495,7 @@ TEST_P(mfed_file_config_files, test_file_load)
 
     EXPECT_EQ(mFed.getEndpointCount(), 2);
     auto id = mFed.getEndpoint("ept1");
-    EXPECT_EQ(mFed.getExtractionType(id), "genmessage");
+    EXPECT_EQ(id.getExtractionType(), "genmessage");
     EXPECT_EQ(id.getInfo(), "this is an information string for use by the application");
 
     EXPECT_EQ(mFed.query("global", "global1"), "this is a global1 value");
@@ -521,7 +521,7 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
 
     EXPECT_EQ(mFed.getEndpointCount(), 3);
     auto id = mFed.getEndpoint("ept1");
-    EXPECT_EQ(mFed.getExtractionType(id), "genmessage");
+    EXPECT_EQ(id.getExtractionType(), "genmessage");
 
     EXPECT_EQ(mFed.filterCount(), 3);
 
@@ -550,14 +550,14 @@ TEST_F(mfed_tests, send_message1)
     const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
     mFed1->enterExecutingMode();
 
-    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
+    ep1.sendTo("ep2", message1.c_str(), 26);
 
     mFed1->requestNextStep();
 
     auto m1 = ep2.getMessage();
     EXPECT_EQ(m1->data.size(), 26U);
 
-    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 31, 1.7);
+    ep1.sendToAt("ep2", 1.7, message1.c_str(), 31);
 
     auto res = mFed1->requestTime(2.0);
     EXPECT_EQ(res, 1.7);
@@ -588,7 +588,7 @@ TEST(messageFederate, constructor1)
     auto m1 = mf2.getMessage(ept1);
     EXPECT_FALSE(m1);
 
-    EXPECT_THROW(mf2.sendMessage(ept1, std::move(m1)), helics::InvalidFunctionCall);
+    EXPECT_THROW(ept1.send(std::move(m1)), helics::InvalidFunctionCall);
 
     mf2.enterExecutingMode();
     mf2.finalize();

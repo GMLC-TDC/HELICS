@@ -146,6 +146,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual void addDestinationTarget(interface_handle handle,
                                       std::string_view dest) override final;
     virtual void addSourceTarget(interface_handle handle, std::string_view name) override final;
+    virtual const std::string& getDestinationTargets(interface_handle handle) const override final;
+
+    virtual const std::string& getSourceTargets(interface_handle handle) const override final;
     virtual const std::string& getInjectionUnits(interface_handle handle) const override final;
     virtual const std::string& getExtractionUnits(interface_handle handle) const override final;
     virtual const std::string& getInjectionType(interface_handle handle) const override final;
