@@ -60,7 +60,7 @@ class MessageExchangeFederate: public BenchmarkFederate {
             }
 
             for (int i = 0; i < msgCount; i++) {
-                ept.send(dest, msg);
+                ept.sendTo(dest, msg);
             }
 
             cTime = fed->requestTimeAdvance(deltaTime);

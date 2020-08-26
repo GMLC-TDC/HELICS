@@ -208,7 +208,6 @@ template<class X>
 std::enable_if_t<std::is_arithmetic<X>::value>
     valueExtract(const data_view& dv, data_type baseType, X& val)
 {
-    constexpr size_t byte_order_check_size = 1;
     switch (baseType) {
         case data_type::helics_any: {
             defV val_dv;
