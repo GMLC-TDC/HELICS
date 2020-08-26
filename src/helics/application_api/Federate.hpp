@@ -621,15 +621,15 @@ class HELICS_CXX_EXPORT Interface {
     /** get the extraction type for an interface,  this is the units associated with data coming out
     of an interface
     @details for publications this is the specified units, for inputs this is the specified type
-    @param handle the interface handle to get the injection type for
     @return a const ref to  std::string  */
     const std::string& getExtractionUnits() const;
     /** get the display name for an input
     @details the name is the given local name or if empty the name of the target*/
     virtual const std::string& getDisplayName() const = 0;
-
+    /** get the source targets for an interface, either the sources for endpoints or inputs, or the source endpoints for a filter*/
     const std::string& getSourceTargets() const;
-
+    /** get the destination targets for an interface, either the destinations of data for endpoints or ipublications, or the
+     * destination endpoints for a filter*/
     const std::string& getDestinationTargets() const;
     /** close the interface*/
     void close();

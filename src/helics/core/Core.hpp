@@ -667,9 +667,8 @@ class Core {
      * events between discrete event federates.  For this use case
      * the receiving federate can deserialize the data and schedule
      * an event for the specified time.
-     @param time the time the event is scheduled for
      @param sourceHandle the source of the event
-     @param destination  the target of the event
+     @param time the time the event is scheduled for
      @param data the raw data for the event
      @param length the record length of the event
      */
