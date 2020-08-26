@@ -102,7 +102,10 @@ endif()
 
 # Warning if CMAKE_INSTALL_PREFIX is empty. Likely set by using the wrong environment variable.
 if(NOT CMAKE_INSTALL_PREFIX)
-    message(WARNING "CMAKE_INSTALL_PREFIX is set to nothing. If you are using an environment variable for handling prefix paths, that variable might not have been set before using it with CMake to set the CMAKE_INSTALL_PREFIX option.")
+    message(
+        WARNING
+            "CMAKE_INSTALL_PREFIX is set to nothing. If you are using an environment variable for handling prefix paths, that variable might not have been set before using it with CMake to set the CMAKE_INSTALL_PREFIX option."
+    )
 endif()
 
 # Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
