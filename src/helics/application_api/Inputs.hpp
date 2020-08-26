@@ -106,10 +106,10 @@ class HELICS_CXX_EXPORT Input:public Interface {
     template<class FedPtr>
     Input(interface_visibility locality,
           FedPtr& valueFed,
-          const std::string& name,
+          const std::string& key,
           const std::string& defaultType = "def",
           const std::string& units = std::string{}):
-        Input(locality, std::addressof(*valueFed), name, defaultType, units)
+        Input(locality, std::addressof(*valueFed), key, defaultType, units)
     {
         static_assert(
             std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value,
@@ -117,27 +117,27 @@ class HELICS_CXX_EXPORT Input:public Interface {
     }
 
     Input(ValueFederate* valueFed,
-          const std::string& name,
+          const std::string& key,
           data_type defType,
           const std::string& units = std::string{}):
-        Input(valueFed, name, typeNameStringRef(defType), units)
+        Input(valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
     template<class FedPtr>
     Input(FedPtr& valueFed,
-          const std::string& name,
+          const std::string& key,
           data_type defType,
           const std::string& units = std::string()):
-        Input(valueFed, name, typeNameStringRef(defType), units)
+        Input(valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
     Input(interface_visibility locality,
           ValueFederate* valueFed,
-          const std::string& name,
+          const std::string& key,
           const std::string& units = std::string{}):
-        Input(locality, valueFed, name, "def", units)
+        Input(locality, valueFed, key, "def", units)
     {
     }
 
@@ -152,20 +152,20 @@ class HELICS_CXX_EXPORT Input:public Interface {
 
     Input(interface_visibility locality,
           ValueFederate* valueFed,
-          const std::string& name,
+          const std::string& key,
           data_type defType,
           const std::string& units = std::string{}):
-        Input(locality, valueFed, name, typeNameStringRef(defType), units)
+        Input(locality, valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
     template<class FedPtr>
     Input(interface_visibility locality,
           FedPtr& valueFed,
-          const std::string& name,
+          const std::string& key,
           data_type defType,
           const std::string& units = std::string{}):
-        Input(locality, valueFed, name, typeNameStringRef(defType), units)
+        Input(locality, valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
@@ -407,6 +407,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
         return hasUpdate && !changeDetectionEnabled &&
             inputVectorOp == multi_input_handling_method::no_op;
     }
+    data_view checkAndGetFedUpdate();
     friend class ValueFederateManager;
 };
 
@@ -425,8 +426,8 @@ HELICS_CXX_EXPORT void
 template<class X>
 void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out)
 {
-    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
-        auto dv = fed->getValueRaw(*this);
+    auto dv = checkAndGetFedUpdate();
+    if (!dv.empty()) {
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
@@ -479,8 +480,8 @@ const X& Input::getValueRef()
 {
     static_assert(std::is_same<typeCategory<X>, std::integral_constant<int, primaryType>>::value,
                   "calling getValue By ref must be with a primary type");
-    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
-        auto dv = fed->getValueRaw(*this);
+    auto dv = checkAndGetFedUpdate();
+    if (!dv.empty()) {
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }

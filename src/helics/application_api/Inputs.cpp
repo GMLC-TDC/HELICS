@@ -761,10 +761,15 @@ void integerExtractAndConvert(defV& store,
     }
 }
 
+data_view Input::checkAndGetFedUpdate() {
+    return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getValueRaw(*this)) :
+                                                                    data_view{};
+ }
+
 char Input::getValueChar()
 {
-    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
-        auto dv = fed->getValueRaw(*this);
+    auto dv = checkAndGetFedUpdate();
+    if (!dv.empty()) {
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
