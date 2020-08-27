@@ -6,14 +6,13 @@ description:
 env:
   variables:
     OUTPUT_PATH: ./UQ_EV_Study
-    N_SAMPLES: 1
+    N_SAMPLES: 10
 
 merlin:
   samples:
     generate:
       cmd: |
         python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
-        cp $(SPECROOT)/EVMsgrunner.json $(MERLIN_INFO)
         cp $(SPECROOT)/EVMsgFed.py $(MERLIN_INFO)
         cp $(SPECROOT)/EVControllerMsgFed.py $(MERLIN_INFO)
     file: $(MERLIN_INFO)/samples.csv
