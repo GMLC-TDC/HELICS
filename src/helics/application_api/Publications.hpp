@@ -259,17 +259,4 @@ class HELICS_CXX_EXPORT Publication:public Interface {
     friend class ValueFederateManager;
 };
 
-/** publish directly from the publication key name
-@details this is a convenience function to publish directly from the publication key
-this function should not be used as the primary means of publications as it does involve an
-additional map find operation vs the member publish calls
-@param fed a reference to a valueFederate
-@param pubKey  the name of the publication
-@param pargs any combination of arguments that go into the other publish commands
-*/
-template<class... Us>
-void publish(ValueFederate& fed, const std::string& pubKey, Us... pargs)
-{
-    fed.getPublication(pubKey).publish(pargs...);
-}
 }  // namespace helics

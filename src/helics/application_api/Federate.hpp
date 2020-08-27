@@ -599,14 +599,12 @@ class HELICS_CXX_EXPORT Interface {
     @details for filters this is the input type, for publications this is type used to transmit
     data, for endpoints this is the specified type and for inputs this is the type of the
     transmitting publication
-    @param handle the interface handle to get the injection type for
     @return a const ref to  std::string  */
     const std::string& getInjectionType() const;
 
     /** get the extraction type for an interface,  this is the type for data coming out of interface
     @details for filters this is the output type, for publications this is the specified type, for
     endpoints this is the specified type and for inputs this is the specified type
-    @param handle the interface handle to get the injection type for
     @return a const ref to  std::string  */
     const std::string& getExtractionType() const;
 
@@ -614,7 +612,6 @@ class HELICS_CXX_EXPORT Interface {
   into an interface
   @details for inputs this is the input type, for publications this is the units used to transmit
   data, and for inputs this is the units of the transmitting publication
-  @param handle the interface handle to get the injection units for
   @return a const ref to  std::string  */
     const std::string& getInjectionUnits() const;
 

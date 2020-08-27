@@ -232,11 +232,10 @@ class HELICS_CXX_EXPORT Input:public Interface {
             "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
             "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move(callback);
-        fed->setInputNotificationCallback(*this, [this](Input& /*unused*/, Time time) {
-            handleCallback(time);
-        });
+        registerCallback();
     }
 
+    
   private:
     template<class X>
     void setDefault_impl(std::integral_constant<int, 0> /*V*/, X&& val)
@@ -254,10 +253,13 @@ class HELICS_CXX_EXPORT Input:public Interface {
     template<class X>
     void setDefault_impl(std::integral_constant<int, 2> /*V*/, X&& val)
     {
-        fed->setDefaultValue(*this,
-                             ValueConverter<remove_cv_ref<X>>::convert(std::forward<X>(val)));
+        auto res = ValueConverter<remove_cv_ref<X>>::convert(std::forward<X>(val));
+        lastValue = std::string(res.to_string());
+        setDefaultRaw(res);
     }
 
+    /** setup the callback for value callback into the federate*/
+    void registerCallback();
   public:
     /** set the default value to use before any update has been published
      */
@@ -267,6 +269,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
         setDefault_impl<X>(typeCategory<X>(), std::forward<X>(val));
     }
 
+    void setDefaultRaw(data_view val);
     /** set the minimum delta for change detection
     @param deltaV a double with the change in a value in order to register a different value
     */
@@ -319,7 +322,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     template<class X>
     void getValue_impl(std::integral_constant<int, nonConvertibleType> /*V*/, X& out)
     {
-        ValueConverter<X>::interpret(fed->getValueRaw(*this), out);
+        ValueConverter<X>::interpret(getRawValue(), out);
     }
 
     template<class X>
@@ -344,7 +347,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     template<class X>
     X getValue_impl(std::integral_constant<int, nonConvertibleType> /*V*/)
     {
-        return ValueConverter<X>::interpret(fed->getValueRaw(*this));
+        return ValueConverter<X>::interpret(getRawValue());
     }
 
   public:

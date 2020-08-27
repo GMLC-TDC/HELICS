@@ -67,6 +67,10 @@ Input::Input(interface_visibility locality,
     }
 }
 
+void Input::setDefaultRaw(data_view val) {
+    fed->setDefaultValue(*this, val);
+}
+
 void Input::handleCallback(Time time)
 {
     if (!isUpdated()) {
@@ -604,6 +608,11 @@ void Input::registerNotificationCallback(std::function<void(Time)> callback)
                                       });
 }
 
+void Input::registerCallback() {
+    fed->setInputNotificationCallback(*this, [this](Input& /*unused*/, Time time) {
+        handleCallback(time);
+    });
+}
 size_t Input::getRawSize()
 {
     isUpdated();
