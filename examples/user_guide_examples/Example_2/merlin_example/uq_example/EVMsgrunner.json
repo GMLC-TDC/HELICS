@@ -9,7 +9,7 @@
         },
         {
             "directory": ".",
-            "exec": "python3 EVMsgFed.py --port 12345 --seed 1",
+            "exec": "python3 EVMsgFed.py --port 12345 --seed 2",
             "host": "broker",
             "name": "EVMsgFed_0",
             "loglevel": 3
