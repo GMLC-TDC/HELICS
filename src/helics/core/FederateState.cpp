@@ -1168,6 +1168,21 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 addDependent(cmd.source_id);
             }
         } break;
+        case CMD_ADD_ENDPOINT: {
+            auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+            if (eptI != nullptr) {
+                if (checkActionFlag(cmd, destination_target))
+                {
+                    eptI->addDestinationTarget(cmd.getSource(),
+                                               std::string(cmd.name()),
+                                               cmd.getString(typeStringLoc));
+                } else {
+                    eptI->addSourceTarget(cmd.getSource(),
+                                               std::string(cmd.name()),
+                                               cmd.getString(typeStringLoc));
+                }
+            }
+        } break;
         case CMD_ADD_DEPENDENCY:
         case CMD_REMOVE_DEPENDENCY:
         case CMD_ADD_DEPENDENT:

@@ -105,6 +105,7 @@ across different compilers*/
         cmd_data_link =
             cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
         cmd_filter_link = cmd_info_basis + 709,  //!< command to add a target to a filter
+        cmd_endpoint_link = cmd_info_basis + 711,  //!< command to link endpoints
 
         cmd_fed_configure_time =
             202,  //!< command to update the configuration of a federate a time parameter
@@ -273,6 +274,7 @@ across different compilers*/
 
 #define CMD_DATA_LINK action_message_def::action_t::cmd_data_link
 #define CMD_FILTER_LINK action_message_def::action_t::cmd_filter_link
+#define CMD_ENDPOINT_LINK action_message_def::action_t::cmd_endpoint_link
 
 #define CMD_REMOVE_NAMED_TARGET action_message_def::action_t::cmd_remove_named_target
 #define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target

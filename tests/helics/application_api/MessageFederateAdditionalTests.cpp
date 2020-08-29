@@ -65,7 +65,7 @@ TEST_F(mfed_tests, endpoint_registration)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
 
     auto& sv = epid.getKey();
-    auto& sv2 = epid.getKey();
+    auto& sv2 = epid2.getKey();
     EXPECT_EQ(sv, "fed0/ep1");
     EXPECT_EQ(sv2, "ep2");
 

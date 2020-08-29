@@ -296,7 +296,7 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(helics_property_time_delta, 1.0);
     mFed2->setProperty(helics_property_time_delta, 1.0);
-
+    epid.setDefaultDestination("ep2");
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
@@ -308,7 +308,7 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     helics::SmallBuffer data2(400, 'b');
     helics::SmallBuffer data3(300, 'c');
     helics::SmallBuffer data4(200, 'd');
-    epid.setDefaultDestination("ep2");
+    
     epid.sendTo("ep2", data1);
     epid.sendTo("ep2", data2);
     epid.send(data3);

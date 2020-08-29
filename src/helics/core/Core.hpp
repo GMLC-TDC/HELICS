@@ -557,7 +557,8 @@ class Core {
     @param handle an interface to add the target to
     @param dest the target endpoint for the filter
     */
-    virtual void addDestinationTarget(interface_handle handle, std::string_view dest) = 0;
+    virtual void
+        addDestinationTarget(interface_handle handle, std::string_view dest, handle_type hint=handle_type::unknown) = 0;
 
     /** add a source target,  the handle can be a subscription, input, filter or endpoint
     @details for subscriptions and inputs this establishes a link from a publication, for endpoints
@@ -566,7 +567,9 @@ class Core {
     @param handle the identifier of the interface
     @param name the name of the filter or its target
     */
-    virtual void addSourceTarget(interface_handle handle, std::string_view name) = 0;
+    virtual void addSourceTarget(interface_handle handle,
+                                 std::string_view name,
+                                 handle_type hint = handle_type::unknown) = 0;
 
     /**
     * get the destination targets for an interface

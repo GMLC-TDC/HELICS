@@ -116,10 +116,10 @@ void Endpoint::send(std::unique_ptr<Message> mess) const
 }
 
 static const std::string emptyStr;
-/** get the target destination for the endpoint TODO(PT):: make this work*/
+
 const std::string& Endpoint::getDefaultDestination() const
 {
-    return (cr != nullptr) ? cr->getSourceTargets(handle) : emptyStr;
+    return (cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr;
 }
 
 void Endpoint::subscribe(const std::string& key)
@@ -157,7 +157,7 @@ void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& cal
 void Endpoint::addSourceFilter(const std::string& filterName)
 {
     if (cr!=nullptr) {
-        cr->addSourceTarget(handle, filterName);
+        cr->addSourceTarget(handle, filterName, handle_type::filter);
     }
    
 }
@@ -165,7 +165,7 @@ void Endpoint::addSourceFilter(const std::string& filterName)
 void Endpoint::addDestinationFilter(const std::string& filterName)
 {
     if (cr != nullptr) {
-        cr->addDestinationTarget(handle, filterName);
+        cr->addDestinationTarget(handle, filterName, handle_type::filter);
     }
 }
 }  // namespace helics

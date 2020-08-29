@@ -1124,7 +1124,9 @@ void CommonCore::removeTarget(interface_handle handle, std::string_view targetTo
     addActionMessage(std::move(cmd));
 }
 
-void CommonCore::addDestinationTarget(interface_handle handle, std::string_view dest)
+void CommonCore::addDestinationTarget(interface_handle handle,
+                                      std::string_view dest,
+                                      handle_type hint)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1133,11 +1135,16 @@ void CommonCore::addDestinationTarget(interface_handle handle, std::string_view 
     ActionMessage cmd;
     cmd.setSource(handleInfo->handle);
     cmd.flags = handleInfo->flags;
+    cmd.counter = static_cast<uint16_t>(handleInfo->handleType);
     setActionFlag(cmd, destination_target);
     cmd.payload = dest;
     switch (handleInfo->handleType) {
         case handle_type::endpoint:
-            cmd.setAction(CMD_ADD_NAMED_FILTER);
+            if(hint == handle_type::filter) { cmd.setAction(CMD_ADD_NAMED_FILTER); }
+            else { cmd.setAction(CMD_ADD_NAMED_ENDPOINT); }
+            if (handleInfo->key.empty()) {
+                cmd.setStringData(handleInfo->type, handleInfo->units);
+            }
             break;
         case handle_type::filter:
             cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -1164,7 +1171,7 @@ void CommonCore::addDestinationTarget(interface_handle handle, std::string_view 
     addActionMessage(std::move(cmd));
 }
 
-void CommonCore::addSourceTarget(interface_handle handle, std::string_view targetName)
+void CommonCore::addSourceTarget(interface_handle handle, std::string_view targetName, handle_type hint)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1176,7 +1183,13 @@ void CommonCore::addSourceTarget(interface_handle handle, std::string_view targe
     cmd.payload = targetName;
     switch (handleInfo->handleType) {
         case handle_type::endpoint:
-            cmd.setAction(CMD_ADD_NAMED_FILTER);
+            if (hint == handle_type::filter)
+            {
+                cmd.setAction(CMD_ADD_NAMED_FILTER);
+            }
+            else {
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+            }
             break;
         case handle_type::filter:
             cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -1578,10 +1591,10 @@ void CommonCore::makeConnections(const std::string& file)
 
 void CommonCore::linkEndpoints(const std::string& source, const std::string& dest)
 {
-   // ActionMessage M(CMD_DATA_LINK);
-   // M.name(source);
-   // M.setStringData(target);
-    //addActionMessage(std::move(M));
+   ActionMessage M(CMD_ENDPOINT_LINK);
+   M.name(source);
+   M.setStringData(dest);
+   addActionMessage(std::move(M));
 }
 
 void CommonCore::dataLink(const std::string& source, const std::string& target)
@@ -3483,13 +3496,30 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                     // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
-                command.setAction(CMD_ADD_FILTER);
+                
+                if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                    command.setAction(CMD_ADD_ENDPOINT);
+                    toggleActionFlag(command, destination_target);
+                } else {
+                    command.setAction(CMD_ADD_FILTER);
+                }
                 command.setDestination(ept->handle);
-                command.payload.clear();
                 addTargetToInterface(command);
+
+                // to the originating interface
                 command.setAction(CMD_ADD_ENDPOINT);
+                if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                    toggleActionFlag(command, destination_target);
+                }
+                
                 command.swapSourceDest();
+                command.setSource(ept->handle);
+                command.name(ept->key);
+                command.setString(typeStringLoc, ept->type);
                 addTargetToInterface(command);
+
+                
+                
             } else {
                 routeMessage(std::move(command));
             }

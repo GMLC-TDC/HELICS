@@ -78,6 +78,17 @@ inline void clearActionFlag(FlagContainer& M, FlagIndex flag)
     M.flags &= static_cast<decltype(M.flags)>(~((1U) << (static_cast<uint16_t>((flag)))));
 }
 
+/** template function to clear a flag in an object containing a flags field*/
+template<class FlagContainer, class FlagIndex>
+inline void toggleActionFlag(FlagContainer& M, FlagIndex flag)
+{
+    if (checkActionFlag(M, flag)) {
+        clearActionFlag(M, flag);
+    }else {
+        setActionFlag(M, flag);
+    }
+}
+
 /** helper function to facilitate make a flag variable*/
 inline constexpr uint16_t make_flags(unsigned int flag)
 {
