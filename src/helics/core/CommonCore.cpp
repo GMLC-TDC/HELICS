@@ -4328,6 +4328,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
     if (handle == nullptr) {
         return m;
     }
+    clearActionFlag(m, filter_processing_required_flag);
     if (checkActionFlag(*handle, has_source_filter_flag)) {
         auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {

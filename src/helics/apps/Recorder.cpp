@@ -105,6 +105,7 @@ namespace apps {
         auto subCount = fed->getInputCount();
         for (int ii = 0; ii < subCount; ++ii) {
             subscriptions.emplace_back(fed->getInput(ii));
+            targets.emplace_back(subscriptions.back().getTarget());
             subids.emplace(subscriptions.back().getHandle(),
                            static_cast<int>(subscriptions.size()) - 1);
             subkeys.emplace(subscriptions.back().getTarget(),

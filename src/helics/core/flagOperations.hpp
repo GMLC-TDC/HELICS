@@ -44,7 +44,7 @@ constexpr uint16_t targetted_flag =
     extra_flag2;  //!< overload of extra_flag2 indicating an endpoint is targetted
 
 constexpr uint16_t filter_processing_required_flag =
-    extra_flag4;  // overload of extra_flag3 indicating that the message requires processing for filters yet
+    extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for filters yet
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

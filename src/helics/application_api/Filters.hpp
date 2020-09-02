@@ -38,7 +38,6 @@ HELICS_CXX_EXPORT filter_types filterTypeFromString(const std::string& filterTyp
 /** class for managing a particular filter*/
 class HELICS_CXX_EXPORT Filter:public Interface {
   protected:
-    Core* corePtr = nullptr;  //!< the Core to use
     bool cloning = false;
     bool disableAssign = false;  //!< disable assignment for the object
   private:
@@ -49,8 +48,10 @@ class HELICS_CXX_EXPORT Filter:public Interface {
     Filter() = default;
     /** construct through a federate*/
     explicit Filter(Federate* ffed, const std::string& filtName = EMPTY_STRING);
-    /** construct from handle*/
+    /** construct from handle and federate*/
     Filter(Federate* ffed, const std::string& filtName, interface_handle ihandle);
+    /** construct from handle and core*/
+    Filter(Core* core, const std::string& filtName, interface_handle ihandle);
     /** construct through a federate*/
     Filter(interface_visibility locality,
            Federate* ffed,
@@ -86,11 +87,6 @@ class HELICS_CXX_EXPORT Filter:public Interface {
     virtual void setString(const std::string& property, const std::string& val);
    
     void addTarget(const std::string& target) { addSourceTarget(target); }
-
-    /** close a filter during an active simulation
-    @details it is not necessary to call this function unless you are continuing the simulation
-    after the close*/
-    void close();
 
   protected:
     /** set a filter operations object */

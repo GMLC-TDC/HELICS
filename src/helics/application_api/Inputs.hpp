@@ -58,6 +58,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     std::shared_ptr<units::precise_unit> inputUnits;  //!< the units of the linked publications
     std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>>
         sourceTypes;  //!< source information for input sources
+    std::string givenTarget; //!< the first target set for the input
     double delta{-1.0};  //!< the minimum difference
     double threshold{0.0};  //!< the threshold to use for binary decisions
     // this needs to match the defV type
@@ -195,7 +196,13 @@ class HELICS_CXX_EXPORT Input:public Interface {
     /** get the units associated with a input*/
     const std::string& getUnits() const { return getExtractionUnits(); }
 
-    void addTarget(const std::string & target) { addSourceTarget(target); }
+    void addTarget(const std::string& target)
+    {
+        if (givenTarget.empty()) {
+            givenTarget = target;
+        }
+        addSourceTarget(target);
+    }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer
     @param assumeUpdate if set to true will assume there was a publication and not check it first,
@@ -397,8 +404,15 @@ class HELICS_CXX_EXPORT Input:public Interface {
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffer>>& dataV);
 
-    virtual const std::string& getDisplayName() const override { return (name.empty())?getSourceTargets():getName(); }
+    const std::string& getTarget() const
+    {
+        return (!givenTarget.empty()) ? givenTarget : getSourceTargets();
+    }
 
+    virtual const std::string& getDisplayName() const override
+    {
+        return (name.empty()) ? getTarget() : getName();
+    }
   private:
     /** load some information about the data source such as type and units*/
     void loadSourceInformation();
