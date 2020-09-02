@@ -502,6 +502,7 @@ namespace apps {
         auto res = subkeys.find(key);
         if ((res == subkeys.end()) || (res->second == -1)) {
             subscriptions.emplace_back(fed->registerSubscription(key));
+            targets.emplace_back(key);
             auto index = static_cast<int>(subscriptions.size()) - 1;
             auto id = subscriptions.back().getHandle();
             subids[id] = index;  // this is a new element
@@ -546,12 +547,12 @@ namespace apps {
         captureInterfaces.push_back(captureDesc);
     }
 
-    std::pair<std::string, std::string> Recorder::getValue(int index) const
+    std::pair<std::string_view, std::string> Recorder::getValue(int index) const
     {
         if (isValidIndex(index, points)) {
-            return {subscriptions[points[index].index].getTarget(), points[index].value};
+            return {targets[points[index].index], points[index].value};
         }
-        return {std::string(), std::string()};
+        return {{}, std::string()};
     }
 
     std::unique_ptr<Message> Recorder::getMessage(int index) const

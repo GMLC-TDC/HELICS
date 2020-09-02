@@ -1310,11 +1310,12 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                     routeMessage(command);
                     if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
                         toggleActionFlag(command, destination_target);
+                        command.name(ept->key);
+                        command.setString(typeStringLoc, ept->type);
                     }
                     command.swapSourceDest();
-                    command.setSource(ept->handle);
-                    command.name(ept->key);
-                    command.setString(typeStringLoc, ept->type);
+                    //command.setSource(ept->handle);
+                    
                     routeMessage(command);
                 } else {
                     command.setAction(CMD_ADD_ENDPOINT);

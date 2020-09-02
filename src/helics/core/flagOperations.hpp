@@ -28,7 +28,7 @@ enum operation_flags : uint16_t {
     destination_processing_flag =
         11,  //!< flag indicating the message is for destination processing
     disconnected_flag = 12,  //!< flag indicating that a broker/federate is disconnected
-    extra_flag3 = 13,  //!< flag indicating the endpoint is targetted
+    extra_flag3 = 13,  //!< extra flag
     extra_flag4 = 14,  //!< extra flag
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
@@ -38,10 +38,13 @@ constexpr uint16_t slow_responding_flag =
                   // responding
 
 constexpr uint16_t cancel_flag =
-    extra_flag3;  // overload of extra_flag3 indicating an operation is canceled
+    extra_flag3;  //!< overload of extra_flag3 indicating an operation is canceled
 
 constexpr uint16_t targetted_flag =
-    extra_flag2;  // overload of extra_flag2 indicating an endpoint is targetted
+    extra_flag2;  //!< overload of extra_flag2 indicating an endpoint is targetted
+
+constexpr uint16_t filter_processing_required_flag =
+    extra_flag4;  // overload of extra_flag3 indicating that the message requires processing for filters yet
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

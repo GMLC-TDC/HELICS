@@ -388,6 +388,7 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
     EXPECT_GE(rec1.messageCount(), 2u);
 
     auto m = rec1.getMessage(0);
+    ASSERT_TRUE(m);
     EXPECT_EQ(m->data.to_string(), "this is a test message");
 }
 

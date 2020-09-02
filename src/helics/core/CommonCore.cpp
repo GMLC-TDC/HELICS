@@ -1698,6 +1698,7 @@ void CommonCore::sendToAt(interface_handle sourceHandle,
 void CommonCore::generateMessages(ActionMessage& message,
                       const std::vector<std::pair<global_handle, std::string_view>>& targets)
 {
+    setActionFlag(message, filter_processing_required_flag);
     if (targets.size() == 1) {
         
         message.setDestination(targets.front().first);
@@ -3306,7 +3307,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         } break;
 
         case CMD_SEND_MESSAGE:
-            if ((command.dest_id == parent_broker_id) && (isLocal(command.source_id))) {
+            if (checkActionFlag(command, filter_processing_required_flag)||((command.dest_id == parent_broker_id) && (isLocal(command.source_id)))) {
                 deliverMessage(processMessage(command));
             } else {
                 deliverMessage(command);
