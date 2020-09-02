@@ -33,7 +33,7 @@ def destroy_federate(fed):
 
 def create_message_federate(fedinitstring,name,period):
     fedinfo = h.helicsCreateFederateInfo()
-    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "tcpss")
     h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
     # Set one second message interval
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_period, period)

@@ -20,7 +20,7 @@ logger.setLevel(logging.DEBUG)
 
 def create_broker():
     initstring = "-f 2 --name=thisbroker"
-    broker = h.helicsCreateBroker("zmq", "", initstring)
+    broker = h.helicsCreateBroker("tcpss", "", initstring)
     isconnected = h.helicsBrokerIsConnected(broker)
 
     if isconnected == 1:
@@ -43,7 +43,7 @@ def create_message_federate(fedinitstring,name,period):
     # Create Federate Info object that describes the federate properties
     fedinfo = h.helicsCreateFederateInfo()
     # Set core type from string
-    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "tcpss")
     #assert status == 0
     # Federate init string
     # you need to tell helics what message bus to use
