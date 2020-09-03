@@ -9,7 +9,7 @@ SYNOPSIS
 --------
 [verse]
 'helics_app broker' [-v|--version] [-h|-?|--help]
-    [--quiet] [--config-file <file>] [-t|--core|--type|--coretype <type>]
+    [--quiet] [--config-file <file>] [-t|--core_type|--coreType|--coretype <type>]
     [-f|-m|--federates|--minfederates|--minfed <num>]
     [-n|--name|--identifier <name>] [--maxiter|--maxiterations <num>]
     [--minbroker|--minbrokers|--minbrokercount <num>]

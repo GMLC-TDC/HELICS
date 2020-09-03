@@ -339,7 +339,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
     og->add_option_function<std::string>(
-          "--coretype,-t,--type",
+          "--coretype,--core_type,--coreType,-t",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
               if (coreType == core_type::UNRECOGNIZED) {

@@ -10,7 +10,7 @@ command line only:
 
 configuration:
   -n [ --name ] arg      name of the broker
-  -t [ --type ] arg      type of the broker ("(zmq)", "ipc", "test", "mpi",
+  -t [ --coretype ] arg      type of the broker ("(zmq)", "ipc", "test", "mpi",
                          "test", "tcp", "udp")
 
  Help for Zero MQ Broker:

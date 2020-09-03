@@ -72,8 +72,8 @@ Federate Info
         Named flag for the federate. Argument can be used multiple times.
 
 -t::
---type::
---core::
+--coreType::
+--core_type::
 --coretype::
         The type of core to connect to. Options include zmq (default), zmqss, tcp,
         tcpss, udp, mpi, and test.

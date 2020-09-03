@@ -4,8 +4,8 @@ include::apps-common-options.adoc[]
         Specify that the broker is a root.
 
 -t::
---type::
---core::
+--coreType::
+--core_type::
 --coretype <type>::
         The type of core to use. Options include zmq (default), zmqss,
         tcp, tcpss, udp, ipc, mpi, and test.
