@@ -29,7 +29,7 @@ input_delay=0 #the input delay for external data to propagate to federates
 subscriptions=[
 {key="pub1",  required=true},
   # shortcut is a naming shortcut for the publication for later retrieval
-{key="fedName/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+{key="fedName/pub2", alias="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 inputs=[

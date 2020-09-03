@@ -125,7 +125,7 @@ As a complement to the extensive listing of HELICS options and flags that can be
     },
     {
       "key": "comboFed/pub2",
-      "shortcut": "pubshortcut"
+      "alias": "pubshortcut"
     }
   ]
 }

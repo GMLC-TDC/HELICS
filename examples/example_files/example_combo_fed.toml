@@ -57,4 +57,4 @@ key="pub1" # the key of the publication
 
 [[subscriptions]]
 key="comboFed/pub2" # the name of the publication to subscribe to
-shortcut="pubshortcut"  #a naming shortcut for the publication for later retrieval
+alias="pubshortcut"  #a naming shortcut for the publication for later retrieval

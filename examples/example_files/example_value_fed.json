@@ -42,7 +42,7 @@
     },
     {
       "key": "fedName/pub2", // the name of the publication to subscribe to
-      "shortcut": "pubshortcut", //a naming shortcut for the publication for later retrieval
+      "alias": "pubshortcut", //a naming shortcut for the publication for later retrieval
       "info": "this is an information string for use by the application"
     }
   ],

@@ -13,7 +13,7 @@ period=  1.0 #the period with which federate may return time
 subscriptions=[
 {key="pub1",  required=true},
   # shortcut is a naming shortcut for the publication for later retrieval
-{key="vFed_toml/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+{key="vFed_toml/pub2", alias="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 inputs=[
