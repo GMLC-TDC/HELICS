@@ -71,7 +71,6 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
-    {"source", helics_flag_source_only},
     {"slow", helics_flag_slow_responding},
     {"slow_response", helics_flag_slow_responding},
     {"slow_responding", helics_flag_slow_responding},
