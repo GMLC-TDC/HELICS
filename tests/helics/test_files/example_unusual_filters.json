@@ -44,7 +44,7 @@
       "flags": "optional"
     },
     {
-      "required": true,
+      "connection_required": true,
       "name": "filtername2", //filters can have names (optional)
       "sourcetargets": ["filterFed/ept2"], //this is a key field specifying the source targets can be an array
       "dest": ["dest targets"], // field specifying destination targets

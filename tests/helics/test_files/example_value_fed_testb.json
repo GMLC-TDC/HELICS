@@ -28,7 +28,7 @@
       "unit": "m", // the units associated with a publication (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
       "info": "this is an information string for use by the application",
-      "flags": ["required", "-optional"]
+      "flags": ["connection_required", "-optional"]
     },
     {
       "key": "pub2", // the name of the publication
@@ -41,7 +41,7 @@
   "subscriptions": [
     {
       "key": "pub1", // the key of the publication
-      "required": true, //set to true to make helics issue a warning if the publication is not found
+      "connection_required": true, //set to true to make helics issue a warning if the publication is not found
       "tolerance": 0.3
     },
     {
@@ -56,7 +56,7 @@
     {
       "key": "ipt2",
       "type": "double",
-      "required": true,
+      "connection_required": true,
       "target": "pub1",
       "global": true
     }

@@ -53,7 +53,7 @@ name="pub2" # the name of the publication (can be key or name)
 
 key="pub1" # the key of the publication
  type="double" # the type associated with a publication (optional)
- required=true #set to true to make helics issue a warning if the publication is not found
+ connection_required=true #set to true to make helics issue a warning if the publication is not found
 
 [[subscriptions]]
 key="comboFed/pub2" # the name of the publication to subscribe to

@@ -39,7 +39,7 @@
   "subscriptions": [
     {
       "key": "pub1", // the key of the publication
-      "required": true //set to true to make helics issue a warning if the publication is not found
+      "connection_required": true //set to true to make helics issue a warning if the publication is not found
     },
     {
       "key": "fedName/pub2", // the name of the publication to subscribe to
@@ -52,7 +52,7 @@
     {
       "key": "ipt2",
       "type": "double",
-      "required": true,
+      "connection_required": true,
       "target": "pub1"
     }
     //specify an input with a target multiple targets could be specified like "targets":["pub1","pub2","pub3"]
