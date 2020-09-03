@@ -46,7 +46,7 @@
       "sourcetargets": "ept1", // source target for the filter
       "inputType": "genmessage", //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
       "outputType": "genmessage", //this could be useful if the filter actually translates the data and can be used to automatically order filters
-      "operation": "delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","custom"
+      "operation": "delay", //currently valid operations are "delay","clone","cloning","randomdelay","randomdrop","reroute","custom"
       "info": "this is an information string for use by the application",
       //additional properties for filters are specified in a property array or object if there is just a single one
       "properties": {
@@ -57,7 +57,7 @@
     {
       "name": "filtername3", //filters can have names (optional)
       "sourcetargets": "ept1", // source target for the filter
-      "operation": "delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","custom"
+      "operation": "delay", //currently valid operations are "delay","clone","cloning","randomdelay","randomdrop","reroute","custom"
       "info": "this is an information string for use by the application",
       //additional properties for filters are specified in a property array or object if there is just a single one
       "properties": {
@@ -69,7 +69,7 @@
       "name": "filtername2", //filters can have names (optional)
       "sourcetargets": ["filterFed/ept2"], //this is a key field specifying the source targets can be an array
       //"dest":["dest targets"],  // field specifying destination targets
-      "operation": "blahblah", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","custom"
+      "operation": "blahblah", //currently valid operations are "delay","clone","cloning","randomdelay","randomdrop","reroute","custom"
       //additional properties for filters are specified in a property array or object if there is just a single one
       "properties": {
         "bname": "newdestination", //A reroute filter takes a new destination
@@ -80,7 +80,7 @@
       "name": "filtername4", //filters can have names (optional)
       "sourcetargets": ["filterFed/ept2"], //this is a key field specifying the source targets can be an array
       //"dest":["dest targets"],  // field specifying destination targets
-      "operation": "delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+      "operation": "delay", //currently valid operations are "delay","clone","cloning","randomdelay","randomdrop","reroute","redirect","custom"
       //additional properties for filters are specified in a property array or object if there is just a single one
       "properties": {
         "bname": "newdestination", //A reroute filter takes a new destination
