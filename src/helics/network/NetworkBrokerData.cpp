@@ -115,7 +115,7 @@ std::shared_ptr<helicsCLI11App>
             "specify that the network connection should be a server or client")
         ->disable_flag_override();
     nbparser->add_option_function<std::string>(
-        "--interface,--localinterface",
+        "--local_interface,--localinterface,--localInterface",
         [this](const std::string& addr) {
             auto localprt = extractInterfaceandPort(addr);
             localInterface = localprt.first;

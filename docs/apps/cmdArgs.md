@@ -16,7 +16,7 @@ configuration:
  Help for Zero MQ Broker:
 
 configuration:
-  --interface arg        the local interface to use for the receive ports
+  --loccal_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokerport arg       port number for the broker priority port
@@ -43,7 +43,7 @@ configuration:
  Help for UDP Broker:
 
 configuration:
-  --interface arg        the local interface to use for the receive ports
+  --loccal_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokerport arg       port number for the broker priority port

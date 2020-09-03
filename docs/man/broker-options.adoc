@@ -66,8 +66,9 @@ Network Connections
 --port <num>::
         The port number to use. For automatically picking a port, use
         -1.
-
---interface::
+        
+--localInterface::
+--local_interface::
 --localinterface <network interface>::
         The local interface to use for the receive ports. Useful if
         on systems that have multiple network cards.

@@ -20,7 +20,7 @@ SYNOPSIS
     [--maxsize <buffer size>] [--maxcount <num msgs>] [--networkretries <num>]
     [--useosport|--use_os_port|useOsPort] [--autobroker] [--brokerinistring <init str>]
     [--client|--server] [-p|--port <num>] [--brokerport <num>] [--localport <num>]
-    [--portstart <num>] [--interface|--localinterface <network interface>] [--root]
+    [--portstart <num>] [--local_interface|--localinterface|--localInterface <network interface>] [--root]
 include::logging-synopsis.adoc[]
 include::timeout-synopsis.adoc[]
 
