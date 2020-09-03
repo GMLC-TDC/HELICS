@@ -26,7 +26,7 @@
       "name": "ept1", // the name of the publication
       "type": "genmessage", // the type associated with a endpoint endpoint types have limited usefulness at present (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
-      "flags": ["optional", "-connection_required"]
+      "flags": ["connection_optional", "-connection_required"]
     },
     {
       "name": "ept2", // the name of the publication
@@ -36,7 +36,7 @@
       //knownDestinations can be used to optimize the communication pathways inside of HELICS
       //the message will be raw data so it would have to be translated to be useful. this can also be a json array to subscribe to multiple publications
       "connection_required": true,
-      "optional": true,
+      "connection_optional": true,
       "sourceFilters": "filt1",
       "destFilters": "filt2"
     }

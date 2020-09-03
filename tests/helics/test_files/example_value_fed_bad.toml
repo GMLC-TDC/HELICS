@@ -17,7 +17,7 @@ subscriptions=[
 ]
 
 inputs=[
-{key="ipt2",  type="double",flags="optional", target="pub1", global=true}
+{key="ipt2",  type="double",flags="connection_optional", target="pub1", global=true}
 ]  #specify an input with a target
 
 publications="bad_pub"
