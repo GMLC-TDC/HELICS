@@ -30,7 +30,6 @@ static const std::map<std::string, filter_types> filterTypes{
     {"random delay", filter_types::random_delay},
     {"random drop", filter_types::random_drop},
     {"reroute", filter_types::reroute},
-    {"redirect", filter_types::reroute},
     {"firewall", filter_types::firewall},
     {"custom", filter_types::custom}};
 

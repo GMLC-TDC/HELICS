@@ -47,7 +47,7 @@ name="ept2" # the name of the endpoint
     targets="ept1"  #this is a key field specifying the target endpoint
     #inputType="genmessage"  #can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
     #outputType="genmessage"  #this could be useful if the filter actually translates the data and can be used to automatically order filters
-    operation="delay" #currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+    operation="delay" #currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","custom"
     info="this is an information string for use by the application"
     #additional properties for filters are specified in a property array or object if there is just a single one
     #A delay filter just has a single property
@@ -56,7 +56,7 @@ name="ept2" # the name of the endpoint
 [[filters]]
     name="filtername2"  #filters can have names (optional)
     targets="filterFed/ept2"  #this is a key field specifying the target endpoint, for filters targets is a synonym for sourcetargets
-    operation="reroute" #currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+    operation="reroute" #currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","custom"
     #additional properties for filters are specified in a property array or object if there is just a single one
      #A reroute filter takes a new destination
      #the value here is the endpoint that should be the new destination
