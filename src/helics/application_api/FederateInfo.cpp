@@ -142,10 +142,9 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"connections", helics_handle_option_connections},
     {"clear_priority_list", helics_handle_option_clear_priority_list},
     {"clear_priority", helics_handle_option_clear_priority_list},
-    {"input_priority", helics_handle_option_input_priority_location},
-    {"priority", helics_handle_option_input_priority_location},
     {"input_priority_location", helics_handle_option_input_priority_location},
-    {"priority_location", helics_handle_option_input_priority_location},
+    {"inputprioritylocation", helics_handle_option_input_priority_location},
+    {"inputPriorityLocation", helics_handle_option_input_priority_location},
     {"multi_input_handling_method", helics_handle_option_multi_input_handling_method},
     {"multi_input_handling", helics_handle_option_multi_input_handling_method}};
 
