@@ -109,8 +109,9 @@ All Core/Broker Types
 --broker_key <key>::
         Specify a key to use to verify all connections to/from a broker.
 
---no_ping::
 --slow_responding::
+--slowresponding::
+--slowResponding::
         Specify that a broker might be slow or unresponsive to ping requests
         from other brokers.
 

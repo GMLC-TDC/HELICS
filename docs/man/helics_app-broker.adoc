@@ -13,7 +13,7 @@ SYNOPSIS
     [-f|-m|--federates|--minfederates|--minfed <num>]
     [-n|--name|--identifier <name>] [--maxiter|--maxiterations <num>]
     [--minbroker|--minbrokers|--minbrokercount <num>]
-    [--key|--broker_key <key>] [--no_ping|--slow_responding]
+    [--key|--broker_key <key>] [--slowresponding|--slow_responding|--slowResponding]
     [--conservative_time_policy|--restrictive_time_policy]
     [--local|--ipv4|--ipv6|--all|--external] [--brokeraddress <address>]
     [--reuse_address] [--broker <identifier>] [--brokername <name>]

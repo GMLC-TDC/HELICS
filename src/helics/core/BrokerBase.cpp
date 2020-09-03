@@ -137,7 +137,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                      brokerKey,
                      "specify a key to use for all connections to/from a broker");
     hApp->add_flag(
-        "--no_ping,--slow_responding",
+        "--slow_responding,--slowResponding,--slowresponding",
         no_ping,
         "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     hApp->add_flag(

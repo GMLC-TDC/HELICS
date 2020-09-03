@@ -66,7 +66,7 @@ TEST(broker_timeout_tests, core_fail_timeout_no_ping_ci_skip)
     auto Fed1 = std::make_shared<helics::Federate>("test1", fi);
 
     fi.coreName = "c2";
-    fi.coreInitString = "--no_ping";
+    fi.coreInitString = "--slow_responding";
 
     auto Fed2 = std::make_shared<helics::Federate>("test2", fi);
 
