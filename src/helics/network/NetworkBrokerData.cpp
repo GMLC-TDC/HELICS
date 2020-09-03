@@ -88,7 +88,7 @@ std::shared_ptr<helicsCLI11App>
         ->check(CLI::PositiveNumber);
     nbparser->add_option("--networkretries", maxRetries, "the maximum number of network retries")
         ->capture_default_str();
-    nbparser->add_flag("--osport,--use_os_port",
+    nbparser->add_flag("--useosport,--use_os_port,--useOsPort",
                        use_os_port,
                        "specify that the ports should be allocated by the host operating system");
     nbparser->add_flag("--autobroker",

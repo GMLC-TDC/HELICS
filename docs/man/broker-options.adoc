@@ -44,7 +44,8 @@ Network Connections
 --networkretries <num>::
         The maximum number of network retries. The default is 5.
 
---osport::
+--useosport::
+--useOsPort::
 --use_os_port::
         Specify that ports should be allocated by the host operating system.
 
