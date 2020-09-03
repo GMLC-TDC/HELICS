@@ -141,7 +141,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         no_ping,
         "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     hApp->add_flag(
-        "--conservative_time_policy,--restrictive_time_policy",
+        "--restrictive_time_policy--restrictivetimepolicy,--restrictiveTimePolicy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
     hApp->add_flag("--terminate_on_error,--halt_on_error",

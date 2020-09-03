@@ -119,7 +119,8 @@ All Core/Broker Types
         the co-simulation if an error is encountered
 
 --restrictive_time_policy::
---conservative_time_policy::
+--restrictivetimepolicy::
+--restrictiveTimePolicy::
         Specify that a broker should use a conservative time policy in the time
         coordinator.
 
