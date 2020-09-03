@@ -806,11 +806,11 @@ static void loadOptions(const Inp& data, Filter& filt)
     }
     auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
     auto adest = [&filt](const std::string& target) { filt.addDestinationTarget(target); };
-    addTargets(data, "targets", asrc);
     addTargets(data, "sourcetargets", asrc);
-    addTargets(data, "desttargets", adest);
     addTargets(data, "sourceTargets", asrc);
+    addTargets(data, "source_targets", asrc);
     addTargets(data, "destTargets", adest);
+    addTargets(data, "desttargets", adest);
 }
 
 void Federate::registerFilterInterfacesJson(const std::string& jsonString)
