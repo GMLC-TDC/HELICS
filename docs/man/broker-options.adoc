@@ -95,7 +95,8 @@ All Core/Broker Types
 --identifier <name>::
         The name used to identify the broker.
 
---maxiter::
+--max_iterations::
+--maxIterations::
 --maxiterations <num>::
         The maximum number of iterations allowed for a timestep. Default is
         10000 iterations.

@@ -100,7 +100,7 @@ configuration:
                          connecting
   --minfed arg           the minimum number of federates that will be
                          connecting
-  --maxiter arg          maximum number of iterations
+  --maxiteration arg     maximum number of iterations
   --logfile arg          the file to log message to
   --loglevel arg         the level which to log the higher this is set to the
                          more gets logs (-1) for no logging

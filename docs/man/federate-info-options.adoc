@@ -55,6 +55,8 @@ Federate Info
         The output delay for outgoing communication of the federate (default in
         in ms).
 
+--max_iterations::
+--maxIterations::
 --maxiterations <num>::
         The maximum number of iterations a federate is allowed to take.
 

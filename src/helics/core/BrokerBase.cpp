@@ -125,7 +125,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier,--uuid", identifier, "the name of the broker/core");
-    hApp->add_option("--maxiter,--maxiterations",
+    hApp->add_option("--max_iterations,--maxiterations,--maxIterations",
                      maxIterationCount,
                      "the maximum number of iterations allowed")
         ->capture_default_str();

@@ -63,10 +63,10 @@ static const std::map<std::string, int> propStringsTranslations{
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
     {"logLevel", helics_property_int_log_level},
-    {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
-    {"maxIterations", helics_property_int_max_iterations},
-    {"iterations", helics_property_int_max_iterations}};
+    {"maxiterations", helics_property_int_max_iterations},
+    {"max_iterations", helics_property_int_max_iterations},
+    {"maxIterations", helics_property_int_max_iterations}};
 
 static const std::map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
@@ -436,7 +436,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->ignore_underscore()
         ->configurable(false);
     app->add_option_function<int>(
-           "--maxiterations",
+           "--maxiterations,--maxIterations,--max_iterations",
            [this](int val) { setProperty(helics_property_int_max_iterations, val); },
            "the maximum number of iterations a federate is allowed to take")
         ->ignore_underscore()
