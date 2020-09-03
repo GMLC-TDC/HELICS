@@ -809,8 +809,9 @@ static void loadOptions(const Inp& data, Filter& filt)
     addTargets(data, "sourcetargets", asrc);
     addTargets(data, "sourceTargets", asrc);
     addTargets(data, "source_targets", asrc);
-    addTargets(data, "destTargets", adest);
-    addTargets(data, "desttargets", adest);
+    addTargets(data, "destinationTargets", adest);
+    addTargets(data, "destinationtargets", adest);
+    addTargets(data, "destination_targets", adest);
 }
 
 void Federate::registerFilterInterfacesJson(const std::string& jsonString)

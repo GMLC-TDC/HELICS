@@ -71,5 +71,5 @@ name="ept2" # the name of the endpoint
     [[filters.properties]]
         name="source"  #source adds a cloning filter for all messages send from a particular endpoint
         value="ept1"    #the value here the endpoint that will have its messages cloned
-        #this could also have been done with the sourcetarget or desttargets fields
+        #this could also have been done with the sourcetarget or destination_targets fields
      #this pair of properties clone all messages to or from "ept1"  this could also be done in one property with "endpoint" but this seemed more instructive in this file
