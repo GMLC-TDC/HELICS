@@ -143,7 +143,8 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"inputprioritylocation", helics_handle_option_input_priority_location},
     {"inputPriorityLocation", helics_handle_option_input_priority_location},
     {"multi_input_handling_method", helics_handle_option_multi_input_handling_method},
-    {"multi_input_handling", helics_handle_option_multi_input_handling_method}};
+    {"multiinputhandlingmethod", helics_handle_option_multi_input_handling_method},
+    {"multiInputHandlingMethod", helics_handle_option_multi_input_handling_method}};
 
 static const std::map<std::string, int> option_value_map{
     {"0", 0},
