@@ -130,7 +130,7 @@ std::shared_ptr<helicsCLI11App>
                          "The port number to use to connect with the broker");
     nbparser
         ->add_option_function<int>(
-            "--localport,--interfaceport",
+            "--localport,--local_port,--localPort",
             [this](int port) {
                 if (port == -999) {
                     use_os_port = true;

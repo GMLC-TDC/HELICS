@@ -376,7 +376,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            },
            "Specify the port number to use")
         ->check(CLI::PositiveNumber);
-    app->add_option("--localport", localport, "Port number to use for connections to this federate")
+    app->add_option("--localport,--localPort,--local_port", localport, "Port number to use for connections to this federate")
         ->ignore_underscore();
     app->add_flag("--autobroker",
                   autobroker,
