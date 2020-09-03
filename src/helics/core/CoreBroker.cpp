@@ -1305,9 +1305,8 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                         }
                     }
                     command.setDestination(ept->handle);
-                    
-                    command.setAction(CMD_ADD_ENDPOINT);
                     routeMessage(command);
+                    command.setAction(CMD_ADD_ENDPOINT);
                     if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
                         toggleActionFlag(command, destination_target);
                         command.name(ept->key);

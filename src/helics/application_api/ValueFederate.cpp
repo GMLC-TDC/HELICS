@@ -125,7 +125,7 @@ Input& ValueFederate::registerGlobalInput(const std::string& key,
 Input& ValueFederate::registerSubscription(const std::string& target, const std::string& units)
 {
     auto& inp = vfManager->registerInput(std::string{}, std::string{}, units);
-    vfManager->addTarget(inp, target);
+    inp.addTarget(target);
     return inp;
 }
 

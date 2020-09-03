@@ -195,14 +195,9 @@ class HELICS_CXX_EXPORT Input:public Interface {
     const std::string& getType() const { return getExtractionType(); }
     /** get the units associated with a input*/
     const std::string& getUnits() const { return getExtractionUnits(); }
-
-    void addTarget(const std::string& target)
-    {
-        if (givenTarget.empty()) {
-            givenTarget = target;
-        }
-        addSourceTarget(target);
-    }
+    /** add a target to the input*/
+    void addTarget(const std::string& target);
+    
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer
     @param assumeUpdate if set to true will assume there was a publication and not check it first,

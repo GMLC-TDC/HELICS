@@ -525,6 +525,7 @@ void Federate::finalizeComplete()
 void Federate::disconnect()
 {
     finalize();
+    
     coreObject = nullptr;
 }
 

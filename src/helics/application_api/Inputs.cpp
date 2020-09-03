@@ -624,6 +624,14 @@ size_t Input::getRawSize()
     return dv.size();
 }
 
+void Input::addTarget(const std::string& target)
+{
+    if (givenTarget.empty()) {
+        givenTarget = target;
+    }
+    fed->addTarget(*this,target);
+}
+
 data_view Input::getRawValue()
 {
     hasUpdate = false;
