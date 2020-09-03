@@ -54,7 +54,7 @@ std::shared_ptr<helicsCLI11App>
                        "allow the server to reuse a bound address, mostly useful for tcp cores");
     nbparser
         ->add_flag(
-            "--noack,--noack_connect",
+            "--noackconnect,--noack_connect--noackConnect",
             noAckConnection,
             "specify that a connection_ack message is not required to be connected with a broker")
         ->ignore_underscore();
