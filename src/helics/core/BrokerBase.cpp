@@ -155,7 +155,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
-            "--loglevel,--log-level",
+            "--loglevel,--log_level,--logLevel",
             [this](int val) { setLogLevel(val); },
             "the level which to log the higher this is set to the more gets logs(-1) for no logging")
         ->transform(

@@ -258,7 +258,7 @@ TEST(other_tests, core_creation)
     EXPECT_STREQ(helicsCoreGetIdentifier(cr), "gcore");
 
     argv[1] = "--name=gcore2";
-    argv[2] = "--log-level=what_logs?";
+    argv[2] = "--log_level=what_logs?";
 
     auto cr2 = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
@@ -287,7 +287,7 @@ TEST(other_tests, broker_creation)
     EXPECT_STREQ(helicsBrokerGetIdentifier(brk), "gbrokerc");
 
     argv[1] = "--name=gbrokerc2";
-    argv[2] = "--log-level=what_logs?";
+    argv[2] = "--log_level=what_logs?";
 
     auto brk2 = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);

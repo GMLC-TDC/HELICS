@@ -62,6 +62,7 @@ static const std::map<std::string, int> propStringsTranslations{
     {"max_iterations", helics_property_int_max_iterations},
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
+    {"logLevel", helics_property_int_log_level},
     {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
     {"maxIterations", helics_property_int_max_iterations},
@@ -450,7 +451,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->ignore_underscore()
         ->check(CLI::PositiveNumber);
     app->add_option_function<int>(
-           "--loglevel,--log-level",
+           "--loglevel,--log_level,--logLevel",
            [this](int val) { setProperty(helics_property_int_log_level, val); },
            "the logging level of a federate")
         ->ignore_underscore()
