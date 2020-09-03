@@ -11,7 +11,7 @@
   "uninterruptible": false, //indicator that the federate should only return requested times
   "coretype": "test", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
   "corename": "mcname", //this matters most for ipc and test cores, can be empty
-  "coreinit": "--autobroker", // the initialization string for the core in the form of a command line arguments
+  "coreinitstring": "--autobroker", // the initialization string for the core in the form of a command line arguments
   "max_iterations": 10, //the maximum number of iterations for a time step
   "period": 1.0, //the period with which federate may return time
   "log_level": 0, // set the log level to error only

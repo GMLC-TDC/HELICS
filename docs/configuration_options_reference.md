@@ -83,7 +83,7 @@ As a complement to the extensive listing of HELICS options and flags that can be
   "uninterruptible": false,
   "coretype": "inproc",
   "corename": "the name of the core",
-  "coreinit": "--autobroker",
+  "coreinitstring": "--autobroker",
   "max_iterations": 10,
   "period": 1.0,
   "offset": 0.0,

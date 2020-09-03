@@ -8,7 +8,8 @@ Federate Info
         The name of the core to create or find.
 
 -i::
---coreinit::
+--core_init_string::
+--coreInitString::
 --coreinitstring <init str>::
         The initialization arguments for the core.
 

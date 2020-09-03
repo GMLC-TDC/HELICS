@@ -4,7 +4,7 @@
   //possible flags
   "coretype": "test", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
   "corename": "multi_core1", //this matters most for ipc and inproc cores, can be empty
-  "coreinit": "--autobroker", // the initialization string for the core in the form of a command line arguments
+  "coreinitstring": "--autobroker", // the initialization string for the core in the form of a command line arguments
 
   //Publications used in the federate
   "publications": [
