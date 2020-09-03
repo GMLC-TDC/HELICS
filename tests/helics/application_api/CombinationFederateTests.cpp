@@ -128,7 +128,7 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
     EXPECT_EQ(sv2, "ep2");
 
     EXPECT_EQ(epid.getExtractionType(), "");
-    EXPECT_EQ(epid.getInjectionType(), "random");
+    EXPECT_EQ(epid2.getInjectionType(), "random");
 
     EXPECT_TRUE(mFed1->getEndpoint("ep1").getHandle() == epid.getHandle());
     EXPECT_TRUE(mFed1->getEndpoint("fed0/ep1").getHandle() == epid.getHandle());
