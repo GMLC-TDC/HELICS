@@ -15,9 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 struct EptInformation {
+    global_handle id;
     std::string key;
     std::string type;
-    global_handle id;
     EptInformation() = default;
     EptInformation(global_handle gid, const std::string& key_, const std::string& type_):
         id(gid), key(key_), type(type_)

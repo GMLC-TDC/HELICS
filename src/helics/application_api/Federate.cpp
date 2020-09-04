@@ -1191,7 +1191,7 @@ void Federate::logMessage(int level, const std::string& message) const
 }
 
 Interface::Interface(Federate* federate, interface_handle id, std::string_view actName):
-    handle(id), name(actName)
+    handle(id), mName(actName)
 {
     if (federate != nullptr) {
         const auto& crp = federate->getCorePointer();
@@ -1303,7 +1303,7 @@ const std::string& Interface::getDestinationTargets() const
 
 const std::string& Interface::getDisplayName() const
 {
-    return (name.empty() ? getTarget() : name);
+    return (mName.empty() ? getTarget() : mName);
 }
 
 void Interface::close()

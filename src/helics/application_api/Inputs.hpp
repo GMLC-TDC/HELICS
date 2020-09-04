@@ -407,7 +407,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
 
     virtual const std::string& getDisplayName() const override
     {
-        return (name.empty()) ? getTarget() : getName();
+        return (mName.empty()) ? getTarget() : getName();
     }
 
   private:
