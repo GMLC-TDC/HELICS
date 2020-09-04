@@ -117,7 +117,7 @@ TEST_F(timing_tests, simple_timing_test_message)
 
     // check that the request is only granted at the appropriate period
     EXPECT_NEAR(gtime, 0.6, 0.000000001);
-    CE(helicsEndpointSendMessageRaw(ept1, "e2", "test1", 5, &err));
+    CE(helicsEndpointSendTo(ept1, "e2", "test1", 5, &err));
 
     CE(helicsFederateRequestTimeAsync(vFed1, 1.85, &err));
 
@@ -161,7 +161,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(gtime = helicsFederateRequestTime(vFed1, 1.0, &err));
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(gtime, 1.0);
-    CE(helicsEndpointSendMessageRaw(ept1, "e2", "test1", 5, &err));
+    CE(helicsEndpointSendTo(ept1, "e2", "test1", 5, &err));
     CE(helicsFederateRequestTimeAsync(vFed1, 1.9, &err));
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
     EXPECT_DOUBLE_EQ(gtime,

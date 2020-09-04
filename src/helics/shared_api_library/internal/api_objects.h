@@ -168,6 +168,8 @@ extern const std::string emptyStr;
 extern const std::string nullStringArgument;
 #define AS_STRING(str) ((str) != nullptr) ? std::string(str) : emptyStr
 
+#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(emptyStr)
+
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \

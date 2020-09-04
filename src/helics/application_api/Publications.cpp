@@ -167,7 +167,18 @@ void Publication::publishString(std::string_view val)
 void Publication::publish(const std::vector<std::string>& val)
 {
     auto buffer = ValueConverter<std::vector<std::string>>::convert(val);
-    publishString(buffer.to_string());
+    auto str = ValueConverter<std::string_view>::interpret(buffer);
+    bool doPublish = true;
+    if (changeDetectionEnabled) {
+        if (changeDetected(prevValue, str, delta)) {
+            prevValue = std::string(str);
+        } else {
+            doPublish = false;
+        }
+    }
+    if (doPublish) {
+        fed->publishRaw(*this, buffer);
+    }
 }
 
 void Publication::publish(const std::vector<double>& val)

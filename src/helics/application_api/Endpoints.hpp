@@ -23,6 +23,7 @@ class HELICS_CXX_EXPORT Endpoint:public Interface {
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
     bool disableAssign{false};  //!< disable assignment for the object
+    std::string defDest; //!< storage for a default destination
   public:
     /** default constructor*/
     Endpoint() = default;
@@ -173,7 +174,7 @@ template<class FedPtr>
     /** add a named filter to an endpoint for all message going to the endpoint*/
     void addDestinationFilter(const std::string& filterName);
     /** set a target destination for unspecified messages*/
-    void setDefaultDestination(std::string_view target) {addDestinationTarget(target); }
+    void setDefaultDestination(std::string_view target);
     /** get the target destination for the endpoint TODO(PT):: make this work*/
     const std::string& getDefaultDestination() const;
 

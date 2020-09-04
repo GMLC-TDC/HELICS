@@ -1308,7 +1308,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
             mv.source_handle = handle;
             mv.setDestination(subs[0]);
             mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
-            mv.payload = std::string(data, len);
+            mv.payload.assign(data, len);
             mv.actionTime = fed->nextAllowedSendTime();
 
             actionQueue.push(std::move(mv));
@@ -1322,7 +1322,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
         mv.source_id = handleInfo->getFederateId();
         mv.source_handle = handle;
         mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
-        mv.payload = std::string(data, len);
+        mv.payload.assign(data, len);
         mv.actionTime = fed->nextAllowedSendTime();
 
         for (auto& target : subs) {

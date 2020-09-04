@@ -1058,7 +1058,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is another global value");
 
     auto str2 = Fed1->query("global", "list");
-    EXPECT_TRUE((str2 == "[global1;global2]") || (str2 == "[global2;global1]"));
+    EXPECT_TRUE((str2 == "[\"global1\",\"global2\"]") || (str2 == "[\"global2\",\"global1\"]"));
 
     auto str3 = Fed1->query("global", "all");
     EXPECT_NE(str3, "#invalid");

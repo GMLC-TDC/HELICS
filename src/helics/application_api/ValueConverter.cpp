@@ -226,6 +226,12 @@ namespace detail {
                    reinterpret_cast<const char*>(data) + 8 + size);
     }
 
+    void convertFromBinary(const std::byte* data, std::string_view& val)
+    {
+        std::size_t size = getDataSize(data);
+        val=std::string_view(reinterpret_cast<const char*>(data) + 8, size);
+    }
+
     void convertFromBinary(const std::byte* data, char* val)
     {
         std::size_t size = getDataSize(data);
@@ -298,8 +304,7 @@ void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::st
         V.append(str);
     }
     auto strgen = generateJsonString(V);
-    store.resize(detail::getBinaryLength(strgen));
-    detail::convertToBinary(store.data(), strgen);
+    return ValueConverter<std::string_view>::convert(strgen,store);
 }
 
 /** interpret a view of the data block and store to the specified value*/
@@ -307,16 +312,20 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
                                                          std::vector<std::string>& val)
 {
     val.clear();
-    std::string str;
-    detail::convertFromBinary(block.bytes(), str);
-    Json::Value V = loadJsonStr(str);
-    if (V.isArray()) {
-        val.reserve(V.size());
-        for (auto& av : V) {
-            val.emplace_back(av.asString());
+    auto str = ValueConverter<std::string_view>::interpret(block);
+    try {
+        Json::Value V = loadJsonStr(str);
+        if (V.isArray()) {
+            val.reserve(V.size());
+            for (auto& av : V) {
+                val.emplace_back(av.asString());
+            }
+        } else {
+            val.emplace_back(str);
         }
-    } else {
-        val.push_back(block.string());
+    }
+    catch(...) {
+        val.emplace_back(str);
     }
 }
 

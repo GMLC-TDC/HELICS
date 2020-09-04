@@ -51,6 +51,9 @@ void Endpoint::sendTo(std::string_view dest, const char* data, size_t data_size)
 {
     if ((cr != nullptr) && (fed->getCurrentMode() == Federate::modes::executing) ||
         (fed->getCurrentMode() == Federate::modes::initializing)) {
+        if (dest.empty()) {
+            dest = defDest;
+        }
         cr->sendTo(handle, dest,data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -82,6 +85,9 @@ void Endpoint::sendToAt(std::string_view dest,
 {
     if ((cr != nullptr) && (fed->getCurrentMode() == Federate::modes::executing) ||
         (fed->getCurrentMode() == Federate::modes::initializing)) {
+        if (dest.empty()) {
+            dest = defDest;
+        }
         cr->sendToAt(handle, dest,sendTime,data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -108,6 +114,9 @@ void Endpoint::send(std::unique_ptr<Message> mess) const
 {
     if ((cr != nullptr) && (fed->getCurrentMode() == Federate::modes::executing) ||
         (fed->getCurrentMode() == Federate::modes::initializing)) {
+        if (mess->dest.empty()) {
+            mess->dest = defDest;
+        }
         cr->sendMessage(handle, std::move(mess));
     } else {
         throw(InvalidFunctionCall(
@@ -117,9 +126,17 @@ void Endpoint::send(std::unique_ptr<Message> mess) const
 
 static const std::string emptyStr;
 
+void Endpoint::setDefaultDestination(std::string_view target)
+{
+    if (defDest.empty() && fed->getCurrentMode() < Federate::modes::executing) {
+        addDestinationTarget(target);
+    }
+    defDest = target;
+}
+
 const std::string& Endpoint::getDefaultDestination() const
 {
-    return (cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr;
+    return (!defDest.empty())?defDest:((cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr);
 }
 
 void Endpoint::subscribe(const std::string& key)

@@ -232,7 +232,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
     // check subscriptions
     EXPECT_EQ(subid.getTarget(), "pub2");
-    EXPECT_EQ(subid.getKey(), "sub2");
+    EXPECT_EQ(subid2.getKey(), "sub2");
 
     EXPECT_EQ(subid.getName(), "fed0/sub1");
     EXPECT_EQ(subid.getKey(), "fed0/sub1");
