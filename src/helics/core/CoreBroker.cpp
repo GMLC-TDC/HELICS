@@ -630,14 +630,16 @@ std::string CoreBroker::generateFederationSummary() const
     }
     Json::Value summary;
     Json::Value block;
-    block["federates"] = _federates.size();
+    block["federates"] = static_cast<int>(_federates.size());
     block["min_federates"] = minFederateCount;
-    block["brokers"] = std::count_if(_brokers.begin(),
-                                     _brokers.end(),
-                                     [](auto& brk) { return !static_cast<bool>(brk._core); }),
-    block["cores"] = std::count_if(_brokers.begin(),
-                                   _brokers.end(),
-                                   [](auto& brk) { return static_cast<bool>(brk._core); }),
+    block["brokers"] =
+        static_cast<int>(std::count_if(_brokers.begin(), _brokers.end(), [](auto& brk) {
+            return !static_cast<bool>(brk._core);
+        }));
+    block["cores"] =
+        static_cast<int>(std::count_if(_brokers.begin(), _brokers.end(), [](auto& brk) {
+            return static_cast<bool>(brk._core);
+        }));
     block["min_brokers"] = minBrokerCount;
     block["publications"] = pubs;
     block["inputs"] = ipts;
