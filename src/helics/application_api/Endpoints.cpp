@@ -37,8 +37,9 @@ Endpoint::Endpoint(interface_visibility locality,
 
 void Endpoint::send(const char* data, size_t data_size) const
 {
-    if ((cr != nullptr) && ((fed->getCurrentMode() == Federate::modes::executing) ||
-        (fed->getCurrentMode() == Federate::modes::initializing))) {
+    if ((cr != nullptr) &&
+        ((fed->getCurrentMode() == Federate::modes::executing) ||
+         (fed->getCurrentMode() == Federate::modes::initializing))) {
         cr->send(handle, data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -48,8 +49,9 @@ void Endpoint::send(const char* data, size_t data_size) const
 
 void Endpoint::sendTo(std::string_view dest, const char* data, size_t data_size) const
 {
-    if ((cr != nullptr) && ((fed->getCurrentMode() == Federate::modes::executing) ||
-        (fed->getCurrentMode() == Federate::modes::initializing))) {
+    if ((cr != nullptr) &&
+        ((fed->getCurrentMode() == Federate::modes::executing) ||
+         (fed->getCurrentMode() == Federate::modes::initializing))) {
         if (dest.empty()) {
             dest = defDest;
         }
@@ -62,8 +64,9 @@ void Endpoint::sendTo(std::string_view dest, const char* data, size_t data_size)
 
 void Endpoint::sendAt(Time sendTime, const char* data, size_t data_size) const
 {
-    if ((cr != nullptr) && ((fed->getCurrentMode() == Federate::modes::executing) ||
-        (fed->getCurrentMode() == Federate::modes::initializing))) {
+    if ((cr != nullptr) &&
+        ((fed->getCurrentMode() == Federate::modes::executing) ||
+         (fed->getCurrentMode() == Federate::modes::initializing))) {
         cr->sendAt(handle, sendTime, data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -82,8 +85,9 @@ void Endpoint::sendToAt(std::string_view dest,
                         const char* data,
                         size_t data_size) const
 {
-    if ((cr != nullptr) && ((fed->getCurrentMode() == Federate::modes::executing) ||
-        (fed->getCurrentMode() == Federate::modes::initializing))) {
+    if ((cr != nullptr) &&
+        ((fed->getCurrentMode() == Federate::modes::executing) ||
+         (fed->getCurrentMode() == Federate::modes::initializing))) {
         if (dest.empty()) {
             dest = defDest;
         }
@@ -99,8 +103,9 @@ void Endpoint::sendToAt(std::string_view dest,
 */
 void Endpoint::send(const void* data, size_t data_size) const
 {
-    if ((cr != nullptr) && ((fed->getCurrentMode() == Federate::modes::executing) ||
-        (fed->getCurrentMode() == Federate::modes::initializing))) {
+    if ((cr != nullptr) &&
+        ((fed->getCurrentMode() == Federate::modes::executing) ||
+         (fed->getCurrentMode() == Federate::modes::initializing))) {
         cr->send(handle, data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -111,8 +116,9 @@ void Endpoint::send(const void* data, size_t data_size) const
 /** send a pointer to a message object*/
 void Endpoint::send(std::unique_ptr<Message> mess) const
 {
-    if ((cr != nullptr) && ((fed->getCurrentMode() == Federate::modes::executing) ||
-        (fed->getCurrentMode() == Federate::modes::initializing))) {
+    if ((cr != nullptr) &&
+        ((fed->getCurrentMode() == Federate::modes::executing) ||
+         (fed->getCurrentMode() == Federate::modes::initializing))) {
         if (mess->dest.empty()) {
             mess->dest = defDest;
         }
