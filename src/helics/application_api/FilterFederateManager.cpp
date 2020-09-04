@@ -113,7 +113,16 @@ void FilterFederateManager::closeAllFilters()
         auto filts = filters.lock();
         for (auto& filt : filts) {
             coreObject->closeHandle(filt->getHandle());
+            filt->disconnectFromCore();
         }
+    }
+}
+
+void FilterFederateManager::disconnectAllFilters()
+{
+    auto filts = filters.lock();
+    for (auto& filt : filts) {
+        filt->disconnectFromCore();
     }
 }
 }  // namespace helics

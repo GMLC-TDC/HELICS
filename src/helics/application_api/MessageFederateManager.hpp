@@ -44,18 +44,13 @@ class MessageFederateManager {
     */
     Endpoint& registerEndpoint(const std::string& name, const std::string& type);
 
-    /** @brief give the core a hint for known communication paths
-    Specifying a path that is not present will cause the simulation to abort with an error message
-    @param localEndpoint the local endpoint of a known communication pair
-    @param remoteEndpoint of a communication pair
-    */
-    void registerKnownCommunicationPath(const Endpoint& localEndpoint,
-                                        const std::string& remoteEndpoint);
-    /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
-    @param ept the specified endpoint to deliver the values
-    @param pubName the name of the publication to subscribe
-    */
-    void subscribe(const Endpoint& ept, const std::string& pubName);
+        /** register a targetted endpoint
+@details call is only valid in startup mode
+@param name the name of the endpoint
+@param type the defined type of the interface for endpoint checking if requested
+*/
+    Endpoint& registerTargettedEndpoint(const std::string& name, const std::string& type);
+
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
     /* check if a given endpoint has any unread messages*/
@@ -75,16 +70,6 @@ class MessageFederateManager {
     static std::unique_ptr<Message> getMessage(const Endpoint& ept);
     /* receive a communication message for any endpoint in the federate*/
     std::unique_ptr<Message> getMessage();
-
-    /**/
-    void sendMessage(const Endpoint& source, const std::string& dest, const data_view& message);
-    /**/
-    void sendMessage(const Endpoint& source,
-                     const std::string& dest,
-                     const data_view& message,
-                     Time sendTime);
-    /**/
-    void sendMessage(const Endpoint& source, std::unique_ptr<Message> message);
 
     /** update the time from oldTime to newTime
     @param newTime the newTime of the federate
@@ -124,11 +109,6 @@ class MessageFederateManager {
     void disconnect();
     /**get the number of registered endpoints*/
     int getEndpointCount() const;
-
-    /** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter(const Endpoint& ept, const std::string& filterName);
-    /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter(const Endpoint& ept, const std::string& filterName);
 
   private:
     class EndpointData {

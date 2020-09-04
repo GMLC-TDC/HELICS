@@ -88,6 +88,13 @@ class Input {
     /** get the size of the raw value */
     int getRawValueSize() { return helicsInputGetRawValueSize(inp); }
 
+    /** get the size of the value as a string */
+    int getStringSize()
+    {
+        //-1 is for the null character which needs to be counted in C but not in a C++ string
+        return helicsInputGetStringSize(inp) - 1;
+    }
+
     /** get the current value as a string*/
     std::string getString()
     {
@@ -104,6 +111,21 @@ class Input {
         }
         return result;
     }
+
+    /** get the current value as a string*/
+    void getString(std::string& str)
+    {
+        int size = helicsInputGetStringSize(inp);
+        str.resize(static_cast<size_t>(size) + 1);
+        // this function results in a null terminated string
+        helicsInputGetString(inp, &str[0], size + 1, &size, HELICS_IGNORE_ERROR);
+        if (!(str.empty()) && (str[static_cast<size_t>(size) - 1] == '\0')) {
+            str.resize(static_cast<size_t>(size) - 1);
+        } else {
+            str.resize(size);
+        }
+    }
+
     /** get the current value as a named point*/
     void getNamedPoint(std::string& name, double* val)
     {

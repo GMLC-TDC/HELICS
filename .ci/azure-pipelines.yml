@@ -65,7 +65,9 @@ jobs:
           XCODE_PATH: $[variables['xcode_path']]
         displayName: 'Set XCode Path'
         condition: ne(variables['xcode_path'],'')
-      - bash: brew install swig zeromq boost
+      - bash: |
+          brew install swig zeromq boost
+          python3 -m pip install pytest
         displayName: 'Install dependencies'
       - bash: |
           source scripts/setup-helics-ci-options.sh

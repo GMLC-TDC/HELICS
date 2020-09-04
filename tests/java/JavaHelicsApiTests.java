@@ -566,8 +566,8 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("sub3Length[0] != 7");
             }
             int sub3ValueSize = helics.helicsInputGetRawValueSize(sub3);
-            if (sub3ValueSize != 6) {
-                javaHelicsApiTests.helicsAssert("sub3ValueSize != 6");
+            if (sub3ValueSize != 14) {
+                javaHelicsApiTests.helicsAssert("sub3ValueSize != 14");
             }
             SWIGTYPE_p_double sub6Vector = null;
             int[] sub6ActualSize = new int[1];

@@ -630,14 +630,16 @@ std::string CoreBroker::generateFederationSummary() const
     }
     Json::Value summary;
     Json::Value block;
-    block["federates"] = _federates.size();
+    block["federates"] = static_cast<int>(_federates.size());
     block["min_federates"] = minFederateCount;
-    block["brokers"] = std::count_if(_brokers.begin(),
-                                     _brokers.end(),
-                                     [](auto& brk) { return !static_cast<bool>(brk._core); }),
-    block["cores"] = std::count_if(_brokers.begin(),
-                                   _brokers.end(),
-                                   [](auto& brk) { return static_cast<bool>(brk._core); }),
+    block["brokers"] =
+        static_cast<int>(std::count_if(_brokers.begin(), _brokers.end(), [](auto& brk) {
+            return !static_cast<bool>(brk._core);
+        }));
+    block["cores"] =
+        static_cast<int>(std::count_if(_brokers.begin(), _brokers.end(), [](auto& brk) {
+            return static_cast<bool>(brk._core);
+        }));
     block["min_brokers"] = minBrokerCount;
     block["publications"] = pubs;
     block["inputs"] = ipts;
@@ -1289,22 +1291,32 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             if (ept != nullptr) {
                 auto fed = _federates.find(ept->getFederateId());
                 if (fed->state < connection_state::error) {
-                    command.setAction(CMD_ADD_FILTER);
-                    command.setDestination(ept->handle);
-                    command.payload.clear();
-                    auto* filt = handles.findHandle(command.getSource());
-                    if (filt != nullptr) {
-                        if ((!filt->type_in.empty()) || (!filt->type_out.empty())) {
-                            command.setStringData(filt->type_in, filt->type_out);
-                        }
-                        if (checkActionFlag(*filt, clone_flag)) {
-                            setActionFlag(command, clone_flag);
+                    if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                        command.setAction(CMD_ADD_ENDPOINT);
+                        toggleActionFlag(command, destination_target);
+                    } else {
+                        command.setAction(CMD_ADD_FILTER);
+                        auto* filt = handles.findHandle(command.getSource());
+                        if (filt != nullptr) {
+                            if ((!filt->type_in.empty()) || (!filt->type_out.empty())) {
+                                command.setStringData(filt->type_in, filt->type_out);
+                            }
+                            if (checkActionFlag(*filt, clone_flag)) {
+                                setActionFlag(command, clone_flag);
+                            }
                         }
                     }
+                    command.setDestination(ept->handle);
                     routeMessage(command);
                     command.setAction(CMD_ADD_ENDPOINT);
+                    if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                        toggleActionFlag(command, destination_target);
+                        command.name(ept->key);
+                        command.setString(typeStringLoc, ept->type);
+                    }
                     command.swapSourceDest();
-                    command.clearStringData();
+                    // command.setSource(ept->handle);
+
                     routeMessage(command);
                 } else {
                     command.setAction(CMD_ADD_ENDPOINT);
@@ -2073,15 +2085,31 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForEndpoints(handleInfo.key);
     for (const auto& target : Handles) {
-        // notify the filter about its endpoint
+        // notify the filter or endpoint about its target
         ActionMessage m(CMD_ADD_ENDPOINT);
         m.setSource(handleInfo.handle);
         m.setDestination(target.first);
         m.flags = target.second;
+        m.name(handleInfo.key);
+        if (!handleInfo.type.empty()) {
+            m.setString(typeStringLoc, handleInfo.type);
+        }
         transmit(getRoute(m.dest_id), m);
 
-        // notify the endpoint about its filter
-        m.setAction(CMD_ADD_FILTER);
+        const auto* iface = handles.findHandle(target.first);
+        if (iface->handleType == handle_type::endpoint) {
+            // notify the endpoint about its endpoint
+            m.setAction(CMD_ADD_ENDPOINT);
+            m.name(iface->key);
+            if (!iface->type.empty()) {
+                m.setString(typeStringLoc, iface->type);
+            }
+            toggleActionFlag(m, destination_target);
+        } else {
+            // notify the endpoint about its filter
+            m.setAction(CMD_ADD_FILTER);
+        }
+
         m.swapSourceDest();
         m.flags = target.second;
         transmit(getRoute(m.dest_id), m);
