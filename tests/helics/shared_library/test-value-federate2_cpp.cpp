@@ -61,11 +61,11 @@ TEST_P(vfed_type_tests, test_block_send_receive)
     std::vector<char> rawdata;
     int actualLen = sub1.getRawValue(rawdata);
     // raw value has an extra 8 bits
-    EXPECT_EQ(actualLen, len+8);
+    EXPECT_EQ(actualLen, len + 8);
 
     len1 = sub1.getRawValueSize();
 
-    EXPECT_EQ(len1, len+8);
+    EXPECT_EQ(len1, len + 8);
 
     EXPECT_FALSE(sub1.isUpdated());
 
