@@ -399,7 +399,7 @@ TEST_P(vfed_type_tests, single_transfer)
     // make sure the string is what we expect
     CE(helicsInputGetString(subid, s, STRINGLEN, &actualLen, &err));
 
-    EXPECT_EQ(actualLen, 8);  //8 = strlen("string2")+ 1 for the null character
+    EXPECT_EQ(actualLen, 8);  // 8 = strlen("string2")+ 1 for the null character
     EXPECT_STREQ(s, "string2");
 
     CE(helicsFederateFinalize(vFed, &err));

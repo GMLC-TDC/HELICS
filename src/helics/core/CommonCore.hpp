@@ -181,28 +181,28 @@ class CommonCore: public Core, public BrokerBase {
     virtual interface_handle getFilter(const std::string& name) const override final;
     virtual void addDependency(local_federate_id federateID,
                                const std::string& federateName) override final;
-    virtual void linkEndpoints(const std::string& source,
-                                                    const std::string& dest) override final;
+    virtual void linkEndpoints(const std::string& source, const std::string& dest) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& source, const std::string& target) override final;
     virtual void addSourceFilterToEndpoint(const std::string& filter,
                                            const std::string& endpoint) override final;
     virtual void addDestinationFilterToEndpoint(const std::string& filter,
                                                 const std::string& endpoint) override final;
-    virtual void send(interface_handle sourceHandle,
-                      const void* data,
-                      uint64_t length) override final;
+    virtual void
+        send(interface_handle sourceHandle, const void* data, uint64_t length) override final;
     virtual void sendAt(interface_handle sourceHandle,
                         Time time,
-                           const void* data,
-                           uint64_t length) override final;
-    virtual void
-        sendTo(interface_handle sourceHandle, std::string_view destination, const void* data, uint64_t length) override final;
+                        const void* data,
+                        uint64_t length) override final;
+    virtual void sendTo(interface_handle sourceHandle,
+                        std::string_view destination,
+                        const void* data,
+                        uint64_t length) override final;
     virtual void sendToAt(interface_handle sourceHandle,
                           std::string_view destination,
                           Time time,
-                        const void* data,
-                        uint64_t length) override final;
+                          const void* data,
+                          uint64_t length) override final;
     virtual void sendMessage(interface_handle sourceHandle,
                              std::unique_ptr<Message> message) override final;
     virtual uint64_t receiveCount(interface_handle destination) override final;

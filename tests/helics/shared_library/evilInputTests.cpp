@@ -3675,7 +3675,6 @@ TEST(evil_endpoint_test, helicsEndpointSendTo)
     EXPECT_NE(err.error_code, 0);
 }
 
-
 TEST(evil_endpoint_test, helicsEndpointSendToAt)
 {
     // void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, const void*
@@ -3684,12 +3683,12 @@ TEST(evil_endpoint_test, helicsEndpointSendToAt)
     auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsEndpointSendToAt(nullptr, nullptr,0.0, nullptr, 45, &err);
+    helicsEndpointSendToAt(nullptr, nullptr, 0.0, nullptr, 45, &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     // auto res2=helicsEndpointSendMessageRaw(nullptr, nullptr, nullptr, int inputDataLength,
     // nullptr);
-    helicsEndpointSendToAt(evil_ept, "dest",-15.7, rdata, 200, &err);
+    helicsEndpointSendToAt(evil_ept, "dest", -15.7, rdata, 200, &err);
     EXPECT_NE(err.error_code, 0);
 }
 

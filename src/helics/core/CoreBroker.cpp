@@ -1313,8 +1313,8 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                         command.setString(typeStringLoc, ept->type);
                     }
                     command.swapSourceDest();
-                    //command.setSource(ept->handle);
-                    
+                    // command.setSource(ept->handle);
+
                     routeMessage(command);
                 } else {
                     command.setAction(CMD_ADD_ENDPOINT);
@@ -2094,8 +2094,8 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         }
         transmit(getRoute(m.dest_id), m);
 
-        const auto *iface=handles.findHandle(target.first);
-        if (iface->handleType==handle_type::endpoint) {
+        const auto* iface = handles.findHandle(target.first);
+        if (iface->handleType == handle_type::endpoint) {
             // notify the endpoint about its endpoint
             m.setAction(CMD_ADD_ENDPOINT);
             m.name(iface->key);
@@ -2107,7 +2107,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
             // notify the endpoint about its filter
             m.setAction(CMD_ADD_FILTER);
         }
-        
+
         m.swapSourceDest();
         m.flags = target.second;
         transmit(getRoute(m.dest_id), m);

@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
-#include "units/units/units.hpp"
 #include "ValueFederate.hpp"
+#include "units/units/units.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -22,7 +22,7 @@ Input::Input(ValueFederate* valueFed,
              interface_handle id,
              const std::string& actName,
              const std::string& unitsOut):
-    Interface(valueFed,id,actName),
+    Interface(valueFed, id, actName),
     fed(valueFed)
 {
     if (!unitsOut.empty()) {
@@ -67,7 +67,8 @@ Input::Input(interface_visibility locality,
     }
 }
 
-void Input::setDefaultRaw(data_view val) {
+void Input::setDefaultRaw(data_view val)
+{
     fed->setDefaultValue(*this, val);
 }
 
@@ -608,7 +609,8 @@ void Input::registerNotificationCallback(std::function<void(Time)> callback)
                                       });
 }
 
-void Input::registerCallback() {
+void Input::registerCallback()
+{
     fed->setInputNotificationCallback(*this, [this](Input& /*unused*/, Time time) {
         handleCallback(time);
     });
@@ -629,7 +631,7 @@ void Input::addTarget(const std::string& target)
     if (givenTarget.empty()) {
         givenTarget = target;
     }
-    fed->addTarget(*this,target);
+    fed->addTarget(*this, target);
 }
 
 data_view Input::getRawValue()
@@ -778,10 +780,11 @@ void integerExtractAndConvert(defV& store,
     }
 }
 
-data_view Input::checkAndGetFedUpdate() {
+data_view Input::checkAndGetFedUpdate()
+{
     return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getValueRaw(*this)) :
                                                                     data_view{};
- }
+}
 
 char Input::getValueChar()
 {

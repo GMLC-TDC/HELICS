@@ -134,6 +134,7 @@ class InputInfo {
     const std::string& getInjectionType() const;
     const std::string& getInjectionUnits() const;
     const std::string& getTargets() const;
+
   private:
     bool updateData(dataRecord&& update, int index);
     mutable std::string inputUnits;

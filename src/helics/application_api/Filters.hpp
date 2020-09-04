@@ -36,7 +36,7 @@ enum class filter_types {
 HELICS_CXX_EXPORT filter_types filterTypeFromString(const std::string& filterType) noexcept;
 
 /** class for managing a particular filter*/
-class HELICS_CXX_EXPORT Filter:public Interface {
+class HELICS_CXX_EXPORT Filter: public Interface {
   protected:
     bool cloning = false;
     bool disableAssign = false;  //!< disable assignment for the object
@@ -85,7 +85,7 @@ class HELICS_CXX_EXPORT Filter:public Interface {
     @param val the numerical value of the property
     */
     virtual void setString(const std::string& property, const std::string& val);
-   
+
     void addTarget(const std::string& target) { addSourceTarget(target); }
 
   protected:

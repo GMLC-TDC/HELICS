@@ -122,8 +122,7 @@ class ActionMessage {
         stringData[0] = string1;
         stringData[1] = string2;
     }
-    void setStringData(std::string_view string1,
-                       std::string_view string2, std::string_view string3)
+    void setStringData(std::string_view string1, std::string_view string2, std::string_view string3)
     {
         stringData.resize(3);
         stringData[0] = string1;

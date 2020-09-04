@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Federate.hpp"
 #include "data_view.hpp"
+
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -17,13 +18,13 @@ namespace helics {
 class MessageFederate;
 
 /** class to manage an endpoint */
-class HELICS_CXX_EXPORT Endpoint:public Interface {
+class HELICS_CXX_EXPORT Endpoint: public Interface {
   private:
     MessageFederate* fed{nullptr};  //!< the MessageFederate to interact with
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
     bool disableAssign{false};  //!< disable assignment for the object
-    std::string defDest; //!< storage for a default destination
+    std::string defDest;  //!< storage for a default destination
   public:
     /** default constructor*/
     Endpoint() = default;
@@ -35,7 +36,7 @@ class HELICS_CXX_EXPORT Endpoint:public Interface {
              const std::string& name,
              const std::string& type = std::string());
 
-template<class FedPtr>
+    template<class FedPtr>
     Endpoint(FedPtr& mFed, const std::string& name, const std::string& type = std::string()):
         Endpoint(std::addressof(*mFed), name, type)
     {
@@ -103,7 +104,7 @@ template<class FedPtr>
     */
     void sendTo(std::string_view dest, const data_view& data) const
     {
-        sendTo(dest, data.data(),data.size());
+        sendTo(dest, data.data(), data.size());
     }
     /** send a data_view
     @details a data view can convert from many different formats so this function should
@@ -112,9 +113,9 @@ template<class FedPtr>
     @param data data representation to send
     @param sendTime  the time the message should be sent
     */
-    void sendToAt(std::string_view dest, Time sendTime, const data_view& data ) const
+    void sendToAt(std::string_view dest, Time sendTime, const data_view& data) const
     {
-        sendToAt(dest, sendTime, data.data(),data.size());
+        sendToAt(dest, sendTime, data.data(), data.size());
     }
     /** send a data block and length to a destination at particular time
    @param dest string name of the destination
@@ -135,7 +136,7 @@ template<class FedPtr>
     be catching many of the common use cases
     @param data the information to send
     */
-    void send(const data_view& data) const { send( data.data(),data.size()); }
+    void send(const data_view& data) const { send(data.data(), data.size()); }
     /** send a data_view to the specified target destination
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
@@ -144,7 +145,7 @@ template<class FedPtr>
     */
     void sendAt(Time sendTime, const data_view& data) const
     {
-        sendAt(sendTime, data.data(),data.size());
+        sendAt(sendTime, data.data(), data.size());
     }
     /** send a pointer to a message object*/
     void send(std::unique_ptr<Message> mess) const;

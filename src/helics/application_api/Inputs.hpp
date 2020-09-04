@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "Federate.hpp"
 #include "HelicsPrimaryTypes.hpp"
 #include "helicsTypes.hpp"
-#include "Federate.hpp"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -20,7 +21,7 @@ class precise_unit;
 
 namespace helics {
 
-    class ValueFederate;
+class ValueFederate;
 enum multi_input_handling_method : uint16_t {
     no_op = helics_multi_input_no_op,
     vectorize_operation = helics_multi_input_vectorize_operation,
@@ -34,7 +35,7 @@ enum multi_input_handling_method : uint16_t {
 };
 
 /** base class for a input object*/
-class HELICS_CXX_EXPORT Input:public Interface {
+class HELICS_CXX_EXPORT Input: public Interface {
   protected:
     ValueFederate* fed = nullptr;  //!< reference to the value federate
   private:
@@ -58,7 +59,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     std::shared_ptr<units::precise_unit> inputUnits;  //!< the units of the linked publications
     std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>>
         sourceTypes;  //!< source information for input sources
-    std::string givenTarget; //!< the first target set for the input
+    std::string givenTarget;  //!< the first target set for the input
     double delta{-1.0};  //!< the minimum difference
     double threshold{0.0};  //!< the threshold to use for binary decisions
     // this needs to match the defV type
@@ -174,7 +175,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     @return the time of the last update
     */
     Time getLastUpdate() const;
-  
+
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
     @param callback a function with signature void( Time time)
@@ -197,7 +198,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     const std::string& getUnits() const { return getExtractionUnits(); }
     /** add a target to the input*/
     void addTarget(const std::string& target);
-    
+
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer
     @param assumeUpdate if set to true will assume there was a publication and not check it first,
@@ -219,7 +220,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
      */
     bool isUpdated() const;
 
-    virtual void setOption(int32_t option, int32_t value=1) override;
+    virtual void setOption(int32_t option, int32_t value = 1) override;
     virtual int32_t getOption(int32_t option) const override;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
@@ -237,7 +238,6 @@ class HELICS_CXX_EXPORT Input:public Interface {
         registerCallback();
     }
 
-    
   private:
     template<class X>
     void setDefault_impl(std::integral_constant<int, 0> /*V*/, X&& val)
@@ -262,6 +262,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
 
     /** setup the callback for value callback into the federate*/
     void registerCallback();
+
   public:
     /** set the default value to use before any update has been published
      */
@@ -408,6 +409,7 @@ class HELICS_CXX_EXPORT Input:public Interface {
     {
         return (name.empty()) ? getTarget() : getName();
     }
+
   private:
     /** load some information about the data source such as type and units*/
     void loadSourceInformation();

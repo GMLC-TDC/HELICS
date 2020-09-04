@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "Endpoints.hpp"
-#include "MessageFederate.hpp"
-#include "../core/core-exceptions.hpp"
+
 #include "../core/Core.hpp"
+#include "../core/core-exceptions.hpp"
+#include "MessageFederate.hpp"
 
 namespace helics {
 
@@ -17,9 +18,7 @@ Endpoint::Endpoint(MessageFederate* mFed, const std::string& name, interface_han
 {
 }
 
-Endpoint::Endpoint(MessageFederate* mFed,
-                   const std::string& name,
-                   const std::string& type):
+Endpoint::Endpoint(MessageFederate* mFed, const std::string& name, const std::string& type):
     Endpoint(mFed->registerEndpoint(name, type))
 {
 }
@@ -54,7 +53,7 @@ void Endpoint::sendTo(std::string_view dest, const char* data, size_t data_size)
         if (dest.empty()) {
             dest = defDest;
         }
-        cr->sendTo(handle, dest,data, data_size);
+        cr->sendTo(handle, dest, data, data_size);
     } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
@@ -65,7 +64,7 @@ void Endpoint::sendAt(Time sendTime, const char* data, size_t data_size) const
 {
     if ((cr != nullptr) && (fed->getCurrentMode() == Federate::modes::executing) ||
         (fed->getCurrentMode() == Federate::modes::initializing)) {
-        cr->sendAt(handle,sendTime, data, data_size);
+        cr->sendAt(handle, sendTime, data, data_size);
     } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
@@ -88,7 +87,7 @@ void Endpoint::sendToAt(std::string_view dest,
         if (dest.empty()) {
             dest = defDest;
         }
-        cr->sendToAt(handle, dest,sendTime,data, data_size);
+        cr->sendToAt(handle, dest, sendTime, data, data_size);
     } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
@@ -136,12 +135,13 @@ void Endpoint::setDefaultDestination(std::string_view target)
 
 const std::string& Endpoint::getDefaultDestination() const
 {
-    return (!defDest.empty())?defDest:((cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr);
+    return (!defDest.empty()) ? defDest :
+                                ((cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr);
 }
 
 void Endpoint::subscribe(const std::string& key)
 {
-    if (cr!=nullptr) {
+    if (cr != nullptr) {
         cr->addSourceTarget(handle, key);
     }
 }
@@ -173,10 +173,9 @@ void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& cal
 /** add a named filter to an endpoint for all message coming from the endpoint*/
 void Endpoint::addSourceFilter(const std::string& filterName)
 {
-    if (cr!=nullptr) {
+    if (cr != nullptr) {
         cr->addSourceTarget(handle, filterName, handle_type::filter);
     }
-   
 }
 /** add a named filter to an endpoint for all message going to the endpoint*/
 void Endpoint::addDestinationFilter(const std::string& filterName)

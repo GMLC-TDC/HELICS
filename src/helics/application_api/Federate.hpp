@@ -40,8 +40,6 @@ class Filter;
 class CloningFilter;
 class Federate;
 
-
-
 /** base class for a federate in the application API
  */
 class HELICS_CXX_EXPORT Federate {
@@ -544,7 +542,6 @@ class HELICS_CXX_EXPORT Federate {
     void registerFilterInterfacesToml(const std::string& tomlString);
 };
 
-
 /** base class for the interface objects*/
 class HELICS_CXX_EXPORT Interface {
   protected:
@@ -584,7 +581,7 @@ class HELICS_CXX_EXPORT Interface {
     void addDestinationTarget(std::string_view newTarget);
     /** remove a named publication from being a target*/
     void removeTarget(std::string_view targetToRemove);
-    
+
     /** get the interface information field of the input*/
     const std::string& getInfo() const;
     /** set the interface information field of the input*/
@@ -623,16 +620,17 @@ class HELICS_CXX_EXPORT Interface {
     /** get the display name for an input
     @details the name is the given local name or if empty the name of the target*/
     virtual const std::string& getDisplayName() const = 0;
-    /** get the source targets for an interface, either the sources for endpoints or inputs, or the source endpoints for a filter*/
+    /** get the source targets for an interface, either the sources for endpoints or inputs, or the
+     * source endpoints for a filter*/
     const std::string& getSourceTargets() const;
-    /** get the destination targets for an interface, either the destinations of data for endpoints or ipublications, or the
-     * destination endpoints for a filter*/
+    /** get the destination targets for an interface, either the destinations of data for endpoints
+     * or ipublications, or the destination endpoints for a filter*/
     const std::string& getDestinationTargets() const;
     /** close the interface*/
     void close();
     /** disconnect the object from the core*/
     void disconnectFromCore();
-    };
+};
 
 /** function to do some housekeeping work
 @details this runs some cleanup routines and tries to close out any residual thread that haven't

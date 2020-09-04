@@ -66,7 +66,8 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federa
                                                                    helics_error* err);
 
 /**
- * Create a targetted endpoint.  Targetted endpoints have specific destinations predefined and do not allow sending messages to other endpoints
+ * Create a targeted endpoint.  Targeted endpoints have specific destinations predefined and do not allow sending messages to other
+ * endpoints
  *
  * @details The endpoint becomes part of the federate and is destroyed when the federate is freed
  *          so there are no separate free functions for endpoints.
@@ -84,10 +85,14 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federa
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterTargettedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
+HELICS_EXPORT helics_endpoint helicsFederateRegisterTargettedEndpoint(helics_federate fed,
+                                                                      const char* name,
+                                                                      const char* type,
+                                                                      helics_error* err);
 
 /**
- * Create a global targetted endpoint, Targetted endpoints have specific destinations predefined and do not allow sending messages to other endpoints
+ * Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other
+ endpoints
  *
  * @details The endpoint becomes part of the federate and is destroyed when the federate is freed
  *          so there are no separate free functions for endpoints.
@@ -105,9 +110,9 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterTargettedEndpoint(helics_fed
  * @endforcpponly
  */
 HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargettedEndpoint(helics_federate fed,
-                                                                   const char* name,
-                                                                   const char* type,
-                                                                   helics_error* err);
+                                                                            const char* name,
+                                                                            const char* type,
+                                                                            helics_error* err);
 
 /**
  * Get an endpoint object from a name.
@@ -171,7 +176,7 @@ HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint,
 HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint);
 
 /**
- * Send a message to the targetted destination.
+ * Send a message to the targeted destination.
  *
  * @param endpoint The endpoint to send the data from.
  * @param data The data to send.
@@ -180,8 +185,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void
-    helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Send a message to the specified destination.
@@ -225,14 +229,14 @@ HELICS_EXPORT void
  */
 
 HELICS_EXPORT void helicsEndpointSendToAt(helics_endpoint endpoint,
-                                              const char* dst,
-                                              helics_time time,
-                                              const void* data,
-                                              int inputDataLength,
-                                              helics_error* err);
+                                          const char* dst,
+                                          helics_time time,
+                                          const void* data,
+                                          int inputDataLength,
+                                          helics_error* err);
 
 /**
- * Send a message at a specific time to the targetted destinations
+ * Send a message at a specific time to the targeted destinations
  *
  * @param endpoint The endpoint to send the data from.
  * @param time The time the message should be sent.
@@ -246,11 +250,8 @@ HELICS_EXPORT void helicsEndpointSendToAt(helics_endpoint endpoint,
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsEndpointSendAt(helics_endpoint endpoint,
-                                          helics_time time,
-                                          const void* data,
-                                          int inputDataLength,
-                                          helics_error* err);
+HELICS_EXPORT void
+    helicsEndpointSendAt(helics_endpoint endpoint, helics_time time, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Send a message object from a specific endpoint.
@@ -466,7 +467,7 @@ HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const
 HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
 
 /**
- * remove an endpoint from being targetted
+ * remove an endpoint from being targeted
  *
  * @param endpoint The endpoint to modify.
  * @param targetEndpoint the name of the endpoint to send messages to
@@ -475,7 +476,6 @@ HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, 
  * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
-
 
 /**
  * add a source Filter to an endpoint

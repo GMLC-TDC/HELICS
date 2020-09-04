@@ -308,7 +308,7 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     helics::SmallBuffer data2(400, 'b');
     helics::SmallBuffer data3(300, 'c');
     helics::SmallBuffer data4(200, 'd');
-    
+
     epid.sendTo("ep2", data1);
     epid.sendTo("ep2", data2);
     epid.send(data3);

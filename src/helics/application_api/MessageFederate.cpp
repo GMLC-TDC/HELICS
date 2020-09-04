@@ -156,9 +156,7 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     if (!info.empty()) {
         ept.setInfo(info);
     }
-    addTargets(data, "subscriptions", [&ept, fed](const std::string& sub) {
-        ept.subscribe(sub);
-    });
+    addTargets(data, "subscriptions", [&ept, fed](const std::string& sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](const std::string& filt) { ept.addSourceFilter(filt); });
     addTargets(data, "sourceFilters", [&ept](const std::string& filt) {
         ept.addSourceFilter(filt);
@@ -306,6 +304,5 @@ int MessageFederate::getEndpointCount() const
 {
     return mfManager->getEndpointCount();
 }
-
 
 }  // namespace helics

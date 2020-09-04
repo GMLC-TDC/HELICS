@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters
  */
 
-#include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "units/units/units.hpp"
 
 #include <future>
@@ -341,7 +341,7 @@ TEST(subscriptionObject, Size_tests)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_TRUE(subObj.isUpdated());
     EXPECT_EQ(subObj.getStringSize(), str.size());
-    EXPECT_EQ(subObj.getRawSize(), str.size()+8);
+    EXPECT_EQ(subObj.getRawSize(), str.size() + 8);
     auto val1 = subObj.getValue<std::string>();
     // now that we got the value it should not be updated
     EXPECT_TRUE(!subObj.isUpdated());

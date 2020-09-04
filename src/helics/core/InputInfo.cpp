@@ -224,11 +224,10 @@ const std::string& InputInfo::getTargets() const
 {
     if (sourceTargets.empty()) {
         if (!source_info.empty()) {
-           
-            if (source_info.size()==1) {
+            if (source_info.size() == 1) {
                 sourceTargets = source_info.front().key;
             } else {
-               sourceTargets.push_back('[');
+                sourceTargets.push_back('[');
                 for (const auto& src : source_info) {
                     sourceTargets.append(generateJsonQuotedString(src.key));
                     sourceTargets.push_back(',');
