@@ -163,9 +163,9 @@ TEST(federateInfo, property_index)
 TEST(federateInfo, option_index)
 {
     EXPECT_EQ(helics::getOptionIndex("unexpected"), -1);
-    EXPECT_EQ(helics::getOptionIndex("single_connection"),
+    EXPECT_EQ(helics::getOptionIndex("single_connection_only"),
               helics_handle_option_single_connection_only);
-    EXPECT_EQ(helics::getOptionIndex("StrictTypeChecking"),
+    EXPECT_EQ(helics::getOptionIndex("strictInputTypeChecking"),
               helics_handle_option_strict_type_checking);
     EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
 }
@@ -186,7 +186,7 @@ TEST(federateInfo, loadinfoPropsJson)
     EXPECT_EQ(f1.coreName, "fred");
     EXPECT_THROW(helics::loadFederateInfo("{\"coreType\":\"fred\"}"), helics::InvalidIdentifier);
     EXPECT_THROW(helics::loadFederateInfo("{\"coretype\":\"fred\"}"), helics::InvalidIdentifier);
-    EXPECT_THROW(helics::loadFederateInfo("{\"type\":\"fred\"}"), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("{\"coretype\":\"fred\"}"), helics::InvalidIdentifier);
 
     f1 = helics::loadFederateInfo(R"({"flags":"autobroker,source_only"})");
     EXPECT_EQ(f1.flagProps.size(), 1U);
@@ -222,12 +222,12 @@ TEST(federateInfo, loadinfoPropsToml)
     EXPECT_EQ(f1.coreName, "fred");
     EXPECT_THROW(helics::loadFederateInfo("\"coreType\"=\"fred\""), helics::InvalidIdentifier);
     EXPECT_THROW(helics::loadFederateInfo("\"coretype\"=\"fred\""), helics::InvalidIdentifier);
-    EXPECT_THROW(helics::loadFederateInfo("\"type\"=\"fred\""), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("\"coretype\"=\"fred\""), helics::InvalidIdentifier);
 
     f1 = helics::loadFederateInfo(R"("coreType"="web")");
     EXPECT_EQ(f1.coreType, helics::core_type::WEBSOCKET);
 
-    f1 = helics::loadFederateInfo(R"("type"="UDP")");
+    f1 = helics::loadFederateInfo(R"("coretype"="UDP")");
     EXPECT_EQ(f1.coreType, helics::core_type::UDP);
 
     f1 = helics::loadFederateInfo(R"("flags"="autobroker,source_only")");
