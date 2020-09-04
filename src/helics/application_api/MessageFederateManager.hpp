@@ -44,7 +44,7 @@ class MessageFederateManager {
     */
     Endpoint& registerEndpoint(const std::string& name, const std::string& type);
 
-        /** register a targetted endpoint
+    /** register a targeted endpoint
 @details call is only valid in startup mode
 @param name the name of the endpoint
 @param type the defined type of the interface for endpoint checking if requested
