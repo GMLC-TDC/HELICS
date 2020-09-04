@@ -38,7 +38,14 @@ constexpr uint16_t slow_responding_flag =
                   // responding
 
 constexpr uint16_t cancel_flag =
-    extra_flag3;  // overload of extra_flag3 indicating an operation is canceled
+    extra_flag3;  //!< overload of extra_flag3 indicating an operation is canceled
+
+constexpr uint16_t targetted_flag =
+    extra_flag2;  //!< overload of extra_flag2 indicating an endpoint is targeted
+
+constexpr uint16_t filter_processing_required_flag =
+    extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for
+                  // filters yet
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
@@ -73,6 +80,17 @@ template<class FlagContainer, class FlagIndex>
 inline void clearActionFlag(FlagContainer& M, FlagIndex flag)
 {
     M.flags &= static_cast<decltype(M.flags)>(~((1U) << (static_cast<uint16_t>((flag)))));
+}
+
+/** template function to clear a flag in an object containing a flags field*/
+template<class FlagContainer, class FlagIndex>
+inline void toggleActionFlag(FlagContainer& M, FlagIndex flag)
+{
+    if (checkActionFlag(M, flag)) {
+        clearActionFlag(M, flag);
+    } else {
+        setActionFlag(M, flag);
+    }
 }
 
 /** helper function to facilitate make a flag variable*/

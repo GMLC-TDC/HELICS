@@ -147,7 +147,7 @@ const std::string& ActionMessage::getString(int index) const
     return emptyStr;
 }
 
-void ActionMessage::setString(int index, const std::string& str)
+void ActionMessage::setString(int index, std::string_view str)
 {
     if (index >= 256 || index < 0) {
         throw(std::invalid_argument("index out of specified range (0-255)"));

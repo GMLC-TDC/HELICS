@@ -41,7 +41,7 @@ class EchoMessageLeaf: public BenchmarkFederate {
             fed->requestNextStep();
             ++cnt;
             if (cnt <= iter) {
-                ept.send("echo", txstring);
+                ept.sendTo("echo", txstring);
             }
             while (ept.hasMessage()) {
                 auto m = ept.getMessage();

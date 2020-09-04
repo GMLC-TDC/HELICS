@@ -98,7 +98,7 @@ TEST_F(timing_tests, simple_timing_test_message)
     auto res = vFed1->requestTime(0.32);
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(res, 0.6);
-    ept1.send("e2", "test1");
+    ept1.sendTo("e2", "test1");
     vFed1->requestTimeAsync(1.85);
     res = vFed2->requestTimeComplete();
     EXPECT_EQ(res, 0.9);  // the message should show up at the next available time point
@@ -272,7 +272,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     auto res = vFed1->requestTime(1.0);
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(res, 1.0);
-    ept1.send("e2", "test1");
+    ept1.sendTo("e2", "test1");
     vFed1->requestTimeAsync(1.9);
     res = vFed2->requestTimeComplete();
     EXPECT_EQ(res,

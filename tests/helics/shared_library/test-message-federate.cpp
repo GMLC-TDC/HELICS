@@ -93,7 +93,7 @@ TEST_P(mfed_simple_type_tests, send_receive)
     EXPECT_TRUE(mFed1State == helics_state_execution);
     std::string data(500, 'a');
 
-    CE(helicsEndpointSendEventRaw(epid, "ep2", data.c_str(), 500, 0.0, &err));
+    CE(helicsEndpointSendToAt(epid, "ep2", 0.0, data.c_str(), 500, &err));
     helics_time time;
     CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
     EXPECT_EQ(time, 1.0);
@@ -136,7 +136,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     EXPECT_TRUE(mFed1State == helics_state_execution);
     std::string data(500, 'a');
 
-    CE(helicsEndpointSendEventRaw(epid, "ep2", data.c_str(), 500, 0.0, &err));
+    CE(helicsEndpointSendToAt(epid, "ep2", 0.0, data.c_str(), 500, &err));
     helics_time time;
     CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
     EXPECT_EQ(time, 1.0);
@@ -251,8 +251,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     std::string data(500, 'a');
     std::string data2(400, 'b');
 
-    CE(helicsEndpointSendEventRaw(epid, "ep2", data.c_str(), 500, 0.0, &err));
-    CE(helicsEndpointSendEventRaw(epid2, "fed0/ep1", data2.c_str(), 400, 0.0, &err));
+    CE(helicsEndpointSendToAt(epid, "ep2", 0.0, data.c_str(), 500, &err));
+    CE(helicsEndpointSendToAt(epid2, "fed0/ep1", 0.0, data2.c_str(), 400, &err));
     // move the time to 1.0
     helics_time time;
     CE(helicsFederateRequestTimeAsync(mFed1, 1.0, &err));
@@ -315,6 +315,8 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
     CE(helicsFederateSetTimeProperty(mFed2, helics_property_time_delta, 1.0, &err));
 
+    helicsEndpointSetDefaultDestination(epid, "ep2", &err);
+
     CE(helicsFederateEnterExecutingModeAsync(mFed1, &err));
     CE(helicsFederateEnterExecutingMode(mFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(mFed1, &err));
@@ -326,11 +328,9 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
 
     std::string data(500, 'a');
 
-    helicsEndpointSetDefaultDestination(epid, "ep2", &err);
-
-    CE(helicsEndpointSendMessageRaw(epid, nullptr, data.c_str(), 500, &err));
-    CE(helicsEndpointSendMessageRaw(epid, nullptr, data.c_str(), 400, &err));
-    CE(helicsEndpointSendMessageRaw(epid, nullptr, data.c_str(), 300, &err));
+    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 500, &err));
+    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 400, &err));
+    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 300, &err));
 
     // move the time to 1.0
     helics_time time;

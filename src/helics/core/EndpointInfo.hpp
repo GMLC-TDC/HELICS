@@ -12,7 +12,21 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <deque>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
+
 namespace helics {
+
+struct EndpointInformation {
+    global_handle id;
+    std::string key;
+    std::string type;
+    EndpointInformation() = default;
+    EndpointInformation(global_handle gid, const std::string& key_, const std::string& type_):
+        id(gid), key(key_), type(type_)
+    {
+    }
+};
 /** data class containing the information about an endpoint*/
 class EndpointInfo {
   public:
@@ -28,8 +42,15 @@ class EndpointInfo {
   private:
     shared_guarded<std::deque<std::unique_ptr<Message>>>
         message_queue;  //!< storage for the messages
+    std::vector<EndpointInformation> sourceInformation;
+    std::vector<EndpointInformation> targetInformation;
+    std::vector<std::pair<global_handle, std::string_view>> targets;
+    mutable std::string sourceTargets;
+    mutable std::string destinationTargets;
+
   public:
-    bool hasFilter = false;  //!< indicator that the message has a filter
+    bool hasFilter{false};  //!< indicator that the message has a filter
+    bool targettedEndpoint{false};  //!< indicator that the endpoint is a targeted endpoint only
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage(Time maxTime);
     /** get the number of messages in the queue up to the specified time*/
@@ -40,5 +61,24 @@ class EndpointInfo {
     Time firstMessageTime() const;
     /** clear all the message queues*/
     void clearQueue();
+    /** add a target target*/
+    void addDestinationTarget(global_handle dest,
+                              const std::string& destName,
+                              const std::string& destType);
+    /** add a source to an endpoint*/
+    void addSourceTarget(global_handle dest,
+                         const std::string& sourceName,
+                         const std::string& sourceType);
+    /** remove a target from connection*/
+    void removeTarget(global_handle targetId);
+    /** get the vector of endpoint targets*/
+    const std::vector<std::pair<global_handle, std::string_view>>& getTargets() const
+    {
+        return targets;
+    }
+    /** get a string with the names of the source endpoints*/
+    const std::string& getSourceTargets() const;
+    /** get a string with the names of the destination endpoints*/
+    const std::string& getDestinationTargets() const;
 };
 }  // namespace helics

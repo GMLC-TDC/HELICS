@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Inputs.hpp"
+#include "ValueFederate.hpp"
 
 #include <array>
 #include <string>

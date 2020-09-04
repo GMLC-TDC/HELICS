@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters
  */
 
-#include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "units/units/units.hpp"
 
 #include <future>
@@ -158,7 +158,7 @@ TEST(subscriptionObject, complex_tests_ci_skip)
     runPubSubTypeTests<std::string, c>("3.14159-2j", c(3.14159, -2));
     runPubSubTypeTests<std::string, c>("-3.14159-2j", c(-3.14159, -2));
 
-    runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, -2), {"-3.14159-2j", std::nan("0")});
+    runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, -2), {"[-3.14159,-2]", std::nan("0")});
     runPubSubTypeTests<c, helics::NamedPoint>(c(-3.14159, 0), {"value", -3.14159});
     runPubSubTypeTests<std::string, c>("-3.14159 + 2i", c(-3.14159, 2));
 
@@ -341,7 +341,7 @@ TEST(subscriptionObject, Size_tests)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_TRUE(subObj.isUpdated());
     EXPECT_EQ(subObj.getStringSize(), str.size());
-    EXPECT_EQ(subObj.getRawSize(), str.size());
+    EXPECT_EQ(subObj.getRawSize(), str.size() + 8);
     auto val1 = subObj.getValue<std::string>();
     // now that we got the value it should not be updated
     EXPECT_TRUE(!subObj.isUpdated());
