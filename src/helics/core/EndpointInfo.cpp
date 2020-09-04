@@ -106,8 +106,8 @@ void EndpointInfo::removeTarget(global_handle targetId)
         if (ti->id == targetId) {
             targetInformation.erase(ti);
             targets.clear();
-            for (const auto& tim : targetInformation) {
-                targets.emplace_back(tim.id, tim.key);
+            for (const auto& targetInfo : targetInformation) {
+                targets.emplace_back(targetInfo.id, targetInfo.key);
             }
             break;
         }
