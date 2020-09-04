@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Federate.hpp"
 #include "Endpoints.hpp"
+#include "Federate.hpp"
 #include "data_view.hpp"
 
 #include <functional>
@@ -101,13 +101,13 @@ class HELICS_CXX_EXPORT MessageFederate:
     Endpoint& registerEndpoint(const std::string& eptName = std::string(),
                                const std::string& type = std::string());
 
-    /** register a targetted endpoint
+    /** register a targeted endpoint
     @details this type of endpoint can can send messages to predefined targets
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
     Endpoint& registerTargettedEndpoint(const std::string& eptName = std::string(),
-                               const std::string& type = std::string());
+                                        const std::string& type = std::string());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
@@ -118,13 +118,13 @@ class HELICS_CXX_EXPORT MessageFederate:
     Endpoint& registerGlobalEndpoint(const std::string& eptName,
                                      const std::string& type = std::string());
 
-     /** register a targetted endpoint directly without prepending the federate name
-   @param eptName the name of the endpoint
-   @param type the defined type of the interface for endpoint checking if requested
-   @return a Reference to an Endpoint Object
-   */
+    /** register a targeted endpoint directly without prepending the federate name
+  @param eptName the name of the endpoint
+  @param type the defined type of the interface for endpoint checking if requested
+  @return a Reference to an Endpoint Object
+  */
     Endpoint& registerGlobalTargettedEndpoint(const std::string& eptName,
-                                     const std::string& type = std::string());
+                                              const std::string& type = std::string());
 
     /** register an indexed Endpoint
     @details register a global endpoint as part of a 1D array of endpoints
@@ -162,7 +162,6 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfacesToml(const std::string& tomlString);
 
   public:
-
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
     @param ept the specified endpoint to deliver the values
     @param key the name of the publication to subscribe

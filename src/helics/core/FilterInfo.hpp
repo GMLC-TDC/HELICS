@@ -64,12 +64,12 @@ class FilterInfo {
   public:
     /** add a target target*/
     void addDestinationEndpoint(global_handle dest,
-                              const std::string& destName,
-                              const std::string& destType);
+                                const std::string& destName,
+                                const std::string& destType);
     /** add a source to an endpoint*/
     void addSourceEndpoint(global_handle dest,
-                         const std::string& sourceName,
-                         const std::string& sourceType);
+                           const std::string& sourceName,
+                           const std::string& sourceType);
     /** remove a target from connection*/
     void removeTarget(global_handle targetId);
     /** get a string with the names of the source endpoints*/

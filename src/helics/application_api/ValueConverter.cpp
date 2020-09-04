@@ -229,7 +229,7 @@ namespace detail {
     void convertFromBinary(const std::byte* data, std::string_view& val)
     {
         std::size_t size = getDataSize(data);
-        val=std::string_view(reinterpret_cast<const char*>(data) + 8, size);
+        val = std::string_view(reinterpret_cast<const char*>(data) + 8, size);
     }
 
     void convertFromBinary(const std::byte* data, char* val)
@@ -304,7 +304,7 @@ void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::st
         V.append(str);
     }
     auto strgen = generateJsonString(V);
-    return ValueConverter<std::string_view>::convert(strgen,store);
+    return ValueConverter<std::string_view>::convert(strgen, store);
 }
 
 /** interpret a view of the data block and store to the specified value*/
@@ -324,7 +324,7 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
             val.emplace_back(str);
         }
     }
-    catch(...) {
+    catch (...) {
         val.emplace_back(str);
     }
 }

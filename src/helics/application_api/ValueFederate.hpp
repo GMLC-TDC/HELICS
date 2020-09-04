@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-data.hpp"
 #include "Federate.hpp"
-#include "ValueConverter.hpp"
-#include "data_view.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+#include "ValueConverter.hpp"
+#include "data_view.hpp"
 
 #include <functional>
 #include <memory>
@@ -522,7 +522,6 @@ class HELICS_CXX_EXPORT ValueFederate:
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
     std::unique_ptr<ValueFederateManager> vfManager;
 };
-
 
 /** publish directly from the publication key name
 @details this is a convenience function to publish directly from the publication key

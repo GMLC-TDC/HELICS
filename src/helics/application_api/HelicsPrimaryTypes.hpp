@@ -217,7 +217,8 @@ std::enable_if_t<std::is_arithmetic<X>::value>
         }
         case data_type::helics_string:
         default:
-            val = static_cast<X>(getDoubleFromString(ValueConverter<std::string_view>::interpret(dv)));
+            val = static_cast<X>(
+                getDoubleFromString(ValueConverter<std::string_view>::interpret(dv)));
             break;
         case data_type::helics_bool:
             val = static_cast<X>((ValueConverter<std::string_view>::interpret(dv) != "0"));

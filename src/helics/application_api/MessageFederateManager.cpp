@@ -132,7 +132,6 @@ std::unique_ptr<Message> MessageFederateManager::getMessage()
     return nullptr;
 }
 
-
 void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;

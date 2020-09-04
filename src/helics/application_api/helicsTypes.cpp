@@ -404,7 +404,7 @@ static int readSize(std::string_view val)
             // go to the alternative path if this fails
         }
     }
-    if (val.find_first_not_of(" ]",fb+1)==std::string_view::npos) {
+    if (val.find_first_not_of(" ]", fb + 1) == std::string_view::npos) {
         return 0;
     }
     auto res = std::count_if(val.begin() + fb,
@@ -650,9 +650,11 @@ SmallBuffer emptyBlock(data_type outputType, data_type inputType = data_type::he
                 default:
                     return ValueConverter<std::string_view>::convert("");
                 case data_type::helics_vector:
-                    return ValueConverter<std::string_view>::convert(helicsVectorString(std::vector<double>()));
+                    return ValueConverter<std::string_view>::convert(
+                        helicsVectorString(std::vector<double>()));
                 case data_type::helics_complex_vector:
-                    return ValueConverter<std::string_view>::convert(helicsComplexVectorString(std::vector<std::complex<double>>()));
+                    return ValueConverter<std::string_view>::convert(
+                        helicsComplexVectorString(std::vector<std::complex<double>>()));
                 case data_type::helics_named_point:
                     return ValueConverter<std::string_view>::convert("0");
             }
@@ -928,7 +930,8 @@ SmallBuffer typeConvert(data_type type, const NamedPoint& val)
         default:
             return ValueConverter<NamedPoint>::convert(val);
         case data_type::helics_string:
-            return ValueConverter<std::string_view>::convert((std::isnan(val.value)) ? val.name : helicsNamedPointString(val));
+            return ValueConverter<std::string_view>::convert(
+                (std::isnan(val.value)) ? val.name : helicsNamedPointString(val));
         case data_type::helics_complex_vector: {
             std::complex<double> v2(val.value, 0.0);
             return ValueConverter<std::complex<double>>::convert(&v2, 1);

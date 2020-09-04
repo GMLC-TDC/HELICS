@@ -1171,15 +1171,14 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ADD_ENDPOINT: {
             auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (eptI != nullptr) {
-                if (checkActionFlag(cmd, destination_target))
-                {
+                if (checkActionFlag(cmd, destination_target)) {
                     eptI->addDestinationTarget(cmd.getSource(),
                                                std::string(cmd.name()),
                                                cmd.getString(typeStringLoc));
                 } else {
                     eptI->addSourceTarget(cmd.getSource(),
-                                               std::string(cmd.name()),
-                                               cmd.getString(typeStringLoc));
+                                          std::string(cmd.name()),
+                                          cmd.getString(typeStringLoc));
                 }
             }
         } break;

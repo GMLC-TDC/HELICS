@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterInfo.hpp"
 //#include "core/core-data.h"
 #include "../common/JsonGeneration.hpp"
+
 #include <algorithm>
 #include <cstring>
 
@@ -46,7 +47,7 @@ void FilterInfo::addSourceEndpoint(global_handle dest,
     /** now update the target information*/
     sourceTargets.reserve(sourceEndpoints.size());
     sourceTargets.clear();
-   sourceEpts.clear();
+    sourceEpts.clear();
     for (const auto& ti : sourceEndpoints) {
         sourceTargets.emplace_back(ti.id);
     }

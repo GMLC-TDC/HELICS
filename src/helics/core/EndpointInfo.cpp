@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "EndpointInfo.hpp"
+
 #include "../common/JsonGeneration.hpp"
 //#include "core/core-data.hpp"
 
@@ -67,11 +68,11 @@ int32_t EndpointInfo::queueSize(Time maxTime) const
 }
 
 void EndpointInfo::addDestinationTarget(global_handle dest,
-                          const std::string& destName,
-                          const std::string& destType)
+                                        const std::string& destName,
+                                        const std::string& destType)
 {
-    for (const auto &ti:targetInformation) {
-        if (ti.id==dest) {
+    for (const auto& ti : targetInformation) {
+        if (ti.id == dest) {
             return;
         }
     }
@@ -79,29 +80,30 @@ void EndpointInfo::addDestinationTarget(global_handle dest,
     /** now update the target information*/
     targets.reserve(targetInformation.size());
     targets.clear();
-    for (const auto &ti:targetInformation) {
+    for (const auto& ti : targetInformation) {
         targets.emplace_back(ti.id, ti.key);
     }
 }
 
 /** add a source to an endpoint*/
 void EndpointInfo::addSourceTarget(global_handle dest,
-                     const std::string& sourceName,
-                     const std::string& sourceType)
+                                   const std::string& sourceName,
+                                   const std::string& sourceType)
 {
     for (const auto& si : sourceInformation) {
         if (si.id == dest) {
             return;
         }
     }
-    sourceInformation.emplace_back(dest, sourceName,sourceType);
+    sourceInformation.emplace_back(dest, sourceName, sourceType);
 }
 
 /** remove a target from connection*/
-void EndpointInfo::removeTarget(global_handle targetId) {
+void EndpointInfo::removeTarget(global_handle targetId)
+{
     auto ti = targetInformation.begin();
-    while (ti!=targetInformation.end()) {
-        if (ti->id==targetId) {
+    while (ti != targetInformation.end()) {
+        if (ti->id == targetId) {
             targetInformation.erase(ti);
             targets.clear();
             for (const auto& tim : targetInformation) {
@@ -119,7 +121,8 @@ void EndpointInfo::removeTarget(global_handle targetId) {
     }
 }
 
-const std::string& EndpointInfo::getSourceTargets() const {
+const std::string& EndpointInfo::getSourceTargets() const
+{
     if (sourceTargets.empty()) {
         if (!sourceInformation.empty()) {
             if (sourceInformation.size() == 1) {
@@ -135,9 +138,10 @@ const std::string& EndpointInfo::getSourceTargets() const {
         }
     }
     return sourceTargets;
- }
+}
 /** get a string with the names of the destination endpoints*/
-const std::string& EndpointInfo::getDestinationTargets() const {
+const std::string& EndpointInfo::getDestinationTargets() const
+{
     if (destinationTargets.empty()) {
         if (!targetInformation.empty()) {
             if (targetInformation.size() == 1) {

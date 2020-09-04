@@ -1140,8 +1140,11 @@ void CommonCore::addDestinationTarget(interface_handle handle,
     cmd.payload = dest;
     switch (handleInfo->handleType) {
         case handle_type::endpoint:
-            if(hint == handle_type::filter) { cmd.setAction(CMD_ADD_NAMED_FILTER); }
-            else { cmd.setAction(CMD_ADD_NAMED_ENDPOINT); }
+            if (hint == handle_type::filter) {
+                cmd.setAction(CMD_ADD_NAMED_FILTER);
+            } else {
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+            }
             if (handleInfo->key.empty()) {
                 cmd.setStringData(handleInfo->type, handleInfo->units);
             }
@@ -1171,7 +1174,9 @@ void CommonCore::addDestinationTarget(interface_handle handle,
     addActionMessage(std::move(cmd));
 }
 
-void CommonCore::addSourceTarget(interface_handle handle, std::string_view targetName, handle_type hint)
+void CommonCore::addSourceTarget(interface_handle handle,
+                                 std::string_view targetName,
+                                 handle_type hint)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1183,11 +1188,9 @@ void CommonCore::addSourceTarget(interface_handle handle, std::string_view targe
     cmd.payload = targetName;
     switch (handleInfo->handleType) {
         case handle_type::endpoint:
-            if (hint == handle_type::filter)
-            {
+            if (hint == handle_type::filter) {
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
-            }
-            else {
+            } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
             }
             break;
@@ -1275,7 +1278,7 @@ const std::string& CommonCore::getSourceTargets(interface_handle handle) const
         }
     }
     return emptyStr;
- }
+}
 
 void CommonCore::setValue(interface_handle handle, const char* data, uint64_t len)
 {
@@ -1416,8 +1419,8 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
 }
 
 interface_handle CommonCore::registerTargettedEndpoint(local_federate_id federateID,
-                                              const std::string& name,
-                                              const std::string& type)
+                                                       const std::string& name,
+                                                       const std::string& type)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1429,13 +1432,8 @@ interface_handle CommonCore::registerTargettedEndpoint(local_federate_id federat
     }
     auto flags = fed->getInterfaceFlags();
     flags |= (1 << targetted_flag);
-    const auto& handle = createBasicHandle(fed->global_id,
-                                           fed->local_id,
-                                           handle_type::endpoint,
-                                           name,
-                                           type,
-                                           std::string{},
-                                           flags);
+    const auto& handle = createBasicHandle(
+        fed->global_id, fed->local_id, handle_type::endpoint, name, type, std::string{}, flags);
 
     auto id = handle.getInterfaceHandle();
     fed->createInterface(handle_type::endpoint, id, name, type, emptyStr);
@@ -1591,10 +1589,10 @@ void CommonCore::makeConnections(const std::string& file)
 
 void CommonCore::linkEndpoints(const std::string& source, const std::string& dest)
 {
-   ActionMessage M(CMD_ENDPOINT_LINK);
-   M.name(source);
-   M.setStringData(dest);
-   addActionMessage(std::move(M));
+    ActionMessage M(CMD_ENDPOINT_LINK);
+    M.name(source);
+    M.setStringData(dest);
+    addActionMessage(std::move(M));
 }
 
 void CommonCore::dataLink(const std::string& source, const std::string& target)
@@ -1636,9 +1634,9 @@ void CommonCore::addDependency(local_federate_id federateID, const std::string& 
 }
 
 void CommonCore::sendTo(interface_handle sourceHandle,
-                      std::string_view destination,
-                      const void* data,
-                      uint64_t length)
+                        std::string_view destination,
+                        const void* data,
+                        uint64_t length)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
@@ -1648,8 +1646,8 @@ void CommonCore::sendTo(interface_handle sourceHandle,
     if (hndl->handleType != handle_type::endpoint) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
-    if (checkActionFlag(*hndl,targetted_flag)) {
-        throw(InvalidFunctionCall("targetted endpoints may not specify a destination"));
+    if (checkActionFlag(*hndl, targetted_flag)) {
+        throw(InvalidFunctionCall("targeted endpoints may not specify a destination"));
     }
     auto* fed = getFederateAt(hndl->local_fed_id);
     ActionMessage m(CMD_SEND_MESSAGE);
@@ -1665,10 +1663,10 @@ void CommonCore::sendTo(interface_handle sourceHandle,
 }
 
 void CommonCore::sendToAt(interface_handle sourceHandle,
-                        std::string_view destination,
-    Time sendTime,
-                        const void* data,
-                        uint64_t length)
+                          std::string_view destination,
+                          Time sendTime,
+                          const void* data,
+                          uint64_t length)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
@@ -1679,7 +1677,7 @@ void CommonCore::sendToAt(interface_handle sourceHandle,
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
     if (checkActionFlag(*hndl, targetted_flag)) {
-        throw(InvalidFunctionCall("targetted endpoints may not specify a destination"));
+        throw(InvalidFunctionCall("targeted endpoints may not specify a destination"));
     }
     auto* fed = getFederateAt(hndl->local_fed_id);
     ActionMessage m(CMD_SEND_MESSAGE);
@@ -1695,14 +1693,14 @@ void CommonCore::sendToAt(interface_handle sourceHandle,
     addActionMessage(std::move(m));
 }
 
-void CommonCore::generateMessages(ActionMessage& message,
-                      const std::vector<std::pair<global_handle, std::string_view>>& targets)
+void CommonCore::generateMessages(
+    ActionMessage& message,
+    const std::vector<std::pair<global_handle, std::string_view>>& targets)
 {
     setActionFlag(message, filter_processing_required_flag);
     if (targets.size() == 1) {
-        
         message.setDestination(targets.front().first);
-        message.setString(0,targets.front().second);
+        message.setString(0, targets.front().second);
         actionQueue.push(std::move(message));
         return;
     }
@@ -1711,7 +1709,7 @@ void CommonCore::generateMessages(ActionMessage& message,
     package.source_id = message.source_id;
     package.source_handle = message.source_handle;
 
-     for (auto& target : targets) {
+    for (auto& target : targets) {
         message.setDestination(target.first);
         message.setString(0, target.second);
         auto res = appendMessage(package, message);
@@ -1726,7 +1724,6 @@ void CommonCore::generateMessages(ActionMessage& message,
     }
     actionQueue.push(std::move(package));
 }
-
 
 void CommonCore::send(interface_handle sourceHandle, const void* data, uint64_t length)
 {
@@ -1753,10 +1750,7 @@ void CommonCore::send(interface_handle sourceHandle, const void* data, uint64_t 
     generateMessages(m, targets);
 }
 
-void CommonCore::sendAt(interface_handle sourceHandle,
-                        Time time,
-                           const void* data,
-                           uint64_t length)
+void CommonCore::sendAt(interface_handle sourceHandle, Time time, const void* data, uint64_t length)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
@@ -3307,7 +3301,8 @@ void CommonCore::processCommand(ActionMessage&& command)
         } break;
 
         case CMD_SEND_MESSAGE:
-            if (checkActionFlag(command, filter_processing_required_flag)||((command.dest_id == parent_broker_id) && (isLocal(command.source_id)))) {
+            if (checkActionFlag(command, filter_processing_required_flag) ||
+                ((command.dest_id == parent_broker_id) && (isLocal(command.source_id)))) {
                 deliverMessage(processMessage(command));
             } else {
                 deliverMessage(command);
@@ -3497,7 +3492,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                     // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
-                
+
                 if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
                     command.setAction(CMD_ADD_ENDPOINT);
                     toggleActionFlag(command, destination_target);
@@ -3512,15 +3507,13 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                 if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
                     toggleActionFlag(command, destination_target);
                 }
-                
+
                 command.swapSourceDest();
                 command.setSource(ept->handle);
                 command.name(ept->key);
                 command.setString(typeStringLoc, ept->type);
                 addTargetToInterface(command);
 
-                
-                
             } else {
                 routeMessage(std::move(command));
             }

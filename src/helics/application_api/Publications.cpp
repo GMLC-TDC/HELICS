@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Publications.hpp"
 
-#include "ValueFederate.hpp"
 #include "../core/core-exceptions.hpp"
+#include "ValueFederate.hpp"
 #include "units/units/units.hpp"
 
 #include <memory>
@@ -22,7 +22,7 @@ Publication::Publication(ValueFederate* valueFed,
                          const std::string& key,
                          const std::string& type,
                          const std::string& units):
-    Interface(valueFed,id,key),
+    Interface(valueFed, id, key),
     fed(valueFed), pubUnits(units)
 {
     pubType = getTypeFromString(type);

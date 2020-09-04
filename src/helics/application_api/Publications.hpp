@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../core/core-exceptions.hpp"
-#include "HelicsPrimaryTypes.hpp"
 #include "Federate.hpp"
+#include "HelicsPrimaryTypes.hpp"
 
 #include <memory>
 #include <string>
@@ -21,7 +21,7 @@ class precise_unit;
 namespace helics {
 class ValueFederate;
 /** define a publication object in the C++98 interface*/
-class HELICS_CXX_EXPORT Publication:public Interface {
+class HELICS_CXX_EXPORT Publication: public Interface {
   protected:
     ValueFederate* fed{nullptr};  //!< the federate construct to interact with
   private:
@@ -178,12 +178,11 @@ class HELICS_CXX_EXPORT Publication:public Interface {
     /** get the units of the publication*/
     const std::string& getUnits() const { return pubUnits; }
 
-    void addTarget(std::string_view target) { addDestinationTarget(target);
-    }
+    void addTarget(std::string_view target) { addDestinationTarget(target); }
     /** close a input during an active simulation
     @details it is not necessary to call this function unless you are continuing the simulation
     after the close*/
-    
+
     /** send a value for publication
     @param val the value to publish*/
     void publish(double val);
@@ -247,6 +246,7 @@ class HELICS_CXX_EXPORT Publication:public Interface {
     void enableChangeDetection(bool enabled = true) noexcept { changeDetectionEnabled = enabled; }
 
     virtual const std::string& getDisplayName() const override { return getName(); }
+
   private:
     /** implementation of the integer publications
     @details this is the same as the other publish function but is used in the template due to

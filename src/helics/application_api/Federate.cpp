@@ -525,7 +525,7 @@ void Federate::finalizeComplete()
 void Federate::disconnect()
 {
     finalize();
-    
+
     coreObject = nullptr;
 }
 
@@ -1190,7 +1190,6 @@ void Federate::logMessage(int level, const std::string& message) const
     }
 }
 
-
 Interface::Interface(Federate* federate, interface_handle id, std::string_view actName):
     handle(id), name(actName)
 {
@@ -1202,17 +1201,19 @@ Interface::Interface(Federate* federate, interface_handle id, std::string_view a
     }
 }
 
-
-const std::string& Interface::getKey() const {
-    return (cr!=nullptr) ? (cr->getHandleName(handle)) : emptyStr;
+const std::string& Interface::getKey() const
+{
+    return (cr != nullptr) ? (cr->getHandleName(handle)) : emptyStr;
 }
 
-const std::string& Interface::getTarget() const {
+const std::string& Interface::getTarget() const
+{
     return emptyStr;
 }
 
-void Interface::addSourceTarget(std::string_view newTarget) {
-    if (cr!=nullptr) {
+void Interface::addSourceTarget(std::string_view newTarget)
+{
+    if (cr != nullptr) {
         cr->addSourceTarget(handle, newTarget);
     } else {
         throw(InvalidFunctionCall(
@@ -1220,8 +1221,9 @@ void Interface::addSourceTarget(std::string_view newTarget) {
     }
 }
 
-void Interface::addDestinationTarget(std::string_view newTarget) {
-    if (cr!=nullptr) {
+void Interface::addDestinationTarget(std::string_view newTarget)
+{
+    if (cr != nullptr) {
         cr->addDestinationTarget(handle, newTarget);
     } else {
         throw(InvalidFunctionCall(
@@ -1229,7 +1231,8 @@ void Interface::addDestinationTarget(std::string_view newTarget) {
     }
 }
 
-void Interface::removeTarget(std::string_view targetToRemove) {
+void Interface::removeTarget(std::string_view targetToRemove)
+{
     if (cr != nullptr) {
         cr->removeTarget(handle, targetToRemove);
     } else {
@@ -1238,14 +1241,14 @@ void Interface::removeTarget(std::string_view targetToRemove) {
     }
 }
 
-
 const std::string& Interface::getInfo() const
 {
-    return (cr!=nullptr) ? cr->getInterfaceInfo(handle) : emptyStr;
+    return (cr != nullptr) ? cr->getInterfaceInfo(handle) : emptyStr;
 }
 
-void Interface::setInfo(const std::string& info) {
-    if (cr!=nullptr) {
+void Interface::setInfo(const std::string& info)
+{
+    if (cr != nullptr) {
         cr->setInterfaceInfo(handle, info);
     } else {
         throw(
@@ -1253,8 +1256,9 @@ void Interface::setInfo(const std::string& info) {
     }
 }
 
-void Interface::setOption(int32_t option, int32_t value) {
-    if (cr!=nullptr) {
+void Interface::setOption(int32_t option, int32_t value)
+{
+    if (cr != nullptr) {
         cr->setHandleOption(handle, option, value);
     } else {
         throw(InvalidFunctionCall(
@@ -1262,24 +1266,28 @@ void Interface::setOption(int32_t option, int32_t value) {
     }
 }
 
-
-int32_t Interface::getOption(int32_t option) const {
-    return (cr!=nullptr) ? cr->getHandleOption(handle, option) : 0;
+int32_t Interface::getOption(int32_t option) const
+{
+    return (cr != nullptr) ? cr->getHandleOption(handle, option) : 0;
 }
 
-const std::string& Interface::getInjectionType() const {
-    return (cr!=nullptr) ? (cr->getInjectionType(handle)) : emptyStr;
+const std::string& Interface::getInjectionType() const
+{
+    return (cr != nullptr) ? (cr->getInjectionType(handle)) : emptyStr;
 }
 
-const std::string& Interface::getExtractionType() const {
-    return (cr!=nullptr) ? (cr->getExtractionType(handle)) : emptyStr;
+const std::string& Interface::getExtractionType() const
+{
+    return (cr != nullptr) ? (cr->getExtractionType(handle)) : emptyStr;
 }
 
-const std::string& Interface::getInjectionUnits() const {
-    return (cr!=nullptr) ? (cr->getInjectionUnits(handle)) : emptyStr;
+const std::string& Interface::getInjectionUnits() const
+{
+    return (cr != nullptr) ? (cr->getInjectionUnits(handle)) : emptyStr;
 }
 
-const std::string& Interface::getExtractionUnits() const {
+const std::string& Interface::getExtractionUnits() const
+{
     return (cr != nullptr) ? (cr->getExtractionUnits(handle)) : emptyStr;
 }
 
@@ -1288,20 +1296,22 @@ const std::string& Interface::getSourceTargets() const
     return (cr != nullptr) ? (cr->getSourceTargets(handle)) : emptyStr;
 }
 
-const std::string& Interface::getDestinationTargets() const {
+const std::string& Interface::getDestinationTargets() const
+{
     return (cr != nullptr) ? (cr->getDestinationTargets(handle)) : emptyStr;
 }
 
-const std::string& Interface::getDisplayName() const {
+const std::string& Interface::getDisplayName() const
+{
     return (name.empty() ? getTarget() : name);
 }
 
-void Interface::close() {
-    if (cr!=nullptr) {
+void Interface::close()
+{
+    if (cr != nullptr) {
         cr->closeHandle(handle);
         cr = nullptr;
     }
-    
 }
 
 void Interface::disconnectFromCore()

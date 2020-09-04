@@ -509,8 +509,8 @@ class Core {
      @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual interface_handle registerTargettedEndpoint(local_federate_id federateID,
-                                              const std::string& name,
-                                              const std::string& type) = 0;
+                                                       const std::string& name,
+                                                       const std::string& type) = 0;
 
     /** get an endpoint Handle from its name
     @param federateID the identifier for the federate
@@ -557,8 +557,9 @@ class Core {
     @param handle an interface to add the target to
     @param dest the target endpoint for the filter
     */
-    virtual void
-        addDestinationTarget(interface_handle handle, std::string_view dest, handle_type hint=handle_type::unknown) = 0;
+    virtual void addDestinationTarget(interface_handle handle,
+                                      std::string_view dest,
+                                      handle_type hint = handle_type::unknown) = 0;
 
     /** add a source target,  the handle can be a subscription, input, filter or endpoint
     @details for subscriptions and inputs this establishes a link from a publication, for endpoints
@@ -604,8 +605,7 @@ class Core {
      * May be used for error checking for compatible types and possible optimization by
      * pre-registering the intent for these endpoints to communicate.
      */
-    virtual void linkEndpoints(const std::string& source,
-                                                    const std::string& dest) = 0;
+    virtual void linkEndpoints(const std::string& source, const std::string& dest) = 0;
 
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/
@@ -640,9 +640,7 @@ class Core {
      * communication network.  This enables simulations to be run with/without
      * a communications model present.
      */
-    virtual void send(interface_handle sourceHandle,
-                        const void* data,
-                        uint64_t length) = 0;
+    virtual void send(interface_handle sourceHandle, const void* data, uint64_t length) = 0;
     /**
      * Send data from source to destination.
      *
@@ -656,9 +654,9 @@ class Core {
      * a communications model present.
      */
     virtual void sendTo(interface_handle sourceHandle,
-                      std::string_view destination,
-                      const void* data,
-                      uint64_t length) = 0;
+                        std::string_view destination,
+                        const void* data,
+                        uint64_t length) = 0;
 
     /**
      * Send data from source to destination with explicit expected delivery time.
@@ -675,27 +673,25 @@ class Core {
      @param data the raw data for the event
      @param length the record length of the event
      */
-    virtual void sendAt(interface_handle sourceHandle,
-                        Time time,
-                           const void* data,
-                           uint64_t length) = 0;
+    virtual void
+        sendAt(interface_handle sourceHandle, Time time, const void* data, uint64_t length) = 0;
 
-     /**
-    * Send data from source to destination with explicit expected delivery time.
-    *
-    * Time supplied is the time that will be reported in the message in the receiving
-    * federate.
-    *
-    * This send version was designed to enable communication of
-    * events between discrete event federates.  For this use case
-    * the receiving federate can deserialize the data and schedule
-    * an event for the specified time.
-    @param time the time the event is scheduled for
-    @param sourceHandle the source of the event
-    @param destination  the target of the event
-    @param data the raw data for the event
-    @param length the record length of the event
-    */
+    /**
+   * Send data from source to destination with explicit expected delivery time.
+   *
+   * Time supplied is the time that will be reported in the message in the receiving
+   * federate.
+   *
+   * This send version was designed to enable communication of
+   * events between discrete event federates.  For this use case
+   * the receiving federate can deserialize the data and schedule
+   * an event for the specified time.
+   @param time the time the event is scheduled for
+   @param sourceHandle the source of the event
+   @param destination  the target of the event
+   @param data the raw data for the event
+   @param length the record length of the event
+   */
     virtual void sendToAt(interface_handle sourceHandle,
                           std::string_view destination,
                           Time time,

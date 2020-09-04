@@ -911,14 +911,12 @@ TEST_F(function_tests, messageFed_event)
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
     helicsFederateEnterExecutingMode(mFed1, nullptr);
 
-    
-
     helicsEndpointSendAt(ept1, 0.0, nullptr, 0, &err);
 
     helicsEndpointSendToAt(ept1, "ept1", 0.0, nullptr, 0, &err);
 
     char data[5] = "test";
-    helicsEndpointSendAt(ept1,0.0, data, 4, &err);
+    helicsEndpointSendAt(ept1, 0.0, data, 4, &err);
     helicsFederateRequestNextStep(mFed1, nullptr);
     auto cnt = helicsEndpointPendingMessages(ept1);
     EXPECT_EQ(cnt, 3);
@@ -943,7 +941,7 @@ TEST_F(function_tests, messageFed_messageObject)
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
 
     helicsFederateEnterExecutingMode(mFed1, nullptr);
-   
+
     // if we are sending a message it can't be null
     helicsEndpointSendMessage(ept1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);

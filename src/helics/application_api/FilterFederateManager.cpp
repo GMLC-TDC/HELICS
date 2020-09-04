@@ -120,9 +120,9 @@ void FilterFederateManager::closeAllFilters()
 
 void FilterFederateManager::disconnectAllFilters()
 {
-        auto filts = filters.lock();
-        for (auto& filt : filts) {
-            filt->disconnectFromCore();
-        }
+    auto filts = filters.lock();
+    for (auto& filt : filts) {
+        filt->disconnectFromCore();
+    }
 }
 }  // namespace helics

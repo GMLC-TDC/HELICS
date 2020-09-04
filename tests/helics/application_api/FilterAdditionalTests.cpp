@@ -166,7 +166,7 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
-    p1.sendTo( "endpt2", data);
+    p1.sendTo("endpt2", data);
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);

@@ -82,7 +82,8 @@ void addOperations(Filter* filt, filter_types type, Core* /*cptr*/)
     }
 }
 
-Filter::Filter(Federate* ffed, const std::string& filtName): Filter(interface_visibility::local,ffed,filtName)
+Filter::Filter(Federate* ffed, const std::string& filtName):
+    Filter(interface_visibility::local, ffed, filtName)
 {
 }
 
@@ -97,18 +98,19 @@ Filter::Filter(Core* core, const std::string& filtName, interface_handle ihandle
 }
 
 Filter::Filter(interface_visibility locality, Federate* ffed, const std::string& filtName):
-    Interface(ffed,interface_handle(),filtName)
+    Interface(ffed, interface_handle(), filtName)
 {
     if (ffed != nullptr) {
         if (locality == interface_visibility::global) {
-            handle=ffed->registerGlobalFilter(filtName);
+            handle = ffed->registerGlobalFilter(filtName);
         } else {
-            handle=ffed->registerFilter(filtName);
+            handle = ffed->registerFilter(filtName);
         }
     }
 }
 
-Filter::Filter(Core* core, const std::string& filtName):Interface(core,interface_handle(),filtName)
+Filter::Filter(Core* core, const std::string& filtName):
+    Interface(core, interface_handle(), filtName)
 {
     if (cr != nullptr) {
         handle = cr->registerFilter(filtName, std::string(), std::string());
@@ -156,10 +158,10 @@ CloningFilter::CloningFilter(Core* core, const std::string& filtName):
 }
 
 CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName):
-    Filter(ffed, filtName,interface_handle())
+    Filter(ffed, filtName, interface_handle())
 {
-    if (ffed!=nullptr) {
-        handle=ffed->registerCloningFilter(filtName);
+    if (ffed != nullptr) {
+        handle = ffed->registerCloningFilter(filtName);
     }
     if (cr != nullptr) {
         setFilterOperations(std::make_shared<CloneFilterOperation>());
@@ -186,8 +188,6 @@ CloningFilter::CloningFilter(interface_visibility locality,
         setFilterOperations(std::make_shared<CloneFilterOperation>());
     }
 }
-
-
 
 void CloningFilter::addDeliveryEndpoint(const std::string& endpoint)
 {
