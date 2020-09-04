@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "EndpointInfo.hpp"
+#include "../common/JsonGeneration.hpp"
 //#include "core/core-data.hpp"
 
 #include <algorithm>
@@ -64,4 +65,94 @@ int32_t EndpointInfo::queueSize(Time maxTime) const
     }
     return cnt;
 }
+
+void EndpointInfo::addDestinationTarget(global_handle dest,
+                          const std::string& destName,
+                          const std::string& destType)
+{
+    for (const auto &ti:targetInformation) {
+        if (ti.id==dest) {
+            return;
+        }
+    }
+    targetInformation.emplace_back(dest, destName, destType);
+    /** now update the target information*/
+    targets.reserve(targetInformation.size());
+    targets.clear();
+    for (const auto &ti:targetInformation) {
+        targets.emplace_back(ti.id, ti.key);
+    }
+}
+
+/** add a source to an endpoint*/
+void EndpointInfo::addSourceTarget(global_handle dest,
+                     const std::string& sourceName,
+                     const std::string& sourceType)
+{
+    for (const auto& si : sourceInformation) {
+        if (si.id == dest) {
+            return;
+        }
+    }
+    sourceInformation.emplace_back(dest, sourceName,sourceType);
+}
+
+/** remove a target from connection*/
+void EndpointInfo::removeTarget(global_handle targetId) {
+    auto ti = targetInformation.begin();
+    while (ti!=targetInformation.end()) {
+        if (ti->id==targetId) {
+            targetInformation.erase(ti);
+            targets.clear();
+            for (const auto& tim : targetInformation) {
+                targets.emplace_back(tim.id, tim.key);
+            }
+            break;
+        }
+    }
+    auto si = sourceInformation.begin();
+    while (si != sourceInformation.end()) {
+        if (si->id == targetId) {
+            sourceInformation.erase(si);
+            return;
+        }
+    }
+}
+
+const std::string& EndpointInfo::getSourceTargets() const {
+    if (sourceTargets.empty()) {
+        if (!sourceInformation.empty()) {
+            if (sourceInformation.size() == 1) {
+                sourceTargets = sourceInformation.front().key;
+            } else {
+                sourceTargets.push_back('[');
+                for (const auto& src : sourceInformation) {
+                    sourceTargets.append(generateJsonQuotedString(src.key));
+                    sourceTargets.push_back(',');
+                }
+                sourceTargets.back() = ']';
+            }
+        }
+    }
+    return sourceTargets;
+ }
+/** get a string with the names of the destination endpoints*/
+const std::string& EndpointInfo::getDestinationTargets() const {
+    if (destinationTargets.empty()) {
+        if (!targetInformation.empty()) {
+            if (targetInformation.size() == 1) {
+                destinationTargets = targetInformation.front().key;
+            } else {
+                destinationTargets.push_back('[');
+                for (const auto& trgt : targetInformation) {
+                    destinationTargets.append(generateJsonQuotedString(trgt.key));
+                    destinationTargets.push_back(',');
+                }
+                destinationTargets.back() = ']';
+            }
+        }
+    }
+    return destinationTargets;
+}
+
 }  // namespace helics

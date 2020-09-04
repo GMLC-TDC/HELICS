@@ -1090,7 +1090,7 @@ void CommonCore::closeHandle(interface_handle handle)
         [handle](auto& hand) { setActionFlag(*hand.getHandleInfo(handle), disconnected_flag); });
 }
 
-void CommonCore::removeTarget(interface_handle handle, const std::string& targetToRemove)
+void CommonCore::removeTarget(interface_handle handle, std::string_view targetToRemove)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1124,7 +1124,9 @@ void CommonCore::removeTarget(interface_handle handle, const std::string& target
     addActionMessage(std::move(cmd));
 }
 
-void CommonCore::addDestinationTarget(interface_handle handle, const std::string& dest)
+void CommonCore::addDestinationTarget(interface_handle handle,
+                                      std::string_view dest,
+                                      handle_type hint)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1133,11 +1135,16 @@ void CommonCore::addDestinationTarget(interface_handle handle, const std::string
     ActionMessage cmd;
     cmd.setSource(handleInfo->handle);
     cmd.flags = handleInfo->flags;
+    cmd.counter = static_cast<uint16_t>(handleInfo->handleType);
     setActionFlag(cmd, destination_target);
     cmd.payload = dest;
     switch (handleInfo->handleType) {
         case handle_type::endpoint:
-            cmd.setAction(CMD_ADD_NAMED_FILTER);
+            if(hint == handle_type::filter) { cmd.setAction(CMD_ADD_NAMED_FILTER); }
+            else { cmd.setAction(CMD_ADD_NAMED_ENDPOINT); }
+            if (handleInfo->key.empty()) {
+                cmd.setStringData(handleInfo->type, handleInfo->units);
+            }
             break;
         case handle_type::filter:
             cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -1164,7 +1171,7 @@ void CommonCore::addDestinationTarget(interface_handle handle, const std::string
     addActionMessage(std::move(cmd));
 }
 
-void CommonCore::addSourceTarget(interface_handle handle, const std::string& targetName)
+void CommonCore::addSourceTarget(interface_handle handle, std::string_view targetName, handle_type hint)
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
@@ -1176,7 +1183,13 @@ void CommonCore::addSourceTarget(interface_handle handle, const std::string& tar
     cmd.payload = targetName;
     switch (handleInfo->handleType) {
         case handle_type::endpoint:
-            cmd.setAction(CMD_ADD_NAMED_FILTER);
+            if (hint == handle_type::filter)
+            {
+                cmd.setAction(CMD_ADD_NAMED_FILTER);
+            }
+            else {
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+            }
             break;
         case handle_type::filter:
             cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -1198,6 +1211,71 @@ void CommonCore::addSourceTarget(interface_handle handle, const std::string& tar
     }
     addActionMessage(std::move(cmd));
 }
+
+const std::string& CommonCore::getDestinationTargets(interface_handle handle) const
+{
+    const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr) {
+        switch (handleInfo->handleType) {
+            case handle_type::input: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* inpInfo = fed->interfaces().getInput(handle);
+                if (inpInfo != nullptr) {
+                    return inpInfo->getTargets();
+                }
+                break;
+            }
+            case handle_type::publication:
+                return emptyStr;
+            case handle_type::endpoint: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* eptInfo = fed->interfaces().getEndpoint(handle);
+                if (eptInfo != nullptr) {
+                    return eptInfo->getDestinationTargets();
+                }
+                break;
+            }
+            case handle_type::filter:
+                return emptyStr;
+            default:
+                return emptyStr;
+        }
+    }
+    return emptyStr;
+}
+
+const std::string& CommonCore::getSourceTargets(interface_handle handle) const
+{
+    const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr) {
+        switch (handleInfo->handleType) {
+            case handle_type::input: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* inpInfo = fed->interfaces().getInput(handle);
+                if (inpInfo != nullptr) {
+                    return inpInfo->getTargets();
+                }
+                break;
+            }
+            case handle_type::publication:
+                return emptyStr;
+            case handle_type::endpoint: {
+                auto* fed = getFederateAt(handleInfo->local_fed_id);
+                auto* eptInfo = fed->interfaces().getEndpoint(handle);
+                if (eptInfo != nullptr) {
+                    return eptInfo->getSourceTargets();
+                }
+                break;
+            }
+            case handle_type::filter: {
+                break;
+            }
+            default:
+                return emptyStr;
+        }
+    }
+    return emptyStr;
+ }
 
 void CommonCore::setValue(interface_handle handle, const char* data, uint64_t len)
 {
@@ -1230,7 +1308,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
             mv.source_handle = handle;
             mv.setDestination(subs[0]);
             mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
-            mv.payload = std::string(data, len);
+            mv.payload.assign(data, len);
             mv.actionTime = fed->nextAllowedSendTime();
 
             actionQueue.push(std::move(mv));
@@ -1244,7 +1322,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
         mv.source_id = handleInfo->getFederateId();
         mv.source_handle = handle;
         mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
-        mv.payload = std::string(data, len);
+        mv.payload.assign(data, len);
         mv.actionTime = fed->nextAllowedSendTime();
 
         for (auto& target : subs) {
@@ -1323,6 +1401,41 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
                                            type,
                                            std::string{},
                                            fed->getInterfaceFlags());
+
+    auto id = handle.getInterfaceHandle();
+    fed->createInterface(handle_type::endpoint, id, name, type, emptyStr);
+    ActionMessage m(CMD_REG_ENDPOINT);
+    m.source_id = fed->global_id.load();
+    m.source_handle = id;
+    m.name(name);
+    m.setStringData(type);
+    m.flags = handle.flags;
+    actionQueue.push(std::move(m));
+
+    return id;
+}
+
+interface_handle CommonCore::registerTargettedEndpoint(local_federate_id federateID,
+                                              const std::string& name,
+                                              const std::string& type)
+{
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid (registerEndpoint)"));
+    }
+    const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
+    if (ept != nullptr) {
+        throw(RegistrationFailure("endpoint name is already used"));
+    }
+    auto flags = fed->getInterfaceFlags();
+    flags |= (1 << targetted_flag);
+    const auto& handle = createBasicHandle(fed->global_id,
+                                           fed->local_id,
+                                           handle_type::endpoint,
+                                           name,
+                                           type,
+                                           std::string{},
+                                           flags);
 
     auto id = handle.getInterfaceHandle();
     fed->createInterface(handle_type::endpoint, id, name, type, emptyStr);
@@ -1467,12 +1580,6 @@ FilterInfo* CommonCore::createFilter(global_broker_id dest,
     return retTarget;
 }
 
-void CommonCore::registerFrequentCommunicationsPair(const std::string& /*source*/,
-                                                    const std::string& /*dest*/)
-{
-    // std::lock_guard<std::mutex> lock (_mutex);
-}
-
 void CommonCore::makeConnections(const std::string& file)
 {
     if (hasTomlExtension(file)) {
@@ -1480,6 +1587,14 @@ void CommonCore::makeConnections(const std::string& file)
     } else {
         makeConnectionsJson(this, file);
     }
+}
+
+void CommonCore::linkEndpoints(const std::string& source, const std::string& dest)
+{
+   ActionMessage M(CMD_ENDPOINT_LINK);
+   M.name(source);
+   M.setStringData(dest);
+   addActionMessage(std::move(M));
 }
 
 void CommonCore::dataLink(const std::string& source, const std::string& target)
@@ -1520,9 +1635,9 @@ void CommonCore::addDependency(local_federate_id federateID, const std::string& 
     addActionMessage(std::move(search));
 }
 
-void CommonCore::send(interface_handle sourceHandle,
-                      const std::string& destination,
-                      const char* data,
+void CommonCore::sendTo(interface_handle sourceHandle,
+                      std::string_view destination,
+                      const void* data,
                       uint64_t length)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
@@ -1533,6 +1648,9 @@ void CommonCore::send(interface_handle sourceHandle,
     if (hndl->handleType != handle_type::endpoint) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
+    if (checkActionFlag(*hndl,targetted_flag)) {
+        throw(InvalidFunctionCall("targetted endpoints may not specify a destination"));
+    }
     auto* fed = getFederateAt(hndl->local_fed_id);
     ActionMessage m(CMD_SEND_MESSAGE);
 
@@ -1540,16 +1658,104 @@ void CommonCore::send(interface_handle sourceHandle,
     m.source_handle = sourceHandle;
     m.source_id = hndl->getFederateId();
 
-    m.payload = std::string(data, length);
+    m.payload.assign(data, length);
     m.setStringData(destination, hndl->key, hndl->key);
     m.actionTime = fed->nextAllowedSendTime();
     addActionMessage(std::move(m));
 }
 
-void CommonCore::sendEvent(Time time,
-                           interface_handle sourceHandle,
-                           const std::string& destination,
-                           const char* data,
+void CommonCore::sendToAt(interface_handle sourceHandle,
+                        std::string_view destination,
+    Time sendTime,
+                        const void* data,
+                        uint64_t length)
+{
+    const auto* hndl = getHandleInfo(sourceHandle);
+    if (hndl == nullptr) {
+        throw(InvalidIdentifier("handle is not valid"));
+    }
+
+    if (hndl->handleType != handle_type::endpoint) {
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
+    }
+    if (checkActionFlag(*hndl, targetted_flag)) {
+        throw(InvalidFunctionCall("targetted endpoints may not specify a destination"));
+    }
+    auto* fed = getFederateAt(hndl->local_fed_id);
+    ActionMessage m(CMD_SEND_MESSAGE);
+
+    m.messageID = ++messageCounter;
+    m.source_handle = sourceHandle;
+    m.source_id = hndl->getFederateId();
+
+    m.payload.assign(data, length);
+    m.setStringData(destination, hndl->key, hndl->key);
+    auto minTime = fed->nextAllowedSendTime();
+    m.actionTime = std::max(sendTime, minTime);
+    addActionMessage(std::move(m));
+}
+
+void CommonCore::generateMessages(ActionMessage& message,
+                      const std::vector<std::pair<global_handle, std::string_view>>& targets)
+{
+    setActionFlag(message, filter_processing_required_flag);
+    if (targets.size() == 1) {
+        
+        message.setDestination(targets.front().first);
+        message.setString(0,targets.front().second);
+        actionQueue.push(std::move(message));
+        return;
+    }
+    /** now generate a multimessage*/
+    ActionMessage package(CMD_MULTI_MESSAGE);
+    package.source_id = message.source_id;
+    package.source_handle = message.source_handle;
+
+     for (auto& target : targets) {
+        message.setDestination(target.first);
+        message.setString(0, target.second);
+        auto res = appendMessage(package, message);
+        if (res < 0)  // deal with max package size if there are a lot of subscribers
+        {
+            actionQueue.push(std::move(package));
+            package = ActionMessage(CMD_MULTI_MESSAGE);
+            package.source_id = message.source_id;
+            package.source_handle = message.source_handle;
+            appendMessage(package, message);
+        }
+    }
+    actionQueue.push(std::move(package));
+}
+
+
+void CommonCore::send(interface_handle sourceHandle, const void* data, uint64_t length)
+{
+    const auto* hndl = getHandleInfo(sourceHandle);
+    if (hndl == nullptr) {
+        throw(InvalidIdentifier("handle is not valid"));
+    }
+    if (hndl->handleType != handle_type::endpoint) {
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
+    }
+    auto* fed = getFederateAt(hndl->local_fed_id);
+    auto targets = fed->getMessageDestinations(sourceHandle);
+    if (targets.empty()) {
+        return;
+    }
+
+    ActionMessage m(CMD_SEND_MESSAGE);
+    m.source_handle = sourceHandle;
+    m.source_id = hndl->getFederateId();
+    m.actionTime = fed->nextAllowedSendTime();
+    m.payload.assign(data, length);
+    m.messageID = ++messageCounter;
+    m.setStringData("", hndl->key, hndl->key);
+    generateMessages(m, targets);
+}
+
+void CommonCore::sendAt(interface_handle sourceHandle,
+                        Time time,
+                           const void* data,
                            uint64_t length)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
@@ -1559,15 +1765,21 @@ void CommonCore::sendEvent(Time time,
     if (hndl->handleType != handle_type::endpoint) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
+    auto* fed = getFederateAt(hndl->local_fed_id);
+    auto targets = fed->getMessageDestinations(sourceHandle);
+    if (targets.empty()) {
+        return;
+    }
+
     ActionMessage m(CMD_SEND_MESSAGE);
     m.source_handle = sourceHandle;
     m.source_id = hndl->getFederateId();
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    auto minTime = fed->nextAllowedSendTime();
     m.actionTime = std::max(time, minTime);
-    m.payload = std::string(data, length);
-    m.setStringData(destination, hndl->key, hndl->key);
+    m.payload.assign(data, length);
     m.messageID = ++messageCounter;
-    addActionMessage(std::move(m));
+    m.setStringData("", hndl->key, hndl->key);
+    generateMessages(m, targets);
 }
 
 void CommonCore::sendMessage(interface_handle sourceHandle, std::unique_ptr<Message> message)
@@ -2516,6 +2728,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 routeMessage(std::move(command));
             }
             break;
+        case CMD_INTERFACE_QUERY:
+            break;
         case CMD_QUERY: {
             if (command.dest_id == parent_broker_id) {
                 const auto& target = command.getString(targetStringLoc);
@@ -3093,7 +3307,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         } break;
 
         case CMD_SEND_MESSAGE:
-            if ((command.dest_id == parent_broker_id) && (isLocal(command.source_id))) {
+            if (checkActionFlag(command, filter_processing_required_flag)||((command.dest_id == parent_broker_id) && (isLocal(command.source_id)))) {
                 deliverMessage(processMessage(command));
             } else {
                 deliverMessage(command);
@@ -3283,13 +3497,30 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                     // TODO(PT): this might generate an error if the required flag was set
                     return;
                 }
-                command.setAction(CMD_ADD_FILTER);
+                
+                if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                    command.setAction(CMD_ADD_ENDPOINT);
+                    toggleActionFlag(command, destination_target);
+                } else {
+                    command.setAction(CMD_ADD_FILTER);
+                }
                 command.setDestination(ept->handle);
-                command.payload.clear();
                 addTargetToInterface(command);
+
+                // to the originating interface
                 command.setAction(CMD_ADD_ENDPOINT);
+                if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                    toggleActionFlag(command, destination_target);
+                }
+                
                 command.swapSourceDest();
+                command.setSource(ept->handle);
+                command.name(ept->key);
+                command.setString(typeStringLoc, ept->type);
                 addTargetToInterface(command);
+
+                
+                
             } else {
                 routeMessage(std::move(command));
             }
@@ -4097,6 +4328,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
     if (handle == nullptr) {
         return m;
     }
+    clearActionFlag(m, filter_processing_required_flag);
     if (checkActionFlag(*handle, has_source_filter_flag)) {
         auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {

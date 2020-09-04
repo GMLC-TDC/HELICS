@@ -154,13 +154,10 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
 
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
-        fed->setInfo(ept.getHandle(), info);
+        ept.setInfo(info);
     }
-    addTargets(data, "knownDestinations", [&ept, fed](const std::string& dest) {
-        fed->registerKnownCommunicationPath(ept, dest);
-    });
     addTargets(data, "subscriptions", [&ept, fed](const std::string& sub) {
-        fed->subscribe(ept, sub);
+        ept.subscribe(sub);
     });
     addTargets(data, "filters", [&ept](const std::string& filt) { ept.addSourceFilter(filt); });
     addTargets(data, "sourceFilters", [&ept](const std::string& filt) {
@@ -225,15 +222,9 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     }
 }
 
-void MessageFederate::subscribe(const Endpoint& ept, const std::string& key)
+void MessageFederate::subscribe(const Endpoint& ept, std::string_view key)
 {
-    mfManager->subscribe(ept, key);
-}
-
-void MessageFederate::registerKnownCommunicationPath(const Endpoint& localEndpoint,
-                                                     const std::string& remoteEndpoint)
-{
-    mfManager->registerKnownCommunicationPath(localEndpoint, remoteEndpoint);
+    coreObject->addSourceTarget(ept, key);
 }
 
 bool MessageFederate::hasMessage() const
@@ -284,51 +275,6 @@ std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
     return nullptr;
 }
 
-void MessageFederate::sendMessage(const Endpoint& source,
-                                  const std::string& dest,
-                                  const data_view& message)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        mfManager->sendMessage(source, dest, message);
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendMessage(const Endpoint& source,
-                                  const std::string& dest,
-                                  const data_view& message,
-                                  Time sendTime)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        mfManager->sendMessage(source, dest, message, sendTime);
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendMessage(const Endpoint& source, std::unique_ptr<Message> message)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        mfManager->sendMessage(source, std::move(message));
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
-void MessageFederate::sendMessage(const Endpoint& source, const Message& message)
-{
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
-        mfManager->sendMessage(source, std::make_unique<Message>(message));
-    } else {
-        throw(InvalidFunctionCall(
-            "messages not allowed outside of execution and initialization mode"));
-    }
-}
-
 Endpoint& MessageFederate::getEndpoint(const std::string& eptName) const
 {
     auto& id = mfManager->getEndpoint(eptName);
@@ -361,14 +307,5 @@ int MessageFederate::getEndpointCount() const
     return mfManager->getEndpointCount();
 }
 
-void MessageFederate::addSourceFilter(const Endpoint& ept, const std::string& filterName)
-{
-    mfManager->addSourceFilter(ept, filterName);
-}
-
-void MessageFederate::addDestinationFilter(const Endpoint& ept, const std::string& filterName)
-{
-    mfManager->addDestinationFilter(ept, filterName);
-}
 
 }  // namespace helics

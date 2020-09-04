@@ -125,7 +125,7 @@ Input& ValueFederate::registerGlobalInput(const std::string& key,
 Input& ValueFederate::registerSubscription(const std::string& target, const std::string& units)
 {
     auto& inp = vfManager->registerInput(std::string{}, std::string{}, units);
-    vfManager->addTarget(inp, target);
+    inp.addTarget(target);
     return inp;
 }
 
@@ -208,7 +208,7 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
     }
     auto info = getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
-        fed->setInfo(objUpdate.getHandle(), info);
+        objUpdate.setInfo(info);
     }
     addTargets(data, "targets", [&objUpdate](const std::string& target) {
         objUpdate.addTarget(target);

@@ -12,14 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-/** define the type of the handle*/
-enum class handle_type : char {
-    unknown = 'u',
-    publication = 'p',  //!< handle to output interface
-    input = 'i',  //!< handle to a input interface
-    endpoint = 'e',  //!< handle to an endpoint
-    filter = 'f',  //!< handle to a filter
-};
 
 /** define extra flag definitions*/
 enum handle_flag_definitions {

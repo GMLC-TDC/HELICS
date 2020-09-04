@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Publications.hpp"
 
+#include "ValueFederate.hpp"
 #include "../core/core-exceptions.hpp"
 #include "units/units/units.hpp"
 
@@ -21,8 +22,8 @@ Publication::Publication(ValueFederate* valueFed,
                          const std::string& key,
                          const std::string& type,
                          const std::string& units):
-    fed(valueFed),
-    handle(id), pubKey(key), pubUnits(units)
+    Interface(valueFed,id,key),
+    fed(valueFed), pubUnits(units)
 {
     pubType = getTypeFromString(type);
     if (!units.empty()) {
@@ -166,7 +167,18 @@ void Publication::publishString(std::string_view val)
 void Publication::publish(const std::vector<std::string>& val)
 {
     auto buffer = ValueConverter<std::vector<std::string>>::convert(val);
-    publishString(buffer.to_string());
+    auto str = ValueConverter<std::string_view>::interpret(buffer);
+    bool doPublish = true;
+    if (changeDetectionEnabled) {
+        if (changeDetected(prevValue, str, delta)) {
+            prevValue = std::string(str);
+        } else {
+            doPublish = false;
+        }
+    }
+    if (doPublish) {
+        fed->publishRaw(*this, buffer);
+    }
 }
 
 void Publication::publish(const std::vector<double>& val)
@@ -249,11 +261,11 @@ void Publication::publish(const NamedPoint& np)
     }
 }
 
-void Publication::publish(std::string_view name, double val)
+void Publication::publish(std::string_view field, double val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled) {
-        NamedPoint np(name, val);
+        NamedPoint np(field, val);
         if (changeDetected(prevValue, np, delta)) {
             prevValue = std::move(np);
         } else {
@@ -261,7 +273,7 @@ void Publication::publish(std::string_view name, double val)
         }
     }
     if (doPublish) {
-        auto db = typeConvert(pubType, name, val);
+        auto db = typeConvert(pubType, field, val);
         fed->publishRaw(*this, db);
     }
 }

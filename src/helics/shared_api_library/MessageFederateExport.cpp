@@ -189,13 +189,13 @@ void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, co
             if ((dest == nullptr) || (std::string(dest).empty())) {
                 endObj->endPtr->send(emptyStr);
             } else {
-                endObj->endPtr->send(dest, emptyStr);
+                endObj->endPtr->sendTo(dest, emptyStr);
             }
         } else {
             if ((dest == nullptr) || (std::string(dest).empty())) {
                 endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
             } else {
-                endObj->endPtr->send(dest, reinterpret_cast<const char*>(data), inputDataLength);
+                endObj->endPtr->sendTo(dest, reinterpret_cast<const char*>(data), inputDataLength);
             }
         }
     }
@@ -204,11 +204,76 @@ void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, co
     }
 }
 
-void helicsEndpointSendEventRaw(helics_endpoint endpoint,
+void helicsEndpointSend(helics_endpoint endpoint,
+                            const void* data,
+                            int inputDataLength,
+                            helics_error* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        if ((data == nullptr) || (inputDataLength <= 0)) {
+            endObj->endPtr->send(emptyStr);
+        } else {
+            endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
+        }
+    }
+    catch (...) {
+        return helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendTo(helics_endpoint endpoint,
+                            const char* dest,
+                            const void* data,
+                            int inputDataLength,
+                            helics_error* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        if ((data == nullptr) || (inputDataLength <= 0)) {
+            endObj->endPtr->sendTo(AS_STRING_VIEW(dest), emptyStr);
+        } else {
+            endObj->endPtr->sendTo(AS_STRING_VIEW(dest), reinterpret_cast<const char*>(data), inputDataLength);
+        }
+    }
+    catch (...) {
+        return helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendAt(helics_endpoint endpoint,
+                            helics_time time,
+                            const void* data,
+                            int inputDataLength,
+                            helics_error* err)
+{
+    auto* endObj = verifyEndpoint(endpoint, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        if ((data == nullptr) || (inputDataLength <= 0)) {
+            endObj->endPtr->sendAt(time, emptyStr);
+        } else {
+            endObj->endPtr->sendAt(time, reinterpret_cast<const char*>(data), inputDataLength);
+        }
+    }
+    catch (...) {
+        return helicsErrorHandler(err);
+    }
+}
+
+void helicsEndpointSendToAt(helics_endpoint endpoint,
                                 const char* dest,
+                                helics_time time,
                                 const void* data,
                                 int inputDataLength,
-                                helics_time time,
                                 helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
@@ -217,17 +282,9 @@ void helicsEndpointSendEventRaw(helics_endpoint endpoint,
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(emptyStr, time);
-            } else {
-                endObj->endPtr->send(dest, emptyStr, time);
-            }
+            endObj->endPtr->sendToAt(AS_STRING_VIEW(dest), time, emptyStr);
         } else {
-            if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength, time);
-            } else {
-                endObj->endPtr->send(dest, reinterpret_cast<const char*>(data), inputDataLength, time);
-            }
+            endObj->endPtr->sendToAt(AS_STRING_VIEW(dest), time, reinterpret_cast<const char*>(data), inputDataLength);
         }
     }
     catch (...) {
@@ -599,6 +656,86 @@ void helicsEndpointSetOption(helics_endpoint end, int option, int value, helics_
     }
     try {
         endObj->endPtr->setOption(option, value);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsEndpointAddSourceTarget(helics_endpoint end, const char* targetEndpoint, helics_error* err) {
+    auto* endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->addSourceTarget(targetEndpoint);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsEndpointAddDestinationTarget(helics_endpoint end, const char* targetEndpoint, helics_error* err)
+{
+    auto* endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->addDestinationTarget(targetEndpoint);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsEndpointRemoveTarget(helics_endpoint end, const char* targetEndpoint, helics_error* err)
+{
+    auto* endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->removeTarget(targetEndpoint);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+
+void helicsEndpointAddSourceFilter(helics_endpoint end, const char* filterName, helics_error* err)
+{
+    auto* endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->addSourceFilter(filterName);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsEndpointAddDestinationFilter(helics_endpoint end, const char* filterName, helics_error* err)
+{
+    auto* endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->addDestinationFilter(filterName);
     }
     // LCOV_EXCL_START
     catch (...) {

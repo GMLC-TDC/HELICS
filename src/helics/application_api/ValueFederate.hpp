@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include "ValueConverter.hpp"
 #include "data_view.hpp"
+#include "Inputs.hpp"
+#include "Publications.hpp"
 
 #include <functional>
 #include <memory>
@@ -17,8 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-class Publication;
-class Input;
 /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
 class ValueFederateManager;
 /** class defining the value based interface */
@@ -523,7 +523,19 @@ class HELICS_CXX_EXPORT ValueFederate:
     std::unique_ptr<ValueFederateManager> vfManager;
 };
 
-}  // namespace helics
 
-#include "Inputs.hpp"
-#include "Publications.hpp"
+/** publish directly from the publication key name
+@details this is a convenience function to publish directly from the publication key
+this function should not be used as the primary means of publications as it does involve an
+additional map find operation vs the member publish calls
+@param fed a reference to a valueFederate
+@param pubKey  the name of the publication
+@param pargs any combination of arguments that go into the other publish commands
+*/
+template<class... Us>
+void publish(ValueFederate& fed, const std::string& pubKey, Us... pargs)
+{
+    fed.getPublication(pubKey).publish(pargs...);
+}
+
+}  // namespace helics

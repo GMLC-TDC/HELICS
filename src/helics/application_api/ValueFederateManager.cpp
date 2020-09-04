@@ -291,8 +291,8 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
     if (queryStr == "inputs") {
         ret = generateStringVector_if(
             inputs.lock_shared(),
-            [](const auto& info) { return info.actualName; },
-            [](const auto& info) { return (!info.actualName.empty()); });
+            [](const auto& info) { return info.getName(); },
+            [](const auto& info) { return (!info.getName().empty()); });
     } else if (queryStr == "publications") {
         ret = generateStringVector_if(
             publications.lock_shared(),

@@ -524,6 +524,16 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
     return {};
 }
 
+std::vector<std::pair<global_handle, std::string_view>>
+    FederateState::getMessageDestinations(interface_handle handle)
+{
+    std::lock_guard<FederateState> fedlock(*this);
+    const auto* eptInfo = interfaceInformation.getEndpoint(handle);
+    if (eptInfo != nullptr) {
+        return eptInfo->getTargets();
+    }
+    return {};
+}
 iteration_time FederateState::requestTime(Time nextTime, iteration_request iterate)
 {
     if (try_lock()) {  // only enter this loop once per federate
@@ -1156,6 +1166,21 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             if (pubI != nullptr) {
                 pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
                 addDependent(cmd.source_id);
+            }
+        } break;
+        case CMD_ADD_ENDPOINT: {
+            auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+            if (eptI != nullptr) {
+                if (checkActionFlag(cmd, destination_target))
+                {
+                    eptI->addDestinationTarget(cmd.getSource(),
+                                               std::string(cmd.name()),
+                                               cmd.getString(typeStringLoc));
+                } else {
+                    eptI->addSourceTarget(cmd.getSource(),
+                                               std::string(cmd.name()),
+                                               cmd.getString(typeStringLoc));
+                }
             }
         } break;
         case CMD_ADD_DEPENDENCY:

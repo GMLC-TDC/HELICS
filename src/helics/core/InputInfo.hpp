@@ -133,11 +133,12 @@ class InputInfo {
 
     const std::string& getInjectionType() const;
     const std::string& getInjectionUnits() const;
-
+    const std::string& getTargets() const;
   private:
     bool updateData(dataRecord&& update, int index);
     mutable std::string inputUnits;
     mutable std::string inputType;
+    mutable std::string sourceTargets;
 };
 
 bool checkTypeMatch(const std::string& type1, const std::string& type2, bool strict_match);

@@ -327,6 +327,11 @@ class FederateState {
     */
     std::vector<global_handle> getSubscribers(interface_handle handle);
 
+    /** get a list of the endpoints a message should be sent to
+    @param handle the endpoint handle to use
+    */
+    std::vector<std::pair<global_handle,std::string_view>> getMessageDestinations(interface_handle handle);
+
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
     */
