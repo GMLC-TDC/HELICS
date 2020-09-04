@@ -44,6 +44,13 @@ class MessageFederateManager {
     */
     Endpoint& registerEndpoint(const std::string& name, const std::string& type);
 
+        /** register a targetted endpoint
+@details call is only valid in startup mode
+@param name the name of the endpoint
+@param type the defined type of the interface for endpoint checking if requested
+*/
+    Endpoint& registerTargettedEndpoint(const std::string& name, const std::string& type);
+
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
     /* check if a given endpoint has any unread messages*/

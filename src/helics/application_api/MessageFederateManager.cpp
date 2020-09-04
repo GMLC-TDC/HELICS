@@ -59,6 +59,36 @@ Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, cons
     throw(RegistrationFailure("Unable to register Endpoint"));
 }
 
+
+Endpoint& MessageFederateManager::registerTargettedEndpoint(const std::string& name, const std::string& type)
+{
+    auto handle = coreObject->registerTargettedEndpoint(fedID, name, type);
+    if (handle.isValid()) {
+        auto edat = std::make_unique<EndpointData>();
+
+        auto eptHandle = local_endpoints.lock();
+        auto loc = eptHandle->insert(name, handle, mFed, name, handle, edat.get());
+        if (loc) {
+            auto& ref = eptHandle->back();
+            ref.referenceIndex = static_cast<int>(*loc);
+            eptHandle.unlock();
+
+            //** now insert the data into the appropriate location in the data array
+            auto datHandle = eptData.lock();
+            if (datHandle->size() == loc) {
+                datHandle->push_back(std::move(edat));
+            } else if (datHandle->size() < loc) {
+                datHandle->resize(*loc + 1);
+                (*datHandle)[*loc] = std::move(edat);
+            } else {
+                (*datHandle)[*loc] = std::move(edat);
+            }
+
+            return ref;
+        }
+    }
+    throw(RegistrationFailure("Unable to register Endpoint"));
+}
 bool MessageFederateManager::hasMessage() const
 {
     auto eptDat = eptData.lock_shared();

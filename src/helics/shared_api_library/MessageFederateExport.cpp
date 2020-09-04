@@ -66,6 +66,27 @@ helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* 
     return nullptr;
 }
 
+helics_endpoint helicsFederateRegisterTargettedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
+{
+    // now generate a generic endpoint
+    auto fedObj = getMessageFedSharedPtr(fed, err);
+    if (!fedObj) {
+        return nullptr;
+    }
+    try {
+        auto end = std::make_unique<helics::EndpointObject>();
+        end->endPtr = &fedObj->registerTargettedEndpoint(AS_STRING(name), AS_STRING(type));
+        end->fedptr = std::move(fedObj);
+        end->fed = helics::getFedObject(fed, nullptr);
+        return addEndpoint(fed, std::move(end));
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+        return nullptr;
+    }
+    return nullptr;
+}
+
 helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
 {
     // now generate a generic subscription
@@ -76,6 +97,26 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const 
     try {
         auto end = std::make_unique<helics::EndpointObject>();
         end->endPtr = &fedObj->registerGlobalEndpoint(AS_STRING(name), AS_STRING(type));
+        end->fedptr = std::move(fedObj);
+        end->fed = helics::getFedObject(fed, nullptr);
+        return addEndpoint(fed, std::move(end));
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    return nullptr;
+}
+
+helics_endpoint helicsFederateRegisterGlobalTargettedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
+{
+    // now generate a generic subscription
+    auto fedObj = getMessageFedSharedPtr(fed, err);
+    if (!fedObj) {
+        return nullptr;
+    }
+    try {
+        auto end = std::make_unique<helics::EndpointObject>();
+        end->endPtr = &fedObj->registerGlobalTargettedEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));
