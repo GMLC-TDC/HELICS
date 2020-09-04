@@ -89,9 +89,11 @@ class Input {
     int getRawValueSize() { return helicsInputGetRawValueSize(inp); }
 
     /** get the size of the value as a string */
-    int getStringSize() {
+    int getStringSize()
+    {
         //-1 is for the null character which needs to be counted in C but not in a C++ string
-        return helicsInputGetStringSize(inp)-1; }
+        return helicsInputGetStringSize(inp) - 1;
+    }
 
     /** get the current value as a string*/
     std::string getString()
@@ -111,7 +113,7 @@ class Input {
     }
 
     /** get the current value as a string*/
-    void getString(std::string &str)
+    void getString(std::string& str)
     {
         int size = helicsInputGetStringSize(inp);
         str.resize(static_cast<size_t>(size) + 1);
