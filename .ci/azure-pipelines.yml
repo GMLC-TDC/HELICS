@@ -37,6 +37,7 @@ jobs:
           USE_MPI: 'true'
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
+          FORCE_PYTHON3: 'true'
         displayName: 'Build HELICS'
 
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
