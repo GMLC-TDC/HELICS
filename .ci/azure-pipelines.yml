@@ -50,7 +50,6 @@ jobs:
       matrix:
         XCode-latest:
           test_config: 'ci'
-          extraFlags: '-DHELICS_FORCE_PYTHON_3=ON'
           vmImage: 'macOS-latest'
         XCode-oldest:
           test_config: 'ci'
@@ -64,6 +63,7 @@ jobs:
       - bash: sudo xcode-select --switch "${XCODE_PATH}/Contents/Developer"
         env:
           XCODE_PATH: $[variables['xcode_path']]
+          FORCE_PYTHON3: 'true'
         displayName: 'Set XCode Path'
         condition: ne(variables['xcode_path'],'')
       - bash: |
