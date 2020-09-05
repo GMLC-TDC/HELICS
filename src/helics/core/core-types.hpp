@@ -87,6 +87,15 @@ enum class iteration_request : signed char {
     iterate_if_needed = 2,  //!< indicator that the iterations need to continue
 };
 
+/** define the type of the handle*/
+enum class handle_type : char {
+    unknown = 'u',
+    publication = 'p',  //!< handle to output interface
+    input = 'i',  //!< handle to a input interface
+    endpoint = 'e',  //!< handle to an endpoint
+    filter = 'f',  //!< handle to a filter
+};
+
 }  // namespace helics
 
 constexpr auto ITERATION_COMPLETE =
@@ -99,8 +108,7 @@ constexpr auto FORCE_ITERATION =
     helics::iteration_request::force_iteration;  //!< simplified alias to force an iteration
 constexpr auto ITERATE_IF_NEEDED =
     helics::iteration_request::iterate_if_needed;  //!< simplified alias to indicate that helics
-                                                   //!< should iterate if
-//!< warranted
+                                                   //!< should iterate if warranted
 
 // #TOBEDEPRECTATED The use of the the core-types header for the functions contained in
 // ../application_api/typeOperations.hpp is deprectaced and will be removed in HELICS 3.0 please use

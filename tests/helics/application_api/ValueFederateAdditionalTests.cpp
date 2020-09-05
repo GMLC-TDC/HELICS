@@ -73,15 +73,15 @@ TEST_P(valuefed_add_ztype_tests, publication_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto sv = vFed1->getInterfaceName(pubid);
-    auto sv2 = vFed1->getInterfaceName(pubid2);
+    auto sv = pubid.getKey();
+    auto sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto pub3name = vFed1->getInterfaceName(pubid3);
+    auto pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
-    EXPECT_EQ(vFed1->getExtractionType(pubid3), "double");
-    EXPECT_EQ(vFed1->getInterfaceUnits(pubid3), "V");
+    EXPECT_EQ(pubid3.getExtractionType(), "double");
+    EXPECT_EQ(pubid3.getExtractionUnits(), "V");
 
     EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pubid.getHandle());
     EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pubid2.getHandle());
@@ -150,7 +150,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
     vFed1->addAlias(subid, "Shortcut");
     EXPECT_EQ(sub3name, "sub3");
 
-    EXPECT_EQ(vFed1->getInterfaceUnits(subid3), "V");
+    EXPECT_EQ(subid3.getExtractionUnits(), "V");
 
     EXPECT_TRUE(vFed1->getSubscription("sub1").getHandle() == subid.getHandle());
     EXPECT_TRUE(vFed1->getSubscription("sub2").getHandle() == subid2.getHandle());
@@ -191,19 +191,19 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
     auto sub3name = vFed1->getTarget(subid3);
     EXPECT_EQ(sub3name, "sub3");
 
-    EXPECT_EQ(vFed1->getInterfaceUnits(subid3), "V");
+    EXPECT_EQ(subid3.getUnits(), "V");
 
     // check publications
 
-    sv = vFed1->getInterfaceName(pubid);
-    sv2 = vFed1->getInterfaceName(pubid2);
+    sv = pubid.getKey();
+    sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto pub3name = vFed1->getInterfaceName(pubid3);
+    auto pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
-    EXPECT_EQ(vFed1->getExtractionType(pubid3), "double");
-    EXPECT_EQ(vFed1->getInterfaceUnits(pubid3), "V");
+    EXPECT_EQ(pubid3.getExtractionType(), "double");
+    EXPECT_EQ(pubid3.getUnits(), "V");
     vFed1->finalize();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
@@ -232,28 +232,28 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
     // check subscriptions
     EXPECT_EQ(subid.getTarget(), "pub2");
-    EXPECT_EQ(vFed1->getInterfaceName(subid2), "sub2");
+    EXPECT_EQ(subid2.getKey(), "sub2");
 
     EXPECT_EQ(subid.getName(), "fed0/sub1");
-    EXPECT_EQ(vFed1->getInterfaceName(subid), "fed0/sub1");
+    EXPECT_EQ(subid.getKey(), "fed0/sub1");
     EXPECT_EQ(vFed1->getTarget(subid), "pub2");
 
-    EXPECT_EQ(vFed1->getExtractionType(subid), "vector");
-    EXPECT_EQ(vFed1->getExtractionType(subid2), "double");
+    EXPECT_EQ(subid.getExtractionType(), "vector");
+    EXPECT_EQ(subid2.getExtractionType(), "double");
 
-    EXPECT_EQ(vFed1->getInjectionType(subid), "int32");
+    EXPECT_EQ(subid.getInjectionType(), "int32");
 
     // check publications
 
-    auto& sv = vFed1->getInterfaceName(pubid);
-    auto& sv2 = vFed1->getInterfaceName(pubid2);
+    auto& sv = pubid.getKey();
+    auto& sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto& pub3name = vFed1->getInterfaceName(pubid3);
+    auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
-    EXPECT_EQ(vFed1->getExtractionType(pubid3), "double");
-    EXPECT_EQ(vFed1->getInterfaceUnits(pubid3), "V");
+    EXPECT_EQ(pubid3.getExtractionType(), "double");
+    EXPECT_EQ(pubid3.getExtractionUnits(), "V");
     vFed1->finalize();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
@@ -516,8 +516,8 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, info_field)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto info1 = vFed1->getInfo(pubid1.getHandle());
-    auto info2 = vFed1->getInfo(pubid2.getHandle());
+    auto info1 = pubid1.getInfo();
+    auto info2 = pubid2.getInfo();
     EXPECT_EQ(info1, "test1");
     EXPECT_EQ(info2, "test2");
 
@@ -543,22 +543,13 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, info_pubs_subs)
 
     vFed1->enterExecutingMode();
 
-    // Check all values can be accessed and returned through the federate.
-    auto info1 = vFed1->getInfo(pubid1.getHandle());
-    auto info2 = vFed1->getInfo(sub1.getHandle());
-    auto info3 = vFed1->getInfo(sub2.getHandle());
-    auto info4 = vFed1->getInfo(sub3.getHandle());
+    // Check all values can be accessed and returned directly from their subscriptions.
+    const auto& info1 = pubid1.getInfo();
+    const auto& sub_info2 = sub1.getInfo();
+    const auto& sub_info3 = sub2.getInfo();
+    const auto& sub_info4 = sub3.getInfo();
 
     EXPECT_EQ(info1, "pub_test1");
-    EXPECT_EQ(info2, "sub_test1");
-    EXPECT_EQ(info3, "sub_test2");
-    EXPECT_EQ(info4, "sub_test3");
-
-    // Check all values can be accessed and returned directly from their subscriptions.
-    auto sub_info2 = sub1.getInfo();
-    auto sub_info3 = sub2.getInfo();
-    auto sub_info4 = sub3.getInfo();
-
     EXPECT_EQ(sub_info2, "sub_test1");
     EXPECT_EQ(sub_info3, "sub_test2");
     EXPECT_EQ(sub_info4, "sub_test3");
@@ -604,7 +595,7 @@ TEST_P(valuefed_add_configfile_tests, file_load)
     EXPECT_EQ(key, "fedName/pub2");
 
     EXPECT_EQ(id.getInfo(), "this is an information string for use by the application");
-    auto pub2name = vFed.getInterfaceName(vFed.getPublication(1));
+    auto pub2name = vFed.getPublication(1).getKey();
     EXPECT_EQ(pub2name, "valueFed/pub2");
     // test the info from a file
     EXPECT_EQ(vFed.getPublication(0).getInfo(),

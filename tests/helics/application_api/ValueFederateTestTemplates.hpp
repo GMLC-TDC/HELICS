@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #ifndef HELICS_SHARED_LIBRARY

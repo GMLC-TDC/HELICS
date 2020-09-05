@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 
 #include <future>
 
