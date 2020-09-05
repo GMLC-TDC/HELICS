@@ -16,7 +16,7 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD "pre-alpha")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-08-07")
+set(HELICS_DATE "2020-09-05")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -392,6 +392,9 @@ include(GNUInstallDirs)
 if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
+
+
+find_package(PythonInterp 3 REQUIRED)
 
 # -------------------------------------------------------------
 # TOML11  add the TOML interpreter
