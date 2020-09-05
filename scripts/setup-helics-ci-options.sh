@@ -42,7 +42,7 @@ if [[ "${DISABLE_INTERFACES}" != *"Python"* ]]; then
     if [[ "$PYTHON_EXECUTABLE" ]]; then
         OPTION_FLAGS_ARR+=("-DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
     fi
-     if [[ "$FORCE_PYTHON3" == 'true']]; then
+    if [[ "$FORCE_PYTHON3" == 'true' ]]; then
         OPTION_FLAGS_ARR+=("-DHELICS_FORCE_PYTHON_3=ON")
     fi
 fi
