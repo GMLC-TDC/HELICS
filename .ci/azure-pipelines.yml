@@ -50,6 +50,7 @@ jobs:
       matrix:
         XCode-latest:
           test_config: 'ci'
+          extraFlags: '-DHELICS_FORCE_PYTHON_3=ON'
           vmImage: 'macOS-latest'
         XCode-oldest:
           test_config: 'ci'

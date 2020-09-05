@@ -393,8 +393,9 @@ if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
 
-
-find_package(PythonInterp 3 REQUIRED)
+if (HELICS_FORCE_PYTHON_3)
+    find_package(PythonInterp 3 REQUIRED)
+endif()
 
 # -------------------------------------------------------------
 # TOML11  add the TOML interpreter
