@@ -393,7 +393,7 @@ if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
 
-if (HELICS_FORCE_PYTHON_3)
+if(HELICS_FORCE_PYTHON_3)
     find_package(PythonInterp 3 REQUIRED)
 endif()
 
