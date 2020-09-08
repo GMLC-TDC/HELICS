@@ -108,7 +108,8 @@ All Core/Broker Types
 --minbrokercount <num>::
         The minimum number of core/brokers that need to be connected.
 
---key::
+--brokerkey::
+--brokerKey::
 --broker_key <key>::
         Specify a key to use to verify all connections to/from a broker.
 

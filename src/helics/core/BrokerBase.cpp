@@ -133,7 +133,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--minbrokers,--minbroker,--minbrokercount",
         minBrokerCount,
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
-    hApp->add_option("--key,--broker_key",
+    hApp->add_option("--broker_key,--brokerkey,--brokerKey",
                      brokerKey,
                      "specify a key to use for all connections to/from a broker");
     hApp->add_flag(

@@ -387,7 +387,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--autobroker",
                   autobroker,
                   "tell the core to automatically generate a broker if needed");
-    app->add_option("--key,--broker_key",
+    app->add_option("--broker_key,--brokerkey,--brokerKey",
                     key,
                     "specify a key to use to match a broker should match the broker key");
     app->add_option_function<Time>(

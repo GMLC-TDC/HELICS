@@ -34,7 +34,8 @@ Federate Info
 --autobroker::
         Automatically generate a broker if needed.
 
---key::
+--brokerkey::
+--brokerKey::
 --broker_key <key>::
         Specify a key to use to verify all connections to/from a broker.
 
