@@ -410,21 +410,21 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     rtgroup->option_defaults()->ignore_underscore();
     rtgroup
         ->add_option_function<Time>(
-            "--rtlag",
+            "--rtlag,--rt_lag,--rtLag",
             [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
             "the amount of the time the federate is allowed to lag realtime before "
             "corrective action is taken (default in ms)")
         ->configurable(false);
     rtgroup
         ->add_option_function<Time>(
-            "--rtlead",
+            "--rtlead,--rt_lead,--rtLead",
             [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
             "the amount of the time the federate is allowed to lead realtime before "
             "corrective action is taken (default in ms)")
         ->configurable(false);
     rtgroup
         ->add_option_function<Time>(
-            "--rttolerance",
+            "--rttolerance,--rt_tolerance,--rtTolerance",
             [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
             "the time tolerance of the real time mode (default in ms)")
         ->configurable(false);
