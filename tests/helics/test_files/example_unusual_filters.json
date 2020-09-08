@@ -39,7 +39,7 @@
       "sourcetargets": "ept1", // source target for the filter
       "inputType": "genmessage", //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
       "outputType": "genmessage", //this could be useful if the filter actually translates the data and can be used to automatically order filters
-      "operation": "custom", //currently valid operations are "delay","clone","cloning","randomdelay","randomdrop","reroute","custom"
+      "operation": "custom", //currently valid operations are "delay","clone","randomdelay","randomdrop","reroute","custom"
       "info": "this is an information string for use by the application",
       "flags": "connection_optional"
     },
@@ -50,7 +50,7 @@
       "dest": ["dest targets"], // field specifying destination targets
       "inputType": "genmessage", //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
       "outputType": "genmessage", //this could be useful if the filter actually translates the data and can be used to automatically order filters
-      "operation": "custom", //currently valid operations are "delay","clone","cloning","randomdelay","randomdrop","reroute","custom"
+      "operation": "custom", //currently valid operations are "delay","clone","randomdelay","randomdrop","reroute","custom"
       "flags": "-connection_optional"
     }
   ]
