@@ -59,6 +59,8 @@ static const std::map<std::string, int> propStringsTranslations{
     {"input_delay", helics_property_time_input_delay},
     {"output_delay", helics_property_time_output_delay},
     {"max_iterations", helics_property_int_max_iterations},
+    {"maxiterations", helics_property_int_max_iterations},
+    {"maxIterations", helics_property_int_max_iterations},
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
     {"logLevel", helics_property_int_log_level},
