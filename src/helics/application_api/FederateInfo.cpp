@@ -74,6 +74,8 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"slow_responding", helics_flag_slow_responding},
     {"slowResponding", helics_flag_slow_responding},
     {"only_update_on_change", helics_flag_only_update_on_change},
+    {"onlyupdateonchange", helics_flag_only_update_on_change},
+    {"onlyUpdateOnChange", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
     {"realtime", helics_flag_realtime},
