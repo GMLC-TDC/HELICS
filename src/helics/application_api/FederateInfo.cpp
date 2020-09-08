@@ -430,13 +430,13 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->configurable(false);
 
     app->add_option_function<Time>(
-           "--inputdelay",
+           "--inputdelay,--input_delay,--inputDelay",
            [this](Time val) { setProperty(helics_property_time_input_delay, val); },
            "the input delay on incoming communication of the federate (default in ms)")
         ->ignore_underscore()
         ->configurable(false);
     app->add_option_function<Time>(
-           "--outputdelay",
+           "--outputdelay,--output_delay,--outputDelay",
            [this](Time val) { setProperty(helics_property_time_output_delay, val); },
            "the output delay for outgoing communication of the federate (default in ms)")
         ->ignore_underscore()
