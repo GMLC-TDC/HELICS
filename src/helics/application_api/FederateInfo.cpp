@@ -133,6 +133,7 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"onlyTransmitOnChange", helics_handle_option_only_transmit_on_change},
     {"only_update_on_change", helics_handle_option_only_update_on_change},
     {"onlyupdateonchange", helics_handle_option_only_update_on_change},
+    {"onlyUpdateOnChange", helics_handle_option_only_update_on_change},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
     {"ignoreunitmismatch", helics_handle_option_ignore_unit_mismatch},
     {"ignoreUnitMismatch", helics_handle_option_ignore_unit_mismatch},
