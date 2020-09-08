@@ -580,6 +580,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_QUERY:
             processQuery(command);
             break;
+        case CMD_SEND_COMMAND:
+            processCommandInstruction(command);
+            break;
         case CMD_QUERY_REPLY:
             if (command.dest_id == global_broker_id_local) {
                 processQueryResponse(command);
@@ -2474,6 +2477,16 @@ void CoreBroker::setGlobal(const std::string& valueName, const std::string& valu
     querycmd.setStringData(value);
     transmitToParent(std::move(querycmd));
 }
+
+void CoreBroker::command(const std::string& target, const std::string& commandStr)
+{
+    ActionMessage cmdcmd(CMD_SEND_COMMAND);
+    cmdcmd.source_id = global_id.load();
+    cmdcmd.payload = commandStr;
+    cmdcmd.setStringData(target);
+    transmitToParent(std::move(cmdcmd));
+}
+
 // enumeration of subqueries that cascade and need multiple levels of processing
 enum subqueries : std::uint16_t {
     general_query = 0,
@@ -2942,8 +2955,77 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
     }
 }
 
-void CoreBroker::checkDependencies()
+void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
 {
+    auto cmd = m.payload.to_string();
+    if (cmd == "terminate") {
+        LOG_SUMMARY(global_broker_id_local,
+                    getIdentifier(),
+                    " received terminate instruction via command instruction")
+        disconnect();
+    } else {
+        LOG_WARNING(global_broker_id_local,
+                    getIdentifier(),
+                    fmt::format(" unrecognized command instruction \"{}\"", cmd));
+    }
+}
+
+void CoreBroker::processCommandInstruction(ActionMessage& m)
+{
+    if (m.dest_id == global_broker_id_local) {
+        processLocalCommandInstruction(m);
+    }
+    else if (m.dest_id == parent_broker_id) {
+        const auto& target = m.getString(targetStringLoc);
+        if (target == "broker" || target==getIdentifier()) {
+            processLocalCommandInstruction(m);
+        } else if (isRootc) {
+            if (target == "federation" || target == "root") {
+                processLocalCommandInstruction(m);
+            } else {
+                route_id route = parent_route_id;
+                auto fed = _federates.find(target);
+                if (fed != _federates.end()) {
+                    route = fed->route;
+                    m.dest_id = fed->parent;
+                } else {
+                    auto broker = _brokers.find(target);
+                    if (broker != _brokers.end()) {
+                        route = broker->route;
+                        m.dest_id = broker->global_id;
+                    } else {
+                        m.swapSourceDest();
+                        m.source_id = global_broker_id_local;
+                        m.setAction(CMD_ERROR);
+                        m.payload = "unable to locate target for command";
+                    }
+                }
+            }
+        } else {
+            route_id route = parent_route_id;
+            auto fed = _federates.find(target);
+            if (fed != _federates.end()) {
+                route = fed->route;
+                m.dest_id = fed->parent;
+            } else {
+                auto broker = _brokers.find(target);
+                if (broker != _brokers.end()) {
+                    route = broker->route;
+                    m.dest_id = broker->global_id;
+                } else {
+                    transmit(parent_route_id, std::move(m));
+                }
+            }
+        }
+    }
+
+    else {
+        transmit(getRoute(m.dest_id), std::move(m));
+    }
+}
+
+void CoreBroker::checkDependencies()
+    {
     if (isRootc) {
         for (const auto& newdep : delayedDependencies) {
             auto depfed = _federates.find(newdep.first);

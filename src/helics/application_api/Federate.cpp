@@ -1100,6 +1100,16 @@ void Federate::setGlobal(const std::string& valueName, const std::string& value)
     }
 }
 
+void Federate::sendCommand(const std::string& target, const std::string& commandStr)
+{
+    if (coreObject) {
+        coreObject->command(target, commandStr);
+    } else {
+        throw(InvalidFunctionCall(
+            " command cannot be called on uninitialized federate or after disconnect call"));
+    }
+}
+
 void Federate::addDependency(const std::string& fedName)
 {
     if (coreObject) {

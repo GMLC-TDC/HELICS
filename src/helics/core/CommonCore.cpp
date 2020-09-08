@@ -2019,6 +2019,23 @@ void CommonCore::setLogFile(const std::string& lfile)
     setLoggingFile(lfile);
 }
 
+std::string CommonCore::getCommand(local_federate_id federateID) {
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("FederateID is not valid (setLoggingCallback)"));
+    }
+    return fed->getCommand();
+}
+
+std::string CommonCore::waitCommand(local_federate_id federateID)
+{
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("FederateID is not valid (setLoggingCallback)"));
+    }
+    return fed->waitCommand();
+}
+
 void CommonCore::setLoggingCallback(
     local_federate_id federateID,
     std::function<void(int, std::string_view, std::string_view)> logFunction)
@@ -2358,6 +2375,20 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     }
 }
 
+void CommonCore::processCommandInstruction(ActionMessage& command)
+{
+    auto cmd = command.payload.to_string();
+    if (cmd == "terminate") {
+        LOG_SUMMARY(global_broker_id_local, getIdentifier(), " received terminate instruction via command instruction")
+        disconnect();
+    }
+    else {
+        LOG_WARNING(global_broker_id_local,
+                    getIdentifier(),
+                    fmt::format(" unrecognized command instruction \"{}\"", cmd));
+    }
+}
+
 std::string CommonCore::coreQuery(const std::string& queryStr) const
 {
     auto res = quickCoreQueries(queryStr);
@@ -2573,6 +2604,16 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
     addActionMessage(std::move(querycmd));
 }
 
+void CommonCore::command(const std::string& target, const std::string& commandStr)
+{
+    ActionMessage cmdcmd(CMD_SEND_COMMAND);
+    cmdcmd.dest_id = root_broker_id;
+    cmdcmd.source_id = direct_core_id;
+    cmdcmd.payload = commandStr;
+    cmdcmd.setStringData(target);
+    addActionMessage(std::move(cmdcmd));
+}
+
 void CommonCore::processPriorityCommand(ActionMessage&& command)
 {
     // deal with a few types of message immediately
@@ -2690,6 +2731,26 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();
             checkAndProcessDisconnect();
+            break;
+        case CMD_SEND_COMMAND:
+            if (command.dest_id == global_broker_id_local) {
+                processCommandInstruction(command);
+            } else if (command.dest_id == parent_broker_id) {
+                const auto& target = command.getString(targetStringLoc);
+                if (target == "core" || target == getIdentifier()) {
+                    processCommandInstruction(command);
+                }
+                else
+                {
+                    auto* fed = getFederateCore(target);
+                    if (fed != nullptr)
+                    {
+                        fed->sendCommand(command);
+                    }
+                }
+            } else {
+                routeMessage(std::move(command));
+            }
             break;
         case CMD_BROKER_QUERY:
             if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {

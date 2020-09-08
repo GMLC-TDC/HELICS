@@ -226,6 +226,13 @@ void BrokerApp::setGlobal(const std::string& valueName, const std::string& value
     }
 }
 
+void BrokerApp::command(const std::string& target, const std::string& commandStr)
+{
+    if (broker) {
+        broker->command(target, commandStr);
+    }
+}
+
 void BrokerApp::setLoggingLevel(int loglevel)
 {
     if (broker) {

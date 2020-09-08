@@ -237,6 +237,11 @@ class CommonCore: public Core, public BrokerBase {
         setQueryCallback(local_federate_id federateID,
                          std::function<std::string(std::string_view)> queryFunction) override;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override;
+    virtual void command(const std::string& target, const std::string& commandStr) override;
+    virtual std::string getCommand(local_federate_id federateID) override;
+
+    virtual std::string waitCommand(local_federate_id federateID) override;
+
     virtual bool connect() override final;
     virtual bool isConnected() const override final;
     virtual void disconnect() override final;
@@ -390,7 +395,8 @@ class CommonCore: public Core, public BrokerBase {
 
     /** generate the filteredEndpoint query results for a particular federate*/
     std::string filteredEndpointQuery(const FederateState* fed) const;
-
+    /** process a command instruction for the core*/
+    void processCommandInstruction(ActionMessage& command);
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to

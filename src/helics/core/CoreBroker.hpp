@@ -285,6 +285,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual std::string query(const std::string& target,
                               const std::string& queryStr) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
+    virtual void command(const std::string& target, const std::string& commandStr) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& publication, const std::string& input) override final;
 
@@ -320,13 +321,16 @@ class CoreBroker: public Broker, public BrokerBase {
     void removeNamedTarget(ActionMessage& command);
     /** answer a query or route the message the appropriate location*/
     void processQuery(ActionMessage& m);
-
     /** answer a query or route the message the appropriate location*/
     void processQueryResponse(const ActionMessage& m);
     /** generate an answer to a local query*/
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer(std::string_view request);
+    /** process a command instruction message*/
+    void processCommandInstruction(ActionMessage& m);
+    /** process a command instruction targetted at this broker*/
+    void processLocalCommandInstruction(ActionMessage& m);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;
     /** locate the route to take to a particular federate*/
