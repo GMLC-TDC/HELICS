@@ -167,7 +167,7 @@ TEST(federateInfo, option_index)
               helics_handle_option_single_connection_only);
     EXPECT_EQ(helics::getOptionIndex("strictInputTypeChecking"),
               helics_handle_option_strict_type_checking);
-    EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
+    EXPECT_EQ(helics::getOptionIndex("uninterruptible"), helics_handle_option_ignore_interrupts);
 }
 
 TEST(federateInfo, loadinfoError)
