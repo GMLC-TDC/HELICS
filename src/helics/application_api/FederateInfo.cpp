@@ -89,6 +89,8 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"restrictive_time_policy", helics_flag_restrictive_time_policy},
     {"restrictiveTimePolicy", helics_flag_restrictive_time_policy},
     {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
+    {"ignoretimeMismatch", helics_flag_ignore_time_mismatch_warnings},
+    {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
     {"strictinputtypechecking", helics_handle_option_strict_type_checking},
     {"strictInputTypeChecking", helics_handle_option_strict_type_checking},
