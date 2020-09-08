@@ -345,7 +345,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           },
           "type  of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
-    app->add_option("--corename", coreName, "the name of the core to create or find")
+    app->add_option("--core_name,--corename,--coreName", coreName, "the name of the core to create or find")
         ->ignore_underscore();
     app->add_option("--coreinitstring,-i,--core_init_string,--coreInitString",
                     coreInitString,
