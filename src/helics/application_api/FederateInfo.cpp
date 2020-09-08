@@ -98,6 +98,7 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"ignoreunitmismatch", helics_handle_option_ignore_unit_mismatch},
     {"ignoreUnitMismatch", helics_handle_option_ignore_unit_mismatch},
     {"buffer_data", helics_handle_option_buffer_data},
+    {"bufferdata", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
     {"connection_required", helics_handle_option_connection_required},
     {"connectionrequired", helics_handle_option_connection_required},
@@ -113,9 +114,9 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"terminateonerror", helics_flag_terminate_on_error}};
 
 static const std::map<std::string, int> optionStringsTranslations{
-    {"buffer", helics_handle_option_buffer_data},
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferdata", helics_handle_option_buffer_data},
+    {"bufferData", helics_handle_option_buffer_data},
     {"connectionoptional", helics_handle_option_connection_optional},
     {"connection_optional", helics_handle_option_connection_optional},
     {"connectionOptional", helics_handle_option_connection_optional},
