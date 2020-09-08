@@ -358,7 +358,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->multi_option_policy(CLI::MultiOptionPolicy::Join);
     app->add_option("--broker,--brokeraddress", broker, "address or name of the broker to connect")
         ->ignore_underscore();
-    app->add_option("--brokerport", brokerPort, "Port number of the Broker")
+    app->add_option("--brokerport,--brokerPort,--broker_port", brokerPort, "Port number of the Broker")
         ->ignore_underscore()
         ->check(CLI::PositiveNumber);
 
