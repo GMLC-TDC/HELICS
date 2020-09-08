@@ -401,7 +401,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "the execution cycle of the federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
-           "--timedelta",
+           "-time_delta,--timeDelta,--timedelta",
            [this](Time val) { setProperty(helics_property_time_delta, val); },
            "The minimum time between time grants for a Federate (default in ms)")
         ->ignore_underscore()
