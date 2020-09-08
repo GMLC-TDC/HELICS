@@ -82,6 +82,7 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"forward_compute", helics_flag_forward_compute},
     {"forwardcompute", helics_flag_forward_compute},
     {"forwardCompute", helics_flag_forward_compute},
+    {"real_time", helics_flag_realtime},
     {"realtime", helics_flag_realtime},
     {"realTime", helics_flag_realtime},
     {"restrictivetimepolicy", helics_flag_restrictive_time_policy},
