@@ -1671,6 +1671,43 @@ void FederateState::logMessage(int level,
     }
 }
 
+void FederateState::sendCommand(ActionMessage & command)
+{
+    auto cmd = command.payload.to_string();
+    if (cmd == "terminate") {
+        if (parent_!=nullptr) {
+            ActionMessage bye(CMD_DISCONNECT);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            parent_->addActionMessage(bye);
+        }
+    }
+    else if (cmd == "command_status") {
+        ActionMessage response(CMD_SEND_COMMAND);
+        response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
+        response.dest_id = command.source_id;
+        response.source_id = global_id.load();
+        if (parent_ != nullptr) {
+            parent_->addActionMessage(response);
+        }
+    }
+    else {
+        commandQueue.emplace(cmd);
+    }
+    
+}
+
+std::string FederateState::getCommand()
+{
+    auto val = commandQueue.try_pop();
+    return (val) ? *val:std::string{};
+}
+
+std::string FederateState::waitCommand()
+{
+    return commandQueue.pop();
+}
+
 std::string FederateState::processQueryActual(std::string_view query) const
 {
     if (query == "publications") {

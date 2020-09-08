@@ -220,6 +220,12 @@ void CoreApp::setGlobal(const std::string& valueName, const std::string& value)
     }
 }
 
+void CoreApp::command(const std::string& target, const std::string& commandStr) {
+    if (core) {
+        core->setGlobal(target, commandStr);
+    }
+}
+
 void CoreApp::setLoggingLevel(int loglevel)
 {
     if (core) {
