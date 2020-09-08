@@ -80,6 +80,8 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"onlytransmitonchange", helics_flag_only_transmit_on_change},
     {"onlyTransmitOnChange", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
+    {"forwardcompute", helics_flag_forward_compute},
+    {"forwardCompute", helics_flag_forward_compute},
     {"realtime", helics_flag_realtime},
     {"realTime", helics_flag_realtime},
     {"restrictivetimepolicy", helics_flag_restrictive_time_policy},
