@@ -42,7 +42,6 @@ static const std::map<std::string, int> propStringsTranslations{
     {"timedelta", helics_property_time_delta},
     {"time_delta", helics_property_time_delta},
     {"timeDelta", helics_property_time_delta},
-    {"delta", helics_property_time_delta},
     {"offset", helics_property_time_offset},
     {"rtlead", helics_property_time_rt_lead},
     {"rtlag", helics_property_time_rt_lag},
