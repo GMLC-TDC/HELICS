@@ -90,6 +90,7 @@ class FedObject {
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
     std::vector<std::unique_ptr<FilterObject>> filters;
+    std::string commandBuffer;
     FedObject() = default;
     ~FedObject();
 };

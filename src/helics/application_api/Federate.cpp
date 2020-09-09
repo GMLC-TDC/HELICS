@@ -1110,6 +1110,26 @@ void Federate::sendCommand(const std::string& target, const std::string& command
     }
 }
 
+std::string Federate::getCommand()
+{
+    if (coreObject) {
+        return coreObject->getCommand(fedID);
+    } else {
+        throw(InvalidFunctionCall(
+            " command cannot be called on uninitialized federate or after disconnect call"));
+    }
+}
+
+std::string Federate::waitCommand()
+{
+    if (coreObject) {
+        return coreObject->waitCommand(fedID);
+    } else {
+        throw(InvalidFunctionCall(
+            " command cannot be called on uninitialized federate or after disconnect call"));
+    }
+}
+
 void Federate::addDependency(const std::string& fedName)
 {
     if (coreObject) {
