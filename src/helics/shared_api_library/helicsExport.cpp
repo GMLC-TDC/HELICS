@@ -472,6 +472,15 @@ void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const ch
     brk->setGlobal(valueName, AS_STRING(value));
 }
 
+void helicsBrokerSendCommand(helics_broker broker, const char* target, const char* command, helics_error* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->command(AS_STRING(target), AS_STRING(command));
+}
+
 void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helics_error* err)
 {
     auto* brk = getBroker(broker, err);
@@ -599,6 +608,16 @@ void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* va
         return;
     }
     cr->setGlobal(valueName, AS_STRING(value));
+}
+
+
+void helicsCoreSendCommand(helics_core core, const char* target, const char* command, helics_error* err)
+{
+    auto* cr = getCore(core, err);
+    if (cr == nullptr) {
+        return;
+    }
+    cr->command(AS_STRING(target), AS_STRING(command));
 }
 
 void helicsCoreSetLogFile(helics_core core, const char* logFileName, helics_error* err)
