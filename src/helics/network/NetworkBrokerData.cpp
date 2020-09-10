@@ -86,7 +86,7 @@ std::shared_ptr<helicsCLI11App>
                      "The maximum number of message to have in a queue")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
-    nbparser->add_option("--networkretries", maxRetries, "the maximum number of network retries")
+    nbparser->add_option("--networkretries,--network_retries,--networkRetries", maxRetries, "the maximum number of network retries")
         ->capture_default_str();
     nbparser->add_flag("--useosport,--use_os_port,--useOsPort",
                        use_os_port,
