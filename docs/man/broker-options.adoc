@@ -120,6 +120,8 @@ All Core/Broker Types
         from other brokers.
 
 --terminate_on_error::
+--terminateonerror::
+--terminateOnError::
         Specify that a broker should treat all errors as global errors and terminate
         the co-simulation if an error is encountered
 

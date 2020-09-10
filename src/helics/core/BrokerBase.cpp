@@ -144,7 +144,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--restrictive_time_policy--restrictivetimepolicy,--restrictiveTimePolicy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
-    hApp->add_flag("--terminate_on_error,--halt_on_error",
+    hApp->add_flag("--terminate_on_error,--terminateonerror,--terminateOnError",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
