@@ -41,7 +41,7 @@ std::shared_ptr<helicsCLI11App>
                    "specify external interface to use, default is --local")
         ->disable_flag_override();
     nbparser->add_option_function<std::string>(
-        "--brokeraddress",
+        "--brokeraddress,--broker_address,--brokerAddress",
         [this, localAddress](const std::string& addr) {
             auto brkprt = extractInterfaceandPort(addr);
             brokerAddress = brkprt.first;
