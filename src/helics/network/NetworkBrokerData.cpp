@@ -91,7 +91,7 @@ std::shared_ptr<helicsCLI11App>
     nbparser->add_flag("--useosport,--use_os_port,--useOsPort",
                        use_os_port,
                        "specify that the ports should be allocated by the host operating system");
-    nbparser->add_flag("--autobroker",
+    nbparser->add_flag("--autobroker,--auto_broker,--autoBroker",
                        autobroker,
                        "allow a broker to be automatically created if one is not available");
     nbparser->add_option("--brokerinitstring,--broker_init_string,--brokerInitString",
