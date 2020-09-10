@@ -124,6 +124,8 @@ bool MultiBroker::brokerConnect()
             // remove options that are used to specify a broker
             app->remove_option(app->get_option("--broker"));
             app->remove_option(app->get_option("--brokerport"));
+            app->remove_option(app->get_option("--broker_port"));
+            app->remove_option(app->get_option("--brokerPort"));
             app->remove_option(app->get_option("--brokername"));
             app->remove_option(app->get_option("--brokeraddress"));
             app->remove_option(app->get_option("--autobroker"));

@@ -125,7 +125,7 @@ std::shared_ptr<helicsCLI11App>
         "the local interface to use for the receive ports");
     nbparser->add_option("--port,-p", portNumber, "port number to use")
         ->transform(CLI::Transformer({{"auto", "-1"}}, CLI::ignore_case));
-    nbparser->add_option("--brokerport",
+    nbparser->add_option("--brokerport,--broker_port,--brokerPort",
                          brokerPort,
                          "The port number to use to connect with the broker");
     nbparser
