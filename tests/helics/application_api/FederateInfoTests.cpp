@@ -259,7 +259,7 @@ TEST(federateInfo, initString)
     helics::FederateInfo fi;
     fi.brokerPort = 6700;
     fi.localport = "5000";
-    fi.key = "key";
+    fi.key = "broker_key";
     fi.broker = "broker2";
     fi.brokerInitString = "-f3";
     helics::FederateInfo f3(helics::generateFullCoreInitString(fi));

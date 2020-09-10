@@ -75,10 +75,10 @@ TEST_F(error_tests, mismatch_broker_key)
 
 TEST_F(error_tests, mismatch_broker_key2)
 {
-    auto broker = AddBroker("test", "-f 1 --key=tkey2");
+    auto broker = AddBroker("test", "-f 1 --broker_key=tkey2");
 
     helics::FederateInfo fi(helics::core_type::TEST);
-    fi.coreInitString = std::string("--timeout=1s --key=tkey --broker=") + broker->getIdentifier();
+    fi.coreInitString = std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
     auto core = helics::CoreFactory::findJoinableCoreOfType(helics::core_type::TEST);
