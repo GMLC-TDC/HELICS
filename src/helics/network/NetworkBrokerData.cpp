@@ -76,7 +76,7 @@ std::shared_ptr<helicsCLI11App>
         },
         "identifier for the broker, this is either the name or network address use --broker_address or --brokername "
         "to explicitly set the network address or name the search for the broker is first by name");
-    nbparser->add_option("--brokername", brokerName, "the name of the broker");
+    nbparser->add_option("--brokername,--brokerName,--broker_name", brokerName, "the name of the broker");
     nbparser->add_option("--maxsize", maxMessageSize, "The message buffer size")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
