@@ -98,7 +98,7 @@ configuration:
   -n [ --name ] arg      name of the broker/core
   --federates arg        the minimum number of federates that will be
                          connecting
-  --minfed arg           the minimum number of federates that will be
+  --federates arg        the minimum number of federates that will be
                          connecting
   --maxiteration arg     maximum number of iterations
   --logfile arg          the file to log message to

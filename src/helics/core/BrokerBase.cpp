@@ -121,7 +121,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     auto* fmtr = addJsonConfig(hApp.get());
     fmtr->maxLayers(0);
     hApp->option_defaults()->ignore_underscore()->ignore_case();
-    hApp->add_option("--federates,-f,--minfederates,--minfed,-m",
+    hApp->add_option("--federates,-f",
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier,--uuid", identifier, "the name of the broker/core");

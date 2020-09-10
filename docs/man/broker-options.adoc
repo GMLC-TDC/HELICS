@@ -86,10 +86,7 @@ Network Connections
 All Core/Broker Types
 ~~~~~~~~~~~~~~~~~~~~~
 -f::
--m::
---minfed::
---federates::
---minfederates <num>::
+--federates <num>::
         The minimum number of federates that will be connecting to the broker.
 
 -n::

@@ -10,7 +10,7 @@ SYNOPSIS
 [verse]
 'helics_broker' [-v|--version] [-h|-?|--help]
     [--quiet] [--config-file <file>] [-t|--core_type|--coreType|--coretype <type>]
-    [-f|-m|--federates|--minfederates|--minfed <num>]
+    [-f|--federates <num>]
     [-n|--name|--identifier <name>] [--maxiter|--maxiterations <num>]
     [--minbroker|--minbrokers|--minbrokercount <num>]
     [--brokerKey|--brokerkey|--broker_key <key>] [--slowresponding|--slow_responding|--slowResponding]
