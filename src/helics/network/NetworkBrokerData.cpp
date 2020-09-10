@@ -140,7 +140,7 @@ std::shared_ptr<helicsCLI11App>
             },
             "port number for the local receive port")
         ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
-    nbparser->add_option("--portstart", portStart, "starting port for automatic port definitions");
+    nbparser->add_option("--portstart,--port_start,--portStart", portStart, "starting port for automatic port definitions");
 
     nbparser->add_callback([this]() {
         if ((!brokerAddress.empty()) && (brokerPort == -1)) {
