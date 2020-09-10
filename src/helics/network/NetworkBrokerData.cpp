@@ -81,7 +81,7 @@ std::shared_ptr<helicsCLI11App>
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
     nbparser
-        ->add_option("--maxcount",
+        ->add_option("--maxcount,--max_count,--maxCount",
                      maxMessageCount,
                      "The maximum number of message to have in a queue")
         ->capture_default_str()
