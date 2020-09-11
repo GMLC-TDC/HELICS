@@ -176,14 +176,14 @@ void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& cal
     }
 }
 
-/** add a named filter to an endpoint for all message coming from the endpoint*/
+/** add a named filter to an endpoint for all messages coming from the endpoint*/
 void Endpoint::addSourceFilter(const std::string& filterName)
 {
     if (cr != nullptr) {
         cr->addSourceTarget(handle, filterName, handle_type::filter);
     }
 }
-/** add a named filter to an endpoint for all message going to the endpoint*/
+/** add a named filter to an endpoint for all messages going to the endpoint*/
 void Endpoint::addDestinationFilter(const std::string& filterName)
 {
     if (cr != nullptr) {

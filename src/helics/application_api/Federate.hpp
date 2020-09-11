@@ -593,13 +593,13 @@ class HELICS_CXX_EXPORT Interface {
     virtual int32_t getOption(int32_t option) const;
 
     /** get the injection type for an interface,  this is the type for data coming into an interface
-    @details for filters this is the input type, for publications this is type used to transmit
+    @details for filters this is the input type, for publications this is the type used to transmit
     data, for endpoints this is the specified type and for inputs this is the type of the
     transmitting publication
     @return a const ref to  std::string  */
     const std::string& getInjectionType() const;
 
-    /** get the extraction type for an interface,  this is the type for data coming out of interface
+    /** get the extraction type for an interface,  this is the type for data coming out of an interface
     @details for filters this is the output type, for publications this is the specified type, for
     endpoints this is the specified type and for inputs this is the specified type
     @return a const ref to  std::string  */
@@ -612,7 +612,7 @@ class HELICS_CXX_EXPORT Interface {
   @return a const ref to  std::string  */
     const std::string& getInjectionUnits() const;
 
-    /** get the extraction type for an interface,  this is the units associated with data coming out
+    /** get the extraction units for an interface,  this is the units associated with data coming out
     of an interface
     @details for publications this is the specified units, for inputs this is the specified type
     @return a const ref to  std::string  */
@@ -624,7 +624,7 @@ class HELICS_CXX_EXPORT Interface {
      * source endpoints for a filter*/
     const std::string& getSourceTargets() const;
     /** get the destination targets for an interface, either the destinations of data for endpoints
-     * or ipublications, or the destination endpoints for a filter*/
+     * or publications, or the destination endpoints for a filter*/
     const std::string& getDestinationTargets() const;
     /** close the interface*/
     void close();

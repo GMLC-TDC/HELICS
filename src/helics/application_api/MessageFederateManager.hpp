@@ -49,7 +49,7 @@ class MessageFederateManager {
 @param name the name of the endpoint
 @param type the defined type of the interface for endpoint checking if requested
 */
-    Endpoint& registerTargettedEndpoint(const std::string& name, const std::string& type);
+    Endpoint& registerTargetedEndpoint(const std::string& name, const std::string& type);
 
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;

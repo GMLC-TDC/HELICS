@@ -66,7 +66,7 @@ helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* 
     return nullptr;
 }
 
-helics_endpoint helicsFederateRegisterTargettedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
+helics_endpoint helicsFederateRegisterTargetedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
 {
     // now generate a generic endpoint
     auto fedObj = getMessageFedSharedPtr(fed, err);
@@ -75,7 +75,7 @@ helics_endpoint helicsFederateRegisterTargettedEndpoint(helics_federate fed, con
     }
     try {
         auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &fedObj->registerTargettedEndpoint(AS_STRING(name), AS_STRING(type));
+        end->endPtr = &fedObj->registerTargetedEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));
@@ -107,7 +107,7 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const 
     return nullptr;
 }
 
-helics_endpoint helicsFederateRegisterGlobalTargettedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
+helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err)
 {
     // now generate a generic subscription
     auto fedObj = getMessageFedSharedPtr(fed, err);
@@ -116,7 +116,7 @@ helics_endpoint helicsFederateRegisterGlobalTargettedEndpoint(helics_federate fe
     }
     try {
         auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &fedObj->registerGlobalTargettedEndpoint(AS_STRING(name), AS_STRING(type));
+        end->endPtr = &fedObj->registerGlobalTargetedEndpoint(AS_STRING(name), AS_STRING(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));

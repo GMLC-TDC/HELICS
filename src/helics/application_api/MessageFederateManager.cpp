@@ -59,10 +59,10 @@ Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, cons
     throw(RegistrationFailure("Unable to register Endpoint"));
 }
 
-Endpoint& MessageFederateManager::registerTargettedEndpoint(const std::string& name,
+Endpoint& MessageFederateManager::registerTargetedEndpoint(const std::string& name,
                                                             const std::string& type)
 {
-    auto handle = coreObject->registerTargettedEndpoint(fedID, name, type);
+    auto handle = coreObject->registerTargetedEndpoint(fedID, name, type);
     if (handle.isValid()) {
         auto edat = std::make_unique<EndpointData>();
 

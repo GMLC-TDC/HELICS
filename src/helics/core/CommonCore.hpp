@@ -168,7 +168,7 @@ class CommonCore: public Core, public BrokerBase {
                                               const std::string& name,
                                               const std::string& type) override final;
 
-    virtual interface_handle registerTargettedEndpoint(local_federate_id federateID,
+    virtual interface_handle registerTargetedEndpoint(local_federate_id federateID,
                                                        const std::string& name,
                                                        const std::string& type) override final;
     virtual interface_handle getEndpoint(local_federate_id federateID,

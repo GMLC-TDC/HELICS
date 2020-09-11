@@ -117,7 +117,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     {
         sendToAt(dest, sendTime, data.data(), data.size());
     }
-    /** send a data block and length to a destination at particular time
+    /** send a data block and length to a destination at a particular time
    @param dest string name of the destination
    @param data pointer to data location
    @param data_size the length of the data
