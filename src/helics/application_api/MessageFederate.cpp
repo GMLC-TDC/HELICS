@@ -115,12 +115,12 @@ Endpoint& MessageFederate::registerEndpoint(const std::string& eptName, const st
 }
 
 Endpoint& MessageFederate::registerTargetedEndpoint(const std::string& eptName,
-                                                     const std::string& type)
+                                                    const std::string& type)
 {
     return mfManager->registerTargetedEndpoint((!eptName.empty()) ?
-                                                    (getName() + nameSegmentSeparator + eptName) :
-                                                    eptName,
-                                                type);
+                                                   (getName() + nameSegmentSeparator + eptName) :
+                                                   eptName,
+                                               type);
 }
 
 Endpoint& MessageFederate::registerGlobalEndpoint(const std::string& eptName,
@@ -130,7 +130,7 @@ Endpoint& MessageFederate::registerGlobalEndpoint(const std::string& eptName,
 }
 
 Endpoint& MessageFederate::registerGlobalTargetedEndpoint(const std::string& eptName,
-                                                           const std::string& type)
+                                                          const std::string& type)
 {
     return mfManager->registerTargetedEndpoint(eptName, type);
 }

@@ -60,7 +60,7 @@ Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, cons
 }
 
 Endpoint& MessageFederateManager::registerTargetedEndpoint(const std::string& name,
-                                                            const std::string& type)
+                                                           const std::string& type)
 {
     auto handle = coreObject->registerTargetedEndpoint(fedID, name, type);
     if (handle.isValid()) {

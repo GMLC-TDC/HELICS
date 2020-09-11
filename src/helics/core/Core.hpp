@@ -509,8 +509,8 @@ class Core {
      @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual interface_handle registerTargetedEndpoint(local_federate_id federateID,
-                                                       const std::string& name,
-                                                       const std::string& type) = 0;
+                                                      const std::string& name,
+                                                      const std::string& type) = 0;
 
     /** get an endpoint Handle from its name
     @param federateID the identifier for the federate
