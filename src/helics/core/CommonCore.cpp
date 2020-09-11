@@ -1418,7 +1418,7 @@ interface_handle CommonCore::registerEndpoint(local_federate_id federateID,
     return id;
 }
 
-interface_handle CommonCore::registerTargettedEndpoint(local_federate_id federateID,
+interface_handle CommonCore::registerTargetedEndpoint(local_federate_id federateID,
                                                        const std::string& name,
                                                        const std::string& type)
 {
