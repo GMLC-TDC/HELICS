@@ -369,16 +369,16 @@ class HELICS_CXX_EXPORT Federate {
      /** get any commands for the Federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
   specific name of a federate, core, or broker
-  @param return a string with the command instructions for the federate the string will be empty if no command is given
+  @return a pair of strings <command,source> with the command instructions for the federate the command string will be empty if no command is given
   */
-    std::string getCommand();
+    std::pair<std::string, std::string> getCommand();
 
         /** get a commands for the Federate, call will block until a command is received
 @param target  the target of the command can be "federation", "federate", "broker", "core", or a
 specific name of a federate, core, or broker
-@param return a string with the command instructions for the federate
+@return a pair of strings <command,source> with the command instructions for the federate
 */
-    std::string waitCommand();
+    std::pair<std::string, std::string> waitCommand();
 
     /** add a dependency for this federate
     @details adds an additional internal time dependency for the federate

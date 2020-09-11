@@ -776,15 +776,15 @@ class Core {
    @param target the specific target of the command
    @param commandStr the actual command
    */
-    virtual void command(const std::string& target, const std::string& commandStr) = 0;
+    virtual void sendCommand(const std::string& target, const std::string& commandStr, const std::string &source) = 0;
 
      /** get a command for a specific federate
   */
-    virtual std::string getCommand(local_federate_id federateID) = 0;
+    virtual std::pair<std::string, std::string> getCommand(local_federate_id federateID) = 0;
 
     /** get a command for a specific federate. block until a command is received
      */
-    virtual std::string waitCommand(local_federate_id federateID) = 0;
+    virtual std::pair<std::string, std::string> waitCommand(local_federate_id federateID) = 0;
 
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of

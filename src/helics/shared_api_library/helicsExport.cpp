@@ -478,7 +478,7 @@ void helicsBrokerSendCommand(helics_broker broker, const char* target, const cha
     if (brk == nullptr) {
         return;
     }
-    brk->command(AS_STRING(target), AS_STRING(command));
+    brk->sendCommand(AS_STRING(target), AS_STRING(command));
 }
 
 void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helics_error* err)
@@ -617,7 +617,7 @@ void helicsCoreSendCommand(helics_core core, const char* target, const char* com
     if (cr == nullptr) {
         return;
     }
-    cr->command(AS_STRING(target), AS_STRING(command));
+    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{});
 }
 
 void helicsCoreSetLogFile(helics_core core, const char* logFileName, helics_error* err)

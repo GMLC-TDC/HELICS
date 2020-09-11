@@ -237,10 +237,10 @@ class CommonCore: public Core, public BrokerBase {
         setQueryCallback(local_federate_id federateID,
                          std::function<std::string(std::string_view)> queryFunction) override;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override;
-    virtual void command(const std::string& target, const std::string& commandStr) override;
-    virtual std::string getCommand(local_federate_id federateID) override;
+    virtual void sendCommand(const std::string& target, const std::string& commandStr, const std::string &source) override;
+    virtual std::pair<std::string, std::string> getCommand(local_federate_id federateID) override;
 
-    virtual std::string waitCommand(local_federate_id federateID) override;
+    virtual std::pair<std::string, std::string> waitCommand(local_federate_id federateID) override;
 
     virtual bool connect() override final;
     virtual bool isConnected() const override final;

@@ -1341,8 +1341,6 @@ HELICS_EXPORT void helicsFederateSendCommand(helics_federate fed, const char* ta
  * get a command sent to the federate
  *
  * @param fed The federate to get the command for
- * @param target The name of the object to send the command to
- * @param command the command to send
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -1350,6 +1348,18 @@ HELICS_EXPORT void helicsFederateSendCommand(helics_federate fed, const char* ta
  * @return a string with the command for the federate if the string is empty no command is available
  */
 HELICS_EXPORT const char * helicsFederateGetCommand(helics_federate fed, helics_error* err);
+
+/**
+ * get the source of the most recently retrieved command sent to the federate
+ *
+ * @param fed The federate to get the command for
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ *
+ * @return a string with the command for the federate if the string is empty no command is available
+ */
+HELICS_EXPORT const char* helicsFederateGetCommandSource(helics_federate fed, helics_error* err);
 
 /**
  * wait for a command sent to the federate

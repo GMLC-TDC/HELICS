@@ -123,8 +123,9 @@ class HELICS_CXX_EXPORT BrokerApp {
    "federation",  "broker", "core", or the name of a specific object/core/broker
    @param target the specific target of the command
    @param commandStr the actual command
+   @param source
    */
-    void command(const std::string& target, const std::string& commandStr);
+    void sendCommand(const std::string& target, const std::string& commandStr);
 
     /** set the log file to use for the broker*/
     void setLogFile(const std::string& logFile);

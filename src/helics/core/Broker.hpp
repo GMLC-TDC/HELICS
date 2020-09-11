@@ -94,11 +94,11 @@ class Broker {
 
     /** send a command to a specific target
    @details the format is somewhat unspecified  target is the name of an object typically one of
-   "federation",  "broker", "core", or the name of a specific object/core/broker
+   "federation","root",  "broker", "core", or the name of a specific object/core/broker
    @param target the specific target of the command
    @param commandStr the actual command
    */
-    virtual void command(const std::string& target, const std::string& commandStr) = 0;
+    virtual void sendCommand(const std::string& target, const std::string& commandStr) = 0;
 
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/

@@ -2019,7 +2019,8 @@ void CommonCore::setLogFile(const std::string& lfile)
     setLoggingFile(lfile);
 }
 
-std::string CommonCore::getCommand(local_federate_id federateID) {
+std::pair<std::string, std::string> CommonCore::getCommand(local_federate_id federateID)
+{
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("FederateID is not valid (setLoggingCallback)"));
@@ -2027,7 +2028,7 @@ std::string CommonCore::getCommand(local_federate_id federateID) {
     return fed->getCommand();
 }
 
-std::string CommonCore::waitCommand(local_federate_id federateID)
+std::pair<std::string, std::string> CommonCore::waitCommand(local_federate_id federateID)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -2380,7 +2381,17 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
     auto cmd = command.payload.to_string();
     if (cmd == "terminate") {
         LOG_SUMMARY(global_broker_id_local, getIdentifier(), " received terminate instruction via command instruction")
-        disconnect();
+        ActionMessage udisconnect(CMD_USER_DISCONNECT);
+        addActionMessage(udisconnect);
+    } else if (cmd == "echo") {
+        LOG_SUMMARY(global_broker_id_local,
+                    getIdentifier(),
+                    " received echo command via command instruction")
+        command.swapSourceDest();
+        command.payload = "echo_reply";
+        command.setString(targetStringLoc, command.getString(sourceStringLoc));
+        command.setString(sourceStringLoc, getIdentifier());
+        addActionMessage(command);
     }
     else {
         LOG_WARNING(global_broker_id_local,
@@ -2604,13 +2615,23 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
     addActionMessage(std::move(querycmd));
 }
 
-void CommonCore::command(const std::string& target, const std::string& commandStr)
+void CommonCore::sendCommand(const std::string& target, const std::string& commandStr, const std::string &source)
 {
     ActionMessage cmdcmd(CMD_SEND_COMMAND);
-    cmdcmd.dest_id = root_broker_id;
-    cmdcmd.source_id = direct_core_id;
+    cmdcmd.dest_id = parent_broker_id;
     cmdcmd.payload = commandStr;
-    cmdcmd.setStringData(target);
+    cmdcmd.setString(targetStringLoc,target);
+    if (!source.empty()) {
+        cmdcmd.setString(sourceStringLoc, source);
+        const auto* fed = getFederate(source);
+        if (fed!=nullptr) {
+            cmdcmd.source_id = fed->global_id;
+        }
+    }
+    else {
+        cmdcmd.setString(sourceStringLoc, getIdentifier());
+        cmdcmd.source_id = getGlobalId();
+    }
     addActionMessage(std::move(cmdcmd));
 }
 
@@ -2735,22 +2756,28 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         case CMD_SEND_COMMAND:
             if (command.dest_id == global_broker_id_local) {
                 processCommandInstruction(command);
-            } else if (command.dest_id == parent_broker_id) {
+                break;
+            }
+            if (command.dest_id == parent_broker_id) {
                 const auto& target = command.getString(targetStringLoc);
                 if (target == "core" || target == getIdentifier()) {
                     processCommandInstruction(command);
+                    break;
                 }
-                else
-                {
-                    auto* fed = getFederateCore(target);
-                    if (fed != nullptr)
-                    {
-                        fed->sendCommand(command);
-                    }
+                auto* fed = getFederateCore(target);
+                if (fed != nullptr) {
+                    fed->sendCommand(command);
+                    break;
                 }
-            } else {
-                routeMessage(std::move(command));
             }
+            if (isLocal(command.dest_id)) {
+                auto* fed = getFederateCore(command.dest_id);
+                if (fed != nullptr) {
+                    fed->sendCommand(command);
+                    break;
+                }
+            }
+            routeMessage(std::move(command));
             break;
         case CMD_BROKER_QUERY:
             if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {

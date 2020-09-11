@@ -285,7 +285,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual std::string query(const std::string& target,
                               const std::string& queryStr) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
-    virtual void command(const std::string& target, const std::string& commandStr) override final;
+    virtual void sendCommand(const std::string& target, const std::string& commandStr) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& publication, const std::string& input) override final;
 

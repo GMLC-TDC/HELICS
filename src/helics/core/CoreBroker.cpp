@@ -2478,12 +2478,13 @@ void CoreBroker::setGlobal(const std::string& valueName, const std::string& valu
     transmitToParent(std::move(querycmd));
 }
 
-void CoreBroker::command(const std::string& target, const std::string& commandStr)
+void CoreBroker::sendCommand(const std::string& target, const std::string& commandStr)
 {
     ActionMessage cmdcmd(CMD_SEND_COMMAND);
     cmdcmd.source_id = global_id.load();
     cmdcmd.payload = commandStr;
-    cmdcmd.setStringData(target);
+    cmdcmd.setString(targetStringLoc, target);
+    cmdcmd.setString(sourceStringLoc, getIdentifier());
     transmitToParent(std::move(cmdcmd));
 }
 
@@ -2962,7 +2963,17 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
         LOG_SUMMARY(global_broker_id_local,
                     getIdentifier(),
                     " received terminate instruction via command instruction")
-        disconnect();
+        ActionMessage udisconnect(CMD_USER_DISCONNECT);
+        addActionMessage(udisconnect);
+    } else if (cmd == "echo") {
+        LOG_SUMMARY(global_broker_id_local,
+                    getIdentifier(),
+                    " received echo command via command instruction")
+        m.swapSourceDest();
+        m.payload = "echo_reply";
+        m.setString(targetStringLoc, m.getString(sourceStringLoc));
+        m.setString(sourceStringLoc, getIdentifier());
+        addActionMessage(m);
     } else {
         LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
@@ -2987,17 +2998,20 @@ void CoreBroker::processCommandInstruction(ActionMessage& m)
                 auto fed = _federates.find(target);
                 if (fed != _federates.end()) {
                     route = fed->route;
-                    m.dest_id = fed->parent;
+                    m.dest_id = fed->global_id;
+                    transmit(route, std::move(m));
                 } else {
                     auto broker = _brokers.find(target);
                     if (broker != _brokers.end()) {
                         route = broker->route;
                         m.dest_id = broker->global_id;
+                        transmit(route, std::move(m));
                     } else {
                         m.swapSourceDest();
                         m.source_id = global_broker_id_local;
                         m.setAction(CMD_ERROR);
                         m.payload = "unable to locate target for command";
+                        transmit(getRoute(m.dest_id), std::move(m));
                     }
                 }
             }
@@ -3006,12 +3020,14 @@ void CoreBroker::processCommandInstruction(ActionMessage& m)
             auto fed = _federates.find(target);
             if (fed != _federates.end()) {
                 route = fed->route;
-                m.dest_id = fed->parent;
+                m.dest_id = fed->global_id;
+                transmit(route, std::move(m));
             } else {
                 auto broker = _brokers.find(target);
                 if (broker != _brokers.end()) {
                     route = broker->route;
                     m.dest_id = broker->global_id;
+                    transmit(route, std::move(m));
                 } else {
                     transmit(parent_route_id, std::move(m));
                 }

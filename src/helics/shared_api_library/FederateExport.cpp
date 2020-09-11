@@ -1241,13 +1241,22 @@ const char* helicsFederateGetCommand(helics_federate fed, helics_error* err) {
         return emptyStr.c_str();
     }
     auto res = fedObj->fedptr->getCommand();
-    if (res.empty()) {
+    if (res.first.empty()) {
         return emptyStr.c_str();
     }
     fedObj->commandBuffer = std::move(res);
-    return fedObj->commandBuffer.c_str();
+    return fedObj->commandBuffer.first.c_str();
 }
 
+const char* helicsFederateGetCommandSource(helics_federate fed, helics_error* err)
+{
+    auto* fedObj = helics::getFedObject(fed, err);
+
+    if (fedObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    return fedObj->commandBuffer.second.c_str();
+}
 
 const char* helicsFederateWaitCommand(helics_federate fed, helics_error* err)
 {
@@ -1257,9 +1266,9 @@ const char* helicsFederateWaitCommand(helics_federate fed, helics_error* err)
         return emptyStr.c_str();
     }
     auto res = fedObj->fedptr->waitCommand();
-    if (res.empty()) {
+    if (res.first.empty()) {
         return emptyStr.c_str();
     }
     fedObj->commandBuffer = std::move(res);
-    return fedObj->commandBuffer.c_str();
+    return fedObj->commandBuffer.first.c_str();
 }
