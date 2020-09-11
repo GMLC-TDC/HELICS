@@ -147,6 +147,6 @@ class PholdFederate: public BenchmarkFederate {
             fed->getCurrentTime() + helics::Time(lookahead_) + helics::Time(rand_exp(rand_gen));
         std::string data = "ev";
         std::string dest = "phold_" + std::to_string(destIndex) + "/ept";
-        ept->send(dest, data, evTime);
+        ept->sendToAt(dest, evTime, data);
     }
 };

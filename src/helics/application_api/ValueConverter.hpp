@@ -78,6 +78,7 @@ namespace detail {
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::complex<double>& val);
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, char* val);
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::string& val);
+    HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::string_view& val);
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, NamedPoint& val);
 
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::vector<double>& val);

@@ -387,8 +387,8 @@ TEST_P(vfed_type_tests, single_transfer)
 
     int actualLen;
     // make sure the value is still what we expect
-    CE(helicsInputGetRawValue(subid, s, STRINGLEN, &actualLen, &err));
-    EXPECT_EQ(std::string(s, actualLen), "string1");
+    CE(helicsInputGetString(subid, s, STRINGLEN, &actualLen, &err));
+    EXPECT_STREQ(s, "string1");
 
     // advance time
     CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
@@ -397,10 +397,10 @@ TEST_P(vfed_type_tests, single_transfer)
     EXPECT_EQ(gtime, 2.0);
 
     // make sure the string is what we expect
-    CE(helicsInputGetRawValue(subid, s, STRINGLEN, &actualLen, &err));
+    CE(helicsInputGetString(subid, s, STRINGLEN, &actualLen, &err));
 
-    EXPECT_EQ(actualLen, 7);
-    EXPECT_EQ(std::string(s, actualLen), "string2");
+    EXPECT_EQ(actualLen, 8);  // 8 = strlen("string2")+ 1 for the null character
+    EXPECT_STREQ(s, "string2");
 
     CE(helicsFederateFinalize(vFed, &err));
 }

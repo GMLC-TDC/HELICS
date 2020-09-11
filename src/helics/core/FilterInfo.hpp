@@ -14,6 +14,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+struct EptInformation {
+    global_handle id;
+    std::string key;
+    std::string type;
+    EptInformation() = default;
+    EptInformation(global_handle gid, const std::string& key_, const std::string& type_):
+        id(gid), key(key_), type(type_)
+    {
+    }
+};
+
 /** data class defining the information about a filter*/
 class FilterInfo {
   public:
@@ -35,15 +46,35 @@ class FilterInfo {
     const std::string key;  //!< the identifier of the filter
     const std::string inputType;  //!< the type of data for the filter
     const std::string outputType;  //!< the outputType of data of the filter
+    std::vector<global_handle> sourceTargets;
+    std::vector<global_handle> destTargets;
     const bool dest_filter = false;  //! indicator that the filter is a destination filter
     bool cloning = false;  //!< indicator that the filter is a cloning filter
     uint16_t flags = 0;  //!< flags for the filter
     // there is a 4 byte gap here
     std::shared_ptr<FilterOperator> filterOp;  //!< the callback operation of the filter
+  private:
+    std::vector<EptInformation>
+        sourceEndpoints;  //!< information about the endpoints for source filters
+    std::vector<EptInformation>
+        destEndpoints;  //!< information about the endpoints for dest Filters
+    mutable std::string sourceEpts;
+    mutable std::string destEpts;
 
-    std::vector<global_handle> sourceTargets;
-    std::vector<global_handle> destTargets;
-    /** remove a target from interface with the filter*/
-    void removeTarget(global_handle targetToRemove);
+  public:
+    /** add a target target*/
+    void addDestinationEndpoint(global_handle dest,
+                                const std::string& destName,
+                                const std::string& destType);
+    /** add a source to an endpoint*/
+    void addSourceEndpoint(global_handle dest,
+                           const std::string& sourceName,
+                           const std::string& sourceType);
+    /** remove a target from connection*/
+    void removeTarget(global_handle targetId);
+    /** get a string with the names of the source endpoints*/
+    const std::string& getSourceEndpoints() const;
+    /** get a string with the names of the destination endpoints*/
+    const std::string& getDestinationEndpoints() const;
 };
 }  // namespace helics

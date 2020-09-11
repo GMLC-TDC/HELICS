@@ -76,7 +76,7 @@ TEST_P(mfed_type_tests, message_federate_send_receive)
 
     std::string data(500, 'a');
 
-    epid.sendMessage("ep2", data, 0.0);
+    epid.sendToAt("ep2", 0.0, data);
     helics_time time = mFed1->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
