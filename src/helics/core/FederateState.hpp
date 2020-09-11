@@ -105,7 +105,7 @@ class FederateState {
         mTimer;  //!< message timer object for real time operations and timeouts
     gmlc::containers::BlockingQueue<ActionMessage>
         queue;  //!< processing queue for messages incoming to a federate
-    gmlc::containers::BlockingQueue<std::string>
+    gmlc::containers::BlockingQueue<std::pair<std::string,std::string>>
         commandQueue;  //!< processing queue for messages incoming to a federate
     std::atomic<uint16_t> interfaceFlags{
         0};  //!< current defaults for operational flags of interfaces for this federate
@@ -398,8 +398,8 @@ class FederateState {
     void sendCommand(ActionMessage& command);
 
     /** get a command for a federate in its queue*/
-    std::string getCommand();
+    std::pair<std::string, std::string> getCommand();
     /** wait for a command to a federate*/
-    std::string waitCommand();
+    std::pair<std::string, std::string> waitCommand();
 };
 }  // namespace helics

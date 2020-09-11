@@ -126,7 +126,7 @@ class HELICS_CXX_EXPORT CoreApp {
    @param target the specific target of the command
    @param commandStr the actual command
    */
-    void command(const std::string& target, const std::string& commandStr);
+    void sendCommand(const std::string& target, const std::string& commandStr);
 
     /** set the log file to use for the core*/
     void setLogFile(const std::string& logFile);

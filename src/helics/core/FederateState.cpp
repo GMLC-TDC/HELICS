@@ -1681,31 +1681,56 @@ void FederateState::sendCommand(ActionMessage & command)
             bye.dest_id = bye.source_id;
             parent_->addActionMessage(bye);
         }
+    } else if (cmd == "echo") {
+        ActionMessage response(CMD_SEND_COMMAND);
+        response.payload = "echo_reply";
+        response.dest_id = command.source_id;
+        response.source_id = global_id.load();
+        response.setString(targetStringLoc, command.getString(sourceStringLoc));
+        response.setString(sourceStringLoc, getIdentifier());
+        if (parent_ != nullptr) {
+            parent_->addActionMessage(response);
+        }
     }
     else if (cmd == "command_status") {
         ActionMessage response(CMD_SEND_COMMAND);
         response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
         response.dest_id = command.source_id;
         response.source_id = global_id.load();
+        response.setString(targetStringLoc, command.getString(sourceStringLoc));
+        response.setString(sourceStringLoc, getIdentifier());
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
     }
     else {
-        commandQueue.emplace(cmd);
+        commandQueue.emplace(cmd, command.getString(sourceStringLoc));
     }
     
 }
 
-std::string FederateState::getCommand()
+std::pair<std::string,std::string> FederateState::getCommand()
 {
     auto val = commandQueue.try_pop();
-    return (val) ? *val:std::string{};
+    if (val->first == "notify") {
+        if (parent_ != nullptr) {
+            parent_->sendCommand(val->second, "notify_response", name);
+        }
+        val = commandQueue.try_pop();
+    }
+    return (val) ? *val : std::pair<std::string, std::string>{std::string{}, std::string{}};
 }
 
-std::string FederateState::waitCommand()
+std::pair<std::string,std::string> FederateState::waitCommand()
 {
-    return commandQueue.pop();
+    auto val= commandQueue.pop();
+    if (val.first == "notify") {
+        if (parent_ != nullptr) {
+            parent_->sendCommand(val.second, "notify_response",name);
+        }
+        val = commandQueue.pop();
+    }
+    return val;
 }
 
 std::string FederateState::processQueryActual(std::string_view query) const
