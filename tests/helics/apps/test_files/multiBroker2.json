@@ -1,14 +1,14 @@
 {
   "master": {
-    "type": "test"
+    "core_type": "test"
   },
   "comms": [
     {
-      "type": "zmq",
+      "core_type": "zmq",
       "local_port": 23410
     },
     {
-      "type": "zmq",
+      "core_type": "zmq",
       "local_port": 23700
     }
   ]

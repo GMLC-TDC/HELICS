@@ -1,11 +1,11 @@
 {
-  "type": "test",
+  "core_type": "test",
   "comms": [
     {
-      "type": "zmq"
+      "core_type": "zmq"
     },
     {
-      "type": "tcp"
+      "core_type": "tcp"
     }
   ]
 }
