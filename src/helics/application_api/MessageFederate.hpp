@@ -107,7 +107,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param type the defined type of the interface for endpoint checking if requested
     */
     Endpoint& registerTargetedEndpoint(const std::string& eptName = std::string(),
-                                        const std::string& type = std::string());
+                                       const std::string& type = std::string());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
@@ -124,7 +124,7 @@ class HELICS_CXX_EXPORT MessageFederate:
   @return a Reference to an Endpoint Object
   */
     Endpoint& registerGlobalTargetedEndpoint(const std::string& eptName,
-                                              const std::string& type = std::string());
+                                             const std::string& type = std::string());
 
     /** register an indexed Endpoint
     @details register a global endpoint as part of a 1D array of endpoints

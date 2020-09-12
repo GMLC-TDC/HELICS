@@ -86,9 +86,9 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federa
  * @endforcpponly
  */
 HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(helics_federate fed,
-                                                                      const char* name,
-                                                                      const char* type,
-                                                                      helics_error* err);
+                                                                     const char* name,
+                                                                     const char* type,
+                                                                     helics_error* err);
 
 /**
  * Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other
@@ -110,9 +110,9 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(helics_fede
  * @endforcpponly
  */
 HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(helics_federate fed,
-                                                                            const char* name,
-                                                                            const char* type,
-                                                                            helics_error* err);
+                                                                           const char* name,
+                                                                           const char* type,
+                                                                           helics_error* err);
 
 /**
  * Get an endpoint object from a name.
