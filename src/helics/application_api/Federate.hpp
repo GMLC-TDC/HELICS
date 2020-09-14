@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <stdexcept>
 #include <string>
 #include <optional>
+#include <utility>
 
 namespace gmlc {
 namespace libguarded {
