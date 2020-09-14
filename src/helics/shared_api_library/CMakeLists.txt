@@ -39,13 +39,9 @@ target_include_directories(
               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-set_target_properties(
-    helics PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
-)
+set_target_properties(helics PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR})
 
-set_target_properties(
-    helics PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
-)
+set_target_properties(helics PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
 target_link_libraries(helics PRIVATE helics_application_api)
 target_link_libraries(helics PRIVATE compile_flags_target)
 

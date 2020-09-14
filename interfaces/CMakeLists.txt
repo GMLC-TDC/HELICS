@@ -7,7 +7,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 cmake_dependent_option(
     BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
@@ -35,10 +34,7 @@ option(HELICS_OVERWRITE_INTERFACE_FILES
 )
 hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
 
-if(BUILD_CSHARP_INTERFACE
-   OR BUILD_OCTAVE_INTERFACE
-   OR SWIG_GENERATE_INTERFACE_FILES_ONLY
-)
+if(BUILD_CSHARP_INTERFACE OR BUILD_OCTAVE_INTERFACE OR SWIG_GENERATE_INTERFACE_FILES_ONLY)
     set(swig_required ON)
 else()
     set(swig_required OFF)
@@ -94,7 +90,6 @@ set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}
 
 # TODO: remove this after all of the interfaces work as standalone builds
 include_directories(${HELICS_SWIG_INCLUDE_DIRS})
-
 
 if(BUILD_JAVA_INTERFACE)
     add_subdirectory(java)

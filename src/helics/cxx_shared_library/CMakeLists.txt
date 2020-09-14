@@ -38,7 +38,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cxx_file_list.cmake)
 
 add_library(
     helicscpp SHARED ${helics_shared_sources} ${conv_headers} ${helics_shared_public_headers}
-                         ${helics_shared_private_headers}
+                     ${helics_shared_private_headers}
 )
 
 target_link_libraries(helicscpp PRIVATE helics_network fmt::fmt)
@@ -54,7 +54,7 @@ set_target_properties(
 
 set_target_properties(
     helicscpp PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
-                             VISIBILITY_INLINES_HIDDEN ON
+                         VISIBILITY_INLINES_HIDDEN ON
 )
 
 file(MAKE_DIRECTORY ${HELICS_BINARY_DIR}/include/helics_cxx)
@@ -89,9 +89,7 @@ if(WIN32)
     install(FILES $<TARGET_LINKER_FILE:helicscpp> DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT libs
     )
-    install(FILES $<TARGET_FILE:helicscpp> DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT Runtime
-    )
+    install(FILES $<TARGET_FILE:helicscpp> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
 else()
     install(TARGETS helicscpp DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RUNTIME)
 endif()
