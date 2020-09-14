@@ -3032,9 +3032,7 @@ void CoreBroker::processCommandInstruction(ActionMessage& m)
                 }
             }
         }
-    }
-
-    else {
+    } else {
         transmit(getRoute(m.dest_id), std::move(m));
     }
 }
