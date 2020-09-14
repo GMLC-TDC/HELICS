@@ -986,7 +986,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         libs
         swig
         matlab
-        python
         java
         octave
         csharp
@@ -1008,7 +1007,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
-    set(CPACK_COMPONENT_PYTHON_DISPLAY_NAME "Python")
     set(CPACK_COMPONENT_MATLAB_DISPLAY_NAME "MATLAB")
     set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
@@ -1019,7 +1017,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
     set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
-    set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
     set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
@@ -1040,7 +1037,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
         "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
-    set(CPACK_COMPONENT_PYTHON_DESCRIPTION "Python language interface")
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
     set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
     set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
