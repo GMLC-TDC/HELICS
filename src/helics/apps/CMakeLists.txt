@@ -150,7 +150,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     if(HELICS_BUILD_CXX_SHARED_LIB)
         add_library(
             helicscpp-apps SHARED ../helics_apps.hpp ${helics_apps_library_files}
-                                      ${helics_apps_public_headers} ${helics_apps_private_headers}
+                                  ${helics_apps_public_headers} ${helics_apps_private_headers}
         )
 
         target_link_libraries(helicscpp-apps PUBLIC HELICS::helicscpp)
@@ -172,13 +172,12 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         set_target_properties(
-            helicscpp-apps PROPERTIES VERSION ${HELICS_VERSION} SOVERSION
-                                                                    ${HELICS_VERSION_MAJOR}
+            helicscpp-apps PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
         )
 
         set_target_properties(
             helicscpp-apps PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
-                                          VISIBILITY_INLINES_HIDDEN ON
+                                      VISIBILITY_INLINES_HIDDEN ON
         )
 
         install(
@@ -189,16 +188,14 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         if(WIN32)
-            install(FILES $<TARGET_LINKER_FILE:helicscpp-apps>
-                    DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs
+            install(FILES $<TARGET_LINKER_FILE:helicscpp-apps> DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                    COMPONENT libs
             )
             install(FILES $<TARGET_FILE:helicscpp-apps> DESTINATION ${CMAKE_INSTALL_BINDIR}
                     COMPONENT Runtime
             )
         else()
-            install(TARGETS helicscpp-apps DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                    COMPONENT RUNTIME
-            )
+            install(TARGETS helicscpp-apps DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RUNTIME)
         endif()
 
         if(NOT HELICS_BINARY_ONLY_INSTALL)
@@ -216,4 +213,3 @@ if(HELICS_BUILD_APP_LIBRARY)
     endif()
 
 endif(HELICS_BUILD_APP_LIBRARY)
-
