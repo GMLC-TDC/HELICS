@@ -2524,6 +2524,45 @@ public class helics {
   }
 
   /**
+   * Create a targeted endpoint.  Targeted endpoints have specific destinations predefined and do not allow sending messages to other<br>
+   * endpoints<br>
+   * <br>
+   * The endpoint becomes part of the federate and is destroyed when the federate is freed<br>
+   *          so there are no separate free functions for endpoints.<br>
+   * <br>
+   * @param fed The federate object in which to create an endpoint must have been created<br>
+   *           with helicsCreateMessageFederate or helicsCreateCombinationFederate.<br>
+   * @param name The identifier for the endpoint. This will be prepended with the federate name for the global identifier.<br>
+   * @param type A string describing the expected type of the publication (may be NULL).<br>
+   * <br>
+   * <br>
+   * @return An object containing the endpoint.
+   */
+  public static SWIGTYPE_p_void helicsFederateRegisterTargetedEndpoint(SWIGTYPE_p_void fed, String name, String type) {
+    long cPtr = helicsJNI.helicsFederateRegisterTargetedEndpoint(SWIGTYPE_p_void.getCPtr(fed), name, type);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
+   * Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other<br>
+   *  endpoints<br>
+   * <br>
+   * The endpoint becomes part of the federate and is destroyed when the federate is freed<br>
+   *          so there are no separate free functions for endpoints.<br>
+   * <br>
+   * @param fed The federate object in which to create an endpoint must have been created<br>
+   *               with helicsCreateMessageFederate or helicsCreateCombinationFederate.<br>
+   * @param name The identifier for the endpoint, the given name is the global identifier.<br>
+   * @param type A string describing the expected type of the publication (may be NULL).<br>
+   * <br>
+   * @return An object containing the endpoint.
+   */
+  public static SWIGTYPE_p_void helicsFederateRegisterGlobalTargetedEndpoint(SWIGTYPE_p_void fed, String name, String type) {
+    long cPtr = helicsJNI.helicsFederateRegisterGlobalTargetedEndpoint(SWIGTYPE_p_void.getCPtr(fed), name, type);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  /**
    * Get an endpoint object from a name.<br>
    * <br>
    * @param fed The message federate object to use to get the endpoint.<br>
@@ -2584,6 +2623,16 @@ public class helics {
   }
 
   /**
+   * Send a message to the targeted destination.<br>
+   * <br>
+   * @param endpoint The endpoint to send the data from.<br>
+   * @param data The data to send.
+   */
+  public static void helicsEndpointSend(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsEndpointSend(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  }
+
+  /**
    * Send a message to the specified destination.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
@@ -2594,12 +2643,12 @@ public class helics {
    * <br>
    * @param data The data to send.
    */
-  public static void helicsEndpointSendMessageRaw(SWIGTYPE_p_void endpoint, String dst, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendMessageRaw(SWIGTYPE_p_void.getCPtr(endpoint), dst, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendTo(SWIGTYPE_p_void endpoint, String dst, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsEndpointSendTo(SWIGTYPE_p_void.getCPtr(endpoint), dst, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
 
   /**
-   * Send a message at a specific time to the specified destination.<br>
+   * Send a message to the specified destination at a specific time.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
    * @param dst The target destination.<br>
@@ -2611,8 +2660,19 @@ public class helics {
    * <br>
    * @param time The time the message should be sent.
    */
-  public static void helicsEndpointSendEventRaw(SWIGTYPE_p_void endpoint, String dst, SWIGTYPE_p_void data, int inputDataLength, double time) {
-    helicsJNI.helicsEndpointSendEventRaw(SWIGTYPE_p_void.getCPtr(endpoint), dst, SWIGTYPE_p_void.getCPtr(data), inputDataLength, time);
+  public static void helicsEndpointSendToAt(SWIGTYPE_p_void endpoint, String dst, double time, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsEndpointSendToAt(SWIGTYPE_p_void.getCPtr(endpoint), dst, time, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  }
+
+  /**
+   * Send a message at a specific time to the targeted destinations<br>
+   * <br>
+   * @param endpoint The endpoint to send the data from.<br>
+   * @param time The time the message should be sent.<br>
+   * @param data The data to send.
+   */
+  public static void helicsEndpointSendAt(SWIGTYPE_p_void endpoint, double time, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsEndpointSendAt(SWIGTYPE_p_void.getCPtr(endpoint), time, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
 
   /**
@@ -2810,7 +2870,7 @@ public class helics {
   /**
    * Set a handle option on an endpoint.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to modify.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
    * @param value The value to set the option to.
    */
@@ -2821,12 +2881,62 @@ public class helics {
   /**
    * Set a handle option on an endpoint.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to modify.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
    * @return the value of the option, for boolean options will be 0 or 1
    */
   public static int helicsEndpointGetOption(SWIGTYPE_p_void endpoint, int option) {
     return helicsJNI.helicsEndpointGetOption(SWIGTYPE_p_void.getCPtr(endpoint), option);
+  }
+
+  /**
+   * add a source target to an endpoint,  Specifying an endpoint to receive undirected messages from<br>
+   * <br>
+   * @param endpoint The endpoint to modify.<br>
+   * @param targetEndpoint the endpoint to get messages from
+   */
+  public static void helicsEndpointAddSourceTarget(SWIGTYPE_p_void endpoint, String targetEndpoint) {
+    helicsJNI.helicsEndpointAddSourceTarget(SWIGTYPE_p_void.getCPtr(endpoint), targetEndpoint);
+  }
+
+  /**
+   * add a destination target to an endpoint,  Specifying an endpoint to send undirected messages to<br>
+   * <br>
+   * @param endpoint The endpoint to modify.<br>
+   * @param targetEndpoint the name of the endpoint to send messages to
+   */
+  public static void helicsEndpointAddDestinationTarget(SWIGTYPE_p_void endpoint, String targetEndpoint) {
+    helicsJNI.helicsEndpointAddDestinationTarget(SWIGTYPE_p_void.getCPtr(endpoint), targetEndpoint);
+  }
+
+  /**
+   * remove an endpoint from being targeted<br>
+   * <br>
+   * @param endpoint The endpoint to modify.<br>
+   * @param targetEndpoint the name of the endpoint to send messages to
+   */
+  public static void helicsEndpointRemoveTarget(SWIGTYPE_p_void endpoint, String targetEndpoint) {
+    helicsJNI.helicsEndpointRemoveTarget(SWIGTYPE_p_void.getCPtr(endpoint), targetEndpoint);
+  }
+
+  /**
+   * add a source Filter to an endpoint<br>
+   * <br>
+   * @param endpoint The endpoint to modify.<br>
+   * @param filterName the name of the filter to add
+   */
+  public static void helicsEndpointAddSourceFilter(SWIGTYPE_p_void endpoint, String filterName) {
+    helicsJNI.helicsEndpointAddSourceFilter(SWIGTYPE_p_void.getCPtr(endpoint), filterName);
+  }
+
+  /**
+   * add a destination filter to an endpoint<br>
+   * <br>
+   * @param endpoint The endpoint to modify.<br>
+   * 
+   */
+  public static void helicsEndpointAddDestinationFilter(SWIGTYPE_p_void endpoint, String filterName) {
+    helicsJNI.helicsEndpointAddDestinationFilter(SWIGTYPE_p_void.getCPtr(endpoint), filterName);
   }
 
   /**

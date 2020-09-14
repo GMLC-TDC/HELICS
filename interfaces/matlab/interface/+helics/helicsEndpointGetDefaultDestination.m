@@ -1,3 +1,3 @@
 function varargout = helicsEndpointGetDefaultDestination(varargin)
-  [varargout{1:nargout}] = helicsMEX(225, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(227, varargin{:});
 end

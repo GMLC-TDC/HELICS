@@ -3032,6 +3032,49 @@ def helicsFederateRegisterGlobalEndpoint(fed: "helics_federate", name: "char con
     """
     return _helics.helicsFederateRegisterGlobalEndpoint(fed, name, type)
 
+def helicsFederateRegisterTargetedEndpoint(fed: "helics_federate", name: "char const *", type: "char const *") -> "helics_endpoint":
+    r"""
+    Create a targeted endpoint.  Targeted endpoints have specific destinations predefined and do not allow sending messages to other
+    endpoints
+
+    The endpoint becomes part of the federate and is destroyed when the federate is freed
+             so there are no separate free functions for endpoints.
+
+    :type fed: void
+    :param fed: The federate object in which to create an endpoint must have been created
+                  with helicsCreateMessageFederate or helicsCreateCombinationFederate.
+    :type name: string
+    :param name: The identifier for the endpoint. This will be prepended with the federate name for the global identifier.
+    :type type: string
+    :param type: A string describing the expected type of the publication (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the endpoint.
+    """
+    return _helics.helicsFederateRegisterTargetedEndpoint(fed, name, type)
+
+def helicsFederateRegisterGlobalTargetedEndpoint(fed: "helics_federate", name: "char const *", type: "char const *") -> "helics_endpoint":
+    r"""
+    Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other
+     endpoints
+
+    The endpoint becomes part of the federate and is destroyed when the federate is freed
+             so there are no separate free functions for endpoints.
+
+    :type fed: void
+    :param fed: The federate object in which to create an endpoint must have been created
+                      with helicsCreateMessageFederate or helicsCreateCombinationFederate.
+    :type name: string
+    :param name: The identifier for the endpoint, the given name is the global identifier.
+    :type type: string
+    :param type: A string describing the expected type of the publication (may be NULL).
+
+    :rtype: void
+    :return: An object containing the endpoint.
+    """
+    return _helics.helicsFederateRegisterGlobalTargetedEndpoint(fed, name, type)
+
 def helicsFederateGetEndpoint(fed: "helics_federate", name: "char const *") -> "helics_endpoint":
     r"""
     Get an endpoint object from a name.
@@ -3097,7 +3140,18 @@ def helicsEndpointGetDefaultDestination(endpoint: "helics_endpoint") -> "char co
     """
     return _helics.helicsEndpointGetDefaultDestination(endpoint)
 
-def helicsEndpointSendMessageRaw(endpoint: "helics_endpoint", dst: "char const *", data: "void const *") -> "int":
+def helicsEndpointSend(endpoint: "helics_endpoint", data: "void const *") -> "int":
+    r"""
+    Send a message to the targeted destination.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type data: void
+    :param data: The data to send.
+    """
+    return _helics.helicsEndpointSend(endpoint, data)
+
+def helicsEndpointSendTo(endpoint: "helics_endpoint", dst: "char const *", data: "void const *") -> "int":
     r"""
     Send a message to the specified destination.
 
@@ -3112,11 +3166,11 @@ def helicsEndpointSendMessageRaw(endpoint: "helics_endpoint", dst: "char const *
     :type data: void
     :param data: The data to send.
     """
-    return _helics.helicsEndpointSendMessageRaw(endpoint, dst, data)
+    return _helics.helicsEndpointSendTo(endpoint, dst, data)
 
-def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dst: "char const *", data: "void const *", time: "helics_time") -> "int":
+def helicsEndpointSendToAt(endpoint: "helics_endpoint", dst: "char const *", time: "helics_time", data: "void const *") -> "int":
     r"""
-    Send a message at a specific time to the specified destination.
+    Send a message to the specified destination at a specific time.
 
     :type endpoint: void
     :param endpoint: The endpoint to send the data from.
@@ -3132,7 +3186,22 @@ def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dst: "char const *",
     :type time: float
     :param time: The time the message should be sent.
     """
-    return _helics.helicsEndpointSendEventRaw(endpoint, dst, data, time)
+    return _helics.helicsEndpointSendToAt(endpoint, dst, time, data)
+
+def helicsEndpointSendAt(endpoint: "helics_endpoint", time: "helics_time", data: "void const *") -> "int":
+    r"""
+    Send a message at a specific time to the targeted destinations
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type time: float
+    :param time: The time the message should be sent.
+    :type data: void
+    :param data: The data to send.
+
+
+    """
+    return _helics.helicsEndpointSendAt(endpoint, time, data)
 
 def helicsEndpointSendMessage(endpoint: "helics_endpoint", message: "helics_message") -> "void":
     r"""
@@ -3337,7 +3406,8 @@ def helicsEndpointSetOption(endpoint: "helics_endpoint", option: "int", value: "
     r"""
     Set a handle option on an endpoint.
 
-    :param end: The endpoint to modify.
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :type value: int
@@ -3349,13 +3419,68 @@ def helicsEndpointGetOption(endpoint: "helics_endpoint", option: "int") -> "int"
     r"""
     Set a handle option on an endpoint.
 
-    :param end: The endpoint to modify.
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :rtype: int
     :return: the value of the option, for boolean options will be 0 or 1
     """
     return _helics.helicsEndpointGetOption(endpoint, option)
+
+def helicsEndpointAddSourceTarget(endpoint: "helics_endpoint", targetEndpoint: "char const *") -> "void":
+    r"""
+    add a source target to an endpoint,  Specifying an endpoint to receive undirected messages from
+
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
+    :type targetEndpoint: string
+    :param targetEndpoint: the endpoint to get messages from
+    """
+    return _helics.helicsEndpointAddSourceTarget(endpoint, targetEndpoint)
+
+def helicsEndpointAddDestinationTarget(endpoint: "helics_endpoint", targetEndpoint: "char const *") -> "void":
+    r"""
+    add a destination target to an endpoint,  Specifying an endpoint to send undirected messages to
+
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
+    :type targetEndpoint: string
+    :param targetEndpoint: the name of the endpoint to send messages to
+    """
+    return _helics.helicsEndpointAddDestinationTarget(endpoint, targetEndpoint)
+
+def helicsEndpointRemoveTarget(endpoint: "helics_endpoint", targetEndpoint: "char const *") -> "void":
+    r"""
+    remove an endpoint from being targeted
+
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
+    :type targetEndpoint: string
+    :param targetEndpoint: the name of the endpoint to send messages to
+    """
+    return _helics.helicsEndpointRemoveTarget(endpoint, targetEndpoint)
+
+def helicsEndpointAddSourceFilter(endpoint: "helics_endpoint", filterName: "char const *") -> "void":
+    r"""
+    add a source Filter to an endpoint
+
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
+    :type filterName: string
+    :param filterName: the name of the filter to add
+    """
+    return _helics.helicsEndpointAddSourceFilter(endpoint, filterName)
+
+def helicsEndpointAddDestinationFilter(endpoint: "helics_endpoint", filterName: "char const *") -> "void":
+    r"""
+    add a destination filter to an endpoint
+
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
+    :param targetEndpoint: the name of the filter to add
+    """
+    return _helics.helicsEndpointAddDestinationFilter(endpoint, filterName)
 
 def helicsMessageGetSource(message: "helics_message") -> "char const *":
     r"""
