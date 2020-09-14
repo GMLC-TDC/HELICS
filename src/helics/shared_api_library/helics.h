@@ -1347,7 +1347,7 @@ HELICS_EXPORT void helicsFederateSendCommand(helics_federate fed, const char* ta
  *
  * @return a string with the command for the federate if the string is empty no command is available
  */
-HELICS_EXPORT const char * helicsFederateGetCommand(helics_federate fed, helics_error* err);
+HELICS_EXPORT const char* helicsFederateGetCommand(helics_federate fed, helics_error* err);
 
 /**
  * get the source of the most recently retrieved command sent to the federate
@@ -1401,7 +1401,6 @@ HELICS_EXPORT void helicsCoreSetGlobal(helics_core core, const char* valueName, 
  * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const char* value, helics_error* err);
-
 
 /**
  * Set a command to another helics object though a core

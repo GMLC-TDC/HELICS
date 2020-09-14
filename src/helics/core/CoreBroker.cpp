@@ -2985,10 +2985,9 @@ void CoreBroker::processCommandInstruction(ActionMessage& m)
 {
     if (m.dest_id == global_broker_id_local) {
         processLocalCommandInstruction(m);
-    }
-    else if (m.dest_id == parent_broker_id) {
+    } else if (m.dest_id == parent_broker_id) {
         const auto& target = m.getString(targetStringLoc);
-        if (target == "broker" || target==getIdentifier()) {
+        if (target == "broker" || target == getIdentifier()) {
             processLocalCommandInstruction(m);
         } else if (isRootc) {
             if (target == "federation" || target == "root") {
@@ -3041,7 +3040,7 @@ void CoreBroker::processCommandInstruction(ActionMessage& m)
 }
 
 void CoreBroker::checkDependencies()
-    {
+{
     if (isRootc) {
         for (const auto& newdep : delayedDependencies) {
             auto depfed = _federates.find(newdep.first);

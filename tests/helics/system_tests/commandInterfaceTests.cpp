@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value converters
  */
+#include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api/BrokerApp.hpp"
 
 #include <future>
 
@@ -40,13 +40,12 @@ TEST_F(command_tests, federate_federate_command)
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
-    auto cmd2=vFed2->getCommand();
+    auto cmd2 = vFed2->getCommand();
     EXPECT_EQ(cmd2.first, "test");
     EXPECT_EQ(cmd2.second, vFed1->getName());
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(command_tests, federate_federate_command2)
 {
@@ -90,7 +89,6 @@ TEST_F(command_tests, federate_federate_command4)
     vFed2->finalize();
 }
 
-
 TEST_F(command_tests, core_federate_command)
 {
     SetupTest<helics::ValueFederate>("test", 2);
@@ -102,7 +100,7 @@ TEST_F(command_tests, core_federate_command)
     vFed2->registerSubscription("pub1");
     auto cr = vFed1->getCorePointer();
 
-   cr->sendCommand(vFed2->getName(), "test","");
+    cr->sendCommand(vFed2->getName(), "test", "");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
@@ -136,7 +134,6 @@ TEST_F(command_tests, coreapp_federate_command)
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(command_tests, broker_federate_command)
 {
@@ -190,7 +187,6 @@ TEST_F(command_tests, brokerapp_federate_command)
     vFed2->finalize();
 }
 
-
 TEST_F(command_tests, federation_finalize_command)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
@@ -211,7 +207,6 @@ TEST_F(command_tests, federation_finalize_command)
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(command_tests, federation_finalize_core_command)
 {
@@ -234,7 +229,6 @@ TEST_F(command_tests, federation_finalize_core_command)
     vFed2->finalize();
 }
 
-
 TEST_F(command_tests, core_echo_command)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
@@ -244,12 +238,11 @@ TEST_F(command_tests, core_echo_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    auto cr=vFed1->getCorePointer();
+    auto cr = vFed1->getCorePointer();
     vFed1->sendCommand(cr->getIdentifier(), "echo");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-    
 
     auto cmd = vFed1->getCommand();
     EXPECT_EQ(cmd.first, "echo_reply");
@@ -258,8 +251,6 @@ TEST_F(command_tests, core_echo_command)
     vFed1->finalize();
     vFed2->finalize();
 }
-
-
 
 TEST_F(command_tests, broker_echo_command)
 {
@@ -283,7 +274,6 @@ TEST_F(command_tests, broker_echo_command)
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(command_tests, fed_echo_command)
 {
@@ -326,7 +316,7 @@ TEST_F(command_tests, fed_notify_command)
     EXPECT_TRUE(cmd.first.empty());
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     cmd = vFed1->getCommand();
-    EXPECT_EQ(cmd.first.compare(0,2,"\"1"), 0);
+    EXPECT_EQ(cmd.first.compare(0, 2, "\"1"), 0);
     EXPECT_EQ(cmd.second, vFed2->getName());
     cmd = vFed1->getCommand();
     EXPECT_EQ(cmd.first, "notify_response");

@@ -1671,11 +1671,11 @@ void FederateState::logMessage(int level,
     }
 }
 
-void FederateState::sendCommand(ActionMessage & command)
+void FederateState::sendCommand(ActionMessage& command)
 {
     auto cmd = command.payload.to_string();
     if (cmd == "terminate") {
-        if (parent_!=nullptr) {
+        if (parent_ != nullptr) {
             ActionMessage bye(CMD_DISCONNECT);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
@@ -1691,8 +1691,7 @@ void FederateState::sendCommand(ActionMessage & command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
-    }
-    else if (cmd == "command_status") {
+    } else if (cmd == "command_status") {
         ActionMessage response(CMD_SEND_COMMAND);
         response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
         response.dest_id = command.source_id;
@@ -1702,14 +1701,12 @@ void FederateState::sendCommand(ActionMessage & command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
-    }
-    else {
+    } else {
         commandQueue.emplace(cmd, command.getString(sourceStringLoc));
     }
-    
 }
 
-std::pair<std::string,std::string> FederateState::getCommand()
+std::pair<std::string, std::string> FederateState::getCommand()
 {
     auto val = commandQueue.try_pop();
     if (val->first == "notify") {
@@ -1721,12 +1718,12 @@ std::pair<std::string,std::string> FederateState::getCommand()
     return (val) ? *val : std::pair<std::string, std::string>{std::string{}, std::string{}};
 }
 
-std::pair<std::string,std::string> FederateState::waitCommand()
+std::pair<std::string, std::string> FederateState::waitCommand()
 {
-    auto val= commandQueue.pop();
+    auto val = commandQueue.pop();
     if (val.first == "notify") {
         if (parent_ != nullptr) {
-            parent_->sendCommand(val.second, "notify_response",name);
+            parent_->sendCommand(val.second, "notify_response", name);
         }
         val = commandQueue.pop();
     }

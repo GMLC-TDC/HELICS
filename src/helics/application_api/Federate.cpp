@@ -1110,7 +1110,7 @@ void Federate::sendCommand(const std::string& target, const std::string& command
     }
 }
 
-std::pair<std::string,std::string> Federate::getCommand()
+std::pair<std::string, std::string> Federate::getCommand()
 {
     if (coreObject) {
         return coreObject->getCommand(fedID);

@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <string>
-#include <optional>
 #include <utility>
 
 namespace gmlc {
@@ -358,23 +358,23 @@ class HELICS_CXX_EXPORT Federate {
     */
     void setGlobal(const std::string& valueName, const std::string& value);
 
-
-     /** send a command to another core or federate
-   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
-   specific name of a federate, core, or broker
-   @param commandStr a string with the command instructions see other documentation for specific properties to
-   command, can be defined by a federate
-   */
-    void sendCommand(const std::string& target, const std::string& queryStr);
-
-     /** get any commands for the Federate
+    /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
   specific name of a federate, core, or broker
-  @return a pair of strings <command,source> with the command instructions for the federate the command string will be empty if no command is given
+  @param commandStr a string with the command instructions see other documentation for specific
+  properties to command, can be defined by a federate
   */
+    void sendCommand(const std::string& target, const std::string& queryStr);
+
+    /** get any commands for the Federate
+ @param target  the target of the command can be "federation", "federate", "broker", "core", or a
+ specific name of a federate, core, or broker
+ @return a pair of strings <command,source> with the command instructions for the federate the
+ command string will be empty if no command is given
+ */
     std::pair<std::string, std::string> getCommand();
 
-        /** get a commands for the Federate, call will block until a command is received
+    /** get a commands for the Federate, call will block until a command is received
 @param target  the target of the command can be "federation", "federate", "broker", "core", or a
 specific name of a federate, core, or broker
 @return a pair of strings <command,source> with the command instructions for the federate

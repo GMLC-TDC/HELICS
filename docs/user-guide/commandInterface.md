@@ -1,8 +1,7 @@
 # Commands
 
-The command interface for HELICS was introduced in HELICS 3.0.  It is an asynchronous communication mechanism to send commands or other information to other components.
+The command interface for HELICS was introduced in HELICS 3.0. It is an asynchronous communication mechanism to send commands or other information to other components.
 Cores and Brokers will respond to a small subset of commands known by HELICS, but federates have a command interface to allow retrieval of commands for interpretation by a federate.
-
 
 The general function appears like
 
@@ -10,7 +9,7 @@ The general function appears like
 void sendCommand(const std::string& target, const std::string& commandStr)
 ```
 
-the same function is available for federates, cores, and brokers.  
+the same function is available for federates, cores, and brokers.
 
 ## Targets
 
@@ -32,8 +31,7 @@ A target is specified, and can be one of the following. A federate named one of 
 
 ## Command String
 
-The `commandStr` is a generic string, so can be anything the can be contained in a string object.  It is expected that most commandStr will have a json format, though a few simple ones are just plain strings.
-
+The `commandStr` is a generic string, so can be anything the can be contained in a string object. It is expected that most commandStr will have a json format, though a few simple ones are just plain strings.
 
 ### HELICS supported commands
 
@@ -53,8 +51,8 @@ The following queries are defined for federates. Federates may specify a callbac
 ```
 
 ### Future
-How this will get used is somewhat up in the air yet.  It is expected that future commands to the objects will help support debugging and other diagnostics but beyond that it is expected to evolve considerably.
 
+How this will get used is somewhat up in the air yet. It is expected that future commands to the objects will help support debugging and other diagnostics but beyond that it is expected to evolve considerably.
 
 ## Usage Notes
 
@@ -63,7 +61,7 @@ Commands that must traverse the network travel along priority paths.
 ### Application API
 
 There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
-To retreive a command addressed to a federate there are two commands
+To retrieve a command addressed to a federate there are two commands
 
 ```cpp
 std::pair<std::string,std::string>     getCommand();
@@ -71,9 +69,10 @@ std::pair<std::string,std::string>     waitCommand();
 ```
 
 The first will return immediately but the strings will be empty if there is no command available.
-The second is a blocking call and will only return if a command is available.  
+The second is a blocking call and will only return if a command is available.
 
-Equivalent calls in the C API are 
+Equivalent calls in the C API are
+
 ```c
 const char *helicsFederateGetCommand(helics_federate fed, helics_error *err);
 const char *helicsFederateWaitCommand(helics_federate fed, helics_error *err);

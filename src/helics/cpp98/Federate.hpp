@@ -146,16 +146,17 @@ class FederateInfo {
                                              propertyValue,
                                              HELICS_NULL_POINTER);
     }
-    void sendCommand(const std::string& target, const std::string& cmd){
-        helicsFederateSendCommand(fi,target.c_str(), cmd.c_str(), HELICS_IGNORE_ERROR);
-    }
-
-    const char* getCommand()
+    void sendCommand(const std::string& target, const std::string& cmd)
     {
-        return helicsFederateGetCommand(fi, HELICS_IGNORE_ERROR);
+        helicsFederateSendCommand(fi, target.c_str(), cmd.c_str(), HELICS_IGNORE_ERROR);
     }
 
-    const char* getCommandSource() { return helicsFederateGetCommandSource(fi, HELICS_IGNORE_ERROR); }
+    const char* getCommand() { return helicsFederateGetCommand(fi, HELICS_IGNORE_ERROR); }
+
+    const char* getCommandSource()
+    {
+        return helicsFederateGetCommandSource(fi, HELICS_IGNORE_ERROR);
+    }
     /** get the underlying helics_federate_info object*/
     helics_federate_info getInfo() { return fi; }
 
