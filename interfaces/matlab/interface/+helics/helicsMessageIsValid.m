@@ -1,3 +1,3 @@
 function varargout = helicsMessageIsValid(varargin)
-  [varargout{1:nargout}] = helicsMEX(257, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(266, varargin{:});
 end
