@@ -12,11 +12,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../api-data.h"
 #include "gmlc/concurrency/TripWire.hpp"
 
+
 #include <deque>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
+#include <utility>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int coreValidationIdentifier = 0x378424EC;
@@ -90,6 +92,7 @@ class FedObject {
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
     std::vector<std::unique_ptr<FilterObject>> filters;
+    std::pair<std::string,std::string> commandBuffer;
     FedObject() = default;
     ~FedObject();
 };
