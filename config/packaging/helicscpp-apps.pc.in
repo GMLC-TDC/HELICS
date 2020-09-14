@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libhelicscpp-apps
+Description: helics Apps C++ shared library
+URL: www.helics.org
+Version: @HELICS_VERSION@
+Libs: -L${libdir} -lhelicscpp-apps
+Libs.private:
+Requires: helicscpp
+Requires.private:
+Cflags:
