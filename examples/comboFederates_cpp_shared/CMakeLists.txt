@@ -11,7 +11,7 @@ add_executable(comboFed_shared comboFed.cpp)
 
 target_link_libraries(comboFed_shared PRIVATE compile_flags_target)
 set_target_properties(comboFed_shared PROPERTIES FOLDER examples)
-target_link_libraries(comboFed_shared PUBLIC helics-shared)
+target_link_libraries(comboFed_shared PUBLIC helicscpp)
 
 add_custom_command(
     TARGET comboFed_shared

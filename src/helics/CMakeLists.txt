@@ -40,9 +40,9 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
     add_subdirectory(cxx_shared_library)
 
     if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-        set_target_properties(helics-shared PROPERTIES FOLDER helics)
+        set_target_properties(helicscpp PROPERTIES FOLDER helics)
     endif()
-    generate_export_header(helics-shared BASE_NAME helics_cxx)
+    generate_export_header(helicscpp BASE_NAME helics_cxx)
     file(COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h
          DESTINATION ${PROJECT_BINARY_DIR}/include/helics_cxx/helics/application_api
     )
