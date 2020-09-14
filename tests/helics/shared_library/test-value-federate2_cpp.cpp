@@ -55,16 +55,17 @@ TEST_P(vfed_type_tests, test_block_send_receive)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_TRUE(sub1.isUpdated());
 
-    int len1 = sub1.getRawValueSize();
+    int len1 = sub1.getStringSize();
 
     EXPECT_EQ(len1, len);
     std::vector<char> rawdata;
     int actualLen = sub1.getRawValue(rawdata);
-    EXPECT_EQ(actualLen, len);
+    // raw value has an extra 8 bits
+    EXPECT_EQ(actualLen, len + 8);
 
     len1 = sub1.getRawValueSize();
 
-    EXPECT_EQ(len1, len);
+    EXPECT_EQ(len1, len + 8);
 
     EXPECT_FALSE(sub1.isUpdated());
 

@@ -92,7 +92,7 @@ class messageGenerator {
             for (int ii = 0; ii < perloop_message_; ++ii) {
                 auto src = messageSource(eng);
                 auto dest = messageDest(eng);
-                epts[src].send(destName + std::to_string(dest), message);
+                epts[src].sendTo(destName + std::to_string(dest), message);
             }
             mFed->requestNextStep();
             auto m = mFed->getMessage();

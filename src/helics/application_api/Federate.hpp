@@ -38,6 +38,7 @@ class MessageOperator;
 class FilterFederateManager;
 class Filter;
 class CloningFilter;
+class Federate;
 
 /** base class for a federate in the application API
  */
@@ -416,23 +417,6 @@ class HELICS_CXX_EXPORT Federate {
         return registerGlobalCloningFilter(std::string(), std::string(), std::string());
     }
 
-    /** add a source target to a filter
-   @param filt the filter object to add a source endpoint to
-   @param targetEndpoint the name of the endpoint to filter the data from
-   */
-    void addSourceTarget(const Filter& filt, const std::string& targetEndpoint);
-    /** add a destination target to a filter
-  @param filt a filter object
-  @param targetEndpoint the name of the endpoint to filter the data going to
-  */
-    void addDestinationTarget(const Filter& filt, const std::string& targetEndpoint);
-
-    /** get the name/key associated with an interface
-    @param handle the interface handle to query
-    @return empty string if an invalid id is passed otherwise the interface name or key (could be
-    empty if the interface was nameless*/
-    const std::string& getInterfaceName(interface_handle handle) const;
-
     /** get a filter from its name
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
@@ -474,6 +458,8 @@ class HELICS_CXX_EXPORT Federate {
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
     virtual void initializeToExecuteStateTransition();
+    /** function to handle any disconnect operations*/
+    virtual void disconnectTransition();
     /** function to generate results for a local Query
     @details should return an empty string if the query is not recognized*/
     virtual std::string localQuery(const std::string& queryStr) const;
@@ -491,9 +477,7 @@ class HELICS_CXX_EXPORT Federate {
     interfaces
     */
     void registerFilterInterfaces(const std::string& configString);
-    /** disconnect an interface from its targets and remove it from consideration
-     */
-    void closeInterface(interface_handle handle);
+
     /** get the underlying federateID for the core*/
     auto getID() const noexcept { return fedID; }
     /** get the current state of the federate*/
@@ -508,70 +492,6 @@ class HELICS_CXX_EXPORT Federate {
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount() const;
-    /** set the information field for an interface
-    @param handle the interface handle for any interface,  the interface handle can be created from
-    any interface object automatically
-    @param info the information to store
-    */
-    void setInfo(interface_handle handle, const std::string& info);
-    /** get the data currently stored for a particular interface handle
-    @param handle the handle to get the information for
-    @return a string with the data for the information*/
-    const std::string& getInfo(interface_handle handle);
-
-    /** set an interface option
-    @param handle the handle of an interface to modify
-    @param option the option field to modify
-    @param option_value the value to set (defaults to 1 or true), most options are boolean but some
-    allow for other values
-    */
-    void setInterfaceOption(interface_handle handle, int32_t option, int32_t option_value = 1);
-    /** get the current value for an interface option
-    @param handle the handle of an interface to modify
-    @param option the option field to modify
-    @return the current value of the interface option will be 0 for false 1 for true for boolean
-    options
-    */
-    int32_t getInterfaceOption(interface_handle handle, int32_t option);
-
-    /** get the injection type for an interface,  this is the type for data coming into an interface
-    @details for filters this is the input type, for publications this is type used to transmit
-    data, for endpoints this is the specified type and for inputs this is the type of the
-    transmitting publication
-    @param handle the interface handle to get the injection type for
-    @return a const ref to  std::string  */
-    const std::string& getInjectionType(interface_handle handle) const;
-
-    /** get the extraction type for an interface,  this is the type for data coming out of interface
-    @details for filters this is the output type, for publications this is the specified type, for
-    endpoints this is the specified type and for inputs this is the specified type
-    @param handle the interface handle to get the injection type for
-    @return a const ref to  std::string  */
-    const std::string& getExtractionType(interface_handle handle) const;
-
-    /** get the injection units for an interface,  this is the units associated with data coming
-  into an interface
-  @details for inputs this is the input type, for publications this is the units used to transmit
-  data, and for inputs this is the units of the transmitting publication
-  @param handle the interface handle to get the injection units for
-  @return a const ref to  std::string  */
-    const std::string& getInjectionUnits(interface_handle handle) const;
-
-    /** get the extraction type for an interface,  this is the units associated with data coming out
-    of an interface
-    @details for publications this is the specified units, for inputs this is the specified type
-    @param handle the interface handle to get the injection type for
-    @return a const ref to  std::string  */
-    const std::string& getExtractionUnits(interface_handle handle) const;
-    /** get the units associated with an interface
-    @details this function will is identical to getExtractionUnits
-    @param handle the interface handle to get the extraction units for
-    @return a const ref to  std::string containing the units */
-    const std::string& getInterfaceUnits(interface_handle handle) const
-    {
-        return getExtractionUnits(handle);
-    }
-
     /** log a message to the federate Logger
    @param level the logging level of the message
    @param message the message to log
@@ -620,6 +540,97 @@ class HELICS_CXX_EXPORT Federate {
     @param tomlString  the location of the file or config String to load to generate the interfaces
     */
     void registerFilterInterfacesToml(const std::string& tomlString);
+};
+
+/** base class for the interface objects*/
+class HELICS_CXX_EXPORT Interface {
+  protected:
+    Core* cr{nullptr};  //!< pointer to the core object
+    interface_handle handle{};  //!< the id as generated by the Federate
+    std::string mName;  //!< the name or key of the interface
+  public:
+    Interface() = default;
+    Interface(Federate* federate, interface_handle id, std::string_view actName);
+    Interface(Core* core, interface_handle id, std::string_view actName):
+        cr(core), handle(id), mName(actName)
+    {
+    }
+    virtual ~Interface() = default;
+    /** get the underlying handle that can be used to make direct calls to the Core API
+     */
+    interface_handle getHandle() const { return handle; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle() const { return handle; }
+    /** check if the Publication links to a valid operation*/
+    bool isValid() const { return handle.isValid(); }
+    bool operator<(const Interface& inp) const { return (handle < inp.handle); }
+    bool operator>(const Interface& inp) const { return (handle > inp.handle); }
+    bool operator==(const Interface& inp) const { return (handle == inp.handle); }
+    bool operator!=(const Interface& inp) const { return (handle != inp.handle); }
+    /** get the Name/Key for the input
+    @details the name is the local name if given, key is the full key name*/
+    const std::string& getName() const { return mName; }
+    /** get the Name/Key for the input
+    @details the name is the local name if given, key is the full key name*/
+    const std::string& getKey() const;
+    /** get an associated target*/
+    const std::string& getTarget() const;
+    /** subscribe to a named publication*/
+    void addSourceTarget(std::string_view newTarget);
+    /** subscribe to a named publication*/
+    void addDestinationTarget(std::string_view newTarget);
+    /** remove a named publication from being a target*/
+    void removeTarget(std::string_view targetToRemove);
+
+    /** get the interface information field of the input*/
+    const std::string& getInfo() const;
+    /** set the interface information field of the input*/
+    void setInfo(const std::string& info);
+    /** set a handle flag for the input*/
+    virtual void setOption(int32_t option, int32_t value = 1);
+
+    /** get the current value of a flag for the handle*/
+    virtual int32_t getOption(int32_t option) const;
+
+    /** get the injection type for an interface,  this is the type for data coming into an interface
+    @details for filters this is the input type, for publications this is the type used to transmit
+    data, for endpoints this is the specified type and for inputs this is the type of the
+    transmitting publication
+    @return a const ref to  std::string  */
+    const std::string& getInjectionType() const;
+
+    /** get the extraction type for an interface,  this is the type for data coming out of an
+    interface
+    @details for filters this is the output type, for publications this is the specified type, for
+    endpoints this is the specified type and for inputs this is the specified type
+    @return a const ref to  std::string  */
+    const std::string& getExtractionType() const;
+
+    /** get the injection units for an interface,  this is the units associated with data coming
+  into an interface
+  @details for inputs this is the input type, for publications this is the units used to transmit
+  data, and for inputs this is the units of the transmitting publication
+  @return a const ref to  std::string  */
+    const std::string& getInjectionUnits() const;
+
+    /** get the extraction units for an interface,  this is the units associated with data coming
+    out of an interface
+    @details for publications this is the specified units, for inputs this is the specified type
+    @return a const ref to  std::string  */
+    const std::string& getExtractionUnits() const;
+    /** get the display name for an input
+    @details the name is the given local name or if empty the name of the target*/
+    virtual const std::string& getDisplayName() const = 0;
+    /** get the source targets for an interface, either the sources for endpoints or inputs, or the
+     * source endpoints for a filter*/
+    const std::string& getSourceTargets() const;
+    /** get the destination targets for an interface, either the destinations of data for endpoints
+     * or publications, or the destination endpoints for a filter*/
+    const std::string& getDestinationTargets() const;
+    /** close the interface*/
+    void close();
+    /** disconnect the object from the core*/
+    void disconnectFromCore();
 };
 
 /** function to do some housekeeping work

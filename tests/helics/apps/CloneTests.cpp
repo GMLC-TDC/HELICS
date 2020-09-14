@@ -122,11 +122,11 @@ TEST(clone_tests, simple_clone_test_message)
     mfed.enterExecutingMode();
     auto retTime = mfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
-    ept.send("ept3", "message");
+    ept.sendTo("ept3", "message");
 
     retTime = mfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    ept2.send("ept1", "reply");
+    ept2.sendTo("ept1", "reply");
 
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 3.0);
@@ -175,11 +175,11 @@ TEST(clone_tests, simple_clone_test_combo)
     mfed.enterExecutingMode();
     auto retTime = mfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
-    ept.send("ept3", "message");
+    ept.sendTo("ept3", "message");
     pub1.publish(3.4);
     retTime = mfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    ept2.send("ept1", "reply");
+    ept2.sendTo("ept1", "reply");
     pub1.publish(4.7);
     pub2.publish(3.3);
     retTime = mfed.requestTime(5);

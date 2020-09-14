@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederateTestTemplates.hpp"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/Core.hpp"
@@ -719,8 +718,7 @@ TEST_P(valuefed_single_type, transfer_close)
     // make sure the value is still what we expect
     s = subid.getString();
     EXPECT_EQ(s, "string1");
-
-    vFed1->closeInterface(pubid.getHandle());
+    pubid.close();
     // advance time
     gtime = vFed1->requestTime(2.0);
     // make sure the value was updated
@@ -820,7 +818,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     subid.getValue(s);
     EXPECT_EQ(s, "string1");
     // advance time
-    vFed1->closeInterface(pubid.getHandle());
+    pubid.close();
     f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(2.0); });
     gtime = vFed2->requestTime(2.0);
 

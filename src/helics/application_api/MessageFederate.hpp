@@ -6,12 +6,14 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "Endpoints.hpp"
 #include "Federate.hpp"
 #include "data_view.hpp"
 
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace helics {
 class MessageFederateManager;
@@ -99,6 +101,14 @@ class HELICS_CXX_EXPORT MessageFederate:
     Endpoint& registerEndpoint(const std::string& eptName = std::string(),
                                const std::string& type = std::string());
 
+    /** register a targeted endpoint
+    @details this type of endpoint can can send messages to predefined targets
+    @param eptName the name of the endpoint
+    @param type the defined type of the interface for endpoint checking if requested
+    */
+    Endpoint& registerTargetedEndpoint(const std::string& eptName = std::string(),
+                                       const std::string& type = std::string());
+
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
     @param eptName the name of the endpoint
@@ -107,6 +117,14 @@ class HELICS_CXX_EXPORT MessageFederate:
     */
     Endpoint& registerGlobalEndpoint(const std::string& eptName,
                                      const std::string& type = std::string());
+
+    /** register a targeted endpoint directly without prepending the federate name
+  @param eptName the name of the endpoint
+  @param type the defined type of the interface for endpoint checking if requested
+  @return a Reference to an Endpoint Object
+  */
+    Endpoint& registerGlobalTargetedEndpoint(const std::string& eptName,
+                                             const std::string& type = std::string());
 
     /** register an indexed Endpoint
     @details register a global endpoint as part of a 1D array of endpoints
@@ -144,19 +162,11 @@ class HELICS_CXX_EXPORT MessageFederate:
     void registerMessageInterfacesToml(const std::string& tomlString);
 
   public:
-    /** give the core a hint for known communication paths
-    @details the function will generate an error in the core if a communication path is not present
-    once the simulation is initialized
-    @param localEndpoint the local endpoint of a known communication pair
-    @param remoteEndpoint of a communication pair
-    */
-    void registerKnownCommunicationPath(const Endpoint& localEndpoint,
-                                        const std::string& remoteEndpoint);
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
     @param ept the specified endpoint to deliver the values
     @param key the name of the publication to subscribe
     */
-    void subscribe(const Endpoint& ept, const std::string& key);
+    void subscribe(const Endpoint& ept, std::string_view key);
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
     /* check if a given endpoint has any unread messages*/
@@ -180,68 +190,6 @@ class HELICS_CXX_EXPORT MessageFederate:
     @return a unique_ptr to a Message object containing the message data*/
     std::unique_ptr<Message> getMessage();
 
-    /** send a message
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param data a buffer containing the data
-    @param dataLength the length of the data buffer
-    */
-    void sendMessage(const Endpoint& source,
-                     const std::string& dest,
-                     const char* data,
-                     size_t dataLength)
-    {
-        sendMessage(source, dest, data_view(data, dataLength));
-    }
-    /** send a message
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param message a data_view of the message
-    */
-    void sendMessage(const Endpoint& source, const std::string& dest, const data_view& message);
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param data a buffer containing the data
-    @param dataLength the length of the data buffer
-    @param sendTime the time the message should be sent
-    */
-    void sendMessage(const Endpoint& source,
-                     const std::string& dest,
-                     const char* data,
-                     size_t dataLength,
-                     Time sendTime)
-    {
-        sendMessage(source, dest, data_view(data, dataLength), sendTime);
-    }
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param dest a string naming the destination
-    @param message a data_view of the message data to send
-    @param sendTime the time the message should be sent
-    */
-    void sendMessage(const Endpoint& source,
-                     const std::string& dest,
-                     const data_view& message,
-                     Time sendTime);
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param message a pointer to the message
-    */
-    void sendMessage(const Endpoint& source, std::unique_ptr<Message> message);
-
-    /** send an event message at a particular time
-    @details send a message to a specific destination
-    @param source the source endpoint
-    @param message a message object
-    */
-    void sendMessage(const Endpoint& source, const Message& message);
-
     /** get an endpoint by its name
     @param name the Endpoint
     @return an Endpoint*/
@@ -262,11 +210,6 @@ class HELICS_CXX_EXPORT MessageFederate:
     */
     void setMessageNotificationCallback(const Endpoint& ept,
                                         const std::function<void(Endpoint&, Time)>& callback);
-
-    /** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter(const Endpoint& ept, const std::string& filterName);
-    /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter(const Endpoint& ept, const std::string& filterName);
 
     virtual void disconnect() override;
 

@@ -66,6 +66,55 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federa
                                                                    helics_error* err);
 
 /**
+ * Create a targeted endpoint.  Targeted endpoints have specific destinations predefined and do not allow sending messages to other
+ * endpoints
+ *
+ * @details The endpoint becomes part of the federate and is destroyed when the federate is freed
+ *          so there are no separate free functions for endpoints.
+ *
+ * @param fed The federate object in which to create an endpoint must have been created
+ *           with helicsCreateMessageFederate or helicsCreateCombinationFederate.
+ * @param name The identifier for the endpoint. This will be prepended with the federate name for the global identifier.
+ * @param type A string describing the expected type of the publication (may be NULL).
+ * @forcpponly
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ *
+ * @return An object containing the endpoint.
+ * @forcpponly
+ *         nullptr on failure.
+ * @endforcpponly
+ */
+HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(helics_federate fed,
+                                                                     const char* name,
+                                                                     const char* type,
+                                                                     helics_error* err);
+
+/**
+ * Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other
+ endpoints
+ *
+ * @details The endpoint becomes part of the federate and is destroyed when the federate is freed
+ *          so there are no separate free functions for endpoints.
+ *
+ * @param fed The federate object in which to create an endpoint must have been created
+              with helicsCreateMessageFederate or helicsCreateCombinationFederate.
+ * @param name The identifier for the endpoint, the given name is the global identifier.
+ * @param type A string describing the expected type of the publication (may be NULL).
+ * @forcpponly
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ * @return An object containing the endpoint.
+ * @forcpponly
+ *         nullptr on failure.
+ * @endforcpponly
+ */
+HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(helics_federate fed,
+                                                                           const char* name,
+                                                                           const char* type,
+                                                                           helics_error* err);
+
+/**
  * Get an endpoint object from a name.
  *
  * @param fed The message federate object to use to get the endpoint.
@@ -127,6 +176,18 @@ HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint,
 HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint);
 
 /**
+ * Send a message to the targeted destination.
+ *
+ * @param endpoint The endpoint to send the data from.
+ * @param data The data to send.
+ * @forcpponly
+ * @param inputDataLength The length of the data to send.
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err);
+
+/**
  * Send a message to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
@@ -144,10 +205,10 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dst, const void* data, int inputDataLength, helics_error* err);
+    helicsEndpointSendTo(helics_endpoint endpoint, const char* dst, const void* data, int inputDataLength, helics_error* err);
 
 /**
- * Send a message at a specific time to the specified destination.
+ * Send a message to the specified destination at a specific time.
  *
  * @param endpoint The endpoint to send the data from.
  * @param dst The target destination.
@@ -166,12 +227,31 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendEventRaw(helics_endpoint endpoint,
-                                              const char* dst,
-                                              const void* data,
-                                              int inputDataLength,
-                                              helics_time time,
-                                              helics_error* err);
+
+HELICS_EXPORT void helicsEndpointSendToAt(helics_endpoint endpoint,
+                                          const char* dst,
+                                          helics_time time,
+                                          const void* data,
+                                          int inputDataLength,
+                                          helics_error* err);
+
+/**
+ * Send a message at a specific time to the targeted destinations
+ *
+ * @param endpoint The endpoint to send the data from.
+ * @param time The time the message should be sent.
+ * @param data The data to send.
+ * @forcpponly
+ * @param inputDataLength The length of the data to send.
+ * @endforcpponly
+
+ * @forcpponly
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ */
+
+HELICS_EXPORT void
+    helicsEndpointSendAt(helics_endpoint endpoint, helics_time time, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Send a message object from a specific endpoint.
@@ -346,7 +426,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* i
 /**
  * Set a handle option on an endpoint.
  *
- * @param end The endpoint to modify.
+ * @param endpoint The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @param value The value to set the option to.
  * @forcpponly
@@ -358,11 +438,66 @@ HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option,
 /**
  * Set a handle option on an endpoint.
  *
- * @param end The endpoint to modify.
+ * @param endpoint The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @return the value of the option, for boolean options will be 0 or 1
  */
 HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint endpoint, int option);
+
+/**
+ * add a source target to an endpoint,  Specifying an endpoint to receive undirected messages from
+ *
+ * @param endpoint The endpoint to modify.
+ * @param targetEndpoint the endpoint to get messages from
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
+
+/**
+ * add a destination target to an endpoint,  Specifying an endpoint to send undirected messages to
+ *
+ * @param endpoint The endpoint to modify.
+ * @param targetEndpoint the name of the endpoint to send messages to
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
+
+/**
+ * remove an endpoint from being targeted
+ *
+ * @param endpoint The endpoint to modify.
+ * @param targetEndpoint the name of the endpoint to send messages to
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
+
+/**
+ * add a source Filter to an endpoint
+ *
+ * @param endpoint The endpoint to modify.
+ * @param filterName the name of the filter to add
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointAddSourceFilter(helics_endpoint endpoint, const char* filterName, helics_error* err);
+
+/**
+ * add a destination filter to an endpoint
+ *
+ * @param endpoint The endpoint to modify.
+ * @param targetEndpoint the name of the filter to add
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointAddDestinationFilter(helics_endpoint endpoint, const char* filterName, helics_error* err);
 
 /**
  * \defgroup Message operation functions

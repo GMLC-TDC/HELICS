@@ -344,7 +344,7 @@ class SmallBuffer {
     }
 
   private:
-    std::array<std::byte, 64> buffer{};
+    std::array<std::byte, 64> buffer{std::byte{0}};
     std::size_t bufferSize{0};
     std::size_t bufferCapacity{64};
     std::byte* heap;

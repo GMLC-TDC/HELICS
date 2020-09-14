@@ -74,6 +74,8 @@ class FilterFederateManager {
     int getFilterCount() const;
     /** close all filters*/
     void closeAllFilters();
+    /** close all filters*/
+    void disconnectAllFilters();
 
   private:
     Core* coreObject = nullptr;

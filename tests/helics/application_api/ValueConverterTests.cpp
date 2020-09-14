@@ -378,7 +378,7 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(std::vector<double>{3.5, 2.7, -9.3},
                       std::vector<double>{},
                       std::vector<double>(25, 97.7),
-                      std::vector<double>(151341.1514),
+                      std::vector<double>{151341.1514},
                       std::vector<double>(0.0),
                       std::vector<double>{0.0, -7.2},
                       std::vector<double>{std::numeric_limits<double>::infinity(),

@@ -94,7 +94,7 @@ TEST(tracer_tests, tracer_test_message)
     mfed.enterExecutingMode();
 
     auto retTime = mfed.requestTime(1.0);
-    e1.send("src1", "this is a test message");
+    e1.sendTo("src1", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
     retTime = mfed.requestTime(2.0);
     int cnt = 0;
@@ -112,7 +112,7 @@ TEST(tracer_tests, tracer_test_message)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->dest, "src1");
     }
-    e1.send("src1", "this is a test message2");
+    e1.sendTo("src1", "this is a test message2");
     EXPECT_EQ(retTime, 2.0);
     mfed.finalize();
     cnt = 0;
@@ -233,7 +233,7 @@ TEST_P(tracer_message_file_tests, test_message_files)
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.send("src1", "this is a test message");
+    e1.sendTo("src1", "this is a test message");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -241,7 +241,7 @@ TEST_P(tracer_message_file_tests, test_message_files)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.send("src1", "this is a test message2");
+    e1.sendTo("src1", "this is a test message2");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);
@@ -293,7 +293,7 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.send("src1", "this is a test message");
+    e1.sendTo("src1", "this is a test message");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -301,7 +301,7 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.send("src1", "this is a test message2");
+    e1.sendTo("src1", "this is a test message2");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);
@@ -356,7 +356,7 @@ TEST(tracer_tests, tracer_test_destendpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.send("d2", "this is a test message");
+    e1.sendTo("d2", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -379,7 +379,7 @@ TEST(tracer_tests, tracer_test_destendpoint_clone)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
-    e2.send("d1", "this is a test message2");
+    e2.sendTo("d1", "this is a test message2");
     mfed.finalize();
     mfed2.finalize();
     cnt = 0;
@@ -434,7 +434,7 @@ TEST(tracer_tests, srcendpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.send("d2", "this is a test message");
+    e1.sendTo("d2", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -456,7 +456,7 @@ TEST(tracer_tests, srcendpoint_clone)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
-    e2.send("d1", "this is a test message2");
+    e2.sendTo("d1", "this is a test message2");
 
     mfed.finalize();
     mfed2.finalize();
@@ -506,7 +506,7 @@ TEST(tracer_tests, tracer_test_endpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.send("d2", "this is a test message");
+    e1.sendTo("d2", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -528,7 +528,7 @@ TEST(tracer_tests, tracer_test_endpoint_clone)
         EXPECT_EQ((*mhandle)->source, "d1");
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
-    e2.send("d1", "this is a test message2");
+    e2.sendTo("d1", "this is a test message2");
 
     mfed.finalize();
     mfed2.finalize();
@@ -588,7 +588,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.send("d2", "this is a test message");
+    e1.sendTo("d2", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
 
     mfed2.requestTimeAsync(2.0);
@@ -611,7 +611,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
 
-    e2.send("d1", "this is a test message2");
+    e2.sendTo("d1", "this is a test message2");
     mfed.finalize();
     mfed2.finalize();
     fut.get();
@@ -653,7 +653,7 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.send("src1", "this is a test message");
+    e1.sendTo("src1", "this is a test message");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -661,7 +661,7 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.send("src1", "this is a test message2");
+    e1.sendTo("src1", "this is a test message2");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);

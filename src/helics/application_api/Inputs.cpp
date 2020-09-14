@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
+#include "ValueFederate.hpp"
 #include "units/units/units.hpp"
 
 #include <algorithm>
@@ -21,8 +22,8 @@ Input::Input(ValueFederate* valueFed,
              interface_handle id,
              const std::string& actName,
              const std::string& unitsOut):
-    fed(valueFed),
-    handle(id), actualName(actName)
+    Interface(valueFed, id, actName),
+    fed(valueFed)
 {
     if (!unitsOut.empty()) {
         outputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(unitsOut));
@@ -64,6 +65,11 @@ Input::Input(interface_visibility locality,
             throw;
         }
     }
+}
+
+void Input::setDefaultRaw(data_view val)
+{
+    fed->setDefaultValue(*this, val);
 }
 
 void Input::handleCallback(Time time)
@@ -546,7 +552,7 @@ void Input::setOption(int32_t option, int32_t value)
     if (option == helics_handle_option_multi_input_handling_method) {
         inputVectorOp = static_cast<multi_input_handling_method>(value);
     } else {
-        fed->setInterfaceOption(handle, option, value);
+        Interface::setOption(option, value);
     }
 }
 
@@ -556,7 +562,7 @@ int32_t Input::getOption(int32_t option) const
     if (option == helics_handle_option_multi_input_handling_method) {
         return static_cast<int32_t>(inputVectorOp);
     }
-    return fed->getInterfaceOption(handle, option);
+    return Interface::getOption(option);
 }
 
 bool Input::isUpdated()
@@ -581,6 +587,34 @@ void Input::clearUpdate()
     fed->clearUpdate(*this);
 }
 
+Time Input::getLastUpdate() const
+{
+    return fed->getLastUpdateTime(*this);
+}
+
+/** register a callback for an update notification
+@details the callback is called just before the time request function returns
+@param callback a function with signature void(Time time)
+time is the time the value was updated,  this callback is a notification callback and doesn't
+return the value
+*/
+void Input::registerNotificationCallback(std::function<void(Time)> callback)
+{
+    fed->setInputNotificationCallback(*this,
+                                      [this, callback = std::move(callback)](const Input& /*inp*/,
+                                                                             Time time) {
+                                          if (isUpdated()) {
+                                              callback(time);
+                                          }
+                                      });
+}
+
+void Input::registerCallback()
+{
+    fed->setInputNotificationCallback(*this, [this](Input& /*unused*/, Time time) {
+        handleCallback(time);
+    });
+}
 size_t Input::getRawSize()
 {
     isUpdated();
@@ -590,6 +624,14 @@ size_t Input::getRawSize()
         return out.size();
     }
     return dv.size();
+}
+
+void Input::addTarget(const std::string& target)
+{
+    if (givenTarget.empty()) {
+        givenTarget = target;
+    }
+    fed->addTarget(*this, target);
 }
 
 data_view Input::getRawValue()
@@ -659,11 +701,11 @@ size_t Input::getVectorSize()
 void Input::loadSourceInformation()
 {
     if (targetType == data_type::helics_unknown) {
-        targetType = getTypeFromString(fed->getExtractionType(*this));
+        targetType = getTypeFromString(getExtractionType());
     }
     multiUnits = false;
-    const auto& iType = fed->getInjectionType(*this);
-    const auto& iUnits = fed->getInjectionUnits(*this);
+    const auto& iType = getInjectionType();
+    const auto& iUnits = getInjectionUnits();
     injectionType = getTypeFromString(iType);
     if ((injectionType == data_type::helics_multi) || (!iUnits.empty() && iUnits.front() == '[')) {
         sourceTypes.clear();
@@ -738,10 +780,16 @@ void integerExtractAndConvert(defV& store,
     }
 }
 
+data_view Input::checkAndGetFedUpdate()
+{
+    return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getValueRaw(*this)) :
+                                                                    data_view{};
+}
+
 char Input::getValueChar()
 {
-    if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
-        auto dv = fed->getValueRaw(*this);
+    auto dv = checkAndGetFedUpdate();
+    if (!dv.empty()) {
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }

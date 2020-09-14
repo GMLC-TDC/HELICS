@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../core/core-exceptions.hpp"
+#include "Federate.hpp"
 #include "HelicsPrimaryTypes.hpp"
-#include "ValueFederate.hpp"
 
 #include <memory>
 #include <string>
@@ -19,11 +19,11 @@ class precise_unit;
 }  // namespace units
 
 namespace helics {
+class ValueFederate;
 /** define a publication object in the C++98 interface*/
-class HELICS_CXX_EXPORT Publication {
+class HELICS_CXX_EXPORT Publication: public Interface {
   protected:
     ValueFederate* fed{nullptr};  //!< the federate construct to interact with
-    interface_handle handle;  //!< the internal id of the publication
   private:
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
@@ -36,7 +36,6 @@ class HELICS_CXX_EXPORT Publication {
     size_t customTypeHash{
         0};  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
     mutable defV prevValue;  //!< the previous value of the publication
-    std::string pubKey;  //!< the name of the publication
     std::string pubUnits;  //!< the defined units of the publication
     std::shared_ptr<units::precise_unit>
         pubUnitType;  //!< a unit representation of the publication unit Type;
@@ -174,52 +173,16 @@ class HELICS_CXX_EXPORT Publication {
     {
     }
 
-    /** get the publication id that can be used to make the function calls from a Value Federate
-     */
-    interface_handle getHandle() const { return handle; }
-    /** implicit conversion operator for extracting the handle*/
-    operator interface_handle() const { return handle; }
-
-    /** check if the Publication links to a valid operation*/
-    bool isValid() const { return handle.isValid(); }
-    bool operator==(const Publication& pub) const { return (handle == pub.handle); }
-    bool operator!=(const Publication& pub) const { return (handle != pub.handle); }
-    bool operator<(const Publication& pub) const { return (handle < pub.handle); }
-
-    /** get the key for the publication*/
-    const std::string& getKey() const { return fed->getInterfaceName(*this); }
-    /** get the key for the publication*/
-    const std::string& getName() const { return pubKey; }
     /** get the type for the publication*/
-    const std::string& getType() const { return fed->getExtractionType(*this); }
+    const std::string& getType() const { return getExtractionType(); }
     /** get the units of the publication*/
     const std::string& getUnits() const { return pubUnits; }
-    /** get the interface information field of the publication*/
-    const std::string& getInfo() const { return fed->getInfo(handle); }
-    /** set the interface information field of the publication*/
-    void setInfo(const std::string& info) { fed->setInfo(handle, info); }
-    /** set an option on the publication
-    @param option the option to set
-    @param value the value to set the option*/
-    void setOption(int32_t option, int32_t value = 1)
-    {
-        fed->setInterfaceOption(handle, option, value);
-    }
 
-    /** get the current value of a flag for the handle*/
-    int32_t getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
-
-    /** add a target to the publication*/
-    void addTarget(const std::string& target) { fed->addTarget(*this, target); }
-    /** remove a named input from sending data*/
-    void removeTarget(const std::string& targetToRemove)
-    {
-        fed->removeTarget(*this, targetToRemove);
-    }
+    void addTarget(std::string_view target) { addDestinationTarget(target); }
     /** close a input during an active simulation
     @details it is not necessary to call this function unless you are continuing the simulation
     after the close*/
-    void close() { fed->closeInterface(handle); }
+
     /** send a value for publication
     @param val the value to publish*/
     void publish(double val);
@@ -233,7 +196,7 @@ class HELICS_CXX_EXPORT Publication {
     void publish(Time val);
     void publish(char val);
     void publish(const NamedPoint& np);
-    void publish(std::string_view name, double val);
+    void publish(std::string_view field, double val);
     /** secondary publish function to allow unit conversion before publication
     @param val the value to publish
     @param units  the units association with the publication
@@ -282,6 +245,8 @@ class HELICS_CXX_EXPORT Publication {
     */
     void enableChangeDetection(bool enabled = true) noexcept { changeDetectionEnabled = enabled; }
 
+    virtual const std::string& getDisplayName() const override { return getName(); }
+
   private:
     /** implementation of the integer publications
     @details this is the same as the other publish function but is used in the template due to
@@ -294,17 +259,4 @@ class HELICS_CXX_EXPORT Publication {
     friend class ValueFederateManager;
 };
 
-/** publish directly from the publication key name
-@details this is a convenience function to publish directly from the publication key
-this function should not be used as the primary means of publications as it does involve an
-additional map find operation vs the member publish calls
-@param fed a reference to a valueFederate
-@param pubKey  the name of the publication
-@param pargs any combination of arguments that go into the other publish commands
-*/
-template<class... Us>
-void publish(ValueFederate& fed, const std::string& pubKey, Us... pargs)
-{
-    fed.getPublication(pubKey).publish(pargs...);
-}
 }  // namespace helics
