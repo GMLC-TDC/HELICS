@@ -285,7 +285,8 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual std::string query(const std::string& target,
                               const std::string& queryStr) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
-    virtual void sendCommand(const std::string& target, const std::string& commandStr) override final;
+    virtual void sendCommand(const std::string& target,
+                             const std::string& commandStr) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& publication, const std::string& input) override final;
 
@@ -329,7 +330,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::string generateQueryAnswer(std::string_view request);
     /** process a command instruction message*/
     void processCommandInstruction(ActionMessage& m);
-    /** process a command instruction targetted at this broker*/
+    /** process a command instruction targeted at this broker*/
     void processLocalCommandInstruction(ActionMessage& m);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;

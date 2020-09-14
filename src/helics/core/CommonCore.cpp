@@ -2380,7 +2380,9 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
 {
     auto cmd = command.payload.to_string();
     if (cmd == "terminate") {
-        LOG_SUMMARY(global_broker_id_local, getIdentifier(), " received terminate instruction via command instruction")
+        LOG_SUMMARY(global_broker_id_local,
+                    getIdentifier(),
+                    " received terminate instruction via command instruction")
         ActionMessage udisconnect(CMD_USER_DISCONNECT);
         addActionMessage(udisconnect);
     } else if (cmd == "echo") {
@@ -2392,8 +2394,7 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
         command.setString(targetStringLoc, command.getString(sourceStringLoc));
         command.setString(sourceStringLoc, getIdentifier());
         addActionMessage(command);
-    }
-    else {
+    } else {
         LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
                     fmt::format(" unrecognized command instruction \"{}\"", cmd));
@@ -2615,20 +2616,21 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
     addActionMessage(std::move(querycmd));
 }
 
-void CommonCore::sendCommand(const std::string& target, const std::string& commandStr, const std::string &source)
+void CommonCore::sendCommand(const std::string& target,
+                             const std::string& commandStr,
+                             const std::string& source)
 {
     ActionMessage cmdcmd(CMD_SEND_COMMAND);
     cmdcmd.dest_id = parent_broker_id;
     cmdcmd.payload = commandStr;
-    cmdcmd.setString(targetStringLoc,target);
+    cmdcmd.setString(targetStringLoc, target);
     if (!source.empty()) {
         cmdcmd.setString(sourceStringLoc, source);
         const auto* fed = getFederate(source);
-        if (fed!=nullptr) {
+        if (fed != nullptr) {
             cmdcmd.source_id = fed->global_id;
         }
-    }
-    else {
+    } else {
         cmdcmd.setString(sourceStringLoc, getIdentifier());
         cmdcmd.source_id = getGlobalId();
     }

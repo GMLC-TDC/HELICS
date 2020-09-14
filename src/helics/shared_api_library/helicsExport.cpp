@@ -610,7 +610,6 @@ void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* va
     cr->setGlobal(valueName, AS_STRING(value));
 }
 
-
 void helicsCoreSendCommand(helics_core core, const char* target, const char* command, helics_error* err)
 {
     auto* cr = getCore(core, err);

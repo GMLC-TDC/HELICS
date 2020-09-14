@@ -105,7 +105,7 @@ class FederateState {
         mTimer;  //!< message timer object for real time operations and timeouts
     gmlc::containers::BlockingQueue<ActionMessage>
         queue;  //!< processing queue for messages incoming to a federate
-    gmlc::containers::BlockingQueue<std::pair<std::string,std::string>>
+    gmlc::containers::BlockingQueue<std::pair<std::string, std::string>>
         commandQueue;  //!< processing queue for messages incoming to a federate
     std::atomic<uint16_t> interfaceFlags{
         0};  //!< current defaults for operational flags of interfaces for this federate

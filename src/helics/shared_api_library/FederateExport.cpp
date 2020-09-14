@@ -1225,7 +1225,8 @@ void helicsFederateLogLevelMessage(helics_federate fed, int loglevel, const char
     fedObj->logMessage(loglevel, AS_STRING(logmessage));
 }
 
-void helicsFederateSendCommand(helics_federate fed, const char* target, const char* command, helics_error* err) {
+void helicsFederateSendCommand(helics_federate fed, const char* target, const char* command, helics_error* err)
+{
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
         return;
@@ -1233,10 +1234,10 @@ void helicsFederateSendCommand(helics_federate fed, const char* target, const ch
     fedObj->sendCommand(AS_STRING(target), AS_STRING(command));
 }
 
-
-const char* helicsFederateGetCommand(helics_federate fed, helics_error* err) {
+const char* helicsFederateGetCommand(helics_federate fed, helics_error* err)
+{
     auto* fedObj = helics::getFedObject(fed, err);
-    
+
     if (fedObj == nullptr) {
         return emptyStr.c_str();
     }

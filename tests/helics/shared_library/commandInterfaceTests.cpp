@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-
 class command_tests: public ::testing::Test, public FederateTestFixture {
 };
 
@@ -24,24 +23,21 @@ TEST_F(command_tests, federate_federate_command)
     helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
     helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
-    helicsFederateSendCommand(vFed1, helicsFederateGetName(vFed2), "test",nullptr);
+    helicsFederateSendCommand(vFed1, helicsFederateGetName(vFed2), "test", nullptr);
     helicsFederateEnterExecutingModeAsync(vFed1, nullptr);
     helicsFederateEnterExecutingMode(vFed2, nullptr);
 
-    helicsFederateEnterExecutingModeComplete(vFed1,nullptr);
+    helicsFederateEnterExecutingModeComplete(vFed1, nullptr);
 
-    const auto* cmd = helicsFederateGetCommand(vFed2,nullptr);
+    const auto* cmd = helicsFederateGetCommand(vFed2, nullptr);
 
     EXPECT_STREQ(cmd, "test");
 
     const auto* cmdsrc = helicsFederateGetCommandSource(vFed2, nullptr);
     EXPECT_STREQ(cmdsrc, helicsFederateGetName(vFed1));
-    helicsFederateFinalize(vFed1,nullptr);
+    helicsFederateFinalize(vFed1, nullptr);
     helicsFederateFinalize(vFed2, nullptr);
 }
-
-
-
 
 TEST_F(command_tests, core_federate_command)
 {
@@ -68,8 +64,6 @@ TEST_F(command_tests, core_federate_command)
     helicsCoreFree(core);
     helicsFederateFinalize(vFed1, nullptr);
     helicsFederateFinalize(vFed2, nullptr);
-   
-
 }
 
 TEST_F(command_tests, broker_federate_command)
@@ -95,5 +89,4 @@ TEST_F(command_tests, broker_federate_command)
     EXPECT_STREQ(cmdsrc, helicsBrokerGetIdentifier(brokers[0]));
     helicsFederateFinalize(vFed1, nullptr);
     helicsFederateFinalize(vFed2, nullptr);
-
 }

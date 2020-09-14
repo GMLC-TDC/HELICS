@@ -220,7 +220,8 @@ void CoreApp::setGlobal(const std::string& valueName, const std::string& value)
     }
 }
 
-void CoreApp::sendCommand(const std::string& target, const std::string& commandStr) {
+void CoreApp::sendCommand(const std::string& target, const std::string& commandStr)
+{
     if (core) {
         core->sendCommand(target, commandStr, std::string{});
     }
