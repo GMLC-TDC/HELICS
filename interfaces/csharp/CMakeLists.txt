@@ -21,7 +21,7 @@ if(SWIG_EXECUTABLE)
         SOURCES helicsCsharp.i
     )
 
-    swig_link_libraries(CShelics helicsSharedLib)
+    swig_link_libraries(CShelics helics)
 
     set_target_properties(${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES FOLDER interfaces)
 
