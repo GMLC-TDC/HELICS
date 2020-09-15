@@ -167,7 +167,7 @@ jobs:
       name: 'MinGW'
       if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
       env:
-        - DISABLE_INTERFACES="Python,Java"
+        - DISABLE_INTERFACES="Java"
         - CI_TEST_MATCH="core-ci-tests"
         - ZMQ_SUBPROJECT=true
         - ZMQ_FORCE_SUBPROJECT=true
@@ -185,7 +185,7 @@ jobs:
       name: 'MSYS'
       if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(msys)/) OR (commit_message =~ /(msys)/)
       env:
-        - DISABLE_INTERFACES="Python,Java"
+        - DISABLE_INTERFACES="Java"
         - CI_TEST_MATCH="core-ci-tests"
         - DISABLE_EXAMPLES=true
         - CMAKE_GENERATOR="MSYS Makefiles"
@@ -228,7 +228,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - RUN_VALGRIND=true
-        - DISABLE_INTERFACES="Python,Java"
+        - DISABLE_INTERFACES="Java"
         - BUILD_TYPE=RelWithDebInfo
     # Code coverage build
     - <<: *daily_linux
@@ -239,7 +239,7 @@ jobs:
         - USE_SWIG=true
         - TEST_TYPE=Coverage
         - BUILD_TYPE=Coverage
-        - DISABLE_INTERFACES="Python,Java"
+        - DISABLE_INTERFACES="Java"
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true

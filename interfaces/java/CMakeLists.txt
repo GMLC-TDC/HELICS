@@ -47,7 +47,7 @@ endif()
 # Find required dependencies
 # ##################################################################################################
 # Find HELICS
-if(NOT hasParent OR NOT TARGET HELICS::helicsSharedLib)
+if(NOT hasParent OR NOT TARGET HELICS::helics)
     find_package(HELICS 2 REQUIRED)
 endif()
 
@@ -138,7 +138,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         SOURCES helicsJava.i
     )
 
-    swig_link_libraries(helicsJava HELICS::helicsSharedLib)
+    swig_link_libraries(helicsJava HELICS::helics)
     swig_link_libraries(helicsJava ${JAVA_LIBRARIES})
 
     if(USE_MODERNIZED_SWIG)
@@ -172,7 +172,7 @@ else()
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/interface/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
     add_library(helicsJava SHARED interface/helicsJava.c)
-    target_link_libraries(helicsJava HELICS::helicsSharedLib ${JAVA_LIBRARIES})
+    target_link_libraries(helicsJava HELICS::helics ${JAVA_LIBRARIES})
     target_include_directories(helicsJava PRIVATE ${JAVA_INCLUDE_PATH})
     target_include_directories(helicsJava PRIVATE ${JAVA_INCLUDE_PATH2})
     target_include_directories(helicsJava PRIVATE ${JNI_INCLUDE_DIRS})
@@ -199,7 +199,7 @@ configure_file(MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/jarproject/C
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/jarproject/buildjar/)
 
-# -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:helicsJava>
+# -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helics>;$<TARGET_FILE:helicsJava>
 add_custom_command(
     TARGET ${HELICS_JAVA_TARGET} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_FILE:${HELICS_JAVA_TARGET}> -P
@@ -253,6 +253,6 @@ if(WIN32)
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(java)
     else()
-        install(FILES "$<TARGET_FILE:HELICS::helicsSharedLib>" DESTINATION java COMPONENT java)
+        install(FILES "$<TARGET_FILE:HELICS::helics>" DESTINATION java COMPONENT java)
     endif()
 endif()
