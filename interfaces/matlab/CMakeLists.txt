@@ -125,9 +125,7 @@ find_package(Matlab COMPONENTS MAIN_PROGRAM)
 # Build the Java interface
 # ##################################################################################################
 message(STATUS "Building MATLAB")
-get_target_property(
-    TMP_HELICS_SHARED_LIB_INCLUDE_DIRS HELICS::helics INTERFACE_INCLUDE_DIRECTORIES
-)
+get_target_property(TMP_HELICS_SHARED_LIB_INCLUDE_DIRS HELICS::helics INTERFACE_INCLUDE_DIRECTORIES)
 if(NOT HELICS_ENABLE_SWIG OR NOT SWIG_EXECUTABLE OR MATLAB_SWIG_NOT_AVAILABLE)
     message(STATUS "Building without swig")
     add_custom_command(
