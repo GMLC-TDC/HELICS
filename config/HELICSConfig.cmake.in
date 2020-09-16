@@ -7,7 +7,7 @@
 #   HELICS_CXX_SHARED_LIBRARY -the C++ shared library
 #   It also creates the following targets if they are available (not all are always built depending on the configuration)
 #   HELICS::helics for the C based shared library
-#   HELICS::helicscpp for C++ based shared library
+#   HELICS::helicscpp for the C++ based shared library
 #   HELICS::helicscpp98 for the C++98 header only library wrapper for the C shared library
 #   HELICS::helics_player is an executable target for the HELICS player
 #   HELICS::helics_broker is an executable target for the helics broker executable
