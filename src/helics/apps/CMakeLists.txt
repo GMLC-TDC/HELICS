@@ -149,22 +149,22 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     if(HELICS_BUILD_CXX_SHARED_LIB)
         add_library(
-            helics-apps-shared SHARED ../helics_apps.hpp ${helics_apps_library_files}
-                                      ${helics_apps_public_headers} ${helics_apps_private_headers}
+            helicscpp-apps SHARED ../helics_apps.hpp ${helics_apps_library_files}
+                                  ${helics_apps_public_headers} ${helics_apps_private_headers}
         )
 
-        target_link_libraries(helics-apps-shared PUBLIC HELICS::helics-shared)
+        target_link_libraries(helicscpp-apps PUBLIC HELICS::helicscpp)
         target_link_libraries(
-            helics-apps-shared PRIVATE helics_common spdlog::spdlog fmt::fmt HELICS::utilities
+            helicscpp-apps PRIVATE helics_common spdlog::spdlog fmt::fmt HELICS::utilities
         )
 
         # add and alias library to match the find_package
-        add_library(HELICS::helics-apps-shared ALIAS helics-apps-shared)
+        add_library(HELICS::helicscpp-apps ALIAS helicscpp-apps)
 
-        target_compile_definitions(helics-apps-shared PRIVATE helics_shared_EXPORTS)
+        target_compile_definitions(helicscpp-apps PRIVATE helicscpp_EXPORTS)
 
         target_include_directories(
-            helics-apps-shared
+            helicscpp-apps
             INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
                       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
                       $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
@@ -172,40 +172,37 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         set_target_properties(
-            helics-apps-shared PROPERTIES VERSION ${HELICS_VERSION} SOVERSION
-                                                                    ${HELICS_VERSION_MAJOR}
+            helicscpp-apps PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
         )
 
         set_target_properties(
-            helics-apps-shared PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
-                                          VISIBILITY_INLINES_HIDDEN ON
+            helicscpp-apps PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
+                                      VISIBILITY_INLINES_HIDDEN ON
         )
 
         install(
-            TARGETS helics-apps-shared ${HELICS_EXPORT_COMMAND}
+            TARGETS helicscpp-apps ${HELICS_EXPORT_COMMAND}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         )
 
         if(WIN32)
-            install(FILES $<TARGET_LINKER_FILE:helics-apps-shared>
-                    DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs
+            install(FILES $<TARGET_LINKER_FILE:helicscpp-apps> DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                    COMPONENT libs
             )
-            install(FILES $<TARGET_FILE:helics-apps-shared> DESTINATION ${CMAKE_INSTALL_BINDIR}
+            install(FILES $<TARGET_FILE:helicscpp-apps> DESTINATION ${CMAKE_INSTALL_BINDIR}
                     COMPONENT Runtime
             )
         else()
-            install(TARGETS helics-apps-shared DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                    COMPONENT RUNTIME
-            )
+            install(TARGETS helicscpp-apps DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RUNTIME)
         endif()
 
         if(NOT HELICS_BINARY_ONLY_INSTALL)
 
             if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
                 install(
-                    FILES $<TARGET_PDB_FILE:helics-apps-shared>
+                    FILES $<TARGET_PDB_FILE:helicscpp-apps>
                     DESTINATION ${CMAKE_INSTALL_BINDIR}
                     OPTIONAL
                     COMPONENT libs
@@ -216,26 +213,3 @@ if(HELICS_BUILD_APP_LIBRARY)
     endif()
 
 endif(HELICS_BUILD_APP_LIBRARY)
-
-# configure executable app
-
-if(NOT CYGWIN)
-    if(HELICS_BUILD_APP_EXECUTABLES)
-        configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
-        add_executable(
-            helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h
-        )
-
-        target_link_libraries(helics-config PRIVATE compile_flags_target)
-        target_include_directories(helics-config PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-        set_target_properties(helics-config PROPERTIES FOLDER apps)
-
-        target_include_directories(helics-config SYSTEM PRIVATE ${HELICS_SOURCE_DIR}/ThirdParty)
-
-        install(TARGETS helics-config ${HELICS_EXPORT_COMMAND}
-                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
-        )
-
-    endif(HELICS_BUILD_APP_EXECUTABLES)
-
-endif(NOT CYGWIN)

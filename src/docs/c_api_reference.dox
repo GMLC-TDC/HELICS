@@ -7,12 +7,16 @@ Index of functions available in the C and by extension the language API's
  \section general General Functions
  in the HELICS C library
  - \ref helicsGetVersion
+ - \ref helicsGetBuildFlags
+ - \ref helicsGetCompilerVersion
  - \ref helicsErrorInitialize
  - \ref helicsErrorClear
  - \ref helicsIsCoreTypeAvailable
  - \ref helicsGetFederateByName
  - \ref helicsGetPropertyIndex
+ - \ref helicsGetFlagIndex
  - \ref helicsGetOptionIndex
+ - \ref helicsGetOptionValue
  - \ref helicsCloseLibrary
  - \ref helicsCleanupLibrary
 
@@ -70,6 +74,8 @@ Functions applying to a \ref helics_broker object
  - \ref helicsBrokerFree
  - \ref helicsBrokerSetGlobal
  - \ref helicsBrokerSetLogFile
+ - \ref helicsBrokerSetTimeBarrier
+ - \ref helicsBrokerClearTimeBarrier
  - \ref helicsBrokerSetLoggingCallback
 
  \section fedinfo Federate Info Functions
@@ -235,12 +241,14 @@ functions applying to a \ref helics_input object
 Functions applying to federates created as a value or combination federate \ref helics_federate objects
  - \ref helicsFederateRegisterEndpoint
  - \ref helicsFederateRegisterGlobalEndpoint
+ - \ref helicsFederateRegisterTargetedEndpoint
+ - \ref helicsFederateRegisterGlobalTargetedEndpoint
  - \ref helicsFederateGetEndpoint
  - \ref helicsFederateGetEndpointByIndex
  - \ref helicsFederateHasMessage
  - \ref helicsFederatePendingMessages
- - \ref helicsFederateGetMessageObject
- - \ref helicsFederateCreateMessageObject
+ - \ref helicsFederateGetMessage
+ - \ref helicsFederateCreateMessage
  - \ref helicsFederateClearMessages
  - \ref helicsFederateGetEndpointCount
 
@@ -271,26 +279,36 @@ functions applying to a \ref helics_message_object
  - \ref helicsMessageSetData
  - \ref helicsMessageAppendData
  - \ref helicsMessageCopy
+ - \ref helicsMessageClone
+ - \ref helicsMessageFree
 
  \section endpoint Endpoint interface Functions
 functions applying to a \ref helics_endpoint object
  - \ref helicsEndpointIsValid
  - \ref helicsEndpointSetDefaultDestination
  - \ref helicsEndpointGetDefaultDestination
- - \ref helicsEndpointSendMessageRaw
- - \ref helicsEndpointSendEventRaw
- - \ref helicsEndpointSendMessageObject
- - \ref helicsEndpointSendMessageObjectZeroCopy
+ - \ref helicsEndpointSend
+ - \ref helicsEndpointSendTo
+ - \ref helicsEndpointSendToAt
+ - \ref helicsEndpointSendAt
+ - \ref helicsEndpointSendMessage
+ - \ref helicsEndpointSendMessageZeroCopy
  - \ref helicsEndpointSubscribe
  - \ref helicsEndpointHasMessage
  - \ref helicsEndpointPendingMessages
- - \ref helicsEndpointGetMessageObject
+ - \ref helicsEndpointGetMessage
+ - \ref helicsEndpointCreateMessage
  - \ref helicsEndpointGetType
  - \ref helicsEndpointGetName
  - \ref helicsEndpointGetInfo
  - \ref helicsEndpointSetInfo
  - \ref helicsEndpointSetOption
  - \ref helicsEndpointGetOption
+ - \ref helicsEndpointAddSourceTarget
+ - \ref helicsEndpointAddDestinationTarget
+ - \ref helicsEndpointRemoveTarget
+ - \ref helicsEndpointAddSourceFilter
+ - \ref helicsEndpointAddDestinationFilter
 
  \section filterfed Filter Federate Functions
 Functions applying to all federates but related to \ref helics_filter
@@ -327,5 +345,7 @@ functions applying to a \ref helics_query object
  - \ref helicsQueryExecuteAsync
  - \ref helicsQueryExecuteComplete
  - \ref helicsQueryIsCompleted
+ - \ref helicsQuerySetTarget
+ - \ref helicsQuerySetQueryString
  - \ref helicsQueryFree
 */

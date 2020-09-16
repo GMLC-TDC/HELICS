@@ -42,7 +42,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m
     COMMAND
-        ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helicsSharedLib> -D
+        ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helics> -D
         BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp -D
         LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/ -D
         OTHER_INCLUDE_LOCATION=${PROJECT_BINARY_DIR}/src/helics/shared_api_library/ -D
@@ -54,7 +54,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helics.oct
     COMMAND ${OCTAVE_EXECUTABLE} "-q" "\"${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m\""
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m helicsSharedLib
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m helics
             ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp
 )
 

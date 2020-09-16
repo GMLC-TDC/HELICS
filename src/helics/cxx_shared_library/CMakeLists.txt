@@ -37,34 +37,30 @@ set(HELICS_LIBRARY_SOURCE_DIR ${HELICS_SOURCE_DIR}/src/helics)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cxx_file_list.cmake)
 
 add_library(
-    helics-shared SHARED ${helics_shared_sources} ${conv_headers} ${helics_shared_public_headers}
-                         ${helics_shared_private_headers}
+    helicscpp SHARED ${helics_shared_sources} ${conv_headers} ${helics_shared_public_headers}
+                     ${helics_shared_private_headers}
 )
 
-target_link_libraries(helics-shared PRIVATE helics_network fmt::fmt)
-target_compile_definitions(helics-shared PRIVATE helics_shared_EXPORTS PUBLIC HELICS_SHARED_LIBRARY)
+target_link_libraries(helicscpp PRIVATE helics_network fmt::fmt)
+target_compile_definitions(helicscpp PRIVATE helicscpp_EXPORTS PUBLIC HELICS_SHARED_LIBRARY)
 
-if(MSYS AND USE_LIBCXX)
-    target_compile_definitions(helics-shared PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
-endif()
+target_compile_options(helicscpp PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251 /wd4275>)
 
-target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251 /wd4275>)
-
-add_library(HELICS::helics-shared ALIAS helics-shared)
+add_library(HELICS::helicscpp ALIAS helicscpp)
 
 set_target_properties(
-    helics-shared PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
+    helicscpp PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
 )
 
 set_target_properties(
-    helics-shared PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
-                             VISIBILITY_INLINES_HIDDEN ON
+    helicscpp PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
+                         VISIBILITY_INLINES_HIDDEN ON
 )
 
 file(MAKE_DIRECTORY ${HELICS_BINARY_DIR}/include/helics_cxx)
 
 add_custom_command(
-    TARGET helics-shared
+    TARGET helicscpp
     POST_BUILD
     COMMAND
         ${CMAKE_COMMAND} -DHELICS_CXX_HEADER_FILE_LOC=${HELICS_BINARY_DIR}/include/helics_cxx
@@ -75,7 +71,7 @@ add_custom_command(
 )
 
 target_include_directories(
-    helics-shared
+    helicscpp
     INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
@@ -83,28 +79,26 @@ target_include_directories(
 )
 
 install(
-    TARGETS helics-shared ${HELICS_EXPORT_COMMAND}
+    TARGETS helicscpp ${HELICS_EXPORT_COMMAND}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 if(WIN32)
-    install(FILES $<TARGET_LINKER_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    install(FILES $<TARGET_LINKER_FILE:helicscpp> DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT libs
     )
-    install(FILES $<TARGET_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT Runtime
-    )
+    install(FILES $<TARGET_FILE:helicscpp> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
 else()
-    install(TARGETS helics-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RUNTIME)
+    install(TARGETS helicscpp DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RUNTIME)
 endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
 
     if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
         install(
-            FILES $<TARGET_PDB_FILE:helics-shared>
+            FILES $<TARGET_PDB_FILE:helicscpp>
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             OPTIONAL
             COMPONENT libs

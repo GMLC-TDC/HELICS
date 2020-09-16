@@ -69,7 +69,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
 
     add_executable(shared_cxx-tests ${shared_cxx_test_sources})
 
-    target_link_libraries(shared_cxx-tests helics_test_base HELICS::helics-shared)
+    target_link_libraries(shared_cxx-tests helics_test_base HELICS::helicscpp)
 
     set_target_properties(shared_cxx-tests PROPERTIES FOLDER tests)
 

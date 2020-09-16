@@ -746,11 +746,11 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
     #[[   if(HELICS_BUILD_CXX_SHARED_LIB)
         set(
             helics_cxx_shared_file
-            "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            "${CMAKE_SHARED_LIBRARY_PREFIX}helicscpp${CMAKE_SHARED_LIBRARY_SUFFIX}"
         )
         set(
             helics_cxx_shared_file_debug
-            "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            "${CMAKE_SHARED_LIBRARY_PREFIX}helicscpp${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
         )
     else(HELICS_BUILD_CXX_SHARED_LIB)
         set(helics_cxx_shared_file)
@@ -760,11 +760,11 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
     if(NOT HELICS_DISABLE_C_SHARED_LIB)
         set(
             helics_c_shared_file
-            "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            "${CMAKE_SHARED_LIBRARY_PREFIX}helics${CMAKE_SHARED_LIBRARY_SUFFIX}"
         )
         set(
             helics_c_shared_file_debug
-            "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            "${CMAKE_SHARED_LIBRARY_PREFIX}helics${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
         )
     else()
         set(helics_c_shared_file)
@@ -911,10 +911,10 @@ if(NOT MSVC AND NOT HELICS_BINARY_ONLY_INSTALL)
 
     if(NOT HELICS_DISABLE_C_SHARED_LIB)
         configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicsSharedLib.pc.in
-            ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc @ONLY
+            ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/helics.pc @ONLY
         )
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.pc
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
         )
     endif()
@@ -926,19 +926,19 @@ if(NOT MSVC AND NOT HELICS_BINARY_ONLY_INSTALL)
     if(HELICS_BUILD_CXX_SHARED_LIB)
 
         configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-shared.pc.in
-            ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc @ONLY
+            ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicscpp.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/helicscpp.pc @ONLY
         )
-        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicscpp.pc
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
         )
 
         if(HELICS_BUILD_APP_LIBRARY)
             configure_file(
-                ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-apps-shared.pc.in
-                ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc @ONLY
+                ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicscpp-apps.pc.in
+                ${CMAKE_CURRENT_BINARY_DIR}/helicscpp-apps.pc @ONLY
             )
-            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc
+            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicscpp-apps.pc
                     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
             )
         endif()
@@ -986,7 +986,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         libs
         swig
         matlab
-        python
         java
         octave
         csharp
@@ -1008,7 +1007,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
-    set(CPACK_COMPONENT_PYTHON_DISPLAY_NAME "Python")
     set(CPACK_COMPONENT_MATLAB_DISPLAY_NAME "MATLAB")
     set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
@@ -1019,7 +1017,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
     set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
-    set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
     set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
@@ -1040,7 +1037,6 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
         "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
-    set(CPACK_COMPONENT_PYTHON_DESCRIPTION "Python language interface")
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
     set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
     set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
