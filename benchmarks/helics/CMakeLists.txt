@@ -79,7 +79,7 @@ install(TARGETS helics_benchmarks ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_I
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
-    target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
+    target_link_libraries(echoBenchmarks_c PUBLIC helics)
     add_benchmark(echoBenchmarks_c)
     set_target_properties(echoBenchmarks_c PROPERTIES FOLDER benchmarks)
     target_compile_definitions(

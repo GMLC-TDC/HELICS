@@ -13,9 +13,6 @@ if(hasParent)
     add_subdirectory(helics)
 
     if(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
-        if(BUILD_PYTHON_INTERFACE)
-            add_subdirectory(python)
-        endif()
 
         if(BUILD_JAVA_INTERFACE)
             add_subdirectory(java)
@@ -39,8 +36,6 @@ else()
     cmake_minimum_required(VERSION 3.10..3.17)
 
     set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
-    set(BUILD_PYTHON_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_PYTHON2_INTERFACE OFF CACHE INTERNAL "")
     set(BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")
     set(BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")
     set(BUILD_CSHARP_INTERFACE OFF CACHE INTERNAL "")
