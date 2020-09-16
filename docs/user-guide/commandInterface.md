@@ -23,7 +23,7 @@ A target is specified, and can be one of the following. A federate named one of 
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``root``, ``federation``                 | The root broker of the federation                                                     |
 +------------------------------------------+---------------------------------------------------------------------------------------+
-| ``core``                                 | The core of a federation, this is not a valid target if called from a broker          |
+| ``core``                                 | The core of a federate, this is not a valid target if called from a broker          |
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``<object name>``                        | any named object in the federation can also be queried, brokers, cores, and federates |
 +------------------------------------------+---------------------------------------------------------------------------------------+
