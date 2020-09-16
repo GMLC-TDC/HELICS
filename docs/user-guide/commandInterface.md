@@ -1,6 +1,6 @@
 # Commands
 
-The command interface for HELICS was introduced in HELICS 3.0. It is an asynchronous communication mechanism to send commands or other information to other components.
+The command interface for HELICS was introduced in HELICS 3. It is an asynchronous communication mechanism to send commands or other information to other components.
 Cores and Brokers will respond to a small subset of commands known by HELICS, but federates have a command interface to allow retrieval of commands for interpretation by a federate.
 
 The general function appears like
@@ -31,22 +31,22 @@ A target is specified, and can be one of the following. A federate named one of 
 
 ## Command String
 
-The `commandStr` is a generic string, so can be anything the can be contained in a string object. It is expected that most commandStr will have a json format, though a few simple ones are just plain strings.
+The `commandStr` is a generic string, so can be anything that can be contained in a string object. It is expected that most command strings will have a json format, though a few simple ones are just plain strings.
 
 ### HELICS supported commands
 
-The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
+The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
 
 ```eval_rst
 +--------------------+------------------------------------------------------------+
-| command String     | Description                                                |
+| Command String     | Description                                                |
 +====================+============================================================+
-| ``terminate``      | [All objects] disconnect the object from the federation                    |
+| ``terminate``      | [all objects] disconnect the object from the federation                    |
 +--------------------+------------------------------------------------------------+
-| ``echo``           | [ALL objects] send a command with a `commandStr`=`echo_reply` back to the sender |
+| ``echo``           | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender |
 +--------------------+------------------------------------------------------------+
 | ``command_status`` | [federates] when received will send a string back to the source of the command
-|                    | looking like \"X unprocessed commands\"    where X is the number of unprocessed commands          |
+|                    | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
 +--------------------+------------------------------------------------------------+
 ```
 
@@ -60,7 +60,7 @@ Commands that must traverse the network travel along priority paths.
 
 ### Application API
 
-There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
+There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html).
 To retrieve a command addressed to a federate there are two commands
 
 ```cpp
@@ -79,4 +79,4 @@ const char *helicsFederateWaitCommand(helics_federate fed, helics_error *err);
 ```
 
 The only error paths are if the federate is not valid or not in a state to receive commands.
-the python calls are similar to other python calls
+The python calls are similar to other python calls.
