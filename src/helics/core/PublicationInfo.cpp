@@ -20,7 +20,7 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
     return false;
 }
 
-void PublicationInfo::removeSubscriber(global_handle subscriberToRemove)
+void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
 {
     subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove),
                       subscribers.end());

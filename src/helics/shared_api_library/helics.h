@@ -995,7 +995,7 @@ HELICS_EXPORT helics_federate_state helicsFederateGetState(helics_federate fed, 
  *
  * @return A core object, nullptr if invalid.
  */
-HELICS_EXPORT helics_core helicsFederateGetCoreObject(helics_federate fed, helics_error* err);
+HELICS_EXPORT helics_core helicsFederateGetCore(helics_federate fed, helics_error* err);
 
 /**
  * Request the next time for federate execution.

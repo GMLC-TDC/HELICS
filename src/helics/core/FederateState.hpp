@@ -56,8 +56,8 @@ class FederateState {
     std::unique_ptr<TimeCoordinator>
         timeCoord;  //!< object that manages the time to determine granting
   public:
-    local_federate_id local_id;  //!< id code for the local federate descriptor
-    std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
+    LocalFederateId local_id;  //!< id code for the local federate descriptor
+    std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
 
   private:
     std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
@@ -109,10 +109,10 @@ class FederateState {
         commandQueue;  //!< processing queue for messages incoming to a federate
     std::atomic<uint16_t> interfaceFlags{
         0};  //!< current defaults for operational flags of interfaces for this federate
-    std::map<global_federate_id, std::deque<ActionMessage>>
+    std::map<GlobalFederateId, std::deque<ActionMessage>>
         delayQueues;  //!< queue for delaying processing of messages for a time
-    std::vector<interface_handle> events;  //!< list of value events to process
-    std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
+    std::vector<InterfaceHandle> events;  //!< list of value events to process
+    std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
@@ -133,7 +133,7 @@ class FederateState {
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed(const ActionMessage& cmd) const;
     /** add a federate to the delayed list*/
-    void addFederateToDelay(global_federate_id id);
+    void addFederateToDelay(GlobalFederateId id);
     /** generate a component of json config string*/
     void generateConfig(Json::Value& base) const;
 
@@ -152,7 +152,7 @@ class FederateState {
     const InterfaceInfo& interfaces() const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize(interface_handle id) const;
+    uint64_t getQueueSize(InterfaceHandle id) const;
     /** get the sum of all message queue sizes i.e. the total number of messages available in all
      * endpoints*/
     uint64_t getQueueSize() const;
@@ -163,21 +163,21 @@ class FederateState {
     /** get the next available message for an endpoint
     @param id the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transferred to the caller*/
-    std::unique_ptr<Message> receive(interface_handle id);
+    std::unique_ptr<Message> receive(InterfaceHandle id);
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny(interface_handle& id);
+    std::unique_ptr<Message> receiveAny(InterfaceHandle& id);
     /**
      * Return the data for the specified handle or the latest input
      */
-    const std::shared_ptr<const SmallBuffer>& getValue(interface_handle handle,
+    const std::shared_ptr<const SmallBuffer>& getValue(InterfaceHandle handle,
                                                        uint32_t* inputIndex);
 
     /**
      * Return all the available data for the specified handle or the latest input
      *
      */
-    const std::vector<std::shared_ptr<const SmallBuffer>>& getAllValues(interface_handle handle);
+    const std::vector<std::shared_ptr<const SmallBuffer>>& getAllValues(InterfaceHandle handle);
 
     /** set the CommonCore object that is managing this Federate*/
     void setParent(CommonCore* coreObject) { parent_ = coreObject; }
@@ -199,7 +199,7 @@ class FederateState {
     /** get an option flag value*/
     bool getOptionFlag(int optionFlag) const;
     /** get the currently active option for a handle*/
-    int32_t getHandleOption(interface_handle handle, char iType, int32_t option) const;
+    int32_t getHandleOption(InterfaceHandle handle, char iType, int32_t option) const;
     /** get the currently active interface flags*/
     uint16_t getInterfaceFlags() const { return interfaceFlags.load(); }
     /** get an option flag value*/
@@ -280,9 +280,9 @@ class FederateState {
     */
     void fillEventVectorNextIteration(Time currentTime);
     /** add a dependency to the timing coordination*/
-    void addDependency(global_federate_id fedToDependOn);
+    void addDependency(GlobalFederateId fedToDependOn);
     /** add a dependent federate*/
-    void addDependent(global_federate_id fedThatDependsOnThis);
+    void addDependent(GlobalFederateId fedThatDependsOnThis);
     /** check the interfaces for any issues*/
     int checkInterfaces();
     /** generate results from a query*/
@@ -295,13 +295,13 @@ class FederateState {
     Time nextAllowedSendTime() const { return allowed_send_time; }
     /**get a reference to the handles of subscriptions with value updates
      */
-    const std::vector<interface_handle>& getEvents() const;
+    const std::vector<InterfaceHandle>& getEvents() const;
     /** get a vector of the federates this one depends on
      */
-    std::vector<global_federate_id> getDependencies() const;
+    std::vector<GlobalFederateId> getDependencies() const;
     /** get a vector to the global ids of dependent federates
      */
-    std::vector<global_federate_id> getDependents() const;
+    std::vector<GlobalFederateId> getDependents() const;
     /** get the last error string */
     const std::string& lastErrorString() const { return errorString; }
     /** get the last error code*/
@@ -327,13 +327,13 @@ class FederateState {
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */
-    std::vector<global_handle> getSubscribers(interface_handle handle);
+    std::vector<GlobalHandle> getSubscribers(InterfaceHandle handle);
 
     /** get a list of the endpoints a message should be sent to
     @param handle the endpoint handle to use
     */
-    std::vector<std::pair<global_handle, std::string_view>>
-        getMessageDestinations(interface_handle handle);
+    std::vector<std::pair<GlobalHandle, std::string_view>>
+        getMessageDestinations(InterfaceHandle handle);
 
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
@@ -382,18 +382,18 @@ class FederateState {
     @param len the length of the data
     @return true if it should be published, false if not
     */
-    bool checkAndSetValue(interface_handle pub_id, const char* data, uint64_t len);
+    bool checkAndSetValue(InterfaceHandle pub_id, const char* data, uint64_t len);
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage(const ActionMessage& msg);
     /** create an interface*/
     void createInterface(handle_type htype,
-                         interface_handle handle,
+                         InterfaceHandle handle,
                          const std::string& key,
                          const std::string& type,
                          const std::string& units);
     /** close an interface*/
-    void closeInterface(interface_handle handle, handle_type type);
+    void closeInterface(InterfaceHandle handle, handle_type type);
     /** send a command to a federate*/
     void sendCommand(ActionMessage& command);
 

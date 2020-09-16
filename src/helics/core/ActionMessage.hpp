@@ -34,10 +34,10 @@ class ActionMessage {
     action_message_def::action_t messageAction{CMD_IGNORE};  // 4 -- command
   public:
     int32_t messageID{0};  //!< 8 -- message ID for a variety of purposes
-    global_federate_id source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
-    interface_handle source_handle{};  //!< 16 -- for local handle or local code
-    global_federate_id dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
-    interface_handle dest_handle{};  //!< 24 local handle for a targeted message
+    GlobalFederateId source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
+    InterfaceHandle source_handle{};  //!< 16 -- for local handle or local code
+    GlobalFederateId dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
+    InterfaceHandle dest_handle{};  //!< 24 local handle for a targeted message
     uint16_t counter{0};  //!< 26 counter for filter tracking or message counter
     uint16_t flags{0};  //!<  28 set of messageFlags
     uint32_t sequenceID{0};  //!< 32 a sequence number for ordering
@@ -59,8 +59,8 @@ class ActionMessage {
     /** construct from action, source and destination id's
      */
     ActionMessage(action_message_def::action_t startingAction,
-                  global_federate_id sourceId,
-                  global_federate_id destId);
+                  GlobalFederateId sourceId,
+                  GlobalFederateId destId);
     /** move constructor*/
     ActionMessage(ActionMessage&& act) noexcept;
     /** build an action message from a message*/
@@ -90,13 +90,13 @@ class ActionMessage {
     void setAction(action_message_def::action_t newAction);
 
     /** set the source from a global handle*/
-    void setSource(global_handle hand)
+    void setSource(GlobalHandle hand)
     {
         source_id = hand.fed_id;
         source_handle = hand.handle;
     }
     /** set the destination from a global handle*/
-    void setDestination(global_handle hand)
+    void setDestination(GlobalHandle hand)
     {
         dest_id = hand.fed_id;
         dest_handle = hand.handle;
@@ -143,10 +143,10 @@ class ActionMessage {
     const std::string& getString(int index) const;
 
     void setString(int index, std::string_view str);
-    /** get the source global_handle*/
-    global_handle getSource() const { return global_handle{source_id, source_handle}; }
+    /** get the source GlobalHandle*/
+    GlobalHandle getSource() const { return GlobalHandle{source_id, source_handle}; }
     /** get the global destination handle*/
-    global_handle getDest() const { return global_handle{dest_id, dest_handle}; }
+    GlobalHandle getDest() const { return GlobalHandle{dest_id, dest_handle}; }
     /** swap the source and destination*/
     void swapSourceDest() noexcept
     {
@@ -154,11 +154,11 @@ class ActionMessage {
         std::swap(source_handle, dest_handle);
     }
     /** set some extra piece of data if the full destination is not used*/
-    void setExtraData(int32_t data) { dest_handle = interface_handle{data}; }
+    void setExtraData(int32_t data) { dest_handle = InterfaceHandle{data}; }
     /** get the extra piece of integer data*/
     int32_t getExtraData() const { return dest_handle.baseValue(); }
     /** set some extra piece of data if the full source is not used*/
-    void setExtraDestData(int32_t data) { source_handle = interface_handle{data}; }
+    void setExtraDestData(int32_t data) { source_handle = InterfaceHandle{data}; }
     /** get the extra piece of integer data used in the destination*/
     int32_t getExtraDestData() const { return source_handle.baseValue(); }
     // functions that convert to and from a byte stream

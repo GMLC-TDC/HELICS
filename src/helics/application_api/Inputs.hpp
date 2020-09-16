@@ -78,7 +78,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input() = default;
     /** construct from a federate and handle, mainly used by the valueFederateManager*/
     Input(ValueFederate* valueFed,
-          interface_handle id,
+          InterfaceHandle id,
           const std::string& actName,
           const std::string& unitsOut = std::string{});
 

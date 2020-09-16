@@ -46,8 +46,8 @@ TEST_F(federateStateTests, constructor_test)
     // EXPECT_EQ(fs->message_queue.size(), 0);
     // EXPECT_EQ(fs->dependencies.size(), 0);
     EXPECT_EQ(fs->getDependents().size(), 0U);
-    EXPECT_TRUE(fs->local_id == helics::local_federate_id{});
-    EXPECT_TRUE(fs->global_id.load() == helics::global_federate_id{});
+    EXPECT_TRUE(fs->local_id == helics::LocalFederateId{});
+    EXPECT_TRUE(fs->global_id.load() == helics::GlobalFederateId{});
     EXPECT_EQ(fs->init_requested, false);
 
     EXPECT_EQ(fs->getCurrentIteration(), 0);
@@ -63,116 +63,116 @@ TEST_F(federateStateTests, constructor_test)
 TEST_F(federateStateTests, create_input_test)
 {
     using namespace helics;
-    fs->interfaces().createInput(interface_handle(0), "first!", "type", "units");
-    fs->interfaces().createInput(interface_handle(1), "second", "type", "units");
-    fs->interfaces().createInput(interface_handle(3), "last", "type", "units");
-    fs->interfaces().createInput(interface_handle(2), "cut-in-line", "type", "units");
+    fs->interfaces().createInput(InterfaceHandle(0), "first!", "type", "units");
+    fs->interfaces().createInput(InterfaceHandle(1), "second", "type", "units");
+    fs->interfaces().createInput(InterfaceHandle(3), "last", "type", "units");
+    fs->interfaces().createInput(InterfaceHandle(2), "cut-in-line", "type", "units");
 
     helics::InputInfo* info;
 
     // Check first subscription
     info = fs->interfaces().getInput("first!");
-    EXPECT_EQ(info->id.handle, interface_handle(0));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(0));
 
-    info = fs->interfaces().getInput(interface_handle(0));
+    info = fs->interfaces().getInput(InterfaceHandle(0));
     EXPECT_EQ(info->key, "first!");
 
     // Check second subscription
     info = fs->interfaces().getInput("second");
-    EXPECT_EQ(info->id.handle, interface_handle(1));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(1));
 
-    info = fs->interfaces().getInput(interface_handle(1));
+    info = fs->interfaces().getInput(InterfaceHandle(1));
     EXPECT_EQ(info->key, "second");
 
     // Check the out of order subscription
     info = fs->interfaces().getInput("cut-in-line");
-    EXPECT_EQ(info->id.handle, interface_handle(2));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(2));
 
-    info = fs->interfaces().getInput(interface_handle(2));
+    info = fs->interfaces().getInput(InterfaceHandle(2));
     EXPECT_EQ(info->key, "cut-in-line");
 
     // Check the displaced (last) subscription
     info = fs->interfaces().getInput("last");
-    EXPECT_EQ(info->id.handle, interface_handle(3));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(3));
 
-    info = fs->interfaces().getInput(interface_handle(3));
+    info = fs->interfaces().getInput(InterfaceHandle(3));
     EXPECT_EQ(info->key, "last");
 }
 
 TEST_F(federateStateTests, create_publication_test)
 {
-    fs->interfaces().createPublication(helics::interface_handle(0), "first!", "type", "units");
-    fs->interfaces().createPublication(helics::interface_handle(1), "second", "type", "units");
-    fs->interfaces().createPublication(helics::interface_handle(3), "last", "type", "units");
-    fs->interfaces().createPublication(helics::interface_handle(2), "cut-in-line", "type", "units");
+    fs->interfaces().createPublication(helics::InterfaceHandle(0), "first!", "type", "units");
+    fs->interfaces().createPublication(helics::InterfaceHandle(1), "second", "type", "units");
+    fs->interfaces().createPublication(helics::InterfaceHandle(3), "last", "type", "units");
+    fs->interfaces().createPublication(helics::InterfaceHandle(2), "cut-in-line", "type", "units");
 
     helics::PublicationInfo* info;
 
     // Check first publication
     info = fs->interfaces().getPublication("first!");
-    EXPECT_EQ(info->id.handle, helics::interface_handle(0));
+    EXPECT_EQ(info->id.handle, helics::InterfaceHandle(0));
 
-    info = fs->interfaces().getPublication(helics::interface_handle(0));
+    info = fs->interfaces().getPublication(helics::InterfaceHandle(0));
     EXPECT_EQ(info->key, "first!");
 
     // Check second publication
     info = fs->interfaces().getPublication("second");
-    EXPECT_EQ(info->id.handle, helics::interface_handle(1));
+    EXPECT_EQ(info->id.handle, helics::InterfaceHandle(1));
 
-    info = fs->interfaces().getPublication(helics::interface_handle(1));
+    info = fs->interfaces().getPublication(helics::InterfaceHandle(1));
     EXPECT_EQ(info->key, "second");
 
     // Check the out of order publication
     info = fs->interfaces().getPublication("cut-in-line");
-    EXPECT_EQ(info->id.handle, helics::interface_handle(2));
+    EXPECT_EQ(info->id.handle, helics::InterfaceHandle(2));
 
-    info = fs->interfaces().getPublication(helics::interface_handle(2));
+    info = fs->interfaces().getPublication(helics::InterfaceHandle(2));
     EXPECT_EQ(info->key, "cut-in-line");
 
     // Check the displaced (last) publication
     info = fs->interfaces().getPublication("last");
-    EXPECT_EQ(info->id.handle, helics::interface_handle(3));
+    EXPECT_EQ(info->id.handle, helics::InterfaceHandle(3));
 
-    info = fs->interfaces().getPublication(helics::interface_handle(3));
+    info = fs->interfaces().getPublication(helics::InterfaceHandle(3));
     EXPECT_EQ(info->key, "last");
 }
 
 TEST_F(federateStateTests, create_endpoint_test)
 {
     using namespace helics;
-    fs->interfaces().createEndpoint(interface_handle(0), "first!", "type");
-    fs->interfaces().createEndpoint(interface_handle(1), "second", "type");
-    fs->interfaces().createEndpoint(interface_handle(3), "last", "type");
-    fs->interfaces().createEndpoint(interface_handle(2), "cut-in-line", "type");
+    fs->interfaces().createEndpoint(InterfaceHandle(0), "first!", "type");
+    fs->interfaces().createEndpoint(InterfaceHandle(1), "second", "type");
+    fs->interfaces().createEndpoint(InterfaceHandle(3), "last", "type");
+    fs->interfaces().createEndpoint(InterfaceHandle(2), "cut-in-line", "type");
 
     EndpointInfo* info;
 
     // Check first endpoint
     info = fs->interfaces().getEndpoint("first!");
-    EXPECT_EQ(info->id.handle, interface_handle(0));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(0));
 
-    info = fs->interfaces().getEndpoint(interface_handle(0));
+    info = fs->interfaces().getEndpoint(InterfaceHandle(0));
     EXPECT_EQ(info->key, "first!");
 
     // Check second endpoint
     info = fs->interfaces().getEndpoint("second");
-    EXPECT_EQ(info->id.handle, interface_handle(1));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(1));
 
-    info = fs->interfaces().getEndpoint(interface_handle(1));
+    info = fs->interfaces().getEndpoint(InterfaceHandle(1));
     EXPECT_EQ(info->key, "second");
 
     // Check the out of order endpoint
     info = fs->interfaces().getEndpoint("cut-in-line");
-    EXPECT_EQ(info->id.handle, interface_handle(2));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(2));
 
-    info = fs->interfaces().getEndpoint(interface_handle(2));
+    info = fs->interfaces().getEndpoint(InterfaceHandle(2));
     EXPECT_EQ(info->key, "cut-in-line");
 
     // Check the displaced (last) endpoint
     info = fs->interfaces().getEndpoint("last");
-    EXPECT_EQ(info->id.handle, interface_handle(3));
+    EXPECT_EQ(info->id.handle, InterfaceHandle(3));
 
-    info = fs->interfaces().getEndpoint(interface_handle(3));
+    info = fs->interfaces().getEndpoint(InterfaceHandle(3));
     EXPECT_EQ(info->key, "last");
 }
 
@@ -199,9 +199,9 @@ TEST_F(federateStateTests, basic_processmessage_test)
     });
 
     fs->global_id =
-        global_federate_id(0);  // if it doesn't match the id in the command, this will hang
+        GlobalFederateId(0);  // if it doesn't match the id in the command, this will hang
     fs_process2.wait();
-    fs->global_id = helics::global_federate_id();
+    fs->global_id = helics::GlobalFederateId();
     auto state = fs_process2.get();
 
     EXPECT_TRUE(state == iteration_result::halted);
@@ -212,7 +212,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
 
     // Test CMD_FED_ACK message when no error
     cmd.setAction(helics::CMD_FED_ACK);
-    global_federate_id fed22(22);
+    GlobalFederateId fed22(22);
     cmd.dest_id = fed22;
     cmd.name("fed_name");
     clearActionFlag(cmd, error_flag);
@@ -224,7 +224,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
 
     // Test CMD_FED_ACK message with an error
     cmd.setAction(helics::CMD_FED_ACK);
-    cmd.dest_id = global_federate_id(23);
+    cmd.dest_id = GlobalFederateId(23);
     setActionFlag(cmd, error_flag);
     fs_process = std::async(std::launch::async, [&]() { return fs->waitSetup(); });
     fs->addAction(cmd);
@@ -290,7 +290,7 @@ TEST_F(federateStateTests, message_test)
 // Test core object usage (if any) - create a dummy core for test purposes
 
 /*
-Core::local_federate_id fedID;
+Core::LocalFederateId fedID;
 bool grant=false;
 bool converged=false;
 bool exec_requested = false;
@@ -299,20 +299,20 @@ Time Te=timeZero;        //!< execution time computation
 Time Tdemin=timeZero;    //!< min dependency event time
 
 DependencyInfo() = default;
-DependencyInfo(Core::local_federate_id id) :fedID(id) {};
+DependencyInfo(Core::LocalFederateId id) :fedID(id) {};
 */
 
 /*
-    uint64_t getQueueSize(interface_handle id) const;
+    uint64_t getQueueSize(InterfaceHandle id) const;
     uint64_t getQueueSize() const;
     uint64_t getFilterQueueSize() const;
-    helics_message *receive(interface_handle id);
-    std::pair<interface_handle, helics_message*> receive();
-    std::pair<interface_handle, helics_message*> receiveForFilter();
+    helics_message *receive(InterfaceHandle id);
+    std::pair<InterfaceHandle, helics_message*> receive();
+    std::pair<InterfaceHandle, helics_message*> receiveForFilter();
     bool processQueue();
     void generateKnownDependencies();
-    void addDependency(Core::local_federate_id);
-    void addDependent(Core::local_federate_id);
+    void addDependency(Core::LocalFederateId);
+    void addDependent(Core::LocalFederateId);
 
     void setCoreObject(CommonCore *parent);
 

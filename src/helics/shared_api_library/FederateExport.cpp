@@ -538,7 +538,7 @@ helics_bool helicsFederateIsValid(helics_federate fed)
     return (fedObj == nullptr) ? helics_false : helics_true;
 }
 
-helics_core helicsFederateGetCoreObject(helics_federate fed, helics_error* err)
+helics_core helicsFederateGetCore(helics_federate fed, helics_error* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {

@@ -31,11 +31,11 @@ class helicsCLI11App;
  */
 class BrokerBase {
   protected:
-    std::atomic<global_broker_id> global_id{
+    std::atomic<GlobalBrokerId> global_id{
         parent_broker_id};  //!< the unique identifier for the broker(core or broker)
-    global_broker_id global_broker_id_local{};  //!< meant to be the same as global_id but not
+    GlobalBrokerId global_broker_id_local{};  //!< meant to be the same as global_id but not
                                                 //!< atomically protected
-    global_broker_id higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
+    GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{
         1};  //!< the logging level to use levels >=this will be ignored
     int32_t consoleLogLevel{1};  //!< the logging level for console display
@@ -161,7 +161,7 @@ class BrokerBase {
     */
     void setLogLevels(int32_t consoleLevel, int32_t fileLevel);
     /** get the internal global broker id*/
-    global_broker_id getGlobalId() const { return global_id.load(); }
+    GlobalBrokerId getGlobalId() const { return global_id.load(); }
 
   private:
     /** start main broker loop*/
@@ -194,7 +194,7 @@ class BrokerBase {
     /** send a Message to the logging system
     @return true if the message was actually logged
     */
-    virtual bool sendToLogger(global_federate_id federateID,
+    virtual bool sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
                               std::string_view message) const;

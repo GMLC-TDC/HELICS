@@ -15,11 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 struct EptInformation {
-    global_handle id;
+    GlobalHandle id;
     std::string key;
     std::string type;
     EptInformation() = default;
-    EptInformation(global_handle gid, const std::string& key_, const std::string& type_):
+    EptInformation(GlobalHandle gid, const std::string& key_, const std::string& type_):
         id(gid), key(key_), type(type_)
     {
     }
@@ -29,8 +29,8 @@ struct EptInformation {
 class FilterInfo {
   public:
     /** constructor from all fields*/
-    FilterInfo(global_broker_id core_id_,
-               interface_handle handle_,
+    FilterInfo(GlobalBrokerId core_id_,
+               InterfaceHandle handle_,
                const std::string& key_,
                const std::string& type_in_,
                const std::string& type_out_,
@@ -40,14 +40,14 @@ class FilterInfo {
         dest_filter(destFilter_)
     {
     }
-    const global_broker_id core_id;  //!< id of the core that manages the filter
-    const interface_handle handle;  //!< id handle of the filter
+    const GlobalBrokerId core_id;  //!< id of the core that manages the filter
+    const InterfaceHandle handle;  //!< id handle of the filter
 
     const std::string key;  //!< the identifier of the filter
     const std::string inputType;  //!< the type of data for the filter
     const std::string outputType;  //!< the outputType of data of the filter
-    std::vector<global_handle> sourceTargets;
-    std::vector<global_handle> destTargets;
+    std::vector<GlobalHandle> sourceTargets;
+    std::vector<GlobalHandle> destTargets;
     const bool dest_filter = false;  //! indicator that the filter is a destination filter
     bool cloning = false;  //!< indicator that the filter is a cloning filter
     uint16_t flags = 0;  //!< flags for the filter
@@ -63,15 +63,15 @@ class FilterInfo {
 
   public:
     /** add a target target*/
-    void addDestinationEndpoint(global_handle dest,
+    void addDestinationEndpoint(GlobalHandle dest,
                                 const std::string& destName,
                                 const std::string& destType);
     /** add a source to an endpoint*/
-    void addSourceEndpoint(global_handle dest,
+    void addSourceEndpoint(GlobalHandle dest,
                            const std::string& sourceName,
                            const std::string& sourceType);
     /** remove a target from connection*/
-    void removeTarget(global_handle targetId);
+    void removeTarget(GlobalHandle targetId);
     /** get a string with the names of the source endpoints*/
     const std::string& getSourceEndpoints() const;
     /** get a string with the names of the destination endpoints*/

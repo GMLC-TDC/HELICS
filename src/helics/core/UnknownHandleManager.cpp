@@ -11,14 +11,14 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 /** add a missingPublication*/
 void UnknownHandleManager::addUnknownPublication(const std::string& key,
-                                                 global_handle target,
+                                                 GlobalHandle target,
                                                  uint16_t flags)
 {
     unknown_publications.emplace(key, std::make_pair(target, flags));
 }
 /** add a missingPublication*/
 void UnknownHandleManager::addUnknownInput(const std::string& key,
-                                           global_handle target,
+                                           GlobalHandle target,
                                            uint16_t flags)
 {
     unknown_inputs.emplace(key, std::make_pair(target, flags));
@@ -26,14 +26,14 @@ void UnknownHandleManager::addUnknownInput(const std::string& key,
 
 /** add a missing destination endpoint*/
 void UnknownHandleManager::addUnknownEndpoint(const std::string& key,
-                                              global_handle target,
+                                              GlobalHandle target,
                                               uint16_t flags)
 {
     unknown_endpoints.emplace(key, std::make_pair(target, flags));
 }
 /** add a missing filter*/
 void UnknownHandleManager::addUnknownFilter(const std::string& key,
-                                            global_handle target,
+                                            GlobalHandle target,
                                             uint16_t flags)
 {
     unknown_filters.emplace(key, std::make_pair(target, flags));
@@ -198,7 +198,7 @@ bool UnknownHandleManager::hasRequiredUnknowns() const
 }
 
 void UnknownHandleManager::processNonOptionalUnknowns(
-    std::function<void(const std::string&, char, global_handle handle)> cfunc) const
+    std::function<void(const std::string&, char, GlobalHandle handle)> cfunc) const
 {
     for (auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(optional_flag)) != 0) {
@@ -228,7 +228,7 @@ void UnknownHandleManager::processNonOptionalUnknowns(
 }
 
 void UnknownHandleManager::processRequiredUnknowns(
-    std::function<void(const std::string&, char, global_handle handle)> cfunc) const
+    std::function<void(const std::string&, char, GlobalHandle handle)> cfunc) const
 {
     for (auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(required_flag)) != 0) {
@@ -279,7 +279,7 @@ void UnknownHandleManager::clearFilter(const std::string& newFilter)
     unknown_dest_filters.erase(newFilter);
 }
 
-void UnknownHandleManager::clearFederateUnknowns(global_federate_id id)
+void UnknownHandleManager::clearFederateUnknowns(GlobalFederateId id)
 {
     for (auto it = std::begin(unknown_publications); it != std::end(unknown_publications);) {
         if (it->second.first.fed_id == id) {

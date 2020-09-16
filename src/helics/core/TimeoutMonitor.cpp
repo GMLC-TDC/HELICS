@@ -209,8 +209,8 @@ void TimeoutMonitor::pingSub(CoreBroker* brk)
     }
     if (activePing) {
         ActionMessage tickf(CMD_BROKER_CONFIGURE);
-        tickf.dest_id = global_federate_id(brk->global_id);
-        tickf.source_id = global_federate_id(brk->global_id);
+        tickf.dest_id = GlobalFederateId(brk->global_id);
+        tickf.source_id = GlobalFederateId(brk->global_id);
         tickf.messageID = REQUEST_TICK_FORWARDING;
         setActionFlag(tickf, indicator_flag);
         brk->addActionMessage(tickf);
@@ -228,14 +228,14 @@ void TimeoutMonitor::reset()
 
 void TimeoutMonitor::pingReply(const ActionMessage& cmd, CoreBroker* brk)
 {
-    if (cmd.source_id == global_federate_id(parentConnection.connection)) {
+    if (cmd.source_id == GlobalFederateId(parentConnection.connection)) {
         parentConnection.waitingForPingReply = false;
         waitingForConnection = false;
     } else {
         bool waiting{false};
         bool waswaiting{false};
         for (auto& conn : connections) {
-            if (cmd.source_id == global_federate_id(conn.connection)) {
+            if (cmd.source_id == GlobalFederateId(conn.connection)) {
                 waswaiting = conn.waitingForPingReply;
                 conn.waitingForPingReply = false;
             }

@@ -67,7 +67,7 @@ int32_t EndpointInfo::queueSize(Time maxTime) const
     return cnt;
 }
 
-void EndpointInfo::addDestinationTarget(global_handle dest,
+void EndpointInfo::addDestinationTarget(GlobalHandle dest,
                                         const std::string& destName,
                                         const std::string& destType)
 {
@@ -86,7 +86,7 @@ void EndpointInfo::addDestinationTarget(global_handle dest,
 }
 
 /** add a source to an endpoint*/
-void EndpointInfo::addSourceTarget(global_handle dest,
+void EndpointInfo::addSourceTarget(GlobalHandle dest,
                                    const std::string& sourceName,
                                    const std::string& sourceType)
 {
@@ -99,7 +99,7 @@ void EndpointInfo::addSourceTarget(global_handle dest,
 }
 
 /** remove a target from connection*/
-void EndpointInfo::removeTarget(global_handle targetId)
+void EndpointInfo::removeTarget(GlobalHandle targetId)
 {
     auto ti = targetInformation.begin();
     while (ti != targetInformation.end()) {

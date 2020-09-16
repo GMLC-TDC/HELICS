@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 Publication::Publication(ValueFederate* valueFed,
-                         interface_handle id,
+                         InterfaceHandle id,
                          const std::string& key,
                          const std::string& type,
                          const std::string& units):

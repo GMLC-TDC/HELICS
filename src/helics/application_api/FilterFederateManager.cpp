@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, local_federate_id id):
+FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, LocalFederateId id):
     coreObject(coreObj), fed(ffed), fedID(id)
 {
 }

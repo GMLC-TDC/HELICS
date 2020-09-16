@@ -101,7 +101,7 @@ namespace helics {
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
-    global_id{global_federate_id()}
+    global_id{GlobalFederateId()}
 {
     for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
@@ -147,9 +147,9 @@ void FederateState::setState(federate_state newState)
 
 void FederateState::reset()
 {
-    global_id = global_federate_id();
-    interfaceInformation.setGlobalId(global_federate_id());
-    local_id = local_federate_id();
+    global_id = GlobalFederateId();
+    interfaceInformation.setGlobalId(GlobalFederateId());
+    local_id = LocalFederateId();
     state = HELICS_CREATED;
     queue.clear();
     delayQueues.clear();
@@ -173,7 +173,7 @@ int32_t FederateState::getCurrentIteration() const
     return timeCoord->getCurrentIteration();
 }
 
-bool FederateState::checkAndSetValue(interface_handle pub_id, const char* data, uint64_t len)
+bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, uint64_t len)
 {
     if (!only_transmit_on_change) {
         return true;
@@ -201,7 +201,7 @@ void FederateState::generateConfig(Json::Value& base) const
     }
 }
 
-uint64_t FederateState::getQueueSize(interface_handle id) const
+uint64_t FederateState::getQueueSize(InterfaceHandle id) const
 {
     const auto* epI = interfaceInformation.getEndpoint(id);
     if (epI != nullptr) {
@@ -219,7 +219,7 @@ uint64_t FederateState::getQueueSize() const
     return cnt;
 }
 
-std::unique_ptr<Message> FederateState::receive(interface_handle id)
+std::unique_ptr<Message> FederateState::receive(InterfaceHandle id)
 {
     auto* epI = interfaceInformation.getEndpoint(id);
     if (epI != nullptr) {
@@ -228,7 +228,7 @@ std::unique_ptr<Message> FederateState::receive(interface_handle id)
     return nullptr;
 }
 
-std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
+std::unique_ptr<Message> FederateState::receiveAny(InterfaceHandle& id)
 {
     Time earliest_time = Time::maxVal();
     EndpointInfo* endpointI = nullptr;
@@ -250,18 +250,18 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
         id = endpointI->id.handle;
         return result;
     }
-    id = interface_handle();
+    id = InterfaceHandle();
     return nullptr;
 }
 
-const std::shared_ptr<const SmallBuffer>& FederateState::getValue(interface_handle handle,
+const std::shared_ptr<const SmallBuffer>& FederateState::getValue(InterfaceHandle handle,
                                                                   uint32_t* inputIndex)
 {
     return interfaces().getInput(handle)->getData(inputIndex);
 }
 
 const std::vector<std::shared_ptr<const SmallBuffer>>&
-    FederateState::getAllValues(interface_handle handle)
+    FederateState::getAllValues(InterfaceHandle handle)
 {
     return interfaces().getInput(handle)->getAllData();
 }
@@ -290,7 +290,7 @@ void FederateState::addAction(ActionMessage&& action)
 }
 
 void FederateState::createInterface(handle_type htype,
-                                    interface_handle handle,
+                                    InterfaceHandle handle,
                                     const std::string& key,
                                     const std::string& type,
                                     const std::string& units)
@@ -342,7 +342,7 @@ void FederateState::createInterface(handle_type htype,
     }
 }
 
-void FederateState::closeInterface(interface_handle handle, handle_type type)
+void FederateState::closeInterface(InterfaceHandle handle, handle_type type)
 {
     switch (type) {
         case handle_type::publication: {
@@ -514,7 +514,7 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate)
     return ret;
 }
 
-std::vector<global_handle> FederateState::getSubscribers(interface_handle handle)
+std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 {
     std::lock_guard<FederateState> fedlock(*this);
     auto* pubInfo = interfaceInformation.getPublication(handle);
@@ -524,8 +524,8 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
     return {};
 }
 
-std::vector<std::pair<global_handle, std::string_view>>
-    FederateState::getMessageDestinations(interface_handle handle)
+std::vector<std::pair<GlobalHandle, std::string_view>>
+    FederateState::getMessageDestinations(InterfaceHandle handle)
 {
     std::lock_guard<FederateState> fedlock(*this);
     const auto* eptInfo = interfaceInformation.getEndpoint(handle);
@@ -704,9 +704,9 @@ void FederateState::finalize()
     }
 }
 
-const std::vector<interface_handle> emptyHandles;
+const std::vector<InterfaceHandle> emptyHandles;
 
-const std::vector<interface_handle>& FederateState::getEvents() const
+const std::vector<InterfaceHandle>& FederateState::getEvents() const
 {
     return events;
 }
@@ -742,7 +742,7 @@ message_processing_result FederateState::processDelayQueue() noexcept
     return ret_code;
 }
 
-void FederateState::addFederateToDelay(global_federate_id id)
+void FederateState::addFederateToDelay(GlobalFederateId id)
 {
     if ((delayedFederates.empty()) || (id > delayedFederates.back())) {
         delayedFederates.push_back(id);
@@ -795,7 +795,7 @@ message_processing_result FederateState::processQueue() noexcept
         //    messLog.push_back(cmd);
         ret_code = processActionMessage(cmd);
         if (ret_code == message_processing_result::delay_message) {
-            delayQueues[static_cast<global_federate_id>(cmd.source_id)].push_back(cmd);
+            delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);
         }
         if (ret_code == message_processing_result::error && cmd.action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
@@ -895,7 +895,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_EXEC_GRANT:
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
+                    addFederateToDelay(GlobalFederateId(cmd.source_id));
                     return message_processing_result::delay_message;
                 case message_process_result::no_effect:
                     return message_processing_result::continue_processing;
@@ -957,7 +957,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
-                        addFederateToDelay(global_federate_id(cmd.source_id));
+                        addFederateToDelay(GlobalFederateId(cmd.source_id));
                         return message_processing_result::delay_message;
                     case message_process_result::no_effect:
                         return message_processing_result::continue_processing;
@@ -983,7 +983,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_DISCONNECT_CORE:
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
+                    addFederateToDelay(GlobalFederateId(cmd.source_id));
                     return message_processing_result::delay_message;
                 case message_process_result::no_effect:
                     return message_processing_result::continue_processing;
@@ -1030,7 +1030,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_TIME_GRANT:
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
+                    addFederateToDelay(GlobalFederateId(cmd.source_id));
                     return message_processing_result::delay_message;
                 case message_process_result::no_effect:
                     return message_processing_result::continue_processing;
@@ -1075,7 +1075,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             }
         } break;
         case CMD_PUB: {
-            auto* subI = interfaceInformation.getInput(interface_handle(cmd.dest_handle));
+            auto* subI = interfaceInformation.getInput(InterfaceHandle(cmd.dest_handle));
             if (subI == nullptr) {
                 break;
             }
@@ -1129,7 +1129,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
-                        addFederateToDelay(global_federate_id(cmd.source_id));
+                        addFederateToDelay(GlobalFederateId(cmd.source_id));
                         return message_processing_result::delay_message;
                     case message_process_result::no_effect:
                         return message_processing_result::continue_processing;
@@ -1539,7 +1539,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
     }
 }
 
-int32_t FederateState::getHandleOption(interface_handle handle, char iType, int32_t option) const
+int32_t FederateState::getHandleOption(InterfaceHandle handle, char iType, int32_t option) const
 {
     switch (iType) {
         case 'i':
@@ -1582,22 +1582,22 @@ int FederateState::inputCount() const
     return static_cast<int>(interfaceInformation.getInputs()->size());
 }
 
-std::vector<global_federate_id> FederateState::getDependencies() const
+std::vector<GlobalFederateId> FederateState::getDependencies() const
 {
     return timeCoord->getDependencies();
 }
 
-std::vector<global_federate_id> FederateState::getDependents() const
+std::vector<GlobalFederateId> FederateState::getDependents() const
 {
     return timeCoord->getDependents();
 }
 
-void FederateState::addDependency(global_federate_id fedToDependOn)
+void FederateState::addDependency(GlobalFederateId fedToDependOn)
 {
     timeCoord->addDependency(fedToDependOn);
 }
 
-void FederateState::addDependent(global_federate_id fedThatDependsOnThis)
+void FederateState::addDependent(GlobalFederateId fedThatDependsOnThis)
 {
     timeCoord->addDependent(fedThatDependsOnThis);
 }

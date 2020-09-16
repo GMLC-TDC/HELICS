@@ -12,31 +12,31 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 
 namespace helics {
-std::ostream& operator<<(std::ostream& os, local_federate_id fid)
+std::ostream& operator<<(std::ostream& os, LocalFederateId fid)
 {
     os << fid.baseValue();
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, interface_handle handle)
+std::ostream& operator<<(std::ostream& os, InterfaceHandle handle)
 {
     os << handle.baseValue();
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, global_broker_id id)
+std::ostream& operator<<(std::ostream& os, GlobalBrokerId id)
 {
     os << id.baseValue();
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, global_federate_id id)
+std::ostream& operator<<(std::ostream& os, GlobalFederateId id)
 {
     os << id.baseValue();
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, global_handle id)
+std::ostream& operator<<(std::ostream& os, GlobalHandle id)
 {
     os << id.fed_id.baseValue() << "::" << id.handle.baseValue();
     return os;

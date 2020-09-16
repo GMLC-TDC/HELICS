@@ -24,8 +24,8 @@ TEST(InfoClass_tests, basichandleinfo_test)
     EXPECT_TRUE(defHnd.units.empty());
 
     // Constructor with last parameter default value
-    helics::BasicHandleInfo hnd1(helics::global_federate_id(15),
-                                 helics::interface_handle(10),
+    helics::BasicHandleInfo hnd1(helics::GlobalFederateId(15),
+                                 helics::InterfaceHandle(10),
                                  helics::handle_type::endpoint,
                                  "key",
                                  "type",
@@ -40,8 +40,8 @@ TEST(InfoClass_tests, basichandleinfo_test)
     EXPECT_EQ(hnd1.units, "units");
 
     // Constructor overriding last parameter default value
-    helics::BasicHandleInfo hnd2(helics::global_federate_id(1500),
-                                 helics::interface_handle(100),
+    helics::BasicHandleInfo hnd2(helics::GlobalFederateId(1500),
+                                 helics::InterfaceHandle(100),
                                  helics::handle_type::endpoint,
                                  "key",
                                  "type",
@@ -59,8 +59,8 @@ TEST(InfoClass_tests, basichandleinfo_test)
 
     // Source filter handle
     // destFilter should be false, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo srcFiltHnd(helics::global_federate_id(2),
-                                       helics::interface_handle(1),
+    helics::BasicHandleInfo srcFiltHnd(helics::GlobalFederateId(2),
+                                       helics::InterfaceHandle(1),
                                        helics::handle_type::filter,
                                        "key",
                                        "type_in",
@@ -76,8 +76,8 @@ TEST(InfoClass_tests, basichandleinfo_test)
 
     // Destination filter handle
     // destFilter should be true, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo dstFiltHnd(helics::global_federate_id(3),
-                                       helics::interface_handle(7),
+    helics::BasicHandleInfo dstFiltHnd(helics::GlobalFederateId(3),
+                                       helics::InterfaceHandle(7),
                                        helics::handle_type::filter,
                                        "key",
                                        "type_in",
@@ -125,7 +125,7 @@ TEST(InfoClass_tests, endpointinfo_test)
     msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time(1);
 
-    helics::EndpointInfo endPI({helics::global_federate_id(5), helics::interface_handle(13)},
+    helics::EndpointInfo endPI({helics::GlobalFederateId(5), helics::InterfaceHandle(13)},
                                "name",
                                "type");
     EXPECT_EQ(endPI.id.handle.baseValue(), 13);
@@ -264,8 +264,8 @@ TEST(InfoClass_tests, filterinfo_test)
     msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time(1);
 
-    helics::FilterInfo filtI(helics::global_broker_id(5),
-                             helics::interface_handle(13),
+    helics::FilterInfo filtI(helics::GlobalBrokerId(5),
+                             helics::InterfaceHandle(13),
                              "name",
                              "type_in",
                              "type_out",
@@ -284,8 +284,8 @@ TEST(InfoClass_tests, inputinfo_test)
 
     std::shared_ptr<const helics::SmallBuffer> ret_data;
 
-    helics::InputInfo subI(helics::global_handle(helics::global_federate_id(5),
-                                                 helics::interface_handle(13)),
+    helics::InputInfo subI(helics::GlobalHandle(helics::GlobalFederateId(5),
+                                                 helics::InterfaceHandle(13)),
                            "key",
                            "type",
                            "units");
@@ -296,7 +296,7 @@ TEST(InfoClass_tests, inputinfo_test)
     EXPECT_EQ(subI.units, "units");
     EXPECT_EQ(subI.required, false);
 
-    helics::global_handle testHandle(helics::global_federate_id(5), helics::interface_handle(45));
+    helics::GlobalHandle testHandle(helics::GlobalFederateId(5), helics::InterfaceHandle(45));
     subI.addSource(testHandle, "", "double", std::string());
     // No data available, shouldn't get a data_block back
     ret_data = subI.getData(0);

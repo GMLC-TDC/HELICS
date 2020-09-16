@@ -31,8 +31,8 @@ ActionMessage::ActionMessage(action_message_def::action_t startingAction):
 }
 
 ActionMessage::ActionMessage(action_message_def::action_t startingAction,
-                             global_federate_id sourceId,
-                             global_federate_id destId):
+                             GlobalFederateId sourceId,
+                             GlobalFederateId destId):
     messageAction(startingAction),
     source_id(sourceId), dest_id(destId)
 {
@@ -374,18 +374,18 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     // messageID = *reinterpret_cast<const int32_t *> (data);
     memcpy(&messageID, data, sizeof(int32_t));
     data += sizeof(int32_t);
-    // source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&source_id, data, sizeof(global_federate_id));
-    data += sizeof(global_federate_id);
-    // source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&source_handle, data, sizeof(interface_handle));
-    data += sizeof(interface_handle);
-    // dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&dest_id, data, sizeof(global_federate_id));
-    data += sizeof(global_federate_id);
-    // dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&dest_handle, data, sizeof(interface_handle));
-    data += sizeof(interface_handle);
+    // source_id = GlobalFederateId{*reinterpret_cast<const int32_t *> (data)};
+    memcpy(&source_id, data, sizeof(GlobalFederateId));
+    data += sizeof(GlobalFederateId);
+    // source_handle = InterfaceHandle{*reinterpret_cast<const int32_t *> (data)};
+    memcpy(&source_handle, data, sizeof(InterfaceHandle));
+    data += sizeof(InterfaceHandle);
+    // dest_id = GlobalFederateId{*reinterpret_cast<const int32_t *> (data)};
+    memcpy(&dest_id, data, sizeof(GlobalFederateId));
+    data += sizeof(GlobalFederateId);
+    // dest_handle = InterfaceHandle{*reinterpret_cast<const int32_t *> (data)};
+    memcpy(&dest_handle, data, sizeof(InterfaceHandle));
+    data += sizeof(InterfaceHandle);
     // counter = *reinterpret_cast<const uint16_t *> (data);
     memcpy(&counter, data, sizeof(uint16_t));
     data += sizeof(uint16_t);
