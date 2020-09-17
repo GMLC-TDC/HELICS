@@ -769,6 +769,26 @@ class Core {
     @param value the value of the global
     */
     virtual void setGlobal(const std::string& valueName, const std::string& value) = 0;
+
+    /** send a command to a specific target
+  @details the format is somewhat unspecified; target is the name of an object, typically one of
+  "federation",  "broker", "core", or the name of a specific object/core/broker
+  @param target the specific target of the command
+  @param commandStr the actual command
+  @param source
+  */
+    virtual void sendCommand(const std::string& target,
+                             const std::string& commandStr,
+                             const std::string& source) = 0;
+
+    /** get a command for a specific federate
+     */
+    virtual std::pair<std::string, std::string> getCommand(local_federate_id federateID) = 0;
+
+    /** get a command for a specific federate. block until a command is received
+     */
+    virtual std::pair<std::string, std::string> waitCommand(local_federate_id federateID) = 0;
+
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", "core", or the name of a specific object/core/broker
@@ -779,6 +799,7 @@ class Core {
     return until the query is answered so use with caution
     */
     virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
+
     /** supply a query callback function
     @details the intention of the query callback is to allow federates to answer particular requests
     through the query interface this allows other federates to make requests or queries of other
