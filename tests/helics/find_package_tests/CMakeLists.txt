@@ -24,7 +24,7 @@ message(STATUS "Binary location is ${PROJECT_BINARY_DIR}")
 # Test the CXX shared library target
 if(HELICS_BUILD_CXX_SHARED_LIB)
     add_executable(shared-library-test-exe ../pkg_test_code/main.cpp)
-    target_link_libraries(shared-library-test-exe HELICS::helics-shared)
+    target_link_libraries(shared-library-test-exe HELICS::helicscpp)
 
     add_test(NAME shared-library-test COMMAND shared-library-test-exe)
     set_property(TEST shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}")
@@ -32,7 +32,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
     # Test the helics_app shared library target
     if(HELICS_BUILD_APP_LIBRARY)
         add_executable(apps-library-test-exe ../pkg_test_code/main-apps.cpp)
-        target_link_libraries(apps-library-test-exe PUBLIC HELICS::helics-apps-shared)
+        target_link_libraries(apps-library-test-exe PUBLIC HELICS::helicscpp-apps)
 
         add_test(NAME apps-library-test COMMAND apps-library-test-exe)
         set_property(TEST apps-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}")
@@ -43,7 +43,7 @@ endif()
 # Test the C and C++98 targets
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_executable(c-shared-library-test-exe ../pkg_test_code/main.c)
-    target_link_libraries(c-shared-library-test-exe HELICS::helicsSharedLib)
+    target_link_libraries(c-shared-library-test-exe HELICS::helics)
 
     add_test(NAME c-shared-library-test COMMAND c-shared-library-test-exe)
     set_property(TEST c-shared-library-test PROPERTY PASS_REGULAR_EXPRESSION "${HELICS_VERSION}")
