@@ -771,10 +771,11 @@ class Core {
     virtual void setGlobal(const std::string& valueName, const std::string& value) = 0;
 
     /** send a command to a specific target
-  @details the format is somewhat unspecified  target is the name of an object typically one of
+  @details the format is somewhat unspecified; target is the name of an object, typically one of
   "federation",  "broker", "core", or the name of a specific object/core/broker
   @param target the specific target of the command
   @param commandStr the actual command
+  @param source
   */
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,

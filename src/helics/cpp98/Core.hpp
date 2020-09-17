@@ -121,7 +121,7 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
-    /** send an aynchronous command to another object
+    /** send an asynchronous command to another object
     @param target the name of the target of the command
     @param command the command message to send
     */

@@ -1106,7 +1106,7 @@ void Federate::sendCommand(const std::string& target, const std::string& command
         coreObject->sendCommand(target, commandStr, getName());
     } else {
         throw(InvalidFunctionCall(
-            " command cannot be called on uninitialized federate or after disconnect call"));
+            "command cannot be called on uninitialized federate or after disconnect call"));
     }
 }
 
@@ -1116,7 +1116,7 @@ std::pair<std::string, std::string> Federate::getCommand()
         return coreObject->getCommand(fedID);
     } else {
         throw(InvalidFunctionCall(
-            " command cannot be called on uninitialized federate or after disconnect call"));
+            "command cannot be called on uninitialized federate or after disconnect call"));
     }
 }
 
@@ -1126,7 +1126,7 @@ std::pair<std::string, std::string> Federate::waitCommand()
         return coreObject->waitCommand(fedID);
     } else {
         throw(InvalidFunctionCall(
-            " command cannot be called on uninitialized federate or after disconnect call"));
+            "command cannot be called on uninitialized federate or after disconnect call"));
     }
 }
 

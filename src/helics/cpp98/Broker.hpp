@@ -157,7 +157,7 @@ class Broker {
         return result;
     }
 
-    /** send an aynchronous command to another object
+    /** send an asynchronous command to another object
     @param target the name of the target of the command
     @param command the command message to send
     */

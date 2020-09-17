@@ -397,7 +397,7 @@ class FederateState {
     /** send a command to a federate*/
     void sendCommand(ActionMessage& command);
 
-    /** get a command for a federate in its queue*/
+    /** get a command for a federate from its queue*/
     std::pair<std::string, std::string> getCommand();
     /** wait for a command to a federate*/
     std::pair<std::string, std::string> waitCommand();

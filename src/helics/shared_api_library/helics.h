@@ -1326,11 +1326,11 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char
 HELICS_EXPORT void helicsFederateLogLevelMessage(helics_federate fed, int loglevel, const char* logmessage, helics_error* err);
 
 /**
- * Set a command to another helics object through a federate
+ * Send a command to another helics object through a federate.
  *
- * @param fed The federate to send the command through
- * @param target The name of the object to send the command to
- * @param command the command to send
+ * @param fed The federate to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -1338,40 +1338,40 @@ HELICS_EXPORT void helicsFederateLogLevelMessage(helics_federate fed, int loglev
 HELICS_EXPORT void helicsFederateSendCommand(helics_federate fed, const char* target, const char* command, helics_error* err);
 
 /**
- * get a command sent to the federate
+ * Get a command sent to the federate.
  *
- * @param fed The federate to get the command for
+ * @param fed The federate to get the command for.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return a string with the command for the federate if the string is empty no command is available
+ * @return A string with the command for the federate, if the string is empty no command is available.
  */
 HELICS_EXPORT const char* helicsFederateGetCommand(helics_federate fed, helics_error* err);
 
 /**
- * get the source of the most recently retrieved command sent to the federate
+ * Get the source of the most recently retrieved command sent to the federate.
  *
- * @param fed The federate to get the command for
+ * @param fed The federate to get the command for.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return a string with the command for the federate if the string is empty no command is available
+ * @return A string with the command for the federate, if the string is empty no command is available.
  */
 HELICS_EXPORT const char* helicsFederateGetCommandSource(helics_federate fed, helics_error* err);
 
 /**
- * wait for a command sent to the federate
+ * Get a command sent to the federate. Blocks until a command is received.
  *
- * @param fed The federate to get the command for
- * @param target The name of the object to send the command to
- * @param command the command to send
+ * @param fed The federate to get the command for.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return a string with the command for the federate if the string is empty no command is available
+ * @return A string with the command for the federate, if the string is empty no command is available.
  */
 HELICS_EXPORT const char* helicsFederateWaitCommand(helics_federate fed, helics_error* err);
 /**
@@ -1403,11 +1403,11 @@ HELICS_EXPORT void helicsCoreSetGlobal(helics_core core, const char* valueName, 
 HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const char* value, helics_error* err);
 
 /**
- * Set a command to another helics object though a core
+ * Send a command to another helics object though a core.
  *
- * @param core The core to send the command through
- * @param target The name of the object to send the command to
- * @param command the command to send
+ * @param core The core to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -1415,11 +1415,11 @@ HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* value
 HELICS_EXPORT void helicsCoreSendCommand(helics_core core, const char* target, const char* command, helics_error* err);
 
 /**
- * Set a command to another helics object through a broker
+ * Send a command to another helics object through a broker.
  *
- * @param core The core to send the command through
- * @param target The name of the object to send the command to
- * @param command the command to send
+ * @param core The core to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly

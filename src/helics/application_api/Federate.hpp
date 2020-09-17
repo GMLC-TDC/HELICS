@@ -361,20 +361,20 @@ class HELICS_CXX_EXPORT Federate {
     /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
   specific name of a federate, core, or broker
-  @param commandStr a string with the command instructions see other documentation for specific
+  @param commandStr a string with the command instructions, see other documentation for specific
   properties to command, can be defined by a federate
   */
     void sendCommand(const std::string& target, const std::string& queryStr);
 
-    /** get any commands for the Federate
+    /** get a command for the Federate
  @param target  the target of the command can be "federation", "federate", "broker", "core", or a
  specific name of a federate, core, or broker
- @return a pair of strings <command,source> with the command instructions for the federate the
+ @return a pair of strings <command,source> with the command instructions for the federate; the
  command string will be empty if no command is given
  */
     std::pair<std::string, std::string> getCommand();
 
-    /** get a commands for the Federate, call will block until a command is received
+    /** get a command for the Federate, if there is none the call will block until a command is received
 @param target  the target of the command can be "federation", "federate", "broker", "core", or a
 specific name of a federate, core, or broker
 @return a pair of strings <command,source> with the command instructions for the federate
