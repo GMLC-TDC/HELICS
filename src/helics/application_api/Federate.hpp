@@ -364,7 +364,7 @@ class HELICS_CXX_EXPORT Federate {
   @param commandStr a string with the command instructions, see other documentation for specific
   properties to command, can be defined by a federate
   */
-    void sendCommand(const std::string& target, const std::string& queryStr);
+    void sendCommand(const std::string& target, const std::string& commandStr);
 
     /** get a command for the Federate
  @param target  the target of the command can be "federation", "federate", "broker", "core", or a
