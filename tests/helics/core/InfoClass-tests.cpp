@@ -285,7 +285,7 @@ TEST(InfoClass_tests, inputinfo_test)
     std::shared_ptr<const helics::SmallBuffer> ret_data;
 
     helics::InputInfo subI(helics::GlobalHandle(helics::GlobalFederateId(5),
-                                                 helics::InterfaceHandle(13)),
+                                                helics::InterfaceHandle(13)),
                            "key",
                            "type",
                            "units");

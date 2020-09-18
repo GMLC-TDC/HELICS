@@ -70,10 +70,7 @@ class GlobalFederateId {
     /** implicit conversion from global_id*/
     constexpr GlobalFederateId(GlobalBrokerId id) noexcept: gid(id.gid) {}  // NOLINT
 
-    constexpr operator GlobalBrokerId() const noexcept
-    {
-        return GlobalBrokerId{gid};
-    }  // NOLINT
+    constexpr operator GlobalBrokerId() const noexcept { return GlobalBrokerId{gid}; }  // NOLINT
     /** conversion to the BaseType*/
     constexpr BaseType baseValue() const { return gid; }
     /** equality operator*/
@@ -124,10 +121,7 @@ class GlobalHandle {
     /** default constructor*/
     constexpr GlobalHandle() = default;
     /** construct directly from a federate_id and InterfaceHandle*/
-    constexpr GlobalHandle(GlobalFederateId fed, InterfaceHandle hand):
-        fed_id(fed), handle(hand)
-    {
-    }
+    constexpr GlobalHandle(GlobalFederateId fed, InterfaceHandle hand): fed_id(fed), handle(hand) {}
     /** convert to a uint64_t
         @details for use in maps and other things*/
     explicit operator uint64_t() const

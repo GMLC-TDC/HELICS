@@ -541,8 +541,7 @@ iteration_result CommonCore::enterExecutingMode(LocalFederateId federateID,
     return fed->enterExecutingMode(iterate);
 }
 
-LocalFederateId CommonCore::registerFederate(const std::string& name,
-                                               const CoreFederateInfo& info)
+LocalFederateId CommonCore::registerFederate(const std::string& name, const CoreFederateInfo& info)
 {
     if (!waitCoreRegistration()) {
         if (brokerState == broker_state_t::errored) {
@@ -836,9 +835,9 @@ const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_fed
 static const std::string emptyString;
 
 InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
-                                           const std::string& key,
-                                           const std::string& type,
-                                           const std::string& units)
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -883,9 +882,9 @@ InterfaceHandle CommonCore::getInput(LocalFederateId federateID, const std::stri
 }
 
 InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
-                                                 const std::string& key,
-                                                 const std::string& type,
-                                                 const std::string& units)
+                                                const std::string& key,
+                                                const std::string& type,
+                                                const std::string& units)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -919,8 +918,7 @@ InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
     return id;
 }
 
-InterfaceHandle CommonCore::getPublication(LocalFederateId federateID,
-                                            const std::string& key) const
+InterfaceHandle CommonCore::getPublication(LocalFederateId federateID, const std::string& key) const
 {
     const auto* pub = handles.read([&key](auto& hand) { return hand.getPublication(key); });
     if (pub->local_fed_id != federateID) {
@@ -1386,8 +1384,8 @@ const std::vector<InterfaceHandle>& CommonCore::getValueUpdates(LocalFederateId 
 }
 
 InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
-                                              const std::string& name,
-                                              const std::string& type)
+                                             const std::string& name,
+                                             const std::string& type)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1419,8 +1417,8 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
 }
 
 InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
-                                                      const std::string& name,
-                                                      const std::string& type)
+                                                     const std::string& name,
+                                                     const std::string& type)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1448,8 +1446,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
     return id;
 }
 
-InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID,
-                                         const std::string& name) const
+InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, const std::string& name) const
 {
     const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept->local_fed_id != federateID) {
@@ -1459,8 +1456,8 @@ InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID,
 }
 
 InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
-                                            const std::string& type_in,
-                                            const std::string& type_out)
+                                           const std::string& type_in,
+                                           const std::string& type_out)
 {
     // check to make sure the name isn't already used
     if (!filterName.empty()) {
@@ -1495,8 +1492,8 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
 }
 
 InterfaceHandle CommonCore::registerCloningFilter(const std::string& filterName,
-                                                   const std::string& type_in,
-                                                   const std::string& type_out)
+                                                  const std::string& type_in,
+                                                  const std::string& type_out)
 {
     // check to make sure the name isn't already used
     if (!filterName.empty()) {
@@ -2084,8 +2081,7 @@ uint16_t CommonCore::getNextAirlockIndex()
     return index;
 }
 
-void CommonCore::setFilterOperator(InterfaceHandle filter,
-                                   std::shared_ptr<FilterOperator> callback)
+void CommonCore::setFilterOperator(InterfaceHandle filter, std::shared_ptr<FilterOperator> callback)
 {
     static std::shared_ptr<FilterOperator> nullFilt = std::make_shared<NullFilterOperator>();
     const auto* hndl = getHandleInfo(filter);
