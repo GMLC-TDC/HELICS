@@ -59,7 +59,7 @@ void TimeCoordinator::disconnect()
     time_granted = Time::maxVal();
     time_grantBase = Time::maxVal();
     if (sendMessageFunction) {
-        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
+        std::set<GlobalFederateId> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
             if (dep.Tnext < Time::maxVal()) {
                 connections.insert(dep.fedID);
@@ -102,7 +102,7 @@ void TimeCoordinator::localError()
     time_granted = Time::maxVal();
     time_grantBase = Time::maxVal();
     if (sendMessageFunction) {
-        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
+        std::set<GlobalFederateId> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
             if (dep.Tnext < Time::maxVal()) {
                 connections.insert(dep.fedID);
@@ -493,12 +493,12 @@ std::string TimeCoordinator::printTimeStatus() const
         static_cast<double>(time_minminDe));
 }
 
-bool TimeCoordinator::isDependency(global_federate_id ofed) const
+bool TimeCoordinator::isDependency(GlobalFederateId ofed) const
 {
     return dependencies.isDependency(ofed);
 }
 
-bool TimeCoordinator::addDependency(global_federate_id fedID)
+bool TimeCoordinator::addDependency(GlobalFederateId fedID)
 {
     if (dependencies.addDependency(fedID)) {
         dependency_federates.lock()->push_back(fedID);
@@ -507,7 +507,7 @@ bool TimeCoordinator::addDependency(global_federate_id fedID)
     return false;
 }
 
-bool TimeCoordinator::addDependent(global_federate_id fedID)
+bool TimeCoordinator::addDependent(GlobalFederateId fedID)
 {
     if (dependents.empty()) {
         dependents.push_back(fedID);
@@ -528,7 +528,7 @@ bool TimeCoordinator::addDependent(global_federate_id fedID)
     return true;
 }
 
-void TimeCoordinator::removeDependency(global_federate_id fedID)
+void TimeCoordinator::removeDependency(GlobalFederateId fedID)
 {
     dependencies.removeDependency(fedID);
     // remove the thread safe version
@@ -539,7 +539,7 @@ void TimeCoordinator::removeDependency(global_federate_id fedID)
     }
 }
 
-void TimeCoordinator::removeDependent(global_federate_id fedID)
+void TimeCoordinator::removeDependent(GlobalFederateId fedID)
 {
     auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
     if (dep != dependents.end()) {
@@ -555,12 +555,12 @@ void TimeCoordinator::removeDependent(global_federate_id fedID)
     }
 }
 
-DependencyInfo* TimeCoordinator::getDependencyInfo(global_federate_id ofed)
+DependencyInfo* TimeCoordinator::getDependencyInfo(GlobalFederateId ofed)
 {
     return dependencies.getDependencyInfo(ofed);
 }
 
-std::vector<global_federate_id> TimeCoordinator::getDependencies() const
+std::vector<GlobalFederateId> TimeCoordinator::getDependencies() const
 {
     return *dependency_federates.lock_shared();
 }
@@ -624,7 +624,7 @@ message_processing_result TimeCoordinator::checkExecEntry()
     return ret;
 }
 
-static bool isDelayableMessage(const ActionMessage& cmd, global_federate_id localId)
+static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localId)
 {
     return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
             (cmd.source_id != localId));
@@ -659,14 +659,14 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_LOCAL_ERROR:
             // this command requires removing dependents as well as dealing with dependency
             // processing
-            removeDependent(global_federate_id(cmd.source_id));
+            removeDependent(GlobalFederateId(cmd.source_id));
             break;
 
         default:
             break;
     }
     if (isDelayableMessage(cmd, source_id)) {
-        auto* dep = dependencies.getDependencyInfo(global_federate_id(cmd.source_id));
+        auto* dep = dependencies.getDependencyInfo(GlobalFederateId(cmd.source_id));
         if (dep == nullptr) {
             return message_process_result::no_effect;
         }

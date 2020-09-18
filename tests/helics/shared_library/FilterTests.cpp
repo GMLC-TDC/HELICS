@@ -602,7 +602,7 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
     EXPECT_TRUE(err.error_code == helics_ok);
 
-    auto cr = helicsFederateGetCoreObject(sFed, &err);
+    auto cr = helicsFederateGetCore(sFed, &err);
 
     CE(helicsCoreAddSourceFilterToEndpoint(cr, "filt1", "src", &err));
 
@@ -764,7 +764,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
     EXPECT_TRUE(err.error_code == helics_ok);
 
-    auto cr = helicsFederateGetCoreObject(sFed, &err);
+    auto cr = helicsFederateGetCore(sFed, &err);
 
     CE(helicsCoreAddDestinationFilterToEndpoint(cr, "filt1", "dest", &err));
 

@@ -18,11 +18,11 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 struct EndpointInformation {
-    global_handle id;
+    GlobalHandle id;
     std::string key;
     std::string type;
     EndpointInformation() = default;
-    EndpointInformation(global_handle gid, const std::string& key_, const std::string& type_):
+    EndpointInformation(GlobalHandle gid, const std::string& key_, const std::string& type_):
         id(gid), key(key_), type(type_)
     {
     }
@@ -31,12 +31,12 @@ struct EndpointInformation {
 class EndpointInfo {
   public:
     /** constructor from all data*/
-    EndpointInfo(global_handle handle, const std::string& key_, const std::string& type_):
+    EndpointInfo(GlobalHandle handle, const std::string& key_, const std::string& type_):
         id(handle), key(key_), type(type_)
     {
     }
 
-    const global_handle id;  //!< identifier for the handle
+    const GlobalHandle id;  //!< identifier for the handle
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:
@@ -44,7 +44,7 @@ class EndpointInfo {
         message_queue;  //!< storage for the messages
     std::vector<EndpointInformation> sourceInformation;
     std::vector<EndpointInformation> targetInformation;
-    std::vector<std::pair<global_handle, std::string_view>> targets;
+    std::vector<std::pair<GlobalHandle, std::string_view>> targets;
     mutable std::string sourceTargets;
     mutable std::string destinationTargets;
 
@@ -62,17 +62,17 @@ class EndpointInfo {
     /** clear all the message queues*/
     void clearQueue();
     /** add a target target*/
-    void addDestinationTarget(global_handle dest,
+    void addDestinationTarget(GlobalHandle dest,
                               const std::string& destName,
                               const std::string& destType);
     /** add a source to an endpoint*/
-    void addSourceTarget(global_handle dest,
+    void addSourceTarget(GlobalHandle dest,
                          const std::string& sourceName,
                          const std::string& sourceType);
     /** remove a target from connection*/
-    void removeTarget(global_handle targetId);
+    void removeTarget(GlobalHandle targetId);
     /** get the vector of endpoint targets*/
-    const std::vector<std::pair<global_handle, std::string_view>>& getTargets() const
+    const std::vector<std::pair<GlobalHandle, std::string_view>>& getTargets() const
     {
         return targets;
     }

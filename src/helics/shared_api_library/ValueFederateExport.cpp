@@ -852,7 +852,7 @@ void helicsInputGetComplex(helics_input inp, double* real, double* imag, helics_
     // LCOV_EXCL_STOP
 }
 
-helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
+HelicsComplex helicsInputGetComplexObject(helics_input inp, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
 

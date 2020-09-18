@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 
 namespace helics {
-void FilterCoordinator::closeFilter(global_handle filt)
+void FilterCoordinator::closeFilter(GlobalHandle filt)
 {
     if (destFilter != nullptr) {
         if ((destFilter->core_id == filt.fed_id) && (destFilter->handle == filt.handle)) {

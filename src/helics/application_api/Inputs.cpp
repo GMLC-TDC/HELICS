@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 Input::Input(ValueFederate* valueFed,
-             interface_handle id,
+             InterfaceHandle id,
              const std::string& actName,
              const std::string& unitsOut):
     Interface(valueFed, id, actName),

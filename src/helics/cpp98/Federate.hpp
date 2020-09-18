@@ -601,7 +601,7 @@ class Federate {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }
     /** get a Core Object*/
-    helics_core getCore() { return helicsFederateGetCoreObject(fed, hThrowOnError()); }
+    helics_core getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
 
   protected:
     helics_federate fed;  //!< underlying helics_federate object

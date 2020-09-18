@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-static constexpr global_federate_id fed2(2);
-static constexpr global_federate_id fed3(3);
+static constexpr GlobalFederateId fed2(2);
+static constexpr GlobalFederateId fed3(3);
 TEST(timeCoord_tests, dependency_tests)
 {
     TimeCoordinator ftc;
@@ -69,7 +69,7 @@ TEST(timeCoord_tests, dependency_test_message)
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = GlobalFederateId(10);
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependencies();
     EXPECT_EQ(deps.size(), 1U);
@@ -132,7 +132,7 @@ TEST(timeCoord_tests, dependent_test_message)
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = GlobalFederateId(10);
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 1U);

@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-void FilterInfo::addDestinationEndpoint(global_handle dest,
+void FilterInfo::addDestinationEndpoint(GlobalHandle dest,
                                         const std::string& destName,
                                         const std::string& destType)
 {
@@ -34,7 +34,7 @@ void FilterInfo::addDestinationEndpoint(global_handle dest,
 }
 
 /** add a source to an endpoint*/
-void FilterInfo::addSourceEndpoint(global_handle dest,
+void FilterInfo::addSourceEndpoint(GlobalHandle dest,
                                    const std::string& sourceName,
                                    const std::string& sourceType)
 {
@@ -54,7 +54,7 @@ void FilterInfo::addSourceEndpoint(global_handle dest,
 }
 
 /** remove a target from connection*/
-void FilterInfo::removeTarget(global_handle targetId)
+void FilterInfo::removeTarget(GlobalHandle targetId)
 {
     auto si = sourceEndpoints.begin();
     while (si != sourceEndpoints.end()) {

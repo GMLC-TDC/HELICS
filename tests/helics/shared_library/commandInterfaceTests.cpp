@@ -48,7 +48,7 @@ TEST_F(command_tests, core_federate_command)
     helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
     helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
-    auto core = helicsFederateGetCoreObject(vFed1, nullptr);
+    auto core = helicsFederateGetCore(vFed1, nullptr);
     helicsCoreSendCommand(core, helicsFederateGetName(vFed2), "test", nullptr);
     helicsFederateEnterExecutingModeAsync(vFed1, nullptr);
     helicsFederateEnterExecutingMode(vFed2, nullptr);

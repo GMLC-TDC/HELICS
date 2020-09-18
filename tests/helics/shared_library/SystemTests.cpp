@@ -315,7 +315,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateRequestTime(fed1, 3.0, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto cr = helicsFederateGetCoreObject(fed1, nullptr);
+    auto cr = helicsFederateGetCore(fed1, nullptr);
     helicsCoreDisconnect(cr, nullptr);
     helicsCoreFree(cr);
     helicsFederateDestroy(fed1);

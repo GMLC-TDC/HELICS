@@ -195,7 +195,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
                                                        findOpenPort(cnt, std::string(cmd.name()));
                 ActionMessage portReply(CMD_PROTOCOL);
                 portReply.messageID = PORT_DEFINITIONS;
-                portReply.source_id = global_federate_id(PortNumber);
+                portReply.source_id = GlobalFederateId(PortNumber);
                 portReply.setExtraData(openPort);
                 portReply.counter = cmd.counter;
                 return portReply;

@@ -54,9 +54,9 @@ void helicsCoreSetLoggingCallback(helics_core core,
     }
     try {
         if (logger == nullptr) {
-            cr->setLoggingCallback(helics::local_core_id, {});
+            cr->setLoggingCallback(helics::gLocalCoreId, {});
         } else {
-            cr->setLoggingCallback(helics::local_core_id,
+            cr->setLoggingCallback(helics::gLocalCoreId,
                                    [logger, userdata](int loglevel, std::string_view ident, std::string_view message) {
                                        const std::string ID(ident);
                                        const std::string mess(message);

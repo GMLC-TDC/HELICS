@@ -230,10 +230,10 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->getCorePointer()->setFlagOption(helics::local_core_id,
+    fed1->getCorePointer()->setFlagOption(helics::gLocalCoreId,
                                           helics_flag_terminate_on_error,
                                           true);
-    fed2->getCorePointer()->setFlagOption(helics::local_core_id,
+    fed2->getCorePointer()->setFlagOption(helics::gLocalCoreId,
                                           helics_flag_terminate_on_error,
                                           true);
 

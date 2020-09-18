@@ -16,30 +16,30 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-void InterfaceInfo::createPublication(interface_handle handle,
+void InterfaceInfo::createPublication(InterfaceHandle handle,
                                       const std::string& key,
                                       const std::string& type,
                                       const std::string& units)
 {
-    publications.lock()->insert(key, handle, global_handle{global_id, handle}, key, type, units);
+    publications.lock()->insert(key, handle, GlobalHandle{global_id, handle}, key, type, units);
 }
 
-void InterfaceInfo::createInput(interface_handle handle,
+void InterfaceInfo::createInput(InterfaceHandle handle,
                                 const std::string& key,
                                 const std::string& type,
                                 const std::string& units)
 {
     auto ciHandle = inputs.lock();
-    ciHandle->insert(key, handle, global_handle{global_id, handle}, key, type, units);
+    ciHandle->insert(key, handle, GlobalHandle{global_id, handle}, key, type, units);
     ciHandle->back()->only_update_on_change = only_update_on_change;
 }
 
-void InterfaceInfo::createEndpoint(interface_handle handle,
+void InterfaceInfo::createEndpoint(InterfaceHandle handle,
                                    const std::string& endpointName,
                                    const std::string& type)
 {
     endpoints.lock()->insert(
-        endpointName, handle, global_handle{global_id, handle}, endpointName, type);
+        endpointName, handle, GlobalHandle{global_id, handle}, endpointName, type);
 }
 
 void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
@@ -58,7 +58,7 @@ const PublicationInfo* InterfaceInfo::getPublication(const std::string& pubName)
     return publications.lock_shared()->find(pubName);
 }
 
-const PublicationInfo* InterfaceInfo::getPublication(interface_handle handle) const
+const PublicationInfo* InterfaceInfo::getPublication(InterfaceHandle handle) const
 {
     return publications.lock()->find(handle);
 }
@@ -68,7 +68,7 @@ PublicationInfo* InterfaceInfo::getPublication(const std::string& pubName)
     return publications.lock()->find(pubName);
 }
 
-PublicationInfo* InterfaceInfo::getPublication(interface_handle handle)
+PublicationInfo* InterfaceInfo::getPublication(InterfaceHandle handle)
 {
     return publications.lock()->find(handle);
 }
@@ -78,7 +78,7 @@ const InputInfo* InterfaceInfo::getInput(const std::string& inputName) const
     return inputs.lock_shared()->find(inputName);
 }
 
-const InputInfo* InterfaceInfo::getInput(interface_handle handle) const
+const InputInfo* InterfaceInfo::getInput(InterfaceHandle handle) const
 {
     return inputs.lock()->find(handle);
 }
@@ -88,7 +88,7 @@ InputInfo* InterfaceInfo::getInput(const std::string& inputName)
     return inputs.lock()->find(inputName);
 }
 
-InputInfo* InterfaceInfo::getInput(interface_handle handle)
+InputInfo* InterfaceInfo::getInput(InterfaceHandle handle)
 {
     return inputs.lock()->find(handle);
 }
@@ -98,7 +98,7 @@ const EndpointInfo* InterfaceInfo::getEndpoint(const std::string& endpointName) 
     return endpoints.lock_shared()->find(endpointName);
 }
 
-const EndpointInfo* InterfaceInfo::getEndpoint(interface_handle handle) const
+const EndpointInfo* InterfaceInfo::getEndpoint(InterfaceHandle handle) const
 {
     return endpoints.lock_shared()->find(handle);
 }
@@ -108,12 +108,12 @@ EndpointInfo* InterfaceInfo::getEndpoint(const std::string& endpointName)
     return endpoints.lock()->find(endpointName);
 }
 
-EndpointInfo* InterfaceInfo::getEndpoint(interface_handle handle)
+EndpointInfo* InterfaceInfo::getEndpoint(InterfaceHandle handle)
 {
     return endpoints.lock()->find(handle);
 }
 
-bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_t value)
+bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t value)
 {
     auto* ipt = getInput(id);
     if (ipt == nullptr) {
@@ -161,7 +161,7 @@ bool InterfaceInfo::setInputProperty(interface_handle id, int32_t option, int32_
     return true;
 }
 
-bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, int32_t value)
+bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, int32_t value)
 {
     auto* pub = getPublication(id);
     if (pub == nullptr) {
@@ -198,7 +198,7 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
 }
 
 // NOLINTNEXTLINE
-bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
+bool InterfaceInfo::setEndpointProperty(InterfaceHandle /*id*/,
                                         int32_t /*option*/,
                                         int32_t /*value*/)
 {
@@ -208,7 +208,7 @@ bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
     return false;
 }
 
-int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) const
+int32_t InterfaceInfo::getInputProperty(InterfaceHandle id, int32_t option) const
 {
     const auto* ipt = getInput(id);
     if (ipt == nullptr) {
@@ -250,7 +250,7 @@ int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) con
     return flagval ? 1 : 0;
 }
 
-int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t option) const
+int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option) const
 {
     const auto* pub = getPublication(id);
     if (pub == nullptr) {
@@ -285,7 +285,7 @@ int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t optio
 }
 
 // NOLINTNEXTLINE
-int32_t InterfaceInfo::getEndpointProperty(interface_handle /*id*/, int32_t /*option*/) const
+int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle /*id*/, int32_t /*option*/) const
 {
     // auto ept = getEndpoint (id);
     // currently no properties on endpoints
