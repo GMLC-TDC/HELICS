@@ -783,11 +783,11 @@ class Core {
 
     /** get a command for a specific federate
      */
-    virtual std::pair<std::string, std::string> getCommand(local_federate_id federateID) = 0;
+    virtual std::pair<std::string, std::string> getCommand(LocalFederateId federateID) = 0;
 
     /** get a command for a specific federate. block until a command is received
      */
-    virtual std::pair<std::string, std::string> waitCommand(local_federate_id federateID) = 0;
+    virtual std::pair<std::string, std::string> waitCommand(LocalFederateId federateID) = 0;
 
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of

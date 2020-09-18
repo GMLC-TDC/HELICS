@@ -240,9 +240,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,
                              const std::string& source) override;
-    virtual std::pair<std::string, std::string> getCommand(local_federate_id federateID) override;
+    virtual std::pair<std::string, std::string> getCommand(LocalFederateId federateID) override;
 
-    virtual std::pair<std::string, std::string> waitCommand(local_federate_id federateID) override;
+    virtual std::pair<std::string, std::string> waitCommand(LocalFederateId federateID) override;
 
     virtual bool connect() override final;
     virtual bool isConnected() const override final;

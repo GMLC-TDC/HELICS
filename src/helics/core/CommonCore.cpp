@@ -2019,7 +2019,7 @@ void CommonCore::setLogFile(const std::string& lfile)
     setLoggingFile(lfile);
 }
 
-std::pair<std::string, std::string> CommonCore::getCommand(local_federate_id federateID)
+std::pair<std::string, std::string> CommonCore::getCommand(LocalFederateId federateID)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -2028,7 +2028,7 @@ std::pair<std::string, std::string> CommonCore::getCommand(local_federate_id fed
     return fed->getCommand();
 }
 
-std::pair<std::string, std::string> CommonCore::waitCommand(local_federate_id federateID)
+std::pair<std::string, std::string> CommonCore::waitCommand(LocalFederateId federateID)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
