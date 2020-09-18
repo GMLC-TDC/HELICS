@@ -168,9 +168,9 @@ class CommonCore: public Core, public BrokerBase {
                                               const std::string& name,
                                               const std::string& type) override final;
 
-    virtual interface_handle registerTargettedEndpoint(local_federate_id federateID,
-                                                       const std::string& name,
-                                                       const std::string& type) override final;
+    virtual interface_handle registerTargetedEndpoint(local_federate_id federateID,
+                                                      const std::string& name,
+                                                      const std::string& type) override final;
     virtual interface_handle getEndpoint(local_federate_id federateID,
                                          const std::string& name) const override final;
     virtual interface_handle registerFilter(const std::string& filterName,
@@ -237,6 +237,13 @@ class CommonCore: public Core, public BrokerBase {
         setQueryCallback(local_federate_id federateID,
                          std::function<std::string(std::string_view)> queryFunction) override;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override;
+    virtual void sendCommand(const std::string& target,
+                             const std::string& commandStr,
+                             const std::string& source) override;
+    virtual std::pair<std::string, std::string> getCommand(local_federate_id federateID) override;
+
+    virtual std::pair<std::string, std::string> waitCommand(local_federate_id federateID) override;
+
     virtual bool connect() override final;
     virtual bool isConnected() const override final;
     virtual void disconnect() override final;
@@ -390,6 +397,8 @@ class CommonCore: public Core, public BrokerBase {
 
     /** generate the filteredEndpoint query results for a particular federate*/
     std::string filteredEndpointQuery(const FederateState* fed) const;
+    /** process a command instruction for the core*/
+    void processCommandInstruction(ActionMessage& command);
 
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation

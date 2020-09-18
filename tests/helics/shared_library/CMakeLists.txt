@@ -22,6 +22,7 @@ set(c_shared_library_test_sources
     badInputTests.cpp
     comboConfigTests.cpp
     loggingTests.cpp
+    commandInterfaceTests.cpp
 )
 
 set(cpp_shared_library_test_sources
@@ -45,8 +46,8 @@ add_executable(
                              ../coreTypeLists.hpp
 )
 
-target_link_libraries(shared-library-tests helics_test_base helicsSharedLib)
-target_link_libraries(shared-library-tests-cpp helics_test_base helicsSharedLib)
+target_link_libraries(shared-library-tests helics_test_base helics)
+target_link_libraries(shared-library-tests-cpp helics_test_base helics)
 
 target_include_directories(
     shared-library-tests PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes

@@ -114,13 +114,13 @@ Endpoint& MessageFederate::registerEndpoint(const std::string& eptName, const st
                                        type);
 }
 
-Endpoint& MessageFederate::registerTargettedEndpoint(const std::string& eptName,
-                                                     const std::string& type)
+Endpoint& MessageFederate::registerTargetedEndpoint(const std::string& eptName,
+                                                    const std::string& type)
 {
-    return mfManager->registerTargettedEndpoint((!eptName.empty()) ?
-                                                    (getName() + nameSegmentSeparator + eptName) :
-                                                    eptName,
-                                                type);
+    return mfManager->registerTargetedEndpoint((!eptName.empty()) ?
+                                                   (getName() + nameSegmentSeparator + eptName) :
+                                                   eptName,
+                                               type);
 }
 
 Endpoint& MessageFederate::registerGlobalEndpoint(const std::string& eptName,
@@ -129,10 +129,10 @@ Endpoint& MessageFederate::registerGlobalEndpoint(const std::string& eptName,
     return mfManager->registerEndpoint(eptName, type);
 }
 
-Endpoint& MessageFederate::registerGlobalTargettedEndpoint(const std::string& eptName,
-                                                           const std::string& type)
+Endpoint& MessageFederate::registerGlobalTargetedEndpoint(const std::string& eptName,
+                                                          const std::string& type)
 {
-    return mfManager->registerTargettedEndpoint(eptName, type);
+    return mfManager->registerTargetedEndpoint(eptName, type);
 }
 
 void MessageFederate::registerInterfaces(const std::string& configString)

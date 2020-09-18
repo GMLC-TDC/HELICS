@@ -17,8 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace gmlc {
 namespace libguarded {
@@ -356,6 +358,30 @@ class HELICS_CXX_EXPORT Federate {
     */
     void setGlobal(const std::string& valueName, const std::string& value);
 
+    /** send a command to another core or federate
+  @param target  the target of the command can be "federation", "federate", "broker", "core", or a
+  specific name of a federate, core, or broker
+  @param commandStr a string with the command instructions, see other documentation for specific
+  properties to command, can be defined by a federate
+  */
+    void sendCommand(const std::string& target, const std::string& commandStr);
+
+    /** get a command for the Federate
+ @param target  the target of the command can be "federation", "federate", "broker", "core", or a
+ specific name of a federate, core, or broker
+ @return a pair of strings <command,source> with the command instructions for the federate; the
+ command string will be empty if no command is given
+ */
+    std::pair<std::string, std::string> getCommand();
+
+    /** get a command for the Federate, if there is none the call will block until a command is
+received
+@param target  the target of the command can be "federation", "federate", "broker", "core", or a
+specific name of a federate, core, or broker
+@return a pair of strings <command,source> with the command instructions for the federate
+*/
+    std::pair<std::string, std::string> waitCommand();
+
     /** add a dependency for this federate
     @details adds an additional internal time dependency for the federate
     @param fedName the name of the federate to add a dependency on
@@ -593,13 +619,14 @@ class HELICS_CXX_EXPORT Interface {
     virtual int32_t getOption(int32_t option) const;
 
     /** get the injection type for an interface,  this is the type for data coming into an interface
-    @details for filters this is the input type, for publications this is type used to transmit
+    @details for filters this is the input type, for publications this is the type used to transmit
     data, for endpoints this is the specified type and for inputs this is the type of the
     transmitting publication
     @return a const ref to  std::string  */
     const std::string& getInjectionType() const;
 
-    /** get the extraction type for an interface,  this is the type for data coming out of interface
+    /** get the extraction type for an interface,  this is the type for data coming out of an
+    interface
     @details for filters this is the output type, for publications this is the specified type, for
     endpoints this is the specified type and for inputs this is the specified type
     @return a const ref to  std::string  */
@@ -612,8 +639,8 @@ class HELICS_CXX_EXPORT Interface {
   @return a const ref to  std::string  */
     const std::string& getInjectionUnits() const;
 
-    /** get the extraction type for an interface,  this is the units associated with data coming out
-    of an interface
+    /** get the extraction units for an interface,  this is the units associated with data coming
+    out of an interface
     @details for publications this is the specified units, for inputs this is the specified type
     @return a const ref to  std::string  */
     const std::string& getExtractionUnits() const;
@@ -624,7 +651,7 @@ class HELICS_CXX_EXPORT Interface {
      * source endpoints for a filter*/
     const std::string& getSourceTargets() const;
     /** get the destination targets for an interface, either the destinations of data for endpoints
-     * or ipublications, or the destination endpoints for a filter*/
+     * or publications, or the destination endpoints for a filter*/
     const std::string& getDestinationTargets() const;
     /** close the interface*/
     void close();

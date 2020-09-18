@@ -47,7 +47,7 @@ endif()
 # Find required dependencies
 # ##################################################################################################
 # Find HELICS
-if(NOT hasParent OR NOT TARGET HELICS::helicsSharedLib)
+if(NOT hasParent OR NOT TARGET HELICS::helics)
     find_package(HELICS 3 REQUIRED)
 endif()
 
@@ -125,9 +125,7 @@ find_package(Matlab COMPONENTS MAIN_PROGRAM)
 # Build the Java interface
 # ##################################################################################################
 message(STATUS "Building MATLAB")
-get_target_property(
-    TMP_HELICS_SHARED_LIB_INCLUDE_DIRS HELICS::helicsSharedLib INTERFACE_INCLUDE_DIRECTORIES
-)
+get_target_property(TMP_HELICS_SHARED_LIB_INCLUDE_DIRS HELICS::helics INTERFACE_INCLUDE_DIRECTORIES)
 if(NOT HELICS_ENABLE_SWIG OR NOT SWIG_EXECUTABLE OR MATLAB_SWIG_NOT_AVAILABLE)
     message(STATUS "Building without swig")
     add_custom_command(
@@ -179,7 +177,7 @@ if(hasParent)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
         COMMAND
-            ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helicsSharedLib> -D
+            ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helics> -D
             BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp -D
             LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/ -D
             OTHER_INCLUDE_LOCATION=${CMAKE_BINARY_DIR}/src/helics/shared_api_library/ -D
@@ -191,7 +189,7 @@ else()
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
         COMMAND
-            ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helicsSharedLib> -D
+            ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helics> -D
             BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp -D
             LIBRARY_INCLUDE_LOCATION=${TMP_HELICS_SHARED_LIB_INCLUDE_DIRS} -D
             SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
@@ -206,7 +204,7 @@ if(WIN32)
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
         COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nosplash -minimize -r
                 "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m HELICS::helicsSharedLib
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m HELICS::helics
                 ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     )
 elseif(APPLE)
@@ -214,7 +212,7 @@ elseif(APPLE)
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
         COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r
                 "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m HELICS::helicsSharedLib
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m HELICS::helics
                 ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     )
 else()
@@ -222,14 +220,14 @@ else()
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
         COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r mkhelicsMEXFile
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m HELICS::helicsSharedLib
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m HELICS::helics
                 ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     )
 endif()
 
 add_custom_target(
     helicsMEX ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
-                          HELICS::helicsSharedLib
+                          HELICS::helics
 )
 set_target_properties(helicsMEX PROPERTIES FOLDER interfaces)
 
@@ -242,7 +240,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} DEST
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp DESTINATION matlab COMPONENT matlab)
 
 if(WIN32)
-    install(FILES $<TARGET_LINKER_FILE:HELICS::helicsSharedLib> DESTINATION matlab COMPONENT matlab)
+    install(FILES $<TARGET_LINKER_FILE:HELICS::helics> DESTINATION matlab COMPONENT matlab)
     if(hasParent)
         install(FILES ${CMAKE_BINARY_DIR}/src/helics/shared_api_library/helics_export.h
                 DESTINATION matlab/headers COMPONENT matlab
