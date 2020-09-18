@@ -17,8 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace gmlc {
 namespace libguarded {
@@ -355,6 +357,30 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(const std::string& valueName, const std::string& value);
+
+    /** send a command to another core or federate
+  @param target  the target of the command can be "federation", "federate", "broker", "core", or a
+  specific name of a federate, core, or broker
+  @param commandStr a string with the command instructions, see other documentation for specific
+  properties to command, can be defined by a federate
+  */
+    void sendCommand(const std::string& target, const std::string& commandStr);
+
+    /** get a command for the Federate
+ @param target  the target of the command can be "federation", "federate", "broker", "core", or a
+ specific name of a federate, core, or broker
+ @return a pair of strings <command,source> with the command instructions for the federate; the
+ command string will be empty if no command is given
+ */
+    std::pair<std::string, std::string> getCommand();
+
+    /** get a command for the Federate, if there is none the call will block until a command is
+received
+@param target  the target of the command can be "federation", "federate", "broker", "core", or a
+specific name of a federate, core, or broker
+@return a pair of strings <command,source> with the command instructions for the federate
+*/
+    std::pair<std::string, std::string> waitCommand();
 
     /** add a dependency for this federate
     @details adds an additional internal time dependency for the federate

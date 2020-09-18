@@ -1224,3 +1224,52 @@ void helicsFederateLogLevelMessage(helics_federate fed, int loglevel, const char
     }
     fedObj->logMessage(loglevel, AS_STRING(logmessage));
 }
+
+void helicsFederateSendCommand(helics_federate fed, const char* target, const char* command, helics_error* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    fedObj->sendCommand(AS_STRING(target), AS_STRING(command));
+}
+
+const char* helicsFederateGetCommand(helics_federate fed, helics_error* err)
+{
+    auto* fedObj = helics::getFedObject(fed, err);
+
+    if (fedObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    auto res = fedObj->fedptr->getCommand();
+    if (res.first.empty()) {
+        return emptyStr.c_str();
+    }
+    fedObj->commandBuffer = std::move(res);
+    return fedObj->commandBuffer.first.c_str();
+}
+
+const char* helicsFederateGetCommandSource(helics_federate fed, helics_error* err)
+{
+    auto* fedObj = helics::getFedObject(fed, err);
+
+    if (fedObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    return fedObj->commandBuffer.second.c_str();
+}
+
+const char* helicsFederateWaitCommand(helics_federate fed, helics_error* err)
+{
+    auto* fedObj = helics::getFedObject(fed, err);
+
+    if (fedObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    auto res = fedObj->fedptr->waitCommand();
+    if (res.first.empty()) {
+        return emptyStr.c_str();
+    }
+    fedObj->commandBuffer = std::move(res);
+    return fedObj->commandBuffer.first.c_str();
+}

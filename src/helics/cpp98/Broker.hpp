@@ -157,10 +157,20 @@ class Broker {
         return result;
     }
 
+    /** send an asynchronous command to another object
+    @param target the name of the target of the command
+    @param command the command message to send
+    */
+    void sendCommand(const std::string& target, const std::string& command)
+    {
+        helicsBrokerSendCommand(broker, target.c_str(), command.c_str(), hThrowOnError());
+    }
+
     void setTimeBarrier(helics_time barrierTime)
     {
         helicsBrokerSetTimeBarrier(broker, barrierTime, HELICS_IGNORE_ERROR);
     }
+
     void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
 
   protected:

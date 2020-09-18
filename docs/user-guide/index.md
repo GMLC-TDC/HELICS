@@ -58,7 +58,7 @@ There are a number of classes of HELICS users:
     queries
     multibroker
     simultaneous_cosimulations
-
+    commandInterface
 
 ```
 
@@ -66,6 +66,7 @@ There are a number of classes of HELICS users:
 - **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 - **[Cores](./CoreTypes.md)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
+- [**Commands**](./commandInterface.md) - Asynchronous commands that can be sent to other objects in the co-simulation
 - [**Connecting Multiple Core Types**](./multibroker.md) - What to do when one type of communication isn't sufficient.
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
 - **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates

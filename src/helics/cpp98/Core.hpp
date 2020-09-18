@@ -121,6 +121,15 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** send an asynchronous command to another object
+    @param target the name of the target of the command
+    @param command the command message to send
+    */
+    void sendCommand(const std::string& target, const std::string& command)
+    {
+        helicsCoreSendCommand(core, target.c_str(), command.c_str(), hThrowOnError());
+    }
+
     /** make a query of the core
 @details this call is blocking until the value is returned which may take some time depending
 on the size of the federation and the specific string being queried
