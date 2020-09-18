@@ -96,7 +96,7 @@ class CommonCore: public Core, public BrokerBase {
         enterExecutingMode(LocalFederateId federateID,
                            iteration_request iterate = NO_ITERATION) override final;
     virtual LocalFederateId registerFederate(const std::string& name,
-                                               const CoreFederateInfo& info) override final;
+                                             const CoreFederateInfo& info) override final;
     virtual const std::string& getFederateName(LocalFederateId federateID) const override final;
     virtual LocalFederateId getFederateId(const std::string& name) const override final;
     virtual int32_t getFederationSize() override final;
@@ -111,8 +111,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual void setIntegerProperty(LocalFederateId federateID,
                                     int32_t property,
                                     int16_t propertyValue) override final;
-    virtual Time getTimeProperty(LocalFederateId federateID,
-                                 int32_t property) const override final;
+    virtual Time getTimeProperty(LocalFederateId federateID, int32_t property) const override final;
     virtual int16_t getIntegerProperty(LocalFederateId federateID,
                                        int32_t property) const override final;
     virtual void setFlagOption(LocalFederateId federateID,
@@ -121,18 +120,18 @@ class CommonCore: public Core, public BrokerBase {
     virtual bool getFlagOption(LocalFederateId federateID, int32_t flag) const override final;
 
     virtual InterfaceHandle registerPublication(LocalFederateId federateID,
-                                                 const std::string& key,
-                                                 const std::string& type,
-                                                 const std::string& units) override final;
+                                                const std::string& key,
+                                                const std::string& type,
+                                                const std::string& units) override final;
     virtual InterfaceHandle getPublication(LocalFederateId federateID,
-                                            const std::string& key) const override final;
+                                           const std::string& key) const override final;
     virtual InterfaceHandle registerInput(LocalFederateId federateID,
-                                           const std::string& key,
-                                           const std::string& type,
-                                           const std::string& units) override final;
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units) override final;
 
     virtual InterfaceHandle getInput(LocalFederateId federateID,
-                                      const std::string& key) const override final;
+                                     const std::string& key) const override final;
 
     virtual const std::string& getHandleName(InterfaceHandle handle) const override final;
 
@@ -165,20 +164,20 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::vector<InterfaceHandle>&
         getValueUpdates(LocalFederateId federateID) override final;
     virtual InterfaceHandle registerEndpoint(LocalFederateId federateID,
-                                              const std::string& name,
-                                              const std::string& type) override final;
+                                             const std::string& name,
+                                             const std::string& type) override final;
 
     virtual InterfaceHandle registerTargetedEndpoint(LocalFederateId federateID,
-                                                      const std::string& name,
-                                                      const std::string& type) override final;
+                                                     const std::string& name,
+                                                     const std::string& type) override final;
     virtual InterfaceHandle getEndpoint(LocalFederateId federateID,
-                                         const std::string& name) const override final;
+                                        const std::string& name) const override final;
     virtual InterfaceHandle registerFilter(const std::string& filterName,
-                                            const std::string& type_in,
-                                            const std::string& type_out) override final;
+                                           const std::string& type_in,
+                                           const std::string& type_out) override final;
     virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
-                                                   const std::string& type_in,
-                                                   const std::string& type_out) override final;
+                                                  const std::string& type_in,
+                                                  const std::string& type_out) override final;
     virtual InterfaceHandle getFilter(const std::string& name) const override final;
     virtual void addDependency(LocalFederateId federateID,
                                const std::string& federateName) override final;

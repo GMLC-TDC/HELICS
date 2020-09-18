@@ -294,9 +294,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     delayTransmitQueue.push(command);
                 }
             } else {
-                _federates.back().global_id = GlobalFederateId(
-                    static_cast<GlobalFederateId::BaseType>(_federates.size()) - 1 +
-                    gGlobalFederateIdShift);
+                _federates.back().global_id =
+                    GlobalFederateId(static_cast<GlobalFederateId::BaseType>(_federates.size()) -
+                                     1 + gGlobalFederateIdShift);
                 _federates.addSearchTermForIndex(_federates.back().global_id,
                                                  static_cast<size_t>(
                                                      _federates.back().global_id.baseValue()) -
@@ -451,7 +451,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             } else {
                 _brokers.back().global_id =
                     GlobalBrokerId(static_cast<GlobalBrokerId::BaseType>(_brokers.size()) - 1 +
-                                     gGlobalBrokerIdShift);
+                                   gGlobalBrokerIdShift);
                 _brokers.addSearchTermForIndex(_brokers.back().global_id, _brokers.size() - 1);
                 auto global_brkid = _brokers.back().global_id;
                 auto route = _brokers.back().route;

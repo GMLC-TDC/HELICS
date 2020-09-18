@@ -214,7 +214,7 @@ class Core {
      * May only be invoked in initialize state otherwise throws an error
      */
     virtual LocalFederateId registerFederate(const std::string& name,
-                                               const CoreFederateInfo& info) = 0;
+                                             const CoreFederateInfo& info) = 0;
 
     /**
      * Returns the federate name.
@@ -284,9 +284,8 @@ class Core {
      * @return an /ref iteration_time object with two field grantedTime and a enumeration indicating
      the state of the iteration
      */
-    virtual iteration_time requestTimeIterative(LocalFederateId federateID,
-                                                Time next,
-                                                iteration_request iterate) = 0;
+    virtual iteration_time
+        requestTimeIterative(LocalFederateId federateID, Time next, iteration_request iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -298,8 +297,7 @@ class Core {
     @param property the property to set see /ref defs::properties
     @param timeValue the requested value of the property
     */
-    virtual void
-        setTimeProperty(LocalFederateId federateID, int32_t property, Time timeValue) = 0;
+    virtual void setTimeProperty(LocalFederateId federateID, int32_t property, Time timeValue) = 0;
     /** get a timebased property on a federate
     @param federateID the federate to set a time based property on
     @param property the property to set see /ref defs::properties
@@ -355,16 +353,16 @@ class Core {
      @return a handle to identify the publication
      */
     virtual InterfaceHandle registerPublication(LocalFederateId federateID,
-                                                 const std::string& key,
-                                                 const std::string& type,
-                                                 const std::string& units) = 0;
+                                                const std::string& key,
+                                                const std::string& type,
+                                                const std::string& units) = 0;
 
     /** get a publication Handle from its key
     @param federateID the identifier for the federate
     @param key the name of the publication
      @return a handle to identify the publication*/
     virtual InterfaceHandle getPublication(LocalFederateId federateID,
-                                            const std::string& key) const = 0;
+                                           const std::string& key) const = 0;
 
     /**
      * Register a control input for the specified federate.
@@ -376,15 +374,14 @@ class Core {
      * @param units a string naming the units of the federate
      */
     virtual InterfaceHandle registerInput(LocalFederateId federateID,
-                                           const std::string& key,
-                                           const std::string& type,
-                                           const std::string& units) = 0;
+                                          const std::string& key,
+                                          const std::string& type,
+                                          const std::string& units) = 0;
     /** get a subscription Handle from its key
     @param federateID the identifier for the federate
     @param key the tag of the named input
     @return a handle to identify the input*/
-    virtual InterfaceHandle getInput(LocalFederateId federateID,
-                                      const std::string& key) const = 0;
+    virtual InterfaceHandle getInput(LocalFederateId federateID, const std::string& key) const = 0;
 
     /**
      * Returns the name or identifier for a specified handle
@@ -499,8 +496,8 @@ class Core {
      @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual InterfaceHandle registerEndpoint(LocalFederateId federateID,
-                                              const std::string& name,
-                                              const std::string& type) = 0;
+                                             const std::string& name,
+                                             const std::string& type) = 0;
 
     /**
      * Register an endpoint which can only send or receive to specific targets
@@ -509,15 +506,15 @@ class Core {
      @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual InterfaceHandle registerTargetedEndpoint(LocalFederateId federateID,
-                                                      const std::string& name,
-                                                      const std::string& type) = 0;
+                                                     const std::string& name,
+                                                     const std::string& type) = 0;
 
     /** get an endpoint Handle from its name
     @param federateID the identifier for the federate
     @param name the name of the endpoint
     @return a handle to identify the endpoint*/
     virtual InterfaceHandle getEndpoint(LocalFederateId federateID,
-                                         const std::string& name) const = 0;
+                                        const std::string& name) const = 0;
 
     /**
     * Register a cloning filter, a cloning filter operates on a copy of the message vs the actual
@@ -531,8 +528,8 @@ class Core {
     @return the handle for the new filter
     */
     virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
-                                                   const std::string& type_in,
-                                                   const std::string& type_out) = 0;
+                                                  const std::string& type_in,
+                                                  const std::string& type_out) = 0;
 
     /**
      * Register source filter.
@@ -546,8 +543,8 @@ class Core {
      @return the handle for the new filter
      */
     virtual InterfaceHandle registerFilter(const std::string& filterName,
-                                            const std::string& type_in,
-                                            const std::string& type_out) = 0;
+                                           const std::string& type_in,
+                                           const std::string& type_out) = 0;
     /**
     * add a destination target,  the handle can be for a filter or a publication
     @details a filter will create an additional processing step for messages before they get to a

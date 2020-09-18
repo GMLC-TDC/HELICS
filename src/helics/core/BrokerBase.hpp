@@ -34,7 +34,7 @@ class BrokerBase {
     std::atomic<GlobalBrokerId> global_id{
         parent_broker_id};  //!< the unique identifier for the broker(core or broker)
     GlobalBrokerId global_broker_id_local{};  //!< meant to be the same as global_id but not
-                                                //!< atomically protected
+                                              //!< atomically protected
     GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{
         1};  //!< the logging level to use levels >=this will be ignored
