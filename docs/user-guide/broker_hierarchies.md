@@ -27,7 +27,7 @@ For examples, the config JSON for the Distribution System A (where Broker A is a
 ```JSON
 {
     "name" : "DistributionSystemA",
-    "coreInit": "--broker_address=tcp://127.0.0.1"
+    "coreInitString": "--broker_address=tcp://127.0.0.1"
     ...
 }
 ```
@@ -43,7 +43,7 @@ Lastly, the JSON config file for the Transmission and Generation System federate
 ```JSON
 {
     "name" : "TransmissionGenerationSystem",
-    "coreInit": "--broker_address=tcp://127.0.0.127"
+    "coreInitString": "--broker_address=tcp://127.0.0.127"
     ...
 }
 ```

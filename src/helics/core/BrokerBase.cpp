@@ -121,11 +121,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     auto* fmtr = addJsonConfig(hApp.get());
     fmtr->maxLayers(0);
     hApp->option_defaults()->ignore_underscore()->ignore_case();
-    hApp->add_option("--federates,-f,--minfederates,--minfed,-m",
+    hApp->add_option("--federates,-f",
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier,--uuid", identifier, "the name of the broker/core");
-    hApp->add_option("--maxiter,--maxiterations",
+    hApp->add_option("--max_iterations,--maxiterations,--maxIterations",
                      maxIterationCount,
                      "the maximum number of iterations allowed")
         ->capture_default_str();
@@ -133,18 +133,18 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--minbrokers,--minbroker,--minbrokercount",
         minBrokerCount,
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
-    hApp->add_option("--key,--broker_key",
+    hApp->add_option("--broker_key,--brokerkey,--brokerKey",
                      brokerKey,
                      "specify a key to use for all connections to/from a broker");
     hApp->add_flag(
-        "--no_ping,--slow_responding",
+        "--slow_responding,--slowResponding,--slowresponding",
         no_ping,
         "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     hApp->add_flag(
-        "--conservative_time_policy,--restrictive_time_policy",
+        "--restrictive_time_policy--restrictivetimepolicy,--restrictiveTimePolicy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
-    hApp->add_flag("--terminate_on_error,--halt_on_error",
+    hApp->add_flag("--terminate_on_error,--terminateonerror,--terminateOnError",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
@@ -155,7 +155,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
-            "--loglevel,--log-level",
+            "--loglevel,--log_level,--logLevel",
             [this](int val) { setLogLevel(val); },
             "the level which to log the higher this is set to the more gets logs(-1) for no logging")
         ->transform(

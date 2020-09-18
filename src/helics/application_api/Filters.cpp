@@ -18,19 +18,14 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 static const std::map<std::string, filter_types> filterTypes{
     {"clone", filter_types::clone},
-    {"cloning", filter_types::clone},
     {"delay", filter_types::delay},
-    {"timedelay", filter_types::delay},
     {"randomdelay", filter_types::random_delay},
-    {"randomdrop", filter_types::random_drop},
-    {"time_delay", filter_types::delay},
     {"random_delay", filter_types::random_delay},
+    {"randomDelay", filter_types::random_delay},
+    {"randomdrop", filter_types::random_drop},
     {"random_drop", filter_types::random_drop},
-    {"time delay", filter_types::delay},
-    {"random delay", filter_types::random_delay},
-    {"random drop", filter_types::random_drop},
+    {"randomDrop", filter_types::random_drop},
     {"reroute", filter_types::reroute},
-    {"redirect", filter_types::reroute},
     {"firewall", filter_types::firewall},
     {"custom", filter_types::custom}};
 
