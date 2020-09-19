@@ -345,7 +345,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           },
           "type  of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
-    app->add_option("--core_name,--corename,--coreName", coreName, "the name of the core to create or find")
+    app->add_option("--core_name,--corename,--coreName",
+                    coreName,
+                    "the name of the core to create or find")
         ->ignore_underscore();
     app->add_option("--coreinitstring,-i,--core_init_string,--coreInitString",
                     coreInitString,
@@ -367,7 +369,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->multi_option_policy(CLI::MultiOptionPolicy::Join);
     app->add_option("--broker,--brokeraddress", broker, "address or name of the broker to connect")
         ->ignore_underscore();
-    app->add_option("--brokerport,--brokerPort,--broker_port", brokerPort, "Port number of the Broker")
+    app->add_option("--brokerport,--brokerPort,--broker_port",
+                    brokerPort,
+                    "Port number of the Broker")
         ->ignore_underscore()
         ->check(CLI::PositiveNumber);
 
@@ -382,7 +386,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            },
            "Specify the port number to use")
         ->check(CLI::PositiveNumber);
-    app->add_option("--localport,--localPort,--local_port", localport, "Port number to use for connections to this federate")
+    app->add_option("--localport,--localPort,--local_port",
+                    localport,
+                    "Port number to use for connections to this federate")
         ->ignore_underscore();
     app->add_flag("--autobroker",
                   autobroker,
