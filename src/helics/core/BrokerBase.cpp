@@ -125,7 +125,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier,--uuid", identifier, "the name of the broker/core");
-    hApp->add_option("--max_iterations,--maxiterations,--maxIterations",
+    hApp->add_option("--max_iterations",
                      maxIterationCount,
                      "the maximum number of iterations allowed")
         ->capture_default_str();
@@ -141,10 +141,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         no_ping,
         "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     hApp->add_flag(
-        "--restrictive_time_policy--restrictivetimepolicy,--restrictiveTimePolicy",
+        "--restrictive_time_policy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
-    hApp->add_flag("--terminate_on_error,--terminateonerror,--terminateOnError",
+    hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
@@ -155,7 +155,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
-            "--loglevel,--log_level,--logLevel",
+            "--loglevel",
             [this](int val) { setLogLevel(val); },
             "the level which to log the higher this is set to the more gets logs(-1) for no logging")
         ->transform(
