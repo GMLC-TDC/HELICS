@@ -79,8 +79,7 @@ std::shared_ptr<helicsCLI11App>
     nbparser->add_option("--brokername,--brokerName,--broker_name",
                          brokerName,
                          "the name of the broker");
-    nbparser
-        ->add_option("--maxsize", maxMessageSize, "The message buffer size")
+    nbparser->add_option("--maxsize", maxMessageSize, "The message buffer size")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
     nbparser
@@ -89,10 +88,7 @@ std::shared_ptr<helicsCLI11App>
                      "The maximum number of message to have in a queue")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
-    nbparser
-        ->add_option("--networkretries",
-                     maxRetries,
-                     "the maximum number of network retries")
+    nbparser->add_option("--networkretries", maxRetries, "the maximum number of network retries")
         ->capture_default_str();
     nbparser->add_flag("--useosport",
                        use_os_port,
@@ -146,9 +142,7 @@ std::shared_ptr<helicsCLI11App>
             },
             "port number for the local receive port")
         ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
-    nbparser->add_option("--portstart",
-                         portStart,
-                         "starting port for automatic port definitions");
+    nbparser->add_option("--portstart", portStart, "starting port for automatic port definitions");
 
     nbparser->add_callback([this]() {
         if ((!brokerAddress.empty()) && (brokerPort == -1)) {
