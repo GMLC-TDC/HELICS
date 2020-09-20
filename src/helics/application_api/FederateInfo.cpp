@@ -345,9 +345,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           },
           "type  of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
-    app->add_option("--corename",
-                    coreName,
-                    "the name of the core to create or find");
+    app->add_option("--corename", coreName, "the name of the core to create or find");
     app->add_option("--coreinitstring,-i",
                     coreInitString,
                     "The initialization arguments for the core")
@@ -365,9 +363,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         })
         ->multi_option_policy(CLI::MultiOptionPolicy::Join);
     app->add_option("--broker,--brokeraddress", broker, "address or name of the broker to connect");
-    app->add_option("--brokerport",
-                    brokerPort,
-                    "Port number of the Broker")
+    app->add_option("--brokerport", brokerPort, "Port number of the Broker")
         ->check(CLI::PositiveNumber);
 
     app->add_option_function<int>(
