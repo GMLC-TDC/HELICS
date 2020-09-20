@@ -42,7 +42,7 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
         {
             "key":"distribution_federate/distribution_loads",
             "type":"double",
-            "required":true
+            "conection_required":true
         }],
     }
 ```
@@ -61,7 +61,7 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
         {
             "key":"transmission_federate/transmission_voltages",
             "type":"double",
-            "required":true
+            "connection_required":true
         }],
     }
 ```

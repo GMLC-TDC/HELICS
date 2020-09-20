@@ -56,7 +56,7 @@ TEST(CoreAppTests, constructor2)
 TEST(CoreAppTests, constructor3)
 {
     helics::CoreApp App(
-        std::vector<std::string>{"--autobroker", "core3", "--name", "test", "--type"});
+        std::vector<std::string>{"--autobroker", "core3", "--name", "test", "--core_type"});
 
     EXPECT_FALSE(App.isConnected());
 
@@ -92,7 +92,7 @@ TEST(CoreAppTests, constructor4)
 TEST(CoreAppTests, constructor5)
 {
     std::vector<std::string> args{
-        "constructor4", "--autobroker", "--name", "core5", "--type", "test"};
+        "constructor4", "--autobroker", "--name", "core5", "--core_type", "test"};
     char* argv[6];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -204,7 +204,7 @@ TEST(CoreAppTests, null)
 
 TEST(CoreAppTests, help)
 {
-    helics::CoreApp app("--type=test --help");
+    helics::CoreApp app("--core_type=test --help");
     EXPECT_FALSE(app.isOpenToNewFederates());
     EXPECT_FALSE(app.isConnected());
     EXPECT_FALSE(app.connect());
@@ -217,7 +217,7 @@ TEST(CoreAppTests, help)
 
 TEST(CoreAppTests, file_logging_p2)
 {
-    helics::CoreApp app("--autobroker --name=loggerCore1 --type=test");
+    helics::CoreApp app("--autobroker --name=loggerCore1 --core_type=test");
     app.setLoggingLevel(5);
     const std::string lfilename = "logfile2.txt";
     app.setLogFile("logfile2.txt");

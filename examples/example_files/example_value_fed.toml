@@ -15,7 +15,7 @@ source_only=false  #indicator that the federate is only a source and is not expe
 uninterruptible=false #indicator that the federate should only return requested times
 coretype="inproc" #the type of the core "test","zmq","udp","ipc","tcp","mpi"
 corename="the name of the core"  #this matters most for ipc and inproc cores, can be empty
-coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
+coreinitstring="--autobroker" # the initialization string for the core in the form of a command line arguments
 max_iterations=10  #the maximum number of iterations for a time step
 period=  1.0 #the period with which federate may return time
 offset= 0.0 # the offset shift in the period
@@ -27,13 +27,13 @@ input_delay=0 #the input delay for external data to propagate to federates
 #set required to true to make helics issue a warning if the publication is not found
 #example of inline tables (be careful it falls under the most recent [section] or [[table]]
 subscriptions=[
-{key="pub1",  required=true},
+{key="pub1",  connection_required=true},
   # shortcut is a naming shortcut for the publication for later retrieval
-{key="fedName/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+{key="fedName/pub2", alias="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 inputs=[
-{key="ipt2",  type="double",required=true, target="pub1"}
+{key="ipt2",  type="double",connection_required=true, target="pub1"}
 ]  #specify an input with a target
 
 #global values that can be read from anywhere in the federation

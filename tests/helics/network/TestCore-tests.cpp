@@ -115,7 +115,7 @@ TEST(TestCore_tests, testcore_pubsub_value_test)
 TEST(TestCore_tests, testcore_send_receive_test)
 {
     const char* initializationString =
-        "--autobroker --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
+        "--autobroker --broker=\"brk1\" --broker_init_string=\"--name=brk1\"";
     auto core = create(helics::core_type::TEST, initializationString);
 
     ASSERT_TRUE(core != nullptr);

@@ -33,7 +33,7 @@ std::shared_ptr<helicsCLI11App>
         auto* fmtr = addJsonConfig(nbparser.get());
         fmtr->maxLayers(0);
     }
-    nbparser->option_defaults()->ignore_underscore();
+    nbparser->option_defaults()->ignore_underscore()->ignore_case();
 
     nbparser
         ->add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
@@ -41,7 +41,7 @@ std::shared_ptr<helicsCLI11App>
                    "specify external interface to use, default is --local")
         ->disable_flag_override();
     nbparser->add_option_function<std::string>(
-        "--brokeraddress",
+        "--broker_address",
         [this, localAddress](const std::string& addr) {
             auto brkprt = extractInterfaceandPort(addr);
             brokerAddress = brkprt.first;
@@ -54,7 +54,7 @@ std::shared_ptr<helicsCLI11App>
                        "allow the server to reuse a bound address, mostly useful for tcp cores");
     nbparser
         ->add_flag(
-            "--noack,--noack_connect",
+            "--noackconnect",
             noAckConnection,
             "specify that a connection_ack message is not required to be connected with a broker")
         ->ignore_underscore();
@@ -76,8 +76,11 @@ std::shared_ptr<helicsCLI11App>
         },
         "identifier for the broker, this is either the name or network address use --broker_address or --brokername "
         "to explicitly set the network address or name the search for the broker is first by name");
-    nbparser->add_option("--brokername", brokerName, "the name of the broker");
-    nbparser->add_option("--maxsize", maxMessageSize, "The message buffer size")
+    nbparser->add_option("--brokername,--brokerName,--broker_name",
+                         brokerName,
+                         "the name of the broker");
+    nbparser
+        ->add_option("--maxsize", maxMessageSize, "The message buffer size")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
     nbparser
@@ -86,15 +89,18 @@ std::shared_ptr<helicsCLI11App>
                      "The maximum number of message to have in a queue")
         ->capture_default_str()
         ->check(CLI::PositiveNumber);
-    nbparser->add_option("--networkretries", maxRetries, "the maximum number of network retries")
+    nbparser
+        ->add_option("--networkretries",
+                     maxRetries,
+                     "the maximum number of network retries")
         ->capture_default_str();
-    nbparser->add_flag("--osport,--use_os_port",
+    nbparser->add_flag("--useosport",
                        use_os_port,
                        "specify that the ports should be allocated by the host operating system");
     nbparser->add_flag("--autobroker",
                        autobroker,
                        "allow a broker to be automatically created if one is not available");
-    nbparser->add_option("--brokerinit",
+    nbparser->add_option("--brokerinitstring,--broker_init_string,--brokerInitString",
                          brokerInitString,
                          "the initialization string for the broker");
     nbparser
@@ -115,7 +121,7 @@ std::shared_ptr<helicsCLI11App>
             "specify that the network connection should be a server or client")
         ->disable_flag_override();
     nbparser->add_option_function<std::string>(
-        "--interface,--localinterface",
+        "--local_interface",
         [this](const std::string& addr) {
             auto localprt = extractInterfaceandPort(addr);
             localInterface = localprt.first;
@@ -130,7 +136,7 @@ std::shared_ptr<helicsCLI11App>
                          "The port number to use to connect with the broker");
     nbparser
         ->add_option_function<int>(
-            "--localport,--interfaceport",
+            "--localport",
             [this](int port) {
                 if (port == -999) {
                     use_os_port = true;
@@ -140,7 +146,9 @@ std::shared_ptr<helicsCLI11App>
             },
             "port number for the local receive port")
         ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
-    nbparser->add_option("--portstart", portStart, "starting port for automatic port definitions");
+    nbparser->add_option("--portstart",
+                         portStart,
+                         "starting port for automatic port definitions");
 
     nbparser->add_callback([this]() {
         if ((!brokerAddress.empty()) && (brokerPort == -1)) {

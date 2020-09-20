@@ -64,7 +64,7 @@ Though contained here in this section on value federates, the options below are 
      ],
      "subscriptions" : [
           {
-               "required": true,
+               "connection_required": true,
                "key" : "TransmissionSim/transmission_voltage",
                "type" : "complex",
                "unit" : "V",

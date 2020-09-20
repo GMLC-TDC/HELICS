@@ -18,13 +18,13 @@ command line only:
 
 configuration:
   -n [ --name ] arg      name of the broker
-  -t [ --type ] arg      type of the broker ("(zmq)", "ipc", "test", "mpi","test", "tcp", "udp")
+  -t [ --coretype ] arg      type of the broker ("(zmq)", "ipc", "test", "mpi","test", "tcp", "udp")
 
  Help for Zero MQ Broker:
 allowed options:
 
 configuration:
-  --interface arg        the local interface to use for the receive ports
+  --loccal_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokername arg       the name of the broker
@@ -41,25 +41,25 @@ configuration:
 allowed options:
 
 configuration:
-  --queueloc arg         the named location of the shared queue
-  -b [ --broker ] arg    identifier for the broker
-  --broker_address arg   location of the broker i.e network address
-  --brokerinit arg       the initialization string for the broker
+  --queueloc arg            the named location of the shared queue
+  -b [ --broker ] arg       identifier for the broker
+  --broker_address arg      location of the broker i.e network address
+  --broker_init_string arg  the initialization string for the broker
 
  Help for Test Broker:
 allowed options:
 
 configuration:
-  --brokername arg       identifier for the broker-same as broker
-  -b [ --broker ] arg    identifier for the broker
-  --broker_address arg   location of the broker i.e network address
-  --brokerinit arg       the initialization string for the broker
+  --brokername arg          identifier for the broker-same as broker
+  -b [ --broker ] arg       identifier for the broker
+  --broker_address arg      location of the broker i.e network address
+  --broker_init_string arg  the initialization string for the broker
 
  Help for TCP Broker:
 allowed options:
 
 configuration:
-  --interface arg        the local interface to use for the receive ports
+  --loccal_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokername arg       the name of the broker
@@ -76,7 +76,7 @@ configuration:
 allowed options:
 
 configuration:
-  --interface arg        the local interface to use for the receive ports
+  --loccal_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokername arg       the name of the broker
@@ -98,9 +98,9 @@ configuration:
   -n [ --name ] arg      name of the broker/core
   --federates arg        the minimum number of federates that will be
                          connecting
-  --minfed arg           the minimum number of federates that will be
+  --federates arg        the minimum number of federates that will be
                          connecting
-  --maxiter arg          maximum number of iterations
+  --maxiteration arg     maximum number of iterations
   --logfile arg          the file to log message to
   --loglevel arg         the level which to log the higher this is set to the
                          more gets logs (-1) for no logging
