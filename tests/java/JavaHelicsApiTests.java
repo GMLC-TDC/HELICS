@@ -373,7 +373,7 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("!ep1TypeString.contains(\"string\")");
             }
 
-            SWIGTYPE_p_void coreFed1 = helics.helicsFederateGetCoreObject(fed1);
+            SWIGTYPE_p_void coreFed1 = helics.helicsFederateGetCore(fed1);
             if (coreFed1 == null) {
                 javaHelicsApiTests.helicsAssert("coreFed1 == null");
             }

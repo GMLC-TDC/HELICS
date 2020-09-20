@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <utility>
 namespace helics {
-ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id):
+ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id):
     coreObject(coreOb), fed(vfed), fedID(id)
 {
 }
@@ -167,7 +167,7 @@ void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& bl
 }
 
 /** we have a new message from the core*/
-void ValueFederateManager::getUpdateFromCore(interface_handle updatedHandle)
+void ValueFederateManager::getUpdateFromCore(InterfaceHandle updatedHandle)
 {
     auto data = coreObject->getValue(updatedHandle);
     auto inpHandle = inputs.lock();

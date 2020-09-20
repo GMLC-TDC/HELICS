@@ -19,12 +19,12 @@ SPDX-License-Identifier: BSD-3-Clause
 @details basic type information and control for HELICS
 */
 namespace helics {
-using identifier_type = std::uint32_t;  //!< specify the underlying type used in the identifiers
+using IdentifierType = std::uint32_t;  //!< specify the underlying type used in the identifiers
 using std::int32_t;
 using std::int64_t;
 
-constexpr identifier_type invalid_id_value =
-    static_cast<identifier_type>(-1);  //!< defining an invalid id value
+constexpr IdentifierType invalid_id_value =
+    static_cast<IdentifierType>(-1);  //!< defining an invalid id value
 
 /** the known types of identifiers*/
 enum class identifiers : char {
@@ -49,6 +49,7 @@ constexpr interface_visibility LOCAL = interface_visibility::local;
 to those that are a actually required and make sense, and make it as low impact as possible.
 it also acts to limit any mistakes of on type of identifier for another
 */
+
 template<typename BaseType, identifiers ID, BaseType invalidValue>
 class identifier_id_t {
   private:
@@ -103,10 +104,10 @@ struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>> {
 
 namespace helics {
 using publication_id_t =
-    identifier_id_t<identifier_type, identifiers::publication, invalid_id_value>;
-using input_id_t = identifier_id_t<identifier_type, identifiers::input, invalid_id_value>;
+    identifier_id_t<IdentifierType, identifiers::publication, invalid_id_value>;
+using input_id_t = identifier_id_t<IdentifierType, identifiers::input, invalid_id_value>;
 
-using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
+using query_id_t = identifier_id_t<IdentifierType, identifiers::query, invalid_id_value>;
 
 /** data class for pair of a string and double*/
 class NamedPoint {

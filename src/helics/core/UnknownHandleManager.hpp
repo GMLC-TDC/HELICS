@@ -18,7 +18,7 @@ namespace helics {
 */
 class UnknownHandleManager {
   public:
-    using targetInfo = std::pair<global_handle, uint16_t>;
+    using targetInfo = std::pair<GlobalHandle, uint16_t>;
 
   private:
     std::unordered_multimap<std::string, targetInfo>
@@ -39,14 +39,14 @@ class UnknownHandleManager {
     /** default constructor*/
     UnknownHandleManager() = default;
     /** add a missingPublication*/
-    void addUnknownPublication(const std::string& key, global_handle target, uint16_t flags);
+    void addUnknownPublication(const std::string& key, GlobalHandle target, uint16_t flags);
     /** add a missingPublication*/
-    void addUnknownInput(const std::string& key, global_handle target, uint16_t flags);
+    void addUnknownInput(const std::string& key, GlobalHandle target, uint16_t flags);
     /** add a missing source endpoint*/
-    void addUnknownEndpoint(const std::string& key, global_handle target, uint16_t flags);
+    void addUnknownEndpoint(const std::string& key, GlobalHandle target, uint16_t flags);
 
     /** add a missing source filter*/
-    void addUnknownFilter(const std::string& key, global_handle target, uint16_t flags);
+    void addUnknownFilter(const std::string& key, GlobalHandle target, uint16_t flags);
     /** add a data link where neither side is known*/
     void addDataLink(const std::string& source, const std::string& target);
     void addSourceFilterLink(const std::string& filter, const std::string& endpoint);
@@ -76,7 +76,7 @@ class UnknownHandleManager {
     /** specify a found source filter*/
     void clearFilter(const std::string& newFilter);
     /** clear all unknowns belonging to a certain federate*/
-    void clearFederateUnknowns(global_federate_id id);
+    void clearFederateUnknowns(GlobalFederateId id);
     /** check if there are any unknowns remaining*/
     bool hasUnknowns() const;
 
@@ -91,7 +91,7 @@ class UnknownHandleManager {
     the global handle.
     */
     void processRequiredUnknowns(
-        std::function<void(const std::string& name, char type, global_handle)> cfunc) const;
+        std::function<void(const std::string& name, char type, GlobalHandle)> cfunc) const;
 
     /** run a callback for each non optional Unknown
     @param cfunc a callback function with the signature of the name of the required interface a
@@ -99,7 +99,7 @@ class UnknownHandleManager {
     the global handle.
     */
     void processNonOptionalUnknowns(
-        std::function<void(const std::string& name, char type, global_handle)> cfunc) const;
+        std::function<void(const std::string& name, char type, GlobalHandle)> cfunc) const;
 };
 
 }  // namespace helics

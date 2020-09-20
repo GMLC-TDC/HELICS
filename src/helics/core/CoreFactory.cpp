@@ -28,7 +28,7 @@ DECLARE_TRIPLINE()
 namespace helics {
 
 namespace CoreFactory {
-    static const std::string emptyString;
+    static const std::string gEmptyString;
 
     /*** class to hold the set of builders
    @details this doesn't work as a global since it tends to get initialized after some of the things
@@ -94,12 +94,12 @@ namespace CoreFactory {
         tparser.addTypeOption();
         tparser.allow_extras();
         tparser.parse(initializationString);
-        return create(tparser.getCoreType(), emptyString, tparser.remaining_for_passthrough());
+        return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
     }
 
     std::shared_ptr<Core> create(core_type type, const std::string& configureString)
     {
-        return create(type, emptyString, configureString);
+        return create(type, gEmptyString, configureString);
     }
 
     std::shared_ptr<Core>
@@ -123,12 +123,12 @@ namespace CoreFactory {
 
         tparser.allow_extras();
         tparser.parse(std::move(args));
-        return create(tparser.getCoreType(), emptyString, tparser.remaining_for_passthrough());
+        return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
     }
 
     std::shared_ptr<Core> create(core_type type, std::vector<std::string> args)
     {
-        return create(type, emptyString, std::move(args));
+        return create(type, gEmptyString, std::move(args));
     }
 
     std::shared_ptr<Core>
@@ -154,7 +154,7 @@ namespace CoreFactory {
 
     std::shared_ptr<Core> create(core_type type, int argc, char* argv[])
     {
-        return create(type, emptyString, argc, argv);
+        return create(type, gEmptyString, argc, argv);
     }
 
     std::shared_ptr<Core>
@@ -342,14 +342,14 @@ thread which allows the destructor to fire if need be without issue*/
     {
         if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED) {
             std::cout << "All core types have similar options\n";
-            auto cr = makeCore(core_type::DEFAULT, emptyString);
+            auto cr = makeCore(core_type::DEFAULT, gEmptyString);
             cr->configure(helpStr);
 #ifdef ENABLE_TCP_CORE
-            cr = makeCore(core_type::TCP_SS, emptyString);
+            cr = makeCore(core_type::TCP_SS, gEmptyString);
             cr->configure(helpStr);
 #endif
         } else {
-            auto cr = makeCore(type, emptyString);
+            auto cr = makeCore(type, gEmptyString);
             cr->configure(helpStr);
         }
     }

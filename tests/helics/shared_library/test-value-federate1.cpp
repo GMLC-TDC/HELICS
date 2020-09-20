@@ -492,7 +492,7 @@ void runFederateTestComplex(const char* core,
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(helics_complex hc = helicsInputGetComplexObject(subid, &err));
+    CE(HelicsComplex hc = helicsInputGetComplexObject(subid, &err));
     // make sure the string is what we expect
     EXPECT_EQ(hc.real, testValue1_r);
     EXPECT_EQ(hc.imag, testValue1_i);
@@ -1007,7 +1007,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_STREQ(helicsPublicationGetInfo(pubid1), "pub1_test");
     EXPECT_STREQ(helicsPublicationGetInfo(pubid2), "pub2_test");
 
-    CE(auto cr = helicsFederateGetCoreObject(vFed, &err));
+    CE(auto cr = helicsFederateGetCore(vFed, &err));
     CE(helicsFederateFinalize(vFed, &err));
 
     CE(auto wait = helicsCoreWaitForDisconnect(cr, 70, &err));

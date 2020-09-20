@@ -52,7 +52,7 @@ class InputInfo {
         }
     };
     /** constructor with all the information*/
-    InputInfo(global_handle handle,
+    InputInfo(GlobalHandle handle,
               const std::string& key_,
               const std::string& type_,
               const std::string& units_):
@@ -61,7 +61,7 @@ class InputInfo {
     {
     }
 
-    const global_handle id;  //!< identifier for the handle
+    const GlobalHandle id;  //!< identifier for the handle
     const std::string key;  //!< the identifier for the input
     const std::string type;  //! the nominal type of data for the input
     const std::string units;  //!< the units of the controlInput
@@ -81,7 +81,7 @@ class InputInfo {
         current_data_time;  //!< the most recent published data times
     std::vector<std::shared_ptr<const SmallBuffer>>
         current_data;  //!< the most recent published data
-    std::vector<global_handle> input_sources;  //!< the sources of the input signals
+    std::vector<GlobalHandle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;  //!< indicator that the source has been deactivated
     std::vector<sourceInformation> source_info;  //!< the name,type,units of the sources
     std::vector<int32_t> priority_sources;  //!< the list of priority inputs;
@@ -96,7 +96,7 @@ class InputInfo {
     /** get a the most recent data point*/
     const std::shared_ptr<const SmallBuffer>& getData(uint32_t* inputIndex) const;
     /** add a data block into the queue*/
-    void addData(global_handle source_id,
+    void addData(GlobalHandle source_id,
                  Time valueTime,
                  unsigned int iteration,
                  std::shared_ptr<const SmallBuffer> data);
@@ -120,12 +120,12 @@ class InputInfo {
     /** get the event based on the event queue*/
     Time nextValueTime() const;
     /** add a new source target to the input*/
-    void addSource(global_handle newSource,
+    void addSource(GlobalHandle newSource,
                    const std::string& sourceName,
                    const std::string& stype,
                    const std::string& sunits);
     /** remove a source */
-    void removeSource(global_handle sourceToRemove, Time minTime);
+    void removeSource(GlobalHandle sourceToRemove, Time minTime);
     /** remove a source */
     void removeSource(const std::string& sourceName, Time minTime);
     /** clear all non-current data*/

@@ -14,8 +14,8 @@ using namespace helics;
 TEST(ftc_tests, dependency_tests)
 {
     ForwardingTimeCoordinator ftc;
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     ftc.addDependency(fed2);
     ftc.addDependency(fed3);
     auto deps = ftc.getDependencies();
@@ -44,8 +44,8 @@ TEST(ftc_tests, dependency_test_message)
 {
     ForwardingTimeCoordinator ftc;
     ActionMessage addDep(CMD_ADD_DEPENDENCY);
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     addDep.source_id = fed2;
 
     ftc.processDependencyUpdateMessage(addDep);
@@ -70,7 +70,7 @@ TEST(ftc_tests, dependency_test_message)
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = GlobalFederateId(10);
     ftc.processDependencyUpdateMessage(remDep);
     deps = ftc.getDependencies();
     EXPECT_EQ(deps.size(), 1U);
@@ -80,8 +80,8 @@ TEST(ftc_tests, dependency_test_message)
 TEST(ftc_tests, dependent_tests)
 {
     ForwardingTimeCoordinator ftc;
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     ftc.addDependent(fed2);
     ftc.addDependent(fed3);
     auto& deps = ftc.getDependents();
@@ -109,8 +109,8 @@ TEST(ftc_tests, dependent_test_message)
 {
     ForwardingTimeCoordinator ftc;
     ActionMessage addDep(CMD_ADD_DEPENDENT);
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     addDep.source_id = fed2;
 
     ftc.processDependencyUpdateMessage(addDep);
@@ -134,7 +134,7 @@ TEST(ftc_tests, dependent_test_message)
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = GlobalFederateId(10);
     ftc.processDependencyUpdateMessage(remDep);
     EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
@@ -143,8 +143,8 @@ TEST(ftc_tests, dependent_test_message)
 TEST(ftc_tests, execMode_entry)
 {
     ForwardingTimeCoordinator ftc;
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     ftc.addDependency(fed2);
     ftc.addDependency(fed3);
     ftc.enteringExecMode();
@@ -187,18 +187,18 @@ void getFTCtoExecMode(ForwardingTimeCoordinator& ftc)
 TEST(ftc_tests, timing_test1)
 {
     ForwardingTimeCoordinator ftc;
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     ftc.addDependency(fed2);
     ftc.addDependency(fed3);
     getFTCtoExecMode(ftc);
 
-    ftc.addDependent(global_federate_id(5));
+    ftc.addDependent(GlobalFederateId(5));
     ActionMessage lastMessage(CMD_INVALID);
-    ftc.source_id = global_federate_id(1);
+    ftc.source_id = GlobalFederateId(1);
     ftc.setMessageSender([&lastMessage](const helics::ActionMessage& mess) { lastMessage = mess; });
 
-    ActionMessage timeUpdate(CMD_TIME_REQUEST, fed2, global_federate_id(1));
+    ActionMessage timeUpdate(CMD_TIME_REQUEST, fed2, GlobalFederateId(1));
     timeUpdate.actionTime = 1.0;
     timeUpdate.Te = 1.0;
     timeUpdate.Tdemin = 1.0;

@@ -17,7 +17,7 @@ namespace helics {
 class PublicationInfo {
   public:
     /** constructor from the basic information*/
-    PublicationInfo(global_handle pid,
+    PublicationInfo(GlobalHandle pid,
                     const std::string& pkey,
                     const std::string& ptype,
                     const std::string& punits):
@@ -25,8 +25,8 @@ class PublicationInfo {
         key(pkey), type(ptype), units(punits)
     {
     }
-    const global_handle id;  //!< the identifier for the containing federate
-    std::vector<global_handle> subscribers;  //!< container for all the subscribers of a publication
+    const GlobalHandle id;  //!< the identifier for the containing federate
+    std::vector<GlobalHandle> subscribers;  //!< container for all the subscribers of a publication
     const std::string key;  //!< the key identifier for the publication
     const std::string type;  //!< the type of the publication data
     const std::string units;  //!< the units of the publication data
@@ -39,6 +39,6 @@ class PublicationInfo {
     /** check the value if it is the same as the most recent data and if changed, store it*/
     bool CheckSetValue(const char* dataToCheck, uint64_t len);
     /** remove a subscriber*/
-    void removeSubscriber(global_handle subscriberToRemove);
+    void removeSubscriber(GlobalHandle subscriberToRemove);
 };
 }  // namespace helics

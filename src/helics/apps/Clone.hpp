@@ -136,9 +136,9 @@ namespace apps {
             cloneSubscriptionNames;  //!< string of the subscriptions of the cloned federate
         std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
-        std::map<helics::interface_handle, int> subids;  //!< map of the subscription ids
+        std::map<helics::InterfaceHandle, int> subids;  //!< map of the subscription ids
         std::map<std::string, int> subkeys;  //!< translate subscription names to an index
-        std::map<helics::interface_handle, int> eptids;  // translate subscription id to index
+        std::map<helics::InterfaceHandle, int> eptids;  // translate subscription id to index
         std::map<std::string, int> eptNames;  //!< translate endpoint name to index
         std::string captureFederate;  //!< storage for the name of the federate to clone
         std::string fedConfig;  //!< storage for the federateConfiguration

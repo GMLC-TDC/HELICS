@@ -504,7 +504,7 @@ class HELICS_CXX_EXPORT ValueFederate:
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
-    @param callback the function to call signature void(input_id_t, Time)
+    @param callback the function to call signature void(Input &, Time)
     */
     void setInputNotificationCallback(std::function<void(Input&, Time)> callback);
     /** register a callback function to call when the specified subscription is updated

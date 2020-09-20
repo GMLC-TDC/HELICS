@@ -29,6 +29,6 @@ class FilterCoordinator {
     int ongoingDestTransactions =
         0;  //!< counter for the number of filtered message returns expected on Destination
     /** make a filter as closed within the coordinator*/
-    void closeFilter(global_handle filt);
+    void closeFilter(GlobalHandle filt);
 };
 }  // namespace helics

@@ -28,25 +28,25 @@ class HandleManager {
     otherwise we would need two classes that do basically the same thing just with different
     container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
-    std::unordered_map<std::string_view, interface_handle>
+    std::unordered_map<std::string_view, InterfaceHandle>
         publications;  //!< map of all local publications
-    std::unordered_map<std::string_view, interface_handle>
+    std::unordered_map<std::string_view, InterfaceHandle>
         endpoints;  //!< map of all local endpoints
-    std::unordered_map<std::string_view, interface_handle> inputs;  //!< map of all local endpoints
-    std::unordered_map<std::string_view, interface_handle> filters;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, InterfaceHandle> inputs;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, InterfaceHandle> filters;  //!< map of all local endpoints
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
     HandleManager() = default;
     /** add a handle to manage*/
-    BasicHandleInfo& addHandle(global_federate_id fed_id,
+    BasicHandleInfo& addHandle(GlobalFederateId fed_id,
                                handle_type what,
                                const std::string& key,
                                const std::string& type,
                                const std::string& units);
     /** add a handle to manage*/
-    BasicHandleInfo& addHandle(global_federate_id fed_id,
-                               interface_handle local_id,
+    BasicHandleInfo& addHandle(GlobalFederateId fed_id,
+                               InterfaceHandle local_id,
                                handle_type what,
                                const std::string& key,
                                const std::string& type,
@@ -56,48 +56,48 @@ class HandleManager {
     /** add a handle at the specified index*/
     void addHandleAtIndex(const BasicHandleInfo& otherHandle, int32_t index);
     /** remove the information at the specified handle*/
-    void removeHandle(global_handle handle);
+    void removeHandle(GlobalHandle handle);
     /** get a handle by index*/
     BasicHandleInfo* getHandleInfo(int32_t index);
     /** get a const handle by index*/
     const BasicHandleInfo* getHandleInfo(int32_t index) const;
     /** get a handle by index*/
-    BasicHandleInfo* getHandleInfo(interface_handle handle);
+    BasicHandleInfo* getHandleInfo(InterfaceHandle handle);
     /** get a const handle by index*/
-    const BasicHandleInfo* getHandleInfo(interface_handle handle) const;
+    const BasicHandleInfo* getHandleInfo(InterfaceHandle handle) const;
     /** find a handle from both the federate and local id*/
-    BasicHandleInfo* findHandle(global_handle id);
+    BasicHandleInfo* findHandle(GlobalHandle id);
     /** find a const handle from both the federate and local id*/
-    const BasicHandleInfo* findHandle(global_handle id) const;
+    const BasicHandleInfo* findHandle(GlobalHandle id) const;
 
-    void setHandleOption(interface_handle handle, int32_t option, int32_t val);
+    void setHandleOption(InterfaceHandle handle, int32_t option, int32_t val);
 
-    int32_t getHandleOption(interface_handle handle, int32_t option) const;
+    int32_t getHandleOption(InterfaceHandle handle, int32_t option) const;
     /** get an endpoint from its name*/
     BasicHandleInfo* getEndpoint(std::string_view name);
     /** get an endpoint from its name*/
     const BasicHandleInfo* getEndpoint(std::string_view name) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    BasicHandleInfo* getEndpoint(interface_handle handle);
+    BasicHandleInfo* getEndpoint(InterfaceHandle handle);
     /** get a const endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    const BasicHandleInfo* getEndpoint(interface_handle handle) const;
+    const BasicHandleInfo* getEndpoint(InterfaceHandle handle) const;
     /** get a const filter by name*/
     const BasicHandleInfo* getFilter(std::string_view name) const;
     BasicHandleInfo* getFilter(std::string_view name);
     // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
-    BasicHandleInfo* getFilter(interface_handle handle);
+    BasicHandleInfo* getFilter(InterfaceHandle handle);
     BasicHandleInfo* getPublication(std::string_view name);
     const BasicHandleInfo* getPublication(std::string_view name) const;
     /** get a publication by index
     @return nullptr if the index doesn't point to a valid publication*/
-    BasicHandleInfo* getPublication(interface_handle handle);
+    BasicHandleInfo* getPublication(InterfaceHandle handle);
     BasicHandleInfo* getInput(std::string_view name);
     const BasicHandleInfo* getInput(std::string_view name) const;
-    local_federate_id getLocalFedID(interface_handle handle) const;
+    LocalFederateId getLocalFedID(InterfaceHandle handle) const;
 
     BasicHandleInfo& operator[](size_t index) { return handles[index]; }
     const BasicHandleInfo& operator[](size_t index) const { return handles[index]; }

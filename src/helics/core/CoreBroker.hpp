@@ -50,9 +50,9 @@ enum class connection_state : std::uint8_t {
 class BasicFedInfo {
   public:
     const std::string name;  //!< name of the federate
-    global_federate_id global_id;  //!< the identification code for the federate
+    GlobalFederateId global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate
-    global_broker_id parent;  //!< the id of the parent broker/core
+    GlobalBrokerId parent;  //!< the id of the parent broker/core
     connection_state state{connection_state::connected};
     explicit BasicFedInfo(const std::string& fedname): name(fedname) {}
 };
@@ -62,9 +62,9 @@ class BasicBrokerInfo {
   public:
     const std::string name;  //!< the name of the broker
 
-    global_broker_id global_id;  //!< the global identifier for the broker
+    GlobalBrokerId global_id;  //!< the global identifier for the broker
     route_id route;  //!< the identifier for the route to take to the broker
-    global_broker_id parent;  //!< the id of the parent broker/core
+    GlobalBrokerId parent;  //!< the id of the parent broker/core
 
     connection_state state{
         connection_state::connected};  //!< specify the current status of the broker
@@ -97,20 +97,20 @@ class CoreBroker: public Broker, public BrokerBase {
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
-    gmlc::containers::DualMappedVector<BasicFedInfo, std::string, global_federate_id>
+    gmlc::containers::DualMappedVector<BasicFedInfo, std::string, GlobalFederateId>
         _federates;  //!< container for all federates
-    gmlc::containers::DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
+    gmlc::containers::DualMappedVector<BasicBrokerInfo, std::string, GlobalBrokerId>
         _brokers;  //!< container for all the broker information
     std::string
         previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
     UnknownHandleManager unknownHandles;  //!< structure containing unknown targeted handles
-    std::vector<std::pair<std::string, global_federate_id>>
+    std::vector<std::pair<std::string, GlobalFederateId>>
         delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::unordered_map<global_federate_id, local_federate_id>
+    std::unordered_map<GlobalFederateId, LocalFederateId>
         global_id_translation;  //!< map to translate global ids to local ones
-    std::unordered_map<global_federate_id, route_id>
+    std::unordered_map<GlobalFederateId, route_id>
         routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, route_id>
         knownExternalEndpoints;  //!< external map for all known external endpoints with names and
@@ -152,8 +152,8 @@ class CoreBroker: public Broker, public BrokerBase {
     /**function for routing a message,  it will override the destination id with the specified
      * argument
      */
-    void routeMessage(ActionMessage& cmd, global_federate_id dest);
-    void routeMessage(ActionMessage&& cmd, global_federate_id dest);
+    void routeMessage(ActionMessage& cmd, GlobalFederateId dest);
+    void routeMessage(ActionMessage&& cmd, GlobalFederateId dest);
     /** function for routing a message from based on the destination specified in the
      * ActionMessage*/
     void routeMessage(const ActionMessage& cmd);
@@ -315,7 +315,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** disconnect a broker/core*/
     void disconnectBroker(BasicBrokerInfo& brk);
     /** mark this broker and all other that have this as a parent as disconnected*/
-    void markAsDisconnected(global_broker_id brkid);
+    void markAsDisconnected(GlobalBrokerId brkid);
     /** run a check for a named interface*/
     void checkForNamedInterface(ActionMessage& command);
     /** remove a named target from an interface*/
@@ -335,13 +335,13 @@ class CoreBroker: public Broker, public BrokerBase {
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;
     /** locate the route to take to a particular federate*/
-    route_id getRoute(global_federate_id fedid) const;
+    route_id getRoute(GlobalFederateId fedid) const;
     /** locate the route to take to a particular federate*/
-    route_id getRoute(int32_t fedid) const { return getRoute(global_federate_id(fedid)); }
+    route_id getRoute(int32_t fedid) const { return getRoute(GlobalFederateId(fedid)); }
 
-    const BasicBrokerInfo* getBrokerById(global_broker_id brokerid) const;
+    const BasicBrokerInfo* getBrokerById(GlobalBrokerId brokerid) const;
 
-    BasicBrokerInfo* getBrokerById(global_broker_id brokerid);
+    BasicBrokerInfo* getBrokerById(GlobalBrokerId brokerid);
 
     void addLocalInfo(BasicHandleInfo& handleInfo, const ActionMessage& m);
     void addPublication(ActionMessage& m);
@@ -360,7 +360,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** generate a string about the federation summarizing connections*/
     std::string generateFederationSummary() const;
     /** label the broker and all children as disconnected*/
-    void labelAsDisconnected(global_broker_id brkid);
+    void labelAsDisconnected(GlobalBrokerId brkid);
 
     /** generate a time barrier request*/
     void generateTimeBarrier(ActionMessage& m);

@@ -30,7 +30,7 @@ void ForwardingTimeCoordinator::enteringExecMode()
 void ForwardingTimeCoordinator::disconnect()
 {
     if (sendMessageFunction) {
-        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
+        std::set<GlobalFederateId> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
             if (dep.Tnext < Time::maxVal()) {
                 connections.insert(dep.fedID);
@@ -64,7 +64,7 @@ void ForwardingTimeCoordinator::disconnect()
     }
 }
 
-static inline bool isBroker(global_federate_id id)
+static inline bool isBroker(GlobalFederateId id)
 {
     return ((id.baseValue() == 1) || (id.baseValue() >= 0x7000'0000));
 }
@@ -74,13 +74,13 @@ class minTimeSet {
     Time minNext = Time::maxVal();
     Time minminDe = Time::maxVal();
     Time minDe = minminDe;
-    global_federate_id minFed;
+    GlobalFederateId minFed;
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
 };
 
 static minTimeSet generateMinTimeSet(const TimeDependencies& dependencies,
                                      bool restricted,
-                                     global_federate_id ignore = global_federate_id())
+                                     GlobalFederateId ignore = GlobalFederateId())
 {
     minTimeSet mTime;
     for (auto& dep : dependencies) {
@@ -100,7 +100,7 @@ static minTimeSet generateMinTimeSet(const TimeDependencies& dependencies,
                 mTime.minminDe = dep.Tdemin;
                 mTime.minFed = dep.fedID;
             } else if (dep.Tdemin == mTime.minminDe) {
-                mTime.minFed = global_federate_id();
+                mTime.minFed = GlobalFederateId();
             }
         } else {
             // this minimum dependent event time received was invalid and can't be trusted
@@ -204,17 +204,17 @@ std::string ForwardingTimeCoordinator::printTimeStatus() const
                        static_cast<double>(time_minminDe));
 }
 
-bool ForwardingTimeCoordinator::isDependency(global_federate_id ofed) const
+bool ForwardingTimeCoordinator::isDependency(GlobalFederateId ofed) const
 {
     return dependencies.isDependency(ofed);
 }
 
-bool ForwardingTimeCoordinator::addDependency(global_federate_id fedID)
+bool ForwardingTimeCoordinator::addDependency(GlobalFederateId fedID)
 {
     return dependencies.addDependency(fedID);
 }
 
-bool ForwardingTimeCoordinator::addDependent(global_federate_id fedID)
+bool ForwardingTimeCoordinator::addDependent(GlobalFederateId fedID)
 {
     if (dependents.empty()) {
         dependents.push_back(fedID);
@@ -232,12 +232,12 @@ bool ForwardingTimeCoordinator::addDependent(global_federate_id fedID)
     return true;
 }
 
-void ForwardingTimeCoordinator::removeDependency(global_federate_id fedID)
+void ForwardingTimeCoordinator::removeDependency(GlobalFederateId fedID)
 {
     dependencies.removeDependency(fedID);
 }
 
-void ForwardingTimeCoordinator::removeDependent(global_federate_id fedID)
+void ForwardingTimeCoordinator::removeDependent(GlobalFederateId fedID)
 {
     auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
     if (dep != dependents.end()) {
@@ -247,14 +247,14 @@ void ForwardingTimeCoordinator::removeDependent(global_federate_id fedID)
     }
 }
 
-const DependencyInfo* ForwardingTimeCoordinator::getDependencyInfo(global_federate_id ofed) const
+const DependencyInfo* ForwardingTimeCoordinator::getDependencyInfo(GlobalFederateId ofed) const
 {
     return dependencies.getDependencyInfo(ofed);
 }
 
-std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies() const
+std::vector<GlobalFederateId> ForwardingTimeCoordinator::getDependencies() const
 {
-    std::vector<global_federate_id> deps;
+    std::vector<GlobalFederateId> deps;
     for (auto& dep : dependencies) {
         deps.push_back(dep.fedID);
     }
@@ -290,7 +290,7 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
 
 ActionMessage
     ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency(const ActionMessage& msg,
-                                                                   global_federate_id iFed) const
+                                                                   GlobalFederateId iFed) const
 {
     auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy, iFed);
     ActionMessage nTime(msg);
