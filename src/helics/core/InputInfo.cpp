@@ -80,7 +80,7 @@ static auto recordComparison = [](const InputInfo::dataRecord& rec1,
         ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
-void InputInfo::addData(global_handle source_id,
+void InputInfo::addData(GlobalHandle source_id,
                         Time valueTime,
                         unsigned int iteration,
                         std::shared_ptr<const SmallBuffer> data)
@@ -111,7 +111,7 @@ void InputInfo::addData(global_handle source_id,
     }
 }
 
-void InputInfo::addSource(global_handle newSource,
+void InputInfo::addSource(GlobalHandle newSource,
                           const std::string& sourceName,
                           const std::string& stype,
                           const std::string& sunits)
@@ -127,7 +127,7 @@ void InputInfo::addSource(global_handle newSource,
     has_target = true;
 }
 
-void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
+void InputInfo::removeSource(GlobalHandle sourceToRemove, Time minTime)
 {
     inputUnits.clear();
     inputType.clear();

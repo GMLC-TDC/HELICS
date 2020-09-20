@@ -115,7 +115,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
     auto& epid = mFed1->registerEndpoint("ep1");
     auto& epid2 = mFed1->registerGlobalEndpoint("ep2", "random");
 
-    helics::interface_handle rxend;
+    helics::InterfaceHandle rxend;
     helics::Time timeRx;
     auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
@@ -163,7 +163,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
     helics::Endpoint ep1(mFed1, "ep1");
     helics::Endpoint ep2(helics::GLOBAL, mFed1, "ep2", "random");
 
-    helics::interface_handle rxend;
+    helics::InterfaceHandle rxend;
     helics::Time timeRx;
     auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
@@ -209,7 +209,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     helics::Endpoint ep1(mFed1, "ep1");
     helics::Endpoint ep2(helics::GLOBAL, mFed1, "ep2", "random");
 
-    helics::interface_handle rxend;
+    helics::InterfaceHandle rxend;
     helics::Time timeRx;
     auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();

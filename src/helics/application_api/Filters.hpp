@@ -49,9 +49,9 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** construct through a federate*/
     explicit Filter(Federate* ffed, const std::string& filtName = EMPTY_STRING);
     /** construct from handle and federate*/
-    Filter(Federate* ffed, const std::string& filtName, interface_handle ihandle);
+    Filter(Federate* ffed, const std::string& filtName, InterfaceHandle ihandle);
     /** construct from handle and core*/
-    Filter(Core* core, const std::string& filtName, interface_handle ihandle);
+    Filter(Core* core, const std::string& filtName, InterfaceHandle ihandle);
     /** construct through a federate*/
     Filter(interface_visibility locality,
            Federate* ffed,
@@ -113,7 +113,7 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
                   const std::string& filtName = EMPTY_STRING);
 
     /** constructor used by FilterFederateManager*/
-    CloningFilter(Federate* ffed, const std::string& filtName, interface_handle handle);
+    CloningFilter(Federate* ffed, const std::string& filtName, InterfaceHandle handle);
     /** move the filter to a new cloning filter*/
     CloningFilter(CloningFilter&& filt) = default;
     /** copy the filter, a copied filter will point to the same object*/

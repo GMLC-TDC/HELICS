@@ -27,7 +27,7 @@ TEST_P(query_tests, publication_queries)
     CE(helicsFederateEnterInitializingMode(vFed2, &err));
     CE(helicsFederateEnterInitializingModeComplete(vFed1, &err));
 
-    auto core = helicsFederateGetCoreObject(vFed1, &err);
+    auto core = helicsFederateGetCore(vFed1, &err);
 
     auto q1 = helicsCreateQuery("fed0", "publications");
 
@@ -63,7 +63,7 @@ TEST_P(query_tests, broker_queries)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
 
-    CE(auto core = helicsFederateGetCoreObject(vFed1, &err));
+    CE(auto core = helicsFederateGetCore(vFed1, &err));
 
     auto q1 = helicsCreateQuery("root", "federates");
     std::string res = helicsQueryCoreExecute(q1, core, nullptr);

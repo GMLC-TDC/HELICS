@@ -590,7 +590,7 @@ HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
  * error.
  * @endforcpponly
  *
- * @return A helics_complex structure with the value.
+ * @return A HelicsComplex structure with the value.
  */
 HELICS_EXPORT helics_complex helicsInputGetComplexObject(helics_input ipt, helics_error* err);
 

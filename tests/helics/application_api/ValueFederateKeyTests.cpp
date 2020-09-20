@@ -645,7 +645,7 @@ TEST_P(valuefed_single_type, all_callback)
     auto& sub3 = vFed1->registerSubscription("fed0/pub3", "");
 
     helics::SmallBuffer db(547, ';');
-    helics::interface_handle lastId;
+    helics::InterfaceHandle lastId;
     helics::Time lastTime;
     vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
         lastTime = callTime;

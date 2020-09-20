@@ -24,67 +24,76 @@ extern "C" {
  * opaque object representing an input
  */
 typedef void* helics_input;
-
+typedef void* HelicsInput;
 /**
  * opaque object representing a publication
  */
 typedef void* helics_publication;
-
+typedef void* HelicsPublication;
 /**
  * opaque object representing an endpoint
  */
 typedef void* helics_endpoint;
+typedef void* HelicsEndpoint;
 
 /**
  * opaque object representing a filter
  */
 typedef void* helics_filter;
+typedef void* HelicsFilter;
 
 /**
  * opaque object representing a core
  */
 typedef void* helics_core;
+typedef void* HelicsCore;
 
 /**
  * opaque object representing a broker
  */
 typedef void* helics_broker;
-
+typedef void* HelicsBroker;
 /**
  * opaque object representing a federate
  */
 typedef void* helics_federate;
+typedef void* HelicsFederate;
 
 /**
  * opaque object representing a filter info object structure
  */
 typedef void* helics_federate_info;
+typedef void* HelicsFederateInfo;
 
 /**
  * opaque object representing a query
  */
 typedef void* helics_query;
+typedef void* HelicsQuery;
 
 /**
  * opaque object representing a message
  */
 typedef void* helics_message;
+typedef void* HelicsMessage;
 
 /**
  * time definition used in the C interface to helics
  */
 typedef double helics_time;
+typedef double HelicsTime;
 
-const helics_time helics_time_zero = 0.0; /*!< definition of time zero-the beginning of simulation */
-const helics_time helics_time_epsilon = 1.0e-9; /*!< definition of the minimum time resolution */
-const helics_time helics_time_invalid = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const helics_time helics_time_maxtime = 9223372036.854774; /*!< definition of time signifying the federate has
+const HelicsTime helics_time_zero = 0.0; /*!< definition of time zero-the beginning of simulation */
+const HelicsTime helics_time_epsilon = 1.0e-9; /*!< definition of the minimum time resolution */
+const HelicsTime helics_time_invalid = -1.785e39; /*!< definition of an invalid time that has no meaning */
+const HelicsTime helics_time_maxtime = 9223372036.854774; /*!< definition of time signifying the federate has
                                                              terminated or to run until the end of the simulation*/
 
 /**
  * defining a boolean type for use in the helics interface
  */
 typedef int helics_bool;
+typedef int HelicsBool;
 
 const helics_bool helics_true = 1; /*!< indicator used for a true response */
 const helics_bool helics_false = 0; /*!< indicator used for a false response */
@@ -128,10 +137,12 @@ typedef enum {
 /**
  *  structure defining a basic complex type
  */
-typedef struct helics_complex {
+typedef struct HelicsComplex {
     double real;
     double imag;
-} helics_complex;
+} HelicsComplex;
+
+typedef HelicsComplex helics_complex;
 
 /**
  * helics error object
@@ -143,6 +154,8 @@ typedef struct helics_error {
     int32_t error_code; /*!< an error code associated with the error*/
     const char* message; /*!< a message associated with the error*/
 } helics_error;
+
+typedef helics_error HelicsError;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

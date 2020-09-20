@@ -9,31 +9,31 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "global_federate_id.hpp"
 #include "gmlc/containers/MapTraits.hpp"
 
-/** override the is_easily_hashable type_trait of interface_handle for use in DualMappedVector and
+/** override the is_easily_hashable type_trait of InterfaceHandle for use in DualMappedVector and
  * some other types that may optionally use std::map or std::unordered_map*/
 template<>
-struct is_easily_hashable<helics::interface_handle> {
+struct is_easily_hashable<helics::InterfaceHandle> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that
  * may optionally use std::map or std::unordered_map*/
 template<>
-struct is_easily_hashable<helics::global_federate_id> {
+struct is_easily_hashable<helics::GlobalFederateId> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that
  * may optionally use std::map or std::unordered_map*/
 template<>
-struct is_easily_hashable<helics::local_federate_id> {
+struct is_easily_hashable<helics::LocalFederateId> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that
  * may optionally use std::map or std::unordered_map*/
 template<>
-struct is_easily_hashable<helics::global_broker_id> {
+struct is_easily_hashable<helics::GlobalBrokerId> {
     static constexpr bool value = true;
 };
 
@@ -47,6 +47,6 @@ struct is_easily_hashable<helics::route_id> {
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that
  * may optionally use std::map or std::unordered_map*/
 template<>
-struct is_easily_hashable<helics::global_handle> {
+struct is_easily_hashable<helics::GlobalHandle> {
     static constexpr bool value = true;
 };

@@ -30,7 +30,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     Endpoint() = default;
     /**/
     // constructor used by messageFederateManager
-    Endpoint(MessageFederate* mFed, const std::string& name, interface_handle id, void* data);
+    Endpoint(MessageFederate* mFed, const std::string& name, InterfaceHandle id, void* data);
 
     Endpoint(MessageFederate* mFed,
              const std::string& name,

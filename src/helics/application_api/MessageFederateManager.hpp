@@ -35,7 +35,7 @@ class MessageFederateManager {
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    MessageFederateManager(Core* coreOb, MessageFederate* mFed, local_federate_id id);
+    MessageFederateManager(Core* coreOb, MessageFederate* mFed, LocalFederateId id);
     ~MessageFederateManager();
     /** register an endpoint
     @details call is only valid in startup mode
@@ -118,13 +118,13 @@ class MessageFederateManager {
     };
     shared_guarded<
         gmlc::containers::
-            DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
+            DualMappedVector<Endpoint, std::string, InterfaceHandle, reference_stability::stable>>
         local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint&, Time)>> allCallback;
     Time CurrentTime = Time::minVal();  //!< the current simulation time
     Core* coreObject;  //!< the pointer to the actual core
     MessageFederate* mFed;  //!< pointer back to the message Federate
-    const local_federate_id fedID;  //!< storage for the federate ID
+    const LocalFederateId fedID;  //!< storage for the federate ID
     shared_guarded<std::vector<std::unique_ptr<EndpointData>>>
         eptData;  //!< the storage for the message queues and other unique Endpoint information
     guarded<std::vector<unsigned int>>

@@ -57,7 +57,7 @@ FederateTestFixture::~FederateTestFixture()
     for (auto& fed : federates) {
         if (fed) {
             helics_federate_state state = helicsFederateGetState(fed, nullptr);
-            helics_core core = helicsFederateGetCoreObject(fed, nullptr);
+            helics_core core = helicsFederateGetCore(fed, nullptr);
             if (state != helics_state_finalize) {
                 helicsFederateFinalize(fed, nullptr);
             }

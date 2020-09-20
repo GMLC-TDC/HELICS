@@ -788,7 +788,7 @@ TEST_F(function_tests, CoreLink)
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(fed3, nullptr);
     helicsErrorClear(&err);
-    auto cr = helicsFederateGetCoreObject(vFed1, &err);
+    auto cr = helicsFederateGetCore(vFed1, &err);
     EXPECT_NE(cr, nullptr);
     helicsCoreDataLink(cr, "pub1", "fed0/inp1", &err);
 
@@ -1124,7 +1124,7 @@ TEST_F(function_tests, filter_core_tests)
 
     auto mFed1 = GetFederateAt(0);
 
-    auto cr = helicsFederateGetCoreObject(mFed1, nullptr);
+    auto cr = helicsFederateGetCore(mFed1, nullptr);
 
     auto filt1 = helicsCoreRegisterFilter(cr, helics_filter_type_delay, "filt1", nullptr);
     EXPECT_NE(filt1, nullptr);
@@ -1147,7 +1147,7 @@ TEST_F(function_tests, filter_core_tests2)
 
     auto mFed1 = GetFederateAt(0);
 
-    auto cr = helicsFederateGetCoreObject(mFed1, nullptr);
+    auto cr = helicsFederateGetCore(mFed1, nullptr);
 
     auto filt1 = helicsCoreRegisterCloningFilter(cr, "filt1", nullptr);
     EXPECT_NE(filt1, nullptr);

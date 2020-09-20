@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 MessageFederateManager::MessageFederateManager(Core* coreOb,
                                                MessageFederate* fed,
-                                               local_federate_id id):
+                                               LocalFederateId id):
     coreObject(coreOb),
     mFed(fed), fedID(id)
 {
@@ -169,7 +169,7 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
     // lock the data updates
     auto eptDat = eptData.lock();
 
-    interface_handle endpoint_id;
+    InterfaceHandle endpoint_id;
     auto epts = local_endpoints.lock();
     auto mcall = allCallback.load();
     for (size_t ii = 0; ii < epCount; ++ii) {

@@ -43,12 +43,12 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     Publication() = default;
     /** constructor for a publication used by the valueFederateManager
     @param valueFed a pointer the link valueFederate
-    @param id the interface_handle from the core
+    @param id the InterfaceHandle from the core
     @param key the identifier for the publication
     @param type the type of the publication
     @param units an optional string defining the units*/
     Publication(ValueFederate* valueFed,
-                interface_handle id,
+                InterfaceHandle id,
                 const std::string& key,
                 const std::string& type,
                 const std::string& units);

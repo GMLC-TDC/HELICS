@@ -87,18 +87,18 @@ Filter::Filter(Federate* ffed, const std::string& filtName):
 {
 }
 
-Filter::Filter(Federate* ffed, const std::string& filtName, interface_handle ihandle):
+Filter::Filter(Federate* ffed, const std::string& filtName, InterfaceHandle ihandle):
     Interface(ffed, ihandle, filtName)
 {
 }
 
-Filter::Filter(Core* core, const std::string& filtName, interface_handle ihandle):
+Filter::Filter(Core* core, const std::string& filtName, InterfaceHandle ihandle):
     Interface(core, ihandle, filtName)
 {
 }
 
 Filter::Filter(interface_visibility locality, Federate* ffed, const std::string& filtName):
-    Interface(ffed, interface_handle(), filtName)
+    Interface(ffed, InterfaceHandle(), filtName)
 {
     if (ffed != nullptr) {
         if (locality == interface_visibility::global) {
@@ -110,7 +110,7 @@ Filter::Filter(interface_visibility locality, Federate* ffed, const std::string&
 }
 
 Filter::Filter(Core* core, const std::string& filtName):
-    Interface(core, interface_handle(), filtName)
+    Interface(core, InterfaceHandle(), filtName)
 {
     if (cr != nullptr) {
         handle = cr->registerFilter(filtName, std::string(), std::string());
@@ -149,7 +149,7 @@ void Filter::setString(const std::string& property, const std::string& val)
 }
 
 CloningFilter::CloningFilter(Core* core, const std::string& filtName):
-    Filter(core, filtName, interface_handle())
+    Filter(core, filtName, InterfaceHandle())
 {
     if (cr != nullptr) {
         handle = cr->registerCloningFilter(filtName, std::string(), std::string());
@@ -158,7 +158,7 @@ CloningFilter::CloningFilter(Core* core, const std::string& filtName):
 }
 
 CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName):
-    Filter(ffed, filtName, interface_handle())
+    Filter(ffed, filtName, InterfaceHandle())
 {
     if (ffed != nullptr) {
         handle = ffed->registerCloningFilter(filtName);
@@ -168,7 +168,7 @@ CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName):
     }
 }
 
-CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName, interface_handle ihandle):
+CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName, InterfaceHandle ihandle):
     Filter(ffed, filtName, ihandle)
 {
 }
@@ -176,7 +176,7 @@ CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName, interf
 CloningFilter::CloningFilter(interface_visibility locality,
                              Federate* ffed,
                              const std::string& filtName):
-    Filter(ffed, filtName, interface_handle())
+    Filter(ffed, filtName, InterfaceHandle())
 {
     if (ffed != nullptr) {
         if (locality == interface_visibility::global) {

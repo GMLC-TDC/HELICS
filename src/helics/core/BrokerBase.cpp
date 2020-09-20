@@ -283,7 +283,7 @@ void BrokerBase::configureBase()
     brokerState = broker_state_t::configured;
 }
 
-bool BrokerBase::sendToLogger(global_federate_id federateID,
+bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
                               std::string_view message) const
