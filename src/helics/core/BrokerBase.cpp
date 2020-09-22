@@ -133,11 +133,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--minbrokers,--minbroker,--minbrokercount",
         minBrokerCount,
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
-    hApp->add_option("--broker_key,--brokerkey,--brokerKey",
+    hApp->add_option("--brokerkey",
                      brokerKey,
                      "specify a key to use for all connections to/from a broker");
     hApp->add_flag(
-        "--slow_responding,--slowResponding,--slowresponding",
+        "--slowresponding",
         no_ping,
         "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     hApp->add_flag(
