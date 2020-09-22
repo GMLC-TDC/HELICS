@@ -59,7 +59,7 @@ configuration:
 allowed options:
 
 configuration:
-  --loccal_interface arg the local interface to use for the receive ports
+  --local_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokername arg       the name of the broker
@@ -76,7 +76,7 @@ configuration:
 allowed options:
 
 configuration:
-  --loccal_interface arg the local interface to use for the receive ports
+  --local_interface arg the local interface to use for the receive ports
   -b [ --broker ] arg    identifier for the broker
   --broker_address arg   location of the broker i.e network address
   --brokername arg       the name of the broker
