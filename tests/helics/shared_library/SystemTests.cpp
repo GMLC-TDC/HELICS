@@ -209,7 +209,7 @@ TEST(other_tests, federate_add_dependency)
     const char* argv[4];
     argv[0] = "";
     argv[1] = "--corename=dcore";
-    argv[2] = "--type_core=test";
+    argv[2] = "--core_type=test";
     argv[3] = "--period=1.0";
 
     auto fi = helicsCreateFederateInfo();
