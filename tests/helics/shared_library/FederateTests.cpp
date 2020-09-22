@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(federate_multiple_federates_multi_cores, *utf::label("ci"))
     helics::FederateInfo fi("fed1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreName = "core_mc1";
-    fi.coreInitString = "1 --broker=brk1 --brokerinit=2";
+    fi.coreInitString = "1 --broker=brk1 --broker_init_string=2";
 
     auto Fed1 = std::make_shared<helics::Federate>(fi);
 

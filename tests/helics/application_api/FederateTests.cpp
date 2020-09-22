@@ -335,7 +335,7 @@ TEST(federate_tests, core_ptr_no_name)
 TEST(federate_tests, from_string)
 {
     auto Fed1 = std::make_shared<helics::Federate>(
-        "fed1", "--type=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
+        "fed1", "--core_type=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
     Fed1->enterExecutingMode();
 
     auto c1 = Fed1->getCorePointer();
@@ -439,7 +439,7 @@ TEST(federate_tests, from_file9)
 TEST(federate_tests, from_string2)
 {
     auto Fed1 = std::make_shared<helics::Federate>(
-        "--name=fed1 --type=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
+        "--name=fed1 --core_type=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
     Fed1->enterExecutingMode();
 
     EXPECT_EQ(Fed1->getName(), "fed1");

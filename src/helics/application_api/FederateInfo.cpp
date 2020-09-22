@@ -42,7 +42,6 @@ static const std::map<std::string, int> propStringsTranslations{
     {"timedelta", helics_property_time_delta},
     {"time_delta", helics_property_time_delta},
     {"timeDelta", helics_property_time_delta},
-    {"delta", helics_property_time_delta},
     {"offset", helics_property_time_offset},
     {"rtlead", helics_property_time_rt_lead},
     {"rtlag", helics_property_time_rt_lag},
@@ -59,102 +58,102 @@ static const std::map<std::string, int> propStringsTranslations{
     {"outputDelay", helics_property_time_output_delay},
     {"input_delay", helics_property_time_input_delay},
     {"output_delay", helics_property_time_output_delay},
-    {"max_iterations", helics_property_int_max_iterations},
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
-    {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
-    {"maxIterations", helics_property_int_max_iterations},
-    {"iterations", helics_property_int_max_iterations}};
+    {"logLevel", helics_property_int_log_level},
+    {"maxiterations", helics_property_int_max_iterations},
+    {"max_iterations", helics_property_int_max_iterations},
+    {"maxIterations", helics_property_int_max_iterations}};
 
 static const std::map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
-    {"source", helics_flag_source_only},
-    {"slow", helics_flag_slow_responding},
-    {"slow_response", helics_flag_slow_responding},
+    {"slowresponding", helics_flag_slow_responding},
     {"slow_responding", helics_flag_slow_responding},
     {"slowResponding", helics_flag_slow_responding},
-    {"no_ping", helics_flag_slow_responding},
-    {"disable_ping", helics_flag_slow_responding},
     {"only_update_on_change", helics_flag_only_update_on_change},
+    {"onlyupdateonchange", helics_flag_only_update_on_change},
+    {"onlyUpdateOnChange", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
+    {"onlytransmitonchange", helics_flag_only_transmit_on_change},
+    {"onlyTransmitOnChange", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
+    {"forwardcompute", helics_flag_forward_compute},
+    {"forwardCompute", helics_flag_forward_compute},
+    {"real_time", helics_flag_realtime},
     {"realtime", helics_flag_realtime},
     {"realTime", helics_flag_realtime},
+    {"restrictivetimepolicy", helics_flag_restrictive_time_policy},
     {"restrictive_time_policy", helics_flag_restrictive_time_policy},
-    {"conservative_time_policy", helics_flag_restrictive_time_policy},
-    {"restrictive_time", helics_flag_restrictive_time_policy},
-    {"conservative_time", helics_flag_restrictive_time_policy},
-    {"restrictiveTime", helics_flag_restrictive_time_policy},
-    {"conservativeTime", helics_flag_restrictive_time_policy},
+    {"restrictiveTimePolicy", helics_flag_restrictive_time_policy},
     {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
-    {"delayed_update", helics_flag_wait_for_current_time_update},
-    {"delayedUpdate", helics_flag_wait_for_current_time_update},
+    {"ignoretimeMismatch", helics_flag_ignore_time_mismatch_warnings},
+    {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+    {"strictinputtypechecking", helics_handle_option_strict_type_checking},
+    {"strictInputTypeChecking", helics_handle_option_strict_type_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
+    {"ignoreunitmismatch", helics_handle_option_ignore_unit_mismatch},
+    {"ignoreUnitMismatch", helics_handle_option_ignore_unit_mismatch},
     {"buffer_data", helics_handle_option_buffer_data},
+    {"bufferdata", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
-    {"required", helics_handle_option_connection_required},
-    {"optional", helics_handle_option_connection_optional},
-    {"wait_for_current_time", helics_flag_wait_for_current_time_update},
+    {"connection_required", helics_handle_option_connection_required},
+    {"connectionrequired", helics_handle_option_connection_required},
+    {"connectionRequired", helics_handle_option_connection_required},
+    {"required", helics_handle_option_connection_required},  //LIKELY TO BE DEPRECATED In the future
+    {"connectionoptional", helics_handle_option_connection_optional},
+    {"connection_optional", helics_handle_option_connection_optional},
+    {"connectionOptional", helics_handle_option_connection_optional},
     {"wait_for_current_time_update", helics_flag_wait_for_current_time_update},
     {"waitforcurrenttimeupdate", helics_flag_wait_for_current_time_update},
-    {"waitforcurrenttime", helics_flag_wait_for_current_time_update},
+    {"waitForCurrentTimeUpdate", helics_flag_wait_for_current_time_update},
     {"terminate_on_error", helics_flag_terminate_on_error},
     {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
 
 static const std::map<std::string, int> optionStringsTranslations{
-    {"buffer", helics_handle_option_buffer_data},
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferdata", helics_handle_option_buffer_data},
-    {"optional", helics_handle_option_connection_optional},
+    {"bufferData", helics_handle_option_buffer_data},
     {"connectionoptional", helics_handle_option_connection_optional},
     {"connection_optional", helics_handle_option_connection_optional},
-    {"required", helics_handle_option_connection_required},
+    {"connectionOptional", helics_handle_option_connection_optional},
     {"connectionrequired", helics_handle_option_connection_required},
     {"connection_required", helics_handle_option_connection_required},
-    {"ignore_interrupts", helics_handle_option_ignore_interrupts},
-    {"ignoreinterrupts", helics_handle_option_ignore_interrupts},
-    {"nointerrupts", helics_handle_option_ignore_interrupts},
-    {"no_interrupts", helics_handle_option_ignore_interrupts},
+    {"required", helics_handle_option_connection_required}, //LIKELY to be deprecated in the future
+    {"connectionRequired", helics_handle_option_connection_required},
     {"uninterruptible", helics_handle_option_ignore_interrupts},
-    {"multiple", helics_handle_option_multiple_connections_allowed},
-    {"multiple_connections", helics_handle_option_multiple_connections_allowed},
     {"multiple_connections_allowed", helics_handle_option_multiple_connections_allowed},
-    {"multipleconnections", helics_handle_option_multiple_connections_allowed},
     {"multipleconnectionsallowed", helics_handle_option_multiple_connections_allowed},
-    {"single", helics_handle_option_single_connection_only},
-    {"single_connection", helics_handle_option_single_connection_only},
+    {"multipleConnectionsAllowed", helics_handle_option_multiple_connections_allowed},
     {"single_connection_only", helics_handle_option_single_connection_only},
-    {"singleconnection", helics_handle_option_single_connection_only},
-    {"singleconnectionsonly", helics_handle_option_single_connection_only},
+    {"singleconnectiononly", helics_handle_option_single_connection_only},
+    {"singleConnectionOnly", helics_handle_option_single_connection_only},
     {"only_transmit_on_change", helics_handle_option_only_transmit_on_change},
     {"onlytransmitonchange", helics_handle_option_only_transmit_on_change},
+    {"onlyTransmitOnChange", helics_handle_option_only_transmit_on_change},
     {"only_update_on_change", helics_handle_option_only_update_on_change},
     {"onlyupdateonchange", helics_handle_option_only_update_on_change},
+    {"onlyUpdateOnChange", helics_handle_option_only_update_on_change},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
-    {"ignore_units", helics_handle_option_ignore_unit_mismatch},
-    {"strict_type_checking", helics_handle_option_strict_type_checking},
-    {"strict_type_matching", helics_handle_option_strict_type_checking},
+    {"ignoreunitmismatch", helics_handle_option_ignore_unit_mismatch},
+    {"ignoreUnitMismatch", helics_handle_option_ignore_unit_mismatch},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
-    {"strict_input_type_matching", helics_handle_option_strict_type_checking},
     {"strictinputtypechecking", helics_handle_option_strict_type_checking},
-    {"strictinputtypematching", helics_handle_option_strict_type_checking},
-    {"stricttypechecking", helics_handle_option_strict_type_checking},
-    {"stricttypematching", helics_handle_option_strict_type_checking},
-    {"strict", helics_handle_option_strict_type_checking},
+    {"strictInputTypeChecking", helics_handle_option_strict_type_checking},
     {"connections", helics_handle_option_connections},
     {"clear_priority_list", helics_handle_option_clear_priority_list},
-    {"clear_priority", helics_handle_option_clear_priority_list},
-    {"input_priority", helics_handle_option_input_priority_location},
-    {"priority", helics_handle_option_input_priority_location},
+    {"clearPriorityList", helics_handle_option_clear_priority_list},
+    {"clearprioritylist", helics_handle_option_clear_priority_list},
     {"input_priority_location", helics_handle_option_input_priority_location},
-    {"priority_location", helics_handle_option_input_priority_location},
+    {"inputprioritylocation", helics_handle_option_input_priority_location},
+    {"inputPriorityLocation", helics_handle_option_input_priority_location},
     {"multi_input_handling_method", helics_handle_option_multi_input_handling_method},
-    {"multi_input_handling", helics_handle_option_multi_input_handling_method}};
+    {"multiinputhandlingmethod", helics_handle_option_multi_input_handling_method},
+    {"multiInputHandlingMethod", helics_handle_option_multi_input_handling_method}};
 
 static const std::map<std::string, int> option_value_map{
     {"0", 0},
@@ -319,7 +318,7 @@ int getOptionValue(std::string val)
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");
-    app->option_defaults()->ignore_case();
+    app->option_defaults()->ignore_case()->ignore_underscore();
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
     app->set_config("--config-file,--config,config",
                     "helicsConfig.ini",
@@ -339,7 +338,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
     og->add_option_function<std::string>(
-          "--coretype,-t,--type",
+          "--coretype,-t",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
               if (coreType == core_type::UNRECOGNIZED) {
@@ -348,30 +347,25 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           },
           "type  of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
-    app->add_option("--corename", coreName, "the name of the core to create or find")
-        ->ignore_underscore();
-    app->add_option("--coreinitstring,-i,--coreinit",
+    app->add_option("--corename", coreName, "the name of the core to create or find");
+    app->add_option("--coreinitstring,-i",
                     coreInitString,
                     "The initialization arguments for the core")
         ->transform([](std::string arg) {
             arg.insert(arg.begin(), ' ');
             return arg;
         })
-        ->ignore_underscore()
         ->multi_option_policy(CLI::MultiOptionPolicy::Join);
-    app->add_option("--brokerinitstring,--brokerinit",
+    app->add_option("--brokerinitstring",
                     brokerInitString,
                     "The initialization arguments for the broker if autogenerated")
         ->transform([](std::string arg) {
             arg.insert(arg.begin(), ' ');
             return arg;
         })
-        ->ignore_underscore()
         ->multi_option_policy(CLI::MultiOptionPolicy::Join);
-    app->add_option("--broker,--brokeraddress", broker, "address or name of the broker to connect")
-        ->ignore_underscore();
+    app->add_option("--broker,--brokeraddress", broker, "address or name of the broker to connect");
     app->add_option("--brokerport", brokerPort, "Port number of the Broker")
-        ->ignore_underscore()
         ->check(CLI::PositiveNumber);
 
     app->add_option_function<int>(
@@ -385,12 +379,13 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            },
            "Specify the port number to use")
         ->check(CLI::PositiveNumber);
-    app->add_option("--localport", localport, "Port number to use for connections to this federate")
-        ->ignore_underscore();
+    app->add_option("--localport",
+                    localport,
+                    "Port number to use for connections to this federate");
     app->add_flag("--autobroker",
                   autobroker,
                   "tell the core to automatically generate a broker if needed");
-    app->add_option("--key,--broker_key",
+    app->add_option("--broker_key,--brokerkey,--brokerKey",
                     key,
                     "specify a key to use to match a broker should match the broker key");
     app->add_option_function<Time>(
@@ -407,7 +402,6 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--timedelta",
            [this](Time val) { setProperty(helics_property_time_delta, val); },
            "The minimum time between time grants for a Federate (default in ms)")
-        ->ignore_underscore()
         ->configurable(false);
     auto* rtgroup = app->add_option_group("realtime");
     rtgroup->option_defaults()->ignore_underscore();
@@ -436,25 +430,21 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--inputdelay",
            [this](Time val) { setProperty(helics_property_time_input_delay, val); },
            "the input delay on incoming communication of the federate (default in ms)")
-        ->ignore_underscore()
         ->configurable(false);
     app->add_option_function<Time>(
            "--outputdelay",
            [this](Time val) { setProperty(helics_property_time_output_delay, val); },
            "the output delay for outgoing communication of the federate (default in ms)")
-        ->ignore_underscore()
         ->configurable(false);
     app->add_option_function<int>(
            "--maxiterations",
            [this](int val) { setProperty(helics_property_int_max_iterations, val); },
            "the maximum number of iterations a federate is allowed to take")
-        ->ignore_underscore()
         ->check(CLI::PositiveNumber);
     app->add_option_function<int>(
-           "--loglevel,--log-level",
+           "--loglevel",
            [this](int val) { setProperty(helics_property_int_log_level, val); },
            "the logging level of a federate")
-        ->ignore_underscore()
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
@@ -675,12 +665,12 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     }
 
     if (!fi.brokerInitString.empty()) {
-        res.append(" --brokerinit \"");
+        res.append(" --broker_init_string \"");
         res.append(fi.brokerInitString);
         res.append("\"");
     }
     if (!fi.key.empty()) {
-        res += " --key=";
+        res += " --broker_key=";
         res.append(fi.key);
     }
     if (!fi.fileInUse.empty()) {  // we used the file, specify a core section

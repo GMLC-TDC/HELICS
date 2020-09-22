@@ -142,7 +142,7 @@ class helicsCLI11App: public CLI::App {
     {
         auto* og = add_option_group("network type")->immediate_callback();
         og->add_option_function<std::string>(
-              "--coretype,-t,--type,--core",
+              "--coretype,--core_type,--coreType,-t",
               [this](const std::string& val) {
                   coreType = coreTypeFromString(val);
                   if (coreType == core_type::UNRECOGNIZED) {
