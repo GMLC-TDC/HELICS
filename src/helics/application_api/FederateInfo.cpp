@@ -103,7 +103,8 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"connection_required", helics_handle_option_connection_required},
     {"connectionrequired", helics_handle_option_connection_required},
     {"connectionRequired", helics_handle_option_connection_required},
-    {"required", helics_handle_option_connection_required},  //LIKELY TO BE DEPRECATED In the future
+    {"required",
+     helics_handle_option_connection_required},  // LIKELY TO BE DEPRECATED In the future
     {"connectionoptional", helics_handle_option_connection_optional},
     {"connection_optional", helics_handle_option_connection_optional},
     {"connectionOptional", helics_handle_option_connection_optional},
@@ -123,7 +124,8 @@ static const std::map<std::string, int> optionStringsTranslations{
     {"connectionOptional", helics_handle_option_connection_optional},
     {"connectionrequired", helics_handle_option_connection_required},
     {"connection_required", helics_handle_option_connection_required},
-    {"required", helics_handle_option_connection_required}, //LIKELY to be deprecated in the future
+    {"required",
+     helics_handle_option_connection_required},  // LIKELY to be deprecated in the future
     {"connectionRequired", helics_handle_option_connection_required},
     {"uninterruptible", helics_handle_option_ignore_interrupts},
     {"multiple_connections_allowed", helics_handle_option_multiple_connections_allowed},
