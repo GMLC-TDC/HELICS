@@ -11,59 +11,59 @@ or direct endpoints or cloned endpoints which exist elsewhere
 allowed options:
 
 command line only:
-  -? [ --help ]          produce help message
-  -v [ --version ]       display a version string
-  --config-file arg      specify a configuration file to use
+  -? [ --help ]                 produce help message
+  -v [ --version ]              display a version string
+  --config-file arg             specify a configuration file to use
 
 configuration:
-  --local                specify otherwise unspecified endpoints and
-                         publications as local( i.e.the keys will be prepended
-                         with the player name
-  --stop arg             the time to stop the player
-  --quiet                turn off most display output
+  --local                       specify otherwise unspecified endpoints and
+                                publications as local( i.e.the keys will be prepended
+                                with the player name
+  --stop arg                    the time to stop the player
+  --quiet                       turn off most display output
 
 allowed options:
 
 configuration:
-  -b [ --broker ] arg    address of the broker to connect
-  -n [ --name ] arg      name of the player federate
-  --corename arg         the name of the core to create or find
-  -c [ --core ] arg      type of the core to connect to
-  --offset arg           the offset of the time steps
-  --period arg           the period of the federate
-  --timedelta arg        the time delta of the federate
-  --rttolerance arg      the time tolerance of the real time mode
-  -i [ --coreinit ] arg  the core initialization string
-  --separator arg        separator character for local federates
-  --inputdelay arg       the input delay on incoming communication of the
-                         federate
-  --outputdelay arg      the output delay for outgoing communication of the
-                         federate
-  -f [ --flags ] arg     named flag for the federate
+  -b [ --broker ] arg           address of the broker to connect
+  -n [ --name ] arg             name of the player federate
+  --corename arg                the name of the core to create or find
+  -c [ --core ] arg             type of the core to connect to
+  --offset arg                  the offset of the time steps
+  --period arg                  the period of the federate
+  --timedelta arg               the time delta of the federate
+  --rttolerance arg             the time tolerance of the real time mode
+  -i [ --coreinitstring ] arg   the core initialization string
+  --separator arg               separator character for local federates
+  --inputdelay arg              the input delay on incoming communication of the
+                                    federate
+  --outputdelay arg             the output delay for outgoing communication of the
+                                    federate
+  -f [ --flags ] arg            named flag for the federate
 
 allowed options:
 
 configuration:
-  --tags arg             tags to record, this argument may be specified any
-                         number of times
-  --endpoints arg        endpoints to capture, this argument may be specified
-                         multiple time
-  --sourceclone arg      existing endpoints to capture generated packets from,
-                         this argument may be specified multiple time
-  --destclone arg        existing endpoints to capture all packets with the
-                         specified endpoint as a destination, this argument may
-                         be specified multiple time
-  --clone arg            existing endpoints to clone all packets to and from
-  --capture arg          capture all the publications of a particular federate
-                         capture="fed1;fed2"  supports multiple arguments or a
-                         semicolon/comma separated list
-  -o [ --output ] arg    the output file for recording the data
-  --allow_iteration      allow iteration on values
-  --verbose              print all value results to the screen
-  --marker arg           print a statement indicating time advancement     every <arg> seconds of the simulation
-                         is the period of the marker
-  --mapfile arg          write progress to a map file for concurrent progress
-                         monitoring
+  --tags arg                    tags to record, this argument may be specified any
+                                    number of times
+  --endpoints arg               endpoints to capture, this argument may be specified
+                                    multiple time
+  --sourceclone arg             existing endpoints to capture generated packets from,
+                                    this argument may be specified multiple time
+  --destclone arg               existing endpoints to capture all packets with the
+                                    specified endpoint as a destination, this argument may
+                                    be specified multiple time
+  --clone arg                   existing endpoints to clone all packets to and from
+  --capture arg                 capture all the publications of a particular federate
+                                    capture="fed1;fed2"  supports multiple arguments or a
+                                    semicolon/comma separated list
+  -o [ --output ] arg           the output file for recording the data
+  --allow_iteration             allow iteration on values
+  --verbose                     print all value results to the screen
+  --marker arg                  print a statement indicating time advancement     every <arg> seconds of the simulation
+                                    is the period of the marker
+  --mapfile arg                 write progress to a map file for concurrent progress
+                                    monitoring
 
 ```
 

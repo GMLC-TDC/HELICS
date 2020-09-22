@@ -50,7 +50,7 @@ TEST(BrokerAppTests, constructor2)
 
 TEST(BrokerAppTests, constructor3)
 {
-    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--type"});
+    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--core_type"});
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -80,7 +80,7 @@ TEST(BrokerAppTests, constructor4)
 
 TEST(BrokerAppTests, constructor5)
 {
-    std::vector<std::string> args{"constructor4", "--name", "brk5", "--type", "test"};
+    std::vector<std::string> args{"constructor4", "--name", "brk5", "--core_type", "test"};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -175,7 +175,7 @@ TEST(BrokerAppTests, constructor12)
 #ifdef ENABLE_ZMQ_CORE
     EXPECT_THROW(helics::BrokerApp(helics::core_type::ZMQ,
                                    "brk12",
-                                   std::vector<std::string>{"10.7.5.5", "--interface"}),
+                                   std::vector<std::string>{"10.7.5.5", "--local_interface"}),
                  helics::ConnectionFailure);
 #endif
 }
@@ -196,7 +196,7 @@ TEST(BrokerAppTests, null)
 
 TEST(BrokerAppTests, help)
 {
-    helics::BrokerApp app("--type=test --help");
+    helics::BrokerApp app("--core_type=test --help");
     EXPECT_FALSE(app.isOpenToNewFederates());
     EXPECT_FALSE(app.isConnected());
     EXPECT_FALSE(app.connect());
@@ -209,7 +209,7 @@ TEST(BrokerAppTests, help)
 
 TEST(BrokerAppTests, file_logging_p2)
 {
-    helics::BrokerApp app("--name=loggerBrk1 --type=test");
+    helics::BrokerApp app("--name=loggerBrk1 --core_type=test");
     app.setLoggingLevel(5);
     const std::string lfilename = "logfile3.txt";
     app.setLogFile("logfile3.txt");

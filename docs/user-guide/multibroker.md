@@ -7,7 +7,7 @@ Starting in HELICS 2.5 there is a Multi Broker type that allows connection with 
 A multibroker can be started as BrokerApp or a helics_broker. For the HELICS Broker the configuration must given as a file since each of the core types linked must be configured independently. Using the helics_broker the startup commands would look something like
 
 ```sh
-helics_broker --type multi --config=helics_mb_config.json --name=broker1
+helics_broker --core_type multi --config=helics_mb_config.json --name=broker1
 ```
 
 A couple example configurations follow.
@@ -20,11 +20,11 @@ A couple example configurations follow.
   "comms": [
     {
       "type": "zmq",
-      "interfaceport": 23410
+      "local_port": 23410
     },
     {
       "type": "zmq",
-      "interfaceport": 23700
+      "local_port": 23700
     }
   ]
 }

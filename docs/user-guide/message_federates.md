@@ -115,17 +115,17 @@ Taking these assumptions and specifications, it is not too difficult to write a 
     {
         "key": "IEEE_123_feeder_0/totalLoad",
         "type": "complex",
-        "required": true
+        "conection_required": true
     },
     {
         "key": "IEEE_123_feeder_0/charge_EV6",
         "type": "complex",
-        "required": true
+        "connection_required": true
     },
     {
         "key": "IEEE_123_feeder_0/charge_EV5",
         "type": "complex",
-        "required": true
+        "connection_required": true
     },
     ...
     ]

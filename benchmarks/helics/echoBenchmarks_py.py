@@ -423,7 +423,7 @@ def BMecho_multiCore(cTypeString, federates):
     if h.helicsIsCoreTypeAvailable(cTypeString) == h.helics_false:
         t.start()
     feds = [f for f in range(0, federates)]
-    initString = "--log-level=no_print --federates={}".format(federates)
+    initString = "--log_level=no_print --federates={}".format(federates)
     broker = h.helicsCreateBroker(cTypeString, "brokerf", initString)
     wcore = h.helicsCreateCore(cTypeString, "", "--federates=1 --log_level=no_print")
     hub = EchoHub_c()

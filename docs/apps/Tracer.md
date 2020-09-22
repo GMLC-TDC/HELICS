@@ -12,38 +12,38 @@ The main use is a simple visual indicator and a monitoring app
 allowed options:
 
 command line only:
-  -? [ --help ]          produce help message
-  -v [ --version ]       display a version string
-  --config-file arg      specify a configuration file to use
+  -? [ --help ]                 produce help message
+  -v [ --version ]              display a version string
+  --config-file arg             specify a configuration file to use
 
 configuration:
-  --stop arg             the time to stop recording
-  --tags arg             tags to record, this argument may be specified any
-                         number of times
-  --endpoints arg        endpoints to capture, this argument may be specified
-                         multiple time
-  --sourceclone arg      existing endpoints to capture generated packets from,
-                         this argument may be specified multiple time
-  --destclone arg        existing endpoints to capture all packets with the
-                         specified endpoint as a destination, this argument may
-                         be specified multiple time
-  --clone arg            existing endpoints to clone all packets to and from
-  --capture arg          capture all the publications of a particular federate
-                         capture="fed1;fed2"  supports multiple arguments or a
-                         semicolon/comma separated list
-  -o [ --output ] arg    the output file for recording the data
-  --mapfile arg          write progress to a memory mapped file
+  --stop arg                    the time to stop recording
+  --tags arg                    tags to record, this argument may be specified any
+                                number of times
+  --endpoints arg               endpoints to capture, this argument may be specified
+                                    multiple time
+  --sourceclone arg             existing endpoints to capture generated packets from,
+                                    this argument may be specified multiple time
+  --destclone arg               existing endpoints to capture all packets with the
+                                    specified endpoint as a destination, this argument may
+                                    be specified multiple time
+  --clone arg                   existing endpoints to clone all packets to and from
+  --capture arg                 capture all the publications of a particular federate
+                                    capture="fed1;fed2"  supports multiple arguments or a
+                                semicolon/comma separated list
+  -o [ --output ] arg           the output file for recording the data
+  --mapfile arg                 write progress to a memory mapped file
 
 
 federate configuration
-  -b [ --broker ] arg    address of the broker to connect
-  -n [ --name ] arg      name of the player federate
-  --corename arg         the name of the core to create or find
-  -c [ --core ] arg      type of the core to connect to
+  -b [ --broker ] arg           address of the broker to connect
+  -n [ --name ] arg             name of the player federate
+  --corename arg                the name of the core to create or find
+  -c [ --core ] arg             type of the core to connect to
   --offset arg           the offset of the time steps
   --period arg           the period of the federate
   --timedelta arg        the time delta of the federate
-  -i [ --coreinit ] arg  the core initialization string
+  -i [ --coreinitstring ] arg  the core initialization string
   --inputdelay arg       the input delay on incoming communication of the
                          federate
   --outputdelay arg      the output delay for outgoing communication of the
