@@ -13,7 +13,7 @@ TEST(networkData_tests, basic_test)
 {
     helics::NetworkBrokerData bdata;
     auto parser = bdata.commandLineParser("local");
-    parser->helics_parse("--broker=bob --interface=harry --ipv4");
+    parser->helics_parse("--broker=bob --local_interface=harry --ipv4");
     EXPECT_EQ(bdata.brokerAddress, "bob");
     EXPECT_EQ(bdata.localInterface, "harry");
     EXPECT_TRUE(bdata.interfaceNetwork == helics::interface_networks::ipv4);

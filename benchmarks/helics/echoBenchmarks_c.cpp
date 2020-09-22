@@ -226,7 +226,7 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
 
         auto initString =
-            std::string("--log-level=no_print --federates=") + std::to_string(feds + 1);
+            std::string("--log_level=no_print --federates=") + std::to_string(feds + 1);
         auto broker =
             helicsCreateBroker(cTypeString.c_str(), "brokerb", initString.c_str(), nullptr);
 

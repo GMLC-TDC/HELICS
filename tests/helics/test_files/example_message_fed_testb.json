@@ -11,7 +11,7 @@
   "uninterruptible": false, //indicator that the federate should only return requested times
   "coretype": "test", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
   "corename": "mcname", //this matters most for ipc and test cores, can be empty
-  "coreinit": "--autobroker", // the initialization string for the core in the form of a command line arguments
+  "coreinitstring": "--autobroker", // the initialization string for the core in the form of a command line arguments
   "max_iterations": 10, //the maximum number of iterations for a time step
   "period": 1.0, //the period with which federate may return time
   "log_level": 0, // set the log level to error only
@@ -26,7 +26,7 @@
       "name": "ept1", // the name of the publication
       "type": "genmessage", // the type associated with a endpoint endpoint types have limited usefulness at present (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
-      "flags": ["optional", "-required"]
+      "flags": ["connection_optional", "-connection_required"]
     },
     {
       "name": "ept2", // the name of the publication
@@ -35,8 +35,8 @@
       "knownDestinations": "ept1", //this value can be an array of strings or just a single one it names key paths
       //knownDestinations can be used to optimize the communication pathways inside of HELICS
       //the message will be raw data so it would have to be translated to be useful. this can also be a json array to subscribe to multiple publications
-      "required": true,
-      "optional": true,
+      "connection_required": true,
+      "connection_optional": true,
       "sourceFilters": "filt1",
       "destFilters": "filt2"
     }

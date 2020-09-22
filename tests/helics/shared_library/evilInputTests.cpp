@@ -950,10 +950,10 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
     auto evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsFederateInfoSetBrokerKey(nullptr, "key", &err);
+    helicsFederateInfoSetBrokerKey(nullptr, "broker_key", &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
-    helicsFederateInfoSetBrokerKey(evil_fi, "key", &err);
+    helicsFederateInfoSetBrokerKey(evil_fi, "broker_key", &err);
     EXPECT_NE(err.error_code, 0);
 
     auto fi = helicsCreateFederateInfo();

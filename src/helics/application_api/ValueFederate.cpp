@@ -195,9 +195,6 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
         [](const std::string& value) { return getOptionValue(value); },
         [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
 
-    callIfMember(data, "shortcut", [&objUpdate, fed](const std::string& val) {
-        fed->addAlias(objUpdate, val);
-    });
     callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
     });

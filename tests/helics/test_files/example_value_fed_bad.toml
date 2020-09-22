@@ -4,7 +4,7 @@ name="vFed_toml" # the name of the federate
 
 coretype="test" #the type of the core "test","zmq","udp","ipc","tcp","mpi"
 corename="toml_test_bad"  #this matters most for ipc and test cores, can be empty
-coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
+coreinitstring="--autobroker" # the initialization string for the core in the form of a command line arguments
 period=  1.0 #the period with which federate may return time
 
 #subscriptions used in the federate (also example of inline table
@@ -13,11 +13,11 @@ period=  1.0 #the period with which federate may return time
 subscriptions=[
 {key="pub1",  required=true},
   # shortcut is a naming shortcut for the publication for later retrieval
-{key="vFed_toml/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+{key="vFed_toml/pub2", alias="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 inputs=[
-{key="ipt2",  type="double",flags="optional", target="pub1", global=true}
+{key="ipt2",  type="double",flags="connection_optional", target="pub1", global=true}
 ]  #specify an input with a target
 
 publications="bad_pub"
