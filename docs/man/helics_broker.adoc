@@ -18,7 +18,7 @@ SYNOPSIS
     [--local|--ipv4|--ipv6|--all|--external] [--brokeraddress <address>]
     [--reuse_address] [--broker <identifier>] [--brokername <name>]
     [--maxsize <buffer size>] [--maxcount <num msgs>] [--networkretries <num>]
-    [--useosport|--use_os_port|useOsPort] [--autobroker] [--brokerinitstring <init str>]
+    [--useosport|--use_os_port|--useOsPort] [--autobroker] [--brokerinitstring <init str>]
     [--client|--server] [-p|--port <num>] [--brokerport <num>] [--localport <num>]
     [--portstart <num>] [--local_interface|--localinterface|--localInterface <network interface>] [--root]
     [--autorestart]
