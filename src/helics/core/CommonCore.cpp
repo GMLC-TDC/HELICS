@@ -570,7 +570,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
         }
         if (feds->size() == 1) {
             checkProperties = true;
-    }
+        }
     }
     if (fed == nullptr) {
         throw(RegistrationFailure("unknown allocation error occurred"));
@@ -597,9 +597,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
                 case defs::properties::log_level:
                 case defs::properties::file_log_level:
                 case defs::properties::console_log_level:
-                    setIntegerProperty(gLocalCoreId,
-                                       prop.first,
-                                       static_cast<int16_t>(prop.second));
+                    setIntegerProperty(gLocalCoreId, prop.first, static_cast<int16_t>(prop.second));
                 default:
                     break;
             }
