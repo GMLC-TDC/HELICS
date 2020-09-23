@@ -19,8 +19,12 @@ h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, 0.01)
 vfed = h.helicsCreateValueFederate(federate_name, fedinfo)
 print(f"{federate_name}: Value federate created")
 
-pub = h.helicsFederateRegisterGlobalTypePublication(vfed, f"globaltopic{sys.argv[1]}", "double", "")
-pub = h.helicsFederateRegisterTypePublication(vfed, f"localtopic{sys.argv[1]}", "double", "")
+pub = h.helicsFederateRegisterGlobalTypePublication(
+    vfed, f"globaltopic{sys.argv[1]}", "double", ""
+)
+pub = h.helicsFederateRegisterTypePublication(
+    vfed, f"localtopic{sys.argv[1]}", "double", ""
+)
 
 print(f"{federate_name}: Publication registered")
 
