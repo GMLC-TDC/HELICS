@@ -115,8 +115,7 @@ inline Message::Message(const Federate& fed):
 
 inline Message& Message::newMessageObject(const Federate& fed)
 {
-    helics_message newmo =
-        helicsFederateCreateMessage(fed.getObject(), hThrowOnError());
+    helics_message newmo = helicsFederateCreateMessage(fed.getObject(), hThrowOnError());
     if (mo != HELICS_NULL_POINTER) {
         helicsMessageFree(mo);
     }

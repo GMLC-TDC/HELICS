@@ -401,8 +401,7 @@ inline Message::Message(const Endpoint& ept):
 
 inline Message& Message::newMessageObject(const Endpoint& ept)
 {
-    helics_message newmo =
-        helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError());
+    helics_message newmo = helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError());
     if (mo != HELICS_NULL_POINTER) {
         helicsMessageFree(mo);
     }
