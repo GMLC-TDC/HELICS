@@ -13,8 +13,8 @@ There are a number of ways around this and some tools to assist in checking and 
 The manual approach works fine. All the network core types accept user specified port numbers. The following script will start up two brokers on separate port numbers:
 
 ```sh
-helics_broker --core_type=zmq --port=20200 &
-helics_broker --core_type=zmq --port=20400 &
+helics_broker --type=zmq --port=20200 &
+helics_broker --type=zmq --port=20400 &
 ```
 
 Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker. These brokers operate independently of each other. The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.
@@ -71,7 +71,7 @@ There is also a [webserver](./webserver.md) that can be run with the other broke
 If there are multiple users and you want to verify that a specific broker can only be used with federates you control. It is possible to add a key to the broker that is required to be supplied with the federates to connect to the broker. **NOTE:** _this is not a cryptographic key, it is just a string that is not programmatically accessible to others._
 
 ```sh
-helics_broker --core_type=zmq --key=my_broker_key
+helics_broker --type=zmq --key=my_broker_key
 ```
 
 Federates then need to supply the key as part of the configuration string otherwise the broker will return an error on connection. This is like a fence that prevents some accidental interactions. The rule is that both the federate and broker must provide no key or the same key.
