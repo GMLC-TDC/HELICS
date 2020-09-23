@@ -78,7 +78,7 @@ toml files are similar. It is also possible to specify at the core level
   "name": "valueFed", // the name of the federate
   "coretype": "zmq", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
   "corename": "core1", //this matters most for ipc and test cores, can be empty
-  "coreinitstring": "--autobroker --log_level=trace", // the initialization string for the core in the form of a command line arguments
+  "coreinit": "--autobroker --log_level=trace", // the initialization string for the core in the form of a command line arguments
   "period": 1.0 //the period with which federate may return time
 }
 ```
@@ -104,7 +104,7 @@ when specifying log levels through the command line or through config files it i
   "name": "valueFed", // the name of the federate
   "coretype": "zmq", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
   "corename": "core1", //this matters most for ipc and test cores, can be empty
-  "coreinitstring": "--autobroker", // the initialization string for the core in the form of a command line arguments
+  "coreinit": "--autobroker", // the initialization string for the core in the form of a command line arguments
   "period": 1.0, //the period with which federate may return time
   "log_level": "connections" //specify the log level as a string
 }
@@ -113,7 +113,7 @@ when specifying log levels through the command line or through config files it i
 ## Log Files
 
 It is possible to specify a log file to use on a core.
-This can be specified through the coreinitstring `--logfile logfile.txt`
+This can be specified through the coreinit string `--logfile logfile.txt`
 
 or on a core object
 
