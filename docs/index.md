@@ -19,26 +19,10 @@ Motivation: Energy systems and their associated information and communication te
 
 ```eval_rst
 .. toctree::
-   :maxdepth: 1
-   :caption: Getting Started
+   :maxdepth: 2
 
-   installation/index
+
    user-guide/index
-   configuration_options_reference
-   support
-   apps/index
-```
-
-```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :caption: Developer Reference
-
    developer-guide/index
-   c-api-reference/index
-   doxygen/index
-   configuration/index
-   ROADMAP
+   api-reference/index
 ```
-
-You can find [Doxygen documentation here](doxygen/index.html).

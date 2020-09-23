@@ -20,7 +20,7 @@ The following table may be useful in understanding the differences between the t
 
 ```eval_rst
 +--------------------------------------------------------------------+--------------------------------------------------------+
-|`Publication <Publications.html>`__/`Input <Inputs.html>`__ Values  | `Endpoint <Endpoints.html>`__                          |
+|`Publication <value_federate>`__/`Input` Values  | `Endpoint <message_federate.html>`__                          |
 +====================================================================+========================================================+
 |Fixed routes defined when federation is initialized                 |Routes determined at time of transmission               |
 +--------------------------------------------------------------------+--------------------------------------------------------+
