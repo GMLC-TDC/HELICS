@@ -1,0 +1,5 @@
+#example toml connection file connections can be an array of two element string arrays  ["publication", "input"]
+globals=[
+["global1","this is a global1 value"],
+["global2","this is another global value"]
+]

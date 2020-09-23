@@ -1,0 +1,19 @@
+{
+    "name": "TransmissionSim",
+    "loglevel": 7,
+    "coreType": "zmq",
+    "timeDelta": 1.0,
+    "uninterruptible": true,
+
+    "publications": [{
+        "key": "TransmissionSim/transmission_voltage",
+        "type": "complex",
+        "global": true
+    }],
+
+    "subscriptions": [{
+        "key": "IEEE_123_feeder_0/totalLoad",
+        "type": "complex",
+        "required": true
+    }]
+}

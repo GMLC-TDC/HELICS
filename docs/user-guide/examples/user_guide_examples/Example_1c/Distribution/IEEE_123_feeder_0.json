@@ -1,0 +1,146 @@
+{
+    "name" : "DistributionSim",
+    "loglevel": 5,
+    "coreType": "zmq",
+    "period" : 1.0,
+    "publications" : [
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/totalLoad",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"network_node\",
+                    \"property\" : \"distribution_load\"
+               }"
+          },
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/charge_EV6",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"EV6\",
+                    \"property\" : \"constant_power_A\"
+               }"
+          },
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/charge_EV5",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"EV5\",
+                    \"property\" : \"constant_power_B\"
+               }"
+          },
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/charge_EV4",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"EV4\",
+                    \"property\" : \"constant_power_C\"
+               }"
+          },
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/charge_EV3",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"EV3\",
+                    \"property\" : \"constant_power_A\"
+               }"
+          },
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/charge_EV2",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"EV2\",
+                    \"property\" : \"constant_power_B\"
+               }"
+          },
+          {
+               "global" : true,
+               "key" : "IEEE_123_feeder_0/charge_EV1",
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"EV1\",
+                    \"property\" : \"constant_power_C\"
+               }"
+          }
+     ],
+     "subscriptions" : [
+          {
+               "required": true,
+               "key" : "TransmissionSim/transmission_voltage",
+               "type" : "complex",
+               "unit" : "V",
+               "info" : "{
+                    \"object\" : \"network_node\",
+                    \"property\" : \"positive_sequence_voltage\"
+                    }"
+          }
+     ],
+     "endpoints" : [
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV6",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV6\",
+                \"property\" : \"constant_power_A\"
+            }"
+        },
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV5",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV5\",
+                \"property\" : \"constant_power_B\"
+            }"
+        },
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV4",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV4\",
+                \"property\" : \"constant_power_C\"
+            }"
+        },
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV3",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV3\",
+                \"property\" : \"constant_power_A\"
+            }"
+        },
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV2",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV2\",
+                \"property\" : \"constant_power_B\"
+            }"
+        },
+        {
+            "global" : true,
+            "name" : "IEEE_123_feeder_0/EV1",
+            "type" : "complex",
+            "info" : "{
+                \"object\" : \"EV1\",
+                \"property\" : \"constant_power_C\"
+            }"
+        }
+     ]
+}
