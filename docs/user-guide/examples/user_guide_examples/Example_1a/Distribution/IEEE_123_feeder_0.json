@@ -17,7 +17,7 @@
      ],
      "subscriptions" : [
           {
-               "required": true,
+               "connection_required": true,
                "key" : "TransmissionSim/transmission_voltage",
                "type" : "complex",
                "unit" : "V",
