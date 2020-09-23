@@ -46,7 +46,7 @@ Below is an example of how a very generic configuration for the transmission fed
         {
             "key":"distribution_federate/distribution_loads",
             "type":"double",
-            "required":true
+            "conection_required":true
         }],
     }
 ```
@@ -65,7 +65,7 @@ Below is an example of how a very generic configuration for the transmission fed
         {
             "key":"transmission_federate/transmission_voltages",
             "type":"double",
-            "required":true
+            "connection_required":true
         }],
     }
 ```
