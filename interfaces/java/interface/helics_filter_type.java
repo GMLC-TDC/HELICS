@@ -29,7 +29,8 @@ public final class helics_filter_type {
    */
   public final static helics_filter_type helics_filter_type_random_drop = new helics_filter_type("helics_filter_type_random_drop", helicsJNI.helics_filter_type_random_drop_get());
   /**
-   *  a filter type that reroutes a message to a different destination than originally specified
+   *  a filter type that reroutes a message to a different destination than originally<br>
+   *        specified
    */
   public final static helics_filter_type helics_filter_type_reroute = new helics_filter_type("helics_filter_type_reroute", helicsJNI.helics_filter_type_reroute_get());
   /**
@@ -37,8 +38,8 @@ public final class helics_filter_type {
    */
   public final static helics_filter_type helics_filter_type_clone = new helics_filter_type("helics_filter_type_clone", helicsJNI.helics_filter_type_clone_get());
   /**
-   *  a customizable filter type that can perform different actions on a message based on firewall<br>
-   *        like rules
+   *  a customizable filter type that can perform different actions on a message based on<br>
+   *        firewall like rules
    */
   public final static helics_filter_type helics_filter_type_firewall = new helics_filter_type("helics_filter_type_firewall", helicsJNI.helics_filter_type_firewall_get());
 

@@ -556,6 +556,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
     FederateState* fed = nullptr;
+    bool checkProperties{false};
     LocalFederateId local_id;
     {
         auto feds = federates.lock();
@@ -567,6 +568,9 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
             throw(RegistrationFailure("duplicate names " + name +
                                       "detected multiple federates with the same name"));
         }
+        if (feds->size() == 1) {
+            checkProperties = true;
+    }
     }
     if (fed == nullptr) {
         throw(RegistrationFailure("unknown allocation error occurred"));
@@ -585,6 +589,22 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
     ActionMessage m(CMD_REG_FED);
     m.name(name);
     addActionMessage(m);
+    // check some properties that should be inherited from the federate if it is the first one
+    if (checkProperties) {
+        // if this is the first federate then the core should inherit the logging level properties
+        for (const auto& prop : info.intProps) {
+            switch (prop.first) {
+                case defs::properties::log_level:
+                case defs::properties::file_log_level:
+                case defs::properties::console_log_level:
+                    setIntegerProperty(gLocalCoreId,
+                                       prop.first,
+                                       static_cast<int16_t>(prop.second));
+                default:
+                    break;
+            }
+        }
+    }
     // now wait for the federateQueue to get the response
     auto valid = fed->waitSetup();
     if (valid == iteration_result::next_step) {
@@ -772,6 +792,14 @@ int16_t CommonCore::getIntegerProperty(LocalFederateId federateID, int32_t prope
 
 void CommonCore::setFlagOption(LocalFederateId federateID, int32_t flag, bool flagValue)
 {
+    if (flag == defs::flags::dumplog || flag == defs::flags::force_logging_flush) {
+        ActionMessage cmd(CMD_BASE_CONFIGURE);
+        cmd.messageID = flag;
+        if (flagValue) {
+            setActionFlag(cmd, indicator_flag);
+        }
+        addActionMessage(cmd);
+    }
     if (federateID == gLocalCoreId) {
         if (flag == defs::flags::delay_init_entry) {
             if (flagValue) {
@@ -1295,10 +1323,11 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
     }
     auto* fed = getFederateAt(handleInfo->local_fed_id);
     if (fed->checkAndSetValue(handle, data, len)) {
-        LOG_DATA_MESSAGES(parent_broker_id,
-                          fed->getIdentifier(),
-                          fmt::format("setting Value for {} size {}", handleInfo->key, len));
-
+        if (fed->loggingLevel() >= helics_log_level_data) {
+            fed->logMessage(helics_log_level_data,
+                            fed->getIdentifier(),
+                            fmt::format("setting value for {} size {}", handleInfo->key, len));
+        }
         auto subs = fed->getSubscribers(handle);
         if (subs.empty()) {
             return;
@@ -1801,9 +1830,16 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     if (m.messageID == 0) {
         m.messageID = ++messageCounter;
     }
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    auto* fed = getFederateAt(hndl->local_fed_id);
+    auto minTime = fed->nextAllowedSendTime();
     if (m.actionTime < minTime) {
         m.actionTime = minTime;
+    }
+
+    if (fed->loggingLevel() >= helics_log_level_data) {
+        fed->logMessage(helics_log_level_data,
+                        "",
+                        fmt::format("receive_message {}", prettyPrintString(m)));
     }
     addActionMessage(std::move(m));
 }

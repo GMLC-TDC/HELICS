@@ -18,32 +18,38 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 namespace helicscpp {
 /** get a string with the helics version info*/
-std::string getHelicsVersionString()
+inline std::string getHelicsVersionString()
 {
     return std::string(helicsGetVersion());
 }
 /** get a string with the helics version info*/
-std::string version()
+inline std::string version()
 {
     return std::string(helicsGetVersion());
 }
 
 /** get a string with the helics version info*/
-std::string buildFlags()
+inline std::string buildFlags()
 {
     return std::string(helicsGetBuildFlags());
 }
 
 /** get a string with the compiler used to compile the library*/
-std::string compilerVersion()
+inline std::string compilerVersion()
 {
     return std::string(helicsGetCompilerVersion());
 }
 
 /** do a cleanup of the brokers and cores currently in the library*/
-void cleanupHelicsLibrary()
+inline void cleanupHelicsLibrary()
 {
     helicsCleanupLibrary();
+}
+
+/** close the library and cleanup all open objects*/
+inline void closeLibrary()
+{
+    helicsCloseLibrary();
 }
 
 }  // namespace helicscpp

@@ -605,6 +605,9 @@ TEST_P(valuefed_add_configfile_tests, file_load)
 
     EXPECT_EQ(vFed.query("global", "global1"), "this is a global1 value");
     EXPECT_EQ(vFed.query("global", "global2"), "this is another global value");
+
+    auto& pub = vFed.getPublication("pub1");
+    EXPECT_EQ(pub.getUnits(), "m");
     vFed.disconnect();
 }
 
@@ -619,6 +622,9 @@ TEST(valuefed_json_tests, file_loadb)
     auto& id = vFed.getPublication("primary");
 
     EXPECT_EQ(id.getName(), "valueFed2/pub2");
+
+    auto& id2 = vFed.getPublication("pub1");
+    EXPECT_EQ(id2.getUnits(), "m");
 
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
@@ -636,6 +642,9 @@ TEST(valuefederate, toml_file_loadb)
     auto& id = vFed.getPublication("primary");
 
     EXPECT_EQ(id.getName(), "valueFed_toml/pub2");
+
+    auto& id2 = vFed.getPublication("pub1");
+    EXPECT_EQ(id2.getUnits(), "m");
     vFed.enterExecutingMode();
     vFed.disconnect();
 }

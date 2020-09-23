@@ -516,6 +516,64 @@ void runFederateTestComplex(const char* core,
     CE(helicsFederateFinalize(vFed, &err));
 }
 
+void runFederateTestComplex2(const char* core,
+                             double defaultValue_r,
+                             double defaultValue_i,
+                             double testValue1_r,
+                             double testValue1_i,
+                             double testValue2_r,
+                             double testValue2_i)
+{
+    helics_time gtime;
+    double val1_r = 0.0;
+    double val1_i = 0.0;
+    helics_error err = helicsErrorInitialize();
+    FederateTestFixture fixture;
+    fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
+    auto vFed = fixture.GetFederateAt(0);
+
+    // register the publications
+    auto pubid = helicsFederateRegisterGlobalTypePublication(vFed, "pub1", "complex", "", &err);
+    auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "complex", &err);
+    CE(helicsInputSetDefaultComplex(subid, defaultValue_r, defaultValue_i, &err));
+
+    CE(helicsFederateEnterExecutingMode(vFed, &err));
+
+    // publish string1 at time=0.0;
+    CE(helicsPublicationPublishComplex(pubid, testValue1_r, testValue1_i, &err));
+
+    CE(helicsInputGetComplex(subid, &val1_r, &val1_i, &err));
+    EXPECT_EQ(val1_r, defaultValue_r);
+    EXPECT_EQ(val1_i, defaultValue_i);
+
+    CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
+    EXPECT_EQ(gtime, 1.0);
+
+    // get the value
+    CE(helics_complex hc = helicsInputGetComplexObject(subid, &err));
+    // make sure the string is what we expect
+    EXPECT_EQ(hc.real, testValue1_r);
+    EXPECT_EQ(hc.imag, testValue1_i);
+
+    // publish a second value
+    CE(helicsPublicationPublishComplex(pubid, testValue2_r, testValue2_i, &err));
+
+    // make sure the value is still what we expect
+    CE(helicsInputGetComplex(subid, &val1_r, &val1_i, &err));
+    EXPECT_EQ(val1_r, testValue1_r);
+    EXPECT_EQ(val1_i, testValue1_i);
+    // advance time
+    CE(gtime = helicsFederateRequestTimeAdvance(vFed, 1.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+
+    CE(hc = helicsInputGetComplexObject(subid, &err));
+    EXPECT_EQ(hc.real, testValue2_r);
+    EXPECT_EQ(hc.imag, testValue2_i);
+
+    CE(helicsFederateFinalize(vFed, &err));
+}
+
 void runFederateTestInteger(const char* core,
                             int64_t defaultValue,
                             int64_t testValue1,
@@ -845,6 +903,10 @@ TEST_P(vfed_type_tests, single_transfer_complex)
     runFederateTestComplex(GetParam(), 54.23233, 0.7, -9.7, 3.2, -3e45, 1e-23);
 }
 
+TEST_F(vfed_single_tests, single_transfer_complex2)
+{
+    runFederateTestComplex2("test", 54.23233, 0.7, -9.7, 3.2, -3e45, 1e-23);
+}
 TEST_P(vfed_type_tests, single_transfer_string)
 {
     runFederateTestString(GetParam(),

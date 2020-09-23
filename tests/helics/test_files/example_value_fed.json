@@ -25,7 +25,7 @@
     {
       "key": "pub1", // the name of the publication
       "type": "double", // the type associated with a publication (optional)
-      "unit": "m", // the units associated with a publication (optional)
+      "units": "m", // the units associated with a publication (optional)
       "global": true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
       "info": "this is an information string for use by the application"
     },

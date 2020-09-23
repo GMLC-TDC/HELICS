@@ -64,22 +64,25 @@ Json::Value loadJsonStr(std::string_view jsonString)
 helics::Time loadJsonTime(const Json::Value& timeElement, time_units defaultUnits)
 {
     if (timeElement.isObject()) {
+        if (timeElement.isMember("unit")) {
+            defaultUnits = gmlc::utilities::timeUnitsFromString(timeElement["unit"].asString());
+        }
         if (timeElement.isMember("units")) {
             defaultUnits = gmlc::utilities::timeUnitsFromString(timeElement["units"].asString());
         }
         if (timeElement.isMember("value")) {
             if (timeElement["value"].isInt64()) {
-                return helics::Time(timeElement["value"].asInt64(), defaultUnits);
+                return {timeElement["value"].asInt64(), defaultUnits};
             }
-            return helics::Time(timeElement["value"].asDouble() * toSecondMultiplier(defaultUnits));
+            return {timeElement["value"].asDouble() * toSecondMultiplier(defaultUnits)};
         }
         return helics::Time::minVal();
     }
     if (timeElement.isInt64()) {
-        return helics::Time(timeElement.asInt64(), defaultUnits);
+        return {timeElement.asInt64(), defaultUnits};
     }
     if (timeElement.isDouble()) {
-        return helics::Time(timeElement.asDouble() * toSecondMultiplier(defaultUnits));
+        return {timeElement.asDouble() * toSecondMultiplier(defaultUnits)};
     }
     return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.asString());
 }
