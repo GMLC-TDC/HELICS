@@ -194,7 +194,7 @@ const std::string& InputInfo::getInjectionType() const
     return inputType;
 }
 
-const std::string& InputInfo::getSourceName(global_handle source) const
+const std::string& InputInfo::getSourceName(GlobalHandle source) const
 {
     static const std::string empty{};
     size_t ii{0};

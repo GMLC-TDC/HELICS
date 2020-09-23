@@ -395,14 +395,14 @@ class Endpoint {
 };
 
 inline Message::Message(const Endpoint& ept):
-    mo(helicsEndpointCreateMessageObject(ept.baseObject(), hThrowOnError()))
+    mo(helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError()))
 {
 }
 
 inline Message& Message::newMessageObject(const Endpoint& ept)
 {
-    helics_message_object newmo =
-        helicsEndpointCreateMessageObject(ept.baseObject(), hThrowOnError());
+    helics_message newmo =
+        helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError());
     if (mo != HELICS_NULL_POINTER) {
         helicsMessageFree(mo);
     }

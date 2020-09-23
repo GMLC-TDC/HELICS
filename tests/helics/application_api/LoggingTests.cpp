@@ -267,10 +267,10 @@ TEST(logging_tests, dumplog)
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
     auto cr = Fed->getCorePointer();
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    cr->setLoggingCallback(helics::local_core_id,
+    cr->setLoggingCallback(helics::gLocalCoreId,
                            [&mlog](int level,
-                                   const std::string& /*unused*/,
-                                   const std::string& message) {
+                                   std::string_view /*unused*/,
+                                   std::string_view message) {
                                mlog.lock()->emplace_back(level, message);
                            });
 
