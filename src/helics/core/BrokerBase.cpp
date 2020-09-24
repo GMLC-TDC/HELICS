@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
 #if !defined(WIN32)
 #    include "spdlog/sinks/syslog_sink.h"
@@ -65,6 +66,7 @@ BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
 
 BrokerBase::~BrokerBase()
 {
+    consoleLogger.reset();
     if (fileLogger) {
         spdlog::drop(identifier);
     }
@@ -149,9 +151,14 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                    "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
-    logging_group->add_flag("--force_logging_flush",
-                            forceLoggingFlush,
-                            "flush the log after every message");
+    logging_group->add_flag_function(
+        "--force_logging_flush",
+        [this](int64_t val) {
+            if (val > 0) {
+                forceLoggingFlush = true;
+            }
+        },
+        "flush the log after every message");
     logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
@@ -214,12 +221,27 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 void BrokerBase::generateLoggers()
 {
     try {
+        consoleLogger = spdlog::get("console");
+        if (!consoleLogger) {
+            try {
+                consoleLogger = spdlog::stdout_color_mt("console");
+                consoleLogger->flush_on(spdlog::level::info);
+                consoleLogger->set_level(spdlog::level::trace);
+            }
+            catch (const spdlog::spdlog_ex&) {
+                consoleLogger = spdlog::get("console");
+            }
+        }
         if (logFile == "syslog") {
 #if !defined(WIN32)
             fileLogger = spdlog::syslog_logger_mt("syslog", identifier);
 #endif
         } else if (!logFile.empty()) {
             fileLogger = spdlog::basic_logger_mt(identifier, logFile);
+        }
+        if (fileLogger) {
+            fileLogger->flush_on(spdlog::level::info);
+            fileLogger->set_level(spdlog::level::trace);
         }
     }
     catch (const spdlog::spdlog_ex& ex) {
@@ -303,15 +325,31 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
                 if (logLevel >= helics_log_level_trace) {
-                    spdlog::trace("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_timing) {
-                    spdlog::debug("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_summary) {
-                    spdlog::info("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel >= helics_log_level_warning) {
-                    spdlog::warn("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(
+                        spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
+                } else if (logLevel >= helics_log_level_error) {
+                    consoleLogger->log(
+                        spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
+                } else if (logLevel == -10) {  // dumplog
+                    consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    spdlog::error("{} ({})::{}", name, federateID.baseValue(), message);
+                    consoleLogger->log(spdlog::level::critical,
+                                       "{} ({})::{}",
+                                       name,
+                                       federateID.baseValue(),
+                                       message);
+                }
+                if (forceLoggingFlush) {
+                    consoleLogger->flush();
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
@@ -327,9 +365,17 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                 } else if (logLevel >= helics_log_level_warning) {
                     fileLogger->log(
                         spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else {
+                } else if (logLevel >= helics_log_level_error) {
                     fileLogger->log(
                         spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
+                } else if (logLevel == -10) {  // dumplog
+                    fileLogger->log(spdlog::level::trace, message);
+                } else {
+                    fileLogger->log(spdlog::level::critical,
+                                    "{} ({})::{}",
+                                    name,
+                                    federateID.baseValue(),
+                                    message);
                 }
 
                 if (forceLoggingFlush) {
@@ -394,6 +440,9 @@ void BrokerBase::setLogLevel(int32_t level)
 
 void BrokerBase::logFlush()
 {
+    if (consoleLogger) {
+        consoleLogger->flush();
+    }
     if (fileLogger) {
         fileLogger->flush();
     }
@@ -535,7 +584,7 @@ void BrokerBase::queueProcessingLoop()
     global_broker_id_local = global_id.load();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
-        if (dumplog) {
+        if (!dumpMessages.empty()) {
             for (auto& act : dumpMessages) {
                 sendToLogger(parent_broker_id,
                              -10,
@@ -641,6 +690,9 @@ void BrokerBase::queueProcessingLoop()
                 }
                 processCommand(std::move(command));
                 break;
+            case CMD_BASE_CONFIGURE:
+                baseConfigure(command);
+                break;
             case CMD_IGNORE:
             default:
                 break;
@@ -684,6 +736,22 @@ void BrokerBase::queueProcessingLoop()
     }
 }
 
+void BrokerBase::baseConfigure(ActionMessage& command)
+{
+    if (command.action() == CMD_BASE_CONFIGURE) {
+        switch (command.messageID) {
+            case helics_flag_dumplog:
+                dumplog = checkActionFlag(command, indicator_flag);
+                break;
+            case helics_flag_force_logging_flush:
+                forceLoggingFlush = checkActionFlag(command, indicator_flag);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command)
 {
     switch (command.action()) {
@@ -692,6 +760,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
         case CMD_TERMINATE_IMMEDIATELY:
         case CMD_STOP:
         case CMD_TICK:
+        case CMD_BASE_CONFIGURE:
         case CMD_PING:
         case CMD_ERROR_CHECK:
             return command.action();

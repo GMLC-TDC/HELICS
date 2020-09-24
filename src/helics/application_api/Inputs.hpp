@@ -54,7 +54,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
         multi_input_handling_method::no_op};  //!< the vector processing method to use
     int32_t prevInputCount{0};  //!< the previous number of inputs
     size_t customTypeHash{0U};  //!< a hash code for the custom type
-    defV lastValue;  //!< the last value updated
+    defV lastValue{invalidDouble};  //!< the last value updated
     std::shared_ptr<units::precise_unit> outputUnits;  //!< the target output units
     std::shared_ptr<units::precise_unit> inputUnits;  //!< the units of the linked publications
     std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>>

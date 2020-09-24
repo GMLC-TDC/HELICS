@@ -225,7 +225,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             Publication* pubAct = &vfManager->getPublication(key);
             if (!pubAct->isValid()) {
                 auto type = getOrDefault(pub, "type", emptyStr);
-                auto units = getOrDefault(pub, "units", emptyStr);
+                auto units = getOrDefault(pub, "unit", emptyStr);
+                replaceIfMember(pub, "units", units);
                 bool global = getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
                     pubAct = &registerGlobalPublication(key, type, units);
@@ -244,7 +245,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             auto* subAct = &vfManager->getSubscription(key);
             if (!subAct->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
-                auto units = getOrDefault(sub, "units", emptyStr);
+                auto units = getOrDefault(sub, "unit", emptyStr);
+                replaceIfMember(sub, "units", units);
                 subAct = &registerInput(emptyStr, type, units);
             }
             subAct->addTarget(key);
@@ -259,7 +261,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             Input* inp = &vfManager->getInput(key);
             if (!inp->isValid()) {
                 auto type = getOrDefault(ipt, "type", emptyStr);
-                auto units = getOrDefault(ipt, "units", emptyStr);
+                auto units = getOrDefault(ipt, "unit", emptyStr);
+                replaceIfMember(ipt, "units", units);
                 bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
                     inp = &registerGlobalInput(key, type, units);
@@ -297,7 +300,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             Publication* pubObj = &vfManager->getPublication(key);
             if (!pubObj->isValid()) {
                 auto type = getOrDefault(pub, "type", emptyStr);
-                auto units = getOrDefault(pub, "units", emptyStr);
+                auto units = getOrDefault(pub, "unit", emptyStr);
+                replaceIfMember(pub, "units", units);
                 bool global = getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
                     pubObj = &registerGlobalPublication(key, type, units);
@@ -322,7 +326,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             Input* id = &vfManager->getSubscription(key);
             if (!id->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
-                auto units = getOrDefault(sub, "units", emptyStr);
+                auto units = getOrDefault(sub, "unit", emptyStr);
+                replaceIfMember(sub, "units", units);
 
                 id = &registerInput(emptyStr, type, units);
             }
@@ -344,7 +349,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             Input* id = &vfManager->getInput(key);
             if (!id->isValid()) {
                 auto type = getOrDefault(ipt, "type", emptyStr);
-                auto units = getOrDefault(ipt, "units", emptyStr);
+                auto units = getOrDefault(ipt, "unit", emptyStr);
+                replaceIfMember(ipt, "units", units);
                 bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
                     id = &registerGlobalInput(key, type, units);

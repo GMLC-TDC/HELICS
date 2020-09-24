@@ -60,7 +60,11 @@ static const std::string emptyString;
 helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnits)
 {
     if (timeElement.is_table()) {
-        auto& units = toml::find_or<std::string>(timeElement, "units", emptyString);
+        const auto& unit = toml::find_or<std::string>(timeElement, "unit", emptyString);
+        if (!unit.empty()) {
+            defaultUnits = gmlc::utilities::timeUnitsFromString(unit);
+        }
+        const auto& units = toml::find_or<std::string>(timeElement, "units", emptyString);
         if (!units.empty()) {
             defaultUnits = gmlc::utilities::timeUnitsFromString(units);
         }

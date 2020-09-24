@@ -257,3 +257,38 @@ TEST(logging_tests, check_log_message_levels_high)
     }
     EXPECT_TRUE(found_low && found_high);
 }
+
+TEST(logging_tests, dumplog)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty(helics::defs::log_level, -1);
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+    auto cr = Fed->getCorePointer();
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    cr->setLoggingCallback(helics::gLocalCoreId,
+                           [&mlog](int level,
+                                   std::string_view /*unused*/,
+                                   std::string_view message) {
+                               mlog.lock()->emplace_back(level, message);
+                           });
+
+    Fed->enterExecutingMode();
+    /** We are setting the flag then clearing it
+    this will generate 1 and at most 2 messages in the log callback
+    Thus the check for this is that there is a least 2 and at most 3 messages
+    in the log block, to indicate that the set and clear was successful*/
+    Fed->setFlagOption(helics_flag_dumplog);
+    Fed->setFlagOption(helics_flag_dumplog, false);
+
+    Fed->finalize();
+    cr->waitForDisconnect();
+    cr.reset();
+    auto llock = mlog.lock();
+    EXPECT_GE(llock->size(), 2U);
+    EXPECT_LE(llock->size(), 3U);
+    // this is to check that it has the correct level
+    EXPECT_EQ(llock->back().first, -10);  // the -10 should have a level enum value at some point in
+                                          // the future as part of the debugging improvements
+}

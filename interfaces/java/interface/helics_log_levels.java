@@ -29,7 +29,8 @@ public final class helics_log_levels {
    */
   public final static helics_log_levels helics_log_level_summary = new helics_log_levels("helics_log_level_summary", helicsJNI.helics_log_level_summary_get());
   /**
-   *  summary+ notices about federate and broker connections +messages about network connections
+   *  summary+ notices about federate and broker connections +messages about network<br>
+   *                   connections
    */
   public final static helics_log_levels helics_log_level_connections = new helics_log_levels("helics_log_level_connections", helicsJNI.helics_log_level_connections_get());
   /**

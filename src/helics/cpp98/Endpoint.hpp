@@ -15,12 +15,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helicscpp {
+class Endpoint;
+class Federate;
 
 class Message {
   public:
     /** default constructor*/
     Message() HELICS_NOTHROW: mo(HELICS_NULL_POINTER) {}
-
+    /** create a message associated with a federate*/
+    explicit Message(const Federate& fed);
+    /** create a message associated with an endpoint*/
+    explicit Message(const Endpoint& ept);
     /** construct from a helics_message object*/
     explicit Message(helics_message hmo) HELICS_NOTHROW: mo(hmo) {}
 
@@ -96,7 +101,7 @@ class Message {
         helicsMessageSetOriginalSource(mo, osrc.c_str(), hThrowOnError());
         return *this;
     }
-    /** get the originali message destination if a filtered altered it*/
+    /** get the original message destination if a filter altered it*/
     const char* originalDestination() const { return helicsMessageGetOriginalDestination(mo); }
     /** set the original destination field*/
     Message& originalDestination(const std::string& odest)
@@ -177,6 +182,11 @@ class Message {
         mo = HELICS_NULL_POINTER;
         return mreturn;
     }
+    /** generate a new message in a federate*/
+    Message& newMessageObject(const Federate& fed);
+
+    /** generate a new message in a federate*/
+    Message& newMessageObject(const Endpoint& ept);
 
   private:
     helics_message mo;  //!< C shared library message_object
@@ -370,7 +380,7 @@ class Endpoint {
     /** get the name of the endpoint*/
     const char* getName() const { return helicsEndpointGetName(ep); }
     /** get the specified type of the endpoint*/
-    std::string getType() { return helicsEndpointGetType(ep); }
+    const char* getType() { return helicsEndpointGetType(ep); }
 
     /** get the interface information field of the filter*/
     const char* getInfo() const { return helicsEndpointGetInfo(ep); }
@@ -383,5 +393,21 @@ class Endpoint {
   private:
     helics_endpoint ep;  //!< the underlying helics_endpoint object
 };
+
+inline Message::Message(const Endpoint& ept):
+    mo(helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError()))
+{
+}
+
+inline Message& Message::newMessageObject(const Endpoint& ept)
+{
+    helics_message newmo = helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError());
+    if (mo != HELICS_NULL_POINTER) {
+        helicsMessageFree(mo);
+    }
+    mo = newmo;
+    return *this;
+}
+
 }  // namespace helicscpp
 #endif

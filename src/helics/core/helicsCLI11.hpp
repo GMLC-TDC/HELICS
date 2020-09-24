@@ -155,7 +155,7 @@ class helicsCLI11App: public CLI::App {
             ->ignore_underscore();
     }
     core_type getCoreType() const { return coreType; }
-    /** set default core core type*/
+    /** set default core type*/
     void setDefaultCoreType(core_type type) { coreType = type; }
 
   private:

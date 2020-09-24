@@ -240,6 +240,8 @@ class FederateState {
     bool try_lock() const { return !processing.test_and_set(); }
     /** unlocks the processing*/
     void unlock() const { processing.clear(std::memory_order_release); }
+    /** get the current logging level*/
+    int loggingLevel() const { return logLevel; }
 
   private:
     /** process the federate queue until returnable event
