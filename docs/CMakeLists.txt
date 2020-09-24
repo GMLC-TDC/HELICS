@@ -38,7 +38,7 @@ if(MSVC)
         ${PROJECT_SOURCE_DIR}/CONTRIBUTING.md
         ${PROJECT_SOURCE_DIR}/docs/developer-guide/Public_API.md
         ${PROJECT_SOURCE_DIR}/docs/docker.md
-        ${PROJECT_SOURCE_DIR}/docs/developer-guide/ROADMAP.md
+        ${PROJECT_SOURCE_DIR}/docs/ROADMAP.md
     )
 
     add_custom_target(helics_package_docs SOURCES ${helics_main_docs})
