@@ -10,11 +10,11 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.0.0][] ~ 2020-09-24
 
-HELICS 3.0 is a major update to HELICS.  The major features that have been added are the command interface and targeted Endpoints.  Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries.  The binary serialization protocol was shifted from Cereal to a custom version that embeds the data type so is more suitable to HELICS data types.  The initial release is an alpha release for some initial testing.  The full change log will be filled out as the release progresses from Alpha to beta to final release.   The [migrating 2 to 3](./docs/developer-guide/porting-2-to=3.md) page includes some specific details on migrating from HELICS 2 to 3.
+HELICS 3.0 is a major update to HELICS. The major features that have been added are the command interface and targeted Endpoints. Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries. The binary serialization protocol was shifted from Cereal to a custom version that embeds the data type so is more suitable to HELICS data types. The initial release is an alpha release for some initial testing. The full change log will be filled out as the release progresses from Alpha to beta to final release. The [migrating 2 to 3](./docs/developer-guide/porting-2-to=3.md) page includes some specific details on migrating from HELICS 2 to 3.
 
 ### Changed
 
-- Data serialization moved to a custom protocol specific to HELICS.  
+- Data serialization moved to a custom protocol specific to HELICS.
 - Minimum build requirements to C++17
 - Many of the API functions now use `string_view` instead of `const std::string &`
 
@@ -26,6 +26,7 @@ HELICS 3.0 is a major update to HELICS.  The major features that have been added
 - Targeted Endpoints
 
 ### Removed
+
 - Message structure from C API
 - Deprecated functions from HELICS 2
 
