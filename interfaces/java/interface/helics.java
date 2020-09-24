@@ -1027,8 +1027,8 @@ public class helics {
    * <br>
    * @return A core object, nullptr if invalid.
    */
-  public static SWIGTYPE_p_void helicsFederateGetCoreObject(SWIGTYPE_p_void fed) {
-    long cPtr = helicsJNI.helicsFederateGetCoreObject(SWIGTYPE_p_void.getCPtr(fed));
+  public static SWIGTYPE_p_void helicsFederateGetCore(SWIGTYPE_p_void fed) {
+    long cPtr = helicsJNI.helicsFederateGetCore(SWIGTYPE_p_void.getCPtr(fed));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -1334,6 +1334,55 @@ public class helics {
   }
 
   /**
+   * Send a command to another helics object through a federate.<br>
+   * <br>
+   * @param fed The federate to send the command through.<br>
+   * @param target The name of the object to send the command to.<br>
+   * @param command The command to send.
+   */
+  public static void helicsFederateSendCommand(SWIGTYPE_p_void fed, String target, String command) {
+    helicsJNI.helicsFederateSendCommand(SWIGTYPE_p_void.getCPtr(fed), target, command);
+  }
+
+  /**
+   * Get a command sent to the federate.<br>
+   * <br>
+   * @param fed The federate to get the command for.<br>
+   * <br>
+   * <br>
+   * @return A string with the command for the federate, if the string is empty no command is available.
+   */
+  public static String helicsFederateGetCommand(SWIGTYPE_p_void fed) {
+    return helicsJNI.helicsFederateGetCommand(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
+   * Get the source of the most recently retrieved command sent to the federate.<br>
+   * <br>
+   * @param fed The federate to get the command for.<br>
+   * <br>
+   * <br>
+   * @return A string with the command for the federate, if the string is empty no command is available.
+   */
+  public static String helicsFederateGetCommandSource(SWIGTYPE_p_void fed) {
+    return helicsJNI.helicsFederateGetCommandSource(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
+   * Get a command sent to the federate. Blocks until a command is received.<br>
+   * <br>
+   * @param fed The federate to get the command for.<br>
+   * <br>
+   * <br>
+   * <br>
+   * <br>
+   * @return A string with the command for the federate, if the string is empty no command is available.
+   */
+  public static String helicsFederateWaitCommand(SWIGTYPE_p_void fed) {
+    return helicsJNI.helicsFederateWaitCommand(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
    * Set a global value in a core.<br>
    * <br>
    * This overwrites any previous value for this name.<br>
@@ -1357,6 +1406,28 @@ public class helics {
    */
   public static void helicsBrokerSetGlobal(SWIGTYPE_p_void broker, String valueName, String value) {
     helicsJNI.helicsBrokerSetGlobal(SWIGTYPE_p_void.getCPtr(broker), valueName, value);
+  }
+
+  /**
+   * Send a command to another helics object though a core.<br>
+   * <br>
+   * @param core The core to send the command through.<br>
+   * @param target The name of the object to send the command to.<br>
+   * @param command The command to send.
+   */
+  public static void helicsCoreSendCommand(SWIGTYPE_p_void core, String target, String command) {
+    helicsJNI.helicsCoreSendCommand(SWIGTYPE_p_void.getCPtr(core), target, command);
+  }
+
+  /**
+   * Send a command to another helics object through a broker.<br>
+   * <br>
+   * <br>
+   * @param target The name of the object to send the command to.<br>
+   * @param command The command to send.
+   */
+  public static void helicsBrokerSendCommand(SWIGTYPE_p_void broker, String target, String command) {
+    helicsJNI.helicsBrokerSendCommand(SWIGTYPE_p_void.getCPtr(broker), target, command);
   }
 
   /**
@@ -2065,10 +2136,10 @@ public class helics {
    * @param ipt The input to get the data for.<br>
    * <br>
    * <br>
-   * @return A helics_complex structure with the value.
+   * @return A HelicsComplex structure with the value.
    */
-  public static helics_complex helicsInputGetComplexObject(SWIGTYPE_p_void ipt) {
-    return new helics_complex(helicsJNI.helicsInputGetComplexObject(SWIGTYPE_p_void.getCPtr(ipt)), true);
+  public static HelicsComplex helicsInputGetComplexObject(SWIGTYPE_p_void ipt) {
+    return new HelicsComplex(helicsJNI.helicsInputGetComplexObject(SWIGTYPE_p_void.getCPtr(ipt)), true);
   }
 
   /**

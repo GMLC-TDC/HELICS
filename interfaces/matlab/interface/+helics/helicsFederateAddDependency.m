@@ -1,3 +1,3 @@
 function varargout = helicsFederateAddDependency(varargin)
-  [varargout{1:nargout}] = helicsMEX(116, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(122, varargin{:});
 end

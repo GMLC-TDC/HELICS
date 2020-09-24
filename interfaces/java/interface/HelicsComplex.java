@@ -11,16 +11,16 @@ package com.java.helics;
 /**
  *  structure defining a basic complex type
  */
-public class helics_complex {
+public class HelicsComplex {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
-  protected helics_complex(long cPtr, boolean cMemoryOwn) {
+  protected HelicsComplex(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  protected static long getCPtr(helics_complex obj) {
+  protected static long getCPtr(HelicsComplex obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -33,30 +33,30 @@ public class helics_complex {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        helicsJNI.delete_helics_complex(swigCPtr);
+        helicsJNI.delete_HelicsComplex(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
   public void setReal(double value) {
-    helicsJNI.helics_complex_real_set(swigCPtr, this, value);
+    helicsJNI.HelicsComplex_real_set(swigCPtr, this, value);
   }
 
   public double getReal() {
-    return helicsJNI.helics_complex_real_get(swigCPtr, this);
+    return helicsJNI.HelicsComplex_real_get(swigCPtr, this);
   }
 
   public void setImag(double value) {
-    helicsJNI.helics_complex_imag_set(swigCPtr, this, value);
+    helicsJNI.HelicsComplex_imag_set(swigCPtr, this, value);
   }
 
   public double getImag() {
-    return helicsJNI.helics_complex_imag_get(swigCPtr, this);
+    return helicsJNI.HelicsComplex_imag_get(swigCPtr, this);
   }
 
-  public helics_complex() {
-    this(helicsJNI.new_helics_complex(), true);
+  public HelicsComplex() {
+    this(helicsJNI.new_HelicsComplex(), true);
   }
 
 }
