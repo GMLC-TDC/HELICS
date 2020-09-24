@@ -113,7 +113,7 @@ when specifying log levels through the command line or through config files it i
 ## Log Files
 
 It is possible to specify a log file to use on a core.
-This can be specified through the coreinitstring `--logfile logfile.txt`
+This can be specified through the coreinit string `--logfile logfile.txt`
 
 or on a core object
 

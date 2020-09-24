@@ -41,18 +41,18 @@ configuration:
 allowed options:
 
 configuration:
-  --queueloc arg            the named location of the shared queue
-  -b [ --broker ] arg       identifier for the broker
-  --broker_address arg      location of the broker i.e network address
+  --queueloc arg         the named location of the shared queue
+  -b [ --broker ] arg    identifier for the broker
+  --broker_address arg   location of the broker i.e network address
   --broker_init_string arg  the initialization string for the broker
 
  Help for Test Broker:
 allowed options:
 
 configuration:
-  --brokername arg          identifier for the broker-same as broker
-  -b [ --broker ] arg       identifier for the broker
-  --broker_address arg      location of the broker i.e network address
+  --brokername arg       identifier for the broker-same as broker
+  -b [ --broker ] arg    identifier for the broker
+  --broker_address arg   location of the broker i.e network address
   --broker_init_string arg  the initialization string for the broker
 
  Help for TCP Broker:
