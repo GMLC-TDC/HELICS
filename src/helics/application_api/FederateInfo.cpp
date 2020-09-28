@@ -93,6 +93,7 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"delayed_update", helics_flag_wait_for_current_time_update},
     {"delayedUpdate", helics_flag_wait_for_current_time_update},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+    {"strict_config_checking", helics_flag_strict_config_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
@@ -559,6 +560,38 @@ FederateInfo loadFederateInfo(const std::string& configString)
         ret.defName = configString;
     }
     return ret;
+}
+
+Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
+{
+    for (auto &tp : timeProps)
+    {
+        if (tp.first == propId)
+        {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
+{
+    for (auto& tp : flagProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+int FederateInfo::checkIntProperty(int propId, int defVal) const
+{
+    for (auto& tp : intProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
 }
 
 void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgParser)

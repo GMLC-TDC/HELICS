@@ -1,0 +1,85 @@
+//this should be a valid json file (except comments are not recognized in standard JSON)
+{
+  //example json configuration file for a message federate that also creates some filters
+  "name": "filterFed", // the name of the federate
+  //possible flags
+  "observer": false, // indicator that the federate does not send anything
+  "rollback": false, // indicator that the federate can use rollback -NOTE: not used at present
+  "only_update_on_change": false, //indicator that the federate should only indicate updated values on change
+  "only_transmit_on_change": false, //indicator that the federate should only publish if the value changed
+  "source_only": false, //indicator that the federate is only a source and is not expected to receive anything
+  "uninterruptible": false, //indicator that the federate should only return requested times
+  "coretype": "test", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
+  "corename": "the name of the core", //this matters most for ipc and test cores, can be empty
+  "coreinit": "--autobroker", // the initialization string for the core in the form of a command line arguments
+  "max_iterations": 10, //the maximum number of iterations for a time step
+  "period": 1.0, //the period with which federate may return time
+  "offset": 0.0, // the offset shift in the period
+  "time_delta": 0.0, // the minimum time between subsequent return times
+  "output_delay": 0, //the propagation delay for federates to send data
+  "input_delay": 0, //the input delay for external data to propagate to federates
+
+  //endpoints used in the federate not really necessary to define endpoints for a filer
+  "endpoints": [
+    {
+      "name": "ept1", // the name of the endpoint
+      "type": "genmessage", // the type associated with a endpoint endpoint types have limited usefulness at present (optional)
+      "global": true //set to true to make the key global (default is false in which case the endpoint is prepended with the federate name)
+    },
+    {
+      "name": "clonedest", // the name of the endpoint
+      "global": true //set to true to make the key global (default is false in which case the endpoint is prepended with the federate name)
+    },
+    {
+      "name": "ept2", // the name of the endpoint
+      "type": "message2", // the type associated with a endpoint (optional)
+      //the fact that there is no global value creates a local endpoint with global name messageFed/ept2
+      "knownDestinations": "ept1", //this value can be an array of strings or just a single one it names key paths
+      //knownDestinations can be used to optimize the communication pathways inside of HELICS
+      "subscriptions": "fed2/sub1" //subscribe an endpoint to a particular publication  this means that an endpoint will get a message whenever anything is published to that particular key
+      //the message will be raw data so it would have to be translated to be useful. this can also be a json array to subscribe to multiple publications
+    }
+  ],
+  "filters": [
+    {
+      "name": "filtername", //filters can have names (optional)
+      "sourcetargets": "ept1", // source target for the filter
+      //"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
+      //"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
+      "operation": "reroute3", //this should produce a warning
+      "info": "this is an information string for use by the application",
+      //additional properties for filters are specified in a property array or object if there is just a single one
+      "properties": {
+        "name": "delay", //A delay filter just has a single property
+        "value": 0.2 //times default to seconds though units can also be specified "200 ms" or similar
+      }
+    },
+    {
+      "name": "filtername2", //filters can have names (optional)
+      "sourcetargets": ["filterFed/ept2"], //this is a key field specifying the source targets can be an array
+      //"dest":["dest targets"],  // field specifying destination targets
+      "operation": "reroute", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+      //additional properties for filters are specified in a property array or object if there is just a single one
+      "properties": {
+        "name": "newdestination", //A reroute filter takes a new destination
+        "value": "ept1" //the value here is the endpoint that should be the new destination
+      }
+    },
+    {
+      "name": "filterClone", //filters can have names (optional)
+      "delivery": "ept2", //cloning filters can have a delivery field
+      "cloning": true, //specify that this is cloning filter
+      //additional properties for filters are specified in a property array or object if there is just a single one
+      "properties": [
+        {
+          "name": "destination", //destination adds a cloning filter for all messages delivered to a particular
+          "value": "ept1" //the value here the endpoint that will have its messages cloned
+        },
+        {
+          "name": "source", //source adds a cloning filter for all messages send from a particular endpoint
+          "value": "ept1" //the value here the endpoint that will have its messages cloned
+        }
+      ] //this pair of properties clone all messages to or from "ept1"  this could also be done in one property with "endpoint" but this seemed more instructive in this file
+    }
+  ]
+}

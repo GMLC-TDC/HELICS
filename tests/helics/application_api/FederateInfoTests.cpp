@@ -168,6 +168,8 @@ TEST(federateInfo, option_index)
     EXPECT_EQ(helics::getOptionIndex("StrictTypeChecking"),
               helics_handle_option_strict_type_checking);
     EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
+    EXPECT_EQ(helics::getOptionIndex("StrictConfigChecking"),
+              helics_flag_strict_config_checking);
 }
 
 TEST(federateInfo, loadinfoError)
@@ -209,6 +211,9 @@ TEST(federateInfo, loadinfoPropsJson)
     f1 = helics::loadFederateInfo(R"({"loglevel":"summary"})");
     EXPECT_EQ(f1.intProps.size(), 1U);
     EXPECT_EQ(f1.intProps[0].second, 2);
+
+    EXPECT_EQ(f1.checkIntProperty(helics_property_int_log_level, -1), helics_log_level_summary);
+
     EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"unknown\"}"), helics::InvalidIdentifier);
 }
 
