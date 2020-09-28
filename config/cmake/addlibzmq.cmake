@@ -19,11 +19,12 @@ else()
     set(zmq_shared_build ON)
 endif()
 
-if(MINGW)
-    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.1)
-else()
-    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.2)
-endif()
+set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.3)
+#if(MINGW)
+#    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.1)
+#else()
+#    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.2)
+#endif()
 
 string(TOLOWER "libzmq" lcName)
 
@@ -124,6 +125,17 @@ set(WITH_PERF_TOOL
     OFF
     CACHE INTERNAL ""
 )
+
+set(WITH_LIBSODIUM_STATIC
+    OFF
+    CACHE INTERNAL ""
+)
+
+set(WITH_NORM
+    OFF
+    CACHE INTERNAL ""
+)
+
 set(ENABLE_CPACK
     OFF
     CACHE INTERNAL ""
@@ -180,6 +192,8 @@ hide_variable(ENABLE_EVENTFD)
 hide_variable(ZMQ_CV_IMPL)
 hide_variable(BUILD_TESTS)
 hide_variable(ENABLE_INTRINSICS)
+hide_variable(ENABLE_INTRINSICS)
+hide_variable(ZMQ_OUTPUT_BASENAME)
 
 hide_variable(ZMQ_WIN32_WINNT)
 
