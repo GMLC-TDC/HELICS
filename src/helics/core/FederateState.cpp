@@ -163,7 +163,7 @@ void FederateState::reInit()
 }
 federate_state FederateState::getState() const
 {
-    return state;
+    return state.load();
 }
 
 int32_t FederateState::getCurrentIteration() const
@@ -1650,6 +1650,36 @@ void FederateState::logMessage(int level,
     }
 }
 
+
+static const std::string& fed_state_string(federate_state state)
+{
+    static const std::string c1{"created"};
+    static const std::string estate{"error"};
+    static const std::string dis{"disconnected"};
+    static const std::string exec{"executing"};
+    static const std::string term{"terminating"};
+    static const std::string unk{"unknown"};
+
+    switch (state) {
+        case federate_state::HELICS_CREATED:
+            return c1;
+
+        case federate_state::HELICS_INITIALIZING:
+            return dis;
+        case federate_state::HELICS_EXECUTING:
+            return exec;
+        case federate_state::HELICS_TERMINATING:
+            return term;
+        case federate_state::HELICS_FINISHED:
+            return dis;
+        case federate_state::HELICS_ERROR:
+            return estate;
+        case federate_state::HELICS_UNKNOWN:
+        default:
+            return unk;
+    }
+}
+
 std::string FederateState::processQueryActual(const std::string& query) const
 {
     if (query == "publications") {
@@ -1699,11 +1729,19 @@ std::string FederateState::processQueryActual(const std::string& query) const
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
         base["parent"] = parent_->getGlobalId().baseValue();
-        base["state"] = static_cast<int>(state.load());
+        base["state"] = fed_state_string(state.load());
         base["publications"] = publicationCount();
         base["input"] = inputCount();
         base["endpoints"] = endpointCount();
         base["granted_time"] = static_cast<double>(grantedTime());
+        return generateJsonString(base);
+    }
+    if (query == "global_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["state"] = fed_state_string(state.load());
         return generateJsonString(base);
     }
     if (query == "timeconfig") {
@@ -1765,11 +1803,11 @@ std::string FederateState::processQuery(const std::string& query) const
 {
     std::string qstring;
     if (query == "publications" || query == "inputs" ||
-        query == "endpoints") {  // these never need to be locked
+        query == "endpoints"||query=="global_state") {  // these never need to be locked
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents;current_time";
+            "publications;inputs;endpoints;interfaces;subscriptions;current_state;global_state;dependencies;timeconfig;config;dependents;current_time";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);
