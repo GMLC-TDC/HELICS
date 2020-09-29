@@ -57,6 +57,36 @@ const std::string& state_string(operation_state state)
             return estate;
     }
 }
+
+static const std::string& fed_state_string(federate_state state)
+{
+    static const std::string c1{"created"};
+    static const std::string estate{"error"};
+    static const std::string dis{"disconnected"};
+    static const std::string exec{"executing"};
+    static const std::string term{"terminating"};
+    static const std::string unk{"unknown"};
+
+    switch (state) {
+        case federate_state::HELICS_CREATED:
+            return c1;
+
+       case federate_state::HELICS_INITIALIZING:
+            return dis;
+       case federate_state::HELICS_EXECUTING:
+           return exec;
+       case federate_state::HELICS_TERMINATING:
+           return term;
+       case federate_state::HELICS_FINISHED:
+           return dis;
+       case federate_state::HELICS_ERROR:
+           return estate;
+       case federate_state::HELICS_UNKNOWN:
+        default:
+            return unk;
+    }
+}
+
 // timeoutMon is a unique_ptr
 CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
@@ -1950,12 +1980,14 @@ enum subqueries : std::uint16_t {
     current_time_map = 2,
     dependency_graph = 3,
     data_flow_graph = 4,
+    global_state=6,
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {current_time_map, true}},
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
+    {"global_state", {global_state, true}},
 };
 
 void CommonCore::setQueryCallback(local_federate_id federateID,
@@ -2055,14 +2087,14 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
     if (queryStr == "state") {
-        return std::to_string(static_cast<int>(fed->getState()));
+        return fed_state_string(fed->getState());
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(fed);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   "[exists;isinit;state;version;queries;filtered_endpoints;current_time;") +
+                   "[exists;isinit;state;global_state;version;queries;filtered_endpoints;current_time;") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -2072,7 +2104,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;exists;name;identifier;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;version;version_all;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
+               "publications;filters;version;version_all;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;global_state;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2131,7 +2163,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     if (loopFederates.size() > 0) {
         base["federates"] = Json::arrayValue;
         for (const auto& fed : loopFederates) {
-            int brkindex = builder.generatePlaceHolder("federates");
+            int brkindex = builder.generatePlaceHolder("federates",fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request);
             if (ret == "#wait") {
                 queryReq.messageID = brkindex;
@@ -2181,6 +2213,9 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                     base["filters"].append(std::move(filter));
                 }
             }
+            break;
+        case global_state:
+            base["state"] = brokerStateName(brokerState.load());
             break;
         default:
             break;

@@ -411,6 +411,57 @@ TEST_F(query, current_state)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, global_state)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto core = vFed1->getCorePointer();
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    auto res = core->query("root", "global_state");
+
+    auto val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 2U);
+    EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
+    EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "executing");
+
+    vFed1->localError(-3, "test error");
+
+    EXPECT_THROW(vFed1->requestTime(2.0), helics::HelicsException);
+    res = core->query("root", "global_state");
+
+    val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 2U);
+    EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
+    if (val["cores"][0]["federates"][0]["name"].asString() == "fed0") {
+        EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "error");
+    }
+    else
+    {
+        EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
+    }
+
+    vFed2->finalize();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    res = core->query("root", "global_state");
+
+    val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 2U);
+    EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
+    EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
+    EXPECT_STREQ(val["cores"][0]["state"].asCString(), "disconnected");
+    core = nullptr;
+
+    vFed1->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
 TEST_F(query, current_state_core)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
