@@ -568,10 +568,8 @@ FederateInfo loadFederateInfo(const std::string& configString)
 
 Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
 {
-    for (auto &tp : timeProps)
-    {
-        if (tp.first == propId)
-        {
+    for (auto& tp : timeProps) {
+        if (tp.first == propId) {
             return tp.second;
         }
     }
