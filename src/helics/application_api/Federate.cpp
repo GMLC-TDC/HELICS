@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
+#include "../common/fmt_format.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/Core.hpp"
 #include "../core/CoreFactory.hpp"
@@ -20,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterFederateManager.hpp"
 #include "Filters.hpp"
 #include "helics/helics-config.h"
-#include "../common/fmt_format.h"
 
 #include <cassert>
 #include <iostream>
@@ -839,15 +839,12 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 
             auto opType = filterTypeFromString(operation);
             if ((useTypes) && (operation != "custom")) {
-                if (strictConfigChecking)
-                {
+                if (strictConfigChecking) {
                     logMessage(helics_log_level_error,
                                "input and output types may only be specified for custom filters");
                     throw(InvalidParameter(
                         "input and output types may only be specified for custom filters"));
-                }
-                else
-                {
+                } else {
                     logMessage(helics_log_level_warning,
                                "input and output types may only be specified for custom filters");
                 }
@@ -856,10 +853,9 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             if (!useTypes) {
                 if (opType == filter_types::unrecognized) {
                     if (strictConfigChecking) {
-                        logMessage(
-                            helics_log_level_error,
-                            fmt::format("unrecognized filter operation:{}",operation));
-                        
+                        logMessage(helics_log_level_error,
+                                   fmt::format("unrecognized filter operation:{}", operation));
+
                         throw(InvalidParameter(
                             "input and output types may only be specified for custom filters"));
                     } else {
@@ -1018,8 +1014,9 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
                         if ((propname.empty()) || (propval.is_uninitialized())) {
                             if (strictConfigChecking) {
-                                logMessage(helics_log_level_error,
-                                           "properties must be specified with \"name\" and \"value\" fields");
+                                logMessage(
+                                    helics_log_level_error,
+                                    "properties must be specified with \"name\" and \"value\" fields");
 
                                 throw(InvalidParameter(
                                     "properties must be specified with \"name\" and \"value\" fields"));

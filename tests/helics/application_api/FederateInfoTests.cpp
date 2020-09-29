@@ -168,7 +168,6 @@ TEST(federateInfo, option_index)
     EXPECT_EQ(helics::getOptionIndex("StrictTypeChecking"),
               helics_handle_option_strict_type_checking);
     EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
-   
 }
 
 TEST(federateInfo, flag_index)

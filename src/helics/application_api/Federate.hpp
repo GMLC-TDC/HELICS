@@ -63,7 +63,8 @@ class HELICS_CXX_EXPORT Federate {
   protected:
     std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
     char nameSegmentSeparator = '/';  //!< the separator between automatically prependend names
-    bool strictConfigChecking = true; //!< set to false to allow some invalid configurations to be ignored instead of error
+    bool strictConfigChecking =
+        true;  //!< set to false to allow some invalid configurations to be ignored instead of error
   private:
     local_federate_id fedID;  //!< the federate ID of the object for use in the core
   protected:
