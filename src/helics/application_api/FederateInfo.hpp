@@ -93,6 +93,10 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   */
     void loadInfoFromJson(const std::string& json, bool runArgParser = true);
 
+    /** check if a property has been set and return its value*/
+    Time checkTimeProperty(int propId, Time defVal) const;
+    bool checkFlagProperty(int propId, bool defVal) const;
+    int checkIntProperty(int propId, int defVal) const;
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
     /** do some additional configuration from config files */

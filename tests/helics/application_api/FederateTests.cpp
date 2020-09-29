@@ -383,6 +383,15 @@ TEST(federate_tests, from_file2)
     Fed1->finalize();
 }
 
+TEST(federate_tests, from_file_invalid)
+{
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+    auto fstr2 = std::string(TEST_DIR) + "invalid_filter_operation.json";
+    std::shared_ptr<helics::Federate> Fed1;
+    EXPECT_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2),std::exception);
+}
+
 TEST(federate_tests, from_file5)
 {
     helics::BrokerFactory::terminateAllBrokers();
