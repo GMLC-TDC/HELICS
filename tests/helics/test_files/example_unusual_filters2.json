@@ -18,7 +18,7 @@
   "time_delta": 0.0, // the minimum time between subsequent return times
   "output_delay": 0, //the propagation delay for federates to send data
   "input_delay": 0, //the input delay for external data to propagate to federates
-
+  "strict_config_checking":false,  //this file is odd so let it be flexible and only produce warnings
   //endpoints used in the federate not really necessary to define endpoints for a filer
   "endpoints": [
     {
