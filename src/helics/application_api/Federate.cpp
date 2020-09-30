@@ -844,10 +844,9 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                                "input and output types may only be specified for custom filters");
                     throw(InvalidParameter(
                         "input and output types may only be specified for custom filters"));
-                } else {
-                    logMessage(helics_log_level_warning,
-                               "input and output types may only be specified for custom filters");
                 }
+                logMessage(helics_log_level_warning,
+                           "input and output types may only be specified for custom filters");
                 continue;
             }
             if (!useTypes) {
@@ -858,10 +857,9 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                         logMessage(helics_log_level_error, emessage);
 
                         throw(InvalidParameter(emessage));
-                    } else {
-                        logMessage(helics_log_level_warning,
-                                   fmt::format("unrecognized filter operation:{}", operation));
                     }
+                    logMessage(helics_log_level_warning,
+                               fmt::format("unrecognized filter operation:{}", operation));
                     continue;
                 }
             }
@@ -882,15 +880,13 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                             if (strictConfigChecking) {
                                 logMessage(
                                     helics_log_level_error,
-                                    "filter properties require \"name\" and \"value\" fields");
+                                    R"(filter properties require "name" and "value" fields)");
 
                                 throw(InvalidParameter(
-                                    "filter properties require \"name\" and \"value\" fields"));
-                            } else {
-                                logMessage(
-                                    helics_log_level_warning,
-                                    "filter properties require \"name\" and \"value\" fields");
+                                    R"(filter properties require "name" and "value" fields)"));
                             }
+                            logMessage(helics_log_level_warning,
+                                       R"(filter properties require "name" and "value" fields)");
                             continue;
                         }
                         if (prop["value"].isDouble()) {
@@ -903,16 +899,16 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         if (strictConfigChecking) {
                             logMessage(helics_log_level_error,
-                                       "filter properties require \"name\" and \"value\" fields");
+                                       R"(filter properties require "name" and "value" fields)");
 
                             throw(InvalidParameter(
-                                "filter properties require \"name\" and \"value\" fields"));
-                        } else {
-                            logMessage(helics_log_level_warning,
-                                       "filter properties require \"name\" and \"value\" fields");
+                                R"(filter properties require "name" and "value" fields)"));
                         }
+                        logMessage(helics_log_level_warning,
+                                   R"(filter properties require "name" and "value" fields)");
                         continue;
-                    } else if (props["value"].isDouble()) {
+                    }
+                    if (props["value"].isDouble()) {
                         filter.set(props["name"].asString(), props["value"].asDouble());
                     } else {
                         filter.setString(props["name"].asString(), props["value"].asString());
@@ -967,23 +963,20 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                                "input and output types may only be specified for custom filters");
                     throw(InvalidParameter(
                         "input and output types may only be specified for custom filters"));
-                } else {
-                    logMessage(helics_log_level_warning,
-                               "input and output types may only be specified for custom filters");
                 }
+                logMessage(helics_log_level_warning,
+                           "input and output types may only be specified for custom filters");
                 continue;
             }
             if (!useTypes) {
                 if (opType == filter_types::unrecognized) {
+                    auto emessage = fmt::format("unrecognized filter operation:{}", operation);
                     if (strictConfigChecking) {
-                        auto emessage = fmt::format("unrecognized filter operation:{}", operation);
                         logMessage(helics_log_level_error, emessage);
 
                         throw(InvalidParameter(emessage));
-                    } else {
-                        logMessage(helics_log_level_warning,
-                                   fmt::format("unrecognized filter operation:{}", operation));
                     }
+                    logMessage(helics_log_level_warning, emessage);
                     continue;
                 }
             }
@@ -1011,15 +1004,13 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                             if (strictConfigChecking) {
                                 logMessage(
                                     helics_log_level_error,
-                                    "filter properties require \"name\" and \"value\" fields");
+                                    R"(filter properties require "name" and "value" fields)");
 
                                 throw(InvalidParameter(
-                                    "filter properties require \"name\" and \"value\" fields"));
-                            } else {
-                                logMessage(
-                                    helics_log_level_warning,
-                                    "filter properties require \"name\" and \"value\" fields");
+                                    R"(filter properties require "name" and "value" fields)"));
                             }
+                            logMessage(helics_log_level_warning,
+                                       R"(filter properties require "name" and "value" fields)");
                             continue;
                         }
                         if (propval.is_floating()) {
@@ -1037,16 +1028,16 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     if ((propname.empty()) || (propval.is_uninitialized())) {
                         if (strictConfigChecking) {
                             logMessage(helics_log_level_error,
-                                       "filter properties require \"name\" and \"value\" fields");
+                                       R"(filter properties require "name" and "value" fields)");
 
                             throw(InvalidParameter(
-                                "filter properties require \"name\" and \"value\" fields"));
-                        } else {
-                            logMessage(helics_log_level_warning,
-                                       "filter properties require \"name\" and \"value\" fields");
+                                R"(filter properties require "name" and "value" fields)"));
                         }
+                        logMessage(helics_log_level_warning,
+                                   R"(filter properties require "name" and "value" fields)");
                         continue;
-                    } else if (propval.is_floating()) {
+                    }
+                    if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
                     } else {
                         filter.setString(propname, propval.as_string());
