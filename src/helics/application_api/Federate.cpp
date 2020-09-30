@@ -853,15 +853,17 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             if (!useTypes) {
                 if (opType == filter_types::unrecognized) {
                     if (strictConfigChecking) {
+                        std::string emessage =
+                            fmt::format("unrecognized filter operation:{}", operation);
                         logMessage(helics_log_level_error,
-                                   fmt::format("unrecognized filter operation:{}", operation));
+                                   emessage);
 
                         throw(InvalidParameter(
-                            "input and output types may only be specified for custom filters"));
+                            emessage));
                     } else {
                         logMessage(
                             helics_log_level_warning,
-                            "input and output types may only be specified for custom filters");
+                                   fmt::format("unrecognized filter operation:{}", operation));
                     }
                     continue;
                 }
@@ -883,14 +885,14 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                             if (strictConfigChecking) {
                                 logMessage(
                                     helics_log_level_error,
-                                    "properties must be specified with \"name\" and \"value\" fields");
+                                    "filter properties require \"name\" and \"value\" fields");
 
                                 throw(InvalidParameter(
-                                    "properties must be specified with \"name\" and \"value\" fields"));
+                                    "filter properties require \"name\" and \"value\" fields"));
                             } else {
                                 logMessage(
                                     helics_log_level_warning,
-                                    "properties must be specified with \"name\" and \"value\" fields");
+                                    "filter properties require \"name\" and \"value\" fields");
                             }
                             continue;
                         }
@@ -905,14 +907,14 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                         if (strictConfigChecking) {
                             logMessage(
                                 helics_log_level_error,
-                                "properties must be specified with \"name\" and \"value\" fields");
+                                "filter properties require \"name\" and \"value\" fields");
 
                             throw(InvalidParameter(
-                                "properties must be specified with \"name\" and \"value\" fields"));
+                                "filter properties require \"name\" and \"value\" fields"));
                         } else {
                             logMessage(
                                 helics_log_level_warning,
-                                "properties must be specified with \"name\" and \"value\" fields");
+                                "filter properties require \"name\" and \"value\" fields");
                         }
                         continue;
                     } else if (props["value"].isDouble()) {
@@ -979,15 +981,16 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             if (!useTypes) {
                 if (opType == filter_types::unrecognized) {
                     if (strictConfigChecking) {
+                        auto emessage = fmt::format("unrecognized filter operation:{}", operation);
                         logMessage(helics_log_level_error,
-                                   fmt::format("unrecognized filter operation:{}", operation));
+                                   emessage);
 
                         throw(InvalidParameter(
-                            "input and output types may only be specified for custom filters"));
+                            emessage));
                     } else {
                         logMessage(
                             helics_log_level_warning,
-                            "input and output types may only be specified for custom filters");
+                                   fmt::format("unrecognized filter operation:{}", operation));
                     }
                     continue;
                 }
@@ -1016,14 +1019,14 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                             if (strictConfigChecking) {
                                 logMessage(
                                     helics_log_level_error,
-                                    "properties must be specified with \"name\" and \"value\" fields");
+                                    "filter properties require \"name\" and \"value\" fields");
 
                                 throw(InvalidParameter(
-                                    "properties must be specified with \"name\" and \"value\" fields"));
+                                    "filter properties require \"name\" and \"value\" fields"));
                             } else {
                                 logMessage(
                                     helics_log_level_warning,
-                                    "properties must be specified with \"name\" and \"value\" fields");
+                                    "filter properties require \"name\" and \"value\" fields");
                             }
                             continue;
                         }
@@ -1043,14 +1046,14 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                         if (strictConfigChecking) {
                             logMessage(
                                 helics_log_level_error,
-                                "properties must be specified with \"name\" and \"value\" fields");
+                                "filter properties require \"name\" and \"value\" fields");
 
                             throw(InvalidParameter(
-                                "properties must be specified with \"name\" and \"value\" fields"));
+                                "filter properties require \"name\" and \"value\" fields"));
                         } else {
                             logMessage(
                                 helics_log_level_warning,
-                                "properties must be specified with \"name\" and \"value\" fields");
+                                "filter properties require \"name\" and \"value\" fields");
                         }
                         continue;
                     } else if (propval.is_floating()) {

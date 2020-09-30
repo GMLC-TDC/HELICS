@@ -95,6 +95,7 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
     {"strict_config_checking", helics_flag_strict_config_checking},
     {"strictconfigchecking", helics_flag_strict_config_checking},
+    {"strictConfigChecking", helics_flag_strict_config_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
