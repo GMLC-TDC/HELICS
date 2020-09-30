@@ -2565,25 +2565,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
             fedstate["id"] = fed.global_id.baseValue();
             base["federates"].append(std::move(fedstate));
         }
-        bool hasCores = false;
-        bool hasBrokers = false;
+        base["cores"] = Json::arrayValue;
+        base["brokers"] = Json::arrayValue;
         for (const auto& brk : _brokers) {
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
             brkstate["name"] = brk.name;
             brkstate["id"] = brk.global_id.baseValue();
             if (brk._core) {
-                if (!hasCores)
-                {
-                    base["cores"] = Json::arrayValue;
-                    hasCores = true;
-                }
                 base["cores"].append(std::move(brkstate));
             } else {
-                if (!hasBrokers) {
-                    base["brokers"] = Json::arrayValue;
-                    hasBrokers = true;
-                }
                 base["brokers"].append(std::move(brkstate));
             }
         }
