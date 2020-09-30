@@ -94,6 +94,9 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
     {"strictinputtypechecking", helics_handle_option_strict_type_checking},
     {"strictInputTypeChecking", helics_handle_option_strict_type_checking},
+    {"strict_config_checking", helics_flag_strict_config_checking},
+    {"strictconfigchecking", helics_flag_strict_config_checking},
+    {"strictConfigChecking", helics_flag_strict_config_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
     {"ignoreunitmismatch", helics_handle_option_ignore_unit_mismatch},
     {"ignoreUnitMismatch", helics_handle_option_ignore_unit_mismatch},
@@ -108,6 +111,8 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"connectionoptional", helics_handle_option_connection_optional},
     {"connection_optional", helics_handle_option_connection_optional},
     {"connectionOptional", helics_handle_option_connection_optional},
+{"no_interrupts", helics_handle_option_ignore_interrupts},
+  {"uninterruptible", helics_handle_option_ignore_interrupts},
     {"wait_for_current_time_update", helics_flag_wait_for_current_time_update},
     {"waitforcurrenttimeupdate", helics_flag_wait_for_current_time_update},
     {"waitForCurrentTimeUpdate", helics_flag_wait_for_current_time_update},
@@ -551,6 +556,36 @@ FederateInfo loadFederateInfo(const std::string& configString)
         ret.defName = configString;
     }
     return ret;
+}
+
+Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
+{
+    for (const auto& tp : timeProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
+{
+    for (const auto& tp : flagProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+int FederateInfo::checkIntProperty(int propId, int defVal) const
+{
+    for (const auto& tp : intProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
 }
 
 void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgParser)

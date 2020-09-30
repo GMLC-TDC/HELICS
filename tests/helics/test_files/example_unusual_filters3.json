@@ -15,6 +15,7 @@
   "max_iterations": 10, //the maximum number of iterations for a time step
   "period": 1.0, //the period with which federate may return time
   "offset": 0.0, // the offset shift in the period
+  "strict_config_checking": false, //this file is odd so let it be flexible and only produce warnings
   "time_delta": 0.0, // the minimum time between subsequent return times
   "output_delay": 0, //the propagation delay for federates to send data
   "input_delay": 0, //the input delay for external data to propagate to federates

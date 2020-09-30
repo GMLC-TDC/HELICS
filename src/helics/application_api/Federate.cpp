@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
+#include "../common/fmt_format.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/Core.hpp"
 #include "../core/CoreFactory.hpp"
@@ -75,6 +76,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(name, fi);
     nameSegmentSeparator = fi.separator;
+    strictConfigChecking = fi.checkFlagProperty(helics_flag_strict_config_checking, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
@@ -112,6 +114,7 @@ Federate::Federate(const std::string& fedName,
     }
     fedID = coreObject->registerFederate(name, fi);
     nameSegmentSeparator = fi.separator;
+    strictConfigChecking = fi.checkFlagProperty(helics_flag_strict_config_checking, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
@@ -141,6 +144,7 @@ Federate::Federate(Federate&& fed) noexcept
     coreObject = std::move(fed.coreObject);
     currentTime = fed.currentTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
+    strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     fManager = std::move(fed.fManager);
     name = std::move(fed.name);
@@ -154,6 +158,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
     coreObject = std::move(fed.coreObject);
     currentTime = fed.currentTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
+    strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     fManager = std::move(fed.fManager);
     name = std::move(fed.name);
@@ -830,12 +835,27 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 
             auto opType = filterTypeFromString(operation);
             if ((useTypes) && (operation != "custom")) {
-                std::cerr << "input and output types may only be specified for custom filters\n";
+                if (strictConfigChecking) {
+                    logMessage(helics_log_level_error,
+                               "input and output types may only be specified for custom filters");
+                    throw(InvalidParameter(
+                        "input and output types may only be specified for custom filters"));
+                }
+                logMessage(helics_log_level_warning,
+                           "input and output types may only be specified for custom filters");
                 continue;
             }
             if (!useTypes) {
                 if (opType == filter_types::unrecognized) {
-                    std::cerr << "unrecognized filter operation:" << operation << '\n';
+                    if (strictConfigChecking) {
+                        std::string emessage =
+                            fmt::format("unrecognized filter operation:{}", operation);
+                        logMessage(helics_log_level_error, emessage);
+
+                        throw(InvalidParameter(emessage));
+                    }
+                    logMessage(helics_log_level_warning,
+                               fmt::format("unrecognized filter operation:{}", operation));
                     continue;
                 }
             }
@@ -853,8 +873,16 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                 if (props.isArray()) {
                     for (const auto& prop : props) {
                         if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
-                            std::cerr
-                                << "properties must be specified with \"name\" and \"value\" fields\n";
+                            if (strictConfigChecking) {
+                                logMessage(
+                                    helics_log_level_error,
+                                    R"(filter properties require "name" and "value" fields)");
+
+                                throw(InvalidParameter(
+                                    R"(filter properties require "name" and "value" fields)"));
+                            }
+                            logMessage(helics_log_level_warning,
+                                       R"(filter properties require "name" and "value" fields)");
                             continue;
                         }
                         if (prop["value"].isDouble()) {
@@ -865,9 +893,18 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     }
                 } else {
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
-                        std::cerr
-                            << "properties must be specified with \"name\" and \"value\" fields\n";
-                    } else if (props["value"].isDouble()) {
+                        if (strictConfigChecking) {
+                            logMessage(helics_log_level_error,
+                                       R"(filter properties require "name" and "value" fields)");
+
+                            throw(InvalidParameter(
+                                R"(filter properties require "name" and "value" fields)"));
+                        }
+                        logMessage(helics_log_level_warning,
+                                   R"(filter properties require "name" and "value" fields)");
+                        continue;
+                    }
+                    if (props["value"].isDouble()) {
                         filter.set(props["name"].asString(), props["value"].asDouble());
                     } else {
                         filter.setString(props["name"].asString(), props["value"].asString());
@@ -917,12 +954,25 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
             auto opType = filterTypeFromString(operation);
             if ((useTypes) && (operation != "custom")) {
-                std::cerr << "input and output types may only be specified for custom filters\n";
+                if (strictConfigChecking) {
+                    logMessage(helics_log_level_error,
+                               "input and output types may only be specified for custom filters");
+                    throw(InvalidParameter(
+                        "input and output types may only be specified for custom filters"));
+                }
+                logMessage(helics_log_level_warning,
+                           "input and output types may only be specified for custom filters");
                 continue;
             }
             if (!useTypes) {
                 if (opType == filter_types::unrecognized) {
-                    std::cerr << "unrecognized filter operation:" << operation << '\n';
+                    auto emessage = fmt::format("unrecognized filter operation:{}", operation);
+                    if (strictConfigChecking) {
+                        logMessage(helics_log_level_error, emessage);
+
+                        throw(InvalidParameter(emessage));
+                    }
+                    logMessage(helics_log_level_warning, emessage);
                     continue;
                 }
             }
@@ -947,8 +997,16 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                         auto propval = toml::find_or(prop, "value", uVal);
 
                         if ((propname.empty()) || (propval.is_uninitialized())) {
-                            std::cerr
-                                << "properties must be specified with \"name\" and \"value\" fields\n";
+                            if (strictConfigChecking) {
+                                logMessage(
+                                    helics_log_level_error,
+                                    R"(filter properties require "name" and "value" fields)");
+
+                                throw(InvalidParameter(
+                                    R"(filter properties require "name" and "value" fields)"));
+                            }
+                            logMessage(helics_log_level_warning,
+                                       R"(filter properties require "name" and "value" fields)");
                             continue;
                         }
                         if (propval.is_floating()) {
@@ -964,9 +1022,18 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     auto propval = toml::find_or(props, "value", uVal);
 
                     if ((propname.empty()) || (propval.is_uninitialized())) {
-                        std::cerr
-                            << "properties must be specified with \"name\" and \"value\" fields\n";
-                    } else if (propval.is_floating()) {
+                        if (strictConfigChecking) {
+                            logMessage(helics_log_level_error,
+                                       R"(filter properties require "name" and "value" fields)");
+
+                            throw(InvalidParameter(
+                                R"(filter properties require "name" and "value" fields)"));
+                        }
+                        logMessage(helics_log_level_warning,
+                                   R"(filter properties require "name" and "value" fields)");
+                        continue;
+                    }
+                    if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
                     } else {
                         filter.setString(propname, propval.as_string());
