@@ -179,6 +179,11 @@ helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mism
 r""" used to not display warnings on mismatched requested times"""
 helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
 r""" specify that a federate error should terminate the federation"""
+helics_flag_strict_config_checking = _helics.helics_flag_strict_config_checking
+r"""
+    specify that checking on configuration files should be strict and throw and error on any
+      invalid values
+    """
 helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush
 r""" specify that the log files should be flushed on every log message"""
 helics_flag_dumplog = _helics.helics_flag_dumplog
