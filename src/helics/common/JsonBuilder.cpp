@@ -35,7 +35,7 @@ bool JsonMapBuilder::isCompleted() const
 int JsonMapBuilder::generatePlaceHolder(const std::string& location, int32_t code)
 {
     int index = static_cast<int>(missing_components.size()) + 2;
-    missing_components.emplace(index, std::make_pair(location,code));
+    missing_components.emplace(index, std::make_pair(location, code));
     return index;
 }
 
@@ -64,10 +64,8 @@ bool JsonMapBuilder::addComponent(const std::string& info, int index) noexcept
 
 bool JsonMapBuilder::clearComponents(int32_t code)
 {
-    for (auto b = missing_components.begin(); b != missing_components.end(); ++b)
-    {
-        if (b->second.second == code)
-        {
+    for (auto b = missing_components.begin(); b != missing_components.end(); ++b) {
+        if (b->second.second == code) {
             missing_components.erase(b);
             return missing_components.empty();
         }

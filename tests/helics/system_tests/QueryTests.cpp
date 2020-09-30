@@ -439,9 +439,7 @@ TEST_F(query, global_state)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
     if (val["cores"][0]["federates"][0]["name"].asString() == "fed0") {
         EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "error");
-    }
-    else
-    {
+    } else {
         EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
     }
 

@@ -71,17 +71,17 @@ static const std::string& fed_state_string(federate_state state)
         case federate_state::HELICS_CREATED:
             return c1;
 
-       case federate_state::HELICS_INITIALIZING:
+        case federate_state::HELICS_INITIALIZING:
             return dis;
-       case federate_state::HELICS_EXECUTING:
-           return exec;
-       case federate_state::HELICS_TERMINATING:
-           return term;
-       case federate_state::HELICS_FINISHED:
-           return dis;
-       case federate_state::HELICS_ERROR:
-           return estate;
-       case federate_state::HELICS_UNKNOWN:
+        case federate_state::HELICS_EXECUTING:
+            return exec;
+        case federate_state::HELICS_TERMINATING:
+            return term;
+        case federate_state::HELICS_FINISHED:
+            return dis;
+        case federate_state::HELICS_ERROR:
+            return estate;
+        case federate_state::HELICS_UNKNOWN:
         default:
             return unk;
     }
@@ -1980,7 +1980,7 @@ enum subqueries : std::uint16_t {
     current_time_map = 2,
     dependency_graph = 3,
     data_flow_graph = 4,
-    global_state=6,
+    global_state = 6,
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2163,7 +2163,8 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     if (loopFederates.size() > 0) {
         base["federates"] = Json::arrayValue;
         for (const auto& fed : loopFederates) {
-            int brkindex = builder.generatePlaceHolder("federates",fed->global_id.load().baseValue());
+            int brkindex =
+                builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request);
             if (ret == "#wait") {
                 queryReq.messageID = brkindex;

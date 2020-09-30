@@ -1650,7 +1650,6 @@ void FederateState::logMessage(int level,
     }
 }
 
-
 static const std::string& fed_state_string(federate_state state)
 {
     static const std::string c1{"created"};
@@ -1802,8 +1801,8 @@ std::string FederateState::processQueryActual(const std::string& query) const
 std::string FederateState::processQuery(const std::string& query) const
 {
     std::string qstring;
-    if (query == "publications" || query == "inputs" ||
-        query == "endpoints"||query=="global_state") {  // these never need to be locked
+    if (query == "publications" || query == "inputs" || query == "endpoints" ||
+        query == "global_state") {  // these never need to be locked
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
