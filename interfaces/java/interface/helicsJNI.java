@@ -53,6 +53,7 @@ public class helicsJNI {
   public final static native int helics_flag_enable_init_entry_get();
   public final static native int helics_flag_ignore_time_mismatch_warnings_get();
   public final static native int helics_flag_terminate_on_error_get();
+  public final static native int helics_flag_strict_config_checking_get();
   public final static native int helics_flag_force_logging_flush_get();
   public final static native int helics_flag_dumplog_get();
   public final static native int helics_log_level_no_print_get();
