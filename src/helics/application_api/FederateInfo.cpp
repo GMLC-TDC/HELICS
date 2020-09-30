@@ -92,6 +92,9 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"ignoretimeMismatch", helics_flag_ignore_time_mismatch_warnings},
     {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+    {"strict_config_checking", helics_flag_strict_config_checking},
+    {"strictconfigchecking", helics_flag_strict_config_checking},
+    {"strictConfigChecking", helics_flag_strict_config_checking},
     {"strictinputtypechecking", helics_handle_option_strict_type_checking},
     {"strictInputTypeChecking", helics_handle_option_strict_type_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
@@ -551,6 +554,36 @@ FederateInfo loadFederateInfo(const std::string& configString)
         ret.defName = configString;
     }
     return ret;
+}
+
+Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
+{
+    for (const auto& tp : timeProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
+{
+    for (const auto& tp : flagProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+int FederateInfo::checkIntProperty(int propId, int defVal) const
+{
+    for (const auto& tp : intProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
 }
 
 void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgParser)
