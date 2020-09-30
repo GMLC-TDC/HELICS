@@ -58,7 +58,7 @@ const std::string& state_string(operation_state state)
     }
 }
 
-static const std::string& fed_state_string(federate_state state)
+static const std::string& fedStateString(federate_state state)
 {
     static const std::string c1{"created"};
     static const std::string estate{"error"};
@@ -2087,7 +2087,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
     if (queryStr == "state") {
-        return fed_state_string(fed->getState());
+        return fedStateString(fed->getState());
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(fed);

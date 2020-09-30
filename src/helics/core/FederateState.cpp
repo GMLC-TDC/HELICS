@@ -1650,7 +1650,7 @@ void FederateState::logMessage(int level,
     }
 }
 
-static const std::string& fed_state_string(federate_state state)
+static const std::string& fedStateString(federate_state state)
 {
     static const std::string c1{"created"};
     static const std::string estate{"error"};
@@ -1728,7 +1728,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
         base["parent"] = parent_->getGlobalId().baseValue();
-        base["state"] = fed_state_string(state.load());
+        base["state"] = fedStateString(state.load());
         base["publications"] = publicationCount();
         base["input"] = inputCount();
         base["endpoints"] = endpointCount();
@@ -1740,7 +1740,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
         base["parent"] = parent_->getGlobalId().baseValue();
-        base["state"] = fed_state_string(state.load());
+        base["state"] = fedStateString(state.load());
         return generateJsonString(base);
     }
     if (query == "timeconfig") {

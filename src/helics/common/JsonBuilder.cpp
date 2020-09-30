@@ -95,7 +95,7 @@ void JsonBuilder::addElement(const std::string& path, const std::string& value)
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
-    auto jv = &getJValue();
+    auto* jv = &getJValue();
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
@@ -111,7 +111,7 @@ void JsonBuilder::addElement(const std::string& path, double value)
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
-    auto jv = &getJValue();
+    auto* jv = &getJValue();
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
@@ -127,7 +127,7 @@ void JsonBuilder::addElement(const std::string& path, const std::vector<double>&
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
-    auto jv = &getJValue();
+    auto* jv = &getJValue();
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
@@ -137,7 +137,7 @@ void JsonBuilder::addElement(const std::string& path, const std::vector<double>&
         jv = &(*jv)[res[ii]];
     }
     (*jv)[res.back()] = Json::arrayValue;
-    for (auto& v : value) {
+    for (const auto& v : value) {
         (*jv)[res.back()].append(v);
     }
 }
