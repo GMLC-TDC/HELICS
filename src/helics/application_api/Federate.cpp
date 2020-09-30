@@ -855,14 +855,11 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     if (strictConfigChecking) {
                         std::string emessage =
                             fmt::format("unrecognized filter operation:{}", operation);
-                        logMessage(helics_log_level_error,
-                                   emessage);
+                        logMessage(helics_log_level_error, emessage);
 
-                        throw(InvalidParameter(
-                            emessage));
+                        throw(InvalidParameter(emessage));
                     } else {
-                        logMessage(
-                            helics_log_level_warning,
+                        logMessage(helics_log_level_warning,
                                    fmt::format("unrecognized filter operation:{}", operation));
                     }
                     continue;
@@ -905,16 +902,14 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                 } else {
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         if (strictConfigChecking) {
-                            logMessage(
-                                helics_log_level_error,
-                                "filter properties require \"name\" and \"value\" fields");
+                            logMessage(helics_log_level_error,
+                                       "filter properties require \"name\" and \"value\" fields");
 
                             throw(InvalidParameter(
                                 "filter properties require \"name\" and \"value\" fields"));
                         } else {
-                            logMessage(
-                                helics_log_level_warning,
-                                "filter properties require \"name\" and \"value\" fields");
+                            logMessage(helics_log_level_warning,
+                                       "filter properties require \"name\" and \"value\" fields");
                         }
                         continue;
                     } else if (props["value"].isDouble()) {
@@ -982,14 +977,11 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                 if (opType == filter_types::unrecognized) {
                     if (strictConfigChecking) {
                         auto emessage = fmt::format("unrecognized filter operation:{}", operation);
-                        logMessage(helics_log_level_error,
-                                   emessage);
+                        logMessage(helics_log_level_error, emessage);
 
-                        throw(InvalidParameter(
-                            emessage));
+                        throw(InvalidParameter(emessage));
                     } else {
-                        logMessage(
-                            helics_log_level_warning,
+                        logMessage(helics_log_level_warning,
                                    fmt::format("unrecognized filter operation:{}", operation));
                     }
                     continue;
@@ -1044,16 +1036,14 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
                     if ((propname.empty()) || (propval.is_uninitialized())) {
                         if (strictConfigChecking) {
-                            logMessage(
-                                helics_log_level_error,
-                                "filter properties require \"name\" and \"value\" fields");
+                            logMessage(helics_log_level_error,
+                                       "filter properties require \"name\" and \"value\" fields");
 
                             throw(InvalidParameter(
                                 "filter properties require \"name\" and \"value\" fields"));
                         } else {
-                            logMessage(
-                                helics_log_level_warning,
-                                "filter properties require \"name\" and \"value\" fields");
+                            logMessage(helics_log_level_warning,
+                                       "filter properties require \"name\" and \"value\" fields");
                         }
                         continue;
                     } else if (propval.is_floating()) {
