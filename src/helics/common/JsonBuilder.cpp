@@ -32,10 +32,10 @@ bool JsonMapBuilder::isCompleted() const
     return (jMap) && (missing_components.empty());
 }
 
-int JsonMapBuilder::generatePlaceHolder(const std::string& location)
+int JsonMapBuilder::generatePlaceHolder(const std::string& location, int32_t code)
 {
     int index = static_cast<int>(missing_components.size()) + 2;
-    missing_components.emplace(index, location);
+    missing_components.emplace(index, std::make_pair(location, code));
     return index;
 }
 
@@ -44,20 +44,31 @@ bool JsonMapBuilder::addComponent(const std::string& info, int index) noexcept
     auto loc = missing_components.find(index);
     if (loc != missing_components.end()) {
         if (info == "#invalid") {
-            (*jMap)[loc->second].append(Json::Value{});
+            (*jMap)[loc->second.first].append(Json::Value{});
         } else {
             try {
                 auto element = loadJsonStr(info);
-                (*jMap)[loc->second].append(element);
+                (*jMap)[loc->second.first].append(element);
             }
             catch (const std::invalid_argument&) {
-                (*jMap)[loc->second].append(Json::Value{});
+                (*jMap)[loc->second.first].append(Json::Value{});
             }
         }
 
         missing_components.erase(loc);
 
         return missing_components.empty();
+    }
+    return false;
+}
+
+bool JsonMapBuilder::clearComponents(int32_t code)
+{
+    for (auto b = missing_components.begin(); b != missing_components.end(); ++b) {
+        if (b->second.second == code) {
+            missing_components.erase(b);
+            return missing_components.empty();
+        }
     }
     return false;
 }
@@ -84,7 +95,7 @@ void JsonBuilder::addElement(const std::string& path, const std::string& value)
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
-    auto jv = &getJValue();
+    auto* jv = &getJValue();
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
@@ -100,7 +111,7 @@ void JsonBuilder::addElement(const std::string& path, double value)
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
-    auto jv = &getJValue();
+    auto* jv = &getJValue();
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
@@ -116,7 +127,7 @@ void JsonBuilder::addElement(const std::string& path, const std::vector<double>&
 {
     stringVector res = gmlc::utilities::stringOps::splitline(
         path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
-    auto jv = &getJValue();
+    auto* jv = &getJValue();
     size_t ii = 0;
     for (ii = 0; ii < res.size() - 1; ++ii) {
         auto& sub = (*jv)[res[ii]];
@@ -126,7 +137,7 @@ void JsonBuilder::addElement(const std::string& path, const std::vector<double>&
         jv = &(*jv)[res[ii]];
     }
     (*jv)[res.back()] = Json::arrayValue;
-    for (auto& v : value) {
+    for (const auto& v : value) {
         (*jv)[res.back()].append(v);
     }
 }

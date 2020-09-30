@@ -314,6 +314,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void disconnectBroker(BasicBrokerInfo& brk);
     /** mark this broker and all other that have this as a parent as disconnected*/
     void markAsDisconnected(global_broker_id brkid);
+    /** check to make sure there are no inflight queries that need to be resolved*/
+    void checkInFlightQueries(global_broker_id brkid);
     /** run a check for a named interface*/
     void checkForNamedInterface(ActionMessage& command);
     /** remove a named target from an interface*/
