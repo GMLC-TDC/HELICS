@@ -64,7 +64,7 @@ add_library(
                                   ${application_api_headers} ${private_application_api_headers}
 )
 
-target_link_libraries(helics_application_api PUBLIC helics_network)
+target_link_libraries(helics_application_api PUBLIC helics_network fmt::fmt)
 
 target_compile_definitions(helics_application_api PUBLIC HELICS_CXX_STATIC_DEFINE)
 if(MSYS AND USE_LIBCXX)

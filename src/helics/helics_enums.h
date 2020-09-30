@@ -122,6 +122,9 @@ typedef enum {
     helics_flag_ignore_time_mismatch_warnings = 67,
     /** specify that a federate error should terminate the federation*/
     helics_flag_terminate_on_error = 72,
+    /** specify that checking on configuration files should be strict and throw and error on any
+   invalid values */
+    helics_flag_strict_config_checking = 75,
     /** specify that the log files should be flushed on every log message*/
     helics_flag_force_logging_flush = 88,
     /** specify that a full log should be dumped into a file*/
