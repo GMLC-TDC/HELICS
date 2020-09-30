@@ -569,7 +569,7 @@ FederateInfo loadFederateInfo(const std::string& configString)
 
 Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
 {
-    for (auto& tp : timeProps) {
+    for (const auto& tp : timeProps) {
         if (tp.first == propId) {
             return tp.second;
         }
@@ -579,7 +579,7 @@ Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
 
 bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
 {
-    for (auto& tp : flagProps) {
+    for (const auto& tp : flagProps) {
         if (tp.first == propId) {
             return tp.second;
         }
@@ -589,7 +589,7 @@ bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
 
 int FederateInfo::checkIntProperty(int propId, int defVal) const
 {
-    for (auto& tp : intProps) {
+    for (const auto& tp : intProps) {
         if (tp.first == propId) {
             return tp.second;
         }
