@@ -2744,8 +2744,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
                 case connection_state::error:
                 case connection_state::disconnected:
                 case connection_state::request_disconnect:
-                    if (index == global_state)
-                    {
+                    if (index == global_state) {
                         Json::Value brkstate;
                         brkstate["state"] = state_string(broker.state);
                         brkstate["name"] = broker.name;
