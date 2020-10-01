@@ -4,12 +4,13 @@
 
 ```eval_rst
 .. toctree::
-    :maxdepth: 1
     :hidden:
-
-
+    :maxdepth: 2
 ```
 
 basic model, from which everything else will be built
 
 the place for newbies.
+## test
+
+## test
