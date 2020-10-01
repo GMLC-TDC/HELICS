@@ -5,7 +5,8 @@
 
 ```eval_rst
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
+    
     fundamental_examples/fundamental_examples_index
     advanced_examples/advanced_examples_index
 
