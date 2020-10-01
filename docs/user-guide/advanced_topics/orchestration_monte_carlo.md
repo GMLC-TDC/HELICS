@@ -24,7 +24,7 @@ $$ M \sim U(a,b) $$
 Where $M$ is the measured voltage, $a$ is the lower bound for possible values, and $b$ is the upper bound for possible values. This is read as, "$M$
  is distributed uniformly with bounds $a$ and $b$." 
  
- ![](../img/uniform_dist.png)
+ ![](../../img/uniform_dist.png)
 
 The uniform distribution is among the most simple of probability distributions. Additional resources on probability and statistics are plentiful; [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/) is highly recommended.
 
@@ -44,7 +44,7 @@ Let's extend our original assumption that the distribution of chargers is static
  $$ L2 \sim P(100,0.5) $$
  $$ L3 \sim P(100,0.2) $$
  
-  ![](../img/EVPoisson.png)
+  ![](../../img/EVPoisson.png)
  
  What if we weren't entirely certain that the average values for $L1, L2, L3$ are $0.3, 0.5, 0.2$, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
  
@@ -66,7 +66,7 @@ Let's extend our original assumption that the distribution of chargers is static
 
 </center>
 
-  ![](../img/EVfulldist.png)
+  ![](../../img/EVfulldist.png)
   
 Notice that the individual overplotted distributions in the two histograms above are different -- there is more flexibility encoded into the second. The distributions in the second plot describe the following assumptions about the anticipated need for Level 1, 2, and 3 chargers:
 
@@ -249,7 +249,7 @@ Co-Sim_n bubbles represents the Monte Carlo simulation. Each co-sim
 runs in parallel with each other since there is no dependency on the
 output that each co-sim runs.
 
-![](../img/UQ_DAG.png)
+![](../../img/UQ_DAG.png)
 
 
 
