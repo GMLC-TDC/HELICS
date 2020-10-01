@@ -13,7 +13,7 @@ Co-simulation is a powerful analysis technique that allows simulators of differe
     fundamental_topics
     advanced_topics
     configuration_options_reference
-    examples/index
+    Examples
     support
 
 ```
