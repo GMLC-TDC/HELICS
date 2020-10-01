@@ -58,35 +58,6 @@ const std::string& state_string(operation_state state)
     }
 }
 
-static const std::string& fedStateString(federate_state state)
-{
-    static const std::string c1{"created"};
-    static const std::string estate{"error"};
-    static const std::string dis{"disconnected"};
-    static const std::string exec{"executing"};
-    static const std::string term{"terminating"};
-    static const std::string unk{"unknown"};
-
-    switch (state) {
-        case federate_state::HELICS_CREATED:
-            return c1;
-
-        case federate_state::HELICS_INITIALIZING:
-            return dis;
-        case federate_state::HELICS_EXECUTING:
-            return exec;
-        case federate_state::HELICS_TERMINATING:
-            return term;
-        case federate_state::HELICS_FINISHED:
-            return dis;
-        case federate_state::HELICS_ERROR:
-            return estate;
-        case federate_state::HELICS_UNKNOWN:
-        default:
-            return unk;
-    }
-}
-
 // timeoutMon is a unique_ptr
 CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
