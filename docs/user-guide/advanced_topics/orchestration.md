@@ -203,7 +203,7 @@ study:
 
 ### DAG of the spec
 
-![](../img/Merlin_pi_send_receive_DAG.png)
+![](../../img/Merlin_pi_send_receive_DAG.png)
 
 ### Why Merlin
 
