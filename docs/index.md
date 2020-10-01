@@ -6,6 +6,7 @@
 [![](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 
+
 This is the documentation for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS is an
 open-source cyber-physical-energy co-simulation framework for energy systems, with a strong tie to the electric
 power system. Although, HELICS was designed to support very-large-scale (100,000+
@@ -17,10 +18,11 @@ Brief History: HELICS began as the core software development of the Grid Moderni
 
 Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
+
 ```eval_rst
 .. toctree::
    :maxdepth: 2
-
+   
 
    user-guide/index
    developer-guide/index

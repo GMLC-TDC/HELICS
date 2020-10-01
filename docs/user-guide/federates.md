@@ -8,6 +8,17 @@ A "federate", as previously introduced in the [HELICS Key Concepts section](./he
 
 HELICS defines three specific types of federates defined by the nature of the messages they are passing to and from the federation:
 
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    
+    value_federates
+    message_federates
+    filters
+
+```
+
+
 1. **Value federates** - Value federates are used when the federate is simulating the physics of a system. The data in the messages they send and receive are indicating new values at the boundary of the federates system under simulation. Taking the example from the our [high-level overview of the process of HELICS co-simulation execution](./helics_co-sim_sequence.md), the transmission and distribution system were value federates; they each supplied messages that updates the other's boundary condition. Value federates typically will update at very regular intervals based on the fidelity of their models and/or the resolution of any supporting data they are using; this likely is related to the time-step of the federate.
 
    Value federates interact with the federation through what are called "interfaces". There are a handful of different interface types which will be discussed shortly but all are intended to provide the same essential functionality: allowing values in HELICS messages to be sent from and received by a given federate. For value federates, these messages will often have one-to-one correspondence to internal variables within the federate. Using the [previous simple transmission and distribution example ](./helics_co-sim_sequence.md), the distribution system may send out a HELICS message that contains the value of its internal positive sequence load variable and receive HELICS messages that it uses for its internal positive sequence substation voltage variable.
@@ -36,3 +47,6 @@ The following table may be useful in understanding the differences between the t
 ```
 
 3. **Combination federates** - As you might guess, this type of federate makes use of both the value method and the endpoint method for transferring data between federates. An example of a federate like this could be a transmission system simulator that is acting both as a physical model of a system as well as a collection of PMUs that are sending data to a centralized generator dispatcher. The solution to the powerflow could be used to define substation voltages to some attached distribution circuits (physical values sent via publication) and the generator output powers could be sent to the centralized controller (control/measurement values being sent over a communication network via endpoints in a message federate).
+
+
+## Example from Base Model 

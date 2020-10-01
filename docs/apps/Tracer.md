@@ -43,7 +43,7 @@ federate configuration
   --offset arg           the offset of the time steps
   --period arg           the period of the federate
   --timedelta arg        the time delta of the federate
-  -i [ --coreinitstring ] arg  the core initialization string
+  -i [ --coreinit ] arg  the core initialization string
   --inputdelay arg       the input delay on incoming communication of the
                          federate
   --outputdelay arg      the output delay for outgoing communication of the

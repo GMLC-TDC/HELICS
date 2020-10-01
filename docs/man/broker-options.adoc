@@ -4,8 +4,8 @@ include::apps-common-options.adoc[]
         Specify that the broker is a root.
 
 -t::
---coreType::
---core_type::
+--type::
+--core::
 --coretype <type>::
         The type of core to use. Options include zmq (default), zmqss,
         tcp, tcpss, udp, ipc, mpi, and test.
@@ -44,17 +44,14 @@ Network Connections
 --networkretries <num>::
         The maximum number of network retries. The default is 5.
 
---useosport::
---useOsPort::
+--osport::
 --use_os_port::
         Specify that ports should be allocated by the host operating system.
 
 --autobroker::
         Allow a broker to automatically be created if one is not available.
 
---broker_init_string <init str>::
---brokerinitstring <init str>::
---brokerInitString <init str>::
+--brokerinit <init str>::
         The initialization string for the broker.
 
 --client::
@@ -67,8 +64,7 @@ Network Connections
         The port number to use. For automatically picking a port, use
         -1.
 
---localInterface::
---local_interface::
+--interface::
 --localinterface <network interface>::
         The local interface to use for the receive ports. Useful if
         on systems that have multiple network cards.
@@ -86,7 +82,10 @@ Network Connections
 All Core/Broker Types
 ~~~~~~~~~~~~~~~~~~~~~
 -f::
---federates <num>::
+-m::
+--minfed::
+--federates::
+--minfederates <num>::
         The minimum number of federates that will be connecting to the broker.
 
 -n::
@@ -94,8 +93,7 @@ All Core/Broker Types
 --identifier <name>::
         The name used to identify the broker.
 
---max_iterations::
---maxIterations::
+--maxiter::
 --maxiterations <num>::
         The maximum number of iterations allowed for a timestep. Default is
         10000 iterations.
@@ -105,26 +103,21 @@ All Core/Broker Types
 --minbrokercount <num>::
         The minimum number of core/brokers that need to be connected.
 
---brokerkey::
---brokerKey::
+--key::
 --broker_key <key>::
         Specify a key to use to verify all connections to/from a broker.
 
+--no_ping::
 --slow_responding::
---slowresponding::
---slowResponding::
         Specify that a broker might be slow or unresponsive to ping requests
         from other brokers.
 
 --terminate_on_error::
---terminateonerror::
---terminateOnError::
         Specify that a broker should treat all errors as global errors and terminate
         the co-simulation if an error is encountered
 
 --restrictive_time_policy::
---restrictivetimepolicy::
---restrictiveTimePolicy::
+--conservative_time_policy::
         Specify that a broker should use a conservative time policy in the time
         coordinator.
 

@@ -20,11 +20,11 @@ A couple example configurations follow.
   "comms": [
     {
       "type": "zmq",
-      "local_port": 23410
+      "interfaceport": 23410
     },
     {
       "type": "zmq",
-      "local_port": 23700
+      "interfaceport": 23700
     }
   ]
 }

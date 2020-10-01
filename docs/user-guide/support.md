@@ -24,3 +24,7 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 - **[Gitter](https://gitter.im/GMLC-TDC/HELICS)** - Live chat with developers (when they're logged in) for quick fix support.
 
 - **Virtual Office Hours** - HELICS developers have periodic open office hours where anybody can come and get hands-on help with understanding HELICS better or getting a particular feature to work. Contact helicsteam@helics.org for an invitation.
+
+
+- [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
+- [**(Termination) Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.

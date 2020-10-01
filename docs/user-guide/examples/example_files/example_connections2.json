@@ -1,0 +1,5 @@
+//this should be a valid json file (except comments are not recognized in standard JSON)
+{
+  //example json connection file  connections can be an array of two element string arrays  ["publication", "input"] or a map with "publication" and "target" for a single string or an array strings as "targets"
+  "connections": [{ "publication": "pub1", "targets": "inp1" }]
+}

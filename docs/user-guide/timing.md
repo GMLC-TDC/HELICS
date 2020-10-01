@@ -61,3 +61,5 @@ Items of notes:
 ## Exercises
 
 To get a reader some practice on how timing working in HELICS some exercises originally used as part of an [in-person tutorial are available](./timing_exercise.md)
+
+## Example from Base Model
