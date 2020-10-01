@@ -6,8 +6,8 @@
 ```eval_rst
 .. toctree::
     :maxdepth: 1
-    fundamental_index
-    advanced_index
+    fundamental_examples/fundamental_examples_index
+    advanced_examples/advanced_examples_index
 
 ```
 <!--- 
