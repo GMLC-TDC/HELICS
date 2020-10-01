@@ -404,4 +404,7 @@ class FederateState {
     /** wait for a command to a federate*/
     std::pair<std::string, std::string> waitCommand();
 };
+
+/** convert the state into a human readable string*/
+const std::string& fedStateString(federate_state state);
 }  // namespace helics
