@@ -2343,7 +2343,41 @@ void CoreBroker::processDisconnect(ActionMessage& command)
     }
 }
 
-void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
+void CoreBroker::checkInFlightQueries(global_broker_id brkid)
+{
+    for (auto& mb : mapBuilders) {
+        auto& builder = std::get<0>(mb);
+        auto& requestors = std::get<1>(mb);
+        if (builder.isCompleted()) {
+            return;
+        }
+        if (builder.clearComponents(brkid.baseValue())) {
+            auto str = builder.generate();
+            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
+                if (requestors[ii].dest_id == global_broker_id_local) {
+                    activeQueries.setDelayedValue(requestors[ii].messageID, str);
+                } else {
+                    requestors[ii].payload = str;
+                    routeMessage(std::move(requestors[ii]));
+                }
+            }
+            if (requestors.back().dest_id == global_broker_id_local) {
+                // TODO(PT) add rvalue reference method
+                activeQueries.setDelayedValue(requestors.back().messageID, str);
+            } else {
+                requestors.back().payload = std::move(str);
+                routeMessage(std::move(requestors.back()));
+            }
+
+            requestors.clear();
+            if (std::get<2>(mb)) {
+                builder.reset();
+            }
+        }
+    }
+}
+
+void CoreBroker::markAsDisconnected(global_broker_id brkid)
 {
     bool isCore{false};
     // using regular loop here since dual mapped vector shouldn't produce a modifiable lvalue
@@ -2378,6 +2412,7 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
 void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
 {
     markAsDisconnected(brk.global_id);
+    checkInFlightQueries(brk.global_id);
     if (brokerState < broker_state_t::operating) {
         if (isRootc) {
             ActionMessage dis(CMD_BROADCAST_DISCONNECT);
@@ -2495,7 +2530,8 @@ enum subqueries : std::uint16_t {
     current_time_map = 2,
     dependency_graph = 3,
     data_flow_graph = 4,
-    version_all = 5
+    version_all = 5,
+    global_state = 6
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2504,6 +2540,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
     {"version_all", {version_all, false}},
+    {"global_state", {global_state, true}},
 };
 
 std::string CoreBroker::generateQueryAnswer(std::string_view request)
@@ -2524,7 +2561,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request)
     if ((request == "queries") || (request == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
                "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
-               "\"current_time\",\"current_state\",\"status\",\"global_time\",\"version\",\"version_all\",\"exists\"]";
+               "\"current_time\",\"current_state\",\"global_state\",\"status\",\"global_time\",\"version\",\"version_all\",\"exists\"]";
     }
     if (request == "address") {
         return std::string{"\""} + getAddress() + '"';
@@ -2586,8 +2623,8 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request)
             fedstate["id"] = fed.global_id.baseValue();
             base["federates"].append(std::move(fedstate));
         }
-        base["brokers"] = Json::arrayValue;
         base["cores"] = Json::arrayValue;
+        base["brokers"] = Json::arrayValue;
         for (const auto& brk : _brokers) {
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
@@ -2735,21 +2772,57 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
     bool hasCores = false;
+    bool hasBrokers = false;
     for (const auto& broker : _brokers) {
         if (broker.parent == global_broker_id_local) {
+            switch (broker.state) {
+                case connection_state::connected:
+                case connection_state::init_requested:
+                case connection_state::operating: {
             int brkindex;
             if (broker._core) {
                 if (!hasCores) {
                     hasCores = true;
                     base["cores"] = Json::arrayValue;
                 }
-                brkindex = builder.generatePlaceHolder("cores");
+                        brkindex =
+                            builder.generatePlaceHolder("cores", broker.global_id.baseValue());
             } else {
-                brkindex = builder.generatePlaceHolder("brokers");
+                        if (!hasBrokers) {
+                            hasBrokers = true;
+                            base["brokers"] = Json::arrayValue;
             }
+                        brkindex =
+                            builder.generatePlaceHolder("brokers", broker.global_id.baseValue());
+                    }
             queryReq.messageID = brkindex;
             queryReq.dest_id = broker.global_id;
             transmit(broker.route, queryReq);
+                } break;
+                case connection_state::error:
+                case connection_state::disconnected:
+                case connection_state::request_disconnect:
+                    if (index == global_state) {
+                        Json::Value brkstate;
+                        brkstate["state"] = state_string(broker.state);
+                        brkstate["name"] = broker.name;
+                        brkstate["id"] = broker.global_id.baseValue();
+                        if (broker._core) {
+                            if (!hasCores) {
+                                base["cores"] = Json::arrayValue;
+                                hasCores = true;
+        }
+                            base["cores"].append(std::move(brkstate));
+                        } else {
+                            if (!hasBrokers) {
+                                base["brokers"] = Json::arrayValue;
+                                hasBrokers = true;
+    }
+                            base["brokers"].append(std::move(brkstate));
+                        }
+                    }
+                    break;
+            }
         }
     }
     switch (index) {
@@ -2770,6 +2843,10 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
         } break;
         case version_all:
             base["version"] = versionString;
+            break;
+        case global_state:
+            base["state"] = brokerStateName(brokerState.load());
+            base["status"] = isConnected();
             break;
     }
 }
