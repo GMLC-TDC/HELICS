@@ -52,11 +52,11 @@
    git clone https://github.com/GMLC-TDC/HELICS-Examples.git
    ```
 
-   - To navigate to the C hello_world example: -folder-HELICS-examples-downloaded-to-/c/hello_world.
+  - To navigate to the C hello_world example: -folder-HELICS-examples-downloaded-to-/c/hello_world.
 
-    It should look like this:
+  It should look like this:
 
-    ![](./visuals/helloworlddir.JPG)
+  ![](./visuals/helloworlddir.JPG)
 
 
 3. Now we will load the examples into Visual Studio.
@@ -116,7 +116,7 @@
 
   b. Go to Project > Properties > C/C++ > All Options > Additional Include Directories > Down Arrow > Edit
 
-    This is where you will add the Include Directory of your HELICS installation. Check Step One (your path should end with include instead of helics, i.e. from the example it should be C:/Users/arbitraryfolder/HELICS/helics_2_6_0/include:
+  This is where you will add the Include Directory of your HELICS installation. Check Step One (your path should end with include instead of helics, i.e. from the example it should be C:/Users/arbitraryfolder/HELICS/helics_2_6_0/include:
 
     ![](./visuals/settingsInclude.jpg)
 
