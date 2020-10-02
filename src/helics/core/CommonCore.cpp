@@ -2284,7 +2284,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
             if (builder.isCompleted()) {
                 auto center = generateMapObjectCounter();
                 if (center == builder.getCounterCode()) {
-                    return std::get<0>(mapBuilders[index]).generate();
+                    return builder.generate();
                 }
                 builder.reset();
             }

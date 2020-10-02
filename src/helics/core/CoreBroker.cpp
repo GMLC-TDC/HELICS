@@ -2610,7 +2610,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
             if (builder.isCompleted()) {
                 auto center = generateMapObjectCounter();
                 if (center == builder.getCounterCode()) {
-                    return std::get<0>(mapBuilders[index]).generate();
+                    return builder.generate();
                 }
                 builder.reset();
             }
