@@ -2608,8 +2608,8 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
             auto& builder = std::get<0>(mapBuilders[index]);
             if (builder.isCompleted()) {
-                auto cnter = generateMapObjectCounter();
-                if (cnter == builder.getCounterCode()) {
+                auto center = generateMapObjectCounter();
+                if (center == builder.getCounterCode()) {
                     return std::get<0>(mapBuilders[index]).generate();
                 }
                 builder.reset();
@@ -2622,11 +2622,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         initializeMapBuilder(request, index, mi->second.second);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
             if (!mi->second.second) {
-                auto cnter = generateMapObjectCounter();
-                std::get<0>(mapBuilders[index]).setCounterCode(cnter);
+                auto center = generateMapObjectCounter();
+                std::get<0>(mapBuilders[index]).setCounterCode(center);
             }
             return std::get<0>(mapBuilders[index]).generate();
-                
         }
         return "#wait";
     }
