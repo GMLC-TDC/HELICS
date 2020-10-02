@@ -39,11 +39,11 @@
 
         ![](./visuals/lib.JPG)
 
-    - include:
+      -  include:
 
         ![](./visuals/include.JPG)
 
-   ** Keep track where the dynamic and static libraries are. We will need to know these locations to link it in Visual Studios!
+        ** Keep track where the dynamic and static libraries are. We will need to know these locations to link it in Visual Studios!
 
 
 2. Pull the HELICS example folder down from github.
@@ -52,59 +52,60 @@
    git clone https://github.com/GMLC-TDC/HELICS-Examples.git
    ```
 
-  - To navigate to the C hello_world example: -folder-HELICS-examples-downloaded-to-/c/hello_world.
+   - To navigate to the C hello_world example: -folder-HELICS-examples-downloaded-to-/c/hello_world.
 
-  It should look like this:
+   It should look like this:
 
-  ![](./visuals/helloworlddir.JPG)
+   ![](./visuals/helloworlddir.JPG)
 
 
 3. Now we will load the examples into Visual Studio.
-- Open up Visual Studio. We will do this twice since helics_world_sender.c and helics_world_receiver.c will need to be ran as two different executables.
 
-  We will first do this for helics_world_sender.c .
+   - Open up Visual Studio. We will do this twice since helics_world_sender.c and helics_world_receiver.c will need to be ran as two different executables.
 
-  a. When you open up Visual Studio, there will be a welcome/get started pop up. You will see panel like this:
+   We will first do this for helics_world_sender.c .
 
-    ![](./visuals/vsStartMenu.JPG)
+   a. When you open up Visual Studio, there will be a welcome/get started pop up. You will see panel like this:
 
-    You will choose "Create a new project."
+   ![](./visuals/vsStartMenu.JPG)
 
-  b. Choose "Empty Project"
+   You will choose "Create a new project."
 
-    ![](./visuals/emptyProject.JPG)
+   b. Choose "Empty Project"
 
-    Even though it says it is C++, we will be using this option and simply changing the suffix/extension.
+  ![](./visuals/emptyProject.JPG)
 
-  c. Enter name the project with the file name without it's suffix (we will first do hello_world_sender):
+   Even though it says it is C++, we will be using this option and simply changing the suffix/extension.
 
-    ![](./visuals/configureSender.jpg)
+   c. Enter name the project with the file name without it's suffix (we will first do hello_world_sender):
 
-  d. Choose "Create".
+   ![](./visuals/configureSender.jpg)
 
-  e. Repeat steps a-d except this time use the name hello_world_receiver.
+   d. Choose "Create".
 
-    Your "Configure your new project" screen should look like this:
+   e. Repeat steps a-d except this time use the name hello_world_receiver.
 
-    ![](./visuals/configureReceiver.jpg)
+   Your "Configure your new project" screen should look like this:
+
+   ![](./visuals/configureReceiver.jpg)
 
   f. Once both projects have been created, we will add their respective source files.
 
-    i. In Solution Explorer,
+      i. In Solution Explorer,
 
-    ```
-    Right click hello_world_sender > Add > Existing item ...
-    ```
+      ```
+      Right click hello_world_sender > Add > Existing item ...
+      ```
 
-    ![](./visuals/addExistingSender.jpg)
+      ![](./visuals/addExistingSender.jpg)
 
-    ii.  Go to the location of where you pulled down the HELICS example:
+      ii.  Go to the location of where you pulled down the HELICS example:
 
-    ![](./visuals/locationSender.jpg)
+      ![](./visuals/locationSender.jpg)
 
-    Click Add. You should see the hello-world_sender.c file appear in the Solutions Explorer under the Source Files.
+      Click Add. You should see the hello-world_sender.c file appear in the Solutions Explorer under the Source Files.
 
-    Now do the same thing with hello_world_receiver.c in the hello_world_receiver Visual Studio project.
+      Now do the same thing with hello_world_receiver.c in the hello_world_receiver Visual Studio project.
 
 4. Linking HELICS in visual studios to run example
 
@@ -118,31 +119,31 @@
 
   This is where you will add the Include Directory of your HELICS installation. Check Step One (your path should end with include instead of helics, i.e. from the example it should be C:/Users/arbitraryfolder/HELICS/helics_2_6_0/include:
 
-    ![](./visuals/settingsInclude.jpg)
+  ![](./visuals/settingsInclude.jpg)
 
-    click Ok > Apply. ** Do not exit out of Properties yet **
+  Click Ok > Apply. ** Do not exit out of Properties yet **
 
   c. Go to Linker > All Options > scroll all the way up
 
-    i. Additional Dependencies > Down Arrow > Edit
+  i. Additional Dependencies > Down Arrow > Edit
 
-      This is where you will add the HELICS static library name: helicsSharedLib.lib
+    This is where you will add the HELICS static library name: helicsSharedLib.lib
 
-      ![](./visuals/settingLib.jpg)
+    ![](./visuals/settingLib.jpg)
 
-      Click Ok > Apply. ** Do not exit out of Properties yet. Stay in Linker**
+    Click Ok > Apply. ** Do not exit out of Properties yet. Stay in Linker**
 
-    ii. Additional Library Directories > Down Arrow > Edit
+  ii. Additional Library Directories > Down Arrow > Edit
 
-      This is where you will add the directories that hold the HELICS static and dynamic libraries, helicsSharedLib.lib and helicsSharedLib.dll, i.e. from example:
+    This is where you will add the directories that hold the HELICS static and dynamic libraries, helicsSharedLib.lib and helicsSharedLib.dll, i.e. from example:
 
-      C:/Users/arbitraryfolder/HELICS/helics_2_6_0/bin
+    C:/Users/arbitraryfolder/HELICS/helics_2_6_0/bin
 
-      C:/Users/arbitraryfolder/HELICS/helics_2_6_0/lib
+    C:/Users/arbitraryfolder/HELICS/helics_2_6_0/lib
 
-      ![](./visuals/settingLibDir.jpg)
+    ![](./visuals/settingLibDir.jpg)
 
-      Click Ok > Apply > Ok (This will exit you out of Properties)
+    Click Ok > Apply > Ok (This will exit you out of Properties)
 
   d. Go to ToolBar > Build > Build Solution
 
@@ -222,4 +223,4 @@
   ![](./visuals/results.jpg)
 
 
-#### Congratulations you ran your first HELICS simulation through Visual Studio!
+##### Congratulations you ran your first HELICS simulation through Visual Studio!
