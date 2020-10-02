@@ -127,23 +127,23 @@
 
   i. Additional Dependencies > Down Arrow > Edit
 
-    This is where you will add the HELICS static library name: helicsSharedLib.lib
+  This is where you will add the HELICS static library name: helicsSharedLib.lib
 
-    ![](./visuals/settingLib.jpg)
+  ![](./visuals/settingLib.jpg)
 
-    Click Ok > Apply. ** Do not exit out of Properties yet. Stay in Linker**
+  Click Ok > Apply. ** Do not exit out of Properties yet. Stay in Linker**
 
   ii. Additional Library Directories > Down Arrow > Edit
 
-    This is where you will add the directories that hold the HELICS static and dynamic libraries, helicsSharedLib.lib and helicsSharedLib.dll, i.e. from example:
+  This is where you will add the directories that hold the HELICS static and dynamic libraries, helicsSharedLib.lib and helicsSharedLib.dll, i.e. from example:
 
-    C:/Users/arbitraryfolder/HELICS/helics_2_6_0/bin
+  C:/Users/arbitraryfolder/HELICS/helics_2_6_0/bin
 
-    C:/Users/arbitraryfolder/HELICS/helics_2_6_0/lib
+  C:/Users/arbitraryfolder/HELICS/helics_2_6_0/lib
 
-    ![](./visuals/settingLibDir.jpg)
+  ![](./visuals/settingLibDir.jpg)
 
-    Click Ok > Apply > Ok (This will exit you out of Properties)
+  Click Ok > Apply > Ok (This will exit you out of Properties)
 
   d. Go to ToolBar > Build > Build Solution
 
