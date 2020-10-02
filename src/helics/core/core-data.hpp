@@ -179,6 +179,18 @@ class Message {
     }
     /** get the payload as a string*/
     const std::string& to_string() const { return data.to_string(); }
+    /** clear all data from the message*/
+    void clear() {
+        time = timeZero;
+        flags = 0;
+        messageID = 0;
+        data.resize(0);
+        dest.clear();
+        source.clear();
+        original_source.clear();
+        original_dest.clear();
+        counter = 0;
+    }
 };
 
 /**
