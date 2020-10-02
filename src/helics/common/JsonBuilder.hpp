@@ -21,7 +21,7 @@ class JsonMapBuilder {
   private:
     std::unique_ptr<Json::Value> jMap;
     std::map<int, std::pair<std::string, int32_t>> missing_components;
-
+    int counterCode{0};  // a code for the user to include for various purposes
   public:
     JsonMapBuilder() noexcept;
     ~JsonMapBuilder();
@@ -47,6 +47,9 @@ class JsonMapBuilder {
     std::string generate();
     /** reset the builder*/
     void reset();
+    /** set the counter code value*/
+    void setCounterCode(int code) { counterCode = code; }
+    int getCounterCode() const { return counterCode; };
 };
 
 /** class to help with the generation of JSON*/

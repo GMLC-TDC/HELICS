@@ -2075,7 +2075,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;exists;name;identifier;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;version;version_all;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;global_state;current_state]";
+               "publications;filters;version;version_all;counter;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;global_state;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2249,6 +2249,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "address") {
         return getAddress();
     }
+    if (queryStr == "counter") {
+        return fmt::format("{}", generateMapObjectCounter());
+    }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
     }
@@ -2277,16 +2280,25 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
-            if (std::get<0>(mapBuilders[index]).isCompleted()) {
-                return std::get<0>(mapBuilders[index]).generate();
+            auto& builder = std::get<0>(mapBuilders[index]);
+            if (builder.isCompleted()) {
+                auto cnter = generateMapObjectCounter();
+                if (cnter == builder.getCounterCode()) {
+                    return std::get<0>(mapBuilders[index]).generate();
+                }
+                builder.reset();
             }
-            if (std::get<0>(mapBuilders[index]).isActive()) {
+            if (builder.isActive()) {
                 return "#wait";
             }
         }
 
         initializeMapBuilder(queryStr, index, mi->second.second);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
+            if (!mi->second.second) {
+                auto cnter = generateMapObjectCounter();
+                std::get<0>(mapBuilders[index]).setCounterCode(cnter);
+            }
             return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
@@ -3634,6 +3646,8 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             requestors.clear();
             if (std::get<2>(mapBuilders[m.counter])) {
                 builder.reset();
+            } else {
+                builder.setCounterCode(generateMapObjectCounter());
             }
         }
     }
@@ -3966,6 +3980,16 @@ bool CommonCore::checkAndProcessDisconnect()
         return true;
     }
     return false;
+}
+
+int CommonCore::generateMapObjectCounter() const
+{
+    int result = static_cast<int>(brokerState.load());
+    for (auto& fed : loopFederates) {
+        result += static_cast<int>(fed.state);
+    }
+    result += static_cast<int>(loopHandles.size());
+    return result;
 }
 
 void CommonCore::sendDisconnect()

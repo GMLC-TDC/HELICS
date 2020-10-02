@@ -204,6 +204,25 @@ TEST_F(query, dependency_graph)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, dependency_graph_reset)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed1->registerGlobalPublication<double>("test1");
+    auto core = vFed1->getCorePointer();
+    auto res1 = core->query("root", "dependency_graph");
+    vFed2->registerSubscription("test1");
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
+    auto res2 = core->query("root", "dependency_graph");
+    EXPECT_NE(res1, res2);
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
 TEST_F(query, global_time)
 {
     SetupTest<helics::ValueFederate>("test_3", 2);
