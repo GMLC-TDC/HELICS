@@ -6,7 +6,7 @@
     * https://github.com/GMLC-TDC/HELICS/releases
     * https://docs.helics.org/en/latest/installation/index.html -  where you will see this:
 
-      ![](./visuals/releases.jpg)
+    ![](./visuals/releases.jpg)
 
   - Once you click have gotten to the list of releases, you will see this:
 
