@@ -49,7 +49,7 @@ class JsonMapBuilder {
     void reset();
     /** set the counter code value*/
     void setCounterCode(int code) { counterCode = code; }
-    int getCounterCode() const { return counterCode; };
+    int getCounterCode() const { return counterCode; }
 };
 
 /** class to help with the generation of JSON*/

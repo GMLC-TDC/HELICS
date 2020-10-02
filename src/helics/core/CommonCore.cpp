@@ -3985,7 +3985,7 @@ bool CommonCore::checkAndProcessDisconnect()
 int CommonCore::generateMapObjectCounter() const
 {
     int result = static_cast<int>(brokerState.load());
-    for (auto& fed : loopFederates) {
+    for (const auto& fed : loopFederates) {
         result += static_cast<int>(fed.state);
     }
     result += static_cast<int>(loopHandles.size());
