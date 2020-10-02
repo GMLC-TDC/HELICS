@@ -74,7 +74,7 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``dependents``     | list of dependent objects [sv]                             |
 +--------------------+------------------------------------------------------------+
-| ``current_time``   | the current time of the federate [JSON]                    |
+| ``current_time``   | the current time data for  the federate [JSON]             |
 +--------------------+------------------------------------------------------------+
 |``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
 +--------------------+------------------------------------------------------------+
