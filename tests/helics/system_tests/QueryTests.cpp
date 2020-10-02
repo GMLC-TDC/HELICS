@@ -287,10 +287,20 @@ TEST_F(query, current_time)
     res = mFed1->query("current_time");
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["granted_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["requested_time"].asDouble(), 1.0);
+
+    mFed1->requestTimeAsync(3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    res = mFed1->query("current_time");
+    val = loadJsonStr(res);
+    EXPECT_EQ(val["granted_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["requested_time"].asDouble(), 3.0);
+    mFed2->requestTime(3.0);
+    mFed1->requestTimeComplete();
 
     res = mFed1->query("broker", "current_time");
     val = loadJsonStr(res);
-    EXPECT_EQ(val["time_next"].asDouble(), 1.0);
+    EXPECT_EQ(val["time_next"].asDouble(), 3.0);
 
     res = mFed1->query("root", "current_time");
     EXPECT_EQ(res, "{}");

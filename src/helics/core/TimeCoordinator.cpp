@@ -483,8 +483,9 @@ void TimeCoordinator::updateTimeGrant()
 std::string TimeCoordinator::printTimeStatus() const
 {
     return fmt::format(
-        R"raw({{"granted_time":{}, "exec":{}, "allow":{}, "value":{}, "message":{}, "minDe":{}, "minminDe":{}}})raw",
+        R"raw({{"granted_time":{},"requested_time":{}, "exec":{}, "allow":{}, "value":{}, "message":{}, "minDe":{}, "minminDe":{}}})raw",
         static_cast<double>(time_granted),
+        static_cast<double>(time_requested),
         static_cast<double>(time_exec),
         static_cast<double>(time_allow),
         static_cast<double>(time_value),

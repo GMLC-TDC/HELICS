@@ -2617,7 +2617,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
 
         } break;
         case CMD_QUERY_REPLY:
-            if (command.dest_id == global_broker_id_local) {
+            if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {
                 processQueryResponse(command);
             } else {
                 transmit(getRoute(command.dest_id), command);
