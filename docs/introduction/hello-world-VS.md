@@ -8,11 +8,11 @@
 
     ![](./visuals/releases.jpg)
 
-  - Once you click have gotten to the list of releases, you will see this:
+  - Once you have gotten to the list of releases, you will see something like this:
 
       ![](./visuals/installerEXE.jpg)
 
-      You will see a file with the .exe suffix like the highlighted file above. That will be your Windows Installer. Download it.
+      There is a file with the .exe suffix like the highlighted file above. That will be your Windows Installer. Download it.
 
   - After downloading the executable, run it.
 
