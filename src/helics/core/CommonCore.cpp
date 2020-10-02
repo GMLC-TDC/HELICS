@@ -2492,6 +2492,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "address") {
         return std::string{"\""} + getAddress() + '"';
     }
+    if (queryStr == "counter") {
+        return fmt::format("{}", generateMapObjectCounter());
+    }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
     }
@@ -2520,16 +2523,25 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
-            if (std::get<0>(mapBuilders[index]).isCompleted()) {
-                return std::get<0>(mapBuilders[index]).generate();
+            auto& builder = std::get<0>(mapBuilders[index]);
+            if (builder.isCompleted()) {
+                auto center = generateMapObjectCounter();
+                if (center == builder.getCounterCode()) {
+                    return builder.generate();
             }
-            if (std::get<0>(mapBuilders[index]).isActive()) {
+                builder.reset();
+            }
+            if (builder.isActive()) {
                 return "#wait";
             }
         }
 
         initializeMapBuilder(queryStr, index, mi->second.second);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
+            if (!mi->second.second) {
+                auto center = generateMapObjectCounter();
+                std::get<0>(mapBuilders[index]).setCounterCode(center);
+            }
             return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
@@ -3947,6 +3959,8 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             requestors.clear();
             if (std::get<2>(mapBuilders[m.counter])) {
                 builder.reset();
+            } else {
+                builder.setCounterCode(generateMapObjectCounter());
             }
         }
     }
@@ -4291,6 +4305,16 @@ bool CommonCore::checkAndProcessDisconnect()
         return true;
     }
     return false;
+}
+
+int CommonCore::generateMapObjectCounter() const
+{
+    int result = static_cast<int>(brokerState.load());
+    for (const auto& fed : loopFederates) {
+        result += static_cast<int>(fed.state);
+    }
+    result += static_cast<int>(loopHandles.size());
+    return result;
 }
 
 void CommonCore::sendDisconnect()
