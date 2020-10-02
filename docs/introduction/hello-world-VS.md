@@ -1,6 +1,6 @@
 # Running hello_world example using HELICS windows installer + Visual Studio 2019
 
-1. Make sure that you have downloaded HELICS through the installer.
+**1. Make sure that you have downloaded HELICS through the installer**
 
   - To get to the installer you can access it through either of the following links:
     * https://github.com/GMLC-TDC/HELICS/releases
@@ -46,7 +46,7 @@
         ** Keep track where the dynamic and static libraries are. We will need to know these locations to link it in Visual Studios!
 
 
-2. Pull the HELICS example folder down from github.
+**2. Pull the HELICS example folder down from github**
 
    ```
    git clone https://github.com/GMLC-TDC/HELICS-Examples.git
@@ -59,9 +59,9 @@
    ![](./visuals/helloworlddir.JPG)
 
 
-3. Now we will load the examples into Visual Studio.
+**3. Load the examples into Visual Studio**
 
-   - Open up Visual Studio. We will do this twice since helics_world_sender.c and helics_world_receiver.c will need to be ran as two different executables.
+   Open up Visual Studio. We will do this twice since helics_world_sender.c and helics_world_receiver.c will need to be ran as two different executables.
 
    We will first do this for helics_world_sender.c .
 
@@ -107,7 +107,7 @@
 
       Now do the same thing with hello_world_receiver.c in the hello_world_receiver Visual Studio project.
 
-4. Linking HELICS in visual studios to run example
+**4. Link HELICS in visual studios to run example**
 
   a. Since we are using the HELICS installer, only the release version is attached. We need to make sure we're running on "Release" and "x64" settings. check that these are set in each tool bar of the projects:
 
@@ -190,7 +190,7 @@
 
   f. Once Solution is built, do steps a-e for other project (if you just did helics_world_sender, do helics_world_receiver, vice versa).
 
-5. Running the example
+**5. Run the example**
 
   To run the example we must have the broker running and also two of the solutions built into executables and ran.
 
