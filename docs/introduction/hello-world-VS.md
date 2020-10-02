@@ -6,11 +6,11 @@
     * https://github.com/GMLC-TDC/HELICS/releases
     * https://docs.helics.org/en/latest/installation/index.html -  where you will see this:
 
-    ![](./visuals/releases.jpg)
+    ![](./visuals/releases.JPG)
 
   - Once you have gotten to the list of releases, you will see something like this:
 
-      ![](./visuals/installerEXE.jpg)
+    ![](./visuals/installerEXE.jpg)
 
       There is a file with the .exe suffix like the highlighted file above. That will be your Windows Installer. Download it.
 
@@ -20,7 +20,7 @@
 
     Once you allow it to make changes, you will have the set up guide appear:
 
-      ![](./visuals/SetUpScreen.jpg)
+      ![](./visuals/SetUpScreen.JPG)
 
   -  Click through:
 
@@ -56,7 +56,7 @@
 
     It should look like this:
 
-    ![](./visuals/helloworlddir.jpg)
+    ![](./visuals/helloworlddir.JPG)
 
 
 3. Now we will load the examples into Visual Studio.
@@ -66,7 +66,7 @@
 
   a. When you open up Visual Studio, there will be a welcome/get started pop up. You will see panel like this:
 
-    ![](./visuals/vsStartMenu.jpg)
+    ![](./visuals/vsStartMenu.JPG)
 
     You will choose "Create a new project."
 
@@ -110,9 +110,9 @@
 
   a. Since we are using the HELICS installer, only the release version is attached. We need to make sure we're running on "Release" and "x64" settings. check that these are set in each tool bar of the projects:
 
-  ![](./visuals/releaseSender.jpg)
+  ![](./visuals/releaseSender.JPG)
 
-  ![](./visuals/releaseReceiver.jpg)
+  ![](./visuals/releaseReceiver.JPG)
 
   b. Go to Project > Properties > C/C++ > All Options > Additional Include Directories > Down Arrow > Edit
 
