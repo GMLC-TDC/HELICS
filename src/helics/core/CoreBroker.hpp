@@ -361,6 +361,7 @@ class CoreBroker: public Broker, public BrokerBase {
 
     /** generate a time barrier request*/
     void generateTimeBarrier(ActionMessage& m);
+    int generateMapObjectCounter() const;
     friend class TimeoutMonitor;
 };
 

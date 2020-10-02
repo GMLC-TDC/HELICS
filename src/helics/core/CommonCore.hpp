@@ -482,7 +482,8 @@ class CommonCore: public Core, public BrokerBase {
     void sendDisconnect();
     /** broadcast a message to all federates*/
     void broadcastToFederates(ActionMessage& cmd);
-
+    /** generate a counter for when to reset object*/
+    int generateMapObjectCounter() const;
     friend class TimeoutMonitor;
 };
 
