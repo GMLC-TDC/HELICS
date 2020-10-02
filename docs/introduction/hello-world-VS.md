@@ -91,21 +91,21 @@
 
   f. Once both projects have been created, we will add their respective source files.
 
-      i. In Solution Explorer,
+  i. In Solution Explorer,
 
-      ```
-      Right click hello_world_sender > Add > Existing item ...
-      ```
+  ```
+  Right click hello_world_sender > Add > Existing item ...
+  ```
 
-      ![](./visuals/addExistingSender.jpg)
+  ![](./visuals/addExistingSender.jpg)
 
-      ii.  Go to the location of where you pulled down the HELICS example:
+  ii.  Go to the location of where you pulled down the HELICS example:
 
-      ![](./visuals/locationSender.jpg)
+  ![](./visuals/locationSender.jpg)
 
-      Click Add. You should see the hello-world_sender.c file appear in the Solutions Explorer under the Source Files.
+  Click Add. You should see the hello-world_sender.c file appear in the Solutions Explorer under the Source Files.
 
-      Now do the same thing with hello_world_receiver.c in the hello_world_receiver Visual Studio project.
+  Now do the same thing with hello_world_receiver.c in the hello_world_receiver Visual Studio project.
 
 **4. Link HELICS in visual studios to run example**
 
