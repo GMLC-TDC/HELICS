@@ -1152,6 +1152,16 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     return {"#invalid"};
 }
 
+void Federate::setQueryCallback(const std::function<std::string(const std::string&)>& queryFunction)
+{
+    if (coreObject) {
+        coreObject->setQueryCallback(fedID, queryFunction);
+    } else {
+        throw(InvalidFunctionCall(
+            " setQueryCallback cannot be called on uninitialized federate or after finalize call"));
+    }
+}
+
 bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
