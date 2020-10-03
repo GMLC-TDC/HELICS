@@ -717,7 +717,7 @@ HELICS_EXPORT helics_message_object helicsMessageClone(helics_message_object mes
 HELICS_EXPORT void helicsMessageFree(helics_message_object message);
 
 /**
- * reset a message to empty state
+ * Reset a message to empty state
  * @param message The message object to copy from.
  * @details The message after this function will be empty, with no source or destination
  * @forcpponly
