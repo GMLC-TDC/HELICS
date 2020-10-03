@@ -38,15 +38,10 @@ _basic_env:
           - valgrind
           - lcov
           - libzmq3-dev
-  - &linux_base
-    os: linux
-    compiler: gcc
 
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
-  allow_failures:
-    - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
     - os: windows
@@ -116,12 +111,6 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-
-    - stage: trigger dependent repositories
-      if: branch IN (master, develop)
-      before_install: true
-      install: true
-      script: scripts/trigger-dependent-ci-builds.sh
 
 branches:
   except:
