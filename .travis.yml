@@ -44,6 +44,12 @@ jobs:
   fast_finish: true
 
   include:
+    - os: Linux
+      name: 'Default nothing job'
+      before-install: echo 'Before Install'
+      install: echo 'Install'
+      script: echo 'Script'
+      
     - os: windows
       name: 'MinGW'
       if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
