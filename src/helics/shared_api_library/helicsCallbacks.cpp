@@ -88,3 +88,26 @@ void helicsFederateSetLoggingCallback(helics_federate fed,
         helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
+
+void helicsFederateSetQueryCallback(helics_federate fed,
+                                    const char* (*queryAnswer)(const char* query, void* userdata),
+                                    void* userdata,
+                                    helics_error* err)
+{
+    auto fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (queryAnswer == nullptr) {
+            fedptr->setQueryCallback({});
+        } else {
+            fedptr->setQueryCallback(
+                [queryAnswer, userdata](const std::string& query) { return std::string(queryAnswer(query.c_str(), userdata)); });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
