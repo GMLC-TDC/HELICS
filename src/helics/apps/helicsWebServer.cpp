@@ -669,12 +669,12 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         case return_val::ok:
         default:
             if (res.second.empty()) {
-                return send(response_ok(index_page,"text/html"));
+                return send(response_ok(index_page, "text/html"));
             }
             if (res.second.front() == '{') {
                 return send(response_ok(res.second, "application/json"));
             }
-            return send(response_ok(res.second,"text/plain"));
+            return send(response_ok(res.second, "text/plain"));
     }
 }
 
