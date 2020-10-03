@@ -594,7 +594,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     // Returns a bad request response
     auto const not_found = [&req](beast::string_view why) {
         http::response<http::string_body> res{http::status::not_found, req.version()};
-        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
+        res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
         res.body() = std::string(why);
@@ -602,49 +602,18 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         return res;
     };
 
-    // generate the main page
-    auto const main_page = [&req]() {
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        if (req.method() != http::verb::head) {
-            res.body() = index_page;
-            res.prepare_payload();
-        } else {
-            res.set(http::field::content_length, index_page.size());
-        }
-        return res;
-    };
-
     // generate a conversion response
-    auto const response_text = [&req](const std::string& value) {
+    auto const response_ok = [&req](const std::string& resp, beast::string_view content_type) {
         http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
-        res.set(http::field::content_type, "text/plain");
-        res.keep_alive(req.keep_alive());
-        if (req.method() != http::verb::head) {
-            res.body() = value;
-            res.prepare_payload();
-        } else {
-            res.set(http::field::content_length, value.size());
-        }
-        return res;
-    };
-
-    // generate a conversion response
-    auto const response_json = [&req](const std::string& resp) {
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
-        res.set(http::field::content_type, "application/json");
+        res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
+        res.set(http::field::content_type, content_type);
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = resp;
             res.prepare_payload();
         } else {
-            res.set(http::field::content_length, resp.size());
+            res.set(http::field::content_length, std::to_string(resp.size()));
         }
-
         return res;
     };
 
@@ -669,7 +638,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     beast::string_view target(req.target());
     if (target == "/index.html" || (target == "/" && !(req.payload_size()))) {
-        return send(main_page());
+        return send(response_ok(index_page, "text/html"));
     }
 
     auto reqpr = processRequestParameters(target, req.body());
@@ -700,12 +669,12 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         case return_val::ok:
         default:
             if (res.second.empty()) {
-                return send(main_page());
+                return send(response_ok(index_page,"text/html"));
             }
             if (res.second.front() == '{') {
-                return send(response_json(res.second));
+                return send(response_ok(res.second, "application/json"));
             }
-            return send(response_text(res.second));
+            return send(response_ok(res.second,"text/plain"));
     }
 }
 
