@@ -38,130 +38,17 @@ _basic_env:
           - valgrind
           - lcov
           - libzmq3-dev
-  - &daily_osx
-    if: type = cron
-    os: osx
-    compiler: clang
-  - &linux_base
-    os: linux
-    compiler: gcc
-  - &osx_base
-    os: osx
-    compiler: clang
-
-# Install macOS dependencies using Homebrew
-addons:
-  homebrew:
-    brewfile: .ci/Brewfile.travis
-    update: true
 
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
-  allow_failures:
-    - os: osx
-    - name: 'Clang 5 Thread Sanitizer'
-    - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
-    # XCode 10.2, OS X 10.14
-    - <<: *osx_base
-      name: 'XCode 10.2, OS X 10.14'
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-        - CI_TEST_EXCLUDE="application-api-ci-tests|system-ci-tests"
-      osx_image: xcode10.2
-
-    # XCode 9.4, OS X 10.13
-    - <<: *osx_base
-      name: 'XCode 9.4, macOS 10.13'
-      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=94"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-        - USE_SWIG=false
-      osx_image: xcode9.4
-      addons:
-        homebrew:
-          brewfile: .ci/Brewfile-minimal.travis
-          update: true
-
-    - <<: *linux_base
-      name: 'GCC 6'
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true
-        - USE_CMAKE_VERSION=3.7.2
-        - BUILD_BENCHMARKS=true
-        - USE_MPI=mpich
-
-    # Clang 5 build
-    - <<: *linux_base
-      name: 'Clang 5'
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - libstdc++-6-dev
-            - clang-5.0
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
-        - CCACHE_CPP2=yes
-        - USE_SWIG=true
-        - BUILD_BENCHMARKS=true
-        - USE_CMAKE_VERSION=3.14.5
-        - CXX_STANDARD=17
-
-    - <<: *linux_base
-      name: 'GCC 4.9 (No SWIG, Packaging)'
-      if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
-        - USE_SWIG=false
-        - CI_BOOST_VERSION=1.61.0
-        - ENABLE_CPACK=true
-        - INSTALL_SYSTEM_LIBRARIES=true
-        - TEST_TYPE=Packaging
-      after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
-
-    - <<: *linux_base
-      name: 'Clang 3.6'
-      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-          packages:
-            - clang-3.6
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
-        - CCACHE_CPP2=yes
-        - USE_SWIG=true
-        - CI_BOOST_VERSION=1.58.0
-        - SKIP_TEST_RUN=true
-        - JOB_OPTION_FLAGS="-DHELICS_DISABLE_BOOST=ON"
+    - os: Linux
+      name: 'Default nothing job'
+      before-install: echo 'Before Install'
+      install: echo 'Install'
+      script: echo 'Script'
 
     - os: windows
       name: 'MinGW'
@@ -205,19 +92,6 @@ jobs:
         - export SHELL_CMD+=" -msys2 -c \$\* --"
         - $SHELL_CMD pacman -Sy --noconfirm --needed base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-zeromq
 
-    # -----------------------------------------------
-    # Daily ZMQ subproject build with new CMake
-    # -----------------------------------------------
-    - <<: *daily_linux
-      name: 'GCC 6 (CMake 3.11.4, ZMQ Subproject)'
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true
-        - SKIP_TEST_RUN=true
-        - USE_CMAKE_VERSION=3.11.4
-        - ZMQ_SUBPROJECT=true
-        - ZMQ_FORCE_SUBPROJECT=true
-
     # ------------------------------------------------
     # Jobs for daily valgrind and code coverage tests
     # ------------------------------------------------
@@ -243,12 +117,6 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-
-    - stage: trigger dependent repositories
-      if: branch IN (master, develop)
-      before_install: true
-      install: true
-      script: scripts/trigger-dependent-ci-builds.sh
 
 branches:
   except:
