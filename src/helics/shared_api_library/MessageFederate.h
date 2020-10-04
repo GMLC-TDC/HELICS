@@ -709,11 +709,22 @@ HELICS_EXPORT helics_message_object helicsMessageClone(helics_message_object mes
 
 /**
  * Free a message object from memory
+ * @param message The message object to copy from.
  * @details memory for message is managed so not using this function does not create memory leaks, this is an indication
  * to the system that the memory for this message is done being used and can be reused for a new message.
  * helicsFederateClearMessages() can also be used to clear up all stored messages at once
  */
 HELICS_EXPORT void helicsMessageFree(helics_message_object message);
+
+/**
+ * Reset a message to empty state
+ * @param message The message object to copy from.
+ * @details The message after this function will be empty, with no source or destination
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsMessageClear(helics_message_object message, helics_error* err);
 
 /**@}*/
 #ifdef __cplusplus

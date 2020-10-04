@@ -508,6 +508,14 @@ TEST(message_object, copy)
 
     EXPECT_EQ(helicsMessageCheckFlag(m2, 4), helics_true);
 
+    helicsMessageClear(m2, &err);
+
+    EXPECT_EQ(helicsMessageIsValid(m2), helics_false);
+
+    EXPECT_EQ(helicsMessageCheckFlag(m2, 4), helics_false);
+
+    EXPECT_EQ(helicsMessageGetRawDataSize(m2), 0);
+
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);
     helicsBrokerDisconnect(brk, nullptr);

@@ -990,6 +990,15 @@ void helicsMessageAppendData(helics_message_object message, const void* data, in
     mess->data.append(static_cast<const char*>(data), inputDataLength);
 }
 
+void helicsMessageClear(helics_message_object message, helics_error* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return;
+    }
+    mess->clear();
+}
+
 void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error* err)
 {
     auto* mess_src = getMessageObj(source_message, err);
