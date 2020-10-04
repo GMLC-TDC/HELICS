@@ -1056,6 +1056,16 @@ void helicsMessageAppendData(helics_message message, const void* data, int input
     mess->data.append(std::string_view{static_cast<const char*>(data), static_cast<std::size_t>(inputDataLength)});
 }
 
+void helicsMessageClear(helics_message_object message, helics_error* err)
+{
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return;
+    }
+    mess->clear();
+}
+
+
 void helicsMessageCopy(helics_message source_message, helics_message dest_message, helics_error* err)
 {
     auto* mess_src = getMessageObj(source_message, err);
