@@ -11,20 +11,20 @@ cmake_minimum_required(VERSION 3.4)
 # Make sure users don't get warnings on a tested (3.4 to 3.17) version of CMake. For most of the
 # policies, the new version is better (hence the change). We don't use the 3.0...3.16 syntax because
 # of a bug in MSVC 15.7 built-in and modified CMake 3.11
-if(CMAKE_VERSION VERSION_LESS 3.17)
+if(CMAKE_VERSION VERSION_LESS 3.18)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 else()
-    cmake_policy(VERSION 3.17)
+    cmake_policy(VERSION 3.18)
 endif()
 
-project(HELICS VERSION 2.6.0)
+project(HELICS VERSION 2.6.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-08-20")
+set(HELICS_DATE "2020-10-04")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
