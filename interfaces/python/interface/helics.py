@@ -3757,11 +3757,22 @@ def helicsMessageClone(message: "helics_message_object") -> "helics_message_obje
 def helicsMessageFree(message: "helics_message_object") -> "void":
     r"""
     Free a message object from memory
+    :type message: void
+    :param message: The message object to copy from.
     memory for message is managed so not using this function does not create memory leaks, this is an indication
     to the system that the memory for this message is done being used and can be reused for a new message.
     helicsFederateClearMessages() can also be used to clear up all stored messages at once
     """
     return _helics.helicsMessageFree(message)
+
+def helicsMessageClear(message: "helics_message_object") -> "void":
+    r"""
+    Reset a message to empty state
+    :type message: void
+    :param message: The message object to copy from.
+    The message after this function will be empty, with no source or destination
+    """
+    return _helics.helicsMessageClear(message)
 
 def helicsFederateRegisterFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""

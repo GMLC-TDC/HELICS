@@ -3154,12 +3154,22 @@ public class helics {
 
   /**
    * Free a message object from memory<br>
+   * @param message The message object to copy from.<br>
    * memory for message is managed so not using this function does not create memory leaks, this is an indication<br>
    * to the system that the memory for this message is done being used and can be reused for a new message.<br>
    * helicsFederateClearMessages() can also be used to clear up all stored messages at once
    */
   public static void helicsMessageFree(SWIGTYPE_p_void message) {
     helicsJNI.helicsMessageFree(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  /**
+   * Reset a message to empty state<br>
+   * @param message The message object to copy from.<br>
+   * The message after this function will be empty, with no source or destination
+   */
+  public static void helicsMessageClear(SWIGTYPE_p_void message) {
+    helicsJNI.helicsMessageClear(SWIGTYPE_p_void.getCPtr(message));
   }
 
   /**
