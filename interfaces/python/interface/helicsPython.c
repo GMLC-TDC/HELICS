@@ -15213,6 +15213,46 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsMessageClear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageClear" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  helicsMessageClear(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateRegisterFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -18779,9 +18819,17 @@ static PyMethodDef SwigMethods[] = {
 		""},
 	 { "helicsMessageFree", _wrap_helicsMessageFree, METH_O, "\n"
 		"Free a message object from memory\n"
+		":type message: void\n"
+		":param message: The message object to copy from.\n"
 		"memory for message is managed so not using this function does not create memory leaks, this is an indication\n"
 		"to the system that the memory for this message is done being used and can be reused for a new message.\n"
 		"helicsFederateClearMessages() can also be used to clear up all stored messages at once\n"
+		""},
+	 { "helicsMessageClear", _wrap_helicsMessageClear, METH_O, "\n"
+		"Reset a message to empty state\n"
+		":type message: void\n"
+		":param message: The message object to copy from.\n"
+		"The message after this function will be empty, with no source or destination\n"
 		""},
 	 { "helicsFederateRegisterFilter", _wrap_helicsFederateRegisterFilter, METH_VARARGS, "\n"
 		"Create a source Filter on the specified federate.\n"
