@@ -6,6 +6,7 @@ on:
   # packages - a list of which packages to build (everything, archive, msvc, installer, sharedlib)
   # commit (optional) - the commit-ish to do a release build with
   repository_dispatch:
+  workflow_dispatch:
   schedule:
     - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
   release:
