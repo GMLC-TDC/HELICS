@@ -363,6 +363,16 @@ class HELICS_CXX_EXPORT Federate {
     */
     bool isQueryCompleted(query_id_t queryIndex) const;
 
+    /** supply a query callback function
+  @details the intention of the query callback is to allow federates to answer particular requests
+  through the query interface this allows other federates to make requests or queries of other
+  federates in an asynchronous fashion.
+  @param queryFunction  a function object that returns a string as a result of a query in the form
+  of const string ref. This callback will be called when a federate received a query that cannot
+  be answered that directed at a particular federate
+  */
+    void setQueryCallback(const std::function<std::string(const std::string&)>& queryFunction);
+
     /** set a federation global value
     @details this overwrites any previous value for this name
     @param valueName the name of the global to set
