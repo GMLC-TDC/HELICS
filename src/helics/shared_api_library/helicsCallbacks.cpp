@@ -88,3 +88,59 @@ void helicsFederateSetLoggingCallback(helics_federate fed,
         helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
+
+void helicsFederateSetQueryCallback(helics_federate fed,
+                                    void (*queryAnswer)(const char* query, int querySize, helics_query_buffer buffer, void* userdata),
+                                    void* userdata,
+                                    helics_error* err)
+{
+    auto fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (queryAnswer == nullptr) {
+            fedptr->setQueryCallback({});
+        } else {
+            fedptr->setQueryCallback(
+                [queryAnswer, userdata](const std::string& query) {
+                std::string buffer(1, '>');
+                    queryAnswer(query.c_str(),static_cast<int>(query.size()), &buffer,userdata);
+                buffer.pop_back();
+                return buffer;
+                });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
+
+
+void helicsQueryBufferFill(helics_query_buffer buffer, const char* string, int stringSize, helics_error* err)
+{
+    static const char* invalidBuffer = "The given buffer is not valid";
+
+    if (((err) != nullptr) && ((err)->error_code != 0)) {
+        return;
+    }                                                        
+    if (buffer == nullptr) {
+        assignError(err, helics_error_invalid_object, invalidBuffer);
+        return;
+    }
+   
+    auto * bufferStr = reinterpret_cast<std::string*>(buffer);
+    if (bufferStr->empty()||bufferStr->back()!='>') {
+        assignError(err, helics_error_invalid_object, invalidBuffer);
+        return;
+    }
+    if (stringSize <= 0||string==nullptr)
+    {
+        bufferStr->clear();
+        bufferStr->push_back('>');
+    }
+    bufferStr->reserve(stringSize + 1);
+    bufferStr->assign(string, string + stringSize);
+    bufferStr->push_back('>');
+}
