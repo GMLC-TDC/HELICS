@@ -162,9 +162,9 @@ class FederateInfo {
 namespace details {
     /** helper function for the callback executor for queries*/
     inline void helicCppQueryCallbackExecutor(const char* query,
-                                       int stringSize,
-                                       helics_query_buffer buffer,
-                                       void* userData)
+                                              int stringSize,
+                                              helics_query_buffer buffer,
+                                              void* userData)
     {
         auto cback = reinterpret_cast<std::function<std::string(const std::string&)>*>(userData);
         std::string val(query, stringSize);
@@ -220,9 +220,8 @@ class Federate {
         if (fed != HELICS_NULL_POINTER) {
             helicsFederateFree(fed);
         }
-#    if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
-        if (callbackBuffer != nullptr)
-        {
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+        if (callbackBuffer != nullptr) {
             auto cback =
                 reinterpret_cast<std::function<std::string(const std::string&)>*>(callbackBuffer);
             delete cback;
@@ -506,16 +505,16 @@ class Federate {
         helicsFederateSetQueryCallback(fed, queryAnswer, userdata, hThrowOnError());
     }
 
-#    if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
-    void setQueryCallback(
-        std::function<std::string(const std::string &)> callback)
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+    void setQueryCallback(std::function<std::string(const std::string&)> callback)
 
     {
         callbackBuffer = new std::function<std::string(const std::string&)>(std::move(callback));
-        helicsFederateSetQueryCallback(fed, details::helicCppQueryCallbackExecutor, callbackBuffer,
+        helicsFederateSetQueryCallback(fed,
+                                       details::helicCppQueryCallbackExecutor,
+                                       callbackBuffer,
                                        hThrowOnError());
     }
-
 
 #endif
     /** define a filter interface
@@ -648,10 +647,9 @@ class Federate {
   protected:
     helics_federate fed;  //!< underlying helics_federate object
     bool exec_async_iterate;  //!< indicator that the federate is in an async operation
-    void* callbackBuffer; //!< buffer to contain pointer to a callback
+    void* callbackBuffer;  //!< buffer to contain pointer to a callback
 };
 
 }  // namespace helicscpp
-
 
 #endif

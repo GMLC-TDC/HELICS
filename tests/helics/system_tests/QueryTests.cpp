@@ -863,7 +863,6 @@ TEST_F(query, queries_callback_test)
     vFed1->finalize();
 }
 
-
 TEST_F(query, concurrent_callback)
 {
     SetupTest<helics::ValueFederate>("test", 2);
