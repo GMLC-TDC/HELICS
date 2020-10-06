@@ -95,7 +95,7 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateFinalizeComplete(vFed1, &err));
 }
 
-static void queryTest(const char* query, int stringSize, helics_query_buffer buffer, void*)
+static void queryTest(const char* query, int stringSize, helics_query_buffer buffer, void* /*unused*/)
 {
     static const char* aret = "AAAA";
     static const char* bret = "BBBB";

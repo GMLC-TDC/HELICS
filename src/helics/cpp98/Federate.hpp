@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
 #    include <functional>
+#    include <utility>
 #endif
 
 namespace helicscpp {
