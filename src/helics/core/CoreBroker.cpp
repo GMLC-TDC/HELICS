@@ -2716,6 +2716,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back(']');
     return gidString;
 }
+
 void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset)
 {
     if (!isValidIndex(index, mapBuilders)) {
