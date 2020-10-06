@@ -23,7 +23,7 @@ void helicsBrokerSetLoggingCallback(helics_broker broker,
                                     void* userdata,
                                     helics_error* err)
 {
-    auto brk = getBroker(broker, err);
+    auto* brk = getBroker(broker, err);
     if (brk == nullptr) {
         return;
     }
@@ -46,7 +46,7 @@ void helicsCoreSetLoggingCallback(helics_core core,
                                   void* userdata,
                                   helics_error* err)
 {
-    auto cr = getCore(core, err);
+    auto* cr = getCore(core, err);
     if (cr == nullptr) {
         return;
     }
@@ -70,7 +70,7 @@ void helicsFederateSetLoggingCallback(helics_federate fed,
                                       void* userdata,
                                       helics_error* err)
 {
-    auto fedptr = getFed(fed, err);
+    auto* fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
         return;
     }
@@ -94,7 +94,7 @@ void helicsFederateSetQueryCallback(helics_federate fed,
                                     void* userdata,
                                     helics_error* err)
 {
-    auto fedptr = getFed(fed, err);
+    auto* fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
         return;
     }
