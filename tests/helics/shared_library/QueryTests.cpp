@@ -98,12 +98,12 @@ TEST_P(query_tests, broker_queries)
 static void
     queryTest(const char* query, int stringSize, helics_query_buffer buffer, void* /*unused*/)
 {
-    static const char* aret = "AAAA";
-    static const char* bret = "BBBB";
     std::string q(query, stringSize);
     if (q == "abc") {
+        static const char* aret = "AAAA";
         helicsQueryBufferFill(buffer, aret, 4, nullptr);
     } else {
+        static const char* bret = "BBBB";
         helicsQueryBufferFill(buffer, bret, 4, nullptr);
     }
 }
@@ -124,7 +124,7 @@ TEST_F(query_test_single, queries_callback_test)
     q1 = helicsCreateQuery(helicsFederateGetName(vFed1), "bca");
     res = helicsQueryExecute(q1, vFed1, nullptr);
     EXPECT_STREQ(res, "BBBB");
-
+    helicsQueryFree(q1);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
     helicsFederateFinalize(vFed1, nullptr);
 }
