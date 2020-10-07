@@ -648,7 +648,7 @@ class Federate {
   protected:
     helics_federate fed;  //!< underlying helics_federate object
     bool exec_async_iterate;  //!< indicator that the federate is in an async operation
-#    if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
   private:
     void* callbackBuffer{nullptr};  //!< buffer to contain pointer to a callback
 #endif
