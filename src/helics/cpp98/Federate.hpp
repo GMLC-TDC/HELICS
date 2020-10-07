@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../shared_api_library/MessageFilters.h"
 #include "../shared_api_library/helics.h"
+#include "../shared_api_library/helicsCallbacks.h"
 #include "Filter.hpp"
 #include "config.hpp"
 #include "helicsExceptions.hpp"
@@ -17,6 +18,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <string>
 #include <vector>
+
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+#    include <functional>
+#    include <utility>
+#endif
 
 namespace helicscpp {
 /** hold federate information in the C++98 API*/
@@ -153,6 +159,22 @@ class FederateInfo {
     helics_federate_info fi;  //!< handle for the underlying federate_info object
 };
 
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+namespace details {
+    /** helper function for the callback executor for queries*/
+    inline void helicCppQueryCallbackExecutor(const char* query,
+                                              int stringSize,
+                                              helics_query_buffer buffer,
+                                              void* userData)
+    {
+        auto cback = reinterpret_cast<std::function<std::string(const std::string&)>*>(userData);
+        std::string val(query, stringSize);
+        std::string result = (*cback)(val);
+        helicsQueryBufferFill(buffer, result.c_str(), static_cast<int>(result.size()), nullptr);
+    }
+}  // namespace details
+#endif
+
 /** an iteration time structure */
 typedef struct {
   public:
@@ -199,6 +221,13 @@ class Federate {
         if (fed != HELICS_NULL_POINTER) {
             helicsFederateFree(fed);
         }
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+        if (callbackBuffer != nullptr) {
+            auto cback =
+                reinterpret_cast<std::function<std::string(const std::string&)>*>(callbackBuffer);
+            delete cback;
+        }
+#endif
     }
     /** cast operator to get the underlying helics_federate object*/
     operator helics_federate() const { return fed; }
@@ -469,6 +498,26 @@ class Federate {
         return result;
     }
 
+    void setQueryCallback(
+        void (*queryAnswer)(const char* query, int querySize, helics_query_buffer, void* userdata),
+        void* userdata)
+
+    {
+        helicsFederateSetQueryCallback(fed, queryAnswer, userdata, hThrowOnError());
+    }
+
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+    void setQueryCallback(std::function<std::string(const std::string&)> callback)
+
+    {
+        callbackBuffer = new std::function<std::string(const std::string&)>(std::move(callback));
+        helicsFederateSetQueryCallback(fed,
+                                       details::helicCppQueryCallbackExecutor,
+                                       callbackBuffer,
+                                       hThrowOnError());
+    }
+
+#endif
     /** define a filter interface
     @details a filter will modify messages coming from or going to target endpoints
     @param type the type of the filter to register
@@ -599,7 +648,12 @@ class Federate {
   protected:
     helics_federate fed;  //!< underlying helics_federate object
     bool exec_async_iterate;  //!< indicator that the federate is in an async operation
+#    if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+  private:
+    void* callbackBuffer{nullptr};  //!< buffer to contain pointer to a callback
+#endif
 };
 
 }  // namespace helicscpp
+
 #endif

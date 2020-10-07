@@ -98,6 +98,44 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(helics_filter filter,
                                                  void* userdata,
                                                  helics_error* err);
 
+/**
+ * Set callback for queries executed against a federate
+ *
+ * @details There are many queries that HELICS understands directly, but it is occasionally useful to have a federate be able to respond
+ * to specific queries with answers specific to a federate
+ *
+ * @param fed The federate to set the callback for
+ * @param queryAnswer A callback with signature const char *(const char *query, int querySize,int *answerSize, void *userdata);
+ *                 The function arguments are the query string requesting an answer along with its size, the string is not guaranteed to be
+ * null terminated answerSize is an outputParameter intended to filled out by the userCallback and should contain the length of the return
+ * string. the return pointer can be NULL if no answer is given and HELICS will generate the appropriate response.
+ * @param userdata A pointer to user data that is passed to the function when executing.
+ * @forcpponly
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ */
+
+HELICS_EXPORT void
+    helicsFederateSetQueryCallback(helics_federate fed,
+                                   void (*queryAnswer)(const char* query, int querySize, helics_query_buffer buffer, void* userdata),
+                                   void* userdata,
+                                   helics_error* err);
+
+/**
+ * Set the data for a query callback
+ *
+ * @details There are many queries that HELICS understands directly, but it is occasionally useful to have a federate be able to respond
+ * to specific queries with answers specific to a federate
+ *
+ * @param buffer the buffer received in a helicsQueryCallback
+ * @param str pointer to the data to fill the buffer with
+ * @param strSize the size of the string
+ * @forcpponly
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsQueryBufferFill(helics_query_buffer buffer, const char* str, int strSize, helics_error* err);
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

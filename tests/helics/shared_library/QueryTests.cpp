@@ -6,10 +6,14 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ctestFixtures.hpp"
+#include "helics/shared_api_library/helicsCallbacks.h"
 
 #include <gtest/gtest.h>
 
 class query_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
+};
+
+class query_test_single: public ::testing::Test, public FederateTestFixture {
 };
 /** test simple creation and destruction*/
 TEST_P(query_tests, publication_queries)
@@ -89,6 +93,40 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateFinalizeAsync(vFed1, &err));
     CE(helicsFederateFinalize(vFed2, &err));
     CE(helicsFederateFinalizeComplete(vFed1, &err));
+}
+
+static void
+    queryTest(const char* query, int stringSize, helics_query_buffer buffer, void* /*unused*/)
+{
+    static const char* aret = "AAAA";
+    static const char* bret = "BBBB";
+    std::string q(query, stringSize);
+    if (q == "abc") {
+        helicsQueryBufferFill(buffer, aret, 4, nullptr);
+    } else {
+        helicsQueryBufferFill(buffer, bret, 4, nullptr);
+    }
+}
+
+TEST_F(query_test_single, queries_callback_test)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+
+    helicsFederateSetQueryCallback(vFed1, queryTest, nullptr, nullptr);
+
+    auto q1 = helicsCreateQuery(helicsFederateGetName(vFed1), "abc");
+
+    auto res = helicsQueryExecute(q1, vFed1, nullptr);
+    EXPECT_STREQ(res, "AAAA");
+
+    helicsQueryFree(q1);
+    q1 = helicsCreateQuery(helicsFederateGetName(vFed1), "bca");
+    res = helicsQueryExecute(q1, vFed1, nullptr);
+    EXPECT_STREQ(res, "BBBB");
+
+    helicsFederateEnterExecutingMode(vFed1, nullptr);
+    helicsFederateFinalize(vFed1, nullptr);
 }
 
 INSTANTIATE_TEST_SUITE_P(query_tests, query_tests, ::testing::ValuesIn(core_types));
