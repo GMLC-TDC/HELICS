@@ -1099,8 +1099,7 @@ TEST(valuefederate, file_and_config)
 
     auto file1 = std::string(TEST_DIR) + "fed1_config.json";
     auto file2 = std::string(TEST_DIR) + "fed2_config.json";
-    auto Fed1 =
-        std::make_shared<helics::ValueFederate>(file1);
+    auto Fed1 = std::make_shared<helics::ValueFederate>(file1);
     auto Fed2 = std::make_shared<helics::ValueFederate>(file2);
 
     Fed1->registerInterfaces(file1);
@@ -1121,19 +1120,18 @@ TEST(valuefederate, file_and_config)
     p1.publish(std::complex<double>(1, 2));
 
     Fed1->requestTimeAsync(1.0);
-    auto t2=Fed2->requestTime(1.0);
-    EXPECT_EQ(t2, 0.5); //fed2 has wait_for_current_time flag active
+    auto t2 = Fed2->requestTime(1.0);
+    EXPECT_EQ(t2, 0.5);  // fed2 has wait_for_current_time flag active
     Fed2->requestTimeAsync(1.0);
     Fed1->requestTimeComplete();
-    auto val=i1.getValue<std::complex<double>>();
+    auto val = i1.getValue<std::complex<double>>();
 
     EXPECT_EQ(val, std::complex<double>(1, 2));
 
     Fed1->finalize();
-    t2=Fed2->requestTimeComplete();
+    t2 = Fed2->requestTimeComplete();
     EXPECT_EQ(t2, 1.0);
     Fed2->finalize();
-
 }
 
 TEST(valuefederate, duplicate_targets)
@@ -1144,7 +1142,6 @@ TEST(valuefederate, duplicate_targets)
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
     auto& p1 = Fed1->registerGlobalPublication<int64_t>("pub");
-    
 
     auto& s1 = Fed1->registerGlobalInput<int64_t>("inp");
 
