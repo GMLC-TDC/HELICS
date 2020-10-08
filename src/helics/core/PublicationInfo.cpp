@@ -19,10 +19,8 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
 
 bool PublicationInfo::addSubscriber(global_handle newSubscriber)
 {
-    for (const auto &sub : subscribers)
-    {
-        if (sub == newSubscriber)
-        {
+    for (const auto& sub : subscribers) {
+        if (sub == newSubscriber) {
             return false;
         }
     }

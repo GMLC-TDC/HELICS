@@ -115,10 +115,8 @@ bool InputInfo::addSource(global_handle newSource,
                           const std::string& stype,
                           const std::string& sunits)
 {
-    for (const auto &is : input_sources)
-    {
-        if (is == newSource)
-        {
+    for (const auto& is : input_sources) {
+        if (is == newSource) {
             return false;
         }
     }
