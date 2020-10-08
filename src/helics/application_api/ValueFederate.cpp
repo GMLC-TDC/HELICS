@@ -251,8 +251,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 auto units = getOrDefault(sub, "unit", emptyStr);
                 replaceIfMember(sub, "units", units);
                 subAct = &registerInput(emptyStr, type, units);
+                subAct->addTarget(key);
             }
-            subAct->addTarget(key);
+            
             loadOptions(this, sub, *subAct);
         }
     }
