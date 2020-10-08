@@ -1132,6 +1132,7 @@ TEST(valuefederate, file_and_config)
     t2 = Fed2->requestTimeComplete();
     EXPECT_EQ(t2, 1.0);
     Fed2->finalize();
+    broker->disconnect();
 }
 
 TEST(valuefederate, duplicate_targets)
