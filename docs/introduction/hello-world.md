@@ -87,7 +87,7 @@ You should see `Hello, World` printed out in the terminal where you ran
 the `hello_world_receiver`.
 
 *For a guide to run this example in Visual Studio go to this link:
-[hello-world-VS](https://helics--1621.org.readthedocs.build/en/1621/introduction/hello-world-VS.html).*
+[hello-world-VS](./hello-world-VS.md).*
 
 
 **Anatomy of a HELICS federation**
