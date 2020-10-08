@@ -353,8 +353,8 @@ class HELICS_CXX_EXPORT Federate {
 
     @param queryIndex the int value returned from the queryAsync call
     @return a string with the value requested.  the format of the string will be either a single
-    string a string vector like "[string1; string2]" or JSON The string "#invalid" is returned if the
-    query was not valid
+    string a string vector like "[string1; string2]" or JSON The string "#invalid" is returned if
+    the query was not valid
     */
     std::string queryComplete(query_id_t queryIndex);
 
