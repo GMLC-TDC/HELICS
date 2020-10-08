@@ -17,6 +17,17 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
     return false;
 }
 
+bool PublicationInfo::addSubscriber(global_handle newSubscriber)
+{
+    for (const auto& sub : subscribers) {
+        if (sub == newSubscriber) {
+            return false;
+        }
+    }
+    subscribers.push_back(newSubscriber);
+    return true;
+}
+
 void PublicationInfo::removeSubscriber(global_handle subscriberToRemove)
 {
     subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove),

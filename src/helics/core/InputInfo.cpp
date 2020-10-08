@@ -110,13 +110,20 @@ void InputInfo::addData(global_handle source_id,
     }
 }
 
-void InputInfo::addSource(global_handle newSource,
+bool InputInfo::addSource(global_handle newSource,
                           const std::string& sourceName,
                           const std::string& stype,
                           const std::string& sunits)
 {
+    for (const auto& is : input_sources) {
+        if (is == newSource) {
+            return false;
+        }
+    }
+    // clear this since it isn't well defined what the units are once a new source is added
     inputUnits.clear();
     inputType.clear();
+
     input_sources.push_back(newSource);
     source_info.emplace_back(sourceName, stype, sunits);
     data_queues.resize(input_sources.size());
@@ -124,10 +131,12 @@ void InputInfo::addSource(global_handle newSource,
     current_data_time.resize(input_sources.size(), {Time::minVal(), 0});
     deactivated.push_back(Time::maxVal());
     has_target = true;
+    return true;
 }
 
 void InputInfo::removeSource(global_handle sourceToRemove, Time minTime)
 {
+    // the inputUnits and type are not determined anymore since the source list has changed
     inputUnits.clear();
     inputType.clear();
     for (size_t ii = 0; ii < input_sources.size(); ++ii) {
