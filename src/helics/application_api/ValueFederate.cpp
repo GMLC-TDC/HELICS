@@ -253,7 +253,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 subAct = &registerInput(emptyStr, type, units);
                 subAct->addTarget(key);
             }
-            
+
             loadOptions(this, sub, *subAct);
         }
     }

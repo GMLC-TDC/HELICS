@@ -126,21 +126,20 @@ void ValueFederateManager::addTarget(const Publication& pub, const std::string& 
 void ValueFederateManager::addTarget(const Input& inp, const std::string& target)
 {
     {
-    auto iTHandle = inputTargets.lock();
-    auto rng = iTHandle->equal_range(inp.handle);
-    for (auto el = rng.first; el != rng.second; ++el) {
-        if (el->second == target) {
-            fed->logWarningMessage(std::string("Duplicate input targets detected for ") +
-                                   inp.actualName + "::" + target);
-            return;
+        auto iTHandle = inputTargets.lock();
+        auto rng = iTHandle->equal_range(inp.handle);
+        for (auto el = rng.first; el != rng.second; ++el) {
+            if (el->second == target) {
+                fed->logWarningMessage(std::string("Duplicate input targets detected for ") +
+                                       inp.actualName + "::" + target);
+                return;
+            }
         }
-    }
     }
 
     coreObject->addSourceTarget(inp.handle, target);
     auto it = inputTargets.lock()->emplace(inp.handle, target);
     targetIDs.lock()->emplace(target, inp.handle);
-    
 }
 
 void ValueFederateManager::removeTarget(const Publication& pub, const std::string& target)
