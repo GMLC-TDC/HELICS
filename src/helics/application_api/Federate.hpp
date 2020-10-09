@@ -369,7 +369,7 @@ class HELICS_CXX_EXPORT Federate {
     federates in an asynchronous fashion.
     @param queryFunction  a function object that returns a string as a result of a query in the form
     of const string ref. This callback will be called when a federate received a query that cannot
-    be answered that directed at a particular federate
+    be answered internally that is directed at that particular federate
     */
     void setQueryCallback(const std::function<std::string(const std::string&)>& queryFunction);
 
