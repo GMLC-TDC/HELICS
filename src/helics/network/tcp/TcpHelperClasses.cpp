@@ -257,13 +257,27 @@ namespace tcp {
                 return 0;
             }
         }
-        auto sz = socket_.send(asio::buffer(buffer, dataLength));
-        assert(sz == dataLength);
-        return sz;
+	
+	size_t	sz,sent_size;
+	int p=0,count=0;
+	sent_size=dataLength;
+        while (count++  < 5 && (sz = socket_.send(asio::buffer((void *)((char *)buffer+p), sent_size))) != sent_size) {
+	   sent_size-=sz; p+=sz;
+	//   std::cerr << "DEBUG partial buffer sent" << std::endl;
+	}
+	if(count < 5 ) return dataLength;
+	else { std::cerr << "TcpConnection send terminated " << std:: endl;  return 0; }
+	
+      //  assert(sz == dataLength);
+      //  return sz;
     }
 
     size_t TcpConnection::send(const std::string& dataString)
     {
+	size_t sz;
+	sz = send(&dataString[0],dataString.size());
+	return sz;
+/*
         if (!isConnected()) {
             if (!waitUntilConnected(300ms)) {
                 std::cerr << "connection timeout waiting again" << std::endl;
@@ -276,6 +290,7 @@ namespace tcp {
         auto sz = socket_.send(asio::buffer(dataString));
         assert(sz == dataString.size());
         return sz;
+*/
     }
 
     size_t TcpConnection::receive(void* buffer, size_t maxDataSize)
