@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <map>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 #include <utility>
 
 namespace helics {

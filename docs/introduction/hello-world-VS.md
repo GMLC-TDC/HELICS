@@ -4,8 +4,8 @@
 
 - To get to the installer you can access it through either of the following links:
 
-  - https://github.com/GMLC-TDC/HELICS/releases
-  - https://docs.helics.org/en/latest/installation/index.html - where you will see this:
+  - [https://github.com/GMLC-TDC/HELICS/releases](https://github.com/GMLC-TDC/HELICS/releases)
+  - [https://docs.helics.org/en/latest/installation/index.html](https://docs.helics.org/en/latest/installation/index.html) - where you will see this:
 
   ![](./visuals/releases.JPG)
 
@@ -25,8 +25,7 @@
 
 - Click through:
 
-
-    Next > I agree > Choose to add system variables if you would like > Next > Choose Destination folder for your install > Next > Choose Start Up Folder > Next > Keep all install components > Install
+Next > I agree > Choose to add system variables if you would like > Next > Choose Destination folder for your install > Next > Choose Start Up Folder > Next > Keep all install components > Install
 
 - This should install HELICS onto Windows and your folder directory should look somewhat like this:
 
@@ -42,16 +41,15 @@
 
     ![](./visuals/lib.JPG)
 
+  - include:
 
-    -  include:
+![](./visuals/include.JPG)
 
-        ![](./visuals/include.JPG)
-
-        ** Keep track where the dynamic and static libraries are. We will need to know these locations to link it in Visual Studios!
+** Keep track where the dynamic and static libraries are. We will need to know these locations to link it in Visual Studios! **
 
 **2. Pull the HELICS example folder down from github**
 
-```
+```cmd
 git clone https://github.com/GMLC-TDC/HELICS-Examples.git
 ```
 
@@ -95,7 +93,7 @@ f. Once both projects have been created, we will add their respective source fil
 
 i. In Solution Explorer,
 
-```
+```txt
 Right click hello_world_sender > Add > Existing item ...
 ```
 
@@ -225,4 +223,4 @@ broker, helics_world_sender, helics_world_receiver, respectively :
 
 ![](./visuals/results.jpg)
 
-##### Congratulations you ran your first HELICS simulation through Visual Studio!
+## Congratulations you ran your first HELICS simulation through Visual Studio!
