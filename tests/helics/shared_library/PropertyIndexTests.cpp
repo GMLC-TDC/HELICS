@@ -26,9 +26,9 @@ TEST(prop_tests, intprops)
 
     EXPECT_EQ(helicsGetPropertyIndex("console_log_level"), helics_property_int_console_log_level);
     EXPECT_EQ(helicsGetPropertyIndex("CONSOLE_LOG_LEVEL"), helics_property_int_console_log_level);
-    EXPECT_EQ(helicsGetPropertyIndex("INT_CONSOLE_LOG_LEVEL"), helics_property_int_console_log_level);
+    EXPECT_EQ(helicsGetPropertyIndex("INT_CONSOLE_LOG_LEVEL"),
+              helics_property_int_console_log_level);
 }
-
 
 TEST(prop_tests, timeprops)
 {
@@ -44,23 +44,23 @@ TEST(prop_tests, timeprops)
     EXPECT_EQ(helicsGetPropertyIndex("TIME_OFFSET"), helics_property_time_offset);
     EXPECT_EQ(helicsGetPropertyIndex("timeoffset"), helics_property_time_offset);
 
-   EXPECT_EQ(helicsGetPropertyIndex("RT_LAG"), helics_property_time_rt_lag);
+    EXPECT_EQ(helicsGetPropertyIndex("RT_LAG"), helics_property_time_rt_lag);
     EXPECT_EQ(helicsGetPropertyIndex("TIME_RT_LAG"), helics_property_time_rt_lag);
-   EXPECT_EQ(helicsGetPropertyIndex("rtlag"), helics_property_time_rt_lag);
+    EXPECT_EQ(helicsGetPropertyIndex("rtlag"), helics_property_time_rt_lag);
 
     EXPECT_EQ(helicsGetPropertyIndex("RT_LEAD"), helics_property_time_rt_lead);
-   EXPECT_EQ(helicsGetPropertyIndex("TIME_RT_LEAD"), helics_property_time_rt_lead);
-   EXPECT_EQ(helicsGetPropertyIndex("rtlead"), helics_property_time_rt_lead);
+    EXPECT_EQ(helicsGetPropertyIndex("TIME_RT_LEAD"), helics_property_time_rt_lead);
+    EXPECT_EQ(helicsGetPropertyIndex("rtlead"), helics_property_time_rt_lead);
 
-     EXPECT_EQ(helicsGetPropertyIndex("RT_TOLERANCE"), helics_property_time_rt_tolerance);
-   EXPECT_EQ(helicsGetPropertyIndex("TIME_RT_TOLERANCE"), helics_property_time_rt_tolerance);
-   EXPECT_EQ(helicsGetPropertyIndex("rttolerance"), helics_property_time_rt_tolerance);
+    EXPECT_EQ(helicsGetPropertyIndex("RT_TOLERANCE"), helics_property_time_rt_tolerance);
+    EXPECT_EQ(helicsGetPropertyIndex("TIME_RT_TOLERANCE"), helics_property_time_rt_tolerance);
+    EXPECT_EQ(helicsGetPropertyIndex("rttolerance"), helics_property_time_rt_tolerance);
 
     EXPECT_EQ(helicsGetPropertyIndex("input_delay"), helics_property_time_input_delay);
-   EXPECT_EQ(helicsGetPropertyIndex("TIME_INPUT_DELAY"), helics_property_time_input_delay);
-   EXPECT_EQ(helicsGetPropertyIndex("INPUT_DELAY"), helics_property_time_input_delay);
+    EXPECT_EQ(helicsGetPropertyIndex("TIME_INPUT_DELAY"), helics_property_time_input_delay);
+    EXPECT_EQ(helicsGetPropertyIndex("INPUT_DELAY"), helics_property_time_input_delay);
 
-   EXPECT_EQ(helicsGetPropertyIndex("output_delay"), helics_property_time_output_delay);
-   EXPECT_EQ(helicsGetPropertyIndex("TIME_OUTPUT_DELAY"), helics_property_time_output_delay);
-   EXPECT_EQ(helicsGetPropertyIndex("OUTPUT_DELAY"), helics_property_time_output_delay);
+    EXPECT_EQ(helicsGetPropertyIndex("output_delay"), helics_property_time_output_delay);
+    EXPECT_EQ(helicsGetPropertyIndex("TIME_OUTPUT_DELAY"), helics_property_time_output_delay);
+    EXPECT_EQ(helicsGetPropertyIndex("OUTPUT_DELAY"), helics_property_time_output_delay);
 }
