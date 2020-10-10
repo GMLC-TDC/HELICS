@@ -2283,7 +2283,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   R"(["exists","isinit","global_state","version","queries","filtered_endpoints","current_time",)") +
+                   R"(["exists","isinit","global_state","version","queries","filtered_endpoints",)") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
