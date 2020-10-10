@@ -6,6 +6,7 @@
 *.player text eol=lf
 
 *.jpg binary
+*.JPG binary
 *.png binary
 *.mat binary
 
