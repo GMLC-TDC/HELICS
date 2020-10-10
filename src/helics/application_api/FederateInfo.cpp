@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <map>
 #include <set>
+#include <unordered_map>
 #include <utility>
 
 namespace helics {
@@ -37,37 +38,63 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static const std::map<std::string, int> propStringsTranslations{
+static const std::unordered_map<std::string, int> propStringsTranslations{
     {"period", helics_property_time_period},
+    {"timeperiod", helics_property_time_period},
+    {"time_period", helics_property_time_period},
     {"timedelta", helics_property_time_delta},
     {"time_delta", helics_property_time_delta},
     {"timeDelta", helics_property_time_delta},
     {"delta", helics_property_time_delta},
     {"offset", helics_property_time_offset},
+    {"timeoffset", helics_property_time_offset},
+    {"time_offset", helics_property_time_offset},
     {"rtlead", helics_property_time_rt_lead},
     {"rtlag", helics_property_time_rt_lag},
     {"rttolerance", helics_property_time_rt_tolerance},
+    {"timertlead", helics_property_time_rt_lead},
+    {"timertlag", helics_property_time_rt_lag},
+    {"timerttolerance", helics_property_time_rt_tolerance},
     {"rtLead", helics_property_time_rt_lead},
     {"rtLag", helics_property_time_rt_lag},
     {"rtTolerance", helics_property_time_rt_tolerance},
     {"rt_lead", helics_property_time_rt_lead},
     {"rt_lag", helics_property_time_rt_lag},
     {"rt_tolerance", helics_property_time_rt_tolerance},
+    {"time_rt_lead", helics_property_time_rt_lead},
+    {"time_rt_lag", helics_property_time_rt_lag},
+    {"time_rt_tolerance", helics_property_time_rt_tolerance},
     {"inputdelay", helics_property_time_input_delay},
     {"outputdelay", helics_property_time_output_delay},
     {"inputDelay", helics_property_time_input_delay},
     {"outputDelay", helics_property_time_output_delay},
     {"input_delay", helics_property_time_input_delay},
     {"output_delay", helics_property_time_output_delay},
-    {"max_iterations", helics_property_int_max_iterations},
+    {"timeinputdelay", helics_property_time_input_delay},
+    {"timeoutputdelay", helics_property_time_output_delay},
+    {"time_input_delay", helics_property_time_input_delay},
+    {"time_output_delay", helics_property_time_output_delay},
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
-    {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
+    {"intloglevel", helics_property_int_log_level},
+    {"int_log_level", helics_property_int_log_level},
+    {"consoleloglevel", helics_property_int_console_log_level},
+    {"console_log_level", helics_property_int_console_log_level},
+    {"intconsoleloglevel", helics_property_int_console_log_level},
+    {"int_console_log_level", helics_property_int_console_log_level},
+    {"fileloglevel", helics_property_int_file_log_level},
+    {"file_log_level", helics_property_int_file_log_level},
+    {"intfileloglevel", helics_property_int_file_log_level},
+    {"int_file_log_level", helics_property_int_file_log_level},
+    {"maxiterations", helics_property_int_max_iterations},
+    {"max_iterations", helics_property_int_max_iterations},
     {"maxIterations", helics_property_int_max_iterations},
+    {"intmaxiterations", helics_property_int_max_iterations},
+    {"int_max_iterations", helics_property_int_max_iterations},
     {"iterations", helics_property_int_max_iterations}};
 
-static const std::map<std::string, int> flagStringsTranslations{
+static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
