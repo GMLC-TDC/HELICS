@@ -72,6 +72,11 @@ typedef void* helics_query;
 typedef void* HelicsQuery;
 
 /**
+ * opaque object representing a string buffer for a query
+ */
+typedef void* helics_query_buffer;
+
+/**
  * opaque object representing a message
  */
 typedef void* helics_message;

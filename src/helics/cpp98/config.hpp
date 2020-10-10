@@ -27,14 +27,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define HELICS_THROWS_EXCEPTION noexcept(false)
 #    define HELICS_NOTHROW noexcept
 #    define HELICS_NULL_POINTER nullptr
+#    define HELICS_HAS_FUNCTIONAL 1
 #elif defined(_MSC_VER) && (_MSC_VER >= 1900)
 #    define HELICS_THROWS_EXCEPTION noexcept(false)
 #    define HELICS_NOTHROW noexcept
 #    define HELICS_NULL_POINTER nullptr
+#    define HELICS_HAS_FUNCTIONAL 1
 #else
 #    define HELICS_THROWS_EXCEPTION throw(HelicsException)
 #    define HELICS_NOTHROW throw()
 #    define HELICS_NULL_POINTER NULL
+#    define HELICS_HAS_FUNCTIONAL 0
 #endif
 
 #define HELICS_IGNORE_ERROR HELICS_NULL_POINTER

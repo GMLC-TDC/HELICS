@@ -868,4 +868,52 @@ TEST_F(query, queries_query)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, queries_callback_test)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    vFed1->setQueryCallback([](const std::string& queryStr) {
+        return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
+    });
+
+    auto res = vFed1->query("abc");
+    EXPECT_EQ(res, "AAAA");
+    res = vFed1->query("bca");
+    EXPECT_EQ(res, "BBBB");
+    vFed1->enterInitializingMode();
+    vFed1->finalize();
+}
+
+TEST_F(query, concurrent_callback)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed1->registerGlobalInput<double>("ipt1");
+    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
+    p1.addTarget("ipt1");
+
+    vFed1->setQueryCallback([](const std::string& queryStr) {
+        return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
+    });
+
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
+
+    vFed1->enterExecutingModeAsync();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query(vFed1->getName(), "abc");
+    EXPECT_EQ(res, "AAAA");
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    res = core->query(vFed1->getName(), "bca");
+    EXPECT_EQ(res, "BBBB");
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
 #endif

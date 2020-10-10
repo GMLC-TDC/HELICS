@@ -808,14 +808,16 @@ class Core {
     */
     virtual void setQueryCallback(LocalFederateId federateID,
                                   std::function<std::string(std::string_view)> queryFunction) = 0;
+
     /**
      * setter for the interface information
      * @param handle the identifiers for the interface to set the info data on
      * @param info a string containing the info data
      */
     virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) = 0;
+
     /**
-     * gett for the interface information
+     * getter for the interface information
      * @param handle the identifiers for the interface to query
      * @return a string containing the Info data stored in an interface
      */
