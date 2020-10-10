@@ -161,6 +161,7 @@ workflows:
       - helicsInstall1
       - helicsInstall2
       - helicsgccTSan
+      - helicsoctave
 
   nightly:
     triggers:

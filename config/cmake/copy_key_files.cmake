@@ -35,6 +35,7 @@ macro(copy_key_files_to_target_location target)
 
     endif(WIN32)
 endmacro()
+
 macro(copy_shared_target target shared_target)
     add_custom_command(
         TARGET ${target} POST_BUILD # Adds a post-build event to api tests
@@ -45,9 +46,10 @@ macro(copy_shared_target target shared_target)
             "$<TARGET_FILE_DIR:${target}>/"
     ) # <--this is out- file path
 endmacro()
+
 macro(install_key_files_with_comp comp)
     install(
-        FILES $<TARGET_FILE:helicsSharedLib>
+        FILES $<TARGET_FILE:helics>
         DESTINATION ${comp}
         COMPONENT ${comp}
     )
