@@ -260,7 +260,7 @@ namespace tcp {
 
         size_t sz;
         size_t sent_size{dataLength};
-        int p{0};
+        size_t p{0};
         int count{0};
         while (count++ < 5 &&
                (sz = socket_.send(asio::buffer(reinterpret_cast<const char*>(buffer) + p,
