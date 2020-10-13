@@ -1147,18 +1147,20 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ADD_PUBLISHER: {
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
-                subI->addSource(cmd.getSource(),
-                                cmd.name,
-                                cmd.getString(typeStringLoc),
-                                cmd.getString(unitStringLoc));
-                addDependency(cmd.source_id);
+                if (subI->addSource(cmd.getSource(),
+                                    cmd.name,
+                                    cmd.getString(typeStringLoc),
+                                    cmd.getString(unitStringLoc))) {
+                    addDependency(cmd.source_id);
+                }
             }
         } break;
         case CMD_ADD_SUBSCRIBER: {
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
-                pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
-                addDependent(cmd.source_id);
+                if (pubI->addSubscriber(cmd.getSource())) {
+                    addDependent(cmd.source_id);
+                }
             }
         } break;
         case CMD_ADD_DEPENDENCY:
