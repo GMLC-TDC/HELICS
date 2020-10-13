@@ -198,7 +198,7 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
 std::string makePortAddress(const std::string& networkInterface, int portNumber)
 {
     std::string newAddress = networkInterface;
-    if (portNumber >= 0) {
+    if (portNumber != 0) {
         newAddress.push_back(':');
         newAddress.append(std::to_string(portNumber));
     }
