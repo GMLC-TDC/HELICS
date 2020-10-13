@@ -115,7 +115,7 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     helics_flag_strict_config_checking = 75,
-    
+
 } helics_federate_flags;
 
 /** enumeration of additional core flags*/
