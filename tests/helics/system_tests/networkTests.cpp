@@ -131,11 +131,9 @@ TEST_F(network_tests, test_otherport)
     fed1.enterExecutingMode();
     fed1.finalize();
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
-    if (broker->isConnected())
-    {
+    if (broker->isConnected()) {
         broker->disconnect();
     }
-
 }
 
 TEST_F(network_tests, test_otherport2)
@@ -154,7 +152,6 @@ TEST_F(network_tests, test_otherport2)
         broker->disconnect();
     }
 }
-
 
 TEST_F(network_tests, test_otherport_fail)
 {
