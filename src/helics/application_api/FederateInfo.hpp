@@ -21,8 +21,10 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   public:
     int uniqueKey{0};  //!< location for keying the info for application purposes
     char separator{'/'};  //!< separator for global name of localFederates
-    bool autobroker{false};  //!< specify that the core should generate a broker if not found otherwise
-    bool debugging{false}; //!< specify that the core/federate should operate in a user debugging mode which will turn off some timeouts
+    bool autobroker{
+        false};  //!< specify that the core should generate a broker if not found otherwise
+    bool debugging{false};  //!< specify that the core/federate should operate in a user debugging
+                            //!< mode which will turn off some timeouts
     core_type coreType{core_type::DEFAULT};  //!< the type of the core
     int brokerPort{-1};  //!< broker port information
 

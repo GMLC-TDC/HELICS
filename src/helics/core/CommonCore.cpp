@@ -3868,7 +3868,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             no_ping = checkActionFlag(cmd, indicator_flag);
             break;
         case defs::flags::debugging:
-            debugging = no_ping= checkActionFlag(cmd, indicator_flag);
+            debugging = no_ping = checkActionFlag(cmd, indicator_flag);
             break;
         case UPDATE_LOGGING_CALLBACK:
             if (checkActionFlag(cmd, empty_flag)) {
