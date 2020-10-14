@@ -136,7 +136,7 @@ int NetworkCommsInterface::findOpenPort(int count, const std::string& host)
 {
     if (openPorts.getDefaultStartingPort() < 0) {
         auto dport = PortNumber - getDefaultBrokerPort();
-        auto start = (dport < 10 * count && dport > 0) ?
+        auto start = (dport < 10 * count && dport >= 0) ?
             getDefaultBrokerPort() + 10 * count * (dport + 1) :
             PortNumber + 5 * count;
         openPorts.setStartingPortNumber(start);
