@@ -212,7 +212,8 @@ class BrokerBase {
     void setErrorState(int eCode, const std::string& estring);
     /** set the logging file if using the default logger*/
     void setLoggingFile(const std::string& lfile);
-
+    /** get the value of a particular flag*/
+    bool getFlagValue(int32_t flag) const;
   public:
     /** generate a callback function for the logging purposes*/
     std::function<void(int, const std::string&, const std::string&)> getLoggingCallback() const;
