@@ -847,6 +847,8 @@ bool CommonCore::getFlagOption(local_federate_id federateID, int32_t flag) const
         case defs::flags::single_thread_federate:
         case defs::flags::rollback:
             return false;
+        default:
+            break;
     }
 
     if (federateID == local_core_id) {
