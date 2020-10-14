@@ -132,6 +132,9 @@ typedef enum {
         If the federate goes offline there is no good way to detect it so use with caution
         */
     helics_flag_slow_responding = 29,
+    /** flag specifying the federate/core/broker is operating in a user debug mode so deadlock timers and timeout are disabled
+    this flag is a combination of slow_responding and disabling of some timeouts*/
+    helics_flag_debugging = 31,
     /** specify that a federate error should terminate the federation*/
     helics_flag_terminate_on_error = 72,
     /** specify that the log files should be flushed on every log message*/

@@ -70,6 +70,7 @@ class BrokerBase {
         false};  //!< flag indicating the broker should use a conservative time policy
     bool terminate_on_error{
         false};  //!< flag indicating that the federation should halt on any error
+    bool debugging{false};  //!< flag indicating operation in a user debugging mode
   private:
     std::atomic<bool> mainLoopIsRunning{
         false};  //!< flag indicating that the main processing loop is running
