@@ -214,6 +214,7 @@ class BrokerBase {
     void setLoggingFile(const std::string& lfile);
     /** get the value of a particular flag*/
     bool getFlagValue(int32_t flag) const;
+
   public:
     /** generate a callback function for the logging purposes*/
     std::function<void(int, const std::string&, const std::string&)> getLoggingCallback() const;
