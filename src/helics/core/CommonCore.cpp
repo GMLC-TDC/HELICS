@@ -833,7 +833,23 @@ void CommonCore::setFlagOption(LocalFederateId federateID, int32_t flag, bool fl
 
 bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
 {
-    if (federateID == gLocalCoreId) {
+    switch (flag) {
+        case defs::flags::enable_init_entry:
+            return (delayInitCounter.load() == 0);
+        case defs::flags::delay_init_entry:
+            return (delayInitCounter.load() != 0);
+        case defs::flags::dumplog:
+        case defs::flags::force_logging_flush:
+            return getFlagValue(flag);
+        case defs::flags::forward_compute:
+        case defs::flags::single_thread_federate:
+        case defs::flags::rollback:
+            return false;
+        default:
+            break;
+    }
+
+    if (federateID == local_core_id) {
         return false;
     }
     auto* fed = getFederateAt(federateID);
@@ -985,7 +1001,7 @@ const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
         }
     }
     return emptyStr;
-}
+}  // namespace helics
 
 const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
 {
