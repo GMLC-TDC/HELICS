@@ -146,6 +146,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--conservative_time_policy,--restrictive_time_policy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
+    hApp->add_flag(
+        "--debugging",
+        debugging,
+        "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
     hApp->add_flag("--terminate_on_error,--halt_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
@@ -278,6 +282,10 @@ int BrokerBase::parseArgs(const std::string& initializationString)
 
 void BrokerBase::configureBase()
 {
+    if (debugging) {
+        no_ping = true;
+        disable_timer = true;
+    }
     if (networkTimeout < timeZero) {
         networkTimeout = 4.0;
     }

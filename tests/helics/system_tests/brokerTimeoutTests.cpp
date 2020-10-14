@@ -93,6 +93,46 @@ TEST(broker_timeout_tests, core_fail_timeout_no_ping_ci_skip)
     Fed2->finalize();
 }
 
+// this test is exactly like the previous one except the core was specified with no_ping so it won't
+// fail
+TEST(broker_timeout_tests, core_fail_debugging_ci_skip)
+{
+    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=200ms --tick 50ms ");
+    brk->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreName = "c1";
+
+    auto Fed1 = std::make_shared<helics::Federate>("test1", fi);
+
+    fi.coreName = "c2";
+    fi.coreInitString = "--debugging";
+
+    auto Fed2 = std::make_shared<helics::Federate>("test2", fi);
+
+    Fed1->enterExecutingModeAsync();
+    Fed2->enterExecutingMode();
+    Fed1->enterExecutingModeComplete();
+
+    Fed1->finalize();
+
+    auto cr = Fed2->getCorePointer();
+    auto tcr = std::dynamic_pointer_cast<helics::testcore::TestCore>(cr);
+    EXPECT_TRUE(tcr);
+
+    auto cms = tcr->getCommsObjectPointer();
+    cms->haltComms();  // this will terminate communications abruptly
+    tcr.reset();
+
+    bool val = brk->waitForDisconnect(std::chrono::milliseconds(2000));
+    EXPECT_FALSE(val);
+    brk->disconnect();
+
+    cr->disconnect();
+    Fed1->finalize();
+    Fed2->finalize();
+}
+
 // this test is similar in concept to the previous two but using --disable_timer flag
 TEST(broker_timeout_tests, core_fail_timeout_no_timer_ci_skip)
 {
