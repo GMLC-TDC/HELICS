@@ -166,24 +166,24 @@ helics_flag_realtime = _helics.helics_flag_realtime
 r""" flag indicating that a federate needs to run in real time"""
 helics_flag_single_thread_federate = _helics.helics_flag_single_thread_federate
 r""" flag indicating that the federate will only interact on a single thread"""
-helics_flag_slow_responding = _helics.helics_flag_slow_responding
-r"""
-    flag specifying that a federate, core, or broker may be slow to respond to pings
-           If the federate goes offline there is no good way to detect it so use with caution
-    """
-helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
-r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
-helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
-r""" used to clear the HELICS_DELAY_INIT_ENTRY flag in cores"""
 helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mismatch_warnings
 r""" used to not display warnings on mismatched requested times"""
-helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
-r""" specify that a federate error should terminate the federation"""
 helics_flag_strict_config_checking = _helics.helics_flag_strict_config_checking
 r"""
     specify that checking on configuration files should be strict and throw and error on any
       invalid values
     """
+helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
+r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
+helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
+r""" used to clear the HELICS_DELAY_INIT_ENTRY flag in cores"""
+helics_flag_slow_responding = _helics.helics_flag_slow_responding
+r"""
+    flag specifying that a federate, core, or broker may be slow to respond to pings
+           If the federate goes offline there is no good way to detect it so use with caution
+    """
+helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
+r""" specify that a federate error should terminate the federation"""
 helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush
 r""" specify that the log files should be flushed on every log message"""
 helics_flag_dumplog = _helics.helics_flag_dumplog

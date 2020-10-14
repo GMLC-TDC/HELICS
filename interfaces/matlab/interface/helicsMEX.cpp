@@ -1208,27 +1208,29 @@ namespace swig {
 
 #define SWIGTYPE_p_char swig_types[0]
 #define SWIGTYPE_p_double swig_types[1]
-#define SWIGTYPE_p_helics_core_type swig_types[2]
-#define SWIGTYPE_p_helics_data_type swig_types[3]
-#define SWIGTYPE_p_helics_error swig_types[4]
-#define SWIGTYPE_p_helics_error_types swig_types[5]
-#define SWIGTYPE_p_helics_federate_flags swig_types[6]
-#define SWIGTYPE_p_helics_federate_state swig_types[7]
-#define SWIGTYPE_p_helics_filter_type swig_types[8]
-#define SWIGTYPE_p_helics_handle_options swig_types[9]
-#define SWIGTYPE_p_helics_iteration_request swig_types[10]
-#define SWIGTYPE_p_helics_iteration_result swig_types[11]
-#define SWIGTYPE_p_helics_log_levels swig_types[12]
-#define SWIGTYPE_p_helics_message swig_types[13]
-#define SWIGTYPE_p_helics_multi_input_mode swig_types[14]
-#define SWIGTYPE_p_helics_properties swig_types[15]
-#define SWIGTYPE_p_int swig_types[16]
-#define SWIGTYPE_p_int16_t swig_types[17]
-#define SWIGTYPE_p_int32_t swig_types[18]
-#define SWIGTYPE_p_p_char swig_types[19]
-#define SWIGTYPE_p_void swig_types[20]
-static swig_type_info *swig_types[22];
-static swig_module_info swig_module = {swig_types, 21, 0, 0, 0, 0};
+#define SWIGTYPE_p_helics_core_flags swig_types[2]
+#define SWIGTYPE_p_helics_core_type swig_types[3]
+#define SWIGTYPE_p_helics_data_type swig_types[4]
+#define SWIGTYPE_p_helics_error swig_types[5]
+#define SWIGTYPE_p_helics_error_types swig_types[6]
+#define SWIGTYPE_p_helics_federate_flags swig_types[7]
+#define SWIGTYPE_p_helics_federate_state swig_types[8]
+#define SWIGTYPE_p_helics_filter_type swig_types[9]
+#define SWIGTYPE_p_helics_flags swig_types[10]
+#define SWIGTYPE_p_helics_handle_options swig_types[11]
+#define SWIGTYPE_p_helics_iteration_request swig_types[12]
+#define SWIGTYPE_p_helics_iteration_result swig_types[13]
+#define SWIGTYPE_p_helics_log_levels swig_types[14]
+#define SWIGTYPE_p_helics_message swig_types[15]
+#define SWIGTYPE_p_helics_multi_input_mode swig_types[16]
+#define SWIGTYPE_p_helics_properties swig_types[17]
+#define SWIGTYPE_p_int swig_types[18]
+#define SWIGTYPE_p_int16_t swig_types[19]
+#define SWIGTYPE_p_int32_t swig_types[20]
+#define SWIGTYPE_p_p_char swig_types[21]
+#define SWIGTYPE_p_void swig_types[22]
+static swig_type_info *swig_types[24];
+static swig_module_info swig_module = {swig_types, 23, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -14358,6 +14360,7 @@ fail:
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "helics_time *|double *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_core_flags = {"_p_helics_core_flags", "enum helics_core_flags *|helics_core_flags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_core_type = {"_p_helics_core_type", "enum helics_core_type *|helics_core_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_data_type = {"_p_helics_data_type", "enum helics_data_type *|helics_data_type *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_error = {"_p_helics_error", "helics_error *", 0, 0, (void*)0, 0};
@@ -14365,6 +14368,7 @@ static swig_type_info _swigt__p_helics_error_types = {"_p_helics_error_types", "
 static swig_type_info _swigt__p_helics_federate_flags = {"_p_helics_federate_flags", "enum helics_federate_flags *|helics_federate_flags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_federate_state = {"_p_helics_federate_state", "enum helics_federate_state *|helics_federate_state *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_filter_type = {"_p_helics_filter_type", "enum helics_filter_type *|helics_filter_type *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_flags = {"_p_helics_flags", "enum helics_flags *|helics_flags *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_handle_options = {"_p_helics_handle_options", "enum helics_handle_options *|helics_handle_options *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_iteration_request = {"_p_helics_iteration_request", "enum helics_iteration_request *|helics_iteration_request *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_iteration_result = {"_p_helics_iteration_result", "enum helics_iteration_result *|helics_iteration_result *", 0, 0, (void*)0, 0};
@@ -14381,6 +14385,7 @@ static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_co
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_double,
+  &_swigt__p_helics_core_flags,
   &_swigt__p_helics_core_type,
   &_swigt__p_helics_data_type,
   &_swigt__p_helics_error,
@@ -14388,6 +14393,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_helics_federate_flags,
   &_swigt__p_helics_federate_state,
   &_swigt__p_helics_filter_type,
+  &_swigt__p_helics_flags,
   &_swigt__p_helics_handle_options,
   &_swigt__p_helics_iteration_request,
   &_swigt__p_helics_iteration_result,
@@ -14404,6 +14410,7 @@ static swig_type_info *swig_type_initial[] = {
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_core_flags[] = {  {&_swigt__p_helics_core_flags, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_core_type[] = {  {&_swigt__p_helics_core_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_data_type[] = {  {&_swigt__p_helics_data_type, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_error[] = {  {&_swigt__p_helics_error, 0, 0, 0},{0, 0, 0, 0}};
@@ -14411,6 +14418,7 @@ static swig_cast_info _swigc__p_helics_error_types[] = {  {&_swigt__p_helics_err
 static swig_cast_info _swigc__p_helics_federate_flags[] = {  {&_swigt__p_helics_federate_flags, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_federate_state[] = {  {&_swigt__p_helics_federate_state, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_filter_type[] = {  {&_swigt__p_helics_filter_type, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_flags[] = {  {&_swigt__p_helics_flags, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_handle_options[] = {  {&_swigt__p_helics_handle_options, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_iteration_request[] = {  {&_swigt__p_helics_iteration_request, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_iteration_result[] = {  {&_swigt__p_helics_iteration_result, 0, 0, 0},{0, 0, 0, 0}};
@@ -14427,6 +14435,7 @@ static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0,
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
   _swigc__p_double,
+  _swigc__p_helics_core_flags,
   _swigc__p_helics_core_type,
   _swigc__p_helics_data_type,
   _swigc__p_helics_error,
@@ -14434,6 +14443,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_helics_federate_flags,
   _swigc__p_helics_federate_state,
   _swigc__p_helics_filter_type,
+  _swigc__p_helics_flags,
   _swigc__p_helics_handle_options,
   _swigc__p_helics_iteration_request,
   _swigc__p_helics_iteration_result,
@@ -14743,12 +14753,12 @@ SWIGINTERN const char* SwigConstantName(int con_id) {
   case 36: return "helics_flag_forward_compute";
   case 37: return "helics_flag_realtime";
   case 38: return "helics_flag_single_thread_federate";
-  case 39: return "helics_flag_slow_responding";
-  case 40: return "helics_flag_delay_init_entry";
-  case 41: return "helics_flag_enable_init_entry";
-  case 42: return "helics_flag_ignore_time_mismatch_warnings";
-  case 43: return "helics_flag_terminate_on_error";
-  case 44: return "helics_flag_strict_config_checking";
+  case 39: return "helics_flag_ignore_time_mismatch_warnings";
+  case 40: return "helics_flag_strict_config_checking";
+  case 41: return "helics_flag_delay_init_entry";
+  case 42: return "helics_flag_enable_init_entry";
+  case 43: return "helics_flag_slow_responding";
+  case 44: return "helics_flag_terminate_on_error";
   case 45: return "helics_flag_force_logging_flush";
   case 46: return "helics_flag_dumplog";
   case 47: return "helics_log_level_no_print";
@@ -14903,12 +14913,12 @@ SWIGINTERN int swigConstant(int SWIGUNUSEDPARM(resc), mxArray *resv[], int argc,
   case 36: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_forward_compute",SWIG_From_int(static_cast< int >(helics_flag_forward_compute)));; break;
   case 37: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_realtime",SWIG_From_int(static_cast< int >(helics_flag_realtime)));; break;
   case 38: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_single_thread_federate",SWIG_From_int(static_cast< int >(helics_flag_single_thread_federate)));; break;
-  case 39: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_slow_responding",SWIG_From_int(static_cast< int >(helics_flag_slow_responding)));; break;
-  case 40: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_delay_init_entry",SWIG_From_int(static_cast< int >(helics_flag_delay_init_entry)));; break;
-  case 41: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_enable_init_entry",SWIG_From_int(static_cast< int >(helics_flag_enable_init_entry)));; break;
-  case 42: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));; break;
-  case 43: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_terminate_on_error",SWIG_From_int(static_cast< int >(helics_flag_terminate_on_error)));; break;
-  case 44: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_strict_config_checking",SWIG_From_int(static_cast< int >(helics_flag_strict_config_checking)));; break;
+  case 39: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));; break;
+  case 40: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_strict_config_checking",SWIG_From_int(static_cast< int >(helics_flag_strict_config_checking)));; break;
+  case 41: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_delay_init_entry",SWIG_From_int(static_cast< int >(helics_flag_delay_init_entry)));; break;
+  case 42: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_enable_init_entry",SWIG_From_int(static_cast< int >(helics_flag_enable_init_entry)));; break;
+  case 43: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_slow_responding",SWIG_From_int(static_cast< int >(helics_flag_slow_responding)));; break;
+  case 44: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_terminate_on_error",SWIG_From_int(static_cast< int >(helics_flag_terminate_on_error)));; break;
   case 45: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_force_logging_flush",SWIG_From_int(static_cast< int >(helics_flag_force_logging_flush)));; break;
   case 46: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_dumplog",SWIG_From_int(static_cast< int >(helics_flag_dumplog)));; break;
   case 47: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_no_print",SWIG_From_int(static_cast< int >(helics_log_level_no_print)));; break;
