@@ -38,3 +38,17 @@ TEST(CoreConfig, test3)
     EXPECT_EQ(cr->getIdentifier(), "core_name10");
     cr->disconnect();
 }
+
+TEST(CoreConfig, getFlagTests)
+{
+    auto cr =
+        helics::CoreFactory::create(helics::core_type::TEST, "--force_logging_flush --dumplog");
+    cr->setFlagOption(helics::local_core_id, helics_flag_delay_init_entry, true);
+
+    EXPECT_TRUE(cr->getFlagOption(helics::local_core_id, helics_flag_delay_init_entry));
+    EXPECT_FALSE(cr->getFlagOption(helics::local_core_id, helics_flag_enable_init_entry));
+
+    EXPECT_TRUE(cr->getFlagOption(helics::local_core_id, helics_flag_force_logging_flush));
+    EXPECT_TRUE(cr->getFlagOption(helics::local_core_id, helics_flag_dumplog));
+    cr->disconnect();
+}
