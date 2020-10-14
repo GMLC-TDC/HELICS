@@ -1431,6 +1431,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             ignore_unit_mismatch = value;
             break;
         case defs::flags::slow_responding:
+        case defs::flags::debugging:
             slow_responding = value;
             break;
         case defs::flags::terminate_on_error:
@@ -1523,6 +1524,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
         case defs::flags::source_only:
             return source_only;
         case defs::flags::slow_responding:
+        case defs::flags::debugging:
             return slow_responding;
         case defs::flags::terminate_on_error:
             return terminate_on_error;
