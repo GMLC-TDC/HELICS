@@ -33,7 +33,7 @@ If applied to a core or broker, it is indicative that the broker doesn't respond
 
 ## debugging
 
-If a program is being debugged and may halt execution the `--debugging` flag may be used to turn off some timeouts and keep everything working a little more smoothly.  This flag is the equivalent of "--slow_responding" for a federate and "--slow_responding --disable_timer` for a broker/core.  
+If a program is being debugged and may halt execution the `--debugging` flag may be used to turn off some timeouts and keep everything working a little more smoothly. This flag is the equivalent of "--slow_responding" for a federate and "--slow_responding --disable_timer` for a broker/core.
 
 ## terminate on error
 

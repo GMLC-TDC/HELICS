@@ -282,8 +282,7 @@ int BrokerBase::parseArgs(const std::string& initializationString)
 
 void BrokerBase::configureBase()
 {
-    if (debugging)
-    {
+    if (debugging) {
         no_ping = true;
         disable_timer = true;
     }
