@@ -26,14 +26,14 @@ Several small bug fixes and minor enhancements to query operations
 - Duplicate target specification and warnings were improved #1639
 - Certain property strings did not generate the correct property index #1642
 - For large packets in the TCP core on particular operating systems partial buffers may be sent and this was not handled property in the tcp core #1600
-- Boost 1.74 deprecated some interfaces used in the webserver.  The code was updated to support the latest release of boost. #1629
+- Boost 1.74 deprecated some interfaces used in the webserver. The code was updated to support the latest release of boost. #1629
 - The requested_time field in the `current_time` query for federates was missing #1619
 - Some broker queries did not reset properly when changes in the federation occurred #1617
 - Handle cases of empty install prefix #1577
 
-
 ### Added
-- The C api now has a query callback method for responding to federate specific queries.  #1634
+
+- The C api now has a query callback method for responding to federate specific queries. #1634
 - Some tutorials for the hello_world example on visual studio #1621
 - A `helicsMessageClear` method was added to the C API for clearing the data from a message object #1622
 - A `global_state` query to actively query the current state of all objects in a federation. #1614
