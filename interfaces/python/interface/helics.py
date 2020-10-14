@@ -182,6 +182,12 @@ r"""
     flag specifying that a federate, core, or broker may be slow to respond to pings
            If the federate goes offline there is no good way to detect it so use with caution
     """
+helics_flag_debugging = _helics.helics_flag_debugging
+r"""
+    flag specifying the federate/core/broker is operating in a user debug mode so deadlock
+       timers and timeout are disabled this flag is a combination of slow_responding and disabling of
+       some timeouts
+    """
 helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
 r""" specify that a federate error should terminate the federation"""
 helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush

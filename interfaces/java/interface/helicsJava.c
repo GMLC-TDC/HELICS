@@ -749,6 +749,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1slow_1respo
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1debugging_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_flags)helics_flag_debugging;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1on_1error_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_flags result;
