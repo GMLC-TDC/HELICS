@@ -106,6 +106,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"slowResponding", helics_flag_slow_responding},
     {"no_ping", helics_flag_slow_responding},
     {"disable_ping", helics_flag_slow_responding},
+    {"debugging", helics_flag_debugging},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
@@ -255,6 +256,9 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg == "autobroker") {
             fi.autobroker = true;
             continue;
+        }
+        if (flg == "debugging") {
+            fi.debugging = true;
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
@@ -438,6 +442,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--autobroker",
                   autobroker,
                   "tell the core to automatically generate a broker if needed");
+    app->add_flag("--debugging",
+                  debugging,
+                  "tell the core to allow user debugging in a nicer fashion");
     app->add_option("--key,--broker_key",
                     key,
                     "specify a key to use to match a broker should match the broker key");
@@ -751,7 +758,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     if (fi.autobroker) {
         res.append(" --autobroker");
     }
-
+    if (fi.debugging) {
+        res.append(" --debugging");
+    }
     if (!fi.brokerInitString.empty()) {
         res.append(" --brokerinit \"");
         res.append(fi.brokerInitString);
