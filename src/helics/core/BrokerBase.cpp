@@ -427,6 +427,18 @@ void BrokerBase::setLoggingFile(const std::string& lfile)
     }
 }
 
+bool BrokerBase::getFlagValue(int32_t flag) const
+{
+    switch (flag) {
+        case helics_flag_dumplog:
+            return dumplog;
+        case helics_flag_force_logging_flush:
+            return forceLoggingFlush.load();
+        default:
+            return false;
+    }
+}
+
 void BrokerBase::setLoggerFunction(
     std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
@@ -770,8 +782,8 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
                 NMess.from_string(command.getString(ii));
                 auto V = commandProcessor(NMess);
                 if (V != CMD_IGNORE) {
-                    // overwrite the abort command but ignore ticks in a multi-message context they
-                    // shouldn't be there
+                    // overwrite the abort command but ignore ticks in a multi-message context
+                    // they shouldn't be there
                     if (V != CMD_TICK) {
                         command = NMess;
                         return V;
