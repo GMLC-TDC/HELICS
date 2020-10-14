@@ -65,6 +65,8 @@ namespace defs {
         ignore_time_mismatch_warnings = helics_flag_ignore_time_mismatch_warnings,
         /** force logging flush*/
         force_logging_flush = helics_flag_force_logging_flush,
+        /** user debugging mode*/
+        debugging = helics_flag_debugging,
         /** dump the logs to a file at the end*/
         dumplog = helics_flag_dumplog,
         /** make all connections required*/
