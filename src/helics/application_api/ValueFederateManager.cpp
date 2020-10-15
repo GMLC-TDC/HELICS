@@ -138,7 +138,7 @@ void ValueFederateManager::addTarget(const Input& inp, const std::string& target
     }
 
     coreObject->addSourceTarget(inp.handle, target);
-    auto it = inputTargets.lock()->emplace(inp.handle, target);
+    inputTargets.lock()->emplace(inp.handle, target);
     targetIDs.lock()->emplace(target, inp.handle);
 }
 

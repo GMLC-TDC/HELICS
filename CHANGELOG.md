@@ -21,7 +21,7 @@ Several small bug fixes and minor enhancements to query operations
 ### Fixed
 
 - A few flags were unable to be queried through `getOptionFlag` operations #1655
-- The index values for some flags were not able to be retrieved vis getFlagIndex operations #1645
+- The index values for some flags were not able to be retrieved via getFlagIndex operations #1645
 - In some cases specifying a custom port of a number less than the default ports led to federates being unable to bind the appropriate port #1648
 - Duplicate target specification and warnings were improved #1639
 - Certain property strings did not generate the correct property index #1642
