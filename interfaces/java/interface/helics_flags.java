@@ -18,6 +18,12 @@ public final class helics_flags {
    */
   public final static helics_flags helics_flag_slow_responding = new helics_flags("helics_flag_slow_responding", helicsJNI.helics_flag_slow_responding_get());
   /**
+   *  flag specifying the federate/core/broker is operating in a user debug mode so deadlock<br>
+   *     timers and timeout are disabled this flag is a combination of slow_responding and disabling of<br>
+   *     some timeouts
+   */
+  public final static helics_flags helics_flag_debugging = new helics_flags("helics_flag_debugging", helicsJNI.helics_flag_debugging_get());
+  /**
    *  specify that a federate error should terminate the federation
    */
   public final static helics_flags helics_flag_terminate_on_error = new helics_flags("helics_flag_terminate_on_error", helicsJNI.helics_flag_terminate_on_error_get());
@@ -64,7 +70,7 @@ public final class helics_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_flags[] swigValues = { helics_flag_slow_responding, helics_flag_terminate_on_error, helics_flag_force_logging_flush, helics_flag_dumplog };
+  private static helics_flags[] swigValues = { helics_flag_slow_responding, helics_flag_debugging, helics_flag_terminate_on_error, helics_flag_force_logging_flush, helics_flag_dumplog };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
