@@ -166,17 +166,28 @@ helics_flag_realtime = _helics.helics_flag_realtime
 r""" flag indicating that a federate needs to run in real time"""
 helics_flag_single_thread_federate = _helics.helics_flag_single_thread_federate
 r""" flag indicating that the federate will only interact on a single thread"""
-helics_flag_slow_responding = _helics.helics_flag_slow_responding
+helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mismatch_warnings
+r""" used to not display warnings on mismatched requested times"""
+helics_flag_strict_config_checking = _helics.helics_flag_strict_config_checking
 r"""
-    flag specifying that a federate, core, or broker may be slow to respond to pings
-           If the federate goes offline there is no good way to detect it so use with caution
+    specify that checking on configuration files should be strict and throw and error on any
+      invalid values
     """
 helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
 r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
 helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
 r""" used to clear the HELICS_DELAY_INIT_ENTRY flag in cores"""
-helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mismatch_warnings
-r""" used to not display warnings on mismatched requested times"""
+helics_flag_slow_responding = _helics.helics_flag_slow_responding
+r"""
+    flag specifying that a federate, core, or broker may be slow to respond to pings
+           If the federate goes offline there is no good way to detect it so use with caution
+    """
+helics_flag_debugging = _helics.helics_flag_debugging
+r"""
+    flag specifying the federate/core/broker is operating in a user debug mode so deadlock
+       timers and timeout are disabled this flag is a combination of slow_responding and disabling of
+       some timeouts
+    """
 helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
 r""" specify that a federate error should terminate the federation"""
 helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush
@@ -3752,11 +3763,22 @@ def helicsMessageClone(message: "helics_message_object") -> "helics_message_obje
 def helicsMessageFree(message: "helics_message_object") -> "void":
     r"""
     Free a message object from memory
+    :type message: void
+    :param message: The message object to copy from.
     memory for message is managed so not using this function does not create memory leaks, this is an indication
     to the system that the memory for this message is done being used and can be reused for a new message.
     helicsFederateClearMessages() can also be used to clear up all stored messages at once
     """
     return _helics.helicsMessageFree(message)
+
+def helicsMessageClear(message: "helics_message_object") -> "void":
+    r"""
+    Reset a message to empty state
+    :type message: void
+    :param message: The message object to copy from.
+    The message after this function will be empty, with no source or destination
+    """
+    return _helics.helicsMessageClear(message)
 
 def helicsFederateRegisterFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""

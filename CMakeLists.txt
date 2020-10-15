@@ -11,20 +11,20 @@ cmake_minimum_required(VERSION 3.4)
 # Make sure users don't get warnings on a tested (3.4 to 3.17) version of CMake. For most of the
 # policies, the new version is better (hence the change). We don't use the 3.0...3.16 syntax because
 # of a bug in MSVC 15.7 built-in and modified CMake 3.11
-if(CMAKE_VERSION VERSION_LESS 3.17)
+if(CMAKE_VERSION VERSION_LESS 3.18)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 else()
-    cmake_policy(VERSION 3.17)
+    cmake_policy(VERSION 3.18)
 endif()
 
-project(HELICS VERSION 2.6.0)
+project(HELICS VERSION 2.6.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-08-20")
+set(HELICS_DATE "2020-10-15")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -100,9 +100,17 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL P
     endif(WIN32)
 endif()
 
+# Warning if CMAKE_INSTALL_PREFIX is empty. Likely set by using the wrong environment variable.
+if(NOT CMAKE_INSTALL_PREFIX)
+    message(
+        WARNING
+            "CMAKE_INSTALL_PREFIX is set to nothing. If you are using an environment variable for handling prefix paths, that variable might not have been set before using it with CMake to set the CMAKE_INSTALL_PREFIX option."
+    )
+endif()
+
 # Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
-get_filename_component(tmp_install_prefix ${CMAKE_INSTALL_PREFIX} REALPATH)
-get_filename_component(tmp_proj_bindir ${PROJECT_BINARY_DIR} REALPATH)
+get_filename_component(tmp_install_prefix "${CMAKE_INSTALL_PREFIX}" REALPATH)
+get_filename_component(tmp_proj_bindir "${PROJECT_BINARY_DIR}" REALPATH)
 # Windows paths are case insensitive
 if(WIN32)
     string(TOLOWER "${tmp_install_prefix}" tmp_install_prefix)

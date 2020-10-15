@@ -722,6 +722,7 @@ class Core {
     return until the query is answered so use with caution
     */
     virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
+
     /** supply a query callback function
     @details the intention of the query callback is to allow federates to answer particular requests
     through the query interface this allows other federates to make requests or queries of other
@@ -733,14 +734,16 @@ class Core {
     */
     virtual void setQueryCallback(local_federate_id federateID,
                                   std::function<std::string(const std::string&)> queryFunction) = 0;
+
     /**
      * setter for the interface information
      * @param handle the identifiers for the interface to set the info data on
      * @param info a string containing the info data
      */
     virtual void setInterfaceInfo(interface_handle handle, std::string info) = 0;
+
     /**
-     * gett for the interface information
+     * getter for the interface information
      * @param handle the identifiers for the interface to query
      * @return a string containing the Info data stored in an interface
      */

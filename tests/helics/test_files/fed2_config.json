@@ -1,0 +1,21 @@
+{
+  "name": "fed_2",
+  "coreType": "zmq",
+  "period": 0.5,
+  "uninterruptible": false,
+  "wait_for_current_time_update": true,
+  "publications": [
+    {
+      "global": true,
+      "key": "value_2",
+      "type": "complex"
+    }
+  ],
+  "subscriptions": [
+    {
+      "required": true,
+      "key": "value_1",
+      "type": "complex"
+    }
+  ]
+}

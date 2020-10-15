@@ -65,6 +65,8 @@ namespace defs {
         ignore_time_mismatch_warnings = helics_flag_ignore_time_mismatch_warnings,
         /** force logging flush*/
         force_logging_flush = helics_flag_force_logging_flush,
+        /** user debugging mode*/
+        debugging = helics_flag_debugging,
         /** dump the logs to a file at the end*/
         dumplog = helics_flag_dumplog,
         /** make all connections required*/
@@ -73,6 +75,8 @@ namespace defs {
         connections_optional = helics_handle_option_connection_optional,
         /** make all inputs have strict type checking*/
         strict_input_type_checking = helics_handle_option_strict_type_checking,
+        /** be strict about config files*/
+        strict_config_checking = helics_flag_strict_config_checking,
         /** ignore mismatching units*/
         ignore_input_unit_mismatch = helics_handle_option_ignore_unit_mismatch
 

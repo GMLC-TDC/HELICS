@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <map>
 #include <set>
+#include <unordered_map>
 #include <utility>
 
 namespace helics {
@@ -37,51 +38,80 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static const std::map<std::string, int> propStringsTranslations{
+static const std::unordered_map<std::string, int> propStringsTranslations{
     {"period", helics_property_time_period},
+    {"timeperiod", helics_property_time_period},
+    {"time_period", helics_property_time_period},
     {"timedelta", helics_property_time_delta},
     {"time_delta", helics_property_time_delta},
     {"timeDelta", helics_property_time_delta},
     {"delta", helics_property_time_delta},
     {"offset", helics_property_time_offset},
+    {"timeoffset", helics_property_time_offset},
+    {"time_offset", helics_property_time_offset},
     {"rtlead", helics_property_time_rt_lead},
     {"rtlag", helics_property_time_rt_lag},
     {"rttolerance", helics_property_time_rt_tolerance},
+    {"timertlead", helics_property_time_rt_lead},
+    {"timertlag", helics_property_time_rt_lag},
+    {"timerttolerance", helics_property_time_rt_tolerance},
     {"rtLead", helics_property_time_rt_lead},
     {"rtLag", helics_property_time_rt_lag},
     {"rtTolerance", helics_property_time_rt_tolerance},
     {"rt_lead", helics_property_time_rt_lead},
     {"rt_lag", helics_property_time_rt_lag},
     {"rt_tolerance", helics_property_time_rt_tolerance},
+    {"time_rt_lead", helics_property_time_rt_lead},
+    {"time_rt_lag", helics_property_time_rt_lag},
+    {"time_rt_tolerance", helics_property_time_rt_tolerance},
     {"inputdelay", helics_property_time_input_delay},
     {"outputdelay", helics_property_time_output_delay},
     {"inputDelay", helics_property_time_input_delay},
     {"outputDelay", helics_property_time_output_delay},
     {"input_delay", helics_property_time_input_delay},
     {"output_delay", helics_property_time_output_delay},
-    {"max_iterations", helics_property_int_max_iterations},
+    {"timeinputdelay", helics_property_time_input_delay},
+    {"timeoutputdelay", helics_property_time_output_delay},
+    {"time_input_delay", helics_property_time_input_delay},
+    {"time_output_delay", helics_property_time_output_delay},
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
-    {"maxiterations", helics_property_int_max_iterations},
     {"logLevel", helics_property_int_log_level},
+    {"intloglevel", helics_property_int_log_level},
+    {"int_log_level", helics_property_int_log_level},
+    {"consoleloglevel", helics_property_int_console_log_level},
+    {"console_log_level", helics_property_int_console_log_level},
+    {"intconsoleloglevel", helics_property_int_console_log_level},
+    {"int_console_log_level", helics_property_int_console_log_level},
+    {"fileloglevel", helics_property_int_file_log_level},
+    {"file_log_level", helics_property_int_file_log_level},
+    {"intfileloglevel", helics_property_int_file_log_level},
+    {"int_file_log_level", helics_property_int_file_log_level},
+    {"maxiterations", helics_property_int_max_iterations},
+    {"max_iterations", helics_property_int_max_iterations},
     {"maxIterations", helics_property_int_max_iterations},
+    {"intmaxiterations", helics_property_int_max_iterations},
+    {"int_max_iterations", helics_property_int_max_iterations},
     {"iterations", helics_property_int_max_iterations}};
 
-static const std::map<std::string, int> flagStringsTranslations{
+static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
     {"source", helics_flag_source_only},
+    {"observer", helics_flag_observer},
     {"slow", helics_flag_slow_responding},
     {"slow_response", helics_flag_slow_responding},
     {"slow_responding", helics_flag_slow_responding},
     {"slowResponding", helics_flag_slow_responding},
     {"no_ping", helics_flag_slow_responding},
     {"disable_ping", helics_flag_slow_responding},
+    {"debugging", helics_flag_debugging},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
     {"realtime", helics_flag_realtime},
+    {"real_time", helics_flag_realtime},
     {"realTime", helics_flag_realtime},
     {"restrictive_time_policy", helics_flag_restrictive_time_policy},
     {"conservative_time_policy", helics_flag_restrictive_time_policy},
@@ -93,20 +123,39 @@ static const std::map<std::string, int> flagStringsTranslations{
     {"delayed_update", helics_flag_wait_for_current_time_update},
     {"delayedUpdate", helics_flag_wait_for_current_time_update},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+    {"strict_config_checking", helics_flag_strict_config_checking},
+    {"strictconfigchecking", helics_flag_strict_config_checking},
+    {"strictConfigChecking", helics_flag_strict_config_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
     {"required", helics_handle_option_connection_required},
     {"optional", helics_handle_option_connection_optional},
+    {"nointerrupts", helics_flag_uninterruptible},
+    {"no_interrupts", helics_flag_uninterruptible},
+    {"uninterruptible", helics_flag_uninterruptible},
+    {"interruptible", helics_flag_interruptible},
     {"wait_for_current_time", helics_flag_wait_for_current_time_update},
     {"wait_for_current_time_update", helics_flag_wait_for_current_time_update},
     {"waitforcurrenttimeupdate", helics_flag_wait_for_current_time_update},
     {"waitforcurrenttime", helics_flag_wait_for_current_time_update},
+    {"delay_init_entry", helics_flag_delay_init_entry},
+    {"delayinitentry", helics_flag_delay_init_entry},
+    {"enable_init_entry", helics_flag_enable_init_entry},
+    {"enableinitentry", helics_flag_enable_init_entry},
+    {"ignore_time_mismatch_warnings", helics_flag_ignore_time_mismatch_warnings},
+    {"ignoretimemismatchwarnings", helics_flag_ignore_time_mismatch_warnings},
+    {"rollback", helics_flag_rollback},
+    {"single_thread_federate", helics_flag_single_thread_federate},
+    {"singlethreadfederate", helics_flag_single_thread_federate},
+    {"force_logging_flush", helics_flag_force_logging_flush},
+    {"forceloggingflush", helics_flag_force_logging_flush},
+    {"dumplog", helics_flag_dumplog},
     {"terminate_on_error", helics_flag_terminate_on_error},
     {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
 
-static const std::map<std::string, int> optionStringsTranslations{
+static const std::unordered_map<std::string, int> optionStringsTranslations{
     {"buffer", helics_handle_option_buffer_data},
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferdata", helics_handle_option_buffer_data},
@@ -207,6 +256,9 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg == "autobroker") {
             fi.autobroker = true;
             continue;
+        }
+        if (flg == "debugging") {
+            fi.debugging = true;
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
@@ -390,6 +442,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--autobroker",
                   autobroker,
                   "tell the core to automatically generate a broker if needed");
+    app->add_flag("--debugging",
+                  debugging,
+                  "tell the core to allow user debugging in a nicer fashion");
     app->add_option("--key,--broker_key",
                     key,
                     "specify a key to use to match a broker should match the broker key");
@@ -561,6 +616,36 @@ FederateInfo loadFederateInfo(const std::string& configString)
     return ret;
 }
 
+Time FederateInfo::checkTimeProperty(int propId, Time defVal) const
+{
+    for (const auto& tp : timeProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+bool FederateInfo::checkFlagProperty(int propId, bool defVal) const
+{
+    for (const auto& tp : flagProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
+int FederateInfo::checkIntProperty(int propId, int defVal) const
+{
+    for (const auto& tp : intProps) {
+        if (tp.first == propId) {
+            return tp.second;
+        }
+    }
+    return defVal;
+}
+
 void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgParser)
 {
     Json::Value doc;
@@ -673,7 +758,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     if (fi.autobroker) {
         res.append(" --autobroker");
     }
-
+    if (fi.debugging) {
+        res.append(" --debugging");
+    }
     if (!fi.brokerInitString.empty()) {
         res.append(" --brokerinit \"");
         res.append(fi.brokerInitString);

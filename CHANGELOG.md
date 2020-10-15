@@ -8,7 +8,39 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.6.0][] ~ 2020-08-20
+## [2.6.1][] - 2020-10-15
+
+Several small bug fixes and minor enhancements to query operations
+
+### Changed
+
+- In `helics_enum.h` flags were separated into separate enums with the same symbols splitting up flags specific to federates, cores, and those applicable to all entities
+- CMAKE 3.18 was tested and verified and used as the baseline version when available.
+- Default libzmq was updated to 4.3.3
+
+### Fixed
+
+- A few flags were unable to be queried through `getOptionFlag` operations #1655
+- The index values for some flags were not able to be retrieved via getFlagIndex operations #1645
+- In some cases specifying a custom port of a number less than the default ports led to federates being unable to bind the appropriate port #1648
+- Duplicate target specification and warnings were improved #1639
+- Certain property strings did not generate the correct property index #1642
+- For large packets in the TCP core on particular operating systems partial buffers may be sent and this was not handled property in the tcp core #1600
+- Boost 1.74 deprecated some interfaces used in the webserver. The code was updated to support the latest release of boost. #1629
+- The requested_time field in the `current_time` query for federates was missing #1619
+- Some broker queries did not reset properly when changes in the federation occurred #1617
+- Handle cases of empty install prefix #1577
+
+### Added
+
+- The C api now has a query callback method for responding to federate specific queries. #1634
+- Some tutorials for the hello_world example on visual studio #1621
+- A `helicsMessageClear` method was added to the C API for clearing the data from a message object #1622
+- A `global_state` query to actively query the current state of all objects in a federation. #1614
+- A strict config checking flag to generate errors on potentially incorrect configuration files #1607
+-
+
+## [2.6.0][] - 2020-08-20
 
 Bug fixes and major logging update
 
@@ -45,7 +77,7 @@ Bug fixes and major logging update
 
 - The previous logger including logger.h has been replaced with spdlog
 
-## [2.5.2][] ~ 2020-06-15
+## [2.5.2][] - 2020-06-15
 
 Bug fix release for some build issues and a fix to the `wait_for_current_time` flag
 
@@ -61,7 +93,7 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 - Add print_systeminfo flag to root helics_benchmark command (#1417)
 - Added cppcheck github action for PR's
 
-## [2.5.1][] ~ 2020-06-05
+## [2.5.1][] - 2020-06-05
 
 ### Changed
 
@@ -771,4 +803,5 @@ This is a major revision so this changelog will not capture all the changes that
 [2.5.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.0
 [2.5.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.1
 [2.5.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.2
-[2.5.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.6.0
+[2.6.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.6.0
+[2.6.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.6.1

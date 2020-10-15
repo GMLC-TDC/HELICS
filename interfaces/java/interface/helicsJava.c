@@ -689,42 +689,6 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1single_1thr
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1slow_1responding_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_federate_flags result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_federate_flags)helics_flag_slow_responding;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1delay_1init_1entry_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_federate_flags result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_federate_flags)helics_flag_delay_init_entry;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1enable_1init_1entry_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  helics_federate_flags result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (helics_federate_flags)helics_flag_enable_init_entry;
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1ignore_1time_1mismatch_1warnings_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_federate_flags result;
@@ -737,13 +701,73 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1ignore_1tim
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1on_1error_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1strict_1config_1checking_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_federate_flags result;
   
   (void)jenv;
   (void)jcls;
-  result = (helics_federate_flags)helics_flag_terminate_on_error;
+  result = (helics_federate_flags)helics_flag_strict_config_checking;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1delay_1init_1entry_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_core_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_core_flags)helics_flag_delay_init_entry;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1enable_1init_1entry_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_core_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_core_flags)helics_flag_enable_init_entry;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1slow_1responding_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_flags)helics_flag_slow_responding;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1debugging_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_flags)helics_flag_debugging;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1on_1error_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_flags)helics_flag_terminate_on_error;
   jresult = (jint)result; 
   return jresult;
 }
@@ -751,11 +775,11 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1
 
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1force_1logging_1flush_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  helics_federate_flags result;
+  helics_flags result;
   
   (void)jenv;
   (void)jcls;
-  result = (helics_federate_flags)helics_flag_force_logging_flush;
+  result = (helics_flags)helics_flag_force_logging_flush;
   jresult = (jint)result; 
   return jresult;
 }
@@ -763,11 +787,11 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1force_1logg
 
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1dumplog_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  helics_federate_flags result;
+  helics_flags result;
   
   (void)jenv;
   (void)jcls;
-  result = (helics_federate_flags)helics_flag_dumplog;
+  result = (helics_flags)helics_flag_dumplog;
   jresult = (jint)result; 
   return jresult;
 }
@@ -8911,6 +8935,29 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageFree(JNIEnv 
   (void)jcls;
   arg1 = *(helics_message_object *)&jarg1; 
   helicsMessageFree(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageClear(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_message_object *)&jarg1; 
+  helicsMessageClear(arg1,arg2);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
 }
 
 

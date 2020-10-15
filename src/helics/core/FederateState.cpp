@@ -163,7 +163,7 @@ void FederateState::reInit()
 }
 federate_state FederateState::getState() const
 {
-    return state;
+    return state.load();
 }
 
 int32_t FederateState::getCurrentIteration() const
@@ -1147,18 +1147,20 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ADD_PUBLISHER: {
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
-                subI->addSource(cmd.getSource(),
-                                cmd.name,
-                                cmd.getString(typeStringLoc),
-                                cmd.getString(unitStringLoc));
-                addDependency(cmd.source_id);
+                if (subI->addSource(cmd.getSource(),
+                                    cmd.name,
+                                    cmd.getString(typeStringLoc),
+                                    cmd.getString(unitStringLoc))) {
+                    addDependency(cmd.source_id);
+                }
             }
         } break;
         case CMD_ADD_SUBSCRIBER: {
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
-                pubI->subscribers.emplace_back(cmd.source_id, cmd.source_handle);
-                addDependent(cmd.source_id);
+                if (pubI->addSubscriber(cmd.getSource())) {
+                    addDependent(cmd.source_id);
+                }
             }
         } break;
         case CMD_ADD_DEPENDENCY:
@@ -1408,6 +1410,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             ignore_unit_mismatch = value;
             break;
         case defs::flags::slow_responding:
+        case defs::flags::debugging:
             slow_responding = value;
             break;
         case defs::flags::terminate_on_error:
@@ -1500,6 +1503,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
         case defs::flags::source_only:
             return source_only;
         case defs::flags::slow_responding:
+        case defs::flags::debugging:
             return slow_responding;
         case defs::flags::terminate_on_error:
             return terminate_on_error;
@@ -1650,6 +1654,35 @@ void FederateState::logMessage(int level,
     }
 }
 
+const std::string& fedStateString(federate_state state)
+{
+    static const std::string c1{"created"};
+    static const std::string estate{"error"};
+    static const std::string init{"initializing"};
+    static const std::string dis{"disconnected"};
+    static const std::string exec{"executing"};
+    static const std::string term{"terminating"};
+    static const std::string unk{"unknown"};
+
+    switch (state) {
+        case federate_state::HELICS_CREATED:
+            return c1;
+        case federate_state::HELICS_INITIALIZING:
+            return init;
+        case federate_state::HELICS_EXECUTING:
+            return exec;
+        case federate_state::HELICS_TERMINATING:
+            return term;
+        case federate_state::HELICS_FINISHED:
+            return dis;
+        case federate_state::HELICS_ERROR:
+            return estate;
+        case federate_state::HELICS_UNKNOWN:
+        default:
+            return unk;
+    }
+}
+
 std::string FederateState::processQueryActual(const std::string& query) const
 {
     if (query == "publications") {
@@ -1699,11 +1732,19 @@ std::string FederateState::processQueryActual(const std::string& query) const
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
         base["parent"] = parent_->getGlobalId().baseValue();
-        base["state"] = static_cast<int>(state.load());
+        base["state"] = fedStateString(state.load());
         base["publications"] = publicationCount();
         base["input"] = inputCount();
         base["endpoints"] = endpointCount();
         base["granted_time"] = static_cast<double>(grantedTime());
+        return generateJsonString(base);
+    }
+    if (query == "global_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["state"] = fedStateString(state.load());
         return generateJsonString(base);
     }
     if (query == "timeconfig") {
@@ -1764,12 +1805,12 @@ std::string FederateState::processQueryActual(const std::string& query) const
 std::string FederateState::processQuery(const std::string& query) const
 {
     std::string qstring;
-    if (query == "publications" || query == "inputs" ||
-        query == "endpoints") {  // these never need to be locked
+    if (query == "publications" || query == "inputs" || query == "endpoints" ||
+        query == "global_state") {  // these never need to be locked
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents;current_time";
+            "publications;inputs;endpoints;interfaces;subscriptions;current_state;global_state;dependencies;timeconfig;config;dependents;current_time";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

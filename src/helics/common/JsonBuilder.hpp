@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace Json {
@@ -19,8 +20,8 @@ namespace helics {
 class JsonMapBuilder {
   private:
     std::unique_ptr<Json::Value> jMap;
-    std::map<int, std::string> missing_components;
-
+    std::map<int, std::pair<std::string, int32_t>> missing_components;
+    int counterCode{0};  // a code for the user to include for various purposes
   public:
     JsonMapBuilder() noexcept;
     ~JsonMapBuilder();
@@ -40,11 +41,15 @@ class JsonMapBuilder {
     bool addComponent(const std::string& info, int index) noexcept;
     /** generate a new location to fill in later
     @return the index value of the location for use in addComponent*/
-    int generatePlaceHolder(const std::string& location);
+    int generatePlaceHolder(const std::string& location, int32_t code);
     /** generate the JSON value*/
+    bool clearComponents(int32_t code);
     std::string generate();
     /** reset the builder*/
     void reset();
+    /** set the counter code value*/
+    void setCounterCode(int code) { counterCode = code; }
+    int getCounterCode() const { return counterCode; }
 };
 
 /** class to help with the generation of JSON*/

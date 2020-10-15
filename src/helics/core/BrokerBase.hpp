@@ -70,6 +70,7 @@ class BrokerBase {
         false};  //!< flag indicating the broker should use a conservative time policy
     bool terminate_on_error{
         false};  //!< flag indicating that the federation should halt on any error
+    bool debugging{false};  //!< flag indicating operation in a user debugging mode
   private:
     std::atomic<bool> mainLoopIsRunning{
         false};  //!< flag indicating that the main processing loop is running
@@ -212,6 +213,8 @@ class BrokerBase {
     void setErrorState(int eCode, const std::string& estring);
     /** set the logging file if using the default logger*/
     void setLoggingFile(const std::string& lfile);
+    /** get the value of a particular flag*/
+    bool getFlagValue(int32_t flag) const;
 
   public:
     /** generate a callback function for the logging purposes*/

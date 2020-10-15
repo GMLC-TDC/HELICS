@@ -19,11 +19,7 @@ else()
     set(zmq_shared_build ON)
 endif()
 
-if(MINGW)
-    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.1)
-else()
-    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.2)
-endif()
+set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.3)
 
 string(TOLOWER "libzmq" lcName)
 
@@ -47,17 +43,6 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
         # Fetch the content using previously declared details
         fetchcontent_populate(libzmq)
 
-        # this section to be removed at the next release of ZMQ for now we need to
-        # download the file in master as the one in the release doesn't work
-        file(RENAME ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in
-             ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in.old
-        )
-        file(
-            DOWNLOAD
-            https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in
-            ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in
-        )
-
     endif()
 
     hide_variable(FETCHCONTENT_SOURCE_DIR_LIBZMQ)
@@ -80,17 +65,6 @@ else() # CMake <3.11
     )
 
     set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${lcName}-build)
-
-    if(NOT EXISTS ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in.old)
-        file(RENAME ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in
-             ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in.old
-        )
-        file(
-            DOWNLOAD
-            https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in
-            ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in
-        )
-    endif()
 
 endif()
 
@@ -124,6 +98,17 @@ set(WITH_PERF_TOOL
     OFF
     CACHE INTERNAL ""
 )
+
+set(WITH_LIBSODIUM_STATIC
+    OFF
+    CACHE INTERNAL ""
+)
+
+set(WITH_NORM
+    OFF
+    CACHE INTERNAL ""
+)
+
 set(ENABLE_CPACK
     OFF
     CACHE INTERNAL ""
@@ -180,6 +165,8 @@ hide_variable(ENABLE_EVENTFD)
 hide_variable(ZMQ_CV_IMPL)
 hide_variable(BUILD_TESTS)
 hide_variable(ENABLE_INTRINSICS)
+hide_variable(ENABLE_INTRINSICS)
+hide_variable(ZMQ_OUTPUT_BASENAME)
 
 hide_variable(ZMQ_WIN32_WINNT)
 
