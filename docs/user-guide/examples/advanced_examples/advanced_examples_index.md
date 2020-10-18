@@ -16,36 +16,28 @@
 
 ```
 
-intro text which describes the examples covered -- 
-the first example is the base model - all other examples build off this model.
-find the source code on github *here*, clone/etc
+
+The Fundamental examples teach three concepts to build on a default setup:
+
+1. Federate Integration with the API
+2. Message and Communication Configuration
+3. Integrating multiple concepts
+
+
+![placeholder](../../../img/user_guide_combinations_advanced.png)
 
 
 
-what does each cover?
-
-1. base model with this configuration - xyz
-
--- follows the co-sim sequence framework in the explanation
-
-2.  message + communication configuration
-
--- sub topics:
-
-* pub/sub + multi-source inputs
-* endpoints+queries 
-* ns3 
-
-4. brokers
-
-* multiple core types
-* hierarchies
-
-5. orchestration
-
-6. many types of federates -- update monish's examples
-
-7. integrating advanced setup options
+## What are we modeling?
 
 
+![](../../../img/battery_charger.png)
+
+
+
+## Where is the code?
+
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+
+[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 

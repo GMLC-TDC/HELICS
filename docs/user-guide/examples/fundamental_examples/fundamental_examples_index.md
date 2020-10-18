@@ -38,3 +38,10 @@ The Fundamental examples address this question with two federates: one to model 
 The examples in this section start with the simplest configuration method, which makes assumptions about the system which may not be completely valid but are reasonable for learning purposes.
 
 Let's build our first HELICS co-simulation!
+
+## Where is the code?
+
+The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+
+[![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental)
+

@@ -2,51 +2,102 @@
 
 
 
+
+The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation.
+
+<p align="center">
+<img src = "../../../img/default_setup.png" width="300">
+</p>
+
+The base example described here will go into detail about the necessary components of a HELICS program. Subsequent examples in the Fundamental Examples section will change small components of the system.
+
+The Base Example tutorial is organized as follows:
+
 ```eval_rst
 .. toctree::
-    :hidden:
+
     :maxdepth: 2
     
 ```
-The Base Example walks through a simple HELICS co-simulation 
-
-## Components of the HELICS program
-
-## Components of the
 
 
+## Example files
 
-When we build a HELICS co-simulation, we need to 
+All files necessary to run the Base Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_default)
 
-What are we trying to simulate?  That will inform the _topology_ of the co-simulation, or how we knit together the individual simulators.
+[![](../../../img/fund_default_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_default)
 
-We will start by connecting two python federates. Remember that a federate[link to federate page] is the same as a simulator (with python, a complete program).
+The files include:
 
-note that we're using the c interface
-want people to see the same apis they would see if they're using matlab, c etc
+* Python program and configuration json for Battery federate
+* Python program and configuration json for Charger federate
+* "runner" json to enable `helics_cli` execution
 
-if you are looking at these examples, and only using python, odds are you're going to like the class-based interface
+## What is this Co-simulation doing?
+
+Describe the purpose of the program -- what is it calculating?
+
+## HELICS Components
+
+What are the necessary components to a basic co-simulation?
+
+### Register and Configure Federates
+
+![](../../../img/reg_config_default.png)
+
+### Enter Execution Mode
+
+![](../../../img/execution_default.png)
+
+### Define Time Variables
+
+![](../../../img/time_default.png)
+
+### Initiate Time Steps
+
+![](../../../img/timestart_default.png)
+
+* request time, grant time
+
+### Send/Receive Communication between Federates
+
+![](../../../img/sendreceive_default.png)
 
 
-basic model, from which everything else will be built
 
-the place for newbies.
-## Register Federates, Configure Federates
+## Default Setup
 
-What are we doing ?  We are telling HELICS to create a federate from a JSON config file.
+The default setup integrates the federates configurations with external JSON files. The message and communication configurations are publications and subscriptions.
 
-## test
+### Simulator Integration: External JSON
 
-## Components to a basic co-simulation
+![](../../../img/externaljson_default.png)
 
-### Pre launch housekeeping
+- picture of jsons
+- where they integrate in the cosim
 
-1. Set up loggers
+### Messages + Communication: pub/sub
 
-2. Plan to terminate federates at completion
 
-We can destroy the federates if the routine completes, but what should we do if the routine crashes prior to completion?
+![](../../../img/default1.png)
 
-### Main Routine
+![](../../../img/pubs.gif)
 
-#### Register federates
+![](../../../img/subs.gif)
+
+![](../../../img/pubs2.gif)
+
+![](../../../img/subs2.gif)
+
+![](../../../img/pubsubs.gif)
+
+### Co-simulation Execution: `helics_cli`
+
+- picture of runner json
+- link to helics_cli page
+- picture of running on the command line
+- picture of output files
+
+
+
+
