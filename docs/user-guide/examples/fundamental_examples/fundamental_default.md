@@ -15,8 +15,9 @@ The Base Example tutorial is organized as follows:
 
 ```eval_rst
 .. toctree::
+    :maxdepth: 1
+    
 
-    :maxdepth: 2
     
 ```
 
