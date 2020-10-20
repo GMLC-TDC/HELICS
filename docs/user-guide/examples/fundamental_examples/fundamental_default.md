@@ -82,15 +82,15 @@ The default setup integrates the federates configurations with external JSON fil
 
 ![](../../../img/default1.png)
 
-![](../../../img/pubs.gif)
+![alt text](../../../img/pubs.gif)
 
-![](../../../img/subs.gif)
+![alt text](../../../img/subs.gif)
 
-![](../../../img/pubs2.gif)
+![alt text](../../../img/pubs2.gif)
 
-![](../../../img/subs2.gif)
+![alt text](../../../img/subs2.gif)
 
-![](../../../img/pubsubs.gif)
+![alt text](../../../img/pubsubs.gif)
 
 ### Co-simulation Execution: `helics_cli`
 
