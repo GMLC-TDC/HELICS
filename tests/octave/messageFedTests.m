@@ -124,43 +124,43 @@ end
 %!     assert(false);
 %! end_try_catch
 
-##% testEndpointSend
-##%!test
-##%! helics;
-##%! [feds,success]=generateFed();
-##%! assert(success)
-##%! try
-##%! epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
-##%!
-##%! epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
-##%!
-##%! helicsFederateSetTimeProperty(feds.mFed,int32(137),1.0);
-##%! helicsFederateEnterExecutingMode(feds.mFed);
-##%! data = 'this is a random string message';
-##%!
-##%! helicsEndpointSendToAt(epid1,'ep2',1.0,data);
-##%!
-##%! granted_time=helicsFederateRequestTime(feds.mFed,2.0);
-##%! assert(granted_time,1.0);
-##%!
-##%! res=helicsFederateHasMessage(feds.mFed);
-##%! assert(res,1);
-##%! res=helicsEndpointHasMessage(epid1);
-##%! assert(res,0);
-##%! res=helicsEndpointHasMessage(epid2);
-##%! assert(res,1);
-##%!
-##%! message = helicsEndpointGetMessage(epid2);
-##%! assert(message.data,data);
-##%! assert(double(message.length),length(data));
-##%! assert(message.original_source,'fed1/ep1');
-##%! assert(message.time,1.0);
-##%! success=closeStruct(feds);
-##%! assert(success);
-##%!
-##%! catch e
-##%!    disp(e.message)
-##%!     disp(e.stack(1))
-##%!     forceCloseStruct(feds);
-##%!     assert(false);
-##%! end_try_catch
+% testEndpointSend
+%!test
+%! helics;
+%! [feds,success]=generateFed();
+%! assert(success)
+%! try
+%! epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
+%!
+%! epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
+%!
+%! helicsFederateSetTimeProperty(feds.mFed,int32(137),1.0);
+%! helicsFederateEnterExecutingMode(feds.mFed);
+%! data = 'this is a random string message';
+%!
+%! helicsEndpointSendToAt(epid1,'ep2',1.0,data);
+%!
+%! granted_time=helicsFederateRequestTime(feds.mFed,2.0);
+%! assert(granted_time,1.0);
+%!
+%! res=helicsFederateHasMessage(feds.mFed);
+%! assert(res,1);
+%! res=helicsEndpointHasMessage(epid1);
+%! assert(res,0);
+%! res=helicsEndpointHasMessage(epid2);
+%! assert(res,1);
+%!
+%! message = helicsEndpointGetMessage(epid2);
+%! assert(helicsMessageGetString(message),data);
+%! assert(double(helicsMessageGetRawDataSize(message)),length(data));
+%! assert(helicsMessageGetOriginalSource(message),'fed1/ep1');
+%! assert(helicsMessageGetTime(message),1.0);
+%! success=closeStruct(feds);
+%! assert(success);
+%!
+%! catch e
+%!    disp(e.message)
+%!     disp(e.stack(1))
+%!     forceCloseStruct(feds);
+%!     assert(false);
+%! end_try_catch
