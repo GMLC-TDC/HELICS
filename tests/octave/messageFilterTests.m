@@ -5,7 +5,7 @@ end
 
 
 %!function [fedStruct,success]=generateFeds(count)
-%! helics
+%! helics;
 %! success=true;
 %! initstring = ['-f ',num2str(count)];
 %! fedinitstring = ['--broker=mainbroker --federates=',num2str(count)];
@@ -44,7 +44,7 @@ end
 %!endfunction
 
 %!function success=closeStruct(fedStruct)
-%! helics
+%! helics;
 %! success=true;
 %! for ii=1:numel(fedStruct.mFed)
 %!   helicsFederateFinalize(fedStruct.mFed{ii});
@@ -60,7 +60,7 @@ end
 %!endfunction
 
 %!function forceCloseStruct(fedStruct)
-%! helics
+%! helics;
 %! for ii=1:numel(fedStruct.mFed)
 %!   helicsFederateFinalize(fedStruct.mFed{ii});
 %! endfor
@@ -86,9 +86,11 @@ end
 %function to test some of the broker functions
 % testBrokerFunctions
 %!test
-%! helics
+%! helics;
 %! initstring = '-f1 --name=mainbroker';
 %! broker=helicsCreateBroker('zmq','',initstring);
+%! valid=helicsBrokerIsValid(broker);
+%! assert(valid,1);
 %! ident=helicsBrokerGetIdentifier(broker);
 %! assert(ident,'mainbroker');
 %! add=helicsBrokerGetAddress(broker);
@@ -100,7 +102,7 @@ end
 %
 % testFilterRegistration
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFeds(2);
 %! assert(success)
 %! try
@@ -142,7 +144,7 @@ end
 %
 % testFilterFunction
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFeds(2);
 %! assert(success)
 %! try

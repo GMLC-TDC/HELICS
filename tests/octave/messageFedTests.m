@@ -5,7 +5,7 @@ end
 
 
 %!function [fedStruct,success]=generateFed()
-%! helics
+%! helics;
 %! success=true;
 %! initstring = '-f 1';
 %! fedinitstring = '--broker=mainbroker --federates=1';
@@ -42,7 +42,7 @@ end
 %!endfunction
 
 %!function success=closeStruct(fedStruct)
-%! helics
+%! helics;
 %! success=true;
 %! helicsFederateFinalize(fedStruct.mFed);
 %! helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
@@ -54,7 +54,7 @@ end
 %!endfunction
 
 %!function forceCloseStruct(fedStruct)
-%! helics
+%! helics;
 %! helicsFederateFinalize(fedStruct.mFed);
 %!
 %! cnt=0;
@@ -75,7 +75,7 @@ end
 
 
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %! try
@@ -126,7 +126,7 @@ end
 
 % testEndpointSend
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %! try
