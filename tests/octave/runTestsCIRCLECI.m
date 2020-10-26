@@ -2,5 +2,5 @@ addpath('/usr/local/octave/');
 helics;
 helicsGetVersion;
 #test messageFedTests;
-#test messageFilterTests;
+test messageFilterTests;
 test valueFedTests;
