@@ -4,7 +4,7 @@ end
 
 
 %!function [fedStruct,success]=generateFed()
-%! helics
+%! helics;
 %! success=true;
 %! initstring = '-f 1';
 %! fedinitstring = '--broker=mainbroker --federates=1';
@@ -42,7 +42,7 @@ end
 %!endfunction
 
 %!function success=closeStruct(fedStruct)
-%! helics
+%! helics;
 %! success=true;
 %! helicsFederateFinalize(fedStruct.vFed);
 %! helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
@@ -54,7 +54,7 @@ end
 %!endfunction
 
 %!function forceCloseStruct(fedStruct)
-%! helics
+%! helics;
 %! helicsFederateFinalize(fedStruct.vFed);
 %!
 %! cnt=0;
@@ -121,7 +121,7 @@ end
 
 % test named point
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -184,7 +184,7 @@ end
 %
 % test boolean
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -249,7 +249,7 @@ end
 %
 % testPublisherRegistration
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -296,7 +296,7 @@ end
 %
 % testDouble
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -363,7 +363,7 @@ end
 %
 % testComplex
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -428,7 +428,7 @@ end
 %
 % testInteger
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -493,7 +493,7 @@ end
 %
 % testString
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!
@@ -559,7 +559,7 @@ end
 %
 % testVector
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %!

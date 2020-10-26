@@ -166,25 +166,25 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 // typemap for vector output functions
 
-%typemap(arginit) (double data[], int maxlen, int *actualSize) {
+%typemap(arginit) (double data[], int maxLength, int *actualSize) {
   $1=(double *)(NULL);
 }
 
-%typemap(in, numinputs=0) (double data[], int maxlen, int *actualSize) {
+%typemap(in, numinputs=0) (double data[], int maxLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (double data[], int maxlen, int *actualSize) {
+%typemap(freearg) (double data[], int maxLength, int *actualSize) {
    if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(double data[], int maxlen, int *actualSize) {
+%typemap(check)(double data[], int maxLength, int *actualSize) {
     $2=helicsInputGetVectorSize(arg1);
     $1=(double *)malloc(sizeof(double)*$2);
 }
 
-%typemap(argout) (double data[], int maxlen, int *actualSize) {
+%typemap(argout) (double data[], int maxLength, int *actualSize) {
 
     Matrix a(*$3,1);
     double *dat=a.fortran_vec();
