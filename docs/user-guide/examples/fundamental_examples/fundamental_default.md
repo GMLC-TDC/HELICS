@@ -20,9 +20,7 @@ The Base Example tutorial is organized as follows:
 
 ```eval_rst
 .. contents::
-
-    :maxdepth: 2
-    
+	:local:    
     
 ```
 
