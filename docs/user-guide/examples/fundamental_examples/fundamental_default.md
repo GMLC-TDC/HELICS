@@ -20,7 +20,6 @@ The Base Example tutorial is organized as follows:
 ```eval_rst
 .. contents::
 	:local:    
-    
 ```
 
 
