@@ -11,7 +11,6 @@ The Base Example walks through a simple HELICS co-simulation between two python 
 	<p align="center">
 	<img src = "../../../img/default_setup.png" width="300">
 	</p>
-	
 ```
 
 The base example described here will go into detail about the necessary components of a HELICS program. Subsequent examples in the Fundamental Examples section will change small components of the system.

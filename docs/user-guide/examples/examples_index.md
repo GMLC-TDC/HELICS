@@ -5,11 +5,10 @@
 
 ```eval_rst
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     
     fundamental_examples/fundamental_examples_index
     advanced_examples/advanced_examples_index
-
 ```
 <!--- 
 this page should mirror the helics_co-sim_sequence, if possible
