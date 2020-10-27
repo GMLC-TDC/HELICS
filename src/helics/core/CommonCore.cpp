@@ -2546,7 +2546,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
                 auto center = generateMapObjectCounter();
                 if (center == builder.getCounterCode()) {
                     return builder.generate();
-            }
+                }
                 builder.reset();
             }
             if (builder.isActive()) {

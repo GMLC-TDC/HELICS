@@ -1157,19 +1157,19 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
                 if (subI->addSource(cmd.getSource(),
-                                std::string(cmd.name()),
-                                cmd.getString(typeStringLoc),
+                                    std::string(cmd.name()),
+                                    cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
-                addDependency(cmd.source_id);
-            }
+                    addDependency(cmd.source_id);
+                }
             }
         } break;
         case CMD_ADD_SUBSCRIBER: {
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 if (pubI->addSubscriber(cmd.getSource())) {
-                addDependent(cmd.source_id);
-            }
+                    addDependent(cmd.source_id);
+                }
             }
         } break;
         case CMD_ADD_ENDPOINT: {
