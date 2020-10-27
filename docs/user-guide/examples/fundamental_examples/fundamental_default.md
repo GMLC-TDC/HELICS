@@ -5,19 +5,23 @@
 
 The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation.
 
-<p align="center">
-<img src = "../../../img/default_setup.png" width="300">
-</p>
+```
+.. raw:: html
+
+	<p align="center">
+	<img src = "../../../img/default_setup.png" width="300">
+	</p>
+```
 
 The base example described here will go into detail about the necessary components of a HELICS program. Subsequent examples in the Fundamental Examples section will change small components of the system.
 
 The Base Example tutorial is organized as follows:
 
 ```eval_rst
-.. toctree::
-    :maxdepth: 1
-    
+.. contents::
 
+    :maxdepth: 2
+    
     
 ```
 
@@ -252,7 +256,7 @@ Thus far we have established that the Battery is publishing its current from han
 
 In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery needs to subscribe to the `Charger/EV_voltage` handle.
 
-![alt text](../../../img/subs2.gif)
+![alt text](../../../img/subs2.gif) **try gitter**
 
 The final configuration for one EV is shown in the image below. Federates subscribe to the handle which is publishing the value they need to perform the analysis.
 
