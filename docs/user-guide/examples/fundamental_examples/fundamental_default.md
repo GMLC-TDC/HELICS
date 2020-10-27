@@ -13,13 +13,34 @@ The Base Example walks through a simple HELICS co-simulation between two python 
 	</p>
 ```
 
+
 <p align="center">
-<img src = "../../../img/default_setup.png" width="300">
+	<img src = "../../../img/default_setup.png" width="300">
 </p>
+
+
+![](../../../img/default_setup.png)
 
 The base example described here will go into detail about the necessary components of a HELICS program. Subsequent examples in the Fundamental Examples section will change small components of the system.
 
 The Base Example tutorial is organized as follows:
+
+* [Example files](#example-files)  
+* [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
+* [HELICS Components](#helics-components) 
+  * [Register and Configure Federates](#register-and-configure-federates)
+  * [Enter Execution Mode](#enter-execution-mode)
+  * [Define Time Variables](#define-time-variables)
+  * [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
+  * [Send Receive Communication between Federates](#send-receive-communication-between-federates)
+* [Default Setup](#default-setup)
+	* [Messages + Communication: pub sub](messages-+-communication:-pub-sub)
+	* [Simulator Integration: External JSON](#simulator-integration:-external-json)
+	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution:-helics_cli)
+* [Questions and Help](#questions-and-help)
+
+
+test here too
 
 ```eval_rst
 .. contents::
@@ -194,7 +215,7 @@ In the `Charger.py` federate, we need to send the first signal **before** enteri
 
 
 
-### Send/Receive Communication between Federates
+### Send Receive Communication between Federates
 
 Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the handles to which they have subscribed, and then send information from the handles from which they publish.
 
@@ -262,7 +283,7 @@ Thus far we have established that the Battery is publishing its current from han
 
 In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery needs to subscribe to the `Charger/EV_voltage` handle.
 
-![alt text](../../../img/subs2.gif) **try gitter**
+![alt text](../../../img/subs2.gif) 
 
 The final configuration for one EV is shown in the image below. Federates subscribe to the handle which is publishing the value they need to perform the analysis.
 
