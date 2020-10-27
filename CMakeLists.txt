@@ -92,9 +92,17 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL P
     endif(WIN32)
 endif()
 
+# Warning if CMAKE_INSTALL_PREFIX is empty. Likely set by using the wrong environment variable.
+if(NOT CMAKE_INSTALL_PREFIX)
+    message(
+        WARNING
+            "CMAKE_INSTALL_PREFIX is set to nothing. If you are using an environment variable for handling prefix paths, that variable might not have been set before using it with CMake to set the CMAKE_INSTALL_PREFIX option."
+    )
+endif()
+
 # Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
-get_filename_component(tmp_install_prefix ${CMAKE_INSTALL_PREFIX} REALPATH)
-get_filename_component(tmp_proj_bindir ${PROJECT_BINARY_DIR} REALPATH)
+get_filename_component(tmp_install_prefix "${CMAKE_INSTALL_PREFIX}" REALPATH)
+get_filename_component(tmp_proj_bindir "${PROJECT_BINARY_DIR}" REALPATH)
 # Windows paths are case insensitive
 if(WIN32)
     string(TOLOWER "${tmp_install_prefix}" tmp_install_prefix)

@@ -19,12 +19,14 @@ class helicsCLI11App;
  */
 class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   public:
-    int uniqueKey = 0;  //!< location for keying the info for application purposes
-    char separator = '/';  //!< separator for global name of localFederates
-    bool autobroker =
-        false;  //!< specify that the core should generate a broker if not found otherwise
-    core_type coreType = core_type::DEFAULT;  //!< the type of the core
-    int brokerPort = -1;  //!< broker port information
+    int uniqueKey{0};  //!< location for keying the info for application purposes
+    char separator{'/'};  //!< separator for global name of localFederates
+    bool autobroker{
+        false};  //!< specify that the core should generate a broker if not found otherwise
+    bool debugging{false};  //!< specify that the core/federate should operate in a user debugging
+                            //!< mode which will turn off some timeouts
+    core_type coreType{core_type::DEFAULT};  //!< the type of the core
+    int brokerPort{-1};  //!< broker port information
 
     std::string defName;  //!< a default name to use for a federate
     std::string coreName;  //!< the name of the core
@@ -92,6 +94,11 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
   @param json a string containing the name of the JSON file or JSON contents
   */
     void loadInfoFromJson(const std::string& json, bool runArgParser = true);
+
+    /** check if a property has been set and return its value*/
+    Time checkTimeProperty(int propId, Time defVal) const;
+    bool checkFlagProperty(int propId, bool defVal) const;
+    int checkIntProperty(int propId, int defVal) const;
 
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();

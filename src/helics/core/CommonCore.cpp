@@ -58,6 +58,7 @@ const std::string& state_string(operation_state state)
             return estate;
     }
 }
+
 // timeoutMon is a unique_ptr
 CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
@@ -832,6 +833,23 @@ void CommonCore::setFlagOption(LocalFederateId federateID, int32_t flag, bool fl
 
 bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
 {
+    switch (flag) {
+        case defs::flags::enable_init_entry:
+            return (delayInitCounter.load() == 0);
+        case defs::flags::delay_init_entry:
+            return (delayInitCounter.load() != 0);
+        case defs::flags::dumplog:
+        case defs::flags::force_logging_flush:
+        case defs::flags::debugging:
+            return getFlagValue(flag);
+        case defs::flags::forward_compute:
+        case defs::flags::single_thread_federate:
+        case defs::flags::rollback:
+            return false;
+        default:
+            break;
+    }
+
     if (federateID == gLocalCoreId) {
         return false;
     }
@@ -984,7 +1002,7 @@ const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
         }
     }
     return emptyStr;
-}
+}  // namespace helics
 
 const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
 {
@@ -2169,12 +2187,14 @@ enum subqueries : std::uint16_t {
     current_time_map = 2,
     dependency_graph = 3,
     data_flow_graph = 4,
+    global_state = 6,
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {current_time_map, true}},
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
+    {"global_state", {global_state, true}},
 };
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
@@ -2274,14 +2294,14 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
     if (queryStr == "state") {
-        return std::to_string(static_cast<int>(fed->getState()));
+        return fedStateString(fed->getState());
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(fed);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   R"(["exists","isinit","state","version","queries","filtered_endpoints","current_time",)") +
+                   R"(["exists","isinit","state","version","queries","filtered_endpoints",)") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -2290,8 +2310,8 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
-               "\"publications\",\"filters\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\",\"current_time\",\"global_time\",\"current_state\"]";
+        return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
+               "\"publications\",\"filters\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"current_state\"]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2350,7 +2370,8 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     if (loopFederates.size() > 0) {
         base["federates"] = Json::arrayValue;
         for (const auto& fed : loopFederates) {
-            int brkindex = builder.generatePlaceHolder("federates");
+            int brkindex =
+                builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request);
             if (ret == "#wait") {
                 queryReq.messageID = brkindex;
@@ -2400,6 +2421,9 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                     base["filters"].append(std::move(filter));
                 }
             }
+            break;
+        case global_state:
+            base["state"] = brokerStateName(brokerState.load());
             break;
         default:
             break;
@@ -2486,6 +2510,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "address") {
         return std::string{"\""} + getAddress() + '"';
     }
+    if (queryStr == "counter") {
+        return fmt::format("{}", generateMapObjectCounter());
+    }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
     }
@@ -2514,16 +2541,25 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
-            if (std::get<0>(mapBuilders[index]).isCompleted()) {
-                return std::get<0>(mapBuilders[index]).generate();
+            auto& builder = std::get<0>(mapBuilders[index]);
+            if (builder.isCompleted()) {
+                auto center = generateMapObjectCounter();
+                if (center == builder.getCounterCode()) {
+                    return builder.generate();
             }
-            if (std::get<0>(mapBuilders[index]).isActive()) {
+                builder.reset();
+            }
+            if (builder.isActive()) {
                 return "#wait";
             }
         }
 
         initializeMapBuilder(queryStr, index, mi->second.second);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
+            if (!mi->second.second) {
+                auto center = generateMapObjectCounter();
+                std::get<0>(mapBuilders[index]).setCounterCode(center);
+            }
             return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
@@ -2895,7 +2931,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
 
         } break;
         case CMD_QUERY_REPLY:
-            if (command.dest_id == global_broker_id_local) {
+            if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {
                 processQueryResponse(command);
             } else {
                 transmit(getRoute(command.dest_id), command);
@@ -3941,6 +3977,8 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             requestors.clear();
             if (std::get<2>(mapBuilders[m.counter])) {
                 builder.reset();
+            } else {
+                builder.setCounterCode(generateMapObjectCounter());
             }
         }
     }
@@ -4144,6 +4182,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case defs::flags::slow_responding:
             no_ping = checkActionFlag(cmd, indicator_flag);
             break;
+        case defs::flags::debugging:
+            debugging = no_ping = checkActionFlag(cmd, indicator_flag);
+            break;
         case UPDATE_LOGGING_CALLBACK:
             if (checkActionFlag(cmd, empty_flag)) {
                 setLoggerFunction(nullptr);
@@ -4285,6 +4326,16 @@ bool CommonCore::checkAndProcessDisconnect()
         return true;
     }
     return false;
+}
+
+int CommonCore::generateMapObjectCounter() const
+{
+    int result = static_cast<int>(brokerState.load());
+    for (const auto& fed : loopFederates) {
+        result += static_cast<int>(fed.state);
+    }
+    result += static_cast<int>(loopHandles.size());
+    return result;
 }
 
 void CommonCore::sendDisconnect()

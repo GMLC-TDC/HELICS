@@ -60,6 +60,8 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``state``          | Current state of the federate as a string [string]         |
 +--------------------+------------------------------------------------------------+
+| ``global_state``   | Current state of the federate as a string [JSON]           |
++--------------------+------------------------------------------------------------+
 | ``publications``   | current publications of a federate [sv]                    |
 +--------------------+------------------------------------------------------------+
 | ``subscriptions``  | current subscriptions of a federate [sv]                   |
@@ -72,7 +74,7 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``dependents``     | list of dependent objects [sv]                             |
 +--------------------+------------------------------------------------------------+
-| ``current_time``   | the current time of the federate [JSON]                    |
+| ``current_time``   | the current time data for the federate [JSON]             |
 +--------------------+------------------------------------------------------------+
 |``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
 +--------------------+------------------------------------------------------------+
@@ -148,6 +150,10 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``current_state``    | The state of all the components of a core as known by the core [JSON]               |
++----------------------+-------------------------------------------------------------------------------------+
+| ``global_state``     | The state of all the components from the components [JSON]                          |
++----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the core and its contained federates [JSON] |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``data_flow_graph``  | a representation of the data connections from all interfaces in a federation [JSON] |
@@ -159,6 +165,8 @@ The following queries will be answered by a core.
 |``version_all``       | data structure with the version string and the federates[JSON]                      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``version``          | the version string for the helics library [string]                                  |
++----------------------+-------------------------------------------------------------------------------------+
+| ``counter``          | A single number with a code, changes indicate core changes [string]                 |
 +----------------------+-------------------------------------------------------------------------------------+
 ```
 
@@ -198,6 +206,8 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``current_state``    | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``global_state``     | a structure with the current state all system components [JSON]                     |
++----------------------+-------------------------------------------------------------------------------------+
 | ``status``           | a structure with the current known status (true if connected) of the broker [JSON]  |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]|
@@ -216,9 +226,11 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``version``          | the version string for the helics library [string]                                  |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``counter``          | A single number with a code, changes indicate federation changes [string]           |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
+`federate_map`, `dependency_graph`, `global_time`,`global_state`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
 
 ### Invalid queries
 
@@ -238,6 +250,8 @@ The error codes follow http error codes for not found(404) or resource not avail
 ## Usage Notes
 
 Queries that must traverse the network travel along priority paths. The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular communication.
+
+The difference between `current_state` and `global_state` is that `current_state` is generated by information contained in the component so doesn't generate secondary queries of other components. Whereas `global_state` will reach out to the other components to get up to date information on the state.
 
 ### Application API
 
