@@ -109,9 +109,9 @@ void helicsFederateSetQueryCallback(helics_federate fed,
         if (queryAnswer == nullptr) {
             fedptr->setQueryCallback({});
         } else {
-            fedptr->setQueryCallback([queryAnswer, userdata](const std::string& query) {
+            fedptr->setQueryCallback([queryAnswer, userdata](std::string_view query) {
                 std::string buffer(1, '>');
-                queryAnswer(query.c_str(), static_cast<int>(query.size()), &buffer, userdata);
+                queryAnswer(query.data(), static_cast<int>(query.size()), &buffer, userdata);
                 buffer.pop_back();
                 return buffer;
             });

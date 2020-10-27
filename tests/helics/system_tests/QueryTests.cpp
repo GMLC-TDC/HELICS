@@ -873,7 +873,7 @@ TEST_F(query, queries_callback_test)
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    vFed1->setQueryCallback([](const std::string& queryStr) {
+    vFed1->setQueryCallback([](std::string_view queryStr) {
         return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
     });
 
@@ -895,7 +895,7 @@ TEST_F(query, concurrent_callback)
     auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
     p1.addTarget("ipt1");
 
-    vFed1->setQueryCallback([](const std::string& queryStr) {
+    vFed1->setQueryCallback([](std::string_view queryStr) {
         return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
     });
 

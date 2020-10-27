@@ -850,7 +850,7 @@ bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
             break;
     }
 
-    if (federateID == local_core_id) {
+    if (federateID == gLocalCoreId) {
         return false;
     }
     auto* fed = getFederateAt(federateID);

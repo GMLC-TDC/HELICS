@@ -41,7 +41,7 @@ class PublicationInfo {
     /** add a new subscriber to the publication
    @return true if the subscriber was added false if duplicate
    */
-    bool addSubscriber(global_handle newSubscriber);
+    bool addSubscriber(GlobalHandle newSubscriber);
 
     /** remove a subscriber*/
     void removeSubscriber(GlobalHandle subscriberToRemove);

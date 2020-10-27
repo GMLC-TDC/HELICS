@@ -134,7 +134,7 @@ void ValueFederateManager::addTarget(const Input& inp, const std::string& target
         for (auto el = rng.first; el != rng.second; ++el) {
             if (el->second == target) {
                 fed->logWarningMessage(std::string("Duplicate input targets detected for ") +
-                                       inp.actualName + "::" + target);
+                                       inp.getName() + "::" + target);
                 return;
             }
         }

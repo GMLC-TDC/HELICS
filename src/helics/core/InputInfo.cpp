@@ -111,7 +111,7 @@ void InputInfo::addData(GlobalHandle source_id,
     }
 }
 
-void InputInfo::addSource(GlobalHandle newSource,
+bool InputInfo::addSource(GlobalHandle newSource,
                           const std::string& sourceName,
                           const std::string& stype,
                           const std::string& sunits)
