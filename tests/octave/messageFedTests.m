@@ -5,7 +5,7 @@ end
 
 
 %!function [fedStruct,success]=generateFed()
-%! helics
+%! helics;
 %! success=true;
 %! initstring = '-f 1';
 %! fedinitstring = '--broker=mainbroker --federates=1';
@@ -42,7 +42,7 @@ end
 %!endfunction
 
 %!function success=closeStruct(fedStruct)
-%! helics
+%! helics;
 %! success=true;
 %! helicsFederateFinalize(fedStruct.mFed);
 %! helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
@@ -54,7 +54,7 @@ end
 %!endfunction
 
 %!function forceCloseStruct(fedStruct)
-%! helics
+%! helics;
 %! helicsFederateFinalize(fedStruct.mFed);
 %!
 %! cnt=0;
@@ -75,7 +75,7 @@ end
 
 
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %! try
@@ -126,7 +126,7 @@ end
 
 % testEndpointSend
 %!test
-%! helics
+%! helics;
 %! [feds,success]=generateFed();
 %! assert(success)
 %! try
@@ -138,7 +138,7 @@ end
 %! helicsFederateEnterExecutingMode(feds.mFed);
 %! data = 'this is a random string message';
 %!
-%! helicsEndpointSendEventRaw(epid1,'ep2',data,1.0);
+%! helicsEndpointSendToAt(epid1,'ep2',1.0,data);
 %!
 %! granted_time=helicsFederateRequestTime(feds.mFed,2.0);
 %! assert(granted_time,1.0);
@@ -151,10 +151,10 @@ end
 %! assert(res,1);
 %!
 %! message = helicsEndpointGetMessage(epid2);
-%! assert(message.data,data);
-%! assert(double(message.length),length(data));
-%! assert(message.original_source,'fed1/ep1');
-%! assert(message.time,1.0);
+%! assert(helicsMessageGetString(message),data);
+%! assert(double(helicsMessageGetRawDataSize(message)),length(data));
+%! assert(helicsMessageGetOriginalSource(message),'fed1/ep1');
+%! assert(helicsMessageGetTime(message),1.0);
 %! success=closeStruct(feds);
 %! assert(success);
 %!
