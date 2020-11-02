@@ -24,10 +24,11 @@ set(type STRING CACHE INTERNAL "")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.7)
-            set(FMT_OS OFF)
+            set(FMT_OS OFF CACHE INTERNAL "")
+            message(STATUS "FMT OS OFF")
     endif()
 endif()
-    
+
 # get the FMT header only library
 add_subdirectory(ThirdParty/fmtlib)
 
