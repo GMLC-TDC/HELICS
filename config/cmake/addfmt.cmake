@@ -22,6 +22,12 @@ set(SUPPORTS_USER_DEFINED_LITERALS ON)
 set(FMT_HAS_VARIANT OFF)
 set(type STRING CACHE INTERNAL "")
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.7)
+            set(FMT_OS OFF)
+    endif()
+endif()
+    
 # get the FMT header only library
 add_subdirectory(ThirdParty/fmtlib)
 
@@ -34,3 +40,4 @@ hide_variable(FMT_WERROR)
 hide_variable(FMT_FUZZ)
 hide_variable(FMT_CUDA_TEST)
 hide_variable(FMT_DEBUG_POSTFIX)
+hide_variable(FMT_OS)
