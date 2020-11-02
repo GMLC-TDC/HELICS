@@ -7,16 +7,16 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.10...3.17)
+cmake_minimum_required(VERSION 3.10...3.18)
 
 project(HELICS VERSION 3.0.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
-set(HELICS_VERSION_BUILD "alpha.1")
+set(HELICS_VERSION_BUILD "alpha.2")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-09-24")
+set(HELICS_DATE "2020-11-05")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
