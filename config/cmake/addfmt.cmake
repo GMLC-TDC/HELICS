@@ -27,7 +27,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
             set(FMT_OS OFF)
     endif()
 endif()
-    
+
 # get the FMT header only library
 add_subdirectory(ThirdParty/fmtlib)
 
