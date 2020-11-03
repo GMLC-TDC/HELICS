@@ -3347,12 +3347,12 @@ TEST(evil_message_object_test, helicsMessageGetMessageID)
 
 TEST(evil_message_object_test, helicsMessageCheckFlag)
 {
-    // helics_bool helicsMessageCheckFlag(helics_message message, int flag);
+    // helics_bool helicsMessageGetFlagOption(helics_message message, int flag);
     char rdata[256];
     auto evil_mo = reinterpret_cast<helics_message>(rdata);
-    auto res1 = helicsMessageCheckFlag(nullptr, 5);
+    auto res1 = helicsMessageGetFlagOption(nullptr, 5);
     EXPECT_EQ(res1, helics_false);
-    auto res2 = helicsMessageCheckFlag(evil_mo, 9);
+    auto res2 = helicsMessageGetFlagOption(evil_mo, 9);
     EXPECT_EQ(res2, helics_false);
 }
 

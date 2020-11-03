@@ -850,7 +850,7 @@ int32_t helicsMessageGetMessageID(helics_message message)
     return mess->messageID;
 }
 
-helics_bool helicsMessageCheckFlag(helics_message message, int flag)
+helics_bool helicsMessageGetFlagOption(helics_message message, int flag)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {
