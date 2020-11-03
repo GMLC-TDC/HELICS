@@ -1658,9 +1658,9 @@ void CommonCore::addDependency(LocalFederateId federateID, const std::string& fe
 }
 
 void CommonCore::sendTo(InterfaceHandle sourceHandle,
-                        std::string_view destination,
                         const void* data,
-                        uint64_t length)
+                        uint64_t length,
+                        std::string_view destination)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
@@ -1687,10 +1687,10 @@ void CommonCore::sendTo(InterfaceHandle sourceHandle,
 }
 
 void CommonCore::sendToAt(InterfaceHandle sourceHandle,
-                          std::string_view destination,
-                          Time sendTime,
                           const void* data,
-                          uint64_t length)
+                          uint64_t length,
+                          std::string_view destination,
+                          Time sendTime)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {
@@ -1774,7 +1774,7 @@ void CommonCore::send(InterfaceHandle sourceHandle, const void* data, uint64_t l
     generateMessages(m, targets);
 }
 
-void CommonCore::sendAt(InterfaceHandle sourceHandle, Time time, const void* data, uint64_t length)
+void CommonCore::sendAt(InterfaceHandle sourceHandle, const void* data, uint64_t length, Time time)
 {
     const auto* hndl = getHandleInfo(sourceHandle);
     if (hndl == nullptr) {

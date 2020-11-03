@@ -191,18 +191,18 @@ class CommonCore: public Core, public BrokerBase {
     virtual void
         send(InterfaceHandle sourceHandle, const void* data, uint64_t length) override final;
     virtual void sendAt(InterfaceHandle sourceHandle,
-                        Time time,
                         const void* data,
-                        uint64_t length) override final;
+                        uint64_t length,
+                        Time time) override final;
     virtual void sendTo(InterfaceHandle sourceHandle,
-                        std::string_view destination,
                         const void* data,
-                        uint64_t length) override final;
+                        uint64_t length,
+                        std::string_view destination) override final;
     virtual void sendToAt(InterfaceHandle sourceHandle,
-                          std::string_view destination,
-                          Time time,
                           const void* data,
-                          uint64_t length) override final;
+                          uint64_t length,
+                          std::string_view destination,
+                          Time time) override final;
     virtual void sendMessage(InterfaceHandle sourceHandle,
                              std::unique_ptr<Message> message) override final;
     virtual uint64_t receiveCount(InterfaceHandle destination) override final;

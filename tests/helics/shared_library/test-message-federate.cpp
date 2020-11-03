@@ -93,7 +93,7 @@ TEST_P(mfed_simple_type_tests, send_receive)
     EXPECT_TRUE(mFed1State == helics_state_execution);
     std::string data(500, 'a');
 
-    CE(helicsEndpointSendToAt(epid, "ep2", 0.0, data.c_str(), 500, &err));
+    CE(helicsEndpointSendToAt(epid, data.c_str(), 500, "ep2", 0.0, &err));
     helics_time time;
     CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
     EXPECT_EQ(time, 1.0);
@@ -136,7 +136,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
     EXPECT_TRUE(mFed1State == helics_state_execution);
     std::string data(500, 'a');
 
-    CE(helicsEndpointSendToAt(epid, "ep2", 0.0, data.c_str(), 500, &err));
+    CE(helicsEndpointSendToAt(epid, data.c_str(), 500, "ep2", 0.0, &err));
     helics_time time;
     CE(time = helicsFederateRequestTime(mFed1, 1.0, &err));
     EXPECT_EQ(time, 1.0);
@@ -251,8 +251,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     std::string data(500, 'a');
     std::string data2(400, 'b');
 
-    CE(helicsEndpointSendToAt(epid, "ep2", 0.0, data.c_str(), 500, &err));
-    CE(helicsEndpointSendToAt(epid2, "fed0/ep1", 0.0, data2.c_str(), 400, &err));
+    CE(helicsEndpointSendToAt(epid, data.c_str(), 500, "ep2", 0.0, &err));
+    CE(helicsEndpointSendToAt(epid2, data2.c_str(), 400, "fed0/ep1", 0.0, &err));
     // move the time to 1.0
     helics_time time;
     CE(helicsFederateRequestTimeAsync(mFed1, 1.0, &err));
@@ -328,9 +328,9 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
 
     std::string data(500, 'a');
 
-    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 500, &err));
-    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 400, &err));
-    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 300, &err));
+    CE(helicsEndpointSendTo(epid, data.c_str(), 500, nullptr, &err));
+    CE(helicsEndpointSendTo(epid, data.c_str(), 400, nullptr, &err));
+    CE(helicsEndpointSendTo(epid, data.c_str(), 300, nullptr, &err));
 
     // move the time to 1.0
     helics_time time;

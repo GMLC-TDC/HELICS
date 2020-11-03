@@ -160,8 +160,8 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    epid.sendTo("ep2", data);
-    epid2.sendTo("fed0/ep1", data2);
+    epid.sendTo(data,"ep2");
+    epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -221,8 +221,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    epid.sendTo("ep2", data);
-    epid2.sendTo("fed0/ep1", data2);
+    epid.sendTo(data,"ep2");
+    epid2.sendTo(data2,"fed0/ep1");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return cFed1->requestTime(1.0); });
     auto gtime = cFed2->requestTime(1.0);
