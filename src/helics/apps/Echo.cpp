@@ -101,7 +101,7 @@ namespace apps {
         auto m = ept.getMessage();
         std::lock_guard<std::mutex> lock(delayTimeLock);
         while (m) {
-            ept.sendToAt(m->data,m->original_source, currentTime + delayTime);
+            ept.sendToAt(m->data, m->original_source, currentTime + delayTime);
             m = ept.getMessage();
         }
     }

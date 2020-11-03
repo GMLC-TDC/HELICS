@@ -465,8 +465,7 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("this is a test message",
-              "d2");
+    e1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
     e2.sendTo("this is a test message2", "d1");

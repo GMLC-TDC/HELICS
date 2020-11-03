@@ -191,7 +191,7 @@ HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data
  * Send a message to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
- 
+
  * @param data The data to send.
  * @forcpponly
  * @param inputDataLength The length of the data to send.

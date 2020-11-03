@@ -131,7 +131,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    epid.sendTo(data,"ep2");
+    epid.sendTo(data, "ep2");
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -179,7 +179,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    ep1.sendTo(data,"ep2");
+    ep1.sendTo(data, "ep2");
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -225,7 +225,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    ep1.sendTo(data,"ep2");
+    ep1.sendTo(data, "ep2");
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -276,10 +276,10 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     helics::SmallBuffer data2(400, std::byte{'b'});
     helics::SmallBuffer data3(300, std::byte{'c'});
     helics::SmallBuffer data4(200, std::byte{'d'});
-    epid.sendTo(data1,"ep2");
-    epid.sendTo(data2,"ep2");
-    epid.sendTo(data3,"ep2");
-    epid.sendTo(data4,"ep2");
+    epid.sendTo(data1, "ep2");
+    epid.sendTo(data2, "ep2");
+    epid.sendTo(data3, "ep2");
+    epid.sendTo(data4, "ep2");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -408,8 +408,7 @@ class PingPongFed {
                     std::cout << name << ": send ping to " << triggers[index].second << " at time "
                               << static_cast<double>(nextTime) << '\n';
 #endif
-                    ep->sendTo("ping"
-                        ,triggers[index].second);
+                    ep->sendTo("ping", triggers[index].second);
                     ++index;
                     if (index >= static_cast<int>(triggers.size())) {
                         break;

@@ -3705,7 +3705,7 @@ TEST(evil_endpoint_test, helicsEndpointSendAt)
     helicsErrorClear(&err);
     // auto res2=helicsEndpointSendEventRaw(     nullptr,    nullptr,    nullptr,     int
     // inputDataLength,     helics_time time,     nullptr);
-    helicsEndpointSendAt(evil_ept, rdata, 56,3.5, &err);
+    helicsEndpointSendAt(evil_ept, rdata, 56, 3.5, &err);
     EXPECT_NE(err.error_code, 0);
 }
 
