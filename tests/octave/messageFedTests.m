@@ -152,7 +152,7 @@ end
 %!
 %! message = helicsEndpointGetMessage(epid2);
 %! assert(helicsMessageGetString(message),data);
-%! assert(double(helicsMessageGetRawDataSize(message)),length(data));
+%! assert(double(helicsMessageGetDataSize(message)),length(data));
 %! assert(helicsMessageGetOriginalSource(message),'fed1/ep1');
 %! assert(helicsMessageGetTime(message),1.0);
 %! success=closeStruct(feds);
