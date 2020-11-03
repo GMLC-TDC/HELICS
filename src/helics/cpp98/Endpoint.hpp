@@ -301,7 +301,6 @@ class Endpoint {
                              &(data[0]),
                              static_cast<int>(data.size()),
                              time,
-
                              hThrowOnError());
     }
     /** send a string to a particular destination at a particular time
@@ -312,7 +311,7 @@ class Endpoint {
     void sendToAt(const std::string& data,const std::string& dest, helics_time time )
     {
         helicsEndpointSendToAt(
-            ep, dest.c_str(), time, &(data[0]), static_cast<int>(data.size()), hThrowOnError());
+            ep, &(data[0]), static_cast<int>(data.size()), dest.c_str(), time, hThrowOnError());
     }
 
     /** send a vector of data to the target destination

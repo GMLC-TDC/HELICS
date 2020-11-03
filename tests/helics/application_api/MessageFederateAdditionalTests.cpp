@@ -558,7 +558,7 @@ TEST_F(mfed_tests, send_message1)
     auto m1 = ep2.getMessage();
     EXPECT_EQ(m1->data.size(), 26U);
 
-    ep1.sendToAt("ep2", 1.7, message1.c_str(), 31);
+    ep1.sendToAt(message1.c_str(), 31, "ep2", 1.7);
 
     auto res = mFed1->requestTime(2.0);
     EXPECT_EQ(res, 1.7);

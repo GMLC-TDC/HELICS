@@ -55,11 +55,11 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
