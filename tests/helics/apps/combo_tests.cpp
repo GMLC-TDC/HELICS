@@ -262,7 +262,7 @@ TEST(combo_tests, check_combination_file_load)
             fed.getPublication(1).publish(1);
         }
     }
-    EXPECT_EQ(fed.pendingMessages(), 3u);
+    EXPECT_EQ(fed.pendingMessagesCount(), 3u);
     fed.finalize();
     fut_play.get();
     fut_rec.get();

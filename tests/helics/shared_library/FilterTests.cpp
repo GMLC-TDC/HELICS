@@ -967,7 +967,7 @@ TEST_F(filter_tests, multi_clone_test)
     CE(helicsFederateRequestTimeComplete(sFed2, &err));
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
-    auto mcnt = helicsEndpointPendingMessages(p3);
+    auto mcnt = helicsEndpointPendingMessagesCount(p3);
     EXPECT_EQ(mcnt, 2);
     auto res = helicsFederateHasMessage(dFed);
     EXPECT_EQ(res, helics_true);
@@ -991,7 +991,7 @@ TEST_F(filter_tests, multi_clone_test)
     }
 
     // now check the message clone
-    mcnt = helicsEndpointPendingMessages(p4);
+    mcnt = helicsEndpointPendingMessagesCount(p4);
     EXPECT_EQ(mcnt, 2);
     res = helicsFederateHasMessage(dcFed);
     EXPECT_EQ(res, helics_true);

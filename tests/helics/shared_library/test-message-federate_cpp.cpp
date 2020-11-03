@@ -127,7 +127,7 @@ TEST_F(mfed_tests, Message)
 
     EXPECT_EQ(time, 1.0);
 
-    auto cnt = epid2.pendingMessages();
+    auto cnt = epid2.pendingMessagesCount();
     EXPECT_EQ(cnt, 2U);
 
     auto M1 = epid2.getMessage();
@@ -143,7 +143,7 @@ TEST_F(mfed_tests, Message)
 
     time = mFed1->requestTimeComplete();
     EXPECT_DOUBLE_EQ(time, 1.0);
-    EXPECT_EQ(epid.pendingMessages(), 1U);
+    EXPECT_EQ(epid.pendingMessagesCount(), 1U);
     auto M3 = epid.getMessage();
     EXPECT_EQ(M3.messageID(), 45);
 

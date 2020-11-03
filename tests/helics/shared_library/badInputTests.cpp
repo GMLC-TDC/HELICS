@@ -412,7 +412,7 @@ TEST_F(function_tests, typePub)
     EXPECT_EQ(str[0], '2');
     EXPECT_EQ(str[1], '7');
 
-    auto messages = helicsFederatePendingMessages(vFed1);
+    auto messages = helicsFederatePendingMessagesCount(vFed1);
     EXPECT_EQ(messages, 0);
 
     helicsFederateFinalize(vFed1, nullptr);
@@ -884,7 +884,7 @@ TEST_F(function_tests, messageFed)
 
     helicsFederateRequestNextStep(mFed1, nullptr);
     // make sure the message got through
-    auto cnt = helicsEndpointPendingMessages(ept1);
+    auto cnt = helicsEndpointPendingMessagesCount(ept1);
     EXPECT_EQ(cnt, 2);
 
     // message Federates do not have publications so should be 0
@@ -918,7 +918,7 @@ TEST_F(function_tests, messageFed_event)
     char data[5] = "test";
     helicsEndpointSendAt(ept1, data, 4, 0.0, &err);
     helicsFederateRequestNextStep(mFed1, nullptr);
-    auto cnt = helicsEndpointPendingMessages(ept1);
+    auto cnt = helicsEndpointPendingMessagesCount(ept1);
     EXPECT_EQ(cnt, 3);
 
     helicsFederateFinalize(mFed1, nullptr);
@@ -972,7 +972,7 @@ TEST_F(function_tests, messageFed_messageObject)
     helicsEndpointSendMessageZeroCopy(ept1, mess1, &err);
 
     helicsFederateRequestNextStep(mFed1, nullptr);
-    auto cnt = helicsEndpointPendingMessages(ept1);
+    auto cnt = helicsEndpointPendingMessagesCount(ept1);
     EXPECT_EQ(cnt, 4);
 
     helicsFederateFinalize(mFed1, nullptr);
@@ -1012,7 +1012,7 @@ TEST_F(function_tests, messageFed_message_object)
     helicsEndpointSendMessage(ept1, mess1, &err);
 
     helicsFederateRequestNextStep(mFed1, nullptr);
-    auto cnt = helicsEndpointPendingMessages(ept1);
+    auto cnt = helicsEndpointPendingMessagesCount(ept1);
     EXPECT_EQ(cnt, 1);
 
     auto m3 = helicsFederateGetMessage(mFed1);

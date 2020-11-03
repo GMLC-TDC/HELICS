@@ -256,18 +256,18 @@ bool MessageFederate::hasMessage(const Endpoint& ept) const
     return false;
 }
 
-uint64_t MessageFederate::pendingMessages(const Endpoint& ept) const
+uint64_t MessageFederate::pendingMessagesCount(const Endpoint& ept) const
 {
     if (currentMode >= modes::initializing) {
-        return mfManager->pendingMessages(ept);
+        return mfManager->pendingMessagesCount(ept);
     }
     return 0;
 }
 
-uint64_t MessageFederate::pendingMessages() const
+uint64_t MessageFederate::pendingMessagesCount() const
 {
     if (currentMode >= modes::initializing) {
-        return mfManager->pendingMessages();
+        return mfManager->pendingMessagesCount();
     }
     return 0;
 }

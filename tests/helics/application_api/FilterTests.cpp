@@ -1071,7 +1071,7 @@ TEST_F(filter_test, message_multi_clone_test)
     sFed2->requestTimeComplete();
     dcFed->requestTimeComplete();
 
-    auto mcnt = dFed->pendingMessages(p3);
+    auto mcnt = dFed->pendingMessagesCount(p3);
     EXPECT_EQ(mcnt, 2);
     auto res = dFed->hasMessage();
     EXPECT_TRUE(res);
@@ -1095,7 +1095,7 @@ TEST_F(filter_test, message_multi_clone_test)
     }
 
     // now check the message clone
-    mcnt = dcFed->pendingMessages(p4);
+    mcnt = dcFed->pendingMessagesCount(p4);
     EXPECT_EQ(mcnt, 2);
     res = dcFed->hasMessage();
     EXPECT_TRUE(res);
