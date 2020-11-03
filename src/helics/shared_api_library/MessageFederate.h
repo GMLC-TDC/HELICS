@@ -586,7 +586,7 @@ HELICS_EXPORT helics_bool helicsMessageGetFlagOption(helics_message message, int
  *
  * @return The size of the data payload.
  */
-HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message message);
+HELICS_EXPORT int helicsMessageGetDataSize(helics_message message);
 
 /**
  * Get the raw data for a message object.
@@ -603,7 +603,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message message);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsMessageGetRawData(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsMessageGetData(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
 
 /**
  * Get a pointer to the raw data of a message.
@@ -612,7 +612,7 @@ HELICS_EXPORT void helicsMessageGetRawData(helics_message message, void* data, i
  *
  * @return A pointer to the raw data in memory, the pointer may be NULL if the message is not a valid message.
  */
-HELICS_EXPORT void* helicsMessageGetRawDataPointer(helics_message message);
+HELICS_EXPORT void* helicsMessageGetDataPointer(helics_message message);
 
 /**
  * A check if the message contains a valid payload.

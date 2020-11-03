@@ -110,18 +110,18 @@ class Message {
         return *this;
     }
     /** get the size of the message data field*/
-    int size() const { return helicsMessageGetRawDataSize(mo); }
+    int size() const { return helicsMessageGetDataSize(mo); }
     /** set the size of the message data field*/
     void resize(int newSize) { helicsMessageResize(mo, newSize, hThrowOnError()); }
     /** reserve a certain amount of size in the message data field which is useful for the append
      * operation*/
     void reserve(int newSize) { helicsMessageReserve(mo, newSize, hThrowOnError()); }
-    /** get a pointer to the raw data field*/
-    void* data() const { return helicsMessageGetRawDataPointer(mo); }
-    /** set the message data from a raw pointer and size*/
-    Message& data(const void* raw, int size)
+    /** get a pointer to the data field*/
+    void* data() const { return helicsMessageGetDataPointer(mo); }
+    /** set the message data from a pointer and size*/
+    Message& data(const void* ptr, int size)
     {
-        helicsMessageSetData(mo, raw, size, hThrowOnError());
+        helicsMessageSetData(mo, ptr, size, hThrowOnError());
         return *this;
     }
     /** set the data from a string*/
@@ -137,9 +137,9 @@ class Message {
         return *this;
     }
     /** append data to the message data field*/
-    Message& append(const void* raw, int size)
+    Message& append(const void* ptr, int size)
     {
-        helicsMessageAppendData(mo, raw, size, hThrowOnError());
+        helicsMessageAppendData(mo, ptr, size, hThrowOnError());
         return *this;
     }
     /** append a string to a message data field*/
