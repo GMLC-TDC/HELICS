@@ -651,9 +651,9 @@ class Core {
      * a communications model present.
      */
     virtual void sendTo(InterfaceHandle sourceHandle,
-                        std::string_view destination,
                         const void* data,
-                        uint64_t length) = 0;
+                        uint64_t length,
+                        std::string_view destination) = 0;
 
     /**
      * Send data from source to destination with explicit expected delivery time.
@@ -666,12 +666,12 @@ class Core {
      * the receiving federate can deserialize the data and schedule
      * an event for the specified time.
      @param sourceHandle the source of the event
-     @param time the time the event is scheduled for
      @param data the raw data for the event
      @param length the record length of the event
+     @param time the time the event is scheduled for
      */
     virtual void
-        sendAt(InterfaceHandle sourceHandle, Time time, const void* data, uint64_t length) = 0;
+        sendAt(InterfaceHandle sourceHandle, const void* data, uint64_t length, Time time) = 0;
 
     /**
    * Send data from source to destination with explicit expected delivery time.
@@ -683,17 +683,17 @@ class Core {
    * events between discrete event federates.  For this use case
    * the receiving federate can deserialize the data and schedule
    * an event for the specified time.
-   @param time the time the event is scheduled for
    @param sourceHandle the source of the event
-   @param destination  the target of the event
    @param data the raw data for the event
    @param length the record length of the event
+   @param destination  the target of the event
+   @param time the time the event is scheduled for
    */
     virtual void sendToAt(InterfaceHandle sourceHandle,
-                          std::string_view destination,
-                          Time time,
                           const void* data,
-                          uint64_t length) = 0;
+                          uint64_t length,
+                          std::string_view destination,
+                          Time time) = 0;
 
     /**
      * Send for filters.

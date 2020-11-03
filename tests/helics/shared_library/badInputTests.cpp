@@ -880,7 +880,7 @@ TEST_F(function_tests, messageFed)
     // test out messages without specifying endpoints
     helicsEndpointSend(ept1, nullptr, 0, &err);
 
-    helicsEndpointSendTo(ept1, "fed0/ept1", nullptr, 0, &err);
+    helicsEndpointSendTo(ept1, nullptr, 0, "fed0/ept1", &err);
 
     helicsFederateRequestNextStep(mFed1, nullptr);
     // make sure the message got through
@@ -892,7 +892,7 @@ TEST_F(function_tests, messageFed)
     EXPECT_EQ(cnt, 0);
 
     helicsFederateFinalize(mFed1, nullptr);
-    helicsEndpointSendTo(ept1, "fed0/ept1", nullptr, 0, &err);
+    helicsEndpointSendTo(ept1, nullptr, 0, "fed0/ept1", &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -911,19 +911,19 @@ TEST_F(function_tests, messageFed_event)
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
     helicsFederateEnterExecutingMode(mFed1, nullptr);
 
-    helicsEndpointSendAt(ept1, 0.0, nullptr, 0, &err);
+    helicsEndpointSendAt(ept1, nullptr, 0, 0.0, & err);
 
     helicsEndpointSendToAt(ept1, "ept1", 0.0, nullptr, 0, &err);
 
     char data[5] = "test";
-    helicsEndpointSendAt(ept1, 0.0, data, 4, &err);
+    helicsEndpointSendAt(ept1, data, 4, 0.0, &err);
     helicsFederateRequestNextStep(mFed1, nullptr);
     auto cnt = helicsEndpointPendingMessages(ept1);
     EXPECT_EQ(cnt, 3);
 
     helicsFederateFinalize(mFed1, nullptr);
     //  can't send an event after the federate is finalized
-    helicsEndpointSendAt(ept1, 0.0, data, 4, &err);
+    helicsEndpointSendAt(ept1, data, 4, 0.0, &err);
     EXPECT_NE(err.error_code, 0);
 }
 

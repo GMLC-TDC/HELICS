@@ -151,14 +151,14 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     for (int ii = 0; ii < 256; ++ii) {
         n5[ii] = std::byte(ii);
     }
-    e1.sendTo("d2", n5);
+    e1.sendTo(n5, "d2");
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
     helics::SmallBuffer n6(256);
     for (int ii = 0; ii < 256; ++ii) {
         n6[ii] = std::byte(255 - ii);
     }
-    e2.sendTo("d1", n6);
+    e2.sendTo(n6, "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);

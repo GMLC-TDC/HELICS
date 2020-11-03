@@ -328,9 +328,9 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
 
     std::string data(500, 'a');
 
-    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 500, &err));
-    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 400, &err));
-    CE(helicsEndpointSendTo(epid, nullptr, data.c_str(), 300, &err));
+    CE(helicsEndpointSendTo(epid, data.c_str(), 500, nullptr, &err));
+    CE(helicsEndpointSendTo(epid, data.c_str(), 400, nullptr, &err));
+    CE(helicsEndpointSendTo(epid, data.c_str(), 300, nullptr, &err));
 
     // move the time to 1.0
     helics_time time;

@@ -88,13 +88,13 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param data_size the length of the data
     @param sendTime the time to send the message
     */
-    void sendTo(std::string_view dest, const char* data, size_t data_size) const;
+    void sendTo(const char* data, size_t data_size, std::string_view dest) const;
     /** send a data block and length
     @param sendTime the time to send the message
     @param data pointer to data location
     @param data_size the length of the data
     */
-    void sendAt(Time sendTime, const char* data, size_t data_size) const;
+    void sendAt(const char* data, size_t data_size, Time sendTime) const;
 
     /** send a data_view
     @details a data view can convert from many different formats so this function should
@@ -102,28 +102,28 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param dest string name of the destination
     @param data the information to send
     */
-    void sendTo(std::string_view dest, const data_view& data) const
+    void sendTo(const data_view& data, std::string_view dest) const
     {
-        sendTo(dest, data.data(), data.size());
+        sendTo(data.data(), data.size(), dest);
     }
     /** send a data_view
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
-    @param dest string name of the destination
     @param data data representation to send
+    @param dest string name of the destination
     @param sendTime  the time the message should be sent
     */
-    void sendToAt(std::string_view dest, Time sendTime, const data_view& data) const
+    void sendToAt(const data_view& data, std::string_view dest, Time sendTime) const
     {
-        sendToAt(dest, sendTime, data.data(), data.size());
+        sendToAt(data.data(), data.size(), dest, sendTime);
     }
     /** send a data block and length to a destination at a particular time
-   @param dest string name of the destination
    @param data pointer to data location
    @param data_size the length of the data
+   @param dest string name of the destination
    @param sendTime the time to send the message
    */
-    void sendToAt(std::string_view dest, Time sendTime, const char* data, size_t data_size) const;
+    void sendToAt(const char* data, size_t data_size, std::string_view dest, Time sendTime) const;
 
     /** send a data block and length to the target destination
     @param data pointer to data location
@@ -143,9 +143,9 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param data a representation to send
     @param sendTime  the time the message should be sent
     */
-    void sendAt(Time sendTime, const data_view& data) const
+    void sendAt(const data_view& data,Time sendTime ) const
     {
-        sendAt(sendTime, data.data(), data.size());
+        sendAt(data.data(), data.size(),sendTime);
     }
     /** send a pointer to a message object*/
     void send(std::unique_ptr<Message> mess) const;

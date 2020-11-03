@@ -47,7 +47,7 @@ void Endpoint::send(const char* data, size_t data_size) const
     }
 }
 
-void Endpoint::sendTo(std::string_view dest, const char* data, size_t data_size) const
+void Endpoint::sendTo(const char* data, size_t data_size, std::string_view dest) const
 {
     if ((cr != nullptr) &&
         ((fed->getCurrentMode() == Federate::modes::executing) ||
@@ -55,35 +55,29 @@ void Endpoint::sendTo(std::string_view dest, const char* data, size_t data_size)
         if (dest.empty()) {
             dest = defDest;
         }
-        cr->sendTo(handle, dest, data, data_size);
+        cr->sendTo(handle, data, data_size, dest);
     } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
     }
 }
 
-void Endpoint::sendAt(Time sendTime, const char* data, size_t data_size) const
+void Endpoint::sendAt(const char* data, size_t data_size, Time sendTime) const
 {
     if ((cr != nullptr) &&
         ((fed->getCurrentMode() == Federate::modes::executing) ||
          (fed->getCurrentMode() == Federate::modes::initializing))) {
-        cr->sendAt(handle, sendTime, data, data_size);
+        cr->sendAt(handle, data, data_size, sendTime);
     } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
     }
 }
 
-/** send a data block and length to a destination at particular time
-@param dest string name of the destination
-@param data pointer to data location
-@param data_size the length of the data
-@param sendTime the time to send the message
-*/
-void Endpoint::sendToAt(std::string_view dest,
-                        Time sendTime,
-                        const char* data,
-                        size_t data_size) const
+void Endpoint::sendToAt(const char* data,
+                        size_t data_size,
+                        std::string_view dest,
+                        Time sendTime) const
 {
     if ((cr != nullptr) &&
         ((fed->getCurrentMode() == Federate::modes::executing) ||
@@ -91,7 +85,7 @@ void Endpoint::sendToAt(std::string_view dest,
         if (dest.empty()) {
             dest = defDest;
         }
-        cr->sendToAt(handle, dest, sendTime, data, data_size);
+        cr->sendToAt(handle, data, data_size, dest, sendTime);
     } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));

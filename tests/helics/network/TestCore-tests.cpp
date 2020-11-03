@@ -143,7 +143,7 @@ TEST(TestCore_tests, testcore_send_receive_test)
 
     std::string str1 = "hello world";
     core->timeRequest(id, 50.0);
-    core->sendTo(end1, "end2", str1.data(), str1.size());
+    core->sendTo(end1, str1.data(), str1.size(), "end2");
 
     core->timeRequest(id, 100.0);
     EXPECT_EQ(core->receiveCount(end1), 0);
@@ -210,7 +210,7 @@ TEST(TestCore_tests, testcore_messagefilter_callback_test)
     core->enterExecutingMode(id);
 
     std::string msgData = "hello world";
-    core->sendTo(end1, "end2", msgData.data(), msgData.size() + 1);
+    core->sendTo(end1, msgData.data(), msgData.size() + 1, "end2");
 
     core->timeRequest(id, 50.0);
 
