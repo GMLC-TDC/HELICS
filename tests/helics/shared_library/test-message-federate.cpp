@@ -214,9 +214,9 @@ TEST_F(mfed_tests, message_object_tests)
     EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
 
     helicsMessageSetFlagOption(M, 7, helics_true, &err);
-    EXPECT_TRUE(helicsMessageCheckFlag(M, 7) == helics_true);
+    EXPECT_TRUE(helicsMessageGetFlagOption(M, 7) == helics_true);
     helicsMessageClearFlags(M);
-    EXPECT_TRUE(helicsMessageCheckFlag(M, 7) == helics_false);
+    EXPECT_TRUE(helicsMessageGetFlagOption(M, 7) == helics_false);
 }
 
 TEST_P(mfed_type_tests, send_receive_2fed)
@@ -392,7 +392,7 @@ TEST(message_object, test1)
     EXPECT_EQ(helicsMessageGetMessageID(m1), 10);
 
     // 89 is an invalid flag
-    EXPECT_EQ(helicsMessageCheckFlag(m1, 89), helics_false);
+    EXPECT_EQ(helicsMessageGetFlagOption(m1, 89), helics_false);
 
     helicsMessageSetString(m2, "raw data", nullptr);
     EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
@@ -419,13 +419,13 @@ TEST(message_object, test1)
     EXPECT_STREQ(helicsMessageGetSource(m1), "source");
 
     helicsMessageSetFlagOption(m1, 4, helics_true, nullptr);
-    EXPECT_EQ(helicsMessageCheckFlag(m1, 4), helics_true);
+    EXPECT_EQ(helicsMessageGetFlagOption(m1, 4), helics_true);
 
     helicsMessageSetFlagOption(m1, 4, helics_false, nullptr);
-    EXPECT_EQ(helicsMessageCheckFlag(m1, 4), helics_false);
+    EXPECT_EQ(helicsMessageGetFlagOption(m1, 4), helics_false);
 
     helicsMessageSetFlagOption(m1, 22, helics_true, &err);
-    EXPECT_EQ(helicsMessageCheckFlag(m1, 22), helics_false);
+    EXPECT_EQ(helicsMessageGetFlagOption(m1, 22), helics_false);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
@@ -506,7 +506,7 @@ TEST(message_object, copy)
 
     EXPECT_EQ(helicsMessageIsValid(m2), helics_true);
 
-    EXPECT_EQ(helicsMessageCheckFlag(m2, 4), helics_true);
+    EXPECT_EQ(helicsMessageGetFlagOption(m2, 4), helics_true);
 
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);
