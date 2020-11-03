@@ -143,9 +143,9 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param data a representation to send
     @param sendTime  the time the message should be sent
     */
-    void sendAt(const data_view& data,Time sendTime ) const
+    void sendAt(const data_view& data, Time sendTime) const
     {
-        sendAt(data.data(), data.size(),sendTime);
+        sendAt(data.data(), data.size(), sendTime);
     }
     /** send a pointer to a message object*/
     void send(std::unique_ptr<Message> mess) const;

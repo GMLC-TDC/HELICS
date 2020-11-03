@@ -911,7 +911,7 @@ TEST_F(function_tests, messageFed_event)
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
     helicsFederateEnterExecutingMode(mFed1, nullptr);
 
-    helicsEndpointSendAt(ept1, nullptr, 0, 0.0, & err);
+    helicsEndpointSendAt(ept1, nullptr, 0, 0.0, &err);
 
     helicsEndpointSendToAt(ept1, "ept1", 0.0, nullptr, 0, &err);
 
