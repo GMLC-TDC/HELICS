@@ -258,9 +258,13 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
     mFed1->setMessageNotificationCallback(epid,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e1cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) { ++e1cnt; });
     mFed2->setMessageNotificationCallback(epid2,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e2cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) {
+                                              ++e2cnt;
+                                          });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(helics_property_time_delta, 1.0);
     mFed2->setProperty(helics_property_time_delta, 1.0);
@@ -344,7 +348,6 @@ class PingPongFed {
   public:
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
-  public:
     PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
         delta(tDelta), name(fname), coreType(ctype)
     {
@@ -370,7 +373,6 @@ class PingPongFed {
         ep = &mFed->registerEndpoint("port");
     }
 
-  private:
     void processMessages(helics::Time currentTime)
     {
         while (mFed->hasMessage(*ep)) {
