@@ -165,7 +165,10 @@ class Message {
         return *this;
     }
     /** check an indexed flag in the message valid numbers are [0,15]*/
-    bool getFlagOption(int flag) const { return (helicsMessageGetFlagOption(mo, flag) == helics_true); }
+    bool getFlagOption(int flag) const
+    {
+        return (helicsMessageGetFlagOption(mo, flag) == helics_true);
+    }
     /** get the messageID*/
     int messageID() const { return helicsMessageGetMessageID(mo); }
     /** set the messageID field of a message object*/
