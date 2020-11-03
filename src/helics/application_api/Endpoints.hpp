@@ -160,8 +160,8 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     std::unique_ptr<Message> getMessage() const;
     /** check if there is a message available*/
     bool hasMessage() const;
-    /** check if there is a message available*/
-    std::uint64_t pendingMessages() const;
+    /** Get the number of available messages*/
+    std::uint64_t pendingMessagesCount() const;
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
     @param callback a function with signature void(endpoint_id_t, Time)
