@@ -230,11 +230,11 @@ HELICS_EXPORT void
  */
 
 HELICS_EXPORT void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
-                                          const void* data,
-                                          int inputDataLength,
-                                          const char* dst,
-                                          helics_time time,
-                                          helics_error* err);
+                                               const void* data,
+                                               int inputDataLength,
+                                               const char* dst,
+                                               helics_time time,
+                                               helics_error* err);
 
 /**
  * Send a message at a specific time to the targeted destinations
