@@ -164,7 +164,7 @@ end
 %! helicsFederateEnterExecutingModeComplete(mFed);
 %!
 %! data='hello world';
-%! helicsEndpointSendTo(p1,'port2',data);
+%! helicsEndpointSendBytesTo(p1,'port2',data);
 %!
 %! granted_time=helicsFederateRequestTime(mFed,1.0);
 %! assert(granted_time,1.0);

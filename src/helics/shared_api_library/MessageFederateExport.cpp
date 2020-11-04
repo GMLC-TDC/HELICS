@@ -245,7 +245,7 @@ void helicsEndpointSendData(helics_endpoint endpoint, const void* data, int inpu
     }
 }
 
-void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err)
+void helicsEndpointSendBytes(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -263,7 +263,7 @@ void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDat
     }
 }
 
-void helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dest, helics_error* err)
+void helicsEndpointSendBytesTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dest, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -281,7 +281,7 @@ void helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputD
     }
 }
 
-void helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err)
+void helicsEndpointSendBytesAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -299,7 +299,7 @@ void helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputD
     }
 }
 
-void helicsEndpointSendToAt(helics_endpoint endpoint,
+void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
                             const void* data,
                             int inputDataLength,
                             const char* dest,
