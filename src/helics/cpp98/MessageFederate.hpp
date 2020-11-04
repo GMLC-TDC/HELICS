@@ -94,7 +94,7 @@ class MessageFederate: public virtual Federate {
     }
 
     /** Returns the number of pending receives for all endpoints. **/
-    int pendingMessages() const { return helicsFederatePendingMessages(fed); }
+    int pendingMessagesCount() const { return helicsFederatePendingMessagesCount(fed); }
 
     /** Get a packet for any endpoints in the federate **/
     Message getMessage() { return Message(helicsFederateGetMessage(fed)); }

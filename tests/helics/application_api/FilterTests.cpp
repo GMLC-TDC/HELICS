@@ -451,7 +451,7 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     }
     if (mFed->hasMessage(p2)) {
         auto m2 = mFed->getMessage(p2);
-        auto ept1Name = p1.getKey();
+        const auto& ept1Name = p1.getKey();
         if (ept1Name.size() > 1) {
             EXPECT_EQ(m2->source, p1.getKey());
             EXPECT_EQ(m2->original_source, p1.getKey());
@@ -1071,7 +1071,7 @@ TEST_F(filter_test, message_multi_clone_test)
     sFed2->requestTimeComplete();
     dcFed->requestTimeComplete();
 
-    auto mcnt = dFed->pendingMessages(p3);
+    auto mcnt = dFed->pendingMessagesCount(p3);
     EXPECT_EQ(mcnt, 2);
     auto res = dFed->hasMessage();
     EXPECT_TRUE(res);
@@ -1095,7 +1095,7 @@ TEST_F(filter_test, message_multi_clone_test)
     }
 
     // now check the message clone
-    mcnt = dcFed->pendingMessages(p4);
+    mcnt = dcFed->pendingMessagesCount(p4);
     EXPECT_EQ(mcnt, 2);
     res = dcFed->hasMessage();
     EXPECT_TRUE(res);

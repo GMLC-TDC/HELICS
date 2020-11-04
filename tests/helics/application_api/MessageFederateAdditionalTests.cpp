@@ -258,9 +258,11 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
     mFed1->setMessageNotificationCallback(epid,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e1cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) { ++e1cnt; });
     mFed2->setMessageNotificationCallback(epid2,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e2cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(helics_property_time_delta, 1.0);
     mFed2->setProperty(helics_property_time_delta, 1.0);
@@ -290,7 +292,7 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     EXPECT_TRUE(!mFed1->hasMessage());
 
     EXPECT_TRUE(!mFed1->hasMessage(epid));
-    auto cnt = mFed2->pendingMessages(epid2);
+    auto cnt = mFed2->pendingMessagesCount(epid2);
     EXPECT_EQ(cnt, 4);
 
     auto M1 = mFed2->getMessage(epid2);
@@ -299,13 +301,13 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 
     EXPECT_EQ(M1->data[245], data1[245]);
     // check the count decremented
-    cnt = mFed2->pendingMessages(epid2);
+    cnt = mFed2->pendingMessagesCount(epid2);
     EXPECT_EQ(cnt, 3);
     auto M2 = mFed2->getMessage();
     ASSERT_TRUE(M2);
     ASSERT_EQ(M2->data.size(), data2.size());
     EXPECT_EQ(M2->data[245], data2[245]);
-    cnt = mFed2->pendingMessages(epid2);
+    cnt = mFed2->pendingMessagesCount(epid2);
     EXPECT_EQ(cnt, 2);
 
     auto M3 = mFed2->getMessage();
@@ -344,7 +346,6 @@ class PingPongFed {
   public:
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
-  public:
     PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
         delta(tDelta), name(fname), coreType(ctype)
     {
@@ -370,7 +371,6 @@ class PingPongFed {
         ep = &mFed->registerEndpoint("port");
     }
 
-  private:
     void processMessages(helics::Time currentTime)
     {
         while (mFed->hasMessage(*ep)) {
@@ -578,13 +578,13 @@ TEST(messageFederate, constructor1)
     mf2 = std::move(mf1);
 
     EXPECT_FALSE(mf2.hasMessage());
-    EXPECT_EQ(mf2.pendingMessages(), 0);
+    EXPECT_EQ(mf2.pendingMessagesCount(), 0);
 
     EXPECT_FALSE(mf2.getMessage());
 
     auto ept1 = mf2.registerEndpoint();
     EXPECT_FALSE(mf2.hasMessage(ept1));
-    EXPECT_EQ(mf2.pendingMessages(ept1), 0);
+    EXPECT_EQ(mf2.pendingMessagesCount(ept1), 0);
     auto m1 = mf2.getMessage(ept1);
     EXPECT_FALSE(m1);
 
