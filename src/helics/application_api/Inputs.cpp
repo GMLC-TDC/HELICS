@@ -67,7 +67,7 @@ Input::Input(interface_visibility locality,
     }
 }
 
-void Input::setDefaultRaw(data_view val)
+void Input::setDefaultBytes(data_view val)
 {
     fed->setDefaultValue(*this, val);
 }
@@ -516,7 +516,7 @@ bool Input::checkUpdate(bool assumeUpdate)
 {
     if (changeDetectionEnabled) {
         if (assumeUpdate || fed->isUpdated(*this)) {
-            auto dv = fed->getValueRaw(*this);
+            auto dv = fed->getBytes(*this);
             if (injectionType == data_type::helics_unknown) {
                 loadSourceInformation();
             }
@@ -615,10 +615,10 @@ void Input::registerCallback()
         handleCallback(time);
     });
 }
-size_t Input::getRawSize()
+size_t Input::getBytesSize()
 {
     isUpdated();
-    auto dv = fed->getValueRaw(*this);
+    auto dv = fed->getBytes(*this);
     if (dv.empty()) {
         const auto& out = getValueRef<std::string>();
         return out.size();
@@ -634,10 +634,10 @@ void Input::addTarget(const std::string& target)
     fed->addTarget(*this, target);
 }
 
-data_view Input::getRawValue()
+data_view Input::getBytes()
 {
     hasUpdate = false;
-    return fed->getValueRaw(*this);
+    return fed->getBytes(*this);
 }
 
 size_t Input::getStringSize()
@@ -782,7 +782,7 @@ void integerExtractAndConvert(defV& store,
 
 data_view Input::checkAndGetFedUpdate()
 {
-    return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getValueRaw(*this)) :
+    return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getBytes(*this)) :
                                                                     data_view{};
 }
 

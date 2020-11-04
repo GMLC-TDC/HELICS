@@ -80,7 +80,7 @@ void Publication::publish(double val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -96,7 +96,7 @@ void Publication::publishInt(int64_t val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -127,7 +127,7 @@ void Publication::publish(Time val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val.getBaseTimeCode());
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -144,7 +144,7 @@ void Publication::publish(bool val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, bstring);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -160,7 +160,7 @@ void Publication::publishString(std::string_view val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -177,7 +177,7 @@ void Publication::publish(const std::vector<std::string>& val)
         }
     }
     if (doPublish) {
-        fed->publishRaw(*this, buffer);
+        fed->publishBytes(*this, buffer);
     }
 }
 
@@ -193,7 +193,7 @@ void Publication::publish(const std::vector<double>& val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -209,7 +209,7 @@ void Publication::publish(const std::vector<std::complex<double>>& val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -225,7 +225,7 @@ void Publication::publish(const double* vals, int size)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, vals, size);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -241,7 +241,7 @@ void Publication::publish(std::complex<double> val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -257,7 +257,7 @@ void Publication::publish(const NamedPoint& np)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, np);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -274,7 +274,7 @@ void Publication::publish(std::string_view field, double val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, field, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 
@@ -332,7 +332,7 @@ void Publication::publishDefV(const defV& val)
     }
     if (doPublish) {
         auto db = typeConvert(pubType, val);
-        fed->publishRaw(*this, db);
+        fed->publishBytes(*this, db);
     }
 }
 }  // namespace helics

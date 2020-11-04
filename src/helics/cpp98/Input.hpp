@@ -45,7 +45,7 @@ class Input {
     /** set the default value as a raw data with length*/
     void setDefault(const char* data, int len)
     {
-        helicsInputSetDefaultRaw(inp, data, len, HELICS_IGNORE_ERROR);
+        helicsInputSetDefaultBytes(inp, data, len, HELICS_IGNORE_ERROR);
     }
     /** set the default value as a string*/
     void setDefault(const std::string& str)
@@ -77,16 +77,16 @@ class Input {
 
     /** Methods to get subscription values **/
     /** get a raw value as a character vector*/
-    int getRawValue(std::vector<char>& data)
+    int getBytes(std::vector<char>& data)
     {
-        int size = helicsInputGetRawValueSize(inp);
+        int size = helicsInputGetBytesSize(inp);
         data.resize(size);
-        helicsInputGetRawValue(
+        helicsInputGetBytes(
             inp, data.data(), static_cast<int>(data.size()), &size, HELICS_IGNORE_ERROR);
         return size;
     }
     /** get the size of the raw value */
-    int getRawValueSize() { return helicsInputGetRawValueSize(inp); }
+    int getBytesSize() { return helicsInputGetBytesSize(inp); }
 
     /** get the size of the value as a string */
     int getStringSize()

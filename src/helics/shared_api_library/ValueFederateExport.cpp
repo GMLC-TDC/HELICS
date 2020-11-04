@@ -480,14 +480,14 @@ void helicsFederateClearUpdates(helics_federate fed)
 }
 
 /* getting and publishing values */
-void helicsPublicationPublishRaw(helics_publication pub, const void* data, int datalen, helics_error* err)
+void helicsPublicationPublishBytes(helics_publication pub, const void* data, int datalen, helics_error* err)
 {
     auto* pubObj = verifyPublication(pub, err);
     if (pubObj == nullptr) {
         return;
     }
     try {
-        pubObj->fedptr->publishRaw(*pubObj->pubPtr, reinterpret_cast<const char*>(data), datalen);
+        pubObj->fedptr->publishBytes(*pubObj->pubPtr, reinterpret_cast<const char*>(data), datalen);
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -668,13 +668,13 @@ void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* er
     inpObj->inputPtr->addTarget(target);
 }
 
-int helicsInputGetRawValueSize(helics_input inp)
+int helicsInputGetBytesSize(helics_input inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
         return (0);
     }
-    return static_cast<int>(inpObj->inputPtr->getRawSize());
+    return static_cast<int>(inpObj->inputPtr->getBytesSize());
 }
 
 bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
@@ -687,7 +687,7 @@ bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
     return true;
 }
 
-void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* actualSize, helics_error* err)
+void helicsInputGetBytes(helics_input inp, void* data, int maxDatalen, int* actualSize, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (actualSize != nullptr) {  // for initialization
@@ -700,7 +700,7 @@ void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* a
         return;
     }
     try {
-        auto dv = inpObj->inputPtr->getRawValue();
+        auto dv = inpObj->inputPtr->getBytes();
         if (maxDatalen > static_cast<int>(dv.size())) {
             memcpy(data, dv.data(), dv.size());
             if (actualSize != nullptr) {
@@ -973,7 +973,7 @@ void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStrin
     // LCOV_EXCL_STOP
 }
 
-void helicsInputSetDefaultRaw(helics_input inp, const void* data, int dataLen, helics_error* err)
+void helicsInputSetDefaultBytes(helics_input inp, const void* data, int dataLen, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {

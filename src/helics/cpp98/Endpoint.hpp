@@ -110,14 +110,14 @@ class Message {
         return *this;
     }
     /** get the size of the message data field*/
-    int size() const { return helicsMessageGetDataSize(mo); }
+    int size() const { return helicsMessageGetBytesSize(mo); }
     /** set the size of the message data field*/
     void resize(int newSize) { helicsMessageResize(mo, newSize, hThrowOnError()); }
     /** reserve a certain amount of size in the message data field which is useful for the append
      * operation*/
     void reserve(int newSize) { helicsMessageReserve(mo, newSize, hThrowOnError()); }
     /** get a pointer to the data field*/
-    void* data() const { return helicsMessageGetDataPointer(mo); }
+    void* data() const { return helicsMessageGetBytesPointer(mo); }
     /** set the message data from a pointer and size*/
     Message& data(const void* ptr, int size)
     {

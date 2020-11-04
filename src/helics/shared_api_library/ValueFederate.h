@@ -326,7 +326,7 @@ HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishRaw(helics_publication pub, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishBytes(helics_publication pub, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Publish a string.
@@ -475,7 +475,7 @@ HELICS_EXPORT void helicsInputAddTarget(helics_input ipt, const char* target, he
  *
  * @return The size of the raw data/string in bytes.
  */
-HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
+HELICS_EXPORT int helicsInputGetBytesSize(helics_input ipt);
 
 /**
  * Get the raw data for the latest value of a subscription.
@@ -489,10 +489,10 @@ HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
  * @endforcpponly
  *
  * @beginPythonOnly
- * @return Raw string data.
+ * @return  raw Bytes of the value, the value is uninterpreted raw bytes.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxDataLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsInputGetBytes(helics_input ipt, void* data, int maxDataLength, int* actualSize, helics_error* err);
 
 /**
  * Get the size of a value for subscription assuming return as a string.
@@ -672,7 +672,7 @@ HELICS_EXPORT void
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultRaw(helics_input ipt, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultBytes(helics_input ipt, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Set the default as a string.

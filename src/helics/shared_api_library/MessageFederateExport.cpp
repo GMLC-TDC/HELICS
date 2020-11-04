@@ -872,7 +872,7 @@ const char* helicsMessageGetString(helics_message message)
     return mess->data.char_data();
 }
 
-int helicsMessageGetDataSize(helics_message message)
+int helicsMessageGetBytesSize(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {
@@ -881,7 +881,7 @@ int helicsMessageGetDataSize(helics_message message)
     return static_cast<int>(mess->data.size());
 }
 
-void helicsMessageGetData(helics_message message, void* data, int maxMessagelen, int* actualSize, helics_error* err)
+void helicsMessageGetBytes(helics_message message, void* data, int maxMessagelen, int* actualSize, helics_error* err)
 {
     auto* mess = getMessageObj(message, err);
     if (mess == nullptr || mess->data.empty()) {
@@ -905,7 +905,7 @@ void helicsMessageGetData(helics_message message, void* data, int maxMessagelen,
     }
 }
 
-void* helicsMessageGetDataPointer(helics_message message)
+void* helicsMessageGetBytesPointer(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {

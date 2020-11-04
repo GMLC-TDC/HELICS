@@ -622,10 +622,10 @@ TEST_P(valuefed_single_type, block_send_receive)
     helics::SmallBuffer db(547, ';');
 
     vFed1->enterExecutingMode();
-    vFed1->publishRaw(pubid3, db);
+    vFed1->publishBytes(pubid3, db);
     vFed1->requestTime(1.0);
     EXPECT_TRUE(vFed1->isUpdated(sub1));
-    auto res = vFed1->getValueRaw(sub1);
+    auto res = vFed1->getBytes(sub1);
     EXPECT_EQ(res.size(), db.size());
     EXPECT_TRUE(vFed1->isUpdated(sub1) == false);
 }
@@ -654,7 +654,7 @@ TEST_P(valuefed_single_type, all_callback)
         lastId = subid.getHandle();
     });
     vFed1->enterExecutingMode();
-    vFed1->publishRaw(pubid3, db);
+    vFed1->publishBytes(pubid3, db);
     vFed1->requestTime(1.0);
     // the callback should have occurred here
     EXPECT_TRUE(lastId == sub3.getHandle());
@@ -680,13 +680,13 @@ TEST_P(valuefed_single_type, all_callback)
     vFed1->setInputNotificationCallback(
         [&](const helics::Input& /*unused*/, helics::Time /*unused*/) { ++ccnt; });
 
-    vFed1->publishRaw(pubid3, db);
+    vFed1->publishBytes(pubid3, db);
     pubid2.publish(4);
     vFed1->requestTime(4.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 2);
     ccnt = 0;  // reset the counter
-    vFed1->publishRaw(pubid3, db);
+    vFed1->publishBytes(pubid3, db);
     pubid2.publish(4);
     pubid1.publish("test string2");
     vFed1->requestTime(5.0);

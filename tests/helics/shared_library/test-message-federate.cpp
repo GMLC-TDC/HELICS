@@ -107,8 +107,8 @@ TEST_P(mfed_simple_type_tests, send_receive)
 
     auto M = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetDataSize(M), 500);
-    char* dptr = reinterpret_cast<char*>(helicsMessageGetDataPointer(M));
+    ASSERT_EQ(helicsMessageGetBytesSize(M), 500);
+    char* dptr = reinterpret_cast<char*>(helicsMessageGetBytesPointer(M));
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'a');
     } else {
@@ -150,9 +150,9 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
 
     auto M = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetDataSize(M), 500);
+    ASSERT_EQ(helicsMessageGetBytesSize(M), 500);
 
-    char* rdata = static_cast<char*>(helicsMessageGetDataPointer(M));
+    char* rdata = static_cast<char*>(helicsMessageGetBytesPointer(M));
     if (rdata != nullptr) {
         EXPECT_EQ(rdata[245], 'a');
     } else {
@@ -200,9 +200,9 @@ TEST_F(mfed_tests, message_object_tests)
 
     M = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE (M);
-    ASSERT_EQ(helicsMessageGetDataSize(M), 500);
+    ASSERT_EQ(helicsMessageGetBytesSize(M), 500);
 
-    char* rdata = static_cast<char*>(helicsMessageGetDataPointer(M));
+    char* rdata = static_cast<char*>(helicsMessageGetBytesPointer(M));
     EXPECT_NE(rdata, nullptr);
     if (rdata != nullptr) {
         EXPECT_EQ(rdata[245], 'a');
@@ -276,8 +276,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
 
     auto M1 = helicsEndpointGetMessage(epid);
     // ASSERT_TRUE(M1);
-    EXPECT_EQ(helicsMessageGetDataSize(M1), 400);
-    auto dptr = static_cast<char*>(helicsMessageGetDataPointer(M1));
+    EXPECT_EQ(helicsMessageGetBytesSize(M1), 400);
+    auto dptr = static_cast<char*>(helicsMessageGetBytesPointer(M1));
     EXPECT_NE(dptr, nullptr);
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'b');
@@ -285,8 +285,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
 
     auto M2 = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE(M2);
-    EXPECT_EQ(helicsMessageGetDataSize(M2), 500);
-    dptr = static_cast<char*>(helicsMessageGetDataPointer(M2));
+    EXPECT_EQ(helicsMessageGetBytesSize(M2), 500);
+    dptr = static_cast<char*>(helicsMessageGetBytesPointer(M2));
     EXPECT_NE(dptr, nullptr);
     if (dptr != nullptr) {
         EXPECT_EQ(dptr[245], 'a');
@@ -401,14 +401,14 @@ TEST(message_object, test1)
 
     char data[20];
     int actSize = 10;
-    helicsMessageGetData(m2, nullptr, 0, &actSize, &err);
+    helicsMessageGetBytes(m2, nullptr, 0, &actSize, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(actSize, 0);
     helicsErrorClear(&err);
 
-    EXPECT_EQ(helicsMessageGetDataPointer(nullptr), nullptr);
+    EXPECT_EQ(helicsMessageGetBytesPointer(nullptr), nullptr);
 
-    helicsMessageGetData(m2, data, 20, &actSize, &err);
+    helicsMessageGetBytes(m2, data, 20, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
@@ -430,14 +430,14 @@ TEST(message_object, test1)
     helicsErrorClear(&err);
 
     helicsMessageResize(m2, 500, nullptr);
-    auto s2 = helicsMessageGetDataSize(m2);
+    auto s2 = helicsMessageGetBytesSize(m2);
     EXPECT_EQ(s2, 500);
 
     helicsMessageReserve(m2, 2000, nullptr);
 
     helicsMessageAppendData(m2, " more data", 8, nullptr);
 
-    s2 = helicsMessageGetDataSize(m2);
+    s2 = helicsMessageGetBytesSize(m2);
     EXPECT_EQ(s2, 508);
 
     // this should generate an out of memory exception
@@ -499,7 +499,7 @@ TEST(message_object, copy)
     char data[20];
     int actSize = 10;
 
-    helicsMessageGetData(m2, data, 20, &actSize, &err);
+    helicsMessageGetBytes(m2, data, 20, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
