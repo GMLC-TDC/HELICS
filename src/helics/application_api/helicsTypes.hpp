@@ -291,7 +291,7 @@ enum class data_type : int {
 
 };
 
-inline constexpr bool isRawType(data_type type)
+inline constexpr bool isBytesType(data_type type)
 {
     return (type == data_type::helics_any) || (type == data_type::helics_custom);
 }

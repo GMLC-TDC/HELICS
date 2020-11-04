@@ -186,7 +186,7 @@ TEST_P(filter_type_tests, message_filter_function)
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -209,7 +209,7 @@ TEST_P(filter_type_tests, message_filter_function)
     EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
 
     CE(helicsFederateRequestTime(mFed, 3.0, &err));
@@ -249,7 +249,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -272,7 +272,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
     EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
 
     CE(helicsFederateRequestTime(mFed, 3.0, &err));
@@ -323,7 +323,7 @@ TEST_P(filter_type_tests, function_two_stage)
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, .0, &err));
     CE(helicsFederateRequestTimeAsync(fFed, 1.0, &err));
@@ -352,7 +352,7 @@ TEST_P(filter_type_tests, function_two_stage)
     EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
 
     CE(helicsFederateRequestTimeComplete(fFed, &err));
@@ -405,7 +405,7 @@ TEST_P(filter_type_tests, function2)
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -413,7 +413,7 @@ TEST_P(filter_type_tests, function2)
 
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(!res);
-    CE(helicsEndpointSendTo(p2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
+    CE(helicsEndpointSendBytesTo(p2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
     CE(helicsFederateRequestTimeAsync(mFed, 2.0, &err));
     CE(helicsFederateRequestTime(fFed, 2.0, &err));
     CE(helicsFederateRequestTimeComplete(mFed, &err));
@@ -429,7 +429,7 @@ TEST_P(filter_type_tests, function2)
     EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
 
     EXPECT_TRUE(!helicsEndpointHasMessage(p1));
@@ -477,7 +477,7 @@ TEST_P(filter_type_tests, message_filter_function3)
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data = "hello world";
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -485,7 +485,7 @@ TEST_P(filter_type_tests, message_filter_function3)
 
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(!res);
-    CE(helicsEndpointSendTo(p2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
+    CE(helicsEndpointSendBytesTo(p2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
     CE(helicsFederateRequestTimeAsync(mFed, 2.0, &err));
     CE(helicsFederateRequestTime(fFed, 2.0, &err));
     CE(helicsFederateRequestTimeComplete(mFed, &err));
@@ -503,7 +503,7 @@ TEST_P(filter_type_tests, message_filter_function3)
     EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
 
     EXPECT_TRUE(helicsEndpointHasMessage(p1));
@@ -542,7 +542,7 @@ TEST_F(filter_tests, clone_test)
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
@@ -558,7 +558,7 @@ TEST_F(filter_tests, clone_test)
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     }
 
     // now check the message clone
@@ -571,7 +571,7 @@ TEST_F(filter_tests, clone_test)
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "cm");
         EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     }
 
     CE(helicsFederateFinalizeAsync(sFed, &err));
@@ -628,7 +628,7 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
@@ -644,7 +644,7 @@ TEST_F(filter_tests, clone_test_connections)
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     }
 
     // now check the message clone
@@ -657,7 +657,7 @@ TEST_F(filter_tests, clone_test_connections)
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "cm");
         EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     }
 
     CE(helicsFederateFinalizeAsync(sFed, &err));
@@ -704,7 +704,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
@@ -720,7 +720,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int>(data.size()));
     }
 
     // now check the message clone
@@ -733,7 +733,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "cm");
         EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int>(data.size()));
     }
 
     CE(helicsFederateFinalizeAsync(sFed, &err));
@@ -790,7 +790,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
     CE(helicsFederateFinalize(sFed, nullptr));
 
@@ -820,7 +820,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_STREQ(helicsMessageGetSource(m2), "src");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
 
     threaddcFed.join();
 
@@ -828,7 +828,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_STREQ(helicsMessageGetOriginalSource(m3), "src");
     EXPECT_STREQ(helicsMessageGetDestination(m3), "cm");
     EXPECT_STREQ(helicsMessageGetOriginalDestination(m3), "dest");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m3), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m3), static_cast<int64_t>(data.size()));
 
     CE(state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_finalize);
@@ -869,7 +869,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
@@ -885,7 +885,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     }
     CE(helicsFederateFinalizeAsync(sFed, &err));
     CE(helicsFederateFinalizeAsync(dFed, &err));
@@ -907,7 +907,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "cm");
         EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     }
 
     CE(helicsFederateFinalize(dcFed, &err));
@@ -956,8 +956,8 @@ TEST_F(filter_tests, multi_clone_test)
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
     std::string data2(400, 'b');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
-    CE(helicsEndpointSendTo(p2, data2.c_str(), static_cast<int>(data2.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
+    CE(helicsEndpointSendBytesTo(p2, data2.c_str(), static_cast<int>(data2.size()), "dest", &err));
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(sFed2, 1.0, &err));
@@ -977,7 +977,7 @@ TEST_F(filter_tests, multi_clone_test)
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage(dFed);
         EXPECT_EQ(res, helics_true);
 
@@ -986,7 +986,7 @@ TEST_F(filter_tests, multi_clone_test)
             EXPECT_STREQ(helicsMessageGetSource(m2), "src2");
             EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src2");
             EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
-            EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data2.size()));
+            EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data2.size()));
         }
     }
 
@@ -1002,7 +1002,7 @@ TEST_F(filter_tests, multi_clone_test)
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "cm");
         EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
-        EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+        EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage(dcFed);
         EXPECT_EQ(res, helics_true);
 
@@ -1012,7 +1012,7 @@ TEST_F(filter_tests, multi_clone_test)
             EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src2");
             EXPECT_STREQ(helicsMessageGetDestination(m2), "cm");
             EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
-            EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data2.size()));
+            EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data2.size()));
         }
     }
 
@@ -1090,7 +1090,7 @@ TEST_F(filter_tests, callback_test)
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
-    CE(helicsEndpointSendTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
     CE(helicsFederateRequestTime(fFed, 1.0, &err));
@@ -1113,7 +1113,7 @@ TEST_F(filter_tests, callback_test)
     EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), static_cast<int64_t>(data.size()));
+    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
 
     CE(helicsFederateRequestTime(mFed, 3.0, &err));

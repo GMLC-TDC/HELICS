@@ -275,10 +275,10 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsPublicationAddTarget(pub, "fed0/key8", &err);
     EXPECT_EQ(helicsPublicationIsValid(pub), helics_true);
 
-    helicsInputSetDefaultRaw(inp_raw1, nullptr, -2, &err);
+    helicsInputSetDefaultBytes(inp_raw1, nullptr, -2, &err);
     EXPECT_EQ(err.error_code, 0);
     char data[256] = "this is a string";
-    helicsInputSetDefaultRaw(inp_raw2, data, 30, &err);
+    helicsInputSetDefaultBytes(inp_raw2, data, 30, &err);
 
     helicsInputSetDefaultBoolean(inp_bool, helics_true, &err);
 

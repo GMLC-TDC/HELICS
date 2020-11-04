@@ -219,7 +219,7 @@ const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint)
     return str.c_str();
 }
 
-void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, const void* data, int inputDataLength, helics_error* err)
+void helicsEndpointSendData(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dest, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -245,7 +245,7 @@ void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, co
     }
 }
 
-void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err)
+void helicsEndpointSendBytes(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -263,7 +263,7 @@ void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDat
     }
 }
 
-void helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dest, helics_error* err)
+void helicsEndpointSendBytesTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dest, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -281,7 +281,7 @@ void helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputD
     }
 }
 
-void helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err)
+void helicsEndpointSendBytesAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -299,7 +299,7 @@ void helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputD
     }
 }
 
-void helicsEndpointSendToAt(helics_endpoint endpoint,
+void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
                             const void* data,
                             int inputDataLength,
                             const char* dest,
@@ -872,7 +872,7 @@ const char* helicsMessageGetString(helics_message message)
     return mess->data.char_data();
 }
 
-int helicsMessageGetRawDataSize(helics_message message)
+int helicsMessageGetByteCount(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {
@@ -881,7 +881,7 @@ int helicsMessageGetRawDataSize(helics_message message)
     return static_cast<int>(mess->data.size());
 }
 
-void helicsMessageGetRawData(helics_message message, void* data, int maxMessagelen, int* actualSize, helics_error* err)
+void helicsMessageGetBytes(helics_message message, void* data, int maxMessagelen, int* actualSize, helics_error* err)
 {
     auto* mess = getMessageObj(message, err);
     if (mess == nullptr || mess->data.empty()) {
@@ -905,7 +905,7 @@ void helicsMessageGetRawData(helics_message message, void* data, int maxMessagel
     }
 }
 
-void* helicsMessageGetRawDataPointer(helics_message message)
+void* helicsMessageGetBytesPointer(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {

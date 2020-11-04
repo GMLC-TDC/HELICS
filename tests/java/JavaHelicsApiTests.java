@@ -439,7 +439,7 @@ public class JavaHelicsApiTests {
              System.out.println(msg2Data);
                 javaHelicsApiTests.helicsAssert("!msg2Data.equals(\"Hello\")");
             }
-            long msg2Length = helics.helicsMessageGetRawDataSize(msg2);
+            long msg2Length = helics.helicsMessageGetByteCount(msg2);
             if (msg2Length != 5) {
                 javaHelicsApiTests.helicsAssert("msg2Length != 5");
             }
@@ -477,7 +477,7 @@ public class JavaHelicsApiTests {
             if (!"There".equals(msg3Data)) {
                 javaHelicsApiTests.helicsAssert("!msg3Data.equals(\"There\")");
             }
-            long msg3Length = helics.helicsMessageGetRawDataSize(msg3);
+            long msg3Length = helics.helicsMessageGetByteCount(msg3);
             if (msg3Length != 5) {
                 javaHelicsApiTests.helicsAssert("msg3Length != 5");
             }
@@ -565,7 +565,7 @@ public class JavaHelicsApiTests {
             if (sub3Length[0] != 7) {
                 javaHelicsApiTests.helicsAssert("sub3Length[0] != 7");
             }
-            int sub3ValueSize = helics.helicsInputGetRawValueSize(sub3);
+            int sub3ValueSize = helics.helicsInputGetByteCount(sub3);
             if (sub3ValueSize != 14) {
                 javaHelicsApiTests.helicsAssert("sub3ValueSize != 14");
             }

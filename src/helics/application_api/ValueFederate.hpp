@@ -328,14 +328,14 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return a constant data block
     @throw std::invalid_argument if id is invalid
     */
-    data_view getValueRaw(const Input& inp);
+    data_view getBytes(const Input& inp);
 
     /** publish a value
     @param pub the publication identifier
     @param block a data block containing the data
     @throw invalid_argument if the publication id is invalid
     */
-    void publishRaw(const Publication& pub, data_view block);
+    void publishBytes(const Publication& pub, data_view block);
 
     /** publish data
   @param pub the publication identifier
@@ -343,9 +343,9 @@ class HELICS_CXX_EXPORT ValueFederate:
   @param data_size the length of the data
   @throw invalid_argument if the publication id is invalid
   */
-    void publishRaw(const Publication& pub, const char* data, size_t data_size)
+    void publishBytes(const Publication& pub, const char* data, size_t data_size)
     {
-        publishRaw(pub, data_view{data, data_size});
+        publishBytes(pub, data_view{data, data_size});
     }
 
     /** register a set of publications based on a publication JSON

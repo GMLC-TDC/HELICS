@@ -394,7 +394,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, vector_callback_lists)
                                             ++ccnt;
                                         });
     vFed1->enterExecutingMode();
-    vFed1->publishRaw(pubid3, db);
+    vFed1->publishBytes(pubid3, db);
     vFed1->requestTime(1.0);
     // callbacks here
     EXPECT_EQ(ccnt, 0);
@@ -404,7 +404,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, vector_callback_lists)
     EXPECT_EQ(ccnt, 1);
 
     ccnt = 0;  // reset the counter
-    vFed1->publishRaw(pubid3, db);
+    vFed1->publishBytes(pubid3, db);
     pubid2.publish(4);
     pubid1.publish("test string2");
     vFed1->requestTime(5.0);
