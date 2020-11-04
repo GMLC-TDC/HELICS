@@ -51,13 +51,13 @@ TEST_P(vfed2_type_tests, block_send_receive)
 
     EXPECT_TRUE(helicsInputIsUpdated(sub1));
 
-    int len1 = helicsInputGetBytesSize(sub1);
+    int len1 = helicsInputGetByteCount(sub1);
 
     EXPECT_EQ(len1, len);
     CE(helicsInputGetBytes(sub1, val, 600, &actualLen, &err));
     EXPECT_EQ(actualLen, len);
 
-    len1 = helicsInputGetBytesSize(sub1);
+    len1 = helicsInputGetByteCount(sub1);
 
     EXPECT_EQ(len1, len);
 

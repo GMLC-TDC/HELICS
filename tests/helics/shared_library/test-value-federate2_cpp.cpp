@@ -63,7 +63,7 @@ TEST_P(vfed_type_tests, test_block_send_receive)
     // raw value has an extra 8 bits
     EXPECT_EQ(actualLen, len + 8);
 
-    len1 = sub1.getBytesSize();
+    len1 = sub1.getByteCount();
 
     EXPECT_EQ(len1, len + 8);
 

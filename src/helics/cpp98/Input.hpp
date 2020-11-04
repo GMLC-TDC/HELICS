@@ -79,14 +79,14 @@ class Input {
     /** get a raw value as a character vector*/
     int getBytes(std::vector<char>& data)
     {
-        int size = helicsInputGetBytesSize(inp);
+        int size = helicsInputGetByteCount(inp);
         data.resize(size);
         helicsInputGetBytes(
             inp, data.data(), static_cast<int>(data.size()), &size, HELICS_IGNORE_ERROR);
         return size;
     }
     /** get the size of the raw value */
-    int getBytesSize() { return helicsInputGetBytesSize(inp); }
+    int getByteCount() { return helicsInputGetByteCount(inp); }
 
     /** get the size of the value as a string */
     int getStringSize()

@@ -475,7 +475,7 @@ HELICS_EXPORT void helicsInputAddTarget(helics_input ipt, const char* target, he
  *
  * @return The size of the raw data/string in bytes.
  */
-HELICS_EXPORT int helicsInputGetBytesSize(helics_input ipt);
+HELICS_EXPORT int helicsInputGetByteCount(helics_input ipt);
 
 /**
  * Get the raw data for the latest value of a subscription.

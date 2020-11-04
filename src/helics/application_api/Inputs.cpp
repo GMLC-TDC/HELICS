@@ -615,7 +615,7 @@ void Input::registerCallback()
         handleCallback(time);
     });
 }
-size_t Input::getBytesSize()
+size_t Input::getByteCount()
 {
     isUpdated();
     auto dv = fed->getBytes(*this);

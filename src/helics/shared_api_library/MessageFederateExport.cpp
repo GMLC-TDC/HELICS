@@ -872,7 +872,7 @@ const char* helicsMessageGetString(helics_message message)
     return mess->data.char_data();
 }
 
-int helicsMessageGetBytesSize(helics_message message)
+int helicsMessageGetByteCount(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {

@@ -2534,14 +2534,14 @@ TEST(evil_input_test, helicsInputAddTarget)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST(evil_input_test, helicsInputGetBytesSize)
+TEST(evil_input_test, helicsInputGetByteCount)
 {
-    // int helicsInputGetBytesSize(helics_input ipt);
+    // int helicsInputGetByteCount(helics_input ipt);
     char rdata[256];
     auto evil_input = reinterpret_cast<helics_input>(rdata);
-    auto res1 = helicsInputGetBytesSize(nullptr);
+    auto res1 = helicsInputGetByteCount(nullptr);
     EXPECT_EQ(res1, 0);
-    auto res2 = helicsInputGetBytesSize(evil_input);
+    auto res2 = helicsInputGetByteCount(evil_input);
     EXPECT_EQ(res2, 0);
 }
 
@@ -3356,14 +3356,14 @@ TEST(evil_message_object_test, helicsMessageCheckFlag)
     EXPECT_EQ(res2, helics_false);
 }
 
-TEST(evil_message_object_test, helicsMessageGetBytesSize)
+TEST(evil_message_object_test, helicsMessageGetByteCount)
 {
-    // int helicsMessageGetBytesSize(helics_message message);
+    // int helicsMessageGetByteCount(helics_message message);
     char rdata[256];
     auto evil_mo = reinterpret_cast<helics_message>(rdata);
-    auto res1 = helicsMessageGetBytesSize(nullptr);
+    auto res1 = helicsMessageGetByteCount(nullptr);
     EXPECT_EQ(res1, 0);
-    auto res2 = helicsMessageGetBytesSize(evil_mo);
+    auto res2 = helicsMessageGetByteCount(evil_mo);
     EXPECT_EQ(res2, 0);
 }
 

@@ -586,7 +586,7 @@ HELICS_EXPORT helics_bool helicsMessageGetFlagOption(helics_message message, int
  *
  * @return The size of the data payload.
  */
-HELICS_EXPORT int helicsMessageGetBytesSize(helics_message message);
+HELICS_EXPORT int helicsMessageGetByteCount(helics_message message);
 
 /**
  * Get the raw data for a message object.

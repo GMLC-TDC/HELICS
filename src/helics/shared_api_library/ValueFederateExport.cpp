@@ -668,13 +668,13 @@ void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* er
     inpObj->inputPtr->addTarget(target);
 }
 
-int helicsInputGetBytesSize(helics_input inp)
+int helicsInputGetByteCount(helics_input inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
         return (0);
     }
-    return static_cast<int>(inpObj->inputPtr->getBytesSize());
+    return static_cast<int>(inpObj->inputPtr->getByteCount());
 }
 
 bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)

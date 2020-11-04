@@ -384,7 +384,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     /** get the raw binary data*/
     data_view getBytes();
     /** get the size of the raw data*/
-    size_t getBytesSize();
+    size_t getByteCount();
     /** get the size of the data if it were a string*/
     size_t getStringSize();
     /** get the number of elements in the data if it were a vector*/
