@@ -2707,43 +2707,46 @@ public class helics {
    * Send a message to the specified destination.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
-   * @param dst The target destination.<br>
+   * <br>
+   * @param data The data to send.<br>
    * <br>
    * <br>
    *             "" to use the default destination.<br>
    * <br>
-   * @param data The data to send.
+   * ,out] err A pointer to an error object for catching errors.
    */
-  public static void helicsEndpointSendTo(SWIGTYPE_p_void endpoint, String dst, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendTo(SWIGTYPE_p_void.getCPtr(endpoint), dst, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendTo(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, String dst) {
+    helicsJNI.helicsEndpointSendTo(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength, dst);
   }
 
   /**
    * Send a message to the specified destination at a specific time.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
+   * @param data The data to send.<br>
+   * <br>
    * @param dst The target destination.<br>
    * <br>
    * <br>
    *             "" to use the default destination.<br>
    * <br>
-   * @param data The data to send.<br>
-   * <br>
    * @param time The time the message should be sent.
    */
-  public static void helicsEndpointSendToAt(SWIGTYPE_p_void endpoint, String dst, double time, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendToAt(SWIGTYPE_p_void.getCPtr(endpoint), dst, time, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendToAt(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, String dst, double time) {
+    helicsJNI.helicsEndpointSendToAt(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength, dst, time);
   }
 
   /**
    * Send a message at a specific time to the targeted destinations<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
-   * @param time The time the message should be sent.<br>
-   * @param data The data to send.
+   * <br>
+   * @param data The data to send.<br>
+   * <br>
+   *   @param time The time the message should be sent.
    */
-  public static void helicsEndpointSendAt(SWIGTYPE_p_void endpoint, double time, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendAt(SWIGTYPE_p_void.getCPtr(endpoint), time, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendAt(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, double time) {
+    helicsJNI.helicsEndpointSendAt(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength, time);
   }
 
   /**
@@ -3095,8 +3098,8 @@ public class helics {
    * <br>
    * @return The flags associated with a message.
    */
-  public static int helicsMessageCheckFlag(SWIGTYPE_p_void message, int flag) {
-    return helicsJNI.helicsMessageCheckFlag(SWIGTYPE_p_void.getCPtr(message), flag);
+  public static int helicsMessageGetFlagOption(SWIGTYPE_p_void message, int flag) {
+    return helicsJNI.helicsMessageGetFlagOption(SWIGTYPE_p_void.getCPtr(message), flag);
   }
 
   /**

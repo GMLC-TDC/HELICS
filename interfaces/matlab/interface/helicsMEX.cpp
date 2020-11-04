@@ -11522,18 +11522,18 @@ fail:
 
 int _wrap_helicsEndpointSendTo(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *arg3 = (void *) 0 ;
-  int arg4 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
   helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
+  size_t size2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  size_t size3 = 0 ;
-  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
   helics_error etemp5 ;
   mxArray * _out;
   
@@ -11548,22 +11548,22 @@ int _wrap_helicsEndpointSendTo(int resc, mxArray *resv[], int argc, mxArray *arg
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendTo" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, &size2, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendTo" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, &size3, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendTo" "', argument " "3"" of type '" "void const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendTo" "', argument " "2"" of type '" "void const *""'");
   }  
-  arg3 = reinterpret_cast< void * >(buf3);
-  arg4 = static_cast< int >(size3 - 1);
-  helicsEndpointSendTo(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  res4 = SWIG_AsCharPtrAndSize(argv[2], &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsEndpointSendTo" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  helicsEndpointSendTo(arg1,(void const *)arg2,arg3,(char const *)arg4,arg5);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -11573,7 +11573,7 @@ int _wrap_helicsEndpointSendTo(int resc, mxArray *resv[], int argc, mxArray *arg
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -11586,21 +11586,21 @@ fail:
 
 int _wrap_helicsEndpointSendToAt(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  helics_time arg3 ;
-  void *arg4 = (void *) 0 ;
-  int arg5 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
+  helics_time arg5 ;
   helics_error *arg6 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
+  size_t size2 = 0 ;
   int alloc2 = 0 ;
-  double val3 ;
-  int ecode3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
-  size_t size4 = 0 ;
   int alloc4 = 0 ;
+  double val5 ;
+  int ecode5 = 0 ;
   helics_error etemp6 ;
   mxArray * _out;
   
@@ -11615,23 +11615,23 @@ int _wrap_helicsEndpointSendToAt(int resc, mxArray *resv[], int argc, mxArray *a
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendToAt" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, &size2, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendToAt" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_double(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsEndpointSendToAt" "', argument " "3"" of type '" "helics_time""'");
-  } 
-  arg3 = static_cast< helics_time >(val3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, &size4, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsEndpointSendToAt" "', argument " "4"" of type '" "void const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendToAt" "', argument " "2"" of type '" "void const *""'");
   }  
-  arg4 = reinterpret_cast< void * >(buf4);
-  arg5 = static_cast< int >(size4 - 1);
-  helicsEndpointSendToAt(arg1,(char const *)arg2,arg3,(void const *)arg4,arg5,arg6);
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  res4 = SWIG_AsCharPtrAndSize(argv[2], &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsEndpointSendToAt" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  ecode5 = SWIG_AsVal_double(argv[3], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendToAt" "', argument " "5"" of type '" "helics_time""'");
+  } 
+  arg5 = static_cast< helics_time >(val5);
+  helicsEndpointSendToAt(arg1,(void const *)arg2,arg3,(char const *)arg4,arg5,arg6);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
@@ -11658,17 +11658,17 @@ fail:
 
 int _wrap_helicsEndpointSendAt(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  helics_time arg2 ;
-  void *arg3 = (void *) 0 ;
-  int arg4 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  helics_time arg4 ;
   helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  size_t size3 = 0 ;
-  int alloc3 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  size_t size2 = 0 ;
+  int alloc2 = 0 ;
+  double val4 ;
+  int ecode4 = 0 ;
   helics_error etemp5 ;
   mxArray * _out;
   
@@ -11683,21 +11683,21 @@ int _wrap_helicsEndpointSendAt(int resc, mxArray *resv[], int argc, mxArray *arg
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendAt" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsEndpointSendAt" "', argument " "2"" of type '" "helics_time""'");
-  } 
-  arg2 = static_cast< helics_time >(val2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, &size3, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendAt" "', argument " "3"" of type '" "void const *""'");
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, &size2, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendAt" "', argument " "2"" of type '" "void const *""'");
   }  
-  arg3 = reinterpret_cast< void * >(buf3);
-  arg4 = static_cast< int >(size3 - 1);
-  helicsEndpointSendAt(arg1,arg2,(void const *)arg3,arg4,arg5);
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  ecode4 = SWIG_AsVal_double(argv[2], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "helicsEndpointSendAt" "', argument " "4"" of type '" "helics_time""'");
+  } 
+  arg4 = static_cast< helics_time >(val4);
+  helicsEndpointSendAt(arg1,(void const *)arg2,arg3,arg4,arg5);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -11706,7 +11706,7 @@ int _wrap_helicsEndpointSendAt(int resc, mxArray *resv[], int argc, mxArray *arg
   }
   return 0;
 fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -12717,7 +12717,7 @@ fail:
 }
 
 
-int _wrap_helicsMessageCheckFlag(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsMessageGetFlagOption(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_message arg1 = (helics_message) 0 ;
   int arg2 ;
   int res1 ;
@@ -12726,19 +12726,19 @@ int _wrap_helicsMessageCheckFlag(int resc, mxArray *resv[], int argc, mxArray *a
   mxArray * _out;
   helics_bool result;
   
-  if (!SWIG_check_num_args("helicsMessageCheckFlag",argc,2,2,0)) {
+  if (!SWIG_check_num_args("helicsMessageGetFlagOption",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageCheckFlag" "', argument " "1"" of type '" "helics_message""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetFlagOption" "', argument " "1"" of type '" "helics_message""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsMessageCheckFlag" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsMessageGetFlagOption" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_bool)helicsMessageCheckFlag(arg1,arg2);
+  result = (helics_bool)helicsMessageGetFlagOption(arg1,arg2);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -15474,7 +15474,7 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 272: return "_wrap_helicsMessageGetTime";
   case 273: return "_wrap_helicsMessageGetString";
   case 274: return "_wrap_helicsMessageGetMessageID";
-  case 275: return "_wrap_helicsMessageCheckFlag";
+  case 275: return "_wrap_helicsMessageGetFlagOption";
   case 276: return "_wrap_helicsMessageGetRawDataSize";
   case 277: return "_wrap_helicsMessageGetRawData";
   case 278: return "_wrap_helicsMessageIsValid";
@@ -15846,7 +15846,7 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 272: flag=_wrap_helicsMessageGetTime(resc,resv,argc,(mxArray**)(argv)); break;
   case 273: flag=_wrap_helicsMessageGetString(resc,resv,argc,(mxArray**)(argv)); break;
   case 274: flag=_wrap_helicsMessageGetMessageID(resc,resv,argc,(mxArray**)(argv)); break;
-  case 275: flag=_wrap_helicsMessageCheckFlag(resc,resv,argc,(mxArray**)(argv)); break;
+  case 275: flag=_wrap_helicsMessageGetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
   case 276: flag=_wrap_helicsMessageGetRawDataSize(resc,resv,argc,(mxArray**)(argv)); break;
   case 277: flag=_wrap_helicsMessageGetRawData(resc,resv,argc,(mxArray**)(argv)); break;
   case 278: flag=_wrap_helicsMessageIsValid(resc,resv,argc,(mxArray**)(argv)); break;

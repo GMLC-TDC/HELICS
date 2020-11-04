@@ -359,9 +359,9 @@ public class helicsJNI {
   public final static native void helicsEndpointSetDefaultDestination(long jarg1, String jarg2);
   public final static native String helicsEndpointGetDefaultDestination(long jarg1);
   public final static native void helicsEndpointSend(long jarg1, long jarg2, int jarg3);
-  public final static native void helicsEndpointSendTo(long jarg1, String jarg2, long jarg3, int jarg4);
-  public final static native void helicsEndpointSendToAt(long jarg1, String jarg2, double jarg3, long jarg4, int jarg5);
-  public final static native void helicsEndpointSendAt(long jarg1, double jarg2, long jarg3, int jarg4);
+  public final static native void helicsEndpointSendTo(long jarg1, long jarg2, int jarg3, String jarg4);
+  public final static native void helicsEndpointSendToAt(long jarg1, long jarg2, int jarg3, String jarg4, double jarg5);
+  public final static native void helicsEndpointSendAt(long jarg1, long jarg2, int jarg3, double jarg4);
   public final static native void helicsEndpointSendMessage(long jarg1, long jarg2);
   public final static native void helicsEndpointSendMessageZeroCopy(long jarg1, long jarg2);
   public final static native void helicsEndpointSubscribe(long jarg1, String jarg2);
@@ -393,7 +393,7 @@ public class helicsJNI {
   public final static native double helicsMessageGetTime(long jarg1);
   public final static native String helicsMessageGetString(long jarg1);
   public final static native int helicsMessageGetMessageID(long jarg1);
-  public final static native int helicsMessageCheckFlag(long jarg1, int jarg2);
+  public final static native int helicsMessageGetFlagOption(long jarg1, int jarg2);
   public final static native int helicsMessageGetRawDataSize(long jarg1);
   public final static native void helicsMessageGetRawData(long jarg1, long jarg2, int jarg3, int[] jarg4);
   public final static native int helicsMessageIsValid(long jarg1);
