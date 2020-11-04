@@ -236,7 +236,7 @@ void helicsEndpointSendMessageRaw(helics_endpoint endpoint, const char* dest, co
             if ((dest == nullptr) || (std::string(dest).empty())) {
                 endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
             } else {
-                endObj->endPtr->sendTo(dest, reinterpret_cast<const char*>(data), inputDataLength);
+                endObj->endPtr->sendTo(reinterpret_cast<const char*>(data), inputDataLength, dest);
             }
         }
     }
@@ -263,7 +263,7 @@ void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDat
     }
 }
 
-void helicsEndpointSendTo(helics_endpoint endpoint, const char* dest, const void* data, int inputDataLength, helics_error* err)
+void helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dest, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -271,9 +271,9 @@ void helicsEndpointSendTo(helics_endpoint endpoint, const char* dest, const void
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendTo(AS_STRING_VIEW(dest), emptyStr);
+            endObj->endPtr->sendTo(emptyStr, AS_STRING_VIEW(dest));
         } else {
-            endObj->endPtr->sendTo(AS_STRING_VIEW(dest), reinterpret_cast<const char*>(data), inputDataLength);
+            endObj->endPtr->sendTo(reinterpret_cast<const char*>(data), inputDataLength, AS_STRING_VIEW(dest));
         }
     }
     catch (...) {
@@ -281,7 +281,7 @@ void helicsEndpointSendTo(helics_endpoint endpoint, const char* dest, const void
     }
 }
 
-void helicsEndpointSendAt(helics_endpoint endpoint, helics_time time, const void* data, int inputDataLength, helics_error* err)
+void helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
@@ -289,9 +289,9 @@ void helicsEndpointSendAt(helics_endpoint endpoint, helics_time time, const void
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendAt(time, emptyStr);
+            endObj->endPtr->sendAt(emptyStr, time);
         } else {
-            endObj->endPtr->sendAt(time, reinterpret_cast<const char*>(data), inputDataLength);
+            endObj->endPtr->sendAt(reinterpret_cast<const char*>(data), inputDataLength, time);
         }
     }
     catch (...) {
@@ -300,10 +300,10 @@ void helicsEndpointSendAt(helics_endpoint endpoint, helics_time time, const void
 }
 
 void helicsEndpointSendToAt(helics_endpoint endpoint,
-                            const char* dest,
-                            helics_time time,
                             const void* data,
                             int inputDataLength,
+                            const char* dest,
+                            helics_time time,
                             helics_error* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
@@ -312,9 +312,9 @@ void helicsEndpointSendToAt(helics_endpoint endpoint,
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendToAt(AS_STRING_VIEW(dest), time, emptyStr);
+            endObj->endPtr->sendToAt(emptyStr, AS_STRING_VIEW(dest), time);
         } else {
-            endObj->endPtr->sendToAt(AS_STRING_VIEW(dest), time, reinterpret_cast<const char*>(data), inputDataLength);
+            endObj->endPtr->sendToAt(reinterpret_cast<const char*>(data), inputDataLength, AS_STRING_VIEW(dest), time);
         }
     }
     catch (...) {

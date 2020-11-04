@@ -113,10 +113,10 @@ TEST(recorder_tests, recorder_test_message)
     mfed.enterExecutingMode();
 
     auto retTime = mfed.requestTime(1.0);
-    e1.sendTo("src1", "this is a test message");
+    e1.sendTo("this is a test message", "src1");
     EXPECT_EQ(retTime, 1.0);
     retTime = mfed.requestTime(2.0);
-    e1.sendTo("src1", "this is a test message2");
+    e1.sendTo("this is a test message2", "src1");
     EXPECT_EQ(retTime, 2.0);
 
     mfed.finalize();
@@ -219,7 +219,7 @@ TEST_P(recorder_message_file_tests, test_message_files)
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.sendTo("src1", "this is a test message");
+    e1.sendTo("this is a test message", "src1");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -227,7 +227,7 @@ TEST_P(recorder_message_file_tests, test_message_files)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.sendTo("src1", "this is a test message2");
+    e1.sendTo("this is a test message2", "src1");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);
@@ -295,7 +295,7 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
     auto retTime = cfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     pub1.publish(3.4);
-    e1.sendTo("src1", "this is a test message");
+    e1.sendTo("this is a test message", "src1");
 
     retTime = cfed.requestTime(1.5);
     EXPECT_EQ(retTime, 1.5);
@@ -303,7 +303,7 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
 
     retTime = cfed.requestTime(2.0);
     EXPECT_EQ(retTime, 2.0);
-    e1.sendTo("src1", "this is a test message2");
+    e1.sendTo("this is a test message2", "src1");
     pub1.publish(4.7);
 
     retTime = cfed.requestTime(3.0);
@@ -372,10 +372,10 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -419,10 +419,10 @@ TEST(recorder_tests, recorder_test_srcendpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -465,10 +465,10 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -512,10 +512,10 @@ TEST_P(recorder_clone_file_tests, simple_clone_test_file)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -573,10 +573,10 @@ TEST(recorder_tests, recorder_test_saveFile1)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -674,11 +674,11 @@ TEST(recorder_tests, recorder_test_saveFile3)
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.sendTo("d2", "this is a test message");
+    e1.sendTo("this is a test message", "d2");
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo("d1", "this is a test message2");
+    e2.sendTo("this is a test message2", "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);

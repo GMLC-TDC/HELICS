@@ -250,29 +250,29 @@ class Endpoint {
     @param data pointer to data location
     @param data_size the length of the data
     */
-    void sendTo(const std::string& dest, const void* data, size_t data_size)
+    void sendTo(const void* data, size_t data_size, const std::string& dest)
     {
-        helicsEndpointSendTo(ep, dest.c_str(), data, static_cast<int>(data_size), hThrowOnError());
+        helicsEndpointSendTo(ep, data, static_cast<int>(data_size), dest.c_str(), hThrowOnError());
     }
     /** send a data block and length
    @param data pointer to data location
    @param data_size the length of the data
    @param time the time to send the message
    */
-    void sendAt(helics_time time, const char* data, size_t data_size)
+    void sendAt(const char* data, size_t data_size, helics_time time)
     {
-        helicsEndpointSendAt(ep, time, data, static_cast<int>(data_size), hThrowOnError());
+        helicsEndpointSendAt(ep, data, static_cast<int>(data_size), time, hThrowOnError());
     }
     /** send a data block and length
-    @param dest destination to send the message to
     @param data pointer to data location
     @param data_size the length of the data
+    @param dest destination to send the message to
     @param time the time to send the message
     */
-    void sendToAt(const std::string& dest, helics_time time, const void* data, size_t data_size)
+    void sendToAt(const void* data, size_t data_size, const std::string& dest, helics_time time)
     {
         helicsEndpointSendToAt(
-            ep, dest.c_str(), time, data, static_cast<int>(data_size), hThrowOnError());
+            ep, data, static_cast<int>(data_size), dest.c_str(), time, hThrowOnError());
     }
     /** send a string to the target destination
     @param data the information to send
@@ -286,33 +286,28 @@ class Endpoint {
      @param dest the target endpoint to send the data to
      @param data the information to send
    */
-    void sendTo(const std::string& dest, const std::string& data)
+    void sendTo(const std::string& data, const std::string& dest)
     {
         helicsEndpointSendTo(
-            ep, dest.c_str(), &(data[0]), static_cast<int>(data.size()), hThrowOnError());
+            ep, &(data[0]), static_cast<int>(data.size()), dest.c_str(), hThrowOnError());
     }
     /** send a string at a particular time
      @param data the information to send
      @param time the time the message should be delivered
    */
-    void sendAt(helics_time time, const std::string& data)
+    void sendAt(const std::string& data, helics_time time)
     {
-        helicsEndpointSendAt(ep,
-                             time,
-                             &(data[0]),
-                             static_cast<int>(data.size()),
-
-                             hThrowOnError());
+        helicsEndpointSendAt(ep, &(data[0]), static_cast<int>(data.size()), time, hThrowOnError());
     }
     /** send a string to a particular destination at a particular time
-     @param dest the target endpoint to send the data to
      @param data the information to send
-      @param time the time the message should be delivered
+     @param dest the target endpoint to send the data to
+     @param time the time the message should be delivered
    */
-    void sendToAt(const std::string& dest, helics_time time, const std::string& data)
+    void sendToAt(const std::string& data, const std::string& dest, helics_time time)
     {
         helicsEndpointSendToAt(
-            ep, dest.c_str(), time, &(data[0]), static_cast<int>(data.size()), hThrowOnError());
+            ep, &(data[0]), static_cast<int>(data.size()), dest.c_str(), time, hThrowOnError());
     }
 
     /** send a vector of data to the target destination
@@ -324,31 +319,31 @@ class Endpoint {
     }
 
     /** send a vector of data to a particular destination
-     @param dest the target endpoint to send the data to
      @param data the information to send
+     @param dest the target endpoint to send the data to
    */
-    void sendTo(const std::string& dest, const std::vector<char>& data)
+    void sendTo(const std::vector<char>& data, const std::string& dest)
     {
         helicsEndpointSendTo(
-            ep, dest.c_str(), data.data(), static_cast<int>(data.size()), hThrowOnError());
+            ep, data.data(), static_cast<int>(data.size()), dest.c_str(), hThrowOnError());
     }
     /** send a vector of data to the target destination at a particular time
      @param data the information to send
       @param time the time the message should be delivered
    */
-    void sendAt(helics_time time, const std::vector<char>& data)
+    void sendAt(const std::vector<char>& data, helics_time time)
     {
-        helicsEndpointSendAt(ep, time, data.data(), static_cast<int>(data.size()), hThrowOnError());
+        helicsEndpointSendAt(ep, data.data(), static_cast<int>(data.size()), time, hThrowOnError());
     }
     /** send a vector of data to a particular destination at a particular time
      @param dest the target endpoint to send the data to
      @param data the information to send
       @param time the time the message should be delivered
    */
-    void sendToAt(const std::string& dest, helics_time time, const std::vector<char>& data)
+    void sendToAt(const std::vector<char>& data, const std::string& dest, helics_time time)
     {
         helicsEndpointSendToAt(
-            ep, dest.c_str(), time, data.data(), static_cast<int>(data.size()), hThrowOnError());
+            ep, data.data(), static_cast<int>(data.size()), dest.c_str(), time, hThrowOnError());
     }
 
     /** send a message object

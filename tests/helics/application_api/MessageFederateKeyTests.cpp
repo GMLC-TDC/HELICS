@@ -57,7 +57,7 @@ TEST_P(mfed_single_type_tests, send_receive)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    epid.sendTo("ep2", data);
+    epid.sendTo(data, "ep2");
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -95,7 +95,7 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
     helics::SmallBuffer data(500, 'a');
 
-    epid.sendTo("ep2", data);
+    epid.sendTo(data, "ep2");
 
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
@@ -139,8 +139,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    epid.sendTo("ep2", data);
-    epid2.sendTo("fed0/ep1", data2);
+    epid.sendTo(data, "ep2");
+    epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -192,8 +192,8 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    epid.sendTo("ep2", data);
-    epid2.sendTo("fed0/ep1", data2);
+    epid.sendTo(data, "ep2");
+    epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -250,8 +250,8 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    epid.sendTo("ep2", data);
-    epid2.sendTo("fed0/ep1", data2);
+    epid.sendTo(data, "ep2");
+    epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);
@@ -309,8 +309,8 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     helics::SmallBuffer data3(300, 'c');
     helics::SmallBuffer data4(200, 'd');
 
-    epid.sendTo("ep2", data1);
-    epid.sendTo("ep2", data2);
+    epid.sendTo(data1, "ep2");
+    epid.sendTo(data2, "ep2");
     epid.send(data3);
     epid.send(data4);
     // move the time to 1.0
@@ -381,8 +381,8 @@ TEST_P(mfed_all_type_tests, time_interruptions)
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
 
-    epid.sendTo("ep2", data);
-    epid2.sendTo("fed0/ep1", data2);
+    epid.sendTo(data, "ep2");
+    epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
     auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
     auto gtime = mFed2->requestTime(1.0);

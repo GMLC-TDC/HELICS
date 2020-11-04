@@ -191,6 +191,10 @@ HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data
  * Send a message to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
+
+ * @param data The data to send.
+ * @forcpponly
+ * @param inputDataLength The length of the data to send.
  * @param dst The target destination.
  * @forcpponly
  *             nullptr to use the default destination.
@@ -198,19 +202,20 @@ HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data
  * @beginpythononly
  *             "" to use the default destination.
  * @endpythononly
- * @param data The data to send.
- * @forcpponly
- * @param inputDataLength The length of the data to send.
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsEndpointSendTo(helics_endpoint endpoint, const char* dst, const void* data, int inputDataLength, helics_error* err);
+    helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dst, helics_error* err);
 
 /**
  * Send a message to the specified destination at a specific time.
  *
  * @param endpoint The endpoint to send the data from.
+ * @param data The data to send.
+ * @forcpponly
+ * @param inputDataLength The length of the data to send.
+ * @endforcpponly
  * @param dst The target destination.
  * @forcpponly
  *             nullptr to use the default destination.
@@ -218,10 +223,6 @@ HELICS_EXPORT void
  * @beginpythononly
  *             "" to use the default destination.
  * @endpythononly
- * @param data The data to send.
- * @forcpponly
- * @param inputDataLength The length of the data to send.
- * @endforcpponly
  * @param time The time the message should be sent.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -229,29 +230,29 @@ HELICS_EXPORT void
  */
 
 HELICS_EXPORT void helicsEndpointSendToAt(helics_endpoint endpoint,
-                                          const char* dst,
-                                          helics_time time,
                                           const void* data,
                                           int inputDataLength,
+                                          const char* dst,
+                                          helics_time time,
                                           helics_error* err);
 
 /**
  * Send a message at a specific time to the targeted destinations
  *
  * @param endpoint The endpoint to send the data from.
- * @param time The time the message should be sent.
+ *
  * @param data The data to send.
  * @forcpponly
  * @param inputDataLength The length of the data to send.
  * @endforcpponly
-
+  @param time The time the message should be sent.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 
 HELICS_EXPORT void
-    helicsEndpointSendAt(helics_endpoint endpoint, helics_time time, const void* data, int inputDataLength, helics_error* err);
+    helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err);
 
 /**
  * Send a message object from a specific endpoint.

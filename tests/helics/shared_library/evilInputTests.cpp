@@ -3666,12 +3666,12 @@ TEST(evil_endpoint_test, helicsEndpointSendTo)
     auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsEndpointSendTo(nullptr, nullptr, nullptr, 45, &err);
+    helicsEndpointSendTo(nullptr, nullptr, 45, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     // auto res2=helicsEndpointSendMessageRaw(nullptr, nullptr, nullptr, int inputDataLength,
     // nullptr);
-    helicsEndpointSendTo(evil_ept, "dest", rdata, 200, &err);
+    helicsEndpointSendTo(evil_ept, rdata, 200, "dest", &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -3683,12 +3683,12 @@ TEST(evil_endpoint_test, helicsEndpointSendToAt)
     auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsEndpointSendToAt(nullptr, nullptr, 0.0, nullptr, 45, &err);
+    helicsEndpointSendToAt(nullptr, nullptr, 45, nullptr, 0.0, &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     // auto res2=helicsEndpointSendMessageRaw(nullptr, nullptr, nullptr, int inputDataLength,
     // nullptr);
-    helicsEndpointSendToAt(evil_ept, "dest", -15.7, rdata, 200, &err);
+    helicsEndpointSendToAt(evil_ept, rdata, 200, "dest", -15.7, &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -3700,12 +3700,12 @@ TEST(evil_endpoint_test, helicsEndpointSendAt)
     auto evil_ept = reinterpret_cast<helics_endpoint>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsEndpointSendAt(nullptr, 3.5, nullptr, 25, &err);
+    helicsEndpointSendAt(nullptr, nullptr, 25, 3.5, &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     // auto res2=helicsEndpointSendEventRaw(     nullptr,    nullptr,    nullptr,     int
     // inputDataLength,     helics_time time,     nullptr);
-    helicsEndpointSendAt(evil_ept, 3.5, rdata, 56, &err);
+    helicsEndpointSendAt(evil_ept, rdata, 56, 3.5, &err);
     EXPECT_NE(err.error_code, 0);
 }
 
