@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class SmallBuffer {
   public:
-    SmallBuffer() noexcept: heap(buffer.data()) {}
+    SmallBuffer() noexcept: heap(&(buffer[0])) {}
 
-    SmallBuffer(const SmallBuffer& sb): heap(buffer.data())
+    SmallBuffer(const SmallBuffer& sb): heap(&(buffer[0]))
     {
         resize(sb.size());
         std::memcpy(heap, sb.heap, sb.size());
@@ -46,25 +46,25 @@ class SmallBuffer {
 
     template<typename U,
              typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
-    SmallBuffer(U&& u): heap(buffer.data())
+    SmallBuffer(U&& u): heap(&(buffer[0]))
     {
         std::string_view val(std::forward<U>(u));
         resize(val.size());
         std::memcpy(heap, val.data(), val.size());
     }
 
-    SmallBuffer(const void* data, size_t size): heap(buffer.data())
+    SmallBuffer(const void* data, size_t size): heap(&(buffer[0]))
     {
         resize(size);
         std::memcpy(heap, data, size);
     }
     /** create a buffer with a specific size*/
-    SmallBuffer(std::size_t size): heap(buffer.data()) { resize(size); }
+    SmallBuffer(std::size_t size): heap(&(buffer[0])) { resize(size); }
 
     /** create a buffer with a specific size and contents*/
-    SmallBuffer(std::size_t size, std::byte val): heap(buffer.data()) { resize(size, val); }
+    SmallBuffer(std::size_t size, std::byte val): heap(&(buffer[0])) { resize(size, val); }
     /** create a buffer with a specific size and contents*/
-    SmallBuffer(std::size_t size, unsigned char val): heap(buffer.data())
+    SmallBuffer(std::size_t size, unsigned char val): heap(&(buffer[0]))
     {
         resize(size, std::byte{val});
     }

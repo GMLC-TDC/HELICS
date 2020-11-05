@@ -211,7 +211,7 @@ h.helicsPublicationPublishChar(pub, string_value)
 For sending a message through an endpoint, that once again looks a little bit different, in this case because - unlike with a publication - a message requires a destination. If a default destination was set when the endpoint was registered (either through the config file or through calling `h.helicsEndpointSetDefaultDestination()`), then an empty string can be passed. Otherwise, the destination must be provided as shown in API call below where dest is the destination and msg is the message to be sent.
 
 ```python
-h.helicsEndpointSendTo(end, msg, dest)
+h.helicsEndpointSendBytesTo(end, msg, dest)
 ```
 
 #### Request the Next Time Step
@@ -346,7 +346,7 @@ while t < end_time:
         # Now loop through all endpoints. For this example, we'll assume that a default destination
         # was provided in the config file.
         for end in ends:
-            h.helicsEndpointSendTo(eid, "string", '')
+            h.helicsEndpointSendBytesTo(eid, "string", '')
             # And once again, you can pull some metadata about the endpoint.
             name = h.helicsEndpointGetName(eid)
             info = h.helicsEndpointGetInfo(eid)

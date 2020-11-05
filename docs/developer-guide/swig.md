@@ -1,24 +1,5 @@
 # Generating SWIG extension
 
-**Python**
-
-The easiest way to generate the latest C files for the Python extension is to use CMake itself.
-For example, you can run the following in a POSIX/Unix environment where you have `swig` installed with Python 3.6.
-
-```bash
-git clone https://github.com/GMLC-TDC/HELICS
-cd HELICS
-mkdir build
-cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-develop/ .. && make -j 8 && make install
-cd swig/python
-cp helicsPYTHON_wrap.c ../../../swig/python/helics_wrap.c
-cp helics.py ../../../swig/python/helics.py
-```
-
-This method verifies that the C file generated from CMake using SWIG compiles correctly into a Python extension.
-
-For building a Python 2 compatible interface, use BUILD_PYTHON2_INTERFACE instead of BUILD_PYTHON_INTERFACE.
-
 **MATLAB**
 
 For the MATLAB extension, you need a special version of SWIG. Get it [here](https://github.com/jaeandersson/swig).
