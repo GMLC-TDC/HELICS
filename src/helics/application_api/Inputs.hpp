@@ -257,7 +257,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     {
         auto res = ValueConverter<remove_cv_ref<X>>::convert(std::forward<X>(val));
         lastValue = std::string(res.to_string());
-        setDefaultRaw(res);
+        setDefaultBytes(res);
     }
 
     /** setup the callback for value callback into the federate*/
@@ -272,7 +272,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
         setDefault_impl<X>(typeCategory<X>(), std::forward<X>(val));
     }
 
-    void setDefaultRaw(data_view val);
+    void setDefaultBytes(data_view val);
     /** set the minimum delta for change detection
     @param deltaV a double with the change in a value in order to register a different value
     */
@@ -325,7 +325,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class X>
     void getValue_impl(std::integral_constant<int, nonConvertibleType> /*V*/, X& out)
     {
-        ValueConverter<X>::interpret(getRawValue(), out);
+        ValueConverter<X>::interpret(getBytes(), out);
     }
 
     template<class X>
@@ -350,7 +350,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class X>
     X getValue_impl(std::integral_constant<int, nonConvertibleType> /*V*/)
     {
-        return ValueConverter<X>::interpret(getRawValue());
+        return ValueConverter<X>::interpret(getBytes());
     }
 
   public:
@@ -382,9 +382,9 @@ class HELICS_CXX_EXPORT Input: public Interface {
     const std::string& getString() { return getValueRef<std::string>(); }
 
     /** get the raw binary data*/
-    data_view getRawValue();
+    data_view getBytes();
     /** get the size of the raw data*/
-    size_t getRawSize();
+    size_t getByteCount();
     /** get the size of the data if it were a string*/
     size_t getStringSize();
     /** get the number of elements in the data if it were a vector*/

@@ -210,7 +210,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxDataLength, int *actualSize) {
-    $2=helicsInputGetRawValueSize(arg1)+2;
+    $2=helicsInputGetByteCount(arg1)+2;
     $1 =  malloc($2);
 }
 
@@ -230,7 +230,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxMessageLength, int *actualSize) {
-    $2=helicsMessageGetRawDataSize(arg1)+2;
+    $2=helicsMessageGetByteCount(arg1)+2;
     $1 =  malloc($2);
 }
 

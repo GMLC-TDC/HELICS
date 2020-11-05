@@ -46,7 +46,7 @@ class Publication {
     void publish(const char* data, int len)
     {
         // returns helics_status
-        helicsPublicationPublishRaw(pub, data, len, HELICS_IGNORE_ERROR);
+        helicsPublicationPublishBytes(pub, data, len, HELICS_IGNORE_ERROR);
     }
     /** publish a string from a char * */
     void publish(const char* str) { helicsPublicationPublishString(pub, str, HELICS_IGNORE_ERROR); }

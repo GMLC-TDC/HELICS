@@ -185,7 +185,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsEndpointSendBytes(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err);
 
 /**
  * Send a message to the specified destination.
@@ -206,7 +206,7 @@ HELICS_EXPORT void helicsEndpointSend(helics_endpoint endpoint, const void* data
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsEndpointSendTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dst, helics_error* err);
+    helicsEndpointSendBytesTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dst, helics_error* err);
 
 /**
  * Send a message to the specified destination at a specific time.
@@ -229,12 +229,12 @@ HELICS_EXPORT void
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsEndpointSendToAt(helics_endpoint endpoint,
-                                          const void* data,
-                                          int inputDataLength,
-                                          const char* dst,
-                                          helics_time time,
-                                          helics_error* err);
+HELICS_EXPORT void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
+                                               const void* data,
+                                               int inputDataLength,
+                                               const char* dst,
+                                               helics_time time,
+                                               helics_error* err);
 
 /**
  * Send a message at a specific time to the targeted destinations
@@ -252,7 +252,7 @@ HELICS_EXPORT void helicsEndpointSendToAt(helics_endpoint endpoint,
  */
 
 HELICS_EXPORT void
-    helicsEndpointSendAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err);
+    helicsEndpointSendBytesAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err);
 
 /**
  * Send a message object from a specific endpoint.
@@ -586,7 +586,7 @@ HELICS_EXPORT helics_bool helicsMessageGetFlagOption(helics_message message, int
  *
  * @return The size of the data payload.
  */
-HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message message);
+HELICS_EXPORT int helicsMessageGetByteCount(helics_message message);
 
 /**
  * Get the raw data for a message object.
@@ -603,7 +603,7 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message message);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsMessageGetRawData(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsMessageGetBytes(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
 
 /**
  * Get a pointer to the raw data of a message.
@@ -612,7 +612,7 @@ HELICS_EXPORT void helicsMessageGetRawData(helics_message message, void* data, i
  *
  * @return A pointer to the raw data in memory, the pointer may be NULL if the message is not a valid message.
  */
-HELICS_EXPORT void* helicsMessageGetRawDataPointer(helics_message message);
+HELICS_EXPORT void* helicsMessageGetBytesPointer(helics_message message);
 
 /**
  * A check if the message contains a valid payload.

@@ -364,12 +364,12 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     }
 }
 
-data_view ValueFederate::getValueRaw(const Input& inp)
+data_view ValueFederate::getBytes(const Input& inp)
 {
     return vfManager->getValue(inp);
 }
 
-void ValueFederate::publishRaw(const Publication& pub, data_view block)  // NOLINT
+void ValueFederate::publishBytes(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         vfManager->publish(pub, block);

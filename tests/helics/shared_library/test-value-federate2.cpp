@@ -45,19 +45,19 @@ TEST_P(vfed2_type_tests, block_send_receive)
     CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_delta, 1.0, &err));
 
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
-    CE(helicsPublicationPublishRaw(pubid3, s.data(), len, &err));
+    CE(helicsPublicationPublishBytes(pubid3, s.data(), len, &err));
 
     CE(helicsFederateRequestTime(vFed1, 1.0, &err));
 
     EXPECT_TRUE(helicsInputIsUpdated(sub1));
 
-    int len1 = helicsInputGetRawValueSize(sub1);
+    int len1 = helicsInputGetByteCount(sub1);
 
     EXPECT_EQ(len1, len);
-    CE(helicsInputGetRawValue(sub1, val, 600, &actualLen, &err));
+    CE(helicsInputGetBytes(sub1, val, 600, &actualLen, &err));
     EXPECT_EQ(actualLen, len);
 
-    len1 = helicsInputGetRawValueSize(sub1);
+    len1 = helicsInputGetByteCount(sub1);
 
     EXPECT_EQ(len1, len);
 
