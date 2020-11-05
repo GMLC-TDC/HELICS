@@ -59,6 +59,25 @@ void helicsErrorClear(helics_error* err)
     }
 }
 
+#ifdef __unix__
+#    include <csignal>
+static void signalHandler(int signum)
+{
+    cout << "Interrupt signal (" << signum << ") received.\n";
+
+    // cleanup and close up stuff here
+    // terminate program
+
+    exit(signum);
+}
+
+void helicsLoadSignalHandler()
+{
+    signal(SIGINT, signalHandler)
+}
+
+#endif
+
 helics_bool helicsIsCoreTypeAvailable(const char* type)
 {
     if (type == nullptr) {
