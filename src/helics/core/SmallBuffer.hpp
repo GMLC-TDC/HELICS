@@ -15,12 +15,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <utility>
 
+#if defined(__APPLE__) && defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wuninitialized"
+#endif
+
 namespace helics {
 class SmallBuffer {
   public:
-    SmallBuffer() noexcept: heap(&(buffer[0])) {}
+    SmallBuffer() noexcept: heap(buffer.data()) {}
 
-    SmallBuffer(const SmallBuffer& sb): heap(&(buffer[0]))
+    SmallBuffer(const SmallBuffer& sb): heap(buffer.data())
     {
         resize(sb.size());
         std::memcpy(heap, sb.heap, sb.size());
@@ -46,25 +51,25 @@ class SmallBuffer {
 
     template<typename U,
              typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
-    SmallBuffer(U&& u): heap(&(buffer[0]))
+    SmallBuffer(U&& u): heap(buffer.data())
     {
         std::string_view val(std::forward<U>(u));
         resize(val.size());
         std::memcpy(heap, val.data(), val.size());
     }
 
-    SmallBuffer(const void* data, size_t size): heap(&(buffer[0]))
+    SmallBuffer(const void* data, size_t size): heap(buffer.data())
     {
         resize(size);
         std::memcpy(heap, data, size);
     }
     /** create a buffer with a specific size*/
-    SmallBuffer(std::size_t size): heap(&(buffer[0])) { resize(size); }
+    SmallBuffer(std::size_t size): heap(buffer.data()) { resize(size); }
 
     /** create a buffer with a specific size and contents*/
-    SmallBuffer(std::size_t size, std::byte val): heap(&(buffer[0])) { resize(size, val); }
+    SmallBuffer(std::size_t size, std::byte val): heap(buffer.data()) { resize(size, val); }
     /** create a buffer with a specific size and contents*/
-    SmallBuffer(std::size_t size, unsigned char val): heap(&(buffer[0]))
+    SmallBuffer(std::size_t size, unsigned char val): heap(buffer.data())
     {
         resize(size, std::byte{val});
     }
@@ -363,4 +368,9 @@ inline bool operator!=(const SmallBuffer& sb1, const SmallBuffer& sb2)
 {
     return (sb1.to_string() != sb2.to_string());
 }
+
+#if defined(__APPLE__) && defined(__clang__)
+#    pragma clang diagnostic pop
+#endif
+
 }  // namespace helics
