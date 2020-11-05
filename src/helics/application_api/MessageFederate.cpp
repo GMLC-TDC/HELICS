@@ -152,7 +152,7 @@ void MessageFederate::registerMessageInterfaces(const std::string& configString)
 
 static const std::string emptyStr;
 template<class Inp>
-static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
+static void loadOptions(const Inp& data, Endpoint& ept)
 {
     addTargets(data, "flags", [&ept](const std::string& target) {
         if (target.front() != '-') {
@@ -171,7 +171,7 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     if (!info.empty()) {
         ept.setInfo(info);
     }
-    addTargets(data, "subscriptions", [&ept, fed](const std::string& sub) { ept.subscribe(sub); });
+    addTargets(data, "subscriptions", [&ept](const std::string& sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](const std::string& filt) { ept.addSourceFilter(filt); });
     addTargets(data, "sourceFilters", [&ept](const std::string& filt) {
         ept.addSourceFilter(filt);
@@ -200,7 +200,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(eptName, type) : registerEndpoint(eptName, type);
 
-            loadOptions(this, ept, epObj);
+            loadOptions(ept, epObj);
         }
     }
 }
@@ -230,7 +230,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(key, type) : registerEndpoint(key, type);
 
-            loadOptions(this, ept, epObj);
+            loadOptions(ept, epObj);
         }
     }
 }
