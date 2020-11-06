@@ -1065,7 +1065,6 @@ void helicsMessageClear(helics_message message, helics_error* err)
     mess->clear();
 }
 
-
 void helicsMessageCopy(helics_message source_message, helics_message dest_message, helics_error* err)
 {
     auto* mess_src = getMessageObj(source_message, err);

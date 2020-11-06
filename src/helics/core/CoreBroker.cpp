@@ -2669,7 +2669,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request)
                 auto center = generateMapObjectCounter();
                 if (center == builder.getCounterCode()) {
                     return builder.generate();
-            }
+                }
                 builder.reset();
             }
             if (builder.isActive()) {
