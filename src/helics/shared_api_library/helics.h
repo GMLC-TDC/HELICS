@@ -52,9 +52,7 @@ HELICS_EXPORT helics_error helicsErrorInitialize(void);
  */
 HELICS_EXPORT void helicsErrorClear(helics_error* err);
 
-#ifdef __unix__
 HELICS_EXPORT void helicsLoadSignalHandler();
-#endif
 
 /**
  * Returns true if core/broker type specified is available in current compilation.
