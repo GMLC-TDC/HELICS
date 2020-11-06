@@ -52,7 +52,22 @@ HELICS_EXPORT helics_error helicsErrorInitialize(void);
  */
 HELICS_EXPORT void helicsErrorClear(helics_error* err);
 
+/** load a signal handler that handles Ctrl-C and shuts down the library*/
 HELICS_EXPORT void helicsLoadSignalHandler();
+
+/** clear HELICS based signal Handlers*/
+HELICS_EXPORT void helicsClearSignalHandler();
+
+/** load a custom signal handler to execute prior to the abort signal handler
+@details  This function is not 100% reliable it will most likely work but uses some functions and
+techniques that are not 100% guaranteed to work in a signal handler
+in worst case it could deadlock.  That is somewhat unlikely given usage patterns
+but it is possible*/
+HELICS_EXPORT void helicsLoadSignalHandlerCallback(void (*handler)(int));
+
+/** execute a global abort by sending an error code */
+HELICS_EXPORT void helicsAbort(int errorCode, const char *errorString);
+
 
 /**
  * Returns true if core/broker type specified is available in current compilation.
