@@ -257,25 +257,47 @@ namespace tcp {
                 return 0;
             }
         }
-        auto sz = socket_.send(asio::buffer(buffer, dataLength));
-        assert(sz == dataLength);
-        return sz;
+
+        size_t sz;
+        size_t sent_size{dataLength};
+        int p{0};
+        int count{0};
+        while (count++ < 5 &&
+               (sz = socket_.send(asio::buffer(reinterpret_cast<const char*>(buffer) + p,
+                                               sent_size))) != sent_size) {
+            sent_size -= sz;
+            p += sz;
+            //   std::cerr << "DEBUG partial buffer sent" << std::endl;
+        }
+        if (count >= 5) {
+            std::cerr << "TcpConnection send terminated " << std::endl;
+            return 0;
+        }
+        return dataLength;
+
+        //  assert(sz == dataLength);
+        //  return sz;
     }
 
     size_t TcpConnection::send(const std::string& dataString)
     {
-        if (!isConnected()) {
-            if (!waitUntilConnected(300ms)) {
-                std::cerr << "connection timeout waiting again" << std::endl;
-            }
-            if (!waitUntilConnected(200ms)) {
-                std::cerr << "connection timeout twice, now returning" << std::endl;
-                return 0;
-            }
-        }
-        auto sz = socket_.send(asio::buffer(dataString));
-        assert(sz == dataString.size());
+        size_t sz;
+        sz = send(&dataString[0], dataString.size());
         return sz;
+        /*
+                if (!isConnected()) {
+                    if (!waitUntilConnected(300ms)) {
+                        std::cerr << "connection timeout waiting again" << std::endl;
+                    }
+                    if (!waitUntilConnected(200ms)) {
+                        std::cerr << "connection timeout twice, now returning" << std::endl;
+                        return 0;
+                    }
+                }
+                auto sz = socket_.send(asio::buffer(dataString));
+                assert(sz == dataString.size());
+                return sz;
+        */
     }
 
     size_t TcpConnection::receive(void* buffer, size_t maxDataSize)
@@ -541,7 +563,7 @@ namespace tcp {
                 acc->set_option(tcp::acceptor::reuse_address(false));
             }
             acc->setAcceptCall([this](TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) {
-                handle_accept(accPtr, conn);
+                handle_accept(std::move(accPtr), std::move(conn));
             });
             acceptors.push_back(std::move(acc));
         }

@@ -669,6 +669,19 @@ void CoreBroker::generateTimeBarrier(ActionMessage& m)
     broadcast(m);
 }
 
+int CoreBroker::generateMapObjectCounter() const
+{
+    int result = static_cast<int>(brokerState.load());
+    for (const auto& brk : _brokers) {
+        result += static_cast<int>(brk.state);
+    }
+    for (const auto& fed : _federates) {
+        result += static_cast<int>(fed.state);
+    }
+    result += static_cast<int>(handles.size());
+    return result;
+}
+
 void CoreBroker::transmitDelayedMessages()
 {
     auto msg = delayTransmitQueue.pop();
@@ -2569,6 +2582,9 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request)
     if (request == "version") {
         return std::string{"\""} + versionString + '"';
     }
+    if (request == "counter") {
+        return fmt::format("{}", generateMapObjectCounter());
+    }
     if (request == "status") {
         Json::Value base;
         base["name"] = getIdentifier();
@@ -2648,16 +2664,25 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request)
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
-            if (std::get<0>(mapBuilders[index]).isCompleted()) {
-                return std::get<0>(mapBuilders[index]).generate();
+            auto& builder = std::get<0>(mapBuilders[index]);
+            if (builder.isCompleted()) {
+                auto center = generateMapObjectCounter();
+                if (center == builder.getCounterCode()) {
+                    return builder.generate();
             }
-            if (std::get<0>(mapBuilders[index]).isActive()) {
+                builder.reset();
+            }
+            if (builder.isActive()) {
                 return "#wait";
             }
         }
 
         initializeMapBuilder(std::string(request), index, mi->second.second);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
+            if (!mi->second.second) {
+                auto center = generateMapObjectCounter();
+                std::get<0>(mapBuilders[index]).setCounterCode(center);
+            }
             return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
@@ -2749,6 +2774,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back(']');
     return gidString;
 }
+
 void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset)
 {
     if (!isValidIndex(index, mapBuilders)) {
@@ -3028,6 +3054,8 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
             requestors.clear();
             if (std::get<2>(mapBuilders[m.counter])) {
                 builder.reset();
+            } else {
+                builder.setCounterCode(generateMapObjectCounter());
             }
         }
     }
