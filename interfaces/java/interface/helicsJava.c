@@ -8994,6 +8994,29 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageFree(JNIEnv 
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageClear(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_message arg1 = (helics_message) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_message *)&jarg1; 
+  helicsMessageClear(arg1,arg2);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
+}
+
+
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterFilter(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3) {
   jlong jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
