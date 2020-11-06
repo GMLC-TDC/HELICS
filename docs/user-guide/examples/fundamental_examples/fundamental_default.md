@@ -5,6 +5,9 @@
 
 The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation.
 
+<p align="center">
+	<img src = "../../../img/default_setup.png" width="300">
+</p>
 
 ![](../../../img/default_setup.png)
 
