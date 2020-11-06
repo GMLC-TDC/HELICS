@@ -2779,25 +2779,25 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
                 case connection_state::connected:
                 case connection_state::init_requested:
                 case connection_state::operating: {
-            int brkindex;
-            if (broker._core) {
-                if (!hasCores) {
-                    hasCores = true;
-                    base["cores"] = Json::arrayValue;
-                }
+                    int brkindex;
+                    if (broker._core) {
+                        if (!hasCores) {
+                            hasCores = true;
+                            base["cores"] = Json::arrayValue;
+                        }
                         brkindex =
                             builder.generatePlaceHolder("cores", broker.global_id.baseValue());
-            } else {
+                    } else {
                         if (!hasBrokers) {
                             hasBrokers = true;
                             base["brokers"] = Json::arrayValue;
-            }
+                        }
                         brkindex =
                             builder.generatePlaceHolder("brokers", broker.global_id.baseValue());
                     }
-            queryReq.messageID = brkindex;
-            queryReq.dest_id = broker.global_id;
-            transmit(broker.route, queryReq);
+                    queryReq.messageID = brkindex;
+                    queryReq.dest_id = broker.global_id;
+                    transmit(broker.route, queryReq);
                 } break;
                 case connection_state::error:
                 case connection_state::disconnected:
@@ -2811,13 +2811,13 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
                             if (!hasCores) {
                                 base["cores"] = Json::arrayValue;
                                 hasCores = true;
-        }
+                            }
                             base["cores"].append(std::move(brkstate));
                         } else {
                             if (!hasBrokers) {
                                 base["brokers"] = Json::arrayValue;
                                 hasBrokers = true;
-    }
+                            }
                             base["brokers"].append(std::move(brkstate));
                         }
                     }
