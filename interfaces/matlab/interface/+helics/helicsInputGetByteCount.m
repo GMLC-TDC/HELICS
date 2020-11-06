@@ -1,3 +1,3 @@
-function varargout = helicsInputGetRawValueSize(varargin)
+function varargout = helicsInputGetByteCount(varargin)
   [varargout{1:nargout}] = helicsMEX(183, varargin{:});
 end
