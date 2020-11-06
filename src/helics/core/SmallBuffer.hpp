@@ -15,6 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <utility>
 
+#if defined(__APPLE__) && defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wuninitialized"
+#endif
+
 namespace helics {
 class SmallBuffer {
   public:
@@ -363,4 +368,9 @@ inline bool operator!=(const SmallBuffer& sb1, const SmallBuffer& sb2)
 {
     return (sb1.to_string() != sb2.to_string());
 }
+
+#if defined(__APPLE__) && defined(__clang__)
+#    pragma clang diagnostic pop
+#endif
+
 }  // namespace helics

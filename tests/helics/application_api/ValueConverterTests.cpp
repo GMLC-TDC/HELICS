@@ -195,7 +195,8 @@ INSTANTIATE_TEST_SUITE_P(int_testing,
                          ::testing::Values(5735,
                                            std::numeric_limits<std::int64_t>::max(),
                                            -246234,
-                                           -std::numeric_limits<std::int64_t>::min(),
+                                           -std::numeric_limits<std::int64_t>::max(),
+                                           std::numeric_limits<std::int64_t>::min(),
                                            0));
 
 class new_converter_tests_complex: public ::testing::TestWithParam<std::complex<double>> {

@@ -31,21 +31,7 @@ fi
 if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
     OPTION_FLAGS_ARR+=("-DBUILD_JAVA_INTERFACE=ON")
 fi
-if [[ "${DISABLE_INTERFACES}" != *"Python"* ]]; then
-    OPTION_FLAGS_ARR+=("-DBUILD_PYTHON_INTERFACE=ON")
-    if [[ "$PYTHON_LIB_PATH" ]]; then
-        OPTION_FLAGS_ARR+=("-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}")
-    fi
-    if [[ "$PYTHON_INCLUDE_PATH" ]]; then
-        OPTION_FLAGS_ARR+=("-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
-    fi
-    if [[ "$PYTHON_EXECUTABLE" ]]; then
-        OPTION_FLAGS_ARR+=("-DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}")
-    fi
-    if [[ "$FORCE_PYTHON3" == 'true' ]]; then
-        OPTION_FLAGS_ARR+=("-DHELICS_FORCE_PYTHON_3=ON")
-    fi
-fi
+
 if [[ "$USE_SWIG" == 'true' ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SWIG=ON")
 fi
