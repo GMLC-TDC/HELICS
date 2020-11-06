@@ -78,13 +78,13 @@ namespace detail {
     static constexpr const std::byte customCode{0xF4};
 
     static constexpr std::byte endianMask{0x01};
-    static constexpr std::byte lowByteMask{0xFF};
-    static constexpr std::byte codeMask{0xFE};
+    // static constexpr std::byte lowByteMask{0xFF};
+    // static constexpr std::byte codeMask{0xFE};
 
     static const std::byte endianCode = checks::isLittleEndian() ? std::byte{0} : std::byte{1};
 
     static constexpr const std::byte littleEndianCode{0x0};
-    static constexpr const std::byte bigEndianCode{0x01};
+    // static constexpr const std::byte bigEndianCode{0x01};
 
     static inline void addCodeAndSize(std::byte* data, std::byte code, size_t size)
     {
@@ -140,7 +140,7 @@ namespace detail {
     size_t convertToBinary(std::byte* data, const std::vector<double>& val)
     {
         addCodeAndSize(data, vectorCode, val.size());
-        if (val.size() > 0) {
+        if (!val.empty()) {
             std::memcpy(data + 8, val.data(), val.size() * sizeof(double));
         }
         return val.size() * sizeof(double) + 8U;
@@ -158,7 +158,7 @@ namespace detail {
     size_t convertToBinary(std::byte* data, const std::vector<std::complex<double>>& val)
     {
         addCodeAndSize(data, cvCode, val.size());
-        if (val.size() > 0) {
+        if (!val.empty()) {
             std::memcpy(data + 8, val.data(), val.size() * sizeof(double) * 2);
         }
         return val.size() * sizeof(double) * 2U + 8U;
@@ -300,7 +300,7 @@ void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::st
                                                        SmallBuffer& store)
 {
     Json::Value V(Json::arrayValue);
-    for (auto& str : val) {
+    for (const auto& str : val) {
         V.append(str);
     }
     auto strgen = generateJsonString(V);
