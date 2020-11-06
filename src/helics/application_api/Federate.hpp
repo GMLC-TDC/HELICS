@@ -361,7 +361,7 @@ class HELICS_CXX_EXPORT Federate {
     of const string ref. This callback will be called when a federate received a query that cannot
     be answered internally that is directed at that particular federate
     */
-    void setQueryCallback(const std::function<std::string(const std::string&)>& queryFunction);
+    void setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction);
 
     /** set a federation global value
     @details this overwrites any previous value for this name

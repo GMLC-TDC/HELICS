@@ -1148,7 +1148,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     return generateJsonErrorResponse(404, "No Async queries are available");
 }
 
-void Federate::setQueryCallback(const std::function<std::string(const std::string&)>& queryFunction)
+void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)
 {
     if (coreObject) {
         coreObject->setQueryCallback(fedID, queryFunction);

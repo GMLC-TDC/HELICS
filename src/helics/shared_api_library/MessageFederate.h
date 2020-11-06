@@ -810,7 +810,7 @@ HELICS_EXPORT void helicsMessageFree(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageClear(helics_message_object message, helics_error* err);
+HELICS_EXPORT void helicsMessageClear(helics_message message, helics_error* err);
 
 /**@}*/
 #ifdef __cplusplus

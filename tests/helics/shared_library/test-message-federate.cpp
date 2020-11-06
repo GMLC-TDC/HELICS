@@ -512,9 +512,9 @@ TEST(message_object, copy)
 
     EXPECT_EQ(helicsMessageIsValid(m2), helics_false);
 
-    EXPECT_EQ(helicsMessageCheckFlag(m2, 4), helics_false);
+    EXPECT_EQ(helicsMessageGetFlagOption(m2, 4), helics_false);
 
-    EXPECT_EQ(helicsMessageGetRawDataSize(m2), 0);
+    EXPECT_EQ(helicsMessageGetByteCount(m2), 0);
 
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);
