@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "internal/api_objects.h"
 
+#include <iostream>
 #include <atomic>
 #include <future>
 #include <memory>
@@ -59,24 +60,18 @@ void helicsErrorClear(helics_error* err)
     }
 }
 
-#ifdef __unix__
-#    include <csignal>
+#include <csignal>
 static void signalHandler(int signum)
 {
-    cout << "Interrupt signal (" << signum << ") received.\n";
-
-    // cleanup and close up stuff here
-    // terminate program
-
+    std::cout << "Interrupt signal (" << signum << ") received.\n";
+    helicsCloseLibrary();
     exit(signum);
 }
 
 void helicsLoadSignalHandler()
 {
-    signal(SIGINT, signalHandler)
+    signal(SIGINT, signalHandler);
 }
-
-#endif
 
 helics_bool helicsIsCoreTypeAvailable(const char* type)
 {
