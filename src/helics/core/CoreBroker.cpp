@@ -2343,7 +2343,7 @@ void CoreBroker::processDisconnect(ActionMessage& command)
     }
 }
 
-void CoreBroker::checkInFlightQueries(global_broker_id brkid)
+void CoreBroker::checkInFlightQueries(GlobalBrokerId brkid)
 {
     for (auto& mb : mapBuilders) {
         auto& builder = std::get<0>(mb);
@@ -2377,7 +2377,7 @@ void CoreBroker::checkInFlightQueries(global_broker_id brkid)
     }
 }
 
-void CoreBroker::markAsDisconnected(global_broker_id brkid)
+void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
 {
     bool isCore{false};
     // using regular loop here since dual mapped vector shouldn't produce a modifiable lvalue

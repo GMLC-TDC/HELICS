@@ -175,7 +175,7 @@ TEST(federateInfo, option_index)
 TEST(federateInfo, flag_index)
 {
     EXPECT_EQ(helics::getFlagIndex("StrictConfigChecking"), helics_flag_strict_config_checking);
-    EXPECT_EQ(helics::getFlagIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
+    EXPECT_EQ(helics::getFlagIndex("un_interruptible"), helics_flag_uninterruptible);
     EXPECT_EQ(helics::getFlagIndex("strict_config_checking"), helics_flag_strict_config_checking);
 }
 
