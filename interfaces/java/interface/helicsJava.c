@@ -749,6 +749,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1strict_1config_1checking_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_federate_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_federate_flags)helics_flag_strict_config_checking;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1force_1logging_1flush_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_federate_flags result;
@@ -5921,7 +5933,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationIsValid(
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishBytes(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   helics_publication arg1 = (helics_publication) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
@@ -5937,7 +5949,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishR
   arg1 = *(helics_publication *)&jarg1; 
   arg2 = *(void **)&jarg2; 
   arg3 = (int)jarg3; 
-  helicsPublicationPublishRaw(arg1,(void const *)arg2,arg3,arg4);
+  helicsPublicationPublishBytes(arg1,(void const *)arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
     {
@@ -6280,7 +6292,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputAddTarget(JNIE
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputGetRawValueSize(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputGetByteCount(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   helics_input arg1 = (helics_input) 0 ;
   int result;
@@ -6288,13 +6300,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsInputGetRawValueSiz
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_input *)&jarg1; 
-  result = (int)helicsInputGetRawValueSize(arg1);
+  result = (int)helicsInputGetByteCount(arg1);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputGetRawValue(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jintArray jarg4) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputGetBytes(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jintArray jarg4) {
   helics_input arg1 = (helics_input) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
@@ -6324,7 +6336,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputGetRawValue(JN
     temp4 = (int)0;
     arg4 = &temp4; 
   }
-  helicsInputGetRawValue(arg1,arg2,arg3,arg4,arg5);
+  helicsInputGetBytes(arg1,arg2,arg3,arg4,arg5);
   {
     jint jvalue = (jint)temp4;
     (*jenv)->SetIntArrayRegion(jenv, jarg4, 0, 1, &jvalue);
@@ -6763,7 +6775,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputGetNamedPoint(
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputSetDefaultRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputSetDefaultBytes(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   helics_input arg1 = (helics_input) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
@@ -6779,7 +6791,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsInputSetDefaultRaw(
   arg1 = *(helics_input *)&jarg1; 
   arg2 = *(void **)&jarg2; 
   arg3 = (int)jarg3; 
-  helicsInputSetDefaultRaw(arg1,(void const *)arg2,arg3,arg4);
+  helicsInputSetDefaultBytes(arg1,(void const *)arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
     {
@@ -7763,7 +7775,7 @@ SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsEndpointGetDefau
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSend(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendBytes(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
@@ -7779,7 +7791,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSend(JNIEnv
   arg1 = *(helics_endpoint *)&jarg1; 
   arg2 = *(void **)&jarg2; 
   arg3 = (int)jarg3; 
-  helicsEndpointSend(arg1,(void const *)arg2,arg3,arg4);
+  helicsEndpointSendBytes(arg1,(void const *)arg2,arg3,arg4);
   {
     if (arg4->error_code!=helics_ok)
     {
@@ -7790,11 +7802,11 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSend(JNIEnv
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jint jarg4) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendBytesTo(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jstring jarg4) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *arg3 = (void *) 0 ;
-  int arg4 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
   helics_error *arg5 = (helics_error *) 0 ;
   helics_error etemp5 ;
   
@@ -7805,15 +7817,15 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendTo(JNIE
     arg5=&etemp5;
   }
   arg1 = *(helics_endpoint *)&jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
-    if (!arg2) return ;
+  arg2 = *(void **)&jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = 0;
+  if (jarg4) {
+    arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
+    if (!arg4) return ;
   }
-  arg3 = *(void **)&jarg3; 
-  arg4 = (int)jarg4; 
-  helicsEndpointSendTo(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
-  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  helicsEndpointSendBytesTo(arg1,(void const *)arg2,arg3,(char const *)arg4,arg5);
+  if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -7824,12 +7836,12 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendTo(JNIE
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendToAt(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jdouble jarg3, jlong jarg4, jint jarg5) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendBytesToAt(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jstring jarg4, jdouble jarg5) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  helics_time arg3 ;
-  void *arg4 = (void *) 0 ;
-  int arg5 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
+  helics_time arg5 ;
   helics_error *arg6 = (helics_error *) 0 ;
   helics_error etemp6 ;
   
@@ -7840,16 +7852,16 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendToAt(JN
     arg6=&etemp6;
   }
   arg1 = *(helics_endpoint *)&jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
-    if (!arg2) return ;
+  arg2 = *(void **)&jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = 0;
+  if (jarg4) {
+    arg4 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg4, 0);
+    if (!arg4) return ;
   }
-  arg3 = (helics_time)jarg3; 
-  arg4 = *(void **)&jarg4; 
-  arg5 = (int)jarg5; 
-  helicsEndpointSendToAt(arg1,(char const *)arg2,arg3,(void const *)arg4,arg5,arg6);
-  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  arg5 = (helics_time)jarg5; 
+  helicsEndpointSendBytesToAt(arg1,(void const *)arg2,arg3,(char const *)arg4,arg5,arg6);
+  if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
   {
     if (arg6->error_code!=helics_ok)
     {
@@ -7860,11 +7872,11 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendToAt(JN
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendAt(JNIEnv *jenv, jclass jcls, jlong jarg1, jdouble jarg2, jlong jarg3, jint jarg4) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendBytesAt(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jdouble jarg4) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  helics_time arg2 ;
-  void *arg3 = (void *) 0 ;
-  int arg4 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  helics_time arg4 ;
   helics_error *arg5 = (helics_error *) 0 ;
   helics_error etemp5 ;
   
@@ -7875,10 +7887,10 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSendAt(JNIE
     arg5=&etemp5;
   }
   arg1 = *(helics_endpoint *)&jarg1; 
-  arg2 = (helics_time)jarg2; 
-  arg3 = *(void **)&jarg3; 
-  arg4 = (int)jarg4; 
-  helicsEndpointSendAt(arg1,arg2,(void const *)arg3,arg4,arg5);
+  arg2 = *(void **)&jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (helics_time)jarg4; 
+  helicsEndpointSendBytesAt(arg1,(void const *)arg2,arg3,arg4,arg5);
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -7997,7 +8009,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointHasMessage(
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederatePendingMessages(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederatePendingMessagesCount(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
   int result;
@@ -8005,13 +8017,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederatePendingMess
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_federate *)&jarg1; 
-  result = (int)helicsFederatePendingMessages(arg1);
+  result = (int)helicsFederatePendingMessagesCount(arg1);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointPendingMessages(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointPendingMessagesCount(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int result;
@@ -8019,7 +8031,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointPendingMess
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_endpoint *)&jarg1; 
-  result = (int)helicsEndpointPendingMessages(arg1);
+  result = (int)helicsEndpointPendingMessagesCount(arg1);
   jresult = (jint)result; 
   return jresult;
 }
@@ -8494,7 +8506,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetMessageID
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageCheckFlag(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetFlagOption(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   jint jresult = 0 ;
   helics_message arg1 = (helics_message) 0 ;
   int arg2 ;
@@ -8504,13 +8516,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageCheckFlag(JN
   (void)jcls;
   arg1 = *(helics_message *)&jarg1; 
   arg2 = (int)jarg2; 
-  result = (helics_bool)helicsMessageCheckFlag(arg1,arg2);
+  result = (helics_bool)helicsMessageGetFlagOption(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetRawDataSize(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetByteCount(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   helics_message arg1 = (helics_message) 0 ;
   int result;
@@ -8518,13 +8530,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetRawDataSi
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_message *)&jarg1; 
-  result = (int)helicsMessageGetRawDataSize(arg1);
+  result = (int)helicsMessageGetByteCount(arg1);
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetRawData(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jintArray jarg4) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetBytes(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jintArray jarg4) {
   helics_message arg1 = (helics_message) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
@@ -8554,7 +8566,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetRawData(J
     temp4 = (int)0;
     arg4 = &temp4; 
   }
-  helicsMessageGetRawData(arg1,arg2,arg3,arg4,arg5);
+  helicsMessageGetBytes(arg1,arg2,arg3,arg4,arg5);
   {
     jint jvalue = (jint)temp4;
     (*jenv)->SetIntArrayRegion(jenv, jarg4, 0, 1, &jvalue);
@@ -8567,6 +8579,20 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetRawData(J
       (*jenv)->ThrowNew(jenv, clazz, arg5->message);
     }
   }
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsMessageGetBytesPointer(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_message arg1 = (helics_message) 0 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_message *)&jarg1; 
+  result = (void *)helicsMessageGetBytesPointer(arg1);
+  *(void **)&jresult = result; 
+  return jresult;
 }
 
 

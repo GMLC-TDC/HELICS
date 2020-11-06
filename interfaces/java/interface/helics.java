@@ -1898,8 +1898,8 @@ public class helics {
    * @param data A pointer to the raw data.<br>
    * @param inputDataLength The size in bytes of the data to publish.
    */
-  public static void helicsPublicationPublishRaw(SWIGTYPE_p_void pub, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsPublicationPublishRaw(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsPublicationPublishBytes(SWIGTYPE_p_void pub, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsPublicationPublishBytes(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
 
   /**
@@ -2031,8 +2031,8 @@ public class helics {
    * <br>
    * @return The size of the raw data/string in bytes.
    */
-  public static int helicsInputGetRawValueSize(SWIGTYPE_p_void ipt) {
-    return helicsJNI.helicsInputGetRawValueSize(SWIGTYPE_p_void.getCPtr(ipt));
+  public static int helicsInputGetByteCount(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetByteCount(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
   /**
@@ -2042,10 +2042,10 @@ public class helics {
    * <br>
    * <br>
    * <br>
-   * @return Raw string data.
+   * @return raw Bytes of the value, the value is uninterpreted raw bytes.
    */
-  public static void helicsInputGetRawValue(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int maxDataLength, int[] actualSize) {
-    helicsJNI.helicsInputGetRawValue(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), maxDataLength, actualSize);
+  public static void helicsInputGetBytes(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int maxDataLength, int[] actualSize) {
+    helicsJNI.helicsInputGetBytes(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), maxDataLength, actualSize);
   }
 
   /**
@@ -2197,8 +2197,8 @@ public class helics {
    * @param ipt The input to set the default for.<br>
    * @param data A pointer to the raw data to use for the default.
    */
-  public static void helicsInputSetDefaultRaw(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsInputSetDefaultRaw(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsInputSetDefaultBytes(SWIGTYPE_p_void ipt, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsInputSetDefaultBytes(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
 
   /**
@@ -2699,51 +2699,54 @@ public class helics {
    * @param endpoint The endpoint to send the data from.<br>
    * @param data The data to send.
    */
-  public static void helicsEndpointSend(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSend(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendBytes(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsEndpointSendBytes(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
 
   /**
    * Send a message to the specified destination.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
-   * @param dst The target destination.<br>
+   * <br>
+   * @param data The data to send.<br>
    * <br>
    * <br>
    *             "" to use the default destination.<br>
    * <br>
-   * @param data The data to send.
+   * ,out] err A pointer to an error object for catching errors.
    */
-  public static void helicsEndpointSendTo(SWIGTYPE_p_void endpoint, String dst, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendTo(SWIGTYPE_p_void.getCPtr(endpoint), dst, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendBytesTo(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, String dst) {
+    helicsJNI.helicsEndpointSendBytesTo(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength, dst);
   }
 
   /**
    * Send a message to the specified destination at a specific time.<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
+   * @param data The data to send.<br>
+   * <br>
    * @param dst The target destination.<br>
    * <br>
    * <br>
    *             "" to use the default destination.<br>
    * <br>
-   * @param data The data to send.<br>
-   * <br>
    * @param time The time the message should be sent.
    */
-  public static void helicsEndpointSendToAt(SWIGTYPE_p_void endpoint, String dst, double time, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendToAt(SWIGTYPE_p_void.getCPtr(endpoint), dst, time, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendBytesToAt(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, String dst, double time) {
+    helicsJNI.helicsEndpointSendBytesToAt(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength, dst, time);
   }
 
   /**
    * Send a message at a specific time to the targeted destinations<br>
    * <br>
    * @param endpoint The endpoint to send the data from.<br>
-   * @param time The time the message should be sent.<br>
-   * @param data The data to send.
+   * <br>
+   * @param data The data to send.<br>
+   * <br>
+   *   @param time The time the message should be sent.
    */
-  public static void helicsEndpointSendAt(SWIGTYPE_p_void endpoint, double time, SWIGTYPE_p_void data, int inputDataLength) {
-    helicsJNI.helicsEndpointSendAt(SWIGTYPE_p_void.getCPtr(endpoint), time, SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  public static void helicsEndpointSendBytesAt(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, double time) {
+    helicsJNI.helicsEndpointSendBytesAt(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(data), inputDataLength, time);
   }
 
   /**
@@ -2804,8 +2807,8 @@ public class helics {
    * <br>
    * @param fed The federate to get the number of waiting messages from.
    */
-  public static int helicsFederatePendingMessages(SWIGTYPE_p_void fed) {
-    return helicsJNI.helicsFederatePendingMessages(SWIGTYPE_p_void.getCPtr(fed));
+  public static int helicsFederatePendingMessagesCount(SWIGTYPE_p_void fed) {
+    return helicsJNI.helicsFederatePendingMessagesCount(SWIGTYPE_p_void.getCPtr(fed));
   }
 
   /**
@@ -2813,8 +2816,8 @@ public class helics {
    * <br>
    * @param endpoint The endpoint to query.
    */
-  public static int helicsEndpointPendingMessages(SWIGTYPE_p_void endpoint) {
-    return helicsJNI.helicsEndpointPendingMessages(SWIGTYPE_p_void.getCPtr(endpoint));
+  public static int helicsEndpointPendingMessagesCount(SWIGTYPE_p_void endpoint) {
+    return helicsJNI.helicsEndpointPendingMessagesCount(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
   /**
@@ -3095,8 +3098,8 @@ public class helics {
    * <br>
    * @return The flags associated with a message.
    */
-  public static int helicsMessageCheckFlag(SWIGTYPE_p_void message, int flag) {
-    return helicsJNI.helicsMessageCheckFlag(SWIGTYPE_p_void.getCPtr(message), flag);
+  public static int helicsMessageGetFlagOption(SWIGTYPE_p_void message, int flag) {
+    return helicsJNI.helicsMessageGetFlagOption(SWIGTYPE_p_void.getCPtr(message), flag);
   }
 
   /**
@@ -3106,8 +3109,8 @@ public class helics {
    * <br>
    * @return The size of the data payload.
    */
-  public static int helicsMessageGetRawDataSize(SWIGTYPE_p_void message) {
-    return helicsJNI.helicsMessageGetRawDataSize(SWIGTYPE_p_void.getCPtr(message));
+  public static int helicsMessageGetByteCount(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetByteCount(SWIGTYPE_p_void.getCPtr(message));
   }
 
   /**
@@ -3119,8 +3122,20 @@ public class helics {
    * <br>
    * @return Raw string data.
    */
-  public static void helicsMessageGetRawData(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int maxMessageLength, int[] actualSize) {
-    helicsJNI.helicsMessageGetRawData(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), maxMessageLength, actualSize);
+  public static void helicsMessageGetBytes(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int maxMessageLength, int[] actualSize) {
+    helicsJNI.helicsMessageGetBytes(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), maxMessageLength, actualSize);
+  }
+
+  /**
+   * Get a pointer to the raw data of a message.<br>
+   * <br>
+   * @param message A message object to get the data for.<br>
+   * <br>
+   * @return A pointer to the raw data in memory, the pointer may be NULL if the message is not a valid message.
+   */
+  public static SWIGTYPE_p_void helicsMessageGetBytesPointer(SWIGTYPE_p_void message) {
+    long cPtr = helicsJNI.helicsMessageGetBytesPointer(SWIGTYPE_p_void.getCPtr(message));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
   /**
