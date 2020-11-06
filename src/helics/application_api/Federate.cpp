@@ -1160,52 +1160,47 @@ bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
 
 void Federate::setGlobal(const std::string& valueName, const std::string& value)
 {
-    if (coreObject) {
-        coreObject->setGlobal(valueName, value);
-    } else {
+    if (!coreObject) {
         throw(InvalidFunctionCall(
             " setGlobal cannot be called on uninitialized federate or after finalize call"));
     }
+    coreObject->setGlobal(valueName, value);
 }
 
 void Federate::sendCommand(const std::string& target, const std::string& commandStr)
 {
-    if (coreObject) {
-        coreObject->sendCommand(target, commandStr, getName());
-    } else {
+    if (!coreObject) {
         throw(InvalidFunctionCall(
             "command cannot be called on uninitialized federate or after disconnect call"));
     }
+    coreObject->sendCommand(target, commandStr, getName());
 }
 
 std::pair<std::string, std::string> Federate::getCommand()
 {
-    if (coreObject) {
-        return coreObject->getCommand(fedID);
-    } else {
+    if (!coreObject) {
         throw(InvalidFunctionCall(
             "command cannot be called on uninitialized federate or after disconnect call"));
     }
+    return coreObject->getCommand(fedID);
 }
 
 std::pair<std::string, std::string> Federate::waitCommand()
 {
-    if (coreObject) {
-        return coreObject->waitCommand(fedID);
-    } else {
+    if (!coreObject) {
         throw(InvalidFunctionCall(
             "command cannot be called on uninitialized federate or after disconnect call"));
     }
+    return coreObject->waitCommand(fedID);
 }
 
 void Federate::addDependency(const std::string& fedName)
 {
-    if (coreObject) {
-        coreObject->addDependency(fedID, fedName);
-    } else {
+    if (!coreObject) {
         throw(InvalidFunctionCall(
             "addDependency cannot be called on uninitialized federate or after finalize call"));
     }
+    coreObject->addDependency(fedID, fedName);
 }
 
 Filter& Federate::registerFilter(const std::string& filterName,
@@ -1306,7 +1301,7 @@ const std::string& Interface::getKey() const
 
 const std::string& Interface::getTarget() const
 {
-    return emptyStr;
+    return (cr != nullptr) ? cr->getSourceTargets(handle) : emptyStr;
 }
 
 void Interface::addSourceTarget(std::string_view newTarget)

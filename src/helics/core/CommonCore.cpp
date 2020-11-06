@@ -1264,7 +1264,6 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
                 break;
             }
             case handle_type::filter:
-                return emptyStr;
             default:
                 return emptyStr;
         }
@@ -1457,7 +1456,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
         throw(RegistrationFailure("endpoint name is already used"));
     }
     auto flags = fed->getInterfaceFlags();
-    flags |= (1 << targetted_flag);
+    flags |= (1U << targetted_flag);
     const auto& handle = createBasicHandle(
         fed->global_id, fed->local_id, handle_type::endpoint, name, type, std::string{}, flags);
 
@@ -1734,7 +1733,7 @@ void CommonCore::generateMessages(
     package.source_id = message.source_id;
     package.source_handle = message.source_handle;
 
-    for (auto& target : targets) {
+    for (const auto& target : targets) {
         message.setDestination(target.first);
         message.setString(0, target.second);
         auto res = appendMessage(package, message);
