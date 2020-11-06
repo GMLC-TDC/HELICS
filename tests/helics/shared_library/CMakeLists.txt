@@ -22,6 +22,7 @@ set(c_shared_library_test_sources
     badInputTests.cpp
     comboConfigTests.cpp
     loggingTests.cpp
+    PropertyIndexTests.cpp
     commandInterfaceTests.cpp
 )
 

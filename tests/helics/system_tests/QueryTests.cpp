@@ -206,6 +206,25 @@ TEST_F(query, dependency_graph)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, dependency_graph_reset)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed1->registerGlobalPublication<double>("test1");
+    auto core = vFed1->getCorePointer();
+    auto res1 = core->query("root", "dependency_graph");
+    vFed2->registerSubscription("test1");
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
+    auto res2 = core->query("root", "dependency_graph");
+    EXPECT_NE(res1, res2);
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
 TEST_F(query, global_time)
 {
     SetupTest<helics::ValueFederate>("test_3", 2);
@@ -270,10 +289,20 @@ TEST_F(query, current_time)
     res = mFed1->query("current_time");
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["granted_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["requested_time"].asDouble(), 1.0);
+
+    mFed1->requestTimeAsync(3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    res = mFed1->query("current_time");
+    val = loadJsonStr(res);
+    EXPECT_EQ(val["granted_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["requested_time"].asDouble(), 3.0);
+    mFed2->requestTime(3.0);
+    mFed1->requestTimeComplete();
 
     res = mFed1->query("broker", "current_time");
     val = loadJsonStr(res);
-    EXPECT_EQ(val["time_next"].asDouble(), 1.0);
+    EXPECT_EQ(val["time_next"].asDouble(), 3.0);
 
     res = mFed1->query("root", "current_time");
     EXPECT_EQ(res, "{}");
@@ -839,4 +868,52 @@ TEST_F(query, queries_query)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, queries_callback_test)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    vFed1->setQueryCallback([](std::string_view queryStr) {
+        return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
+    });
+
+    auto res = vFed1->query("abc");
+    EXPECT_EQ(res, "AAAA");
+    res = vFed1->query("bca");
+    EXPECT_EQ(res, "BBBB");
+    vFed1->enterInitializingMode();
+    vFed1->finalize();
+}
+
+TEST_F(query, concurrent_callback)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed1->registerGlobalInput<double>("ipt1");
+    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
+    p1.addTarget("ipt1");
+
+    vFed1->setQueryCallback([](std::string_view queryStr) {
+        return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
+    });
+
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
+
+    vFed1->enterExecutingModeAsync();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query(vFed1->getName(), "abc");
+    EXPECT_EQ(res, "AAAA");
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    res = core->query(vFed1->getName(), "bca");
+    EXPECT_EQ(res, "BBBB");
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
 #endif

@@ -185,6 +185,7 @@ class Message {
         mo = HELICS_NULL_POINTER;
         return mreturn;
     }
+    void clear() { helicsMessageClear(mo, HELICS_IGNORE_ERROR); }
     /** generate a new message in a federate*/
     Message& newMessageObject(const Federate& fed);
 

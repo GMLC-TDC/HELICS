@@ -209,7 +209,7 @@ class HELICS_CXX_EXPORT Federate {
     Time requestTime(Time nextInternalTimeStep);
 
     /** request a time advancement to the next allowed time
-  @return the granted time step*/
+    @return the granted time step*/
     Time requestNextStep() { return requestTime(timeZero); }
 
     /** request a time advancement by a certain amount
@@ -339,12 +339,12 @@ class HELICS_CXX_EXPORT Federate {
 
     /** get the results of an async query
     @details the call will block until the results are returned inquiry of queryCompleted() to check
-   if the results have been returned or not yet
+    if the results have been returned or not yet
 
     @param queryIndex the int value returned from the queryAsync call
-   @return a string with the value requested.  the format of the string will be either a single
-   string a string vector like "[string1; string2]" or JSON The string "#invalid" is returned if the
-   query was not valid
+    @return a string with the value requested.  the format of the string will be either a single
+    string a string vector like "[string1; string2]" or JSON The string "#invalid" is returned if
+    the query was not valid
     */
     std::string queryComplete(query_id_t queryIndex);
 
@@ -352,6 +352,16 @@ class HELICS_CXX_EXPORT Federate {
     @return true if the results are ready for /ref queryFinalize
     */
     bool isQueryCompleted(query_id_t queryIndex) const;
+
+    /** supply a query callback function
+    @details the intention of the query callback is to allow federates to answer particular requests
+    through the query interface this allows other federates to make requests or queries of other
+    federates in an asynchronous fashion.
+    @param queryFunction  a function object that returns a string as a result of a query in the form
+    of const string ref. This callback will be called when a federate received a query that cannot
+    be answered internally that is directed at that particular federate
+    */
+    void setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction);
 
     /** set a federation global value
     @details this overwrites any previous value for this name

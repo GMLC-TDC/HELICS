@@ -74,7 +74,7 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``dependents``     | list of dependent objects [sv]                             |
 +--------------------+------------------------------------------------------------+
-| ``current_time``   | the current time of the federate [JSON]                    |
+| ``current_time``   | the current time data for the federate [JSON]             |
 +--------------------+------------------------------------------------------------+
 |``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
 +--------------------+------------------------------------------------------------+
@@ -166,6 +166,8 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``version``          | the version string for the helics library [string]                                  |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``counter``          | A single number with a code, changes indicate core changes [string]                 |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
 The last two are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.
@@ -224,9 +226,11 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``version``          | the version string for the helics library [string]                                  |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``counter``          | A single number with a code, changes indicate federation changes [string]           |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
+`federate_map`, `dependency_graph`, `global_time`,`global_state`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
 
 ### Invalid queries
 
