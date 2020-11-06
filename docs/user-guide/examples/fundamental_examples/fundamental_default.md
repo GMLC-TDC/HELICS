@@ -5,19 +5,6 @@
 
 The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation.
 
-```eval_rst
-.. raw:: html
-
-	<p align="center">
-	<img src = "../../../img/default_setup.png" width="300">
-	</p>
-```
-
-
-<p align="center">
-	<img src = "../../../img/default_setup.png" width="300">
-</p>
-
 
 ![](../../../img/default_setup.png)
 
@@ -34,23 +21,13 @@ The Base Example tutorial is organized as follows:
   * [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
   * [Send Receive Communication between Federates](#send-receive-communication-between-federates)
 * [Default Setup](#default-setup)
-	* [Messages + Communication: pub sub](messages-+-communication:-pub-sub)
-	* [Simulator Integration: External JSON](#simulator-integration:-external-json)
-	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution:-helics_cli)
+	* [Messages + Communication: pub sub](messages-+-communication-pub-sub)
+	* [Simulator Integration: External JSON](#simulator-integration-external-json)
+	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics_cli)
 * [Questions and Help](#questions-and-help)
 
 
-test here too
 
-```eval_rst
-.. contents::
-	:local:    
-	
-	##example-files
-	#example-files
-	example-files
-	
-```
 
 
 ## Example files
@@ -271,23 +248,23 @@ When configuring the communication passage between federates, it is important to
 
 We have named the publication handle for the `Battery` federate `EV_current` to indicate the information being broadcast. This is what the publication is doing -- we are telling the Battery federate that we want to publish the EV_current. The full handle for the current is `Battery/EV_current` (within the JSON, this is also called the `key`).
 
-![alt text](../../../img/battery_pub.png)
+![](../../../img/battery_pub.png)
 
 How does the current value get from the Battery federate's publication to the Charger federate? The Charger must subscribe to this publication handle -- the Charger will subscribe to `Battery/EV_current`.
 
-![alt text](../../../img/charger_sub.png)
+![](../../../img/charger_sub.png)
 
 Thus far we have established that the Battery is publishing its current from handle `Battery/EV_current` and the Charger is subscribing to this handle. The Charger is also sending information about values. The Charger federate will be publishing the voltage value from the `Charger/EV_voltage` handle.
 
-![alt text](../../../img/charger_pub.png)
+![](../../../img/charger_pub.png)
 
 In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery needs to subscribe to the `Charger/EV_voltage` handle.
 
-![alt text](../../../img/battery_sub.png) 
+![](../../../img/battery_sub.png) 
 
 The final configuration for one EV is shown in the image below. Federates subscribe to the handle which is publishing the value they need to perform the analysis.
 
-![alt text](../../../img/pubsubs.png)
+![](../../../img/pubsubs.png)
 
 ### Simulator Integration: External JSON
 
