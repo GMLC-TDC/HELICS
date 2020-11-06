@@ -42,6 +42,7 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"period", helics_property_time_period},
     {"timeperiod", helics_property_time_period},
     {"time_period", helics_property_time_period},
+    {"delta", helics_property_time_delta},
     {"timedelta", helics_property_time_delta},
     {"time_delta", helics_property_time_delta},
     {"timeDelta", helics_property_time_delta},
