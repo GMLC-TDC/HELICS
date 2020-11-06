@@ -73,6 +73,8 @@ namespace defs {
         connections_optional = helics_handle_option_connection_optional,
         /** make all inputs have strict type checking*/
         strict_input_type_checking = helics_handle_option_strict_type_checking,
+        /** be strict about config files*/
+        strict_config_checking = helics_flag_strict_config_checking,
         /** ignore mismatching units*/
         ignore_input_unit_mismatch = helics_handle_option_ignore_unit_mismatch
 
