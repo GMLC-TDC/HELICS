@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 #if defined(__APPLE__) && defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wuninitialized"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wuninitialized"
 #endif
 
 namespace helics {
