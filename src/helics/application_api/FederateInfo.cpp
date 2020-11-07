@@ -138,7 +138,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferdata", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
-    
+
     {"optional", helics_handle_option_connection_optional},
     {"nointerrupts", helics_flag_uninterruptible},
     {"no_interrupts", helics_flag_uninterruptible},
