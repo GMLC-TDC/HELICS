@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 
-namespace helics {
-namespace tcp {
+namespace helics::tcp {
     using asio::ip::tcp;
     using namespace std::chrono_literals;  // NOLINT
 
@@ -260,7 +259,7 @@ namespace tcp {
 
         size_t sz;
         size_t sent_size{dataLength};
-        int p{0};
+        size_t p{0};
         int count{0};
         while (count++ < 5 &&
                (sz = socket_.send(asio::buffer(reinterpret_cast<const char*>(buffer) + p,
@@ -751,5 +750,4 @@ namespace tcp {
         }
     }
 
-}  // namespace tcp
-}  // namespace helics
+}  // namespace helics::tcp
