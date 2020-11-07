@@ -110,26 +110,39 @@ typedef enum {
     helics_flag_realtime = 16,
     /** flag indicating that the federate will only interact on a single thread*/
     helics_flag_single_thread_federate = 27,
-    /** flag specifying that a federate, core, or broker may be slow to respond to pings
-        If the federate goes offline there is no good way to detect it so use with caution
-        */
-    helics_flag_slow_responding = 29,
+    /** used to not display warnings on mismatched requested times*/
+    helics_flag_ignore_time_mismatch_warnings = 67,
+    /** specify that checking on configuration files should be strict and throw and error on any
+   invalid values */
+    helics_flag_strict_config_checking = 75,
+
+} helics_federate_flags;
+
+/** enumeration of additional core flags*/
+typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     helics_flag_delay_init_entry = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
     helics_flag_enable_init_entry = 47,
-    /** used to not display warnings on mismatched requested times*/
-    helics_flag_ignore_time_mismatch_warnings = 67,
+} helics_core_flags;
+
+/** enumeration of general flags that can be used in federates/cores/brokers */
+typedef enum {
+    /** flag specifying that a federate, core, or broker may be slow to respond to pings
+        If the federate goes offline there is no good way to detect it so use with caution
+        */
+    helics_flag_slow_responding = 29,
+    /** flag specifying the federate/core/broker is operating in a user debug mode so deadlock
+    timers and timeout are disabled this flag is a combination of slow_responding and disabling of
+    some timeouts*/
+    helics_flag_debugging = 31,
     /** specify that a federate error should terminate the federation*/
     helics_flag_terminate_on_error = 72,
-    /** specify that checking on configuration files should be strict and throw and error on any
-   invalid values */
-    helics_flag_strict_config_checking = 75,
     /** specify that the log files should be flushed on every log message*/
     helics_flag_force_logging_flush = 88,
     /** specify that a full log should be dumped into a file*/
     helics_flag_dumplog = 89
-} helics_federate_flags;
+} helics_flags;
 
 /** log level definitions
  */
