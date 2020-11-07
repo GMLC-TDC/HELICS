@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 
-namespace helics {
-namespace tcp {
+namespace helics::tcp {
     using asio::ip::tcp;
     using namespace std::chrono_literals;  // NOLINT
 
@@ -751,5 +750,4 @@ namespace tcp {
         }
     }
 
-}  // namespace tcp
-}  // namespace helics
+}  // namespace helics::tcp
