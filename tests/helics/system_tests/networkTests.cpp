@@ -121,7 +121,7 @@ TEST_F(network_tests, test_external_udp_ipv4)
 
 TEST_F(network_tests, test_otherport)
 {
-    const std::string brokerArgs = "--interface=tcp://127.0.0.1:33200";
+    const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33200";
     auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
@@ -138,7 +138,7 @@ TEST_F(network_tests, test_otherport)
 
 TEST_F(network_tests, test_otherport2)
 {
-    const std::string brokerArgs = "--interface=tcp://127.0.0.1:20200";
+    const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:20200";
     auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
@@ -155,7 +155,7 @@ TEST_F(network_tests, test_otherport2)
 
 TEST_F(network_tests, test_otherport_fail)
 {
-    const std::string brokerArgs = "--interface=tcp://127.0.0.1:33100";
+    const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33100";
     auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
