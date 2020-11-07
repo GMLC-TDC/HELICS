@@ -833,6 +833,22 @@ void CommonCore::setFlagOption(LocalFederateId federateID, int32_t flag, bool fl
 
 bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
 {
+    switch (flag) {
+        case defs::flags::enable_init_entry:
+            return (delayInitCounter.load() == 0);
+        case defs::flags::delay_init_entry:
+            return (delayInitCounter.load() != 0);
+        case defs::flags::dumplog:
+        case defs::flags::force_logging_flush:
+        case defs::flags::debugging:
+            return getFlagValue(flag);
+        case defs::flags::forward_compute:
+        case defs::flags::single_thread_federate:
+        case defs::flags::rollback:
+            return false;
+        default:
+            break;
+    }
     if (federateID == gLocalCoreId) {
         return false;
     }
@@ -985,7 +1001,7 @@ const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
         }
     }
     return emptyStr;
-}
+}  // namespace helics
 
 const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
 {
@@ -4163,6 +4179,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             break;
         case defs::flags::slow_responding:
             no_ping = checkActionFlag(cmd, indicator_flag);
+            break;
+        case defs::flags::debugging:
+            debugging = no_ping = checkActionFlag(cmd, indicator_flag);
             break;
         case UPDATE_LOGGING_CALLBACK:
             if (checkActionFlag(cmd, empty_flag)) {

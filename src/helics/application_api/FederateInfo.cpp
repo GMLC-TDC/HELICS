@@ -98,11 +98,15 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"sourceOnly", helics_flag_source_only},
-    {"slowresponding", helics_flag_slow_responding},
+    {"source", helics_flag_source_only},
+    {"observer", helics_flag_observer},
+    {"slow", helics_flag_slow_responding},
+    {"slow_response", helics_flag_slow_responding},
     {"slow_responding", helics_flag_slow_responding},
     {"slowResponding", helics_flag_slow_responding},
     {"uninterruptible", helics_flag_uninterruptible},
-    {"interruptible", -helics_flag_uninterruptible},
+    {"interruptible", helics_flag_interruptible},
+    {"debugging", helics_flag_debugging},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"onlyupdateonchange", helics_flag_only_update_on_change},
     {"onlyUpdateOnChange", helics_flag_only_update_on_change},
@@ -114,6 +118,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"forwardCompute", helics_flag_forward_compute},
     {"real_time", helics_flag_realtime},
     {"realtime", helics_flag_realtime},
+    {"real_time", helics_flag_realtime},
     {"realTime", helics_flag_realtime},
     {"restrictivetimepolicy", helics_flag_restrictive_time_policy},
     {"restrictive_time_policy", helics_flag_restrictive_time_policy},
@@ -133,6 +138,13 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferdata", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
+
+    {"optional", helics_handle_option_connection_optional},
+    {"nointerrupts", helics_flag_uninterruptible},
+    {"no_interrupts", helics_flag_uninterruptible},
+    {"uninterruptible", helics_flag_uninterruptible},
+    {"interruptible", helics_flag_interruptible},
+    {"wait_for_current_time", helics_flag_wait_for_current_time_update},
     {"connection_required", helics_handle_option_connection_required},
     {"connectionrequired", helics_handle_option_connection_required},
     {"connectionRequired", helics_handle_option_connection_required},
@@ -144,11 +156,23 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"wait_for_current_time_update", helics_flag_wait_for_current_time_update},
     {"waitforcurrenttimeupdate", helics_flag_wait_for_current_time_update},
     {"waitForCurrentTimeUpdate", helics_flag_wait_for_current_time_update},
+    {"delay_init_entry", helics_flag_delay_init_entry},
+    {"delayinitentry", helics_flag_delay_init_entry},
+    {"enable_init_entry", helics_flag_enable_init_entry},
+    {"enableinitentry", helics_flag_enable_init_entry},
+    {"ignore_time_mismatch_warnings", helics_flag_ignore_time_mismatch_warnings},
+    {"ignoretimemismatchwarnings", helics_flag_ignore_time_mismatch_warnings},
+    {"rollback", helics_flag_rollback},
+    {"single_thread_federate", helics_flag_single_thread_federate},
+    {"singlethreadfederate", helics_flag_single_thread_federate},
+    {"force_logging_flush", helics_flag_force_logging_flush},
+    {"forceloggingflush", helics_flag_force_logging_flush},
+    {"dumplog", helics_flag_dumplog},
     {"terminate_on_error", helics_flag_terminate_on_error},
     {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
 
-static const std::map<std::string, int> optionStringsTranslations{
+static const std::unordered_map<std::string, int> optionStringsTranslations{
     {"buffer_data", helics_handle_option_buffer_data},
     {"bufferdata", helics_handle_option_buffer_data},
     {"bufferData", helics_handle_option_buffer_data},
@@ -241,6 +265,9 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg == "autobroker") {
             fi.autobroker = true;
             continue;
+        }
+        if (flg == "debugging") {
+            fi.debugging = true;
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
@@ -420,6 +447,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--autobroker",
                   autobroker,
                   "tell the core to automatically generate a broker if needed");
+    app->add_flag("--debugging",
+                  debugging,
+                  "tell the core to allow user debugging in a nicer fashion");
+
     app->add_option("--broker_key,--brokerkey,--brokerKey",
                     key,
                     "specify a key to use to match a broker should match the broker key");
@@ -728,7 +759,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     if (fi.autobroker) {
         res.append(" --autobroker");
     }
-
+    if (fi.debugging) {
+        res.append(" --debugging");
+    }
     if (!fi.brokerInitString.empty()) {
         res.append(" --broker_init_string \"");
         res.append(fi.brokerInitString);

@@ -146,6 +146,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--restrictive_time_policy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
+    hApp->add_flag(
+        "--debugging",
+        debugging,
+        "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
@@ -278,6 +282,10 @@ int BrokerBase::parseArgs(const std::string& initializationString)
 
 void BrokerBase::configureBase()
 {
+    if (debugging) {
+        no_ping = true;
+        disable_timer = true;
+    }
     if (networkTimeout < timeZero) {
         networkTimeout = 4.0;
     }
@@ -424,6 +432,18 @@ void BrokerBase::setLoggingFile(const std::string& lfile)
                 fileLogger.reset();
             }
         }
+    }
+}
+
+bool BrokerBase::getFlagValue(int32_t flag) const
+{
+    switch (flag) {
+        case helics_flag_dumplog:
+            return dumplog;
+        case helics_flag_force_logging_flush:
+            return forceLoggingFlush.load();
+        default:
+            return false;
     }
 }
 
@@ -770,8 +790,8 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
                 NMess.from_string(command.getString(ii));
                 auto V = commandProcessor(NMess);
                 if (V != CMD_IGNORE) {
-                    // overwrite the abort command but ignore ticks in a multi-message context they
-                    // shouldn't be there
+                    // overwrite the abort command but ignore ticks in a multi-message context
+                    // they shouldn't be there
                     if (V != CMD_TICK) {
                         command = NMess;
                         return V;

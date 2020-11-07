@@ -119,4 +119,51 @@ TEST_F(network_tests, test_external_udp_ipv4)
     vFed1->finalize();
 }
 
+TEST_F(network_tests, test_otherport)
+{
+    const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33200";
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+
+    EXPECT_TRUE(broker->isConnected());
+    helics::FederateInfo fi("--core_type=ZMQ --broker=tcp://127.0.0.1:33200");
+    helics::ValueFederate fed1("fed1", fi);
+
+    fed1.enterExecutingMode();
+    fed1.finalize();
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
+    if (broker->isConnected()) {
+        broker->disconnect();
+    }
+}
+
+TEST_F(network_tests, test_otherport2)
+{
+    const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:20200";
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+
+    EXPECT_TRUE(broker->isConnected());
+    helics::FederateInfo fi("--core_type=ZMQ --broker=tcp://127.0.0.1:20200");
+    helics::ValueFederate fed1("fed1", fi);
+
+    fed1.enterExecutingMode();
+    fed1.finalize();
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
+    if (broker->isConnected()) {
+        broker->disconnect();
+    }
+}
+
+TEST_F(network_tests, test_otherport_fail)
+{
+    const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33100";
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+
+    EXPECT_TRUE(broker->isConnected());
+    helics::FederateInfo fi("--core_type=ZMQ --broker=tcp://127.0.0.1:33198 --timeout=100ms");
+    EXPECT_THROW(helics::ValueFederate fed1("fed1", fi), helics::RegistrationFailure);
+
+    if (broker->isConnected()) {
+        broker->disconnect();
+    }
+}
 #endif
