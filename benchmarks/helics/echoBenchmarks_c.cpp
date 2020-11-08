@@ -83,7 +83,7 @@ class EchoHub_c {
                 if (helicsInputIsUpdated(subs[ii]) == helics_true) {
                     int actLen{0};
                     helicsInputGetString(subs[ii], buffer, 256, &actLen, nullptr);
-                    helicsPublicationPublishRaw(pubs[ii], buffer, actLen, nullptr);
+                    helicsPublicationPublishBytes(pubs[ii], buffer, actLen, nullptr);
                 }
             }
             cTime = helicsFederateRequestTime(vFed, finalTime + 0.05, nullptr);
