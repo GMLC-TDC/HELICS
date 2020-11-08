@@ -67,39 +67,14 @@ public final class helics_federate_flags {
    */
   public final static helics_federate_flags helics_flag_single_thread_federate = new helics_federate_flags("helics_flag_single_thread_federate", helicsJNI.helics_flag_single_thread_federate_get());
   /**
-   *  flag specifying that a federate, core, or broker may be slow to respond to pings<br>
-   *         If the federate goes offline there is no good way to detect it so use with caution
-   */
-  public final static helics_federate_flags helics_flag_slow_responding = new helics_federate_flags("helics_flag_slow_responding", helicsJNI.helics_flag_slow_responding_get());
-  /**
-   *  used to delay a core from entering initialization mode even if it would otherwise be ready
-   */
-  public final static helics_federate_flags helics_flag_delay_init_entry = new helics_federate_flags("helics_flag_delay_init_entry", helicsJNI.helics_flag_delay_init_entry_get());
-  /**
-   *  used to clear the HELICS_DELAY_INIT_ENTRY flag in cores
-   */
-  public final static helics_federate_flags helics_flag_enable_init_entry = new helics_federate_flags("helics_flag_enable_init_entry", helicsJNI.helics_flag_enable_init_entry_get());
-  /**
    *  used to not display warnings on mismatched requested times
    */
   public final static helics_federate_flags helics_flag_ignore_time_mismatch_warnings = new helics_federate_flags("helics_flag_ignore_time_mismatch_warnings", helicsJNI.helics_flag_ignore_time_mismatch_warnings_get());
-  /**
-   *  specify that a federate error should terminate the federation
-   */
-  public final static helics_federate_flags helics_flag_terminate_on_error = new helics_federate_flags("helics_flag_terminate_on_error", helicsJNI.helics_flag_terminate_on_error_get());
   /**
    *  specify that checking on configuration files should be strict and throw and error on any<br>
    *    invalid values 
    */
   public final static helics_federate_flags helics_flag_strict_config_checking = new helics_federate_flags("helics_flag_strict_config_checking", helicsJNI.helics_flag_strict_config_checking_get());
-  /**
-   *  specify that the log files should be flushed on every log message
-   */
-  public final static helics_federate_flags helics_flag_force_logging_flush = new helics_federate_flags("helics_flag_force_logging_flush", helicsJNI.helics_flag_force_logging_flush_get());
-  /**
-   *  specify that a full log should be dumped into a file
-   */
-  public final static helics_federate_flags helics_flag_dumplog = new helics_federate_flags("helics_flag_dumplog", helicsJNI.helics_flag_dumplog_get());
 
   public final int swigValue() {
     return swigValue;
@@ -135,7 +110,7 @@ public final class helics_federate_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_restrictive_time_policy, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_slow_responding, helics_flag_delay_init_entry, helics_flag_enable_init_entry, helics_flag_ignore_time_mismatch_warnings, helics_flag_terminate_on_error, helics_flag_strict_config_checking, helics_flag_force_logging_flush, helics_flag_dumplog };
+  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_restrictive_time_policy, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_ignore_time_mismatch_warnings, helics_flag_strict_config_checking };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

@@ -1,7 +1,7 @@
 function v = helics_filter_type_random_drop()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 109);
+    vInitialized = helicsMEX(0, 110);
   end
   v = vInitialized;
 end
