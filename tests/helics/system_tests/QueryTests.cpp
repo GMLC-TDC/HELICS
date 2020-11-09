@@ -910,10 +910,16 @@ TEST_F(query, queries_disconnected)
     vFed2->finalize();
     vFed1->requestTime(3.0);
     res = vFed1->query(vFed2->getName(), "state");
+    int ii{0};
     while (res != "disconnected") {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         res = vFed1->query(vFed2->getName(), "state");
+        if (++ii > 10)
+        {
+            break;
+        }
     }
+    EXPECT_EQ(res, "disconnected");
     res = vFed1->query(vFed2->getName(), "dependency_graph");
     EXPECT_EQ(res, "#disconnected");
     vFed1->finalize();
