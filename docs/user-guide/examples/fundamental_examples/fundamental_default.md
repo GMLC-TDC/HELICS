@@ -101,7 +101,7 @@ The files include:
 
 * Python program and configuration JSON for Battery federate
 * Python program and configuration JSON for Charger federate
-* "runner" json to enable `helics_cli` execution of the co-simulation
+* "runner" JSON to enable `helics_cli` execution of the co-simulation
 
 ## What is this Co-simulation doing?
 
