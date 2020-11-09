@@ -2357,14 +2357,12 @@ void CoreBroker::checkInFlightQueries(global_broker_id brkid)
 
 void CoreBroker::markAsDisconnected(global_broker_id brkid)
 {
-    bool isCore{false};
     // using regular loop here since dual mapped vector shouldn't produce a modifiable lvalue
     for (size_t ii = 0; ii < _brokers.size(); ++ii) {  // NOLINT
         auto& brk = _brokers[ii];
         if (brk.global_id == brkid) {
             if (brk.state != connection_state::error) {
                 brk.state = connection_state::disconnected;
-                isCore = brk._core;
             }
         }
         if (brk.parent == brkid) {
@@ -2374,14 +2372,12 @@ void CoreBroker::markAsDisconnected(global_broker_id brkid)
             }
         }
     }
-    if (isCore) {
-        for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
-            auto& fed = _federates[ii];
+    for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
+        auto& fed = _federates[ii];
 
-            if (fed.parent == brkid) {
-                if (fed.state != connection_state::error) {
-                    fed.state = connection_state::disconnected;
-                }
+        if (fed.parent == brkid) {
+            if (fed.state != connection_state::error) {
+                fed.state = connection_state::disconnected;
             }
         }
     }
@@ -2943,12 +2939,40 @@ void CoreBroker::processQuery(ActionMessage& m)
             route = fed->route;
             m.dest_id = fed->parent;
             response = checkFedQuery(*fed, m.payload);
+            if (response.empty() && fed->state >= connection_state::error) {
+                route = parent_route_id;
+                switch (fed->state) {
+                    case connection_state::error:
+                        response = "#errored";
+                        break;
+                    case connection_state::disconnected:
+                    case connection_state::request_disconnect:
+                        response = "#disconnected";
+                        break;
+                    default:
+                        break;
+                }
+            }
         } else {
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
                 m.dest_id = broker->global_id;
                 response = checkBrokerQuery(*broker, m.payload);
+                if (response.empty() && broker->state >= connection_state::error) {
+                    route = parent_route_id;
+                    switch (broker->state) {
+                        case connection_state::error:
+                            response = "#errored";
+                            break;
+                        case connection_state::disconnected:
+                        case connection_state::request_disconnect:
+                            response = "#disconnected";
+                            break;
+                        default:
+                            break;
+                    }
+                }
             } else if (isRootc && m.payload == "exists") {
                 response = "false";
             }
@@ -3061,8 +3085,8 @@ void CoreBroker::checkDependencies()
             }
         }
     } else {
-        // if there is more than 2 dependents(higher broker + 2 or more other objects then we
-        // need to be a timeCoordinator
+        // if there is more than 2 dependents(higher broker + 2 or more other objects
+        // then we need to be a timeCoordinator
         if (timeCoord->getDependents().size() > 2) {
             return;
         }
