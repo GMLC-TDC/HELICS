@@ -658,3 +658,71 @@ TEST(messageFederate, constructor5)
     mf1.enterExecutingMode();
     mf1.finalize();
 }
+
+TEST_F(mfed_tests, message_warnings)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> warnings{0};
+
+    mFed1->setLoggingCallback([&warnings](int level, const std::string & /*ignored*/, const std::string & /*ignored*/){
+        if (level <= helics_log_level_warning) {
+            ++warnings;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, "unknown", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(warnings.load(), 1);
+
+
+    mFed1->sendMessage(ep1, "unknown2", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(3.0);
+    EXPECT_EQ(warnings.load(), 2);
+
+    mFed1->finalize();
+}
+
+
+
+TEST_F(mfed_tests, message_warnings_ignore)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> warnings{0};
+
+    mFed1->setLoggingCallback(
+        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_warning) {
+                ++warnings;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    helics::Message mess1;
+    mess1.data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    mess1.dest = "unknown";
+    
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(warnings.load(), 1);
+    mess1.flags |= (1 << 8);  //this is a the optional flag
+    // it should cause the unknown destination to be ignored
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(3.0);
+    EXPECT_EQ(warnings.load(), 1);
+
+    mFed1->finalize();
+}
