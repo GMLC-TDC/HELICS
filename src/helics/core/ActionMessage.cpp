@@ -49,8 +49,8 @@ ActionMessage::ActionMessage(const ActionMessage& act):
 }
 
 ActionMessage::ActionMessage(std::unique_ptr<Message> message):
-    messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), actionTime(message->time),
-    payload(std::move(message->data.m_data)), name(payload),
+    messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), flags(message->flags),
+    actionTime(message->time), payload(std::move(message->data.m_data)), name(payload),
     stringData({std::move(message->dest),
                 std::move(message->source),
                 std::move(message->original_source),
@@ -117,6 +117,7 @@ ActionMessage& ActionMessage::operator=(std::unique_ptr<Message> message) noexce
 {
     messageAction = CMD_SEND_MESSAGE;
     messageID = message->messageID;
+    flags = message->flags;
     payload = std::move(message->data.m_data);
     actionTime = message->time;
     stringData = {std::move(message->dest),
