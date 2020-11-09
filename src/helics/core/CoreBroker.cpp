@@ -1066,18 +1066,16 @@ void CoreBroker::processCommand(ActionMessage&& command)
             if (command.dest_id == parent_broker_id) {
                 auto route = fillMessageRouteInformation(command);
                 if (route == parent_route_id && isRootc && command.action() == CMD_SEND_MESSAGE) {
-                    if (!checkActionFlag(command, optional_flag))
-                    {
-                        ActionMessage warn(checkActionFlag(command, required_flag)?CMD_ERROR: CMD_WARNING);
+                    if (!checkActionFlag(command, optional_flag)) {
+                        ActionMessage warn(checkActionFlag(command, required_flag) ? CMD_ERROR :
+                                                                                     CMD_WARNING);
                         warn.source_id = global_broker_id_local;
                         warn.dest_id = command.source_id;
                         warn.payload = fmt::format("{} is not a known endpoint, message dropped",
                                                    command.getString(targetStringLoc));
                         transmit(getRoute(warn.dest_id), warn);
                     }
-                }
-                else
-                {
+                } else {
                     transmit(route, command);
                 }
             } else {
