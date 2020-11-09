@@ -258,9 +258,13 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
     mFed1->setMessageNotificationCallback(epid,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e1cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) { ++e1cnt; });
     mFed2->setMessageNotificationCallback(epid2,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e2cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) {
+                                              ++e2cnt;
+                                          });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(helics_property_time_delta, 1.0);
     mFed2->setProperty(helics_property_time_delta, 1.0);
@@ -344,7 +348,7 @@ class PingPongFed {
   public:
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
-  public:
+
     PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
         delta(tDelta), name(fname), coreType(ctype)
     {
@@ -370,7 +374,6 @@ class PingPongFed {
         ep = &mFed->registerEndpoint("port");
     }
 
-  private:
     void processMessages(helics::Time currentTime)
     {
         while (mFed->hasMessage(*ep)) {
@@ -657,4 +660,70 @@ TEST(messageFederate, constructor5)
     EXPECT_EQ(mf1.getCorePointer()->getIdentifier(), "mfc5");
     mf1.enterExecutingMode();
     mf1.finalize();
+}
+
+TEST_F(mfed_tests, message_warnings)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> warnings{0};
+
+    mFed1->setLoggingCallback(
+        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_warning) {
+                ++warnings;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, "unknown", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(warnings.load(), 1);
+
+    mFed1->sendMessage(ep1, "unknown2", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(3.0);
+    EXPECT_EQ(warnings.load(), 2);
+
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, message_warnings_ignore)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> warnings{0};
+
+    mFed1->setLoggingCallback(
+        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_warning) {
+                ++warnings;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    helics::Message mess1;
+    mess1.data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    mess1.dest = "unknown";
+
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(warnings.load(), 1);
+    mess1.flags |= (1 << 8);  // this is a the optional flag
+    // it should cause the unknown destination to be ignored
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(3.0);
+    EXPECT_EQ(warnings.load(), 1);
+
+    mFed1->finalize();
 }
