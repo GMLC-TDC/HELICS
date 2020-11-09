@@ -910,8 +910,7 @@ TEST_F(query, queries_disconnected)
     vFed2->finalize();
     vFed1->requestTime(3.0);
     res = vFed1->query(vFed2->getName(), "state");
-    while (res != "disconnected")
-    {
+    while (res != "disconnected") {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         res = vFed1->query(vFed2->getName(), "state");
     }
