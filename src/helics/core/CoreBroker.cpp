@@ -2372,15 +2372,15 @@ void CoreBroker::markAsDisconnected(global_broker_id brkid)
             }
         }
     }
-        for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
-            auto& fed = _federates[ii];
+    for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
+        auto& fed = _federates[ii];
 
-            if (fed.parent == brkid) {
-                if (fed.state != connection_state::error) {
-                    fed.state = connection_state::disconnected;
-                }
+        if (fed.parent == brkid) {
+            if (fed.state != connection_state::error) {
+                fed.state = connection_state::disconnected;
             }
         }
+    }
 }
 
 void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
