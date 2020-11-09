@@ -914,8 +914,7 @@ TEST_F(query, queries_disconnected)
     while (res != "disconnected") {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         res = vFed1->query(vFed2->getName(), "state");
-        if (++ii > 10)
-        {
+        if (++ii > 10) {
             break;
         }
     }
