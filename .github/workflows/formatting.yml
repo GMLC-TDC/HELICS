@@ -21,7 +21,7 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-python@v2
     - name: set PY
-      run: echo "::set-env name=PY::$(python --version --version | sha256sum | cut -d' ' -f1)"
+      run: echo "PY=$(python --version --version | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
     - name: install shfmt
       run: sudo snap install shfmt
     - uses: actions/cache@v1
