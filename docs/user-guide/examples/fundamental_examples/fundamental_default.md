@@ -12,6 +12,7 @@ The base example described here will go into detail about the necessary componen
 
 The Base Example tutorial is organized as follows:
 
+* [Computing Environment](#computing-environment)
 * [Example files](#example-files)  
 * [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
 * [HELICS Components](#helics-components) 
@@ -21,10 +22,67 @@ The Base Example tutorial is organized as follows:
   * [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
   * [Send Receive Communication between Federates](#send-receive-communication-between-federates)
 * [Default Setup](#default-setup)
-	* [Messages + Communication: pub sub](messages-+-communication-pub-sub)
+	* [Messages + Communication: pub sub](messages-communication-pub-sub)
 	* [Simulator Integration: External JSON](#simulator-integration-external-json)
-	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics_cli)
+	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics-cli)
 * [Questions and Help](#questions-and-help)
+
+
+## Computing Environment
+
+This example was successfully run on `Tue Nov 10 11:16:44 PST 2020` with the following computing environment.
+
+* 	Operating System
+
+```
+$ sw_vers
+ProductName:	Mac OS X
+ProductVersion:	10.14.6
+BuildVersion:	18G6032
+```
+*  python version
+
+```
+$ python
+Python 3.7.6 (default, Jan  8 2020, 13:42:34) 
+[Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+```
+* python modules for this example
+
+```
+$ pip list | grep matplotlib
+matplotlib                    3.1.3    
+$ pip list | grep numpy
+numpy                         1.18.5 
+```
+If these modules are not installed, you can install them with
+
+```
+$ pip install matplotlib
+$ pip install numpy
+```
+* 	helics_broker version
+
+```
+$ helics_broker --version
+2.4.0 (2020-02-04)
+```
+* 	helics_cli version
+
+```
+$ helics --version
+0.4.1-HEAD-ef36755
+```
+*	pyhelics init file
+
+```
+$ python
+
+>>> import helics as h
+>>> h.__file__
+'/Users/[username]/Software/pyhelics/helics/__init__.py'
+```
 
 
 
@@ -236,41 +294,41 @@ And publishes the charging voltage at its publication handle:
 
 ## Default Setup
 
-The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](link to helics cli md). This section explains how information is passed between publications and subscriptions, how to configure the federates with JSONs, and how to launch the co-simulation with `helics_cli`.
+The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](link to helics cli md) (**NEEDS LINK**). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSONs and how to launch the co-simulation with `helics_cli`.
 
 ### Messages + Communication: pub/sub
 
-In the Base Example, the information being passed between the `Battery.py` federate and the `Charger.py` federate is the **voltage** applied to the battery, and the **current** measured across the battery and fed back to the charger. Voltage and current are both physical quantities, meaning that unless we act on these quantities to change them, they will retain their values. For this reason, in HELICS physical quantities are called **values**. Values are sent via publication and subscription -- a federate can publish its value(s), and another federate can subscribe this value(s).
+In the Base Example, the information being passed between the `Battery.py` federate and the `Charger.py` federate is the **voltage** applied to the battery, and the **current** measured across the battery and fed back to the charger. Voltage and current are both physical quantities, meaning that unless we act on these quantities to change them, they will retain their values. For this reason, in HELICS, physical quantities are called **values**. Values are sent via publication and subscription -- a federate can publish its value(s), and another federate can subscribe this value(s).
 
-When configuring the communication passage between federates, it is important to connect the federate to the correct **handle**. In the image below, we have a Battery federate and a Charger federate. Each federate has a **publication** handle  (red) and a **subscription** handle (yellow). How are values passed between federates with pubs and subs?
+When configuring the communication passage between federates, it is important to connect the federate to the correct **handle**. In the image below, we have a Battery federate and a Charger federate. Each federate has a **publication** handle  (red) and a **subscription** handle (yellow). The publication handle is also called the **output**, and the subscription handle the **input**. How are values passed between federates with pubs and subs?
 
-![](../../../img/default1.png)
+![](../../../img/handles.png)
 
-We have named the publication handle for the `Battery` federate `EV_current` to indicate the information being broadcast. This is what the publication is doing -- we are telling the Battery federate that we want to publish the EV_current. The full handle for the current is `Battery/EV_current` (within the JSON, this is also called the `key`).
+We have **named** the publication handle for the `Battery` federate `EV_current` to indicate the information being broadcast -- we can also call the pub handle the **named output**. This is what the publication is doing -- we are telling the Battery federate that we want to publish the EV_current. The full handle for the current is `Battery/EV_current` (within the JSON, this is also called the `key`).
 
 ![](../../../img/battery_pub.png)
 
-How does the current value get from the Battery federate's publication to the Charger federate? The Charger must subscribe to this publication handle -- the Charger will subscribe to `Battery/EV_current`.
+How does the current value get from the Battery federate's publication to the Charger federate? The Charger must subscribe to this publication handle -- the Charger will subscribe to `Battery/EV_current`. The Charger subscription handle has not been given a name (e.g., `Charger/EV_current`), but it will receive **input** -- the Charger subscription is a defined unnamed input with a targeted publication. In this example, we configure the target of the Charger subscription in the JSON to  the publication handle name `Battery/EV_current`.
 
 ![](../../../img/charger_sub.png)
 
-Thus far we have established that the Battery is publishing its current from handle `Battery/EV_current` and the Charger is subscribing to this handle. The Charger is also sending information about values. The Charger federate will be publishing the voltage value from the `Charger/EV_voltage` handle.
+Thus far we have established that the Battery is publishing its current from the named handle `Battery/EV_current` and the Charger is subscribing to this named handle. The Charger is also sending information about values. The Charger federate will be publishing the voltage value from the `Charger/EV_voltage` handle (a named output).
 
 ![](../../../img/charger_pub.png)
 
-In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery needs to subscribe to the `Charger/EV_voltage` handle.
+In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery will have an unnamed input subscription which targets the `Charger/EV_voltage` handle.
 
 ![](../../../img/battery_sub.png) 
 
-The final configuration for one EV is shown in the image below. Federates subscribe to the handle which is publishing the value they need to perform the analysis.
+With a better understanding of how we want to configure the pubs and subs, we can now move on to the mechanics of integrating the two simulators.
 
-![](../../../img/pubsubs.png)
+
 
 ### Simulator Integration: External JSON
 
 Configuration of federates may be done with JSON files. Each federate will have its own configuration ("config") file. It's good practice to mirror the name of the federate with the config file. For example, the `Battery.py` federate will have a config file named `BatteryConfig.json`. 
 
-There are (extensive ways)[link to config page] to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
+There are (extensive ways)[link to config page] (**needs link**) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
 
 ```
 {
@@ -312,15 +370,16 @@ This federate is configured with pubs and subs, so it will need an option to ind
     ]
 ```
 
-This pub and sub configuration is telling us that the `Battery.py` federate is publishing in units of amps (`A`) for current from the handle (`key`) `Battery/EV1_current`. This federate is also subscribing to information from the `Charger.py` federate. It has subscribed to a value in units of volts (`V`) at the handle (`key`) `Charger/EV1_voltage`.
+This pub and sub configuration is telling us that the `Battery.py` federate is publishing in units of amps (`A`) for current from the named handle (`key`) `Battery/EV1_current`. This federate is also subscribing to information from the `Charger.py` federate. It has subscribed to a value in units of volts (`V`) at the named handle (`key`) `Charger/EV1_voltage`.
 
-As discussed in [Section about Register and Configure Federates], the federate registration and configuration with JSON files in the python federate is done with one line of code:
+As discussed in [Register and Configure Federates](#register-and-configure-federates), the federate registration and configuration with JSON files in the python federate is done with one line of code:
 ```
 fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 ```
 
 Recall that federate registration and configuration is typically done **before** entering execution mode.
 
+**outstanding allison question:**
 (can you create a new configuration after entering execution mode?)
 
 
