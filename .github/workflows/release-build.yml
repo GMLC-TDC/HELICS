@@ -136,7 +136,7 @@ jobs:
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
-            macos_target_ver: '10.9'
+            macos_target_ver: '10.14'
           - id: linux-x64
             os: ubuntu-latest
             arch: x64
@@ -224,7 +224,7 @@ jobs:
           - id: macos-x64
             os: macos-latest
             arch: x64
-            macos_target_ver: '10.9'
+            macos_target_ver: '10.14'
           - id: ubuntu-x64
             os: ubuntu-latest
             arch: x64
