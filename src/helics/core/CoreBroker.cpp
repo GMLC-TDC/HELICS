@@ -2957,7 +2957,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
-    } else if ((isRootc) && (target == "global")) {
+    } else if ((isRootc) && (target == "global" || target=="global_value")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
@@ -2965,7 +2965,14 @@ void CoreBroker::processQuery(ActionMessage& m)
 
         auto gfind = global_values.find(std::string(m.payload.to_string()));
         if (gfind != global_values.end()) {
-            queryResp.payload = gfind->second;
+            if (target == "global_value") {
+                queryResp.payload = gfind->second;
+            } else {
+                Json::Value v;
+                v["name"] = std::string(m.payload.to_string());
+                v["value"] = gfind->second;
+                queryResp.payload = generateJsonString(v);
+            }
         } else if (m.payload.to_string() == "list") {
             queryResp.payload =
                 generateStringVector(global_values, [](const auto& gv) { return gv.first; });
