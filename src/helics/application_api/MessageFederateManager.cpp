@@ -167,6 +167,10 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto epCount = coreObject->receiveCountAny(fedID);
+    if (epCount == 0)
+    {
+        return;
+    }
     // lock the data updates
     auto eptDat = eptData.lock();
 
@@ -209,7 +213,11 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 
 void MessageFederateManager::startupToInitializeStateTransition() {}
 
-void MessageFederateManager::initializeToExecuteStateTransition() {}
+void MessageFederateManager::initializeToExecuteStateTransition(iteration_result result)
+{
+    Time ctime = result == iteration_result::next_step ? timeZero : initializationTime;
+    updateTime(ctime, initializationTime);
+}
 
 std::string MessageFederateManager::localQuery(const std::string& queryStr) const
 {
