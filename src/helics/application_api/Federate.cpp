@@ -287,11 +287,12 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
                 case iteration_result::next_step:
                     currentMode = modes::executing;
                     currentTime = timeZero;
-                    initializeToExecuteStateTransition();
+                    initializeToExecuteStateTransition(res);
                     break;
                 case iteration_result::iterating:
                     currentMode = modes::initializing;
-                    updateTime(getCurrentTime(), getCurrentTime());
+                    currentTime = initializationTime;
+                    initializeToExecuteStateTransition(res);
                     break;
                 case iteration_result::error:
                     // LCOV_EXCL_START
@@ -373,11 +374,12 @@ iteration_result Federate::enterExecutingModeComplete()
                     case iteration_result::next_step:
                         currentMode = modes::executing;
                         currentTime = timeZero;
-                        initializeToExecuteStateTransition();
+                        initializeToExecuteStateTransition(iteration_result::next_step);
                         break;
                     case iteration_result::iterating:
                         currentMode = modes::initializing;
-                        updateTime(getCurrentTime(), getCurrentTime());
+                        currentTime = initializationTime;
+                        initializeToExecuteStateTransition(iteration_result::iterating);
                         break;
                     case iteration_result::error:
                         // LCOV_EXCL_START
@@ -744,7 +746,7 @@ void Federate::startupToInitializeStateTransition()
 {
     // child classes may do something with this
 }
-void Federate::initializeToExecuteStateTransition()
+void Federate::initializeToExecuteStateTransition(iteration_result /*unused*/)
 {
     // child classes may do something with this
 }

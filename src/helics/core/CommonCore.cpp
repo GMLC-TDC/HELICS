@@ -1810,7 +1810,7 @@ std::unique_ptr<Message> CommonCore::receiveAny(local_federate_id federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("FederateID is not valid (receiveAny)"));
     }
-    if (fed->getState() != HELICS_EXECUTING) {
+    if (fed->getState() == HELICS_CREATED) {
         endpoint_id = interface_handle();
         return nullptr;
     }
@@ -1823,7 +1823,7 @@ uint64_t CommonCore::receiveCountAny(local_federate_id federateID)
     if (fed == nullptr) {
         throw(InvalidIdentifier("FederateID is not valid (receiveCountAny)"));
     }
-    if (fed->getState() != HELICS_EXECUTING) {
+    if (fed->getState() == HELICS_CREATED ) {
         return 0;
     }
 
