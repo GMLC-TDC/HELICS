@@ -73,11 +73,11 @@ TEST_P(valuefed_add_ztype_tests, publication_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
 
-    auto sv = pubid.getKey();
-    auto sv2 = pubid2.getKey();
+    const auto& sv = pubid.getKey();
+    const auto& sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getExtractionType(), "double");
@@ -199,7 +199,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
     sv2 = pubid2.getKey();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getKey();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getExtractionType(), "double");
