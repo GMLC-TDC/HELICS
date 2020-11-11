@@ -725,3 +725,35 @@ TEST_F(mfed_tests, message_warnings_ignore)
 
     mFed1->finalize();
 }
+
+TEST_F(mfed_tests, message_init_iteration)
+{
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    auto& ep2 = mFed2->registerGlobalEndpoint("ep2");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterInitializingModeAsync();
+    mFed2->enterInitializingMode();
+    mFed1->enterInitializingModeComplete();
+
+    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
+    mFed1->enterExecutingModeAsync();
+
+    auto result = mFed2->enterExecutingMode(helics::iteration_request::iterate_if_needed);
+    EXPECT_EQ(result, helics::iteration_result::iterating);
+
+    EXPECT_TRUE(ep2.hasMessage());
+
+    auto m = ep2.getMessage();
+    EXPECT_EQ(m->data.size(), 26U);
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+    mFed2->finalize();
+
+    mFed1->finalize();
+}

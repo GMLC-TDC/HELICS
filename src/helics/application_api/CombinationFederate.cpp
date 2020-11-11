@@ -69,10 +69,10 @@ void CombinationFederate::startupToInitializeStateTransition()
     MessageFederate::startupToInitializeStateTransition();
 }
 
-void CombinationFederate::initializeToExecuteStateTransition()
+void CombinationFederate::initializeToExecuteStateTransition(iteration_result result)
 {
-    ValueFederate::initializeToExecuteStateTransition();
-    MessageFederate::initializeToExecuteStateTransition();
+    ValueFederate::initializeToExecuteStateTransition(result);
+    MessageFederate::initializeToExecuteStateTransition(result);
 }
 
 std::string CombinationFederate::localQuery(const std::string& queryStr) const
