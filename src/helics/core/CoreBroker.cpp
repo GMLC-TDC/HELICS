@@ -2957,7 +2957,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
-    } else if ((isRootc) && (target == "global" || target=="global_value")) {
+    } else if ((isRootc) && (target == "global" || target == "global_value")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
