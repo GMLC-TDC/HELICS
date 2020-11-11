@@ -167,8 +167,7 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto epCount = coreObject->receiveCountAny(fedID);
-    if (epCount == 0)
-    {
+    if (epCount == 0) {
         return;
     }
     // lock the data updates
