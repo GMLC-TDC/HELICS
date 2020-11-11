@@ -1823,7 +1823,7 @@ uint64_t CommonCore::receiveCountAny(local_federate_id federateID)
     if (fed == nullptr) {
         throw(InvalidIdentifier("FederateID is not valid (receiveCountAny)"));
     }
-    if (fed->getState() == HELICS_CREATED ) {
+    if (fed->getState() == HELICS_CREATED) {
         return 0;
     }
 
