@@ -99,7 +99,8 @@ class Broker {
 
     /** set a federation global value
     @details this overwrites any previous value for this name
-    globals can be queried with a target of "global" and queryStr of the value to Query
+    globals can be queried with a target of "global" or "global_value" and queryStr of the value to Query
+    "global_value" will return the string directly.  "global" will return the value and name in a JSON structure
     @param valueName the name of the global to set
     @param value the value of the global
     */

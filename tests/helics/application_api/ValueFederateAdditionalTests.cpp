@@ -603,8 +603,8 @@ TEST_P(valuefed_add_configfile_tests, file_load)
 
     EXPECT_EQ(vFed.getInput(2).getName(), "valueFed/ipt2");
 
-    EXPECT_EQ(vFed.query("global", "global1"), "this is a global1 value");
-    EXPECT_EQ(vFed.query("global", "global2"), "this is another global value");
+    EXPECT_EQ(vFed.query("global_value", "global1"), "this is a global1 value");
+    EXPECT_EQ(vFed.query("global_value", "global2"), "this is another global value");
 
     auto& pub = vFed.getPublication("pub1");
     EXPECT_EQ(pub.getUnits(), "m");
