@@ -323,7 +323,8 @@ class FederateState {
     @param iterate the type of iteration requested
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time requestTime(Time nextTime, iteration_request iterate, bool generateRequest=false);
+    iteration_time
+        requestTime(Time nextTime, iteration_request iterate, bool generateRequest = false);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */
