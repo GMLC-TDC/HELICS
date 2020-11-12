@@ -789,7 +789,13 @@ TEST_F(mfed_tests, message_init_time0)
         EXPECT_EQ(m1->data.size(), 26U);
     }
 
-    EXPECT_TRUE(ep1.hasMessage());
+    auto res = ep1.hasMessage();
+    EXPECT_TRUE(res);
+    if (!res)
+    {
+        ep1.hasMessage();
+    }
+
     auto m2 = ep1.getMessage();
     if (m2) {
         EXPECT_EQ(m2->data.size(), 26U);
