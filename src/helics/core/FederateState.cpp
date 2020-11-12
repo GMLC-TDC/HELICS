@@ -450,15 +450,13 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
 {
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
-        if (sendRequest)
-        {
+        if (sendRequest) {
             ActionMessage exec(CMD_EXEC_REQUEST);
             exec.source_id = global_id.load();
             setIterationFlags(exec, iterate);
             setActionFlag(exec, indicator_flag);
             addAction(exec);
         }
-        
 
         auto ret = processQueue();
         if (ret == message_processing_result::next_step) {
@@ -526,7 +524,8 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
     return {};
 }
 
-iteration_time FederateState::requestTime(Time nextTime, iteration_request iterate, bool generateRequest)
+iteration_time
+    FederateState::requestTime(Time nextTime, iteration_request iterate, bool generateRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime();
@@ -534,8 +533,7 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
         LOG_TRACE(timeCoord->printTimeStatus());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
-        if (generateRequest)
-        {
+        if (generateRequest) {
             ActionMessage treq(CMD_TIME_REQUEST);
             treq.source_id = global_id.load();
             treq.actionTime = nextTime;
@@ -544,7 +542,7 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
             addAction(treq);
             LOG_TRACE(timeCoord->printTimeStatus());
         }
-        
+
 // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 #ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (rt_lag < Time::maxVal())) {
@@ -1009,7 +1007,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_TIME_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
-                checkActionFlag(cmd,indicator_flag)) {  // this sets up a time request
+                checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
                 iteration_request iterate = iteration_request::no_iterations;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?
