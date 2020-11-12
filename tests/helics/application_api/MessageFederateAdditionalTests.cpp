@@ -791,8 +791,7 @@ TEST_F(mfed_tests, message_init_time0)
 
     auto res = ep1.hasMessage();
     EXPECT_TRUE(res);
-    if (!res)
-    {
+    if (!res) {
         ep1.hasMessage();
     }
 

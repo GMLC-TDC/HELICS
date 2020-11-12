@@ -2878,21 +2878,21 @@ void CommonCore::processCommand(ActionMessage&& command)
                     break;
                 }
             }
-                if (command.dest_id == global_broker_id_local) {
-                    timeCoord->processTimeMessage(command);
-                    if (!enteredExecutionMode) {
-                        auto res = timeCoord->checkExecEntry();
-                        if (res == message_processing_result::next_step) {
-                            enteredExecutionMode = true;
-                        }
+            if (command.dest_id == global_broker_id_local) {
+                timeCoord->processTimeMessage(command);
+                if (!enteredExecutionMode) {
+                    auto res = timeCoord->checkExecEntry();
+                    if (res == message_processing_result::next_step) {
+                        enteredExecutionMode = true;
                     }
-                } else if (command.source_id == global_broker_id_local) {
-                    for (auto dep : timeCoord->getDependents()) {
-                        routeMessage(command, dep);
-                    }
-                } else {
-                    routeMessage(command);
                 }
+            } else if (command.source_id == global_broker_id_local) {
+                for (auto dep : timeCoord->getDependents()) {
+                    routeMessage(command, dep);
+                }
+            } else {
+                routeMessage(command);
+            }
             break;
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
