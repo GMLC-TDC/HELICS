@@ -317,13 +317,13 @@ class FederateState {
     @param iterate indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingMode(iteration_request iterate);
+    iteration_result enterExecutingMode(iteration_request iterate, bool generateRequest = false);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param iterate the type of iteration requested
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time requestTime(Time nextTime, iteration_request iterate);
+    iteration_time requestTime(Time nextTime, iteration_request iterate, bool generateRequest=false);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */

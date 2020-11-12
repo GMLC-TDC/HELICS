@@ -498,7 +498,7 @@ class HELICS_CXX_EXPORT Federate {
     virtual void startupToInitializeStateTransition();
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
-    virtual void initializeToExecuteStateTransition();
+    virtual void initializeToExecuteStateTransition(iteration_result iterate);
     /** function to generate results for a local Query
     @details should return an empty string if the query is not recognized*/
     virtual std::string localQuery(const std::string& queryStr) const;
