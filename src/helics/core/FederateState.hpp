@@ -315,18 +315,19 @@ class FederateState {
     iteration_result enterInitializingMode();
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
-    @param sendRequest generates the local actionMessage inside the function leaving to false assumes the caller generated the message 
-    returns either converged or nonconverged depending on whether an iteration is needed
+    @param sendRequest generates the local actionMessage inside the function leaving to false
+    assumes the caller generated the message returns either converged or nonconverged depending on
+    whether an iteration is needed
     */
     iteration_result enterExecutingMode(iteration_request iterate, bool sendRequest = false);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param iterate the type of iteration requested
-    @param sendRequest generates the local actionMessage inside the function leaving to false assumes the caller generated the message
+    @param sendRequest generates the local actionMessage inside the function leaving to false
+    assumes the caller generated the message
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time
-        requestTime(Time nextTime, iteration_request iterate, bool sendRequest = false);
+    iteration_time requestTime(Time nextTime, iteration_request iterate, bool sendRequest = false);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */
