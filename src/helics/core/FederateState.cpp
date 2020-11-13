@@ -525,7 +525,7 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
 }
 
 iteration_time
-    FederateState::requestTime(Time nextTime, iteration_request iterate, bool generateRequest)
+    FederateState::requestTime(Time nextTime, iteration_request iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime();
@@ -533,7 +533,7 @@ iteration_time
         LOG_TRACE(timeCoord->printTimeStatus());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
-        if (generateRequest) {
+        if (sendRequest) {
             ActionMessage treq(CMD_TIME_REQUEST);
             treq.source_id = global_id.load();
             treq.actionTime = nextTime;
