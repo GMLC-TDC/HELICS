@@ -446,15 +446,17 @@ iteration_result FederateState::enterInitializingMode()
     return ret;
 }
 
-iteration_result FederateState::enterExecutingMode(iteration_request iterate)
+iteration_result FederateState::enterExecutingMode(iteration_request iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
-        ActionMessage exec(CMD_EXEC_REQUEST);
-        exec.source_id = global_id.load();
-        setIterationFlags(exec, iterate);
-
-        addAction(exec);
+        if (sendRequest) {
+            ActionMessage exec(CMD_EXEC_REQUEST);
+            exec.source_id = global_id.load();
+            setIterationFlags(exec, iterate);
+            setActionFlag(exec, indicator_flag);
+            addAction(exec);
+        }
 
         auto ret = processQueue();
         if (ret == message_processing_result::next_step) {
@@ -522,7 +524,8 @@ std::vector<global_handle> FederateState::getSubscribers(interface_handle handle
     return {};
 }
 
-iteration_time FederateState::requestTime(Time nextTime, iteration_request iterate)
+iteration_time
+    FederateState::requestTime(Time nextTime, iteration_request iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime();
@@ -530,12 +533,16 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
         LOG_TRACE(timeCoord->printTimeStatus());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
-        ActionMessage treq(CMD_TIME_REQUEST);
-        treq.source_id = global_id.load();
-        treq.actionTime = nextTime;
-        setIterationFlags(treq, iterate);
-        addAction(treq);
-        LOG_TRACE(timeCoord->printTimeStatus());
+        if (sendRequest) {
+            ActionMessage treq(CMD_TIME_REQUEST);
+            treq.source_id = global_id.load();
+            treq.actionTime = nextTime;
+            setIterationFlags(treq, iterate);
+            setActionFlag(treq, indicator_flag);
+            addAction(treq);
+            LOG_TRACE(timeCoord->printTimeStatus());
+        }
+
 // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 #ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (rt_lag < Time::maxVal())) {
@@ -863,7 +870,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
-                (cmd.dest_id == parent_broker_id)) {  // this sets up a time request
+                checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
                 iteration_request iterate = iteration_request::no_iterations;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?
@@ -1000,7 +1007,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_TIME_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
-                (cmd.dest_id == parent_broker_id)) {  // this sets up a time request
+                checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
                 iteration_request iterate = iteration_request::no_iterations;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?

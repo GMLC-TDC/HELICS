@@ -535,10 +535,18 @@ iteration_result CommonCore::enterExecutingMode(local_federate_id federateID,
     }
     // do an exec check on the fed to process previously received messages so it can't get in a
     // deadlocked state
-    ActionMessage exec(CMD_EXEC_CHECK);
-    fed->addAction(exec);
+    ActionMessage execc(CMD_EXEC_CHECK);
+    fed->addAction(execc);
+
+    ActionMessage exec(CMD_EXEC_REQUEST);
+    exec.source_id = fed->global_id.load();
+    exec.dest_id = fed->global_id.load();
+    setIterationFlags(exec, iterate);
+    setActionFlag(exec, indicator_flag);
+    addActionMessage(exec);
+
     // TODO(PT): check for error conditions?
-    return fed->enterExecutingMode(iterate);
+    return fed->enterExecutingMode(iterate, false);
 }
 
 local_federate_id CommonCore::registerFederate(const std::string& name,
@@ -659,7 +667,14 @@ Time CommonCore::timeRequest(local_federate_id federateID, Time next)
     }
     switch (fed->getState()) {
         case HELICS_EXECUTING: {
-            auto ret = fed->requestTime(next, iteration_request::no_iterations);
+            // generate the request through the core
+            ActionMessage treq(CMD_TIME_REQUEST);
+            treq.source_id = fed->global_id.load();
+            treq.dest_id = fed->global_id.load();
+            treq.actionTime = next;
+            setActionFlag(treq, indicator_flag);
+            addActionMessage(treq);
+            auto ret = fed->requestTime(next, iteration_request::no_iterations, false);
             switch (ret.state) {
                 case iteration_result::error:
                     throw(FunctionExecutionFailure(fed->lastErrorString()));
@@ -706,7 +721,16 @@ iteration_time CommonCore::requestTimeIterative(local_federate_id federateID,
         }
     }
 
-    return fed->requestTime(next, iterate);
+    // generate the request through the core
+    ActionMessage treq(CMD_TIME_REQUEST);
+    treq.source_id = fed->global_id.load();
+    treq.dest_id = fed->global_id.load();
+    treq.actionTime = next;
+    setIterationFlags(treq, iterate);
+    setActionFlag(treq, indicator_flag);
+    addActionMessage(treq);
+
+    return fed->requestTime(next, iterate, false);
 }
 
 Time CommonCore::getCurrentTime(local_federate_id federateID) const
@@ -1810,7 +1834,7 @@ std::unique_ptr<Message> CommonCore::receiveAny(local_federate_id federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("FederateID is not valid (receiveAny)"));
     }
-    if (fed->getState() != HELICS_EXECUTING) {
+    if (fed->getState() == HELICS_CREATED) {
         endpoint_id = interface_handle();
         return nullptr;
     }
@@ -1823,7 +1847,7 @@ uint64_t CommonCore::receiveCountAny(local_federate_id federateID)
     if (fed == nullptr) {
         throw(InvalidIdentifier("FederateID is not valid (receiveCountAny)"));
     }
-    if (fed->getState() != HELICS_EXECUTING) {
+    if (fed->getState() == HELICS_CREATED) {
         return 0;
     }
 
