@@ -33,6 +33,10 @@ constexpr Time timeZero = Time::zeroVal();
 constexpr Time timeEpsilon = Time::epsilon();
 /** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon();
+
+/** common definition of currentTime in initialization mode*/
+constexpr Time initializationTime = negEpsilon;
+
 /** user defined literal for a time variable*/
 constexpr Time operator"" _t(long double val)
 {
