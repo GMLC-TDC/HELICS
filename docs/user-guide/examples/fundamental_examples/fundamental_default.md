@@ -20,6 +20,7 @@ The Base Example tutorial is organized as follows:
   * [Define Time Variables](#define-time-variables)
   * [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
   * [Send Receive Communication between Federates](#send-receive-communication-between-federates)
+  * [Finalize Co-simulation](#finalize-co-simulation)
 * [Default Setup](#default-setup)
 	* [Messages + Communication: pub sub](messages-communication-pub-sub)
 	* [Simulator Integration: External JSON](#simulator-integration-external-json)
@@ -290,6 +291,10 @@ And publishes the charging voltage at its publication handle:
                 f' at time {grantedtime}')
 ```
 
+### Finalize Co-simulation
+
+After all the time steps have completed, it's good practice to 
+
 
 ## Default Setup
 
@@ -327,7 +332,7 @@ With a better understanding of how we want to configure the pubs and subs, we ca
 
 Configuration of federates may be done with JSON files. Each federate will have its own configuration ("config") file. It's good practice to mirror the name of the federate with the config file. For example, the `Battery.py` federate will have a config file named `BatteryConfig.json`. 
 
-There are (extensive ways)[link to config page] (**needs link**) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
+There are [extensive ways](../../configuration_options_reference.html) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
 
 ```
 {
