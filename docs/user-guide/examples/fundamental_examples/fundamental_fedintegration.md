@@ -9,8 +9,6 @@ This tutorial is organized as follows:
 
 * [Computing Environment](#computing-environment)
 * [Example files](#example-files)  
-* [What is this Co-simulation doing differently?](#what-is-this-co-simulation-doing-differently)
-* [HELICS Components](#helics-components) 
 * [Federate Integration with PyHELICS API](#federate-integration-with-pyhelics-api)
 	* [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api)
 	* [Federate integration with API calls](#federate-integration-with-api-calls)
@@ -88,25 +86,6 @@ The files include:
 * Python program for Battery federate
 * Python program for Charger federate
 * "runner" JSON to enable `helics_cli` execution of the co-simulation
-
-## What is this Co-simulation doing differently?
-
-The Federate Integration Co-simulation is modeling the exact same interaction as in the [**Base Example**](./fundamental_default#what-is-this-co-simulation-doing). Please reference the Base Example for information about the research question addressed by this co-simulation.
-
-This example does not differ from the Base Example in its calculations.
-
-## HELICS Components
-
-The components for this example are largely the same as [**Base Example**](./fundamental_default#helics-components):
-
-1. Register and Configure Federates
-2. Enter Execution Mode
-3. Define Time Variables
-4. Initiate Time Steps for the Time Loop
-5. Send and Receive Communication between Federates
-6. Finalize Co-simulation
-
-The only difference is with **registering and configuring the federates**, which is described in the next section.
 
 ## Federate Integration with PyHELICS API
 
