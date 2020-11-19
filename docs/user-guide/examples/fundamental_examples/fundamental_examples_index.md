@@ -3,10 +3,17 @@
 
 The Fundamental Examples teach three concepts to build on a default setup:
 
-1. [Base Example](./fundamental_default.md)
-2. [Federate Integration with the API](./fundamental_fedintegration.md)
-2. [Message and Communication Configuration](./fundamental_communication.md)
-3. [Integrating multiple concepts](./fundamental_final.md)
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    
+    fundamental_default
+    fundamental_fedintegration
+    fundamental_communication
+    fundamental_final
+
+```
 
 
 ![](../../../img/user_guide_combinations_fundamental.png)
@@ -27,9 +34,11 @@ This page describes the model -- what is the research question addressed, and wh
 
 
 <a name="where-is-the-code">
+<strong>
 <span style="font-size:larger;color:black;text-decoration:underline;">
-**Where is the code?**
+Where is the code?
 </span>
+</strong>
 </a>
 
 The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
@@ -38,9 +47,11 @@ The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examp
 
 
 <a name="what-is-this-co-simulation-doing">
+<strong>
 <span style="font-size:larger;color:black;text-decoration:underline;">
-**What is this Co-simulation doing?**
+What is this Co-simulation doing?
 </span>
+</strong>
 </a>
 
 The Fundamental Examples model the interaction between five electric vehicles (EVs) each connected to a charging station -- five EVs, five charging stations. You can imagine that five EVs enter a parking garage filled with charging stations (charging garage). We will be modeling the EVs as if they are solely their on-board batteries.
@@ -97,17 +108,21 @@ Now that we know these three quantities -- the number of EVs, the capacity of th
 The `Battery.py` federate can tell us the SOC of each EV throughout the co-simulation, and the `Charger.py` federate can tell us the aggregate power draw from all the EVs throughout the co-simulation. The co-simulation will be run for one week.
 
 <a name="helics-components">
+<strong>
 <span style="font-size:larger;color:black;text-decoration:underline;">
-**HELICS Components**
+HELICS Components
 </span>
+</strong>
 </a>
 
 We know conceptually what we want to (co-)simulate. What are the necessary HELICS components to knit these two federates into one co-simulation?
 
 <a name="register-and-configure-federates">
+<strong>
 <span style="color:black;text-decoration:underline;">
-**Register and Configure Federates**
+Register and Configure Federates
 </span>
+</strong>
 </a>
 
 The first task is to register and configure the federates with HELICS within each python program:
@@ -124,9 +139,11 @@ The first task is to register and configure the federates with HELICS within eac
 Since we are configuring with external JSON files, this is done in one line! 
 
 <a name="enter-execution-mode">
+<strong>
 <span style="color:black;text-decoration:underline;">
-**Enter Execution Mode**
+Enter Execution Mode
 </span>
+</strong>
 </a>
 
 The HELICS co-simulation starts by instructing each federate to enter execution mode.
@@ -139,9 +156,11 @@ The HELICS co-simulation starts by instructing each federate to enter execution 
 ```
 
 <a name="define-time-variables">
+<strong>
 <span style="color:black;text-decoration:underline;">
-**Define Time Variables**
+Define Time Variables
 </span>
+</strong>
 </a>
 
 Time management is a vital component to HELICS co-simulations. Every HELICS co-simulation needs to be provided information about the start time (`grantedtime`), the end time (`total_interval`) and the time step (`update_interval`). Federates can step through time at different rates [LINK TO TIME MD], and it is allowable to have federates start and stop at different times, but this must be curated to meet the needs of the research question.
@@ -158,9 +177,11 @@ Time management is a vital component to HELICS co-simulations. Every HELICS co-s
 ```
 
 <a name="initiate-time-steps-for-the-time-loop">
+<strong>
 <span style="color:black;text-decoration:underline;">
-**Initiate Time Steps for the Time Loop**
+Initiate Time Steps for the Time Loop
 </span>
+</strong>
 </a>
 
 Starting the co-simulation time sequence is also a function of the needs of the research question. In the Base Example, the EVs will already be "connected" to the Chargers and will be waiting for the voltage signal from the Charger. This means we need to set up a signal to send from the Charger to the EV *before* the EV requests the signal.
@@ -208,9 +229,11 @@ In the `Charger.py` federate, we need to send the first signal **before** enteri
 
 
 <a name="send-receive-communication-between-federates">
+<strong>
 <span style="color:black;text-decoration:underline;">
-**Send/Receive Communication between Federates**
+Send/Receive Communication between Federates
 </span>
+</strong>
 </a>
 
 Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the handles to which they have subscribed, and then send information from the handles from which they publish.
@@ -253,9 +276,11 @@ And publishes the charging voltage at its publication handle:
 ```
 
 <a name="finalize-co-simulation">
+<strong>
 <span style="color:black;text-decoration:underline;">
-**Finalize Co-simulation**
+Finalize Co-simulation
 </span>
+</strong>
 </a>
 
 After all the time steps have completed, it's good practice to finalize the co-simulation by freeing the federates and closing the HELICS libraries:
@@ -268,15 +293,4 @@ h.helicsCloseLibrary()
 ```
 
 
-
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-    
-    fundamental_default
-    fundamental_fedintegration
-    fundamental_communication
-    fundamental_final
-
-```
 
