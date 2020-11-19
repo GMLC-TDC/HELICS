@@ -23,9 +23,10 @@ The Advanced Base example walks through a HELICS co-simulation between three pyt
 The Advanced Base Example tutorial is organized as follows:
 
 * [Example files](#example-files)  
-* [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-  * [Differences as Compared to the Base Example](#differences-as-compared-to-the-base-example)
-* [HELICS Components](#helics-components) 
+* [Co-simulation Setup](#co-simulation-setup)
+	* [Messages + Values](#messages-values)
+	* [Co-simulation Execution and Results](#co-simulation-execution-and-results)
+* [Questions and Help](#questions-and-help)
 
 
 
