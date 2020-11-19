@@ -1,6 +1,7 @@
 # Advanced Examples
 
 
+The Advanced Examples teach four concepts to build on a default setup:
 
 
 ```eval_rst
@@ -16,28 +17,43 @@
 ```
 
 
-The Advanced Examples teach four concepts to build on a default setup:
-
-1. Message and Communication Configuration
-	* Multi-source inputs
-	* Queries
-	* Integration with NS3
-2. Brokers
-	* Multiple cores
-	* Broker hierarchies
-3. Orchestration
-4. Many types of federates
-
 
 ![placeholder](../../../img/user_guide_combinations_advanced.png)
 
-## Where is the code?
+
+The Advanced Examples are modular, but build upon the base example. Users are encouraged to dive into a specific concept to build their HELICS knowledge once they have mastered the default setup in the base example.
+
+This page describes the model for the Advanced Examples. This model is topically the same as the Fundamental Examples, but more complex in its execution. This allows the research question to become more nuanced, and for the user to define new components to a HELICS co-simulation.
+
+* [Where is the code?](#where-is-the-code)
+* [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
+	* [Differences Compared to the Fundamental Examples](#differences-compared-to-the-fundamental-examples)
+		* [HELICS Differences](#helics-differences)
+		* [Research Question Complexity Differences](#research-question-complexity-differences)
+* [HELICS Components](#helics-components)
+	* [Federates with infinite time](#federates-with-infinite-time)
+	* [Initial time requests and model initialization](#initial-time-requests-and-model-initialization)
+
+
+<a name="where-is-the-code">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+Where is the code?
+</span>
+</strong>
+</a>
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
 
 [![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 
-## What is this Co-simulation doing?
+<a name="what-is-this-co-simulation-doing">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+What is this Co-simulation doing?
+</span>
+</strong>
+</a>
 
 The Advanced Examples are similar in theme to the [Base Example](../fundamental_examples/fundamental_default.md) in that both are looking at power management for an EV charging garage. The implemented federates, however, are slightly more sophisticated and include a new centralized charging controller federate. 
 
@@ -47,16 +63,34 @@ The Advanced Examples are similar in theme to the [Base Example](../fundamental_
 
 Every time charging is terminated on an EV, a new EV to take its place is randomly assigned a supported charging level and initial SOC. 
 
-### Differences Compared to the Fundamental Examples
+<a name="differences-compared-to-the-fundamental-examples">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Differences Compared to the Fundamental Examples
+</span>
+</strong>
+</a>
 
 There are a few important distinctions between the Fundamental Examples and the Advanced Examples, which can be grouped into __HELICS__ differences and __research question complexity__ differences.
 
-#### HELICS Differences
+<a name="helics-differences">
+<strong>
+<span style="color:black">
+HELICS Differences
+</span>
+</strong>
+</a>
 
 1. **Communication:** Both physical value exchanges and abstract information exchanges are modeled. The exchange of physical values takes place between the Battery and Charger federates (this was also introduced in a slimmed-down fashion in the [Fundamental Communication Example](../fundamental_examples/fundamental_communication.md)). The message exchange (control signals, in this case) takes place between the Charger and Controller federates. For a further look at the difference between these two messaging mechanisms see our User Guide page on [value federates](../../fundamental_topics/value_federates.md) and [message federates.](../../fundamental_topics/message_federates.md)
 2. **Timing:** The Controller federate has no regular update interval. The Controller works in pure abstract information and has no regular time steps to simulate. As such, it requests a maximum simulated time supported by HELICS (`HELICS_TIME_MAXTIME`) and makes sure it can be interrupted by setting `uninterruptable` to `false` in its configuration file. Any time a message comes in for the Controller, HELICS grants it a time, the Controller performs the required calculation, sends out a new control signal, and requests `HELICS_TIME_MAXTIME` again.
 
-#### Research Question Complexity Differences
+<a name="research-question-complexity-differences">
+<strong>
+<span style="color:black">
+Research Question Complexity Differences
+</span>
+</strong>
+</a>
 
 In the [Fundamental Base Example](../fundamental_examples/fundamental_default.md), a similar research question is being addressed by this co-simulation anlaysis: estimate the **instantaneous power draw** from the EVs in the garage. And though you may have similar questions, there are several complicating changes in the new model:
 
@@ -71,7 +105,13 @@ This existence of two values for one property is not uncommon and is as much a f
 **TODO: Talk about how a fully charged EV is replaced in the model**
 
 
-## HELICS Components
+<a name="helics-components">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+HELICS Components
+</span>
+</strong>
+</a>
 
 The HELICS components introduced in the Fundamental Examples are extended in the Advanced Examples with additional discussion of timing and initialization of federates. These new components enter into the sequence as follows:
 
@@ -85,7 +125,14 @@ The HELICS components introduced in the Fundamental Examples are extended in the
 6. Finalize Co-simulation
 
 
-### Federates with infinite time
+<a name="federates-with-infinite-time">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Federates with infinite time
+</span>
+</strong>
+</a>
+
 Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
 
 **TODO: Get rid of fake\_max\_time**
@@ -107,7 +154,13 @@ Federates which are abstractions of reality (e.g., controllers) do not need regu
 ```
 
 
-### Initial time requests and model initialization
+<a name="initial-time-requests-and-model-initialization">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Initial time requests and model initialization
+</span>
+</strong>
+</a>
 
 As in the [Base Example](../fundamental_examples/fundamental_default.md), the EV batteries are assumed connected to the chargers at the beginning of the simulation and information exchange is initiated by the Charger federate sending the charging voltage to the Battery federate. In the Advanced Examples, this is a convenient choice as the charging voltage is constant and thus is never a function of the charging current. In a more realistic model, it's easy to imagine that the charger has an algorithm that adjusts the charging voltage based on the charging current to, say, ensure the battery is charged at a particular power level. In that case, __the dependency of the models is circular__; this is common component that needs to be addressed. 
 
