@@ -5,6 +5,7 @@
 
 ```eval_rst
 .. toctree::
+    :hidden:
     :maxdepth: 1
     
     fundamental_default
