@@ -1,39 +1,38 @@
 # Fundamental Examples
 
 
-
-
-```eval_rst
-.. toctree::
-    :hidden:
-    :maxdepth: 1
-    
-    fundamental_default
-    fundamental_fedintegration
-    fundamental_communication
-    fundamental_final
-
-```
-
-
 The Fundamental Examples teach three concepts to build on a default setup:
 
-1. Federate Integration with the API
-2. Message and Communication Configuration
-3. Integrating multiple concepts
+1. [Base Example](./fundamental_default.md)
+2. [Federate Integration with the API](./fundamental_fedintegration.md)
+2. [Message and Communication Configuration](./fundamental_communication.md)
+3. [Integrating multiple concepts](./fundamental_final.md)
 
 
 ![](../../../img/user_guide_combinations_fundamental.png)
 
 The Fundamental examples are meant to build in complexity -- if you are new to HELICS, we recommend you start with the Base Example, which is also the recommended default setup. The examples in this section start with the simplest configuration method, which makes assumptions about the system which may not be completely valid but are reasonable for learning purposes.
 
-This page describes the model -- what is the research question addressed, and what are the components to a simple HELICS co-simulation.
+This page describes the model -- what is the research question addressed, and what are the components to a simple HELICS co-simulation:
+
+* [Where is the code?](#where-is-the-code)
+* [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
+* [HELICS Components](#helics-components)
+	* [Register and Configure Federates](#register-and-configure-federates)
+	* [Enter Execution Mode](#enter-execution-mode)
+	* [Define Time Variables](#define-time-variables)
+	* [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
+	* [Send/Receive Communication between Federates](#send-receive-communication-between-federates)
+	* [Finalize Co-simulation](#finalize-co-simulation)
+
+
 
 ## Where is the code?
 
 The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
 
 [![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental)
+
 
 
 ## What is this Co-simulation doing?
@@ -187,7 +186,7 @@ In the `Charger.py` federate, we need to send the first signal **before** enteri
 
 
 
-### Send Receive Communication between Federates
+### Send/Receive Communication between Federates
 
 Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the handles to which they have subscribed, and then send information from the handles from which they publish.
 
@@ -240,4 +239,16 @@ h.helicsCloseLibrary()
 ```
 
 
+
+```eval_rst
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+    
+    fundamental_default
+    fundamental_fedintegration
+    fundamental_communication
+    fundamental_final
+
+```
 

@@ -3,14 +3,7 @@
 
 
 
-```eval_rst
-.. toctree::
-    :hidden:
-    :maxdepth: 1
-    
-    fundamental_examples/fundamental_examples_index
-    advanced_examples/advanced_examples_index
-```
+
 <!--- 
 this page should mirror the helics_co-sim_sequence, if possible
 -->
@@ -25,4 +18,14 @@ This can be addressed with a simple two-federate co-simulation, as demonstrated 
 
 ## Learning Tracks
 
-fundamental vs advanced?
+There are two learning tracks available to those hoping to improve their HELICS skills.  The Fundamental Examples are designed for users with no experience with HELICS or co-simulation.  The Advanced Examples are geared towards users who are familiar with HELICS and feel confident in their abilities to build a simple co-simuluation.  The Advanced Examples harness the full suite of HELICS capabilities, whereas the Fundamental Examples teach the user the basics.
+
+These two learning tracks each start with a "base" model, which should also be considered the recommended default settings. Examples beyond the base model within a track are modular, not sequential, allowing the user to self-guide towards concepts in which they want to gain skill.
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    
+    fundamental_examples/fundamental_examples_index
+    advanced_examples/advanced_examples_index
+```
