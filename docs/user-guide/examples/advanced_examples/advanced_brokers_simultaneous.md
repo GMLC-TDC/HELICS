@@ -177,3 +177,5 @@ The peak charging results are shown below. As can be seen, the peak power amplit
 ![placeholder](../../../img/advanced_simultaneous_power_2.png)
 
 ![placeholder](../../../img/advanced_simultaneous_power_3.png)
+
+To do a more legitimate sensitivity analysis to the population of EVs that are being charged, a sample size larger than three is almost certainly necessary. [We've put together another example](./advanced_orchestration.md) to show how to orchestrate running larger sets of co-simulations to address exactly these kinds of needs.
