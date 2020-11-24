@@ -1,4 +1,4 @@
-# Brokers - Simultaneous Cosimulation
+# Brokers - Simultaneous Co-simulations
 
 
 
@@ -20,7 +20,7 @@ This example shows how to configure a HELICS co-simulation so that multiple co-s
 	* [Differences Compared to the Fundamental Examples](#differences-compared-to-the-advanced-default-example)
 		* [HELICS Differences](#helics-differences)
 		* [Research Question Complexity Differences](#research-question-complexity-differences)
-* [Running the Co-simulations](#running-the-cosimulations)
+* [Execution and Results](#execution-and-results)
 
 
 	
@@ -153,10 +153,10 @@ Research Question Complexity Differences
 The Advanced Default example uses a random number generator to determine things like initial state-of-charge of the battery and charging power of the individual EV batteries. These factors have an impact on the charging duration for each EV battery and the peak charging power seen over the duration of the simulation. Since the later is _the_ key metric of the simulation experiment, there is strong motivation to vary the seed value for the random number generator to expand the range of results, effectively increasing the sample size. These co-simluations could each be run serially but assuming the computer in question has the horsepower, there's no reason not to run them in parallel.
 
 
-<a name="running-the-cosimulations">
+<a name="execution-and-results">
 <strong>
 <span style="color:black;text-decoration:underline;">
-Running the co-simulations
+Execution and Results
 </span>
 </strong>
 </a>
