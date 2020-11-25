@@ -9,10 +9,11 @@ The Advanced Examples teach four concepts to build on a default setup:
     :maxdepth: 1
     
     advanced_default
-    advanced_communication
     advanced_brokers_simultaneous
     advanced_brokers_hiearchies
     advanced_brokers_multibroker
+    advanced_query
+    advanced_input
     advanced_orchestration
     advanced_manyfeds
     advanced_final
