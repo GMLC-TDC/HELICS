@@ -25,8 +25,6 @@ This example shows how to configure a HELICS co-simulation so that multiple co-s
 
 	
 	
-	
-## Where is the code
 <a name="where-is-the-code">
 <strong>
 <span style="font-size:larger;color:black;text-decoration:underline;">
