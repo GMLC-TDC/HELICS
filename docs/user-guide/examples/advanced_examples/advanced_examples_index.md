@@ -13,7 +13,7 @@ The Advanced Examples teach four concepts to build on a default setup:
     advanced_brokers_hiearchies
     advanced_brokers_multibroker
     advanced_query
-    advanced_input
+    advanced_multi_input
     advanced_orchestration
     advanced_manyfeds
     advanced_final
