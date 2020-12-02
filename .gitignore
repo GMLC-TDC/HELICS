@@ -255,3 +255,4 @@ tags
 ### MATLAB ###
 *.mex*
 .DS_Store
+HELICS_xcode
