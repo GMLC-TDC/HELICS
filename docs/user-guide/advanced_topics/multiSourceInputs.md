@@ -1,10 +1,10 @@
-# Multi Source Inputs
+# Multi-Source Inputs
 
-On occasion it is useful to allow multiple source to feed an input. Creating an N to 1 relationship for publications to inputs. This could occur on situations like a summing junction, or a switch that can be turned on or off from multiple other federates, or just to gather an input vector. While technically supported prior to [2.5.1](https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.1) the control and access to this feature of HELICS was not well though through or straightforward. The developments in 2.5.1 made it possible to specify a mathematical reduce operation on multiple inputs to allow access to them as a single value or vector.
+On occasion it is useful to allow multiple source to feed an input, creating an _n_-to-one (publications to input) relationship for publications to inputs. This could occur in situations like a summing junction, or a switch that can be turned on or off from multiple other federates. Alternatively, a multi-source input can be a convenient way to collecting multiple inputs into a vector for processing by the federate. While technically supported prior to [2.5.1](https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.1) the control and access to this feature of HELICS was not well thought through or straightforward. The developments in 2.5.1 made it possible to specify a mathematical reduce operation on multiple inputs to allow access to them as a single value or vector.
 
 ## Mechanics of multi-input handling
 
-Internally HELICS manages input data in a queue when a federate is granted time the values are scanned and placed in a holding location by source. In many cases there is likely only to be a single source. But if multiple publications link to a single source the results are placed in a vector. The order in that vector is by order of linking. If a single publication value is retrieved from the Input the newest value is given as if it were a single source. In case of ties the publication that connected first is given priority.
+Internally, HELICS manages input data in a queue and when a federate is granted a time, the values are read and placed in a holding location by source. In many cases there is likely only to be a single source. But if multiple publications link to a single source the results are placed in a vector. The order in that vector is by order of linking when the federate with the multi-source input is created. If a single publication value is retrieved from the input, the newest value is given as if it were a single source. In case of ties (multiple publishing federates publishing values on the same timestep), the publication that connected first is given priority.
 
 ## Controlling the behavior
 
@@ -109,3 +109,7 @@ inputs=[
 ```
 
 The priority of the inputs in most cases determined by the order of adding the publications as a target. This is not strictly guaranteed to occur but is a general rule and only applies in the default case, and possibly the diff operation.
+
+## Example
+
+A [full co-simulation example](./examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input).
