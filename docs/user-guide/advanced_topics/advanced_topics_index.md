@@ -19,7 +19,7 @@
 - [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 - [**Cores**](./CoreTypes.md) - Discussion of the different types of message-passing buses and their implementation as HELICS cores
 - **Multiple Brokers**
-	- [**Connecting Multiple Core Types**](./multibroker.md) What to do when one type of communication isn't sufficient.
+	- [**Connecting Multiple Core Types**](./multibroker.md) What to do when one type of communication isn't sufficient. **TDH**: I've already referenced the multi-broker example in CoreTypes.md. The only content in this file that isn't in the example is the "Limitations" section.
 	- [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to
 - **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
