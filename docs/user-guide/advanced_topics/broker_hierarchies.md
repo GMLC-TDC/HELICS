@@ -14,9 +14,9 @@ So, using an example we've seen several times, imagine a scenario where a single
 
 The diagrams below show the message and broker topologies for this hypothetical examples.
 
-![Message topology](../img/broker_hierarchy_message_topology.png)
+![](../../img/broker_hierarchy_message_topology.png)
 
-![Broker topology](../img/broker_hierarchy_broker_topology.png)
+![](../../img/broker_hierarchy_broker_topology.png)
 
 ## Broker Hierarchy Implementation
 
@@ -47,3 +47,8 @@ Lastly, the JSON config file for the Transmission and Generation System federate
     ...
 }
 ```
+
+## Example
+
+
+A [full co-simulation example](./examples/advanced_examples/broker_hierarchies.md) showing how to implement a broker hierarchy  [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/hierarchies).
