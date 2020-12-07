@@ -38,25 +38,13 @@ This page describes the model for the Advanced Examples. This model is topically
 	* [Initial time requests and model initialization](#initial-time-requests-and-model-initialization)
 
 
-<a name="where-is-the-code">
-<strong>
-<span style="font-size:larger;color:black;text-decoration:underline;">
-Where is the code?
-</span>
-</strong>
-</a>
+##Where is the code?
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
 
 [![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 
-<a name="what-is-this-co-simulation-doing">
-<strong>
-<span style="font-size:larger;color:black;text-decoration:underline;">
-What is this Co-simulation doing?
-</span>
-</strong>
-</a>
+##What is this Co-simulation doing?
 
 The Advanced Examples are similar in theme to the [Base Example](../fundamental_examples/fundamental_default.md) in that both are looking at power management for an EV charging garage. The implemented federates, however, are slightly more sophisticated and include a new centralized charging controller federate. 
 
@@ -66,34 +54,16 @@ The Advanced Examples are similar in theme to the [Base Example](../fundamental_
 
 Every time charging is terminated on an EV, a new EV to take its place is randomly assigned a supported charging level and initial SOC. 
 
-<a name="differences-compared-to-the-fundamental-examples">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Differences Compared to the Fundamental Examples
-</span>
-</strong>
-</a>
+###Differences Compared to the Fundamental Examples
 
 There are a few important distinctions between the Fundamental Examples and the Advanced Examples, which can be grouped into __HELICS__ differences and __research question complexity__ differences.
 
-<a name="helics-differences">
-<strong>
-<span style="color:black">
-HELICS Differences
-</span>
-</strong>
-</a>
+####HELICS Differences
 
 1. **Communication:** Both physical value exchanges and abstract information exchanges are modeled. The exchange of physical values takes place between the Battery and Charger federates (this was also introduced in a slimmed-down fashion in the [Fundamental Communication Example](../fundamental_examples/fundamental_communication.md)). The message exchange (control signals, in this case) takes place between the Charger and Controller federates. For a further look at the difference between these two messaging mechanisms see our User Guide page on [value federates](../../fundamental_topics/value_federates.md) and [message federates.](../../fundamental_topics/message_federates.md)
 2. **Timing:** The Controller federate has no regular update interval. The Controller works in pure abstract information and has no regular time steps to simulate. As such, it requests a maximum simulated time supported by HELICS (`HELICS_TIME_MAXTIME`) and makes sure it can be interrupted by setting `uninterruptable` to `false` in its configuration file. Any time a message comes in for the Controller, HELICS grants it a time, the Controller performs the required calculation, sends out a new control signal, and requests `HELICS_TIME_MAXTIME` again.
 
-<a name="research-question-complexity-differences">
-<strong>
-<span style="color:black">
-Research Question Complexity Differences
-</span>
-</strong>
-</a>
+####Research Question Complexity Differences
 
 In the [Fundamental Base Example](../fundamental_examples/fundamental_default.md), a similar research question is being addressed by this co-simulation anlaysis: estimate the **instantaneous power draw** from the EVs in the garage. And though you may have similar questions, there are several complicating changes in the new model:
 
@@ -108,13 +78,7 @@ This existence of two values for one property is not uncommon and is as much a f
 **TODO: Talk about how a fully charged EV is replaced in the model**
 
 
-<a name="helics-components">
-<strong>
-<span style="font-size:larger;color:black;text-decoration:underline;">
-HELICS Components
-</span>
-</strong>
-</a>
+##HELICS Components
 
 The HELICS components introduced in the Fundamental Examples are extended in the Advanced Examples with additional discussion of timing and initialization of federates. These new components enter into the sequence as follows:
 
@@ -128,13 +92,7 @@ The HELICS components introduced in the Fundamental Examples are extended in the
 6. Finalize Co-simulation
 
 
-<a name="federates-with-infinite-time">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Federates with infinite time
-</span>
-</strong>
-</a>
+###Federates with infinite time
 
 Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
 
@@ -157,13 +115,8 @@ Federates which are abstractions of reality (e.g., controllers) do not need regu
 ```
 
 
-<a name="initial-time-requests-and-model-initialization">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Initial time requests and model initialization
-</span>
-</strong>
-</a>
+###Initial time requests and model initialization
+
 
 As in the [Base Example](../fundamental_examples/fundamental_default.md), the EV batteries are assumed connected to the chargers at the beginning of the simulation and information exchange is initiated by the Charger federate sending the charging voltage to the Battery federate. In the Advanced Examples, this is a convenient choice as the charging voltage is constant and thus is never a function of the charging current. In a more realistic model, it's easy to imagine that the charger has an algorithm that adjusts the charging voltage based on the charging current to, say, ensure the battery is charged at a particular power level. In that case, __the dependency of the models is circular__; this is common component that needs to be addressed. 
 
