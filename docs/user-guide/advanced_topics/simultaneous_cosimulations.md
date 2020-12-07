@@ -1,77 +1,98 @@
 # Simultaneous Co-simulations
 
-Sometimes it is necessary or desirable to be able to execute multiple simultaneous simulations on a single computer system. Either for increased parallelism or from multiple users or as part of a larger coordinated execution for sensitivity analysis or uncertainty quantification. HELICS includes a number of different options for managing this and making it easier.
+Sometimes it is necessary or desirable to be able to execute multiple simultaneous simulations on a single computer system. For example, there may be a need to run a large number of co-simulations as part of a sensitivity study. HELICS includes a number of different options for managing this and making it easier.
 
-## General Notes
-
-HELICS starts with some default port numbers for network communication, so only a single broker (per core type) with default options is allowed to be running on a single computer at a given time. This is the general restriction on running multiple simultaneous co-simulations. It is not allowed to have multiple default brokers running at the same time, the network ports will interfere and the co-simulation will fail.
-
-There are a number of ways around this and some tools to assist in checking and coordinating.
+The key limitation is the network port number used to form the HELICS communication bus. Unless otherwise specified, HELICS uses a default port numbers for this bus, so only a single broker (per core type) with default options is able to run on a single compute node at a given time. There are a number of ways around this and some tools to assist in checking and coordinating.
 
 ## Specify port numbers
 
-The manual approach works fine. All the network core types accept user specified port numbers. The following script will start up two brokers on separate port numbers:
+The most straight-forward way of working around this port number limitation is by manually specifying a given port for each co-simulation to be run. For this to to work, the port number must be defined for all co-simulation participants, including the HELICS broker. 
 
-```sh
+
+Broker:
+```
 helics_broker --type=zmq --port=20200 &
-helics_broker --type=zmq --port=20400 &
 ```
 
-Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker. These brokers operate independently of each other. The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.
+Federate (in JSON config file):
+```json
+{
+  "name": "federate_name",
+  "loglevel": 1,
+  "coreType": "zmq",
+  "brokerPort": "20100",
+  ...
+```
+
+### Example
+
+A [full co-simulation example](./examples/advanced_examples/advanced_brokers_simultaneous.md) demonstrating simultaneous co-simulations in this manner is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simultaneous).
+
 
 ## Use Broker server
 
-For the zmq, zmqss, tcp, and udp core types it is possible to use the broker server.
+For the zmq, zmqss, tcp, and udp core types it is possible to create HELICS co-simulations using a broker server. A broker server is a built-in HELICS application that generates a broker or use by the co-simulation on-demand. The user launches the broker server instead, specifying which core type to use, and when the co-simulation is launched, the broker_server will generate a broker on a unique port number for the federation to use and direct all the federates in the federation to use that port.
 
+broker_server command-line launch:
 ```sh
 helics_broker_server --zmq
-helics_broker_server --zmqss
-helics_broker_server --tcp
-helics_broker_server --udp
 ```
 
-multiple broker servers can be run simultaneously
+Multiple broker servers can be run simultaneously:
 
+broker_server command-line launch:
 ```sh
 helics_broker_server --zmq --tcp --udp
 ```
 
-The broker server currently has a default timeout of 30 minutes on the default port and will automatically generate brokers on separate ports and direct federates which broker to use. The duration of the server can be controlled via
+The broker server has a default timeout of 30 minutes on the default port  The duration of the server can be controlled via a command-line option on launch:
 
 ```sh
 helics_broker_server --zmq --duration=24hours
 ```
 
-It will also generate brokers as needed so the `helics_broker` does not need to be restarted for every run.
 
-By default the servers will use the default ports and all interfaces. This can be configured through a configuration file
+By default the servers will use the default ports and all interfaces. This can be set through a configuration file
 
+broker_server command-line launch:
 ```sh
 helics_broker_server --zmq --duration=24hours --config=broker_config.json
 ```
 
-this is a json file. The sections in the json file include the server type For example
 
+borker_config.json
 ```json
 {
   "zmq": {
     "interface": "tcp://127.0.0.1"
   },
   "tcp": {
-    "interface": "127.0.0.1",
+    "interface": "tcp://127.0.0.1",
     "port": 9568
   }
 }
 ```
 
-There is also a [webserver](./webserver.md) that can be run with the other broker servers.
 
 ## Use of keys
 
-If there are multiple users and you want to verify that a specific broker can only be used with federates you control. It is possible to add a key to the broker that is required to be supplied with the federates to connect to the broker. **NOTE:** _this is not a cryptographic key, it is just a string that is not programmatically accessible to others._
+The previous techniques have used methods to create separate brokers and network connections to segregate the traffic for each simultaneously running co-simulation. Alternatively, the use of broker keys allows traffic from multiple co-simulations to flow through the same broker yet not interfere with each other. **NOTE:** _This key is not a cryptographic key, it is just a string to mark co-simulation traffic as belonging to a specific federation._
 
+broker_server command-line launch:
 ```sh
 helics_broker --type=zmq --key=my_broker_key
 ```
 
-Federates then need to supply the key as part of the configuration string otherwise the broker will return an error on connection. This is like a fence that prevents some accidental interactions. The rule is that both the federate and broker must provide no key or the same key.
+Federate configuration:
+```json
+{
+  "name": "federate_name",
+  "loglevel": 1,
+  "coreType": "zmq",
+  "coreInitString": "--key=my_broker_key"
+  ...
+```
+
+
+## Orchestration Tool
+We would be remise to not mention that the HELICS team has been using a specific orchestration tool, [Merlin](https://github.com/LLNL/merlin), to manage the work around running multiple co-simulations. This tool allows for higher-level management of co-simulations when a particular analysis requires multiple co-simulation runs to get the final results. See the [User Guide section](./orchestration.md) on the tool to learn more.
