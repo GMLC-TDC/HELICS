@@ -21,7 +21,9 @@ A target is specified, and can be one of the following. A federate named one of 
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``root``, ``federation``, ``rootbroker`` | The root broker of the federation                                                     |
 +------------------------------------------+---------------------------------------------------------------------------------------+
-| ``global``                               | Retrieve the data associated with a global variable                                   |
+| ``global``                               | Retrieve the data associated with a global variable in a json format                  |
++------------------------------------------+---------------------------------------------------------------------------------------+
+| ``global_value``                         | Retrieve the data associated with a global variable in direct string (no formatting)  |
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``parent``                               | The parent of the caller                                                              |
 +------------------------------------------+---------------------------------------------------------------------------------------+

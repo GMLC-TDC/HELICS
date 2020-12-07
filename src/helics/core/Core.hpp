@@ -789,7 +789,8 @@ class Core {
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", "core", or the name of a specific object/core/broker
-    target can also be "global" to query a global value stored in the broker
+    target can also be "global_value" to query a global value stored in the broker, or "global" to
+    get a json structure with the name and value
     @param target the specific target of the query
     @param queryStr the actual query
     @return a string containing the response to the query.  Query is a blocking call and will not

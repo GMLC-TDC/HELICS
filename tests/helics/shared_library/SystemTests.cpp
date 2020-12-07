@@ -20,12 +20,12 @@ TEST(other_tests, broker_global_value)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsBrokerSetGlobal(brk, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global", "testglobal");
+    auto q = helicsCreateQuery("global_value", "testglobal");
     auto res = helicsQueryBrokerExecute(q, brk, &err);
     EXPECT_EQ(res, globalVal);
     helicsBrokerSetGlobal(brk, "testglobal2", globalVal2.c_str(), &err);
     helicsQueryFree(q);
-    q = helicsCreateQuery("global", "testglobal2");
+    q = helicsCreateQuery("global_value", "testglobal2");
     res = helicsQueryBrokerExecute(q, brk, &err);
     EXPECT_EQ(res, globalVal2);
 
@@ -70,12 +70,12 @@ TEST(other_tests, core_global_value)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsCoreSetGlobal(cr, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global", "testglobal");
+    auto q = helicsCreateQuery("global_value", "testglobal");
     auto res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal);
     helicsCoreSetGlobal(cr, "testglobal2", globalVal2.c_str(), &err);
     helicsQueryFree(q);
-    q = helicsCreateQuery("global", "testglobal2");
+    q = helicsCreateQuery("global_value", "testglobal2");
     res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal2);
     res = helicsQueryCoreExecute(nullptr, cr, &err);
@@ -137,12 +137,12 @@ TEST(other_tests, federate_global_value)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsFederateSetGlobal(fed, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global", "testglobal");
+    auto q = helicsCreateQuery("global_value", "testglobal");
     auto res = helicsQueryExecute(q, fed, &err);
     EXPECT_EQ(res, globalVal);
     helicsFederateSetGlobal(fed, "testglobal2", globalVal2.c_str(), &err);
     helicsQueryFree(q);
-    q = helicsCreateQuery("global", "testglobal2");
+    q = helicsCreateQuery("global_value", "testglobal2");
     helicsQueryExecuteAsync(q, fed, &err);
     while (helicsQueryIsCompleted(q) == helics_false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -350,7 +350,7 @@ TEST(other_tests, broker_after_close)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsBrokerSetGlobal(brk, "testglobal", globalVal.c_str(), &err);
-    auto q = helicsCreateQuery("global", "testglobal");
+    auto q = helicsCreateQuery("global_value", "testglobal");
     auto res = helicsQueryBrokerExecute(q, brk, &err);
     EXPECT_EQ(res, globalVal);
     helicsBrokerSetGlobal(brk, "testglobal2", globalVal2.c_str(), &err);

@@ -17,13 +17,13 @@ TEST(broker_tests, global_value_test)
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     brk->setGlobal("testglobal", globalVal);
-    auto res = brk->query("global", "testglobal");
+    auto res = brk->query("global_value", "testglobal");
     EXPECT_EQ(res, globalVal);
     brk->setGlobal("testglobal2", globalVal2);
 
-    res = brk->query("global", "testglobal");
+    res = brk->query("global_value", "testglobal");
     EXPECT_EQ(res, globalVal);
-    res = brk->query("global", "testglobal2");
+    res = brk->query("global_value", "testglobal2");
     EXPECT_EQ(res, globalVal2);
     brk->disconnect();
     EXPECT_FALSE(brk->isConnected());

@@ -4,7 +4,10 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+using ::testing::HasSubstr;
 
 #ifdef _MSC_VER
 #    pragma warning(push, 0)
@@ -269,25 +272,29 @@ TEST(CoreAppTests, core_global_file_ci_skip)
 
     Fed1->enterInitializingModeComplete();
 
-    auto str1 = Fed1->query("global", "global1");
+    auto str1 = Fed1->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = Fed2->query("global", "global1");
+    str1 = Fed2->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = app.query("global", "GlobalB");
+    str1 = app.query("global_value", "GlobalB");
     EXPECT_EQ(str1, "excited");
-    str1 = brk.query("global", "GlobalC");
+    str1 = brk.query("global_value", "GlobalC");
     EXPECT_EQ(str1, "excited_too");
 
-    str1 = Fed1->query("global", "global2");
+    str1 = Fed1->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = Fed2->query("global", "global2");
+    str1 = Fed2->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = app.query("global", "global2");
+    str1 = app.query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = brk.query("global", "global2");
+    str1 = brk.query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
 
-    auto str3 = Fed1->query("global", "all");
+    str1 = brk.query("global", "global2");
+    EXPECT_THAT(str1, HasSubstr("\"global2\""));
+    EXPECT_THAT(str1, HasSubstr("\"value\""));
+    EXPECT_THAT(str1, HasSubstr("\"this is another global value\""));
+    auto str3 = Fed1->query("global_value", "all");
     EXPECT_NE(str3, "#invalid");
     Fed1->finalize();
     Fed2->finalize();

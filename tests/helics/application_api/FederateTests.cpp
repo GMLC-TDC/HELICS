@@ -1013,14 +1013,14 @@ TEST_P(federate_global_files, global_file_ci_skip)
 
     Fed1->enterInitializingModeComplete();
 
-    auto str1 = Fed1->query("global", "global1");
+    auto str1 = Fed1->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = Fed2->query("global", "global1");
+    str1 = Fed2->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
 
-    str1 = Fed1->query("global", "global2");
+    str1 = Fed1->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = Fed2->query("global", "global2");
+    str1 = Fed2->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
     Fed1->finalize();
     Fed2->finalize();
@@ -1048,28 +1048,28 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
 
     Fed1->enterInitializingModeComplete();
 
-    auto str1 = Fed1->query("global", "global1");
+    auto str1 = Fed1->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = Fed2->query("global", "global1");
+    str1 = Fed2->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = cr->query("global", "global1");
+    str1 = cr->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = brk->query("global", "global1");
+    str1 = brk->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
 
-    str1 = Fed1->query("global", "global2");
+    str1 = Fed1->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = Fed2->query("global", "global2");
+    str1 = Fed2->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = cr->query("global", "global2");
+    str1 = cr->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = brk->query("global", "global2");
+    str1 = brk->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
 
-    auto str2 = Fed1->query("global", "list");
+    auto str2 = Fed1->query("global_value", "list");
     EXPECT_TRUE((str2 == "[\"global1\",\"global2\"]") || (str2 == "[\"global2\",\"global1\"]"));
 
-    auto str3 = Fed1->query("global", "all");
+    auto str3 = Fed1->query("global_value", "all");
     EXPECT_NE(str3, "#invalid");
     Fed1->finalize();
     Fed2->finalize();
