@@ -19,8 +19,6 @@ The Advanced Examples teach four concepts to build on a default setup:
     advanced_final
 ```
 
-
-
 ![placeholder](../../../img/user_guide_combinations_advanced.png)
 
 
