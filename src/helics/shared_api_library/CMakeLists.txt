@@ -98,7 +98,7 @@ if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
 endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.h ${CMAKE_CURRENT_BINARY_DIR}/helics_api.h
+    install(FILES ${HELICS_SOURCE_DIR}/src/helics/helics.h ${HELICS_SOURCE_DIR}/src/helics/helics_api.h
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers
     )
 

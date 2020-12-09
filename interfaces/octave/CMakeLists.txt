@@ -18,9 +18,6 @@ if(NOT MKOCTFILE_EXECUTABLE)
     )
 endif()
 
-# Compile OCT file add_custom_target("helicsOCT" ALL)
-file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
-
 # custom command for building the wrap file
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cxx
@@ -29,7 +26,7 @@ add_custom_command(
         "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
         ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
     DEPENDS ${CMAKE_SOURCE_DIR}/interfaces/helics.i ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
-            ${CMAKE_CURRENT_SOURCE_DIR}/octave_maps.i ${SHARED_LIB_HEADERS}
+            ${CMAKE_CURRENT_SOURCE_DIR}/octave_maps.i ${CMAKE_SOURCE_DIR}/src/helics/helics.h
 )
 
 add_custom_command(
@@ -44,8 +41,8 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helics> -D
         BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp -D
-        LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/ -D
-        OTHER_INCLUDE_LOCATION=${PROJECT_BINARY_DIR}/src/helics/shared_api_library/ -D
+        LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/ -D
+        OTHER_INCLUDE_LOCATION=${PROJECT_BINARY_DIR}/src/helics/ -D
         SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
         ${CMAKE_CURRENT_SOURCE_DIR}/generateOCTcreationScript.cmake
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp

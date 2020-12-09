@@ -1,6 +1,6 @@
 
 %{
-#include "api-data.h"
+#include "helics.h"
 #include "CMatrix.h"
 #include "ov-complex.h"
 
