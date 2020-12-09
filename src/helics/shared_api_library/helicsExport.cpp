@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 #include "../core/helicsVersion.hpp"
 #include "../helics.hpp"
-#include "helics.h"
+#include "helicsCore.h"
 #include "helics/helics-config.h"
 #include "internal/api_objects.h"
 

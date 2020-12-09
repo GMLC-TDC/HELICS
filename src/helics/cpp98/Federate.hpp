@@ -8,9 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_FEDERATE_HPP_
 #pragma once
 
-#include "../shared_api_library/MessageFilters.h"
-#include "../shared_api_library/helics.h"
-#include "../shared_api_library/helicsCallbacks.h"
+#include "../helics.h"
 #include "Filter.hpp"
 #include "config.hpp"
 #include "helicsExceptions.hpp"

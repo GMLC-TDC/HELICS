@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Created on Mon Dec  7 14:25:17 2020
@@ -6,8 +7,19 @@ Created on Mon Dec  7 14:25:17 2020
 """
 
 import re
+import sys
+import os
 
-outfile=open("helics.h","w")
+outpath='./'
+inpath='../'
+
+if len(sys.argv) > 1:
+    outpath=sys.argv[1]
+    
+if len(sys.argv) > 2:
+    inpath=sys.argv[2]
+    
+outfile=open(os.path.join(outpath,"helics.h"),"w")
 
 outfile.write("/*\n")
 outfile.write("Copyright (c) 2017-2020,\n")
@@ -33,16 +45,21 @@ outfile.write("#endif\n\n")
               
 outfile.write("#define HELICS_DEPRECATED\n\n")
               
-files=['../src/helics/helics_enums.h',
-       '../src/helics/shared_api_library/api-data.h',
-       '../src/helics/shared_api_library/helics.h',
-       '../src/helics/shared_api_library/ValueFederate.h',
-       '../src/helics/shared_api_library/MessageFederate.h',
-       '../src/helics/shared_api_library/MessageFilters.h',
-       '../src/helics/shared_api_library/helicsCallbacks.h']
+              
+outfile.write("#ifdef __cplusplus\n")
+outfile.write('extern "C" {\n')
+outfile.write("#endif\n")
+              
+files=['src/helics/helics_enums.h',
+       'src/helics/shared_api_library/api-data.h',
+       'src/helics/shared_api_library/helicsCore.h',
+       'src/helics/shared_api_library/ValueFederate.h',
+       'src/helics/shared_api_library/MessageFederate.h',
+       'src/helics/shared_api_library/MessageFilters.h',
+       'src/helics/shared_api_library/helicsCallbacks.h']
 
 for file in files:
-   file_in = open(file,"r")
+   file_in = open(os.path.join(inpath,file),"r")
    contents=file_in.read()
    contents=re.sub('#ifdef __cplusplus[^#]*#endif','',contents)
    contents=re.sub('/*Copyright[^\*]*/','',contents)
@@ -56,11 +73,15 @@ for file in files:
    outfile.write(contents)
 
 
+outfile.write("#ifdef __cplusplus\n")
+outfile.write('} /* end of extern "C" { */\n')
+outfile.write("#endif\n")
+              
 outfile.write("#endif\n")
 outfile.close()
    
 
-outfile2=open("helics_api.h","w")
+outfile2=open(os.path.join(outpath,"helics_api.h"),"w")
 
 outfile2.write("/*\n")
 outfile2.write("Copyright (c) 2017-2020,\n")
@@ -74,7 +95,7 @@ outfile2.write("#include <stdint.h>\n\n")
               
 
 for file in files:
-   file_in = open(file,"r")
+   file_in = open(os.path.join(inpath,file),"r")
    contents=file_in.read()
    contents=re.sub('#ifdef __cplusplus[^#]*#endif','',contents)
    contents=re.sub('/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/','',contents)
@@ -86,6 +107,11 @@ for file in files:
    contents=re.sub('^[^#]*#ifndef[^#]*#define[^\n]*\n[\s]*','',contents)
    contents=re.sub('\n\n\n','\n\n',contents)
    contents=re.sub('\n\n\n','\n\n',contents)
+   contents=re.sub('\);\n\n',');\n',contents)
+   contents=re.sub(',\n\s*\n',',\n',contents)
+   contents=re.sub('{\n\s*\n','{\n',contents)
+   contents=re.sub('\n\s*\n}','\n}',contents)
+   contents=re.sub('\n ','\n',contents)
    file_in.close()
    outfile2.write(contents)
 

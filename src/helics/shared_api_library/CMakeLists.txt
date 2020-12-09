@@ -8,7 +8,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 set(helicsShared_headers
-    helics.h
+    helicsCore.h
     api-data.h
     ValueFederate.h
     MessageFederate.h
@@ -98,15 +98,11 @@ if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
 endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.h ${CMAKE_CURRENT_BINARY_DIR}/helics_api.h
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers
     )
 
-    install(FILES ${helicsShared_headers}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers
-    )
-
-    install(FILES ../chelics.h ../helics98.hpp ../helics_enums.h
+    install(FILES ../helics98.hpp
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers
     )
 endif()
