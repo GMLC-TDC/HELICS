@@ -8,9 +8,7 @@
 %module helics
 
 %{
-#include "ValueFederate.h"
-#include "MessageFederate.h"
-#include "MessageFilters.h"
+#include "helics.h"
 %}
 
 %apply double *OUTPUT {double*};
@@ -28,9 +26,4 @@
 %ignore helicsMessageGetRawDataPointer;
 %ignore helicsMessageResize;
 
-%include "../helics_enums.h"
-%include "api-data.h"
-%include "helics.h"
-%include "ValueFederate.h"
-%include "MessageFederate.h"
-%include "MessageFilters.h"
+%include "../helics.h"
