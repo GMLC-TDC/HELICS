@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_FILTER_HPP_
 #pragma once
 
-#include "../helics.h"
+#include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
 #include <string>

@@ -27,7 +27,7 @@ add_library(helicsCpp98 INTERFACE)
 target_link_libraries(helicsCpp98 INTERFACE helics)
 add_library(HELICS::helicsCpp98 ALIAS helicsCpp98)
 target_include_directories(
-    helicsCpp98 INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/helics>
+    helicsCpp98 INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
                           $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
 )
 
