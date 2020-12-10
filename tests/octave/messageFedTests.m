@@ -138,7 +138,7 @@ end
 %! helicsFederateEnterExecutingMode(feds.mFed);
 %! data = 'this is a random string message';
 %!
-%! helicsEndpointSendToAt(epid1,'ep2',1.0,data);
+%! helicsEndpointSendBytesToAt(epid1,data,'ep2',1.0);
 %!
 %! granted_time=helicsFederateRequestTime(feds.mFed,2.0);
 %! assert(granted_time,1.0);

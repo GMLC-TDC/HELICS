@@ -48,14 +48,8 @@ add_executable(
 )
 
 target_link_libraries(shared-library-tests helics_test_base helics)
-target_link_libraries(shared-library-tests-cpp helics_test_base helics)
+target_link_libraries(shared-library-tests-cpp helics_test_base helicsCpp98)
 
-target_include_directories(
-    shared-library-tests PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes
-)
-target_include_directories(
-    shared-library-tests-cpp PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes
-)
 set_target_properties(shared-library-tests shared-library-tests-cpp PROPERTIES FOLDER tests)
 
 target_compile_definitions(

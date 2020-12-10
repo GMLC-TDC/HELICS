@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_
 #define HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_
 
-#include "helics.h"
+#include "helicsCore.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../coreTypeLists.hpp"
-#include "../src/helics/cpp98/Broker.hpp"
-#include "../src/helics/cpp98/Core.hpp"
-#include "../src/helics/cpp98/Federate.hpp"
+#include "helics/cpp98/Broker.hpp"
+#include "helics/cpp98/Core.hpp"
+#include "helics/cpp98/Federate.hpp"
 #include "helics/helics-config.h"
 
 #include <memory>
