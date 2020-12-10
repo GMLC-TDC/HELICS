@@ -8,7 +8,7 @@
 %module helics
 
 %{
-#include "helics.h"
+#include "helics/helics.h"
 %}
 
 %apply double *OUTPUT {double*};
@@ -26,4 +26,4 @@
 %ignore helicsMessageGetRawDataPointer;
 %ignore helicsMessageResize;
 
-%include "../helics.h"
+%include "helics/helics.h"

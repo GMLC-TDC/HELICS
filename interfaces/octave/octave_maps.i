@@ -1,6 +1,6 @@
 
 %{
-#include "helics.h"
+#include "helics/helics.h"
 #include "CMatrix.h"
 #include "ov-complex.h"
 
