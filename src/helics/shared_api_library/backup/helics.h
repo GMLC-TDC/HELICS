@@ -10,17 +10,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #if defined _WIN32 || defined __CYGWIN__
-    #ifdef __GNUC__
-        #define HELICS_EXPORT __attribute__ ((dllimport))
-    #else
-        #define HELICS_EXPORT __declspec(dllimport)
-    #endif
+#    ifdef __GNUC__
+#        define HELICS_EXPORT __attribute__((dllimport))
+#    else
+#        define HELICS_EXPORT __declspec(dllimport)
+#    endif
 #else
-    #define HELICS_EXPORT
+#    define HELICS_EXPORT
 #endif
 
 #define HELICS_DEPRECATED
@@ -34,8 +34,7 @@ extern "C" {
 
 /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
 typedef enum {
-    helics_core_type_default =
-        0, /*!< a default core type that will default to something available*/
+    helics_core_type_default = 0, /*!< a default core type that will default to something available*/
     helics_core_type_zmq = 1, /*!< use the Zero MQ networking protocol */
     helics_core_type_mpi = 2, /*!< use MPI for operation on a parallel cluster */
     helics_core_type_test = 3, /*!< use the Test core if all federates are in the same process */
@@ -47,11 +46,9 @@ typedef enum {
     helics_core_type_ipc = 5,
     helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
     helics_core_type_udp = 7, /*!< use UDP packets to send the data */
-    helics_core_type_zmq_test =
-        10, /*!< single socket version of ZMQ core usually for high fed count on the same system*/
+    helics_core_type_zmq_test = 10, /*!< single socket version of ZMQ core usually for high fed count on the same system*/
     helics_core_type_nng = 9, /*!< for using the nanomsg communications */
-    helics_core_type_tcp_ss =
-        11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
+    helics_core_type_tcp_ss = 11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
     helics_core_type_http = 12, /*!< a core type using http for communication*/
     helics_core_type_websocket = 14, /*!< a core using websockets for communication*/
     helics_core_type_inproc = 18, /*!< an in process core type for handling communications in shared
@@ -187,19 +184,14 @@ typedef enum {
     helics_error_fatal = -404, /*!< global fatal error for federation */
     helics_error_external_type = -203, /*!< an unknown non-helics error was produced */
     helics_error_other = -101, /*!< the function produced a helics error of some other type */
-    helics_error_insufficient_space =
-        -18, /*!< insufficient space is available to store requested data */
+    helics_error_insufficient_space = -18, /*!< insufficient space is available to store requested data */
     helics_error_execution_failure = -14, /*!< the function execution has failed */
-    helics_error_invalid_function_call =
-        -10, /*!< the call made was invalid in the present state of the calling object */
-    helics_error_invalid_state_transition =
-        -9, /*!< error issued when an invalid state transition occurred */
+    helics_error_invalid_function_call = -10, /*!< the call made was invalid in the present state of the calling object */
+    helics_error_invalid_state_transition = -9, /*!< error issued when an invalid state transition occurred */
     helics_warning = -8, /*!< the function issued a warning of some kind */
-    helics_error_system_failure =
-        -6, /*!< the federate has terminated unexpectedly and the call cannot be completed */
+    helics_error_system_failure = -6, /*!< the federate has terminated unexpectedly and the call cannot be completed */
     helics_error_discard = -5, /*!< the input was discarded and not used for some reason */
-    helics_error_invalid_argument =
-        -4, /*!< the parameter passed was invalid and unable to be used */
+    helics_error_invalid_argument = -4, /*!< the parameter passed was invalid and unable to be used */
     helics_error_invalid_object = -3, /*!< indicator that the object used was not a valid object */
     helics_error_connection_failure = -2, /*!< the operation to connect has failed */
     helics_error_registration_failure = -1, /*!< registration has failed */
@@ -323,7 +315,6 @@ typedef enum {
  * @file
  * @brief Data structures for the C api
  */
-
 
 /**
  * opaque object representing an input
@@ -466,7 +457,6 @@ typedef struct helics_error {
 } helics_error;
 
 typedef helics_error HelicsError;
-
 
 /**
  * @file
@@ -2059,7 +2049,6 @@ HELICS_EXPORT void helicsQueryFree(helics_query query);
  */
 HELICS_EXPORT void helicsCleanupLibrary(void);
 
-
 /**
  * sub/pub registration
  */
@@ -3054,7 +3043,7 @@ HELICS_EXPORT int helicsFederateGetPublicationCount(helics_federate fed);
  */
 HELICS_EXPORT int helicsFederateGetInputCount(helics_federate fed);
 
- /* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
+/* HELICS_APISHARED_VALUE_FEDERATE_FUNCTIONS_H_*/
 /* MessageFederate Calls*/
 
 /**
@@ -3850,7 +3839,7 @@ HELICS_EXPORT void helicsMessageClear(helics_message message, helics_error* err)
 
 /**@}*/
 
- /*HELICS_APISHARED_MESSAGE_FEDERATE_FUNCTIONS_H_*/
+/*HELICS_APISHARED_MESSAGE_FEDERATE_FUNCTIONS_H_*/
 /**
  * Create a source Filter on the specified federate.
  *
@@ -4140,7 +4129,7 @@ HELICS_EXPORT int helicsFilterGetOption(helics_filter filt, int option);
  * @}
  */
 
- /* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
+/* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
 /**
  * Set the logging callback to a broker.
  *
@@ -4257,7 +4246,6 @@ HELICS_EXPORT void
  * @endforcpponly
  */
 HELICS_EXPORT void helicsQueryBufferFill(helics_query_buffer buffer, const char* str, int strSize, helics_error* err);
-
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
