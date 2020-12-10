@@ -26,7 +26,8 @@ add_custom_command(
         "-I${PROJECT_BINARY_DIR}/helics_generated_includes/"
         ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
     DEPENDS ${PROJECT_SOURCE_DIR}/interfaces/helics.i ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
-            ${CMAKE_CURRENT_SOURCE_DIR}/octave_maps.i ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/octave_maps.i
+            ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
 )
 
 add_custom_command(

@@ -117,6 +117,7 @@ if(NOT USE_MODERNIZED_SWIG)
     include_directories(${JAVA_INCLUDE_PATH})
     include_directories(${JAVA_INCLUDE_PATH2})
     include_directories(${JNI_INCLUDE_DIRS})
+    include_directories(${PROJECT_BINARY_DIR}/helics_generated_includes/)
     # "Using old SWIG include_directories")
 endif()
 

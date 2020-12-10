@@ -28,21 +28,35 @@ set(helicsShared_sources
 
 include(GenerateExportHeader)
 
-if (PYTHON_EXECUTABLE)
-        add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
-                           COMMAND ${PYTHON_EXECUTABLE} ARGS ${PROJECT_SOURCE_DIR}/scripts/generateHelicsH.py ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/
-                                   ${PROJECT_SOURCE_DIR}
-                           DEPENDS helicsCore.h helicsCallbacks.h
-                           MessageFederate.h ValueFederate.h
-                           MessageFilters.h api-data.h
-                           ../helics_enums.h
-                           )
+if(PYTHON_EXECUTABLE)
+    add_custom_command(
+        OUTPUT ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+               ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
+        COMMAND ${PYTHON_EXECUTABLE} ARGS ${PROJECT_SOURCE_DIR}/scripts/generateHelicsH.py
+                ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/ ${PROJECT_SOURCE_DIR}
+        DEPENDS helicsCore.h
+                helicsCallbacks.h
+                MessageFederate.h
+                ValueFederate.h
+                MessageFilters.h
+                api-data.h
+                ../helics_enums.h
+    )
 else()
-        configure_file(${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics.h ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h COPYONLY)
-        configure_file(${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics_api.h ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h COPYONLY)
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics.h
+        ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h COPYONLY
+    )
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics_api.h
+        ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h COPYONLY
+    )
 endif()
-    
-add_library(helics SHARED ${helicsShared_sources} ${helicsShared_headers} ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h)
+
+add_library(
+    helics SHARED ${helicsShared_sources} ${helicsShared_headers}
+                  ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+)
 
 add_library(HELICS::helics ALIAS helics)
 generate_export_header(helics BASE_NAME helics)
@@ -112,11 +126,10 @@ if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
 endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
-    install(FILES ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
+    install(FILES ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+                  ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers
     )
 
-    install(FILES ../helics98.hpp
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers
-    )
+    install(FILES ../helics98.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers)
 endif()

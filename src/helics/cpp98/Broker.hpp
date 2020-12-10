@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_BROKER_HPP_
 #pragma once
 
-#include "helics/helics.h"
 #include "config.hpp"
+#include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
 #include <stdexcept>
