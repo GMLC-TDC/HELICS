@@ -5,8 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include <cmath>
-#include <cpp98/ValueFederate.hpp>
-#include <cpp98/helics.hpp>  // helicsVersionString
+#include <helics/cpp98/ValueFederate.hpp>
+#include <helics/cpp98/helics.hpp>  // helicsVersionString
 #include <iostream>
 
 int main(int /*argc*/, char** /*argv*/)

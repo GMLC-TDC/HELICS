@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters
  */
 #include "ctestFixtures.hpp"
-#include "helics/shared_api_library/helicsCallbacks.h"
+#include "helics/helics.h"
 
 using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>;
 TEST(logging_tests, check_log_message)

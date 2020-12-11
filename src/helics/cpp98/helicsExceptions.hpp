@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #define _HELICS_CPP98_EXCEPTIONS_
 #pragma once
 
-#include "../shared_api_library/helics.h"
 #include "config.hpp"
+#include "helics/helics.h"
 
 #include <stdexcept>
 

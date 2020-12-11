@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_MESSAGE_FEDERATE_HPP_
 #pragma once
 
-#include "../shared_api_library/MessageFederate.h"
 #include "Endpoint.hpp"
 #include "Federate.hpp"
+#include "helics/helics.h"
 
 #include <string>
 #include <vector>

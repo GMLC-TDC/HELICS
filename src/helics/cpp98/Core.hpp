@@ -8,10 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_CPP98_CORE_HPP_
 #pragma once
 
-#include "../cpp98/Filter.hpp"
-#include "../shared_api_library/MessageFilters.h"
-#include "../shared_api_library/helics.h"
+#include "Filter.hpp"
 #include "config.hpp"
+#include "helics/helics.h"
 
 #include <stdexcept>
 #include <string>

@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../coreTypeLists.hpp"
-#include "helics/chelics.h"
+#include "helics/helics.h"
 
 #include <string>
 #include <vector>
