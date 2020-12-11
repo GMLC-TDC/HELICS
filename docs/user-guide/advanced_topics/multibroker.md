@@ -1,4 +1,4 @@
-# Multi Broker
+# Multi-Protocol Broker
 
 Starting in HELICS 2.5 there is a Multi Broker type that allows connection with multiple communication types simultaneously. The multibroker allows an unlimited number of communication operations to interact.
 
