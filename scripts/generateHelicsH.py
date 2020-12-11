@@ -32,7 +32,7 @@ outfile.write("*/\n\n")
 outfile.write("#ifndef HELICS_C_API_H_\n")
 outfile.write("#define HELICS_C_API_H_\n\n")
 outfile.write("#pragma once\n\n")
-              
+
 outfile.write("#include <stdint.h>\n")
 outfile.write("#include <stdlib.h>\n\n")
 
@@ -48,7 +48,7 @@ outfile.write("#    else\n")
 outfile.write("#        define HELICS_EXPORT\n")
 outfile.write("#    endif\n")
 outfile.write("#endif\n\n")
-    
+
 outfile.write("#ifndef HELICS_DEPRECATED\n")
 outfile.write("#    if defined _WIN32 || defined __CYGWIN__\n")
 outfile.write("#        ifdef __GNUC__\n")
