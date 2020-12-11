@@ -17,6 +17,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - Data serialization moved to a custom protocol specific to HELICS.
 - Minimum build requirements to C++17
 - Many of the API functions now use `string_view` instead of `const std::string &`
+- The C shared library now comes with only a single header `helics.h` this should be included for all uses of the C shared library
 
 ### Fixed
 
@@ -29,6 +30,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 
 - Message structure from C API
 - Deprecated functions from HELICS 2
+- the separate headers for the C shared library are no longer installed only a single header is needed and includes all functionsa and operations.
 
 ## [2.6.1][] - 2020-10-15
 
