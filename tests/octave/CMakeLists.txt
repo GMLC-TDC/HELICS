@@ -21,3 +21,5 @@ else()
 endif()
 
 set_property(TEST octave_tests PROPERTY LABELS Octave Continuous Daily)
+
+set_property(TEST octave_tests PROPERTY FAIL_REGULAR_EXPRESSION "failed")

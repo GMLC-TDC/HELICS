@@ -5,7 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ctestFixtures.hpp"
-#include "helics/shared_api_library/helicsCallbacks.h"
+#include "helics/helics.h"
 
 #include <gtest/gtest.h>
 

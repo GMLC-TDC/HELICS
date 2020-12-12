@@ -28,6 +28,7 @@ A list of known PRs that made breaking changes is also provided.
 
 ### C Shared API
 
+- Only 1 header is now used `#include<helics/helics.h>` for all uses of the C shared library in C/C++ code no other headers are needed, the other headers are no longer available.
 - Removed `helics_message` struct -- call functions to set fields instead. `helicsEndpointGetMessage` and `helicsFederateGetMessage` returning this struct were removed -- call functions to get field values instead. Changed in [#1363][1].
 - `helics_message_object` typedef was renamed to `helics_message` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `helics_message`. Changed in [#1363][1].
 - Renamed `helicsEndpointSendMessageObject` to `helicsEndpointSendMessage`, `helicsSendMessageObjectZeroCopy` to `helicsSendMessageZeroCopy`, `helicsEndpointGetMessageObject` to `helicsEndpointGetMessage`, `helicsEndpointCreateMessageObject` to `helicsEndpointCreateMessage`, `helicsFederateGetMessageObject` to `helicsFederateGetMessage`, and `helicsFederateCreateMessageObject` to `helicsFederateCreateMessage`. Changed in [#1363][1].

@@ -1,5 +1,5 @@
 %{
-  #include "api-data.h"
+  #include "helics/helics.h"
 
 %}
 

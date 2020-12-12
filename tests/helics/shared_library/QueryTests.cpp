@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ctestFixtures.hpp"
-#include "helics/shared_api_library/helicsCallbacks.h"
+#include "helics/helics.h"
 
 #include <gtest/gtest.h>
 

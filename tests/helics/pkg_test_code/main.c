@@ -5,7 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/chelics.h"
+#include "helics/helics.h"
 
 #include <stdio.h>
 int main()
