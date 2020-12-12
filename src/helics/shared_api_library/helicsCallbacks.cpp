@@ -130,13 +130,13 @@ void helicsQueryBufferFill(helics_query_buffer buffer, const char* string, int s
         return;
     }
     if (buffer == nullptr) {
-        assignError(err, helics_error_invalid_object, invalidBuffer);
+        assignError(err, HELICS_ERROR_invalid_object, invalidBuffer);
         return;
     }
 
     auto* bufferStr = reinterpret_cast<std::string*>(buffer);
     if (bufferStr->empty() || bufferStr->back() != '>') {
-        assignError(err, helics_error_invalid_object, invalidBuffer);
+        assignError(err, HELICS_ERROR_invalid_object, invalidBuffer);
         return;
     }
     if (stringSize <= 0 || string == nullptr) {

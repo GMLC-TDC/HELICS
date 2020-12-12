@@ -79,7 +79,7 @@ struct FederateTestFixture {
 
         helics::FederateInfo fi(helics::core::coreTypeFromString(core_type_name));
         if (time_delta != helics::timeZero) {
-            fi.setProperty(helics_property_time_delta, time_delta);
+            fi.setProperty(HELICS_PROPERTY_TIME_delta, time_delta);
         }
 
         switch (setup) {

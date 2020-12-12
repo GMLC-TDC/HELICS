@@ -73,7 +73,7 @@ struct FederateTestFixture_cpp {
         helicscpp::FederateInfo fi;
 
         fi.setCoreType(core_type_name);
-        fi.setProperty(helics_property_time_delta, time_delta);
+        fi.setProperty(HELICS_PROPERTY_TIME_delta, time_delta);
         switch (setup) {
             case 1:
             default: {

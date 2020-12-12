@@ -18,17 +18,17 @@ using elsewhere is probably not going to work.
 
 /** enumeration of defined print levels*/
 enum log_level : int {
-    no_print = helics_log_level_no_print,  //!< never print
-    error = helics_log_level_error,  //!< only print errors
-    warning = helics_log_level_warning,  //!< print/log warning and errors
-    summary = helics_log_level_summary,  //!< print/log summary information
+    no_print = HELICS_LOG_LEVEL_no_print,  //!< never print
+    error = HELICS_LOG_LEVEL_error,  //!< only print errors
+    warning = HELICS_LOG_LEVEL_warning,  //!< print/log warning and errors
+    summary = HELICS_LOG_LEVEL_summary,  //!< print/log summary information
     connections =
-        helics_log_level_connections,  //!< print summary+ federate level connection information
+        HELICS_LOG_LEVEL_connections,  //!< print summary+ federate level connection information
     interfaces =
-        helics_log_level_interfaces,  //!< print connections +interface level connection information
-    timing = helics_log_level_timing,  //!< print interfaces+ timing(exec/grant/disconnect)
-    data = helics_log_level_data,  //!< print timing+data transmissions
-    trace = helics_log_level_trace,  //!< trace level printing (all processed messages)
+        HELICS_LOG_LEVEL_interfaces,  //!< print connections +interface level connection information
+    timing = HELICS_LOG_LEVEL_timing,  //!< print interfaces+ timing(exec/grant/disconnect)
+    data = HELICS_LOG_LEVEL_data,  //!< print timing+data transmissions
+    trace = HELICS_LOG_LEVEL_trace,  //!< trace level printing (all processed messages)
     fed = 99999  //!< special logging command for message coming from a fed
 };
 

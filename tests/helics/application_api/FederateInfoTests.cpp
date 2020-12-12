@@ -157,26 +157,26 @@ TEST(federateInfo, constructor_fail)
 TEST(federateInfo, property_index)
 {
     EXPECT_EQ(helics::getPropertyIndex("unexpected"), -1);
-    EXPECT_EQ(helics::getPropertyIndex("rtlag"), helics_property_time_rt_lag);
-    EXPECT_EQ(helics::getPropertyIndex("RTlead"), helics_property_time_rt_lead);
-    EXPECT_EQ(helics::getPropertyIndex("RT__Tolerance"), helics_property_time_rt_tolerance);
+    EXPECT_EQ(helics::getPropertyIndex("rtlag"), HELICS_PROPERTY_TIME_rt_lag);
+    EXPECT_EQ(helics::getPropertyIndex("RTlead"), HELICS_PROPERTY_TIME_rt_lead);
+    EXPECT_EQ(helics::getPropertyIndex("RT__Tolerance"), HELICS_PROPERTY_TIME_rt_tolerance);
 }
 
 TEST(federateInfo, option_index)
 {
     EXPECT_EQ(helics::getOptionIndex("unexpected"), -1);
     EXPECT_EQ(helics::getOptionIndex("single_connection_only"),
-              helics_handle_option_single_connection_only);
+              HELICS_HANDLE_OPTION_single_connection_only);
     EXPECT_EQ(helics::getOptionIndex("strictInputTypeChecking"),
-              helics_handle_option_strict_type_checking);
-    EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
+              HELICS_HANDLE_OPTION_strict_type_checking);
+    EXPECT_EQ(helics::getOptionIndex("un_interruptible"), HELICS_HANDLE_OPTION_ignore_interrupts);
 }
 
 TEST(federateInfo, flag_index)
 {
-    EXPECT_EQ(helics::getFlagIndex("StrictConfigChecking"), helics_flag_strict_config_checking);
-    EXPECT_EQ(helics::getFlagIndex("un_interruptible"), helics_flag_uninterruptible);
-    EXPECT_EQ(helics::getFlagIndex("strict_config_checking"), helics_flag_strict_config_checking);
+    EXPECT_EQ(helics::getFlagIndex("StrictConfigChecking"), HELICS_FLAG_strict_config_checking);
+    EXPECT_EQ(helics::getFlagIndex("un_interruptible"), HELICS_FLAG_uninterruptible);
+    EXPECT_EQ(helics::getFlagIndex("strict_config_checking"), HELICS_FLAG_strict_config_checking);
 }
 
 TEST(federateInfo, loadinfoError)
@@ -219,7 +219,7 @@ TEST(federateInfo, loadinfoPropsJson)
     EXPECT_EQ(f1.intProps.size(), 1U);
     EXPECT_EQ(f1.intProps[0].second, 2);
 
-    EXPECT_EQ(f1.checkIntProperty(helics_property_int_log_level, -1), helics_log_level_summary);
+    EXPECT_EQ(f1.checkIntProperty(HELICS_PROPERTY_INT_log_level, -1), HELICS_LOG_LEVEL_summary);
 
     EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"unknown\"}"), helics::InvalidIdentifier);
 }

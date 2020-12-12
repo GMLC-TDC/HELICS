@@ -19,13 +19,13 @@ class FilterOperator;
 class CoreApp;
 /** a set of common defined filters*/
 enum class filter_types {
-    custom = helics_filter_type_custom,
-    delay = helics_filter_type_delay,
-    random_delay = helics_filter_type_random_delay,
-    random_drop = helics_filter_type_random_drop,
-    reroute = helics_filter_type_reroute,
-    clone = helics_filter_type_clone,
-    firewall = helics_filter_type_firewall,
+    custom = HELICS_FILTER_TYPE_custom,
+    delay = HELICS_FILTER_TYPE_delay,
+    random_delay = HELICS_FILTER_TYPE_random_delay,
+    random_drop = HELICS_FILTER_TYPE_random_drop,
+    reroute = HELICS_FILTER_TYPE_reroute,
+    clone = HELICS_FILTER_TYPE_clone,
+    firewall = HELICS_FILTER_TYPE_firewall,
     unrecognized = 7
 
 };

@@ -151,7 +151,7 @@ void HandleManager::setHandleOption(InterfaceHandle handle, int32_t option, int3
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         switch (option) {
-            case helics_handle_option_connection_required:
+            case HELICS_HANDLE_OPTION_connection_required:
                 if (val != 0) {
                     clearActionFlag(handles[index], optional_flag);
                     setActionFlag(handles[index], required_flag);
@@ -159,7 +159,7 @@ void HandleManager::setHandleOption(InterfaceHandle handle, int32_t option, int3
                     clearActionFlag(handles[index], required_flag);
                 }
                 break;
-            case helics_handle_option_connection_optional:
+            case HELICS_HANDLE_OPTION_connection_optional:
                 if (val != 0) {
                     clearActionFlag(handles[index], required_flag);
                     setActionFlag(handles[index], optional_flag);
@@ -179,19 +179,19 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
     bool rvalue{false};
     if (isValidIndex(index, handles)) {
         switch (option) {
-            case helics_handle_option_only_update_on_change:
+            case HELICS_HANDLE_OPTION_only_update_on_change:
                 rvalue = checkActionFlag(handles[index], extra_flag1);
                 break;
-            case helics_handle_option_only_transmit_on_change:
+            case HELICS_HANDLE_OPTION_only_transmit_on_change:
                 rvalue = checkActionFlag(handles[index], extra_flag2);
                 break;
-            case helics_handle_option_connection_required:
+            case HELICS_HANDLE_OPTION_connection_required:
                 rvalue = checkActionFlag(handles[index], required_flag);
                 break;
-            case helics_handle_option_connection_optional:
+            case HELICS_HANDLE_OPTION_connection_optional:
                 rvalue = checkActionFlag(handles[index], optional_flag);
                 break;
-            case helics_handle_option_single_connection_only:
+            case HELICS_HANDLE_OPTION_single_connection_only:
                 rvalue = checkActionFlag(handles[index], extra_flag4);
                 break;
             default:

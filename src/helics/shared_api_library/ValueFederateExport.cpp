@@ -29,12 +29,12 @@ static helics::InputObject* verifyInput(helics_input inp, helics_error* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (inp == nullptr) {
-        assignError(err, helics_error_invalid_object, invalidInputString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidInputString);
         return nullptr;
     }
     auto* inpObj = reinterpret_cast<helics::InputObject*>(inp);
     if (inpObj->valid != InputValidationIdentifier) {
-        assignError(err, helics_error_invalid_object, invalidInputString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidInputString);
         return nullptr;
     }
     return inpObj;
@@ -44,12 +44,12 @@ static helics::PublicationObject* verifyPublication(helics_publication pub, heli
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (pub == nullptr) {
-        assignError(err, helics_error_invalid_object, invalidPublicationString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidPublicationString);
         return nullptr;
     }
     auto* pubObj = reinterpret_cast<helics::PublicationObject*>(pub);
     if (pubObj->valid != PublicationValidationIdentifier) {
-        assignError(err, helics_error_invalid_object, invalidPublicationString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidPublicationString);
         return nullptr;
     }
     return pubObj;
@@ -121,11 +121,11 @@ helics_publication
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < helics_data_type_string) || (type > helics_data_type_time)) {
-        if (type == helics_data_type_raw) {
+    if ((type < HELICS_DATA_TYPE_string) || (type > HELICS_DATA_TYPE_time)) {
+        if (type == HELICS_DATA_TYPE_raw) {
             return helicsFederateRegisterTypePublication(fed, key, "raw", units, err);
         }
-        assignError(err, helics_error_invalid_argument, unknownTypeCode);
+        assignError(err, HELICS_ERROR_invalid_argument, unknownTypeCode);
         return nullptr;
     }
     try {
@@ -174,11 +174,11 @@ helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < 0) || (type > helics_data_type_time)) {
-        if (type == helics_data_type_raw) {
+    if ((type < 0) || (type > HELICS_DATA_TYPE_time)) {
+        if (type == HELICS_DATA_TYPE_raw) {
             return helicsFederateRegisterGlobalTypePublication(fed, key, "raw", units, err);
         }
-        assignError(err, helics_error_invalid_argument, unknownTypeCode);
+        assignError(err, HELICS_ERROR_invalid_argument, unknownTypeCode);
         return nullptr;
     }
 
@@ -221,12 +221,12 @@ helics_input helicsFederateRegisterInput(helics_federate fed, const char* key, h
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < helics_data_type_string) || (type > helics_data_type_time)) {
-        if (type == helics_data_type_raw) {
+    if ((type < HELICS_DATA_TYPE_string) || (type > HELICS_DATA_TYPE_time)) {
+        if (type == HELICS_DATA_TYPE_raw) {
             return helicsFederateRegisterTypeInput(fed, key, "raw", units, err);
         }
-        if (type != helics_data_type_any) {
-            assignError(err, helics_error_invalid_argument, unknownTypeCode);
+        if (type != HELICS_DATA_TYPE_any) {
+            assignError(err, HELICS_ERROR_invalid_argument, unknownTypeCode);
             return nullptr;
         }
     }
@@ -271,12 +271,12 @@ helics_input
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < helics_data_type_string) || (type > helics_data_type_time)) {
-        if (type == helics_data_type_raw) {
+    if ((type < HELICS_DATA_TYPE_string) || (type > HELICS_DATA_TYPE_time)) {
+        if (type == HELICS_DATA_TYPE_raw) {
             return helicsFederateRegisterGlobalTypeInput(fed, key, "raw", units, err);
         }
-        if (type != helics_data_type_any) {
-            assignError(err, helics_error_invalid_argument, unknownTypeCode);
+        if (type != HELICS_DATA_TYPE_any) {
+            assignError(err, HELICS_ERROR_invalid_argument, unknownTypeCode);
             return nullptr;
         }
     }
@@ -340,7 +340,7 @@ helics_publication helicsFederateGetPublication(helics_federate fed, const char*
     try {
         auto& pub = fedObj->getPublication(key);
         if (!pub.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidPubName);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidPubName);
             return nullptr;
         }
         auto pubObj = std::make_unique<helics::PublicationObject>();
@@ -365,7 +365,7 @@ helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int 
     try {
         auto& id = fedObj->getPublication(index);
         if (!id.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidPubIndex);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidPubIndex);
             return nullptr;
         }
         auto pub = std::make_unique<helics::PublicationObject>();
@@ -395,7 +395,7 @@ helics_input helicsFederateGetInput(helics_federate fed, const char* key, helics
     try {
         auto& id = fedObj->getInput(key);
         if (!id.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidInputName);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidInputName);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -420,7 +420,7 @@ helics_input helicsFederateGetInputByIndex(helics_federate fed, int index, helic
     try {
         auto& id = fedObj->getInput(index);
         if (!id.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidInputIndex);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidInputIndex);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -448,7 +448,7 @@ helics_input helicsFederateGetSubscription(helics_federate fed, const char* key,
     try {
         auto& id = fedObj->getSubscription(key);
         if (!id.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidSubKey);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidSubKey);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -529,7 +529,7 @@ void helicsPublicationPublishBoolean(helics_publication pub, helics_bool val, he
         return;
     }
     try {
-        pubObj->pubPtr->publish((val != helics_false));
+        pubObj->pubPtr->publish((val != HELICS_FALSE));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -644,18 +644,18 @@ helics_bool helicsPublicationIsValid(helics_publication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (pubObj->pubPtr->isValid()) ? helics_true : helics_false;
+    return (pubObj->pubPtr->isValid()) ? helics_true : HELICS_FALSE;
 }
 
 helics_bool helicsInputIsValid(helics_input ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (inpObj->inputPtr->isValid()) ? helics_true : helics_false;
+    return (inpObj->inputPtr->isValid()) ? helics_true : HELICS_FALSE;
 }
 
 void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* err)
@@ -681,7 +681,7 @@ bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
 {
     static constexpr char invalidOutputString[] = "Output string location is invalid";
     if ((outputString == nullptr) || (maxlen <= 0)) {
-        assignError(err, helics_error_invalid_argument, invalidOutputString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidOutputString);
         return false;
     }
     return true;
@@ -766,16 +766,16 @@ helics_bool helicsInputGetBoolean(helics_input inp, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     try {
         bool boolval = inpObj->inputPtr->getValue<bool>();
-        return (boolval) ? helics_true : helics_false;
+        return (boolval) ? helics_true : HELICS_FALSE;
     }
     // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return helics_false;
+        return HELICS_FALSE;
     }
     // LCOV_EXCL_STOP
 }
@@ -784,14 +784,14 @@ double helicsInputGetDouble(helics_input inp, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
     try {
         return inpObj->inputPtr->getValue<double>();
     }
     catch (...) {
         helicsErrorHandler(err);
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
 }
 
@@ -799,7 +799,7 @@ helics_time helicsInputGetTime(helics_input inp, helics_error* err)
 {
     auto* inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
     try {
         auto T = inpObj->inputPtr->getValue<helics::Time>();
@@ -808,7 +808,7 @@ helics_time helicsInputGetTime(helics_input inp, helics_error* err)
     // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
     // LCOV_EXCL_STOP
 }
@@ -858,7 +858,7 @@ HelicsComplex helicsInputGetComplexObject(helics_input inp, helics_error* err)
 
     if (inpObj == nullptr) {
         // time invalid is just an invalid double
-        return {helics_time_invalid, helics_time_invalid};
+        return {HELICS_TIME_INVALID, HELICS_TIME_INVALID};
     }
 
     try {
@@ -868,7 +868,7 @@ HelicsComplex helicsInputGetComplexObject(helics_input inp, helics_error* err)
     // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return {helics_time_invalid, helics_time_invalid};
+        return {HELICS_TIME_INVALID, HELICS_TIME_INVALID};
     }
     // LCOV_EXCL_STOP
 }
@@ -1024,7 +1024,7 @@ void helicsInputSetDefaultBoolean(helics_input inp, helics_bool val, helics_erro
     if (inpObj == nullptr) {
         return;
     }
-    inpObj->inputPtr->setDefault((val != helics_false));
+    inpObj->inputPtr->setDefault((val != HELICS_FALSE));
 }
 
 void helicsInputSetDefaultDouble(helics_input inp, double val, helics_error* err)
@@ -1327,14 +1327,14 @@ int helicsInputGetOption(helics_input inp, int option)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     try {
         return (inpObj->inputPtr->getOption(option));
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     // LCOV_EXCL_STOP
 }
@@ -1359,14 +1359,14 @@ int helicsPublicationGetOption(helics_publication pub, int option)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     try {
         return pubObj->pubPtr->getOption(option);
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     // LCOV_EXCL_STOP
 }
@@ -1409,18 +1409,18 @@ helics_bool helicsInputIsUpdated(helics_input inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
 
     auto val = inpObj->inputPtr->isUpdated();
-    return (val) ? helics_true : helics_false;
+    return (val) ? helics_true : HELICS_FALSE;
 }
 
 helics_time helicsInputLastUpdateTime(helics_input inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
     try {
         auto time = inpObj->inputPtr->getLastUpdate();
@@ -1428,7 +1428,7 @@ helics_time helicsInputLastUpdateTime(helics_input inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
     // LCOV_EXCL_STOP
 }

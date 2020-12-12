@@ -46,7 +46,7 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     SetupTest<ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<ValueFederate>(0);
 
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_connection_optional);
 
     // register the publications
     Publication pubid(vFed1.get(), "pub1", helicsType<std::string>());
@@ -107,7 +107,7 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
                               helics::data_type::helics_string);
 
     auto& subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");
@@ -140,8 +140,8 @@ static bool dual_transfer_test(std::shared_ptr<helics::ValueFederate>& vFed1,
                                helics::Publication& pubid,
                                helics::Input& subid)
 {
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     bool correct = true;
 
@@ -321,9 +321,9 @@ TEST_P(valuefed_flagfile_tests, configure_test)
     auto val = V2.getIntegerProperty(helics::defs::log_level);
     EXPECT_EQ(val, -1);
     EXPECT_EQ(V2.getName(), "test_bes");
-    bool result = V2.getFlagOption(helics_flag_only_transmit_on_change);
+    bool result = V2.getFlagOption(HELICS_FLAG_only_transmit_on_change);
     EXPECT_TRUE(result);
-    result = V2.getFlagOption(helics_flag_wait_for_current_time_update);
+    result = V2.getFlagOption(HELICS_FLAG_wait_for_current_time_update);
     EXPECT_TRUE(result);
     V2.finalize();
 }
@@ -571,7 +571,7 @@ TEST_P(valuefed_single_type, init_publish)
     auto& pubid = vFed1->registerGlobalPublication<double>("pub1");
 
     auto& subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->enterInitializingMode();
     pubid.publish(1.0);
 
@@ -704,7 +704,7 @@ TEST_P(valuefed_single_type, transfer_close)
     auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");
@@ -748,7 +748,7 @@ TEST_P(valuefed_single_type, transfer_remove_target)
     auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");
@@ -795,8 +795,8 @@ TEST_P(valuefed_all_type_tests, dual_transfer_close)
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
     vFed2->enterExecutingMode();
@@ -856,8 +856,8 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
     vFed2->enterExecutingMode();
@@ -921,8 +921,8 @@ TEST_F(valuefed_tests, rem_target_single_test)
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
     vFed2->enterExecutingMode();
@@ -989,8 +989,8 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 
     auto& subid = vFed2->registerGlobalInput<std::string>("sub1");
     pubid.addTarget("sub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
     vFed2->enterExecutingMode();

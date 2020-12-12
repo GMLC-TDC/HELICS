@@ -74,9 +74,9 @@ TEST(echo_tests, echo_test_delay_period)
 
     fi.coreName = "ecore3";
     fi.coreInitString = "-f 2 --autobroker";
-    fi.setProperty(helics_property_time_period, 1.1);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.1);
     helics::apps::Echo echo1("echo1", fi);
-    fi.setProperty(helics_property_time_period, 0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 0);
 
     echo1.addEndpoint("test");
     echo1.setEchoDelay(1.2);

@@ -30,27 +30,27 @@ enum federate_state {
 
 /** the type of the cores that are available */
 enum class core_type : int {
-    DEFAULT = helics_core_type_default,  //!< pick a core type depending on compile configuration
+    DEFAULT = HELICS_CORE_TYPE_default,  //!< pick a core type depending on compile configuration
                                          //!< usually either
     //!< ZMQ if available or UDP
-    ZMQ = helics_core_type_zmq,  //!< use the Zero MQ networking protocol
-    MPI = helics_core_type_mpi,  //!< use MPI for operation on a parallel cluster
-    TEST = helics_core_type_test,  //!< use the Test core if all federates are in the same process
-    INTERPROCESS = helics_core_type_interprocess,  //!< interprocess uses memory mapped files to
+    ZMQ = HELICS_CORE_TYPE_zmq,  //!< use the Zero MQ networking protocol
+    MPI = HELICS_CORE_TYPE_mpi,  //!< use MPI for operation on a parallel cluster
+    TEST = HELICS_CORE_TYPE_test,  //!< use the Test core if all federates are in the same process
+    INTERPROCESS = HELICS_CORE_TYPE_interprocess,  //!< interprocess uses memory mapped files to
                                                    //!< transfer data (for
     //!< use when all federates are on the same machine
-    IPC = helics_core_type_ipc,  //!< same as INTERPROCESS
-    TCP = helics_core_type_tcp,  //!< use a generic TCP protocol message stream to send messages
-    TCP_SS = helics_core_type_tcp_ss,  //!< a single socket version of the TCP core for more easily
+    IPC = HELICS_CORE_TYPE_ipc,  //!< same as INTERPROCESS
+    TCP = HELICS_CORE_TYPE_tcp,  //!< use a generic TCP protocol message stream to send messages
+    TCP_SS = HELICS_CORE_TYPE_tcp_ss,  //!< a single socket version of the TCP core for more easily
                                        //!< handling firewalls
-    UDP = helics_core_type_udp,  //!< use UDP packets to send the data
-    NNG = helics_core_type_nng,  //!< reserved for future Nanomsg implementation
-    ZMQ_SS = helics_core_type_zmq_test,  //!< single socket version of ZMQ core for better
+    UDP = HELICS_CORE_TYPE_udp,  //!< use UDP packets to send the data
+    NNG = HELICS_CORE_TYPE_nng,  //!< reserved for future Nanomsg implementation
+    ZMQ_SS = HELICS_CORE_TYPE_zmq_test,  //!< single socket version of ZMQ core for better
                                          //!< scalability performance
-    HTTP = helics_core_type_http,  //!< core/broker using web traffic
-    WEBSOCKET = helics_core_type_websocket,  //!< core/broker using web sockets
-    INPROC = helics_core_type_inproc,  //!< core/broker using a stripped down in process core type
-    NULLCORE = helics_core_type_null,  //!< explicit core type that doesn't exist
+    HTTP = HELICS_CORE_TYPE_http,  //!< core/broker using web traffic
+    WEBSOCKET = HELICS_CORE_TYPE_websocket,  //!< core/broker using web sockets
+    INPROC = HELICS_CORE_TYPE_inproc,  //!< core/broker using a stripped down in process core type
+    NULLCORE = HELICS_CORE_TYPE_null,  //!< explicit core type that doesn't exist
     UNRECOGNIZED = 22,  //!< unknown
     MULTI = 45  //!< use the multi-broker
 

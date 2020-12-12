@@ -146,7 +146,7 @@ TEST(logging_tests, check_log_message_functions)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, helics_log_level_trace);
+    fi.setProperty(helics::defs::log_level, HELICS_LOG_LEVEL_trace);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -168,22 +168,22 @@ TEST(logging_tests, check_log_message_functions)
     int order = 0;
     for (auto& m : llock) {
         if (m.second.find("ERROR") != std::string::npos) {
-            EXPECT_EQ(m.first, helics_log_level_error);
+            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_error);
             EXPECT_EQ(order, 0);
             order = 1;
         }
         if (m.second.find("WARNING") != std::string::npos) {
-            EXPECT_EQ(m.first, helics_log_level_warning);
+            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_warning);
             EXPECT_EQ(order, 1);
             order = 2;
         }
         if (m.second.find("INFO") != std::string::npos) {
-            EXPECT_EQ(m.first, helics_log_level_summary);
+            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_summary);
             EXPECT_EQ(order, 2);
             order = 3;
         }
         if (m.second.find("DEBUG") != std::string::npos) {
-            EXPECT_GT(m.first, helics_log_level_summary);
+            EXPECT_GT(m.first, HELICS_LOG_LEVEL_summary);
             EXPECT_EQ(order, 3);
             order = 4;
         }
@@ -279,8 +279,8 @@ TEST(logging_tests, dumplog)
     this will generate 1 and at most 2 messages in the log callback
     Thus the check for this is that there is a least 2 and at most 3 messages
     in the log block, to indicate that the set and clear was successful*/
-    Fed->setFlagOption(helics_flag_dumplog);
-    Fed->setFlagOption(helics_flag_dumplog, false);
+    Fed->setFlagOption(HELICS_FLAG_dumplog);
+    Fed->setFlagOption(HELICS_FLAG_dumplog, false);
 
     Fed->finalize();
     cr->waitForDisconnect();

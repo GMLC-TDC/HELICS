@@ -86,7 +86,7 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateEnterInitializingModeComplete(vFed1, &err));
     // expected to be false since it isn't associated with a asynchronous query
     auto qcomplete = helicsQueryIsCompleted(q1);
-    EXPECT_EQ(qcomplete, helics_false);
+    EXPECT_EQ(qcomplete, HELICS_FALSE);
 
     helicsQueryFree(q1);
     helicsCoreFree(core);

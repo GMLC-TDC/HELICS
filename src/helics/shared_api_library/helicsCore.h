@@ -182,7 +182,7 @@ HELICS_EXPORT helics_bool helicsBrokerIsValid(helics_broker broker);
  *
  * @details A connected broker implies it is attached to cores or cores could reach out to communicate.
  *
- * @return helics_false if not connected.
+ * @return HELICS_FALSE if not connected.
  */
 HELICS_EXPORT helics_bool helicsBrokerIsConnected(helics_broker broker);
 
@@ -243,7 +243,7 @@ HELICS_EXPORT void helicsBrokerMakeConnections(helics_broker broker, const char*
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_true if the disconnect was successful, helics_false if there was a timeout.
+ * @return helics_true if the disconnect was successful, HELICS_FALSE if there was a timeout.
  */
 HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect(helics_core core, int msToWait, helics_error* err);
 
@@ -256,7 +256,7 @@ HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect(helics_core core, int msTo
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_true if the disconnect was successful, helics_false if there was a timeout.
+ * @return helics_true if the disconnect was successful, HELICS_FALSE if there was a timeout.
  */
 HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, helics_error* err);
 
@@ -265,7 +265,7 @@ HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, in
  *
  * @details A connected core implies it is attached to federates or federates could be attached to it
  *
- * @return helics_false if not connected, helics_true if it is connected.
+ * @return HELICS_FALSE if not connected, helics_true if it is connected.
  */
 HELICS_EXPORT helics_bool helicsCoreIsConnected(helics_core core);
 
@@ -373,7 +373,7 @@ HELICS_EXPORT void helicsCoreSetReadyToInit(helics_core core, helics_error* err)
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_false if not connected, helics_true if it is connected.
+ * @return HELICS_FALSE if not connected, helics_true if it is connected.
  */
 HELICS_EXPORT helics_bool helicsCoreConnect(helics_core core, helics_error* err);
 
@@ -585,7 +585,7 @@ HELICS_EXPORT void helicsFederateInfoFree(helics_federate_info fi);
 /**
  * Check if a federate_object is valid.
  *
- * @return helics_true if the federate is a valid active federate, helics_false otherwise
+ * @return helics_true if the federate is a valid active federate, HELICS_FALSE otherwise
  */
 HELICS_EXPORT helics_bool helicsFederateIsValid(helics_federate fed);
 
@@ -735,7 +735,7 @@ HELICS_EXPORT int helicsGetOptionValue(const char* val);
  * @details Valid flags are available /ref helics_federate_flags.
  * @param fi The federate info object to alter.
  * @param flag A numerical index for a flag.
- * @param value The desired value of the flag helics_true or helics_false.
+ * @param value The desired value of the flag helics_true or HELICS_FALSE.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -879,7 +879,7 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(helics_federate fed,
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_false if not completed, helics_true if completed.
+ * @return HELICS_FALSE if not completed, helics_true if completed.
  */
 HELICS_EXPORT helics_bool helicsFederateIsAsyncOperationCompleted(helics_federate fed, helics_error* err);
 
@@ -1006,7 +1006,7 @@ HELICS_EXPORT helics_core helicsFederateGetCore(helics_federate fed, helics_erro
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid.
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid.
  */
 HELICS_EXPORT helics_time helicsFederateRequestTime(helics_federate fed, helics_time requestTime, helics_error* err);
 
@@ -1019,7 +1019,7 @@ HELICS_EXPORT helics_time helicsFederateRequestTime(helics_federate fed, helics_
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
 HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, helics_time timeDelta, helics_error* err);
 
@@ -1034,7 +1034,7 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
 HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, helics_error* err);
 
@@ -1054,7 +1054,7 @@ HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, hel
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result.
+ * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated along with the appropriate iteration result.
  * @beginPythonOnly
  * This function also returns the iteration specification of the result.
  * @endPythonOnly
@@ -1086,7 +1086,7 @@ HELICS_EXPORT void helicsFederateRequestTimeAsync(helics_federate fed, helics_ti
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated.
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  */
 HELICS_EXPORT helics_time helicsFederateRequestTimeComplete(helics_federate fed, helics_error* err);
 
@@ -1117,7 +1117,7 @@ HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(helics_federate fed,
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The granted time, will return helics_time_maxtime if the simulation has terminated.
+ * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  * @beginPythonOnly
  * This function also returns the iteration specification of the result.
  * @endPythonOnly

@@ -39,7 +39,7 @@ static helics::EndpointObject* verifyEndpoint(helics_endpoint ept, helics_error*
     HELICS_ERROR_CHECK(err, nullptr);
     auto* endObj = reinterpret_cast<helics::EndpointObject*>(ept);
     if (endObj == nullptr || endObj->valid != EndpointValidationIdentifier) {
-        assignError(err, helics_error_invalid_object, invalidEndpoint);
+        assignError(err, HELICS_ERROR_invalid_object, invalidEndpoint);
         return nullptr;
     }
     return endObj;
@@ -140,7 +140,7 @@ helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name,
     try {
         auto& id = fedObj->getEndpoint(name);
         if (!id.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidEndName);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidEndName);
             return nullptr;
         }
         auto end = std::make_unique<helics::EndpointObject>();
@@ -166,7 +166,7 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
     try {
         auto& id = fedObj->getEndpoint(index);
         if (!id.isValid()) {
-            assignError(err, helics_error_invalid_argument, invalidEndIndex);
+            assignError(err, HELICS_ERROR_invalid_argument, invalidEndIndex);
             return nullptr;
         }
         auto end = std::make_unique<helics::EndpointObject>();
@@ -187,9 +187,9 @@ helics_bool helicsEndpointIsValid(helics_endpoint endpoint)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (endObj->endPtr->isValid()) ? helics_true : helics_false;
+    return (endObj->endPtr->isValid()) ? helics_true : HELICS_FALSE;
 }
 
 void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err)
@@ -365,7 +365,7 @@ void helicsEndpointSendMessageZeroCopy(helics_endpoint endpoint, helics_message 
             }
         }
     } else {
-        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
+        assignError(err, HELICS_ERROR_invalid_argument, emptyMessageErrorString);
     }
 }
 
@@ -390,18 +390,18 @@ helics_bool helicsFederateHasMessage(helics_federate fed)
 {
     auto* mFed = getMessageFed(fed, nullptr);
     if (mFed == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (mFed->hasMessage()) ? helics_true : helics_false;
+    return (mFed->hasMessage()) ? helics_true : HELICS_FALSE;
 }
 
 helics_bool helicsEndpointHasMessage(helics_endpoint endpoint)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (endObj->endPtr->hasMessage()) ? helics_true : helics_false;
+    return (endObj->endPtr->hasMessage()) ? helics_true : HELICS_FALSE;
 }
 
 int helicsFederatePendingMessagesCount(helics_federate fed)
@@ -666,14 +666,14 @@ int helicsEndpointGetOption(helics_endpoint end, int option)
 {
     auto* endObj = verifyEndpoint(end, nullptr);
     if (endObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     try {
         return endObj->endPtr->getOption(option);
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     // LCOV_EXCL_STOP
 }
@@ -781,7 +781,7 @@ helics::Message* getMessageObj(helics_message message, helics_error* err)
     HELICS_ERROR_CHECK(err, nullptr);
     auto* mess = reinterpret_cast<helics::Message*>(message);
     if (mess == nullptr || mess->messageValidation != messageKeyCode) {
-        assignError(err, helics_error_invalid_argument, invalidMessageObject);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidMessageObject);
         return nullptr;
     }
     return mess;
@@ -836,7 +836,7 @@ helics_time helicsMessageGetTime(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {
-        return helics_time_invalid;
+        return HELICS_TIME_INVALID;
     }
     return static_cast<double>(mess->time);
 }
@@ -854,13 +854,13 @@ helics_bool helicsMessageGetFlagOption(helics_message message, int flag)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     // bits in a uint16
     if (flag >= static_cast<int>(sizeof(uint16_t) * 8) || flag < 0) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (checkActionFlag(*mess, flag) ? helics_true : helics_false);
+    return (checkActionFlag(*mess, flag) ? helics_true : HELICS_FALSE);
 }
 
 const char* helicsMessageGetString(helics_message message)
@@ -895,7 +895,7 @@ void helicsMessageGetBytes(helics_message message, void* data, int maxMessagelen
         if (actualSize != nullptr) {
             *actualSize = 0;
         }
-        assignError(err, helics_error_insufficient_space, invalidInsufficient);
+        assignError(err, HELICS_ERROR_insufficient_space, invalidInsufficient);
         return;
     }
 
@@ -918,9 +918,9 @@ helics_bool helicsMessageIsValid(helics_message message)
 {
     auto* mess = getMessageObj(message, nullptr);
     if (mess == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (mess->isValid() ? helics_true : helics_false);
+    return (mess->isValid() ? helics_true : HELICS_FALSE);
 }
 
 void helicsMessageSetSource(helics_message message, const char* src, helics_error* err)
@@ -1019,7 +1019,7 @@ void helicsMessageSetFlagOption(helics_message message, int flag, helics_bool fl
     }
     if (flag > 15 || flag < 0) {
         static constexpr const char invalidFlagIndex[] = "flag variable is out of bounds must be in [0,15]";
-        assignError(err, helics_error_invalid_argument, invalidFlagIndex);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidFlagIndex);
         return;
     }
     if (flagValue == helics_true) {
@@ -1093,7 +1093,7 @@ helics_message helicsMessageClone(helics_message message, helics_error* err)
     }
     auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
     if (messages == nullptr) {
-        assignError(err, helics_error_invalid_argument, emptyMessageErrorString);
+        assignError(err, HELICS_ERROR_invalid_argument, emptyMessageErrorString);
         return nullptr;
     }
     auto* mess_clone = messages->newMessage();

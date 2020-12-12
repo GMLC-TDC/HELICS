@@ -64,7 +64,7 @@ namespace apps {
         auto app = generateParser();
 
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_source_only);
+            fed->setFlagOption(HELICS_FLAG_source_only);
             app->helics_parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -115,7 +115,7 @@ namespace apps {
 
     Player::Player(const std::string& appName, const FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
     }
 
     Player::Player(const std::string& appName,
@@ -123,19 +123,19 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
     }
 
     Player::Player(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
     }
 
     Player::Player(const std::string& appName, const std::string& configString):
         App(appName, configString)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
         Player::loadJsonFile(configString);
     }
 

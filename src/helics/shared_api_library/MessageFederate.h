@@ -293,7 +293,7 @@ HELICS_EXPORT void helicsEndpointSubscribe(helics_endpoint endpoint, const char*
  *
  * @param fed The federate to check.
  *
- * @return helics_true if the federate has a message waiting, helics_false otherwise.
+ * @return helics_true if the federate has a message waiting, HELICS_FALSE otherwise.
  */
 HELICS_EXPORT helics_bool helicsFederateHasMessage(helics_federate fed);
 
@@ -302,7 +302,7 @@ HELICS_EXPORT helics_bool helicsFederateHasMessage(helics_federate fed);
  *
  * @param endpoint The endpoint to check.
  *
- * @return helics_true if the endpoint has a message, helics_false otherwise.
+ * @return helics_true if the endpoint has a message, HELICS_FALSE otherwise.
  */
 HELICS_EXPORT helics_bool helicsEndpointHasMessage(helics_endpoint endpoint);
 

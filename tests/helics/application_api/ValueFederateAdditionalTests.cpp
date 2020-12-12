@@ -132,7 +132,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_connection_optional);
     auto& subid = vFed1->registerSubscription("sub1", "V");
     auto& subid2 = vFed1->registerSubscription("sub2");
 
@@ -167,7 +167,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_connection_optional);
     // register the publications
     auto pubid = vFed1->registerPublication<std::string>("pub1");
     auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
@@ -214,7 +214,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_connection_optional);
     // register the publications
     auto& pubid = vFed1->registerPublication<std::string>("pub1");
     auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
@@ -269,7 +269,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
     auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");
@@ -456,8 +456,8 @@ TEST_P(valuefed_add_type_tests_ci_skip, async_calls)
     auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     vFed1->enterExecutingModeAsync();
     EXPECT_TRUE(!vFed1->isAsyncOperationCompleted());
@@ -529,7 +529,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, info_pubs_subs)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_connection_optional);
     auto pubid1 = vFed1->registerIndexedPublication<double>("pub1", 0);
     pubid1.setInfo(std::string("pub_test1"));
 

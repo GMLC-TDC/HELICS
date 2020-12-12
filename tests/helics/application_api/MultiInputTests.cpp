@@ -575,7 +575,7 @@ TEST_F(multiInput, file_config_json)
     EXPECT_EQ(res, 2);
     res = i1.getOption(helics::defs::options::multi_input_handling_method);
 
-    EXPECT_EQ(res, helics_multi_input_average_operation);
+    EXPECT_EQ(res, HELICS_MULTI_INPUT_average_operation);
 
     p1.publish(11.3);
     p2.publish(14.7);
@@ -600,7 +600,7 @@ TEST_F(multiInput, file_config_toml)
     EXPECT_EQ(res, 2);
     res = i1.getOption(helics::defs::options::multi_input_handling_method);
 
-    EXPECT_EQ(res, helics_multi_input_average_operation);
+    EXPECT_EQ(res, HELICS_MULTI_INPUT_average_operation);
 
     p1.publish(11.3);
     p2.publish(14.7);

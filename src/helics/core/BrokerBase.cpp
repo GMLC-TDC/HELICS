@@ -102,20 +102,20 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
     return hApp;
 }
 
-static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
-                                                      {"no_print", helics_log_level_no_print},
-                                                      {"error", helics_log_level_error},
-                                                      {"warning", helics_log_level_warning},
-                                                      {"summary", helics_log_level_summary},
-                                                      {"connections", helics_log_level_connections},
+static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_no_print},
+                                                      {"no_print", HELICS_LOG_LEVEL_no_print},
+                                                      {"error", HELICS_LOG_LEVEL_error},
+                                                      {"warning", HELICS_LOG_LEVEL_warning},
+                                                      {"summary", HELICS_LOG_LEVEL_summary},
+                                                      {"connections", HELICS_LOG_LEVEL_connections},
                                                       /** connections+ interface definitions*/
-                                                      {"interfaces", helics_log_level_interfaces},
+                                                      {"interfaces", HELICS_LOG_LEVEL_interfaces},
                                                       /** interfaces + timing message*/
-                                                      {"timing", helics_log_level_timing},
+                                                      {"timing", HELICS_LOG_LEVEL_timing},
                                                       /** timing+ data transfer notices*/
-                                                      {"data", helics_log_level_data},
+                                                      {"data", HELICS_LOG_LEVEL_data},
                                                       /** all internal messages*/
-                                                      {"trace", helics_log_level_trace}};
+                                                      {"trace", HELICS_LOG_LEVEL_trace}};
 
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
@@ -332,19 +332,19 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             loggerFunction(logLevel, fmt::format("{} ({})", name, federateID.baseValue()), message);
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
-                if (logLevel >= helics_log_level_trace) {
+                if (logLevel >= HELICS_LOG_LEVEL_trace) {
                     consoleLogger->log(
                         spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_timing) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_timing) {
                     consoleLogger->log(
                         spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_summary) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_summary) {
                     consoleLogger->log(
                         spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_warning) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_warning) {
                     consoleLogger->log(
                         spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_error) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_error) {
                     consoleLogger->log(
                         spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel == -10) {  // dumplog
@@ -361,19 +361,19 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-                if (logLevel >= helics_log_level_trace) {
+                if (logLevel >= HELICS_LOG_LEVEL_trace) {
                     fileLogger->log(
                         spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_timing) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_timing) {
                     fileLogger->log(
                         spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_summary) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_summary) {
                     fileLogger->log(
                         spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_warning) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_warning) {
                     fileLogger->log(
                         spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= helics_log_level_error) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_error) {
                     fileLogger->log(
                         spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel == -10) {  // dumplog
@@ -417,7 +417,7 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
         }
     }
 
-    sendToLogger(global_id.load(), helics_log_level_error, identifier, estring);
+    sendToLogger(global_id.load(), HELICS_LOG_LEVEL_error, identifier, estring);
 }
 
 void BrokerBase::setLoggingFile(const std::string& lfile)
@@ -438,9 +438,9 @@ void BrokerBase::setLoggingFile(const std::string& lfile)
 bool BrokerBase::getFlagValue(int32_t flag) const
 {
     switch (flag) {
-        case helics_flag_dumplog:
+        case HELICS_FLAG_dumplog:
             return dumplog;
-        case helics_flag_force_logging_flush:
+        case HELICS_FLAG_force_logging_flush:
             return forceLoggingFlush.load();
         default:
             return false;
@@ -760,10 +760,10 @@ void BrokerBase::baseConfigure(ActionMessage& command)
 {
     if (command.action() == CMD_BASE_CONFIGURE) {
         switch (command.messageID) {
-            case helics_flag_dumplog:
+            case HELICS_FLAG_dumplog:
                 dumplog = checkActionFlag(command, indicator_flag);
                 break;
-            case helics_flag_force_logging_flush:
+            case HELICS_FLAG_force_logging_flush:
                 forceLoggingFlush = checkActionFlag(command, indicator_flag);
                 break;
             default:

@@ -43,7 +43,7 @@ namespace helics {
 namespace apps {
     Recorder::Recorder(const std::string& appName, FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
     }
 
     Recorder::Recorder(std::vector<std::string> args): App("recorder", std::move(args))
@@ -57,7 +57,7 @@ namespace apps {
     {
         auto app = buildArgParserApp();
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_observer);
+            fed->setFlagOption(HELICS_FLAG_observer);
             app->parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -73,19 +73,19 @@ namespace apps {
                        const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
     }
 
     Recorder::Recorder(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
     }
 
     Recorder::Recorder(const std::string& appName, const std::string& jsonString):
         App(appName, jsonString)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
         Recorder::loadJsonFile(jsonString);
     }
 

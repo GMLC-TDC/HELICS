@@ -160,13 +160,13 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 - A few missing message operators to the C++98 API, such as `data`, `append`, `setFlag`, `checkFlag`, `sendMessageZeroCopy`
 - Made the Message class return a self Reference for the setters
 - A test to run the helics-broker executable as part of the CI tests
-- A bug in the helics_broker that no longer ran correct defaults
+- A bug in the HelicsBroker that no longer ran correct defaults
 - A "version_all" query, to retrieve the version of HELICS in use for all cores/brokers, and a "version" query to retrieve the version of a specific target.
 - A series of checks for markdown, spelling, shellcheck, python formatting, cpplint, end-of-line and automated generation of PR scripts for the formatting updates.
 - Some level of automated scaling for benchmarks for small systems
 - API functions for retrieving the build flags used to generate the library
 - Some additional message interpreters to aid in debugging
-- A test using the standalone `helics_broker` to run an example
+- A test using the standalone `HelicsBroker` to run an example
 
 ## [2.5.0][] - 2020-04-26
 
@@ -178,7 +178,7 @@ Some library reorganization, additional static analysis(CppLint and clang-tidy),
 - Update FMT library to version 6.2.0
 - The core and broker Factories use a map instead of a fixed list which is a step toward allowing user defined cores
 - Updated CLI11 included code to customized version to allow configuration of cores and brokers through Json files
-- The ordering of the helics_error_types enum is in ascending order
+- The ordering of the HELICS_ERROR_types enum is in ascending order
 - Refactored the Matlab and Java swig interface builds to enable standalone builds
 
 ### Fixed
@@ -548,7 +548,7 @@ Minor release which fixes a few bugs and add some JSON related input and queries
 
 - a few possible race conditions found by thread-sanitizer
 - cleared up a couple scenarios that were triggering occasional test failure in the system tests
-- `helics_broker` and `helics_app` were returning non-zero return values when `--version` or `--help` were used, they now return 0 in those cases
+- `HelicsBroker` and `helics_app` were returning non-zero return values when `--version` or `--help` were used, they now return 0 in those cases
 - a small memory leak when a JSON stream builder was created and not destroyed properly
 - an inconsistency between the `helics_time_maxtime` in the C shared library and the maxTime value used in C++, this could in some cases result in failing termination conditions
 
@@ -668,7 +668,7 @@ This is a major revision so this changelog will not capture all the changes that
 - working octave interface for Linux
 - some additional tests for the shared library
 - TOML readers for interface description in Federates
-- interactive command line for helics_broker
+- interactive command line for HelicsBroker
 - a few new queries on brokers see [Queries](docs/user_guide/Queries.md)
 - CPACK can now build a dmg files
 - Players can have multiline comments in input file and omit the tag for repeated messages

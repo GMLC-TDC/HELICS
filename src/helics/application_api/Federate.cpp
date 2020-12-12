@@ -76,7 +76,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(name, fi);
     nameSegmentSeparator = fi.separator;
-    strictConfigChecking = fi.checkFlagProperty(helics_flag_strict_config_checking, true);
+    strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_strict_config_checking, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
@@ -114,7 +114,7 @@ Federate::Federate(const std::string& fedName,
     }
     fedID = coreObject->registerFederate(name, fi);
     nameSegmentSeparator = fi.separator;
-    strictConfigChecking = fi.checkFlagProperty(helics_flag_strict_config_checking, true);
+    strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_strict_config_checking, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
@@ -836,12 +836,12 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             auto opType = filterTypeFromString(operation);
             if ((useTypes) && (operation != "custom")) {
                 if (strictConfigChecking) {
-                    logMessage(helics_log_level_error,
+                    logMessage(HELICS_LOG_LEVEL_error,
                                "input and output types may only be specified for custom filters");
                     throw(InvalidParameter(
                         "input and output types may only be specified for custom filters"));
                 }
-                logMessage(helics_log_level_warning,
+                logMessage(HELICS_LOG_LEVEL_warning,
                            "input and output types may only be specified for custom filters");
                 continue;
             }
@@ -850,11 +850,11 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     if (strictConfigChecking) {
                         std::string emessage =
                             fmt::format("unrecognized filter operation:{}", operation);
-                        logMessage(helics_log_level_error, emessage);
+                        logMessage(HELICS_LOG_LEVEL_error, emessage);
 
                         throw(InvalidParameter(emessage));
                     }
-                    logMessage(helics_log_level_warning,
+                    logMessage(HELICS_LOG_LEVEL_warning,
                                fmt::format("unrecognized filter operation:{}", operation));
                     continue;
                 }
@@ -875,13 +875,13 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                         if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
                             if (strictConfigChecking) {
                                 logMessage(
-                                    helics_log_level_error,
+                                    HELICS_LOG_LEVEL_error,
                                     R"(filter properties require "name" and "value" fields)");
 
                                 throw(InvalidParameter(
                                     R"(filter properties require "name" and "value" fields)"));
                             }
-                            logMessage(helics_log_level_warning,
+                            logMessage(HELICS_LOG_LEVEL_warning,
                                        R"(filter properties require "name" and "value" fields)");
                             continue;
                         }
@@ -894,13 +894,13 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                 } else {
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         if (strictConfigChecking) {
-                            logMessage(helics_log_level_error,
+                            logMessage(HELICS_LOG_LEVEL_error,
                                        R"(filter properties require "name" and "value" fields)");
 
                             throw(InvalidParameter(
                                 R"(filter properties require "name" and "value" fields)"));
                         }
-                        logMessage(helics_log_level_warning,
+                        logMessage(HELICS_LOG_LEVEL_warning,
                                    R"(filter properties require "name" and "value" fields)");
                         continue;
                     }
@@ -955,12 +955,12 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             auto opType = filterTypeFromString(operation);
             if ((useTypes) && (operation != "custom")) {
                 if (strictConfigChecking) {
-                    logMessage(helics_log_level_error,
+                    logMessage(HELICS_LOG_LEVEL_error,
                                "input and output types may only be specified for custom filters");
                     throw(InvalidParameter(
                         "input and output types may only be specified for custom filters"));
                 }
-                logMessage(helics_log_level_warning,
+                logMessage(HELICS_LOG_LEVEL_warning,
                            "input and output types may only be specified for custom filters");
                 continue;
             }
@@ -968,11 +968,11 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                 if (opType == filter_types::unrecognized) {
                     auto emessage = fmt::format("unrecognized filter operation:{}", operation);
                     if (strictConfigChecking) {
-                        logMessage(helics_log_level_error, emessage);
+                        logMessage(HELICS_LOG_LEVEL_error, emessage);
 
                         throw(InvalidParameter(emessage));
                     }
-                    logMessage(helics_log_level_warning, emessage);
+                    logMessage(HELICS_LOG_LEVEL_warning, emessage);
                     continue;
                 }
             }
@@ -999,13 +999,13 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                         if ((propname.empty()) || (propval.is_uninitialized())) {
                             if (strictConfigChecking) {
                                 logMessage(
-                                    helics_log_level_error,
+                                    HELICS_LOG_LEVEL_error,
                                     R"(filter properties require "name" and "value" fields)");
 
                                 throw(InvalidParameter(
                                     R"(filter properties require "name" and "value" fields)"));
                             }
-                            logMessage(helics_log_level_warning,
+                            logMessage(HELICS_LOG_LEVEL_warning,
                                        R"(filter properties require "name" and "value" fields)");
                             continue;
                         }
@@ -1023,13 +1023,13 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
                     if ((propname.empty()) || (propval.is_uninitialized())) {
                         if (strictConfigChecking) {
-                            logMessage(helics_log_level_error,
+                            logMessage(HELICS_LOG_LEVEL_error,
                                        R"(filter properties require "name" and "value" fields)");
 
                             throw(InvalidParameter(
                                 R"(filter properties require "name" and "value" fields)"));
                         }
-                        logMessage(helics_log_level_warning,
+                        logMessage(HELICS_LOG_LEVEL_warning,
                                    R"(filter properties require "name" and "value" fields)");
                         continue;
                     }
@@ -1286,7 +1286,7 @@ void Federate::logMessage(int level, const std::string& message) const
 {
     if (coreObject) {
         coreObject->logMessage(fedID, level, message);
-    } else if (level <= helics_log_level_warning) {
+    } else if (level <= HELICS_LOG_LEVEL_warning) {
         std::cerr << message << std::endl;
     } else {
         std::cout << message << std::endl;

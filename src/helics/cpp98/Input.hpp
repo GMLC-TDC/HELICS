@@ -57,7 +57,7 @@ class Input {
     /** set the default bool value*/
     void setDefault(bool val)
     {
-        helicsInputSetDefaultBoolean(inp, val ? helics_true : helics_false, HELICS_IGNORE_ERROR);
+        helicsInputSetDefaultBoolean(inp, val ? helics_true : HELICS_FALSE, HELICS_IGNORE_ERROR);
     }
     /** set the default double value*/
     void setDefault(double val) { helicsInputSetDefaultDouble(inp, val, HELICS_IGNORE_ERROR); }

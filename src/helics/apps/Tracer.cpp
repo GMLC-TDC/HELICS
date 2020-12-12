@@ -34,7 +34,7 @@ namespace helics {
 namespace apps {
     Tracer::Tracer(const std::string& appName, FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
     }
 
     Tracer::Tracer(std::vector<std::string> args): App("tracer", std::move(args)) { processArgs(); }
@@ -45,7 +45,7 @@ namespace apps {
     {
         auto app = buildArgParserApp();
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_observer);
+            fed->setFlagOption(HELICS_FLAG_observer);
             app->parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -60,18 +60,18 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
     }
 
     Tracer::Tracer(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
     }
 
     Tracer::Tracer(const std::string& name, const std::string& file): App(name, file)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_observer);
         Tracer::loadJsonFile(file);
     }
 

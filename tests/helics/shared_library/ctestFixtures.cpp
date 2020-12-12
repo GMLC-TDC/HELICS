@@ -71,7 +71,7 @@ FederateTestFixture::~FederateTestFixture()
     federates.clear();
 
     for (auto& broker : brokers) {
-        if (helicsBrokerIsValid(broker) == helics_false) {
+        if (helicsBrokerIsValid(broker) == HELICS_FALSE) {
             continue;
         }
         helics_bool res;
@@ -149,7 +149,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
 
     helics_federate_info fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str(), &err);
-    helicsFederateInfoSetTimeProperty(fi, helics_property_time_delta, time_delta, &err);
+    helicsFederateInfoSetTimeProperty(fi, HELICS_PROPERTY_TIME_delta, time_delta, &err);
 
     switch (setup) {
         case 1:
@@ -158,13 +158,13 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             auto core = helicsCreateCore(core_type_name.c_str(), NULL, init.c_str(), &err);
 
             helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
-            assert(err.error_code == 0);
+            assert(err.errorCode == 0);
             size_t offset = federates.size();
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii) {
                 auto name = name_prefix + std::to_string(ii + offset);
                 auto fed = ctor(name.c_str(), fi, &err);
-                assert(err.error_code == 0);
+                assert(err.errorCode == 0);
                 federates[ii + offset] = fed;
             }
             helicsCoreFree(core);
@@ -177,10 +177,10 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
                 auto core = helicsCreateCore(core_type_name.c_str(), NULL, init.c_str(), &err);
 
                 helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
-                assert(err.error_code == 0);
+                assert(err.errorCode == 0);
                 auto name = name_prefix + std::to_string(ii + offset);
                 auto fed = ctor(name.c_str(), fi, &err);
-                assert(err.error_code == 0);
+                assert(err.errorCode == 0);
                 federates[ii + offset] = fed;
                 helicsCoreFree(core);
             }

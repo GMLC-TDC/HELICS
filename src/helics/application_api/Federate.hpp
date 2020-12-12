@@ -541,28 +541,28 @@ specific name of a federate, core, or broker
     */
     void logErrorMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_error, message);
+        logMessage(HELICS_LOG_LEVEL_error, message);
     }
     /** log a warning message to the federate Logger
     @param message the message to log
     */
     void logWarningMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_warning, message);
+        logMessage(HELICS_LOG_LEVEL_warning, message);
     }
     /** log an info message to the federate Logger
     @param message the message to log
     */
     void logInfoMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_summary, message);
+        logMessage(HELICS_LOG_LEVEL_summary, message);
     }
     /** log a debug message to the federate Logger
     @param message the message to log
     */
     void logDebugMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_data, message);
+        logMessage(HELICS_LOG_LEVEL_data, message);
     }
     /** call to complete async operation with no output*/
     void completeOperation();

@@ -40,7 +40,7 @@ namespace apps {
         helicsCLI11App app("Options specific to the Source App");
         app.add_option("--default_period", defaultPeriod, "the default period publications");
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_source_only);
+            fed->setFlagOption(HELICS_FLAG_source_only);
             app.parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -52,7 +52,7 @@ namespace apps {
     }
     Source::Source(const std::string& appName, const FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
     }
 
     Source::Source(const std::string& appName,
@@ -60,19 +60,19 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
     }
 
     Source::Source(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
     }
 
     Source::Source(const std::string& name, const std::string& configString):
         App(name, configString)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_source_only);
 
         Source::loadJsonFile(configString);
     }

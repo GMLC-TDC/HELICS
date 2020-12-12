@@ -495,7 +495,7 @@ TEST(federate_tests, enterExec)
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
     Fed1->enterInitializingModeAsync();
-    Fed1->setProperty(helics_properties::helics_property_time_delta, helics::Time(1.0));
+    Fed1->setProperty(helics_properties::HELICS_PROPERTY_TIME_delta, helics::Time(1.0));
     // make sure it doesn't error if called twice
     EXPECT_NO_THROW(Fed1->enterInitializingModeAsync());
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());

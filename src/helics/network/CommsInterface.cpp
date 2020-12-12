@@ -538,7 +538,7 @@ bool CommsInterface::isConnected() const
 void CommsInterface::logMessage(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(helics_log_level_interfaces, "commMessage||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_interfaces, "commMessage||" + name, message);
     } else {
         std::cout << "commMessage||" << name << ":" << message << std::endl;
     }
@@ -547,7 +547,7 @@ void CommsInterface::logMessage(const std::string& message) const
 void CommsInterface::logWarning(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(helics_log_level_warning, "commWarning||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_warning, "commWarning||" + name, message);
     } else {
         std::cerr << "commWarning||" << name << ":" << message << std::endl;
     }
@@ -556,7 +556,7 @@ void CommsInterface::logWarning(const std::string& message) const
 void CommsInterface::logError(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(helics_log_level_error, "commERROR||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_error, "commERROR||" + name, message);
     } else {
         std::cerr << "commERROR||" << name << ":" << message << std::endl;
     }

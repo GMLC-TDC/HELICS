@@ -31,7 +31,7 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     fi.coreName = "ccore2";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::CombinationFederate mfed("block1", fi);
 
@@ -88,7 +88,7 @@ static void useFile(const std::string& corename, const std::string& file)
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = corename;
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::apps::Player play1("play1", fi);
     play1.loadFile(file);
@@ -124,7 +124,7 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     fi.coreName = "ccore3";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::CombinationFederate mfed("block1", fi);
 
@@ -188,7 +188,7 @@ static void useFileBinary(const std::string& corename, const std::string& file)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = corename;
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::apps::Player play1("play1", fi);
     play1.loadFile(file);

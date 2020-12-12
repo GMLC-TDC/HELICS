@@ -122,13 +122,13 @@ class FederateInfo {
     }
     /** set a flag
     @param flag /ref helics_federate_flags
-    @param value the value of the flag usually helics_true or helics_false
+    @param value the value of the flag usually helics_true or HELICS_FALSE
     */
     void setFlagOption(int flag, bool value = true)
     {
         helicsFederateInfoSetFlagOption(fi,
                                         flag,
-                                        value ? helics_true : helics_false,
+                                        value ? helics_true : HELICS_FALSE,
                                         HELICS_NULL_POINTER);
     }
     /** set a time federate or core property
@@ -250,7 +250,7 @@ class Federate {
     {
         helicsFederateSetFlagOption(fed,
                                     flag,
-                                    flagValue ? helics_true : helics_false,
+                                    flagValue ? helics_true : HELICS_FALSE,
                                     hThrowOnError());
     }
     /**  set a time property option for the federate
@@ -275,7 +275,7 @@ class Federate {
     */
     bool getFlagOption(int flag) const
     {
-        return (helicsFederateGetFlagOption(fed, flag, hThrowOnError()) != helics_false);
+        return (helicsFederateGetFlagOption(fed, flag, hThrowOnError()) != HELICS_FALSE);
     }
     /** get the value of a time option for the federate
     @param tProperty the option to get
@@ -346,10 +346,10 @@ class Federate {
     @param iterate an optional flag indicating the desired iteration mode
     */
     helics_iteration_result
-        enterExecutingMode(helics_iteration_request iterate = helics_iteration_request_no_iteration)
+        enterExecutingMode(helics_iteration_request iterate = HELICS_ITERATION_REQUEST_no_iteration)
     {
-        helics_iteration_result out_iterate = helics_iteration_result_next_step;
-        if (iterate == helics_iteration_request_no_iteration) {
+        helics_iteration_result out_iterate = HELICS_ITERATION_RESULT_next_step;
+        if (iterate == HELICS_ITERATION_REQUEST_no_iteration) {
             helicsFederateEnterExecutingMode(fed, hThrowOnError());
         } else {
             out_iterate = helicsFederateEnterExecutingModeIterative(fed, iterate, hThrowOnError());
@@ -362,9 +362,9 @@ class Federate {
     @param iterate an optional flag indicating the desired iteration mode
     */
     void enterExecutingModeAsync(
-        helics_iteration_request iterate = helics_iteration_request_no_iteration)
+        helics_iteration_request iterate = HELICS_ITERATION_REQUEST_no_iteration)
     {
-        if (iterate == helics_iteration_request_no_iteration) {
+        if (iterate == HELICS_ITERATION_REQUEST_no_iteration) {
             helicsFederateEnterExecutingModeAsync(fed, hThrowOnError());
             exec_async_iterate = false;
         } else {
@@ -379,7 +379,7 @@ class Federate {
     */
     helics_iteration_result enterExecutingModeComplete()
     {
-        helics_iteration_result out_iterate = helics_iteration_result_next_step;
+        helics_iteration_result out_iterate = HELICS_ITERATION_RESULT_next_step;
         if (exec_async_iterate) {
             out_iterate = helicsFederateEnterExecutingModeIterativeComplete(fed, hThrowOnError());
         } else {

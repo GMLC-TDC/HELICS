@@ -1337,8 +1337,8 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
     }
     auto* fed = getFederateAt(handleInfo->local_fed_id);
     if (fed->checkAndSetValue(handle, data, len)) {
-        if (fed->loggingLevel() >= helics_log_level_data) {
-            fed->logMessage(helics_log_level_data,
+        if (fed->loggingLevel() >= HELICS_LOG_LEVEL_data) {
+            fed->logMessage(HELICS_LOG_LEVEL_data,
                             fed->getIdentifier(),
                             fmt::format("setting value for {} size {}", handleInfo->key, len));
         }
@@ -1850,8 +1850,8 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
         m.actionTime = minTime;
     }
 
-    if (fed->loggingLevel() >= helics_log_level_data) {
-        fed->logMessage(helics_log_level_data,
+    if (fed->loggingLevel() >= HELICS_LOG_LEVEL_data) {
+        fed->logMessage(HELICS_LOG_LEVEL_data,
                         "",
                         fmt::format("receive_message {}", prettyPrintString(m)));
     }

@@ -42,7 +42,7 @@ TEST_P(vfed2_type_tests, block_send_receive)
     auto pubid3 = helicsFederateRegisterTypePublication(vFed1, "pub3", "", "", &err);
     EXPECT_TRUE(pubid3 != nullptr);
     auto sub1 = helicsFederateRegisterSubscription(vFed1, "fed0/pub3", "", &err);
-    CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_delta, 1.0, &err));
+    CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_delta, 1.0, &err));
 
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
     CE(helicsPublicationPublishBytes(pubid3, s.data(), len, &err));
@@ -80,10 +80,10 @@ TEST_P(vfed2_simple_type_tests, async_calls)
 
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", helics_data_type_string, nullptr, &err);
+        vFed1, "pub1", HELICS_DATA_TYPE_string, nullptr, &err);
     auto subid = helicsFederateRegisterSubscription(vFed2, "pub1", "", &err);
-    CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_delta, 1.0, &err));
-    CE(helicsFederateSetTimeProperty(vFed2, helics_property_time_delta, 1.0, &err));
+    CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_delta, 1.0, &err));
+    CE(helicsFederateSetTimeProperty(vFed2, HELICS_PROPERTY_TIME_delta, 1.0, &err));
 
     CE(helicsFederateEnterExecutingModeAsync(vFed1, &err));
     CE(helicsFederateEnterExecutingModeAsync(vFed2, &err));
@@ -139,7 +139,7 @@ TEST_F(vfed2_tests, file_load)
     // fi = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     vFed = helicsCreateValueFederateFromConfig(TEST_DIR "/example_value_fed.json", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
     ASSERT_FALSE(vFed == nullptr);
     const char* s = helicsFederateGetName(vFed);
     EXPECT_STREQ(s, "valueFed");
@@ -162,10 +162,10 @@ TEST_F(vfed2_tests, json_publish)
     ASSERT_FALSE(vFed1 == nullptr);
     helicsFederateSetSeparator(vFed1, '/', nullptr);
 
-    helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
-    helicsFederateRegisterPublication(vFed1, "pub2", helics_data_type_string, "", nullptr);
-    helicsFederateRegisterPublication(vFed1, "group1/pubA", helics_data_type_double, "", nullptr);
-    helicsFederateRegisterPublication(vFed1, "group1/pubB", helics_data_type_string, "", nullptr);
+    helicsFederateRegisterGlobalPublication(vFed1, "pub1", HELICS_DATA_TYPE_double, "", nullptr);
+    helicsFederateRegisterPublication(vFed1, "pub2", HELICS_DATA_TYPE_string, "", nullptr);
+    helicsFederateRegisterPublication(vFed1, "group1/pubA", HELICS_DATA_TYPE_double, "", nullptr);
+    helicsFederateRegisterPublication(vFed1, "group1/pubB", HELICS_DATA_TYPE_string, "", nullptr);
 
     auto s1 = helicsFederateRegisterSubscription(vFed1, "pub1", nullptr, nullptr);
     auto s2 = helicsFederateRegisterSubscription(vFed1, "fed0/pub2", nullptr, nullptr);

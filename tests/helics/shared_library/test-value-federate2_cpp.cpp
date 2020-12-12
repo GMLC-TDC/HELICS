@@ -39,13 +39,13 @@ TEST_P(vfed_type_tests, test_block_send_receive)
     ASSERT_TRUE((vFed1));
     auto pubid1 = vFed1->registerPublication("pub1", "string", "");
     EXPECT_TRUE(pubid1.baseObject() != nullptr);
-    auto pubid2 = vFed1->registerGlobalPublication("pub2", helics_data_type_int, "");
+    auto pubid2 = vFed1->registerGlobalPublication("pub2", HELICS_DATA_TYPE_int, "");
     EXPECT_TRUE(pubid2.baseObject() != nullptr);
     auto pubid3 = vFed1->registerPublication("pub3", "");
     EXPECT_TRUE(pubid3.baseObject() != nullptr);
     auto sub1 = vFed1->registerSubscription("fed0/pub3");
     SCOPED_TRACE("reg opt1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     SCOPED_TRACE("set Delta");
     vFed1->enterExecutingMode();
     SCOPED_TRACE("publish");
@@ -82,10 +82,10 @@ TEST_P(vfed_type_tests, test_async_calls)
     auto vFed2 = GetFederateAs<helicscpp::ValueFederate>(1);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication("pub1", helics_data_type_string, "");
+    auto pubid = vFed1->registerGlobalPublication("pub1", HELICS_DATA_TYPE_string, "");
     auto subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();

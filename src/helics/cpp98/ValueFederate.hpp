@@ -22,14 +22,14 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helicscpp {
 /** enumeration of the available types of publications and inputs*/
 enum PubSubTypes {
-    STRING_TYPE = helics_data_type_string,
-    DOUBLE_TYPE = helics_data_type_double,
-    INT_TYPE = helics_data_type_int,
-    COMPLEX_TYPE = helics_data_type_complex,
-    VECTOR_TYPE = helics_data_type_vector,
-    TIME_TYPE = helics_data_type_time,
-    BOOLEAN_TYPE = helics_data_type_boolean,
-    RAW_TYPE = helics_data_type_raw
+    STRING_TYPE = HELICS_DATA_TYPE_string,
+    DOUBLE_TYPE = HELICS_DATA_TYPE_double,
+    INT_TYPE = HELICS_DATA_TYPE_int,
+    COMPLEX_TYPE = HELICS_DATA_TYPE_complex,
+    VECTOR_TYPE = HELICS_DATA_TYPE_vector,
+    TIME_TYPE = HELICS_DATA_TYPE_time,
+    BOOLEAN_TYPE = HELICS_DATA_TYPE_boolean,
+    RAW_TYPE = HELICS_DATA_TYPE_raw
 };
 
 /** Class defining a ValueFederate object which interacts with publication and Inputs*/
@@ -49,7 +49,7 @@ class ValueFederate: public virtual Federate {
     {
         fed = helicsCreateValueFederate(fedName.c_str(), fi.getInfo(), hThrowOnError());
         if (fed == NULL) {
-            throw(HelicsException(helics_error_registration_failure, "Fed==NULL"));
+            throw(HelicsException(HELICS_ERROR_registration_failure, "Fed==NULL"));
         }
     }
     /**constructor taking a string with the required information
@@ -60,7 +60,7 @@ class ValueFederate: public virtual Federate {
     {
         fed = helicsCreateValueFederateFromConfig(configString.c_str(), hThrowOnError());
         if (fed == NULL) {
-            throw(HelicsException(helics_error_registration_failure, "Fed==NULL"));
+            throw(HelicsException(HELICS_ERROR_registration_failure, "Fed==NULL"));
         }
     }
     /** copy constructor*/
@@ -72,7 +72,7 @@ class ValueFederate: public virtual Federate {
         ipts = fedObj.ipts;
         pubs = fedObj.pubs;
         if (fed == NULL) {
-            throw(HelicsException(helics_error_registration_failure, "Fed==NULL move constructor"));
+            throw(HelicsException(HELICS_ERROR_registration_failure, "Fed==NULL move constructor"));
         }
         return *this;
     }

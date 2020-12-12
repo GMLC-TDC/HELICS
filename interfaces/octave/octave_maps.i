@@ -8,28 +8,28 @@
 static octave_value Helics_ErrorType(helics_error *err) {
 switch (err->error_code)
   {
-  case helics_error_registration_failure:
+  case HELICS_ERROR_registration_failure:
     return "helics:registration_failure";
-  case   helics_error_connection_failure:
+  case   HELICS_ERROR_connection_failure:
     return "helics:connection_failure";
-  case   helics_error_invalid_object:
+  case   HELICS_ERROR_invalid_object:
     return "helics:invalid_object";
-  case   helics_error_invalid_argument:
+  case   HELICS_ERROR_invalid_argument:
     return "helics:invalid_argument";
-  case   helics_error_discard:
+  case   HELICS_ERROR_discard:
     return "helics:discard";
-  case helics_error_system_failure:
+  case HELICS_ERROR_system_failure:
     return "helics:system_failure";
-  case   helics_error_invalid_state_transition:
+  case   HELICS_ERROR_invalid_state_transition:
     return "helics:invalid_state_transition";
-  case   helics_error_invalid_function_call:
+  case   HELICS_ERROR_invalid_function_call:
     return "helics:invalid_function_call";
-  case   helics_error_execution_failure:
+  case   HELICS_ERROR_execution_failure:
     return "helics:execution_failure";
-  case   helics_error_insufficient_space:
+  case   HELICS_ERROR_insufficient_space:
     return "helics:insufficient_space";
-  case   helics_error_other:
-  case   helics_error_external_type:
+  case   HELICS_ERROR_other:
+  case   HELICS_ERROR_external_type:
   default:
     return "helics:error";
   }

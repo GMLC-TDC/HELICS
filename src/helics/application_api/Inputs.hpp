@@ -23,15 +23,14 @@ namespace helics {
 
 class ValueFederate;
 enum multi_input_handling_method : uint16_t {
-    no_op = helics_multi_input_no_op,
-    vectorize_operation = helics_multi_input_vectorize_operation,
-    and_operation = helics_multi_input_and_operation,
-    or_operation = helics_multi_input_or_operation,
-    sum_operation = helics_multi_input_sum_operation,
-    diff_operation = helics_multi_input_diff_operation,
-    max_operation = helics_multi_input_max_operation,
-    min_operation = helics_multi_input_min_operation,
-    average_operation = helics_multi_input_average_operation
+    no_op = HELICS_MULTI_INPUT_no_op,
+    vectorize_OPERATION = HELICS_MULTI_INPUT_VECTORIZE_OPERATION,
+    and_OPERATION = HELICS_MULTI_INPUT_AND_OPERATION,
+    or_OPERATION = HELICS_MULTI_INPUT_SUM_OPERATION,
+    diff_OPERATION = HELICS_MULTI_INPUT_DIFF_OPERATION,
+    max_OPERATION = HELICS_MULTI_INPUT_MAX_OPERATION,
+    min_OPERATION = HELICS_MULTI_INPUT_MIN_OPERATION,
+    average_OPERATION = HELICS_MULTI_INPUT_AVERAGE_OPERATION
 };
 
 /** base class for a input object*/

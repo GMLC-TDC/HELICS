@@ -161,7 +161,7 @@ class Message {
     /** set an indexed flag in the message*/
     Message& setFlag(int flag, bool val)
     {
-        helicsMessageSetFlagOption(mo, flag, val ? helics_true : helics_false, hThrowOnError());
+        helicsMessageSetFlagOption(mo, flag, val ? helics_true : HELICS_FALSE, hThrowOnError());
         return *this;
     }
     /** check an indexed flag in the message valid numbers are [0,15]*/

@@ -50,7 +50,7 @@ TEST_P(mfed_single_type_tests, send_receive)
 
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed1->registerGlobalEndpoint("ep2", "random");
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     mFed1->enterExecutingMode();
 
@@ -88,7 +88,7 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
     Endpoint epid(mFed1.get(), "ep1");
 
     Endpoint epid2(GLOBAL, mFed1.get(), "ep2", "random");
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     mFed1->enterExecutingMode();
 
@@ -126,8 +126,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
@@ -181,8 +181,8 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
@@ -237,8 +237,8 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
 
     Endpoint epid2(GLOBAL, mFed2.get(), "ep2", "random");
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
@@ -294,8 +294,8 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     epid.setDefaultDestination("ep2");
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
@@ -368,8 +368,8 @@ TEST_P(mfed_all_type_tests, time_interruptions)
 
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
-    mFed1->setProperty(helics_property_time_delta, 1);
-    mFed2->setProperty(helics_property_time_delta, 0.5);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 0.5);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();

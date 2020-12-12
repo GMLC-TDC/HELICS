@@ -331,7 +331,7 @@ TEST(tracer_tests, tracer_test_destendpoint_clone)
     fi.coreName = "tcore-dep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
@@ -414,7 +414,7 @@ TEST(tracer_tests, srcendpoint_clone)
     };
     trace1.setClonedMessageCallback(cb);
 
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 
@@ -486,7 +486,7 @@ TEST(tracer_tests, tracer_test_endpoint_clone)
     };
     trace1.setClonedMessageCallback(cb);
 
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 
@@ -565,7 +565,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     fi.coreName.push_back(indx++);
     fi.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 

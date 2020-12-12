@@ -45,7 +45,7 @@ const std::string emptyStr;
 helics_error helicsErrorInitialize(void)
 {
     helics_error err;
-    err.error_code = 0;
+    err.errorCode = 0;
     err.message = nullstrPtr;
     return err;
 }
@@ -62,17 +62,17 @@ void helicsErrorClear(helics_error* err)
 helics_bool helicsIsCoreTypeAvailable(const char* type)
 {
     if (type == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     auto coreType = helics::core::coreTypeFromString(type);
-    return (helics::core::isCoreTypeAvailable(coreType)) ? helics_true : helics_false;
+    return (helics::core::isCoreTypeAvailable(coreType)) ? helics_true : HELICS_FALSE;
 }
 
 // typedef enum {
 
 //    helics_ok = 0, /*!< the function executed successfully */
-//    helics_error_invalid_object, /*!< indicator that the object used was not a valid object */
-//    helics_error_invalid_argument, /*!< the parameter passed was invalid and unable to be used*/
+//    HELICS_ERROR_invalid_object, /*!< indicator that the object used was not a valid object */
+//    HELICS_ERROR_invalid_argument, /*!< the parameter passed was invalid and unable to be used*/
 //    helics_discard, /*!< the input was discarded and not used for some reason */
 //    helics_terminated, /*!< the federate has terminated and the call cannot be completed*/
 //    helics_warning, /*!< the function issued a warning of some kind */
@@ -98,55 +98,55 @@ void helicsErrorHandler(helics_error* err) noexcept
                 std::rethrow_exception(eptr);
             } else {
                 // LCOV_EXCL_START
-                err->error_code = helics_error_external_type;
+                err->error_code = HELICS_ERROR_external_type;
                 err->message = unknown_err_string;
                 // LCOV_EXCL_STOP
             }
         }
         catch (const helics::InvalidFunctionCall& ifc) {
-            err->error_code = helics_error_invalid_function_call;
+            err->error_code = HELICS_ERROR_invalid_function_call;
             err->message = getMasterHolder()->addErrorString(ifc.what());
         }
         catch (const helics::InvalidParameter& ip) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(ip.what());
         }
         catch (const helics::RegistrationFailure& rf) {
-            err->error_code = helics_error_registration_failure;
+            err->error_code = HELICS_ERROR_registration_failure;
             err->message = getMasterHolder()->addErrorString(rf.what());
         }
         catch (const helics::ConnectionFailure& cf) {
-            err->error_code = helics_error_connection_failure;
+            err->error_code = HELICS_ERROR_connection_failure;
             err->message = getMasterHolder()->addErrorString(cf.what());
         }
         // LCOV_EXCL_START
         catch (const helics::InvalidIdentifier& iid) {
-            err->error_code = helics_error_invalid_object;
+            err->error_code = HELICS_ERROR_invalid_object;
             err->message = getMasterHolder()->addErrorString(iid.what());
         }
         catch (const helics::HelicsSystemFailure& ht) {
-            err->error_code = helics_error_system_failure;
+            err->error_code = HELICS_ERROR_system_failure;
             err->message = getMasterHolder()->addErrorString(ht.what());
         }
         // LCOV_EXCL_STOP
         catch (const helics::HelicsException& he) {
-            err->error_code = helics_error_other;
+            err->error_code = HELICS_ERROR_other;
             err->message = getMasterHolder()->addErrorString(he.what());
         }
         catch (const std::exception& exc) {
-            err->error_code = helics_error_external_type;
+            err->error_code = HELICS_ERROR_external_type;
             err->message = getMasterHolder()->addErrorString(exc.what());
         }
         // LCOV_EXCL_START
         catch (...) {
-            err->error_code = helics_error_external_type;
+            err->error_code = HELICS_ERROR_external_type;
             err->message = unknown_err_string;
         }
         // LCOV_EXCL_STOP
     }
     // LCOV_EXCL_START
     catch (...) {
-        err->error_code = helics_error_external_type;
+        err->error_code = HELICS_ERROR_external_type;
         err->message = unknown_err_string;
     }
     // LCOV_EXCL_STOP
@@ -162,14 +162,14 @@ CoreObject* getCoreObject(helics_core core, helics_error* err) noexcept
         return nullptr;
     }
     if (core == nullptr) {
-        assignError(err, helics_error_invalid_object, invalidCoreString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidCoreString);
         return nullptr;
     }
     auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
     if (coreObj->valid == coreValidationIdentifier) {
         return coreObj;
     }
-    assignError(err, helics_error_invalid_object, invalidCoreString);
+    assignError(err, HELICS_ERROR_invalid_object, invalidCoreString);
     return nullptr;
 }
 
@@ -179,14 +179,14 @@ BrokerObject* getBrokerObject(helics_broker broker, helics_error* err) noexcept
         return nullptr;
     }
     if (broker == nullptr) {
-        assignError(err, helics_error_invalid_object, invalidBrokerString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidBrokerString);
         return nullptr;
     }
     auto* brokerObj = reinterpret_cast<helics::BrokerObject*>(broker);
     if (brokerObj->valid == brokerValidationIdentifier) {
         return brokerObj;
     }
-    assignError(err, helics_error_invalid_object, invalidBrokerString);
+    assignError(err, HELICS_ERROR_invalid_object, invalidBrokerString);
     return nullptr;
 }
 
@@ -228,7 +228,7 @@ helics_core helicsCreateCore(const char* type, const char* name, const char* ini
 
     if (ct == helics::core_type::UNRECOGNIZED) {
         if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -262,7 +262,7 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
 
     if (ct == helics::core_type::UNRECOGNIZED) {
         if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -307,9 +307,9 @@ helics_bool helicsCoreIsValid(helics_core core)
 {
     auto* coreObj = helics::getCoreObject(core, nullptr);
     if (coreObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (coreObj->coreptr) ? helics_true : helics_false;
+    return (coreObj->coreptr) ? helics_true : HELICS_FALSE;
 }
 
 helics_federate helicsGetFederateByName(const char* fedName, helics_error* err)
@@ -319,7 +319,7 @@ helics_federate helicsGetFederateByName(const char* fedName, helics_error* err)
     }
     if (fedName == nullptr) {
         if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString("fedName is empty");
         }
         return nullptr;
@@ -328,7 +328,7 @@ helics_federate helicsGetFederateByName(const char* fedName, helics_error* err)
     auto* fed = mob->findFed(fedName);
     if (fed == nullptr) {
         if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string(fedName) + " is not an active federate identifier");
         }
         return nullptr;
@@ -345,7 +345,7 @@ helics_broker helicsCreateBroker(const char* type, const char* name, const char*
 
     if (ct == helics::core_type::UNRECOGNIZED) {
         if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -373,7 +373,7 @@ helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int
 
     if (ct == helics::core_type::UNRECOGNIZED) {
         if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
+            err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -415,18 +415,18 @@ helics_bool helicsBrokerIsValid(helics_broker broker)
 {
     auto* brokerObj = helics::getBrokerObject(broker, nullptr);
     if (brokerObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (brokerObj->brokerptr) ? helics_true : helics_false;
+    return (brokerObj->brokerptr) ? helics_true : HELICS_FALSE;
 }
 
 helics_bool helicsBrokerIsConnected(helics_broker broker)
 {
     auto* brk = getBroker(broker, nullptr);
     if (brk == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (brk->isConnected()) ? helics_true : helics_false;
+    return (brk->isConnected()) ? helics_true : HELICS_FALSE;
 }
 
 static constexpr char invalidDataLinkString[] = "Data link arguments cannot be null";
@@ -438,7 +438,7 @@ void helicsBrokerDataLink(helics_broker broker, const char* source, const char* 
         return;
     }
     if ((source == nullptr) || (target == nullptr)) {
-        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidDataLinkString);
         return;
     }
     brk->dataLink(source, target);
@@ -451,7 +451,7 @@ void helicsCoreDataLink(helics_core core, const char* source, const char* target
         return;
     }
     if ((source == nullptr) || (target == nullptr)) {
-        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidDataLinkString);
         return;
     }
     cr->dataLink(source, target);
@@ -466,7 +466,7 @@ void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const ch
         return;
     }
     if (valueName == nullptr) {
-        assignError(err, helics_error_invalid_argument, invalidGlobalString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidGlobalString);
         return;
     }
     brk->setGlobal(valueName, AS_STRING(value));
@@ -515,7 +515,7 @@ void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* fil
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidDataLinkString);
         return;
     }
     brk->addSourceFilterToEndpoint(filter, endpoint);
@@ -528,7 +528,7 @@ void helicsBrokerAddDestinationFilterToEndpoint(helics_broker broker, const char
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidDataLinkString);
         return;
     }
     brk->addDestinationFilterToEndpoint(filter, endpoint);
@@ -555,7 +555,7 @@ void helicsCoreAddSourceFilterToEndpoint(helics_core core, const char* filter, c
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidDataLinkString);
         return;
     }
     cr->addSourceFilterToEndpoint(filter, endpoint);
@@ -568,7 +568,7 @@ void helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filt
         return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
-        assignError(err, helics_error_invalid_argument, invalidDataLinkString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidDataLinkString);
         return;
     }
     cr->addDestinationFilterToEndpoint(filter, endpoint);
@@ -592,9 +592,9 @@ helics_bool helicsCoreIsConnected(helics_core core)
 {
     auto* cr = getCore(core, nullptr);
     if (cr == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
-    return (cr->isConnected()) ? helics_true : helics_false;
+    return (cr->isConnected()) ? helics_true : HELICS_FALSE;
 }
 
 void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* value, helics_error* err)
@@ -604,7 +604,7 @@ void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* va
         return;
     }
     if (valueName == nullptr) {
-        assignError(err, helics_error_invalid_argument, invalidGlobalString);
+        assignError(err, HELICS_ERROR_invalid_argument, invalidGlobalString);
         return;
     }
     cr->setGlobal(valueName, AS_STRING(value));
@@ -684,16 +684,16 @@ helics_bool helicsCoreConnect(helics_core core, helics_error* err)
 {
     auto* cr = getCore(core, err);
     if (cr == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
 
     try {
-        return (cr->connect()) ? helics_true : helics_false;
+        return (cr->connect()) ? helics_true : HELICS_FALSE;
     }
     // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return helics_false;
+        return HELICS_FALSE;
     }
     // LCOV_EXCL_STOP
 }
@@ -722,7 +722,7 @@ helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, he
         return helics_true;
     }
     bool res = brk->waitForDisconnect(std::chrono::milliseconds(msToWait));
-    return res ? helics_true : helics_false;
+    return res ? helics_true : HELICS_FALSE;
 }
 
 helics_bool helicsCoreWaitForDisconnect(helics_core core, int msToWait, helics_error* err)
@@ -732,7 +732,7 @@ helics_bool helicsCoreWaitForDisconnect(helics_core core, int msToWait, helics_e
         return helics_true;
     }
     bool res = cr->waitForDisconnect(std::chrono::milliseconds(msToWait));
-    return res ? helics_true : helics_false;
+    return res ? helics_true : HELICS_FALSE;
 }
 
 void helicsBrokerDisconnect(helics_broker broker, helics_error* err)
@@ -838,12 +838,12 @@ static helics::QueryObject* getQueryObj(helics_query query, helics_error* err)
         return nullptr;
     }
     if (query == nullptr) {
-        assignError(err, helics_error_invalid_object, invalidQueryString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidQueryString);
         return nullptr;
     }
     auto* queryPtr = reinterpret_cast<helics::QueryObject*>(query);
     if (queryPtr->valid != validQueryIdentifier) {
-        assignError(err, helics_error_invalid_object, invalidQueryString);
+        assignError(err, HELICS_ERROR_invalid_object, invalidQueryString);
         return nullptr;
     }
     return queryPtr;
@@ -970,13 +970,13 @@ helics_bool helicsQueryIsCompleted(helics_query query)
 {
     auto* queryObj = getQueryObj(query, nullptr);
     if (queryObj == nullptr) {
-        return helics_false;
+        return HELICS_FALSE;
     }
     if (queryObj->asyncIndexCode.isValid()) {
         auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
-        return (res) ? helics_true : helics_false;
+        return (res) ? helics_true : HELICS_FALSE;
     }
-    return helics_false;
+    return HELICS_FALSE;
 }
 
 void helicsQuerySetTarget(helics_query query, const char* target, helics_error* err)

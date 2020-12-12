@@ -197,8 +197,8 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->setFlagOption(helics_flag_terminate_on_error);
-    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed1->setFlagOption(HELICS_FLAG_terminate_on_error);
+    fed2->setFlagOption(HELICS_FLAG_terminate_on_error);
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
 
@@ -235,10 +235,10 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->getCorePointer()->setFlagOption(helics::gLocalCoreId,
-                                          helics_flag_terminate_on_error,
+                                          HELICS_FLAG_terminate_on_error,
                                           true);
     fed2->getCorePointer()->setFlagOption(helics::gLocalCoreId,
-                                          helics_flag_terminate_on_error,
+                                          HELICS_FLAG_terminate_on_error,
                                           true);
 
     fed1->registerGlobalPublication("testkey", "");
@@ -481,7 +481,7 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     auto fed3 = GetFederateAs<helics::ValueFederate>(2);
 
     fed1->registerGlobalPublication("t1", "double", "V");
-    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed2->setFlagOption(HELICS_FLAG_terminate_on_error);
     fed2->registerSubscription("t1", "m");
     auto& sub = fed3->registerSubscription("t1", "m");
     sub.setOption(helics::defs::options::ignore_unit_mismatch);

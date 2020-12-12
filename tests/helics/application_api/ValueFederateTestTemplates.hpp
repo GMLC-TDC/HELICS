@@ -32,7 +32,7 @@ void runFederateTest(const std::string& core_type_str,
     auto& pubid = vFed->registerGlobalPublication<X>("pub1");
 
     auto& subid = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     subid.setDefault(defaultValue);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -82,7 +82,7 @@ void runFederateTestObj(const std::string& core_type_str,
 
     auto& subid = vFed->registerSubscription("pub1");
 
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     subid.setDefault(defaultValue);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -128,7 +128,7 @@ void runFederateTestv2(const std::string& core_type_str,
     auto& pubid = vFed->registerGlobalPublication<X>("pub1");
 
     auto& subid = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     subid.setDefault(defaultValue);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -176,8 +176,8 @@ void runDualFederateTest(const std::string& core_type_str,
     auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
     auto& subid = fedB->registerSubscription("pub1");
-    fedA->setProperty(helics_property_time_delta, 1.0);
-    fedB->setProperty(helics_property_time_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     subid.setDefault(defaultValue);
 
@@ -240,8 +240,8 @@ void runDualFederateTestv2(const std::string& core_type_str,
     auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
     auto& subid = fedB->registerSubscription("pub1");
-    fedA->setProperty(helics_property_time_delta, 1.0);
-    fedB->setProperty(helics_property_time_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     subid.setDefault(defaultValue);
     auto f1finish = std::async(std::launch::async, [&]() { fedA->enterExecutingMode(); });
@@ -297,8 +297,8 @@ void runDualFederateTestObj(const std::string& core_type_str,
     auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
     auto subid = fedB->registerSubscription("pub1");
-    fedA->setProperty(helics_property_time_delta, 1.0);
-    fedB->setProperty(helics_property_time_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     subid.setDefault(defaultValue);
 

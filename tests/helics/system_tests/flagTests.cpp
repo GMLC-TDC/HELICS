@@ -173,9 +173,9 @@ TEST_F(flag_tests, slow_federate)
     // and captured
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_flag_slow_responding);
+    vFed1->setFlagOption(HELICS_FLAG_slow_responding);
     vFed1->enterExecutingMode();
-    EXPECT_TRUE(vFed1->getFlagOption(helics_flag_slow_responding));
+    EXPECT_TRUE(vFed1->getFlagOption(HELICS_FLAG_slow_responding));
     vFed1->finalize();
 }
 

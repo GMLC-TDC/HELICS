@@ -40,7 +40,7 @@ class Core {
     /** explicitly get the base helics_core object*/
     helics_core baseObject() const { return core; }
     /** check if the core is connected to the broker*/
-    bool isConnected() const { return (helicsCoreIsConnected(core) != helics_false); }
+    bool isConnected() const { return (helicsCoreIsConnected(core) != HELICS_FALSE); }
     /** copy constructor*/
     Core(const Core& cr) { core = helicsCoreClone(cr.core, hThrowOnError()); }
     /** copy assignment*/
@@ -79,7 +79,7 @@ class Core {
      */
     bool waitForDisconnect(int msToWait = -1)
     {
-        return (helicsCoreWaitForDisconnect(core, msToWait, hThrowOnError()) != helics_false);
+        return (helicsCoreWaitForDisconnect(core, msToWait, hThrowOnError()) != HELICS_FALSE);
     }
     /** get an identifier string for the core
      */

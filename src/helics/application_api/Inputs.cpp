@@ -549,7 +549,7 @@ bool Input::checkUpdate(bool assumeUpdate)
 
 void Input::setOption(int32_t option, int32_t value)
 {
-    if (option == helics_handle_option_multi_input_handling_method) {
+    if (option == HELICS_HANDLE_OPTION_multi_input_handling_method) {
         inputVectorOp = static_cast<multi_input_handling_method>(value);
     } else {
         Interface::setOption(option, value);
@@ -559,7 +559,7 @@ void Input::setOption(int32_t option, int32_t value)
 /** get the current value of a flag for the handle*/
 int32_t Input::getOption(int32_t option) const
 {
-    if (option == helics_handle_option_multi_input_handling_method) {
+    if (option == HELICS_HANDLE_OPTION_multi_input_handling_method) {
         return static_cast<int32_t>(inputVectorOp);
     }
     return Interface::getOption(option);

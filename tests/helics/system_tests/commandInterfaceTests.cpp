@@ -34,7 +34,7 @@ TEST_F(command_tests, federate_federate_command)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->sendCommand(vFed2->getName(), "test");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -56,7 +56,7 @@ TEST_F(command_tests, federate_federate_command2)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->sendCommand(vFed2->getName(), "test");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -77,7 +77,7 @@ TEST_F(command_tests, federate_federate_command4)
     vFed1->registerGlobalPublication<double>("pub1");
 
     vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
     vFed1->sendCommand(vFed2->getName(), "test");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();

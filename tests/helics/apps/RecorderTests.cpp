@@ -352,7 +352,7 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
     fi.coreName = "rcore-dep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 
@@ -399,7 +399,7 @@ TEST(recorder_tests, recorder_test_srcendpoint_clone)
     fi.coreName = "rcore2";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
     helics::MessageFederate mfed2("block2", fi);
@@ -445,7 +445,7 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     fi.coreName = "rcore3";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 
@@ -493,7 +493,7 @@ TEST_P(recorder_clone_file_tests, simple_clone_test_file)
     fi.coreName = std::string("rcore4") + GetParam();
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 
@@ -553,7 +553,7 @@ TEST(recorder_tests, recorder_test_saveFile1)
     fi.coreName = "rcore5";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::MessageFederate mfed("block1", fi);
 
@@ -650,7 +650,7 @@ TEST(recorder_tests, recorder_test_saveFile3)
     fi.coreName = "rcore7";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1);
 
     helics::CombinationFederate mfed("block1", fi);
 

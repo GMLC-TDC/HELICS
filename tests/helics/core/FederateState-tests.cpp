@@ -33,7 +33,7 @@ TEST_F(federateStateTests, constructor_test)
     EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::time_delta), helics::Time::epsilon());
     EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::output_delay), helics::Time::zeroVal());
     EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::input_delay), helics::Time::zeroVal());
-    EXPECT_EQ(fs->getTimeProperty(helics_property_time_period), helics::Time::zeroVal());
+    EXPECT_EQ(fs->getTimeProperty(HELICS_PROPERTY_TIME_PERIOD), helics::Time::zeroVal());
     EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::observer), false);
     EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::uninterruptible), false);
     EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::interruptible), true);

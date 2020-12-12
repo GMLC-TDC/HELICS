@@ -91,7 +91,7 @@ class Publication {
     /** publish a boolean value*/
     void publish(bool val)
     {
-        helicsPublicationPublishBoolean(pub, val ? helics_true : helics_false, HELICS_IGNORE_ERROR);
+        helicsPublicationPublishBoolean(pub, val ? helics_true : HELICS_FALSE, HELICS_IGNORE_ERROR);
     }
     /** get the key for the publication*/
     const char* getKey() const { return helicsPublicationGetKey(pub); }

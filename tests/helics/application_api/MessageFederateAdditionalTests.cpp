@@ -124,7 +124,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
 
     mFed1->setMessageNotificationCallback(mend);
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     mFed1->enterExecutingMode();
 
@@ -172,7 +172,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
     ep2.setCallback(mend);
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     mFed1->enterExecutingMode();
 
@@ -218,7 +218,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
     ep2.setCallback(mend);
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     mFed1->enterExecutingMode();
 
@@ -264,8 +264,8 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
@@ -360,7 +360,7 @@ class PingPongFed {
         helics::FederateInfo fi(coreType);
         fi.coreName = "pptest";
         fi.coreInitString = "-f 3";
-        fi.setProperty(helics_property_time_delta, delta);
+        fi.setProperty(HELICS_PROPERTY_TIME_delta, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string("about to create federate ") + name + "\n";
 #endif
@@ -600,7 +600,7 @@ TEST(messageFederate, constructor2)
 {
     auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=cb --autobroker");
     helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    fi.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
     helics::MessageFederate mf1("fed1", cr, fi);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
@@ -619,7 +619,7 @@ TEST(messageFederate, constructor3)
     helics::CoreApp cr("--core_type=test --name=cb2 --autobroker");
 
     helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    fi.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
     helics::MessageFederate mf1("fed1", cr, fi);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
@@ -637,7 +637,7 @@ TEST(messageFederate, constructor4)
 {
     helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
 
-    mf1.setProperty(helics_property_int_log_level, helics_log_level_error);
+    mf1.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
 
     mf1.registerGlobalFilter("filt1");
     mf1.registerGlobalFilter("filt2");

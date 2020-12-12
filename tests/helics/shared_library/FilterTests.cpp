@@ -37,16 +37,16 @@ TEST_P(filter_type_tests, registration)
 
     helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     helicsFederateRegisterGlobalEndpoint(mFed, "port2", nullptr, &err);
-    EXPECT_EQ(err.error_code, helics_ok);
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter1", &err));
+    EXPECT_EQ(err.errorCode, helics_ok);
+    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err));
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter2", &err));
     CE(helicsFilterAddDestinationTarget(f2, "port2", &err));
     EXPECT_TRUE(f2 != f1);
     CE(auto ep1 = helicsFederateRegisterEndpoint(fFed, "fout", "", &err));
     EXPECT_TRUE(ep1 != nullptr);
-    CE(auto f3 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "c4", &err));
+    CE(auto f3 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "c4", &err));
     EXPECT_EQ(helicsFilterIsValid(f3), helics_true);
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
     EXPECT_TRUE(f3 != f2);
@@ -61,7 +61,7 @@ TEST_P(filter_type_tests, registration)
     EXPECT_STREQ(tmp, "filter0/c4");
 
     auto f1_n = helicsFederateGetFilterByIndex(fFed, -2, &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     EXPECT_EQ(f1_n, nullptr);
     helicsErrorClear(&err);
 
@@ -94,17 +94,17 @@ TEST_P(filter_type_tests, info_tests)
     CE(helicsEndpointSetInfo(p1, "p1_test", &err));
     CE(helicsEndpointSetInfo(p2, "p2_test", &err));
 
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter1", &err));
+    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err));
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     CE(helicsFilterSetInfo(f1, "f1_test", &err));
 
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter2", &err));
     CE(helicsFilterAddDestinationTarget(f2, "port2", &err));
     CE(helicsFilterSetInfo(f2, "f2_test", &err));
 
     CE(auto ep1 = helicsFederateRegisterEndpoint(fFed, "fout", "", &err));
     CE(helicsEndpointSetInfo(ep1, "ep1_test", &err));
-    CE(auto f3 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "c4", &err));
+    CE(auto f3 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "c4", &err));
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
     CE(helicsFilterSetInfo(f3, "f3_test", &err));
 
@@ -138,18 +138,18 @@ TEST_F(filter_tests, core_filter_reg)
     EXPECT_EQ(core1IdentifierString, "core1");
 
     CE(auto sourceFilter1 = helicsCoreRegisterFilter(
-           core1, helics_filter_type::helics_filter_type_delay, "core1SourceFilter", &err));
+           core1, helics_filter_type::HELICS_FILTER_TYPE_delay, "core1SourceFilter", &err));
 
     CE(helicsFilterAddSourceTarget(sourceFilter1, "ep1", &err));
     CE(auto destinationFilter1 = helicsCoreRegisterFilter(
-           core1, helics_filter_type::helics_filter_type_delay, "core1DestinationFilter", &err));
+           core1, helics_filter_type::HELICS_FILTER_TYPE_delay, "core1DestinationFilter", &err));
 
     helicsFilterAddDestinationTarget(destinationFilter1, "ep2", &err);
     CE(auto cloningFilter1 = helicsCoreRegisterCloningFilter(core1, "ep3", &err));
 
     helicsFilterRemoveDeliveryEndpoint(cloningFilter1, "ep3", &err);
     int core1IsConnected = helicsCoreIsConnected(core1);
-    EXPECT_NE(core1IsConnected, helics_false);
+    EXPECT_NE(core1IsConnected, HELICS_FALSE);
     helicsCoreSetReadyToInit(core1, &err);
     helicsCoreDisconnect(core1, &err);
     helicsCoreDisconnect(core2, &err);
@@ -168,13 +168,13 @@ TEST_P(filter_type_tests, message_filter_function)
     auto mFed = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        mFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        mFed, HELICS_FLAG_ignore_time_mismatch_warnings, helics_true, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_delay, "filter1", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err);
+    EXPECT_EQ(err.errorCode, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
@@ -231,13 +231,13 @@ TEST_P(filter_simple_type_tests, function_mObj)
     auto mFed = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        mFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        mFed, HELICS_FLAG_ignore_time_mismatch_warnings, helics_true, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_delay, "filter1", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err);
+    EXPECT_EQ(err.errorCode, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
@@ -300,16 +300,16 @@ TEST_P(filter_type_tests, function_two_stage)
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_delay, "filter1", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err);
+    EXPECT_EQ(err.errorCode, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
 
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 1.25, &err));
 
-    CE(auto f2 = helicsFederateRegisterFilter(fFed2, helics_filter_type_delay, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed2, HELICS_FILTER_TYPE_delay, "filter2", &err));
     CE(helicsFilterAddSourceTarget(f2, "port1", &err));
     EXPECT_TRUE(f2 != nullptr);
     CE(helicsFilterSet(f2, "delay", 1.25, &err));
@@ -343,7 +343,7 @@ TEST_P(filter_type_tests, function_two_stage)
     CE(helicsFederateRequestTimeAsync(fFed, 3.0, &err));
     CE(helicsFederateRequestTimeAsync(fFed2, 3.0, &err));
     CE(helicsFederateRequestTime(mFed, 3.0, &err));
-    if (helicsEndpointHasMessage(p2) == helics_false) {
+    if (helicsEndpointHasMessage(p2) == HELICS_FALSE) {
         printf("missing message\n");
     }
     ASSERT_TRUE(helicsEndpointHasMessage(p2));
@@ -382,20 +382,20 @@ TEST_P(filter_type_tests, function2)
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
 
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_delay, "filter1", &err));
+    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err));
     helicsFilterAddSourceTarget(f1, "port1", nullptr);
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
 
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, helics_filter_type_delay, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter2", &err));
     helicsFilterAddSourceTarget(f2, "port2", nullptr);
     EXPECT_TRUE(f2 != nullptr);
     CE(helicsFilterSet(f2, "delay", 2.5, &err));
     // this is expected to fail since a regular filter doesn't have a delivery endpoint
     helicsFilterAddDeliveryEndpoint(f2, "port1", &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
@@ -453,19 +453,19 @@ TEST_P(filter_type_tests, message_filter_function3)
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "random", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
 
     CE(auto f1 =
-           helicsFederateRegisterGlobalFilter(fFed, helics_filter_type_custom, "filter1", &err));
+           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err));
     EXPECT_TRUE(f1 != nullptr);
     helicsFilterAddSourceTarget(f1, "port1", nullptr);
     CE(auto f2 =
-           helicsFederateRegisterGlobalFilter(fFed, helics_filter_type_delay, "filter2", &err));
+           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_delay, "filter2", &err));
     helicsFilterAddSourceTarget(f2, "port1", nullptr);
 
     helicsFederateRegisterEndpoint(fFed, "fout", "", &err);
     CE(auto f3 =
-           helicsFederateRegisterFilter(fFed, helics_filter_type_random_delay, "filter3", &err));
+           helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_random_delay, "filter3", &err));
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
 
     CE(helicsFilterSet(f2, "delay", 2.5, &err));
@@ -530,7 +530,7 @@ TEST_F(filter_tests, clone_test)
 
     auto f1 = helicsFederateRegisterCloningFilter(dcFed, nullptr, &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.error_code == helics_ok);
+    EXPECT_TRUE(err.errorCode == helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
@@ -600,7 +600,7 @@ TEST_F(filter_tests, clone_test_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.error_code == helics_ok);
+    EXPECT_TRUE(err.errorCode == helics_ok);
 
     auto cr = helicsFederateGetCore(sFed, &err);
 
@@ -608,7 +608,7 @@ TEST_F(filter_tests, clone_test_connections)
 
     // error test
     helicsCoreAddSourceFilterToEndpoint(cr, nullptr, "src", &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
@@ -686,13 +686,13 @@ TEST_F(filter_tests, clone_test_broker_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.error_code == helics_ok);
+    EXPECT_TRUE(err.errorCode == helics_ok);
 
     CE(helicsBrokerAddSourceFilterToEndpoint(brokers[0], "filt1", "src", &err));
 
     // error test
     helicsBrokerAddSourceFilterToEndpoint(brokers[0], nullptr, "src", &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
@@ -762,7 +762,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.error_code == helics_ok);
+    EXPECT_TRUE(err.errorCode == helics_ok);
 
     auto cr = helicsFederateGetCore(sFed, &err);
 
@@ -771,7 +771,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     // error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
 
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
     helicsCoreFree(cr);
 
@@ -805,7 +805,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto dcFedExec = [&]() {
         helicsFederateRequestTime(dcFed, 2.0, nullptr);
         auto res = helicsFederateHasMessage(dcFed);
-        if (res == helics_false) {
+        if (res == HELICS_FALSE) {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             helicsFederateRequestTime(dcFed, 4.0, nullptr);
         }
@@ -851,13 +851,13 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.error_code == helics_ok);
+    EXPECT_TRUE(err.errorCode == helics_ok);
 
     CE(helicsBrokerAddDestinationFilterToEndpoint(brokers[0], "filt1", "dest", &err));
 
     // error test
     helicsBrokerAddDestinationFilterToEndpoint(brokers[0], nullptr, "dest", &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
@@ -893,7 +893,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     // now check the message clone
     auto res2 = helicsFederateHasMessage(dcFed);
 
-    if (res2 == helics_false) {
+    if (res2 == HELICS_FALSE) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         CE(helicsFederateRequestTime(dcFed, 2.0, &err));
         res2 = helicsFederateHasMessage(dcFed);
@@ -930,17 +930,17 @@ TEST_F(filter_tests, multi_clone_test)
     auto dcFed = GetFederateAt(3);
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
-    ASSERT_EQ(err.error_code, 0);
+    ASSERT_EQ(err.errorCode, 0);
     auto p2 = helicsFederateRegisterGlobalEndpoint(sFed2, "src2", "", &err);
-    ASSERT_EQ(err.error_code, 0);
+    ASSERT_EQ(err.errorCode, 0);
     auto p3 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
-    ASSERT_EQ(err.error_code, 0);
+    ASSERT_EQ(err.errorCode, 0);
     auto p4 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
-    ASSERT_EQ(err.error_code, 0);
+    ASSERT_EQ(err.errorCode, 0);
 
     auto f1 = helicsFederateRegisterCloningFilter(dcFed, "", &err);
     helicsFilterAddDeliveryEndpoint(f1, "cm", nullptr);
-    ASSERT_EQ(err.error_code, 0);
+    ASSERT_EQ(err.errorCode, 0);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
     CE(helicsFilterAddSourceTarget(f1, "src2", &err));
 
@@ -996,7 +996,7 @@ TEST_F(filter_tests, multi_clone_test)
     res = helicsFederateHasMessage(dcFed);
     EXPECT_EQ(res, helics_true);
 
-    if (res != helics_false) {
+    if (res != HELICS_FALSE) {
         auto m2 = helicsFederateGetMessage(dcFed);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -1006,7 +1006,7 @@ TEST_F(filter_tests, multi_clone_test)
         res = helicsFederateHasMessage(dcFed);
         EXPECT_EQ(res, helics_true);
 
-        if (res != helics_false) {
+        if (res != HELICS_FALSE) {
             m2 = helicsFederateGetMessage(dcFed);
             EXPECT_STREQ(helicsMessageGetSource(m2), "src2");
             EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src2");
@@ -1066,21 +1066,21 @@ TEST_F(filter_tests, callback_test)
     auto mFed = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        mFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        mFed, HELICS_FLAG_ignore_time_mismatch_warnings, helics_true, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter1", &err);
-    auto f2 = helicsFederateRegisterFilter(mFed, helics_filter_type_delay, "dfilter", &err);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err);
+    auto f2 = helicsFederateRegisterFilter(mFed, HELICS_FILTER_TYPE_delay, "dfilter", &err);
 
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     CE(helicsFilterSetCustomCallback(f1, filterFunc1, nullptr, &err));
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 
     helicsFilterSetCustomCallback(f2, filterFunc1, nullptr, &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));

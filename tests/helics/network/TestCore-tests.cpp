@@ -59,7 +59,7 @@ TEST(TestCore_tests, testcore_pubsub_value_test)
     EXPECT_EQ(core->getFederateName(id), "sim1");
     EXPECT_TRUE(core->getFederateId("sim1") == id);
 
-    core->setTimeProperty(id, helics_property_time_delta, 1.0);
+    core->setTimeProperty(id, HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto sub1 = core->registerInput(id, "", "type", "units");
     core->addSourceTarget(sub1, "sim1_pub");
@@ -129,7 +129,7 @@ TEST(TestCore_tests, testcore_send_receive_test)
     EXPECT_EQ(core->getFederateName(id), "sim1");
     EXPECT_TRUE(core->getFederateId("sim1") == id);
 
-    core->setTimeProperty(id, helics_property_time_delta, 1.0);
+    core->setTimeProperty(id, HELICS_PROPERTY_TIME_delta, 1.0);
 
     auto end1 = core->registerEndpoint(id, "end1", "type");
     EXPECT_EQ(core->getInjectionType(end1), "type");

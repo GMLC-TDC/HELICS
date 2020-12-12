@@ -108,7 +108,7 @@ TEST(clone_tests, simple_clone_test_message)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "clone_core4";
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1("c1", fi);
     c1.setFederateToClone("block1");
@@ -157,7 +157,7 @@ TEST(clone_tests, simple_clone_test_combo)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "clone_core6";
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1("c1", fi);
     c1.setFederateToClone("block1");

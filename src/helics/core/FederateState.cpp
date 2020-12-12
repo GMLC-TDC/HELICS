@@ -39,37 +39,37 @@ class MessageTimer {
 
 #include "../common/fmt_format.h"
 static const std::string emptyStr;
-#define LOG_ERROR(message) logMessage(helics_log_level_error, emptyStr, message)
-#define LOG_WARNING(message) logMessage(helics_log_level_warning, emptyStr, message)
+#define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_error, emptyStr, message)
+#define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_warning, emptyStr, message)
 
 #ifdef HELICS_ENABLE_LOGGING
 
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
-            if (logLevel >= helics_log_level_summary) {                                            \
-                logMessage(Hhelics_log_level_summary, emptyStr, message);                          \
+            if (logLevel >= HELICS_LOG_LEVEL_summary) {                                            \
+                logMessage(HHELICS_LOG_LEVEL_summary, emptyStr, message);                          \
             }                                                                                      \
         } while (false)
 
 #    define LOG_INTERFACES(message)                                                                \
         do {                                                                                       \
-            if (logLevel >= helics_log_level_interfaces) {                                         \
-                logMessage(helics_log_level_interfaces, emptyStr, message);                        \
+            if (logLevel >= HELICS_LOG_LEVEL_interfaces) {                                         \
+                logMessage(HELICS_LOG_LEVEL_interfaces, emptyStr, message);                        \
             }                                                                                      \
         } while (false)
 
 #    ifdef HELICS_ENABLE_DEBUG_LOGGING
 #        define LOG_TIMING(message)                                                                \
             do {                                                                                   \
-                if (logLevel >= helics_log_level_timing) {                                         \
-                    logMessage(helics_log_level_timing, emptyStr, message);                        \
+                if (logLevel >= HELICS_LOG_LEVEL_timing) {                                         \
+                    logMessage(HELICS_LOG_LEVEL_timing, emptyStr, message);                        \
                 }                                                                                  \
             } while (false)
 
 #        define LOG_DATA(message)                                                                  \
             do {                                                                                   \
-                if (logLevel >= helics_log_level_data) {                                           \
-                    logMessage(helics_log_level_data, emptyStr, message);                          \
+                if (logLevel >= HELICS_LOG_LEVEL_data) {                                           \
+                    logMessage(HELICS_LOG_LEVEL_data, emptyStr, message);                          \
                 }                                                                                  \
             } while (false)
 #    else
@@ -80,8 +80,8 @@ static const std::string emptyStr;
 #    ifdef HELICS_ENABLE_TRACE_LOGGING
 #        define LOG_TRACE(message)                                                                 \
             do {                                                                                   \
-                if (logLevel >= helics_log_level_trace) {                                          \
-                    logMessage(helics_log_level_trace, emptyStr, message);                         \
+                if (logLevel >= HELICS_LOG_LEVEL_trace) {                                          \
+                    logMessage(HELICS_LOG_LEVEL_trace, emptyStr, message);                         \
                 }                                                                                  \
             } while (false)
 #    else
