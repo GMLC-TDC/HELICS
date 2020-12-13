@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "Core.hpp"
-#include "core-types.hpp"
+#include "CoreTypes.hpp"
 
 #include <chrono>
 #include <memory>
@@ -64,20 +64,20 @@ namespace CoreFactory {
 @param configureString a string containing arguments for configuration of the core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& coreName, const std::string& configureString);
+        create(CoreType type, const std::string& coreName, const std::string& configureString);
     /**
      * Creates a Core API object of the specified type.
      *
      * Invokes initialize() on the instantiated Core object.
      */
-    std::shared_ptr<Core> create(core_type type, const std::string& configureString);
+    std::shared_ptr<Core> create(CoreType type, const std::string& configureString);
 
     /** create a core from a type and command line arguments
 @param type the type of core to create
 @param argc the number of command line arguments
 @param argv the actual string parameters for the command line
 */
-    std::shared_ptr<Core> create(core_type type, int argc, char* argv[]);
+    std::shared_ptr<Core> create(CoreType type, int argc, char* argv[]);
 
     /** create a core from arguments
 @details an argument of '--coretype' must be specified to define the type,  otherwise the default
@@ -91,7 +91,7 @@ type is used
 @param type the type of core to create
 @param args a vector of reversed command line arguments
 */
-    std::shared_ptr<Core> create(core_type type, std::vector<std::string> args);
+    std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args);
 
     /** create a core from arguments
 @details an argument of '--coretype' must be specified to define the type,  otherwise the default
@@ -110,7 +110,7 @@ type is used
 @return a pointer to the created core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& coreName, int argc, char* argv[]);
+        create(CoreType type, const std::string& coreName, int argc, char* argv[]);
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
@@ -119,25 +119,25 @@ type is used
 @return a pointer to the created core
 */
     std::shared_ptr<Core>
-        create(core_type type, const std::string& coreName, std::vector<std::string> args);
+        create(CoreType type, const std::string& coreName, std::vector<std::string> args);
 
     /** tries to find a named core if it fails it creates a new one
      */
-    std::shared_ptr<Core> FindOrCreate(core_type type,
+    std::shared_ptr<Core> FindOrCreate(CoreType type,
                                        const std::string& coreName,
                                        const std::string& configureString);
 
     /** tries to find a named core if it fails it creates a new one
      */
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& coreName, int argc, char* argv[]);
+        FindOrCreate(CoreType type, const std::string& coreName, int argc, char* argv[]);
 
     /** tries to find a named core if it fails it creates a new one
      */
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args);
+        FindOrCreate(CoreType type, const std::string& coreName, std::vector<std::string> args);
     /** try to find a joinable core of a specific type*/
-    std::shared_ptr<Core> findJoinableCoreOfType(core_type type);
+    std::shared_ptr<Core> findJoinableCoreOfType(CoreType type);
 
     /** locate a registered Core by name
 @param name the name of the core to find
@@ -149,7 +149,7 @@ type is used
 by calling cleanUpCores earlier if desired
 @param core a pointer to a testCore object that should be found globally
 @return true if the registration was successful false otherwise*/
-    bool registerCore(const std::shared_ptr<Core>& core, core_type type);
+    bool registerCore(const std::shared_ptr<Core>& core, CoreType type);
 
     /** remove a Core from the registry
 @param name the name of the Core to unregister
@@ -157,7 +157,7 @@ by calling cleanUpCores earlier if desired
     void unregisterCore(const std::string& name);
 
     /** add a type associated with a core*/
-    void addAssociatedCoreType(const std::string& name, core_type type);
+    void addAssociatedCoreType(const std::string& name, CoreType type);
 
     /** clean up unused cores
 @details when Cores are unregistered they get put in a holding area that gets cleaned up when a new
@@ -178,8 +178,8 @@ Core is registered or when the clean up function is called this prevents some od
  */
     bool copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName);
 
-    /** display the help listing for a particular core_type*/
-    void displayHelp(core_type type = core_type::UNRECOGNIZED);
+    /** display the help listing for a particular CoreType*/
+    void displayHelp(CoreType type = CoreType::UNRECOGNIZED);
 
     /** terminate All existing cores */
     void terminateAllCores();

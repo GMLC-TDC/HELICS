@@ -119,7 +119,7 @@ external protection, that will result in undefined behavior
     */
         void addPublication(const std::string& key,
                             const std::string& generator,
-                            data_type type,
+                            DataType type,
                             Time period,
                             const std::string& units = std::string());
 
@@ -130,7 +130,7 @@ external protection, that will result in undefined behavior
     @param units the units associated with the publication
     */
         void addPublication(const std::string& key,
-                            data_type type,
+                            DataType type,
                             Time period,
                             const std::string& units = std::string())
         {

@@ -235,7 +235,7 @@ void contextProcessingLoop(std::shared_ptr<AsioContextManager> ptr)
         }
         catch (const std::system_error& se) {
             auto nclk = std::chrono::steady_clock::now();
-            std::cerr << "asio system error in context loop " << se.what() << " ran for "
+            std::cerr << "asio system ERROR_RESULT in context loop " << se.what() << " ran for "
                       << (nclk - clk).count() / 1000000 << "ms" << std::endl;
         }
         catch (const std::exception& e) {
@@ -244,7 +244,7 @@ void contextProcessingLoop(std::shared_ptr<AsioContextManager> ptr)
                       << (nclk - clk).count() / 1000000 << "ms" << std::endl;
         }
         catch (...) {
-            std::cout << "caught other error in context loop" << std::endl;
+            std::cout << "caught other ERROR_RESULT in context loop" << std::endl;
         }
     }
 

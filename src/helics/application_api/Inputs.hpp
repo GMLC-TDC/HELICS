@@ -22,15 +22,15 @@ class precise_unit;
 namespace helics {
 
 class ValueFederate;
-enum multi_input_handling_method : uint16_t {
-    no_op = HELICS_MULTI_INPUT_no_op,
-    vectorize_OPERATION = HELICS_MULTI_INPUT_VECTORIZE_OPERATION,
-    and_OPERATION = HELICS_MULTI_INPUT_AND_OPERATION,
-    or_OPERATION = HELICS_MULTI_INPUT_SUM_OPERATION,
-    diff_OPERATION = HELICS_MULTI_INPUT_DIFF_OPERATION,
-    max_OPERATION = HELICS_MULTI_INPUT_MAX_OPERATION,
-    min_OPERATION = HELICS_MULTI_INPUT_MIN_OPERATION,
-    average_OPERATION = HELICS_MULTI_INPUT_AVERAGE_OPERATION
+enum MultiInputHandlingMethod : uint16_t {
+    NO_OP = HELICS_MULTI_INPUT_NO_OP,
+    VECTORIZE_OPERATION = HELICS_MULTI_INPUT_VECTORIZE_OPERATION,
+    AND_OPERATION = HELICS_MULTI_INPUT_AND_OPERATION,
+    OR_OPERATION = HELICS_MULTI_INPUT_SUM_OPERATION,
+    DIFF_OPERATION = HELICS_MULTI_INPUT_DIFF_OPERATION,
+    MAX_OPERATION = HELICS_MULTI_INPUT_MAX_OPERATION,
+    MIN_OPERATION = HELICS_MULTI_INPUT_MIN_OPERATION,
+    AVERAGE_OPERATION = HELICS_MULTI_INPUT_AVERAGE_OPERATION
 };
 
 /** base class for a input object*/
@@ -41,22 +41,22 @@ class HELICS_CXX_EXPORT Input: public Interface {
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
 
-    data_type targetType{data_type::helics_unknown};  //!< the underlying type the input targets
-    data_type injectionType{
-        data_type::helics_unknown};  //!< the type of data coming from the publication
+    DataType targetType{DataType::HELICS_UNKNOWN};  //!< the underlying type the input targets
+    DataType injectionType{
+        DataType::HELICS_UNKNOWN};  //!< the type of data coming from the publication
     bool changeDetectionEnabled{false};  //!< the change detection is enabled
     bool hasUpdate{false};  //!< the value has been updated
     bool disableAssign{false};  //!< disable assignment for the object
     bool useThreshold{false};  //!< flag to indicate use a threshold for binary output
     bool multiUnits{false};  //!< flag indicating there are multiple Input Units
-    multi_input_handling_method inputVectorOp{
-        multi_input_handling_method::no_op};  //!< the vector processing method to use
+    MultiInputHandlingMethod inputVectorOp{
+        MultiInputHandlingMethod::NO_OP};  //!< the vector processing method to use
     int32_t prevInputCount{0};  //!< the previous number of inputs
     size_t customTypeHash{0U};  //!< a hash code for the custom type
     defV lastValue{invalidDouble};  //!< the last value updated
     std::shared_ptr<units::precise_unit> outputUnits;  //!< the target output units
     std::shared_ptr<units::precise_unit> inputUnits;  //!< the units of the linked publications
-    std::vector<std::pair<data_type, std::shared_ptr<units::precise_unit>>>
+    std::vector<std::pair<DataType, std::shared_ptr<units::precise_unit>>>
         sourceTypes;  //!< source information for input sources
     std::string givenTarget;  //!< the first target set for the input
     double delta{-1.0};  //!< the minimum difference
@@ -119,7 +119,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
 
     Input(ValueFederate* valueFed,
           const std::string& key,
-          data_type defType,
+          DataType defType,
           const std::string& units = std::string{}):
         Input(valueFed, key, typeNameStringRef(defType), units)
     {
@@ -128,7 +128,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class FedPtr>
     Input(FedPtr& valueFed,
           const std::string& key,
-          data_type defType,
+          DataType defType,
           const std::string& units = std::string()):
         Input(valueFed, key, typeNameStringRef(defType), units)
     {
@@ -154,7 +154,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input(interface_visibility locality,
           ValueFederate* valueFed,
           const std::string& key,
-          data_type defType,
+          DataType defType,
           const std::string& units = std::string{}):
         Input(locality, valueFed, key, typeNameStringRef(defType), units)
     {
@@ -164,7 +164,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     Input(interface_visibility locality,
           FedPtr& valueFed,
           const std::string& key,
-          data_type defType,
+          DataType defType,
           const std::string& units = std::string{}):
         Input(locality, valueFed, key, typeNameStringRef(defType), units)
     {
@@ -186,8 +186,8 @@ class HELICS_CXX_EXPORT Input: public Interface {
     /** get the type of the data coming from the publication*/
     const std::string& getPublicationType() const
     {
-        return ((injectionType == data_type::helics_unknown) ||
-                (injectionType == data_type::helics_custom)) ?
+        return ((injectionType == DataType::HELICS_UNKNOWN) ||
+                (injectionType == DataType::HELICS_CUSTOM)) ?
             getInjectionType() :
             typeNameStringRef(injectionType);
     }
@@ -230,7 +230,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     void setInputNotificationCallback(std::function<void(const X&, Time)> callback)
     {
         static_assert(
-            helicsType<X>() != data_type::helics_custom,
+            helicsType<X>() != DataType::HELICS_CUSTOM,
             "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
             "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move(callback);
@@ -390,12 +390,12 @@ class HELICS_CXX_EXPORT Input: public Interface {
     size_t getVectorSize();
 
     /** get the HELICS data type for the input*/
-    data_type getHelicsType() const { return targetType; }
+    DataType getHelicsType() const { return targetType; }
 
     /** get the HELICS data type for the publication*/
-    data_type getHelicsInjectionType() const { return injectionType; }
+    DataType getHelicsInjectionType() const { return injectionType; }
 
-    multi_input_handling_method getMultiInputMode() const { return inputVectorOp; }
+    MultiInputHandlingMethod getMultiInputMode() const { return inputVectorOp; }
 
     bool vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffer>>& dataV);
 
@@ -418,7 +418,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     bool allowDirectFederateUpdate() const
     {
         return hasUpdate && !changeDetectionEnabled &&
-            inputVectorOp == multi_input_handling_method::no_op;
+            inputVectorOp == MultiInputHandlingMethod::NO_OP;
     }
     data_view checkAndGetFedUpdate();
     friend class ValueFederateManager;
@@ -441,14 +441,14 @@ void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out
 {
     auto dv = checkAndGetFedUpdate();
     if (!dv.empty()) {
-        if (injectionType == data_type::helics_unknown) {
+        if (injectionType == DataType::HELICS_UNKNOWN) {
             loadSourceInformation();
         }
 
-        if (injectionType == helics::data_type::helics_double) {
+        if (injectionType == helics::DataType::HELICS_DOUBLE) {
             defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
             valueExtract(val, out);
-        } else if (injectionType == helics::data_type::helics_int) {
+        } else if (injectionType == helics::DataType::HELICS_INT) {
             defV val;
             integerExtractAndConvert(val, dv, inputUnits, outputUnits);
             valueExtract(val, out);
@@ -484,7 +484,7 @@ inline const std::string& getValueRefImpl(defV& val)
     if ((val.index() == named_point_loc)) {
         return std::get<NamedPoint>(val).name;
     }
-    valueConvert(val, data_type::helics_string);
+    valueConvert(val, DataType::HELICS_STRING);
     return std::get<std::string>(val);
 }
 
@@ -495,16 +495,16 @@ const X& Input::getValueRef()
                   "calling getValue By ref must be with a primary type");
     auto dv = checkAndGetFedUpdate();
     if (!dv.empty()) {
-        if (injectionType == data_type::helics_unknown) {
+        if (injectionType == DataType::HELICS_UNKNOWN) {
             loadSourceInformation();
         }
 
         if (changeDetectionEnabled) {
             X out;
-            if (injectionType == helics::data_type::helics_double) {
+            if (injectionType == helics::DataType::HELICS_DOUBLE) {
                 defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                 valueExtract(val, out);
-            } else if (injectionType == helics::data_type::helics_int) {
+            } else if (injectionType == helics::DataType::HELICS_INT) {
                 defV val;
                 integerExtractAndConvert(val, dv, inputUnits, outputUnits);
                 valueExtract(val, out);

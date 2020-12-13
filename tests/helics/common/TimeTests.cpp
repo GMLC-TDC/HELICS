@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "gmlc/utilities/timeStringOps.hpp"
-#include "helics/core/helics-time.hpp"
+#include "helics/core/helicsTime.hpp"
 #include "helics/shared_api_library/api-data.h"
 using namespace helics;
 

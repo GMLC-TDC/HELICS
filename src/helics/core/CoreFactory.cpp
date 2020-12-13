@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommonCore.hpp"
 #include "core-exceptions.hpp"
-#include "core-types.hpp"
+#include "CoreTypes.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
@@ -76,12 +76,12 @@ namespace CoreFactory {
         MasterCoreBuilder::addBuilder(std::move(cb), name, code);
     }
 
-    std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
+    std::shared_ptr<Core> makeCore(CoreType type, const std::string& name)
     {
-        if (type == core_type::NULLCORE) {
+        if (type == CoreType::NULLCORE) {
             throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         }
-        if (type == core_type::DEFAULT) {
+        if (type == CoreType::DEFAULT) {
             return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
         }
         return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
@@ -97,13 +97,13 @@ namespace CoreFactory {
         return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
     }
 
-    std::shared_ptr<Core> create(core_type type, const std::string& configureString)
+    std::shared_ptr<Core> create(CoreType type, const std::string& configureString)
     {
         return create(type, gEmptyString, configureString);
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& coreName, const std::string& configureString)
+        create(CoreType type, const std::string& coreName, const std::string& configureString)
     {
         auto core = makeCore(type, coreName);
         if (!core) {
@@ -126,13 +126,13 @@ namespace CoreFactory {
         return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
     }
 
-    std::shared_ptr<Core> create(core_type type, std::vector<std::string> args)
+    std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)
     {
         return create(type, gEmptyString, std::move(args));
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& coreName, std::vector<std::string> args)
+        create(CoreType type, const std::string& coreName, std::vector<std::string> args)
     {
         auto core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
@@ -152,13 +152,13 @@ namespace CoreFactory {
         return create(tparser.getCoreType(), tparser.remaining_for_passthrough());
     }
 
-    std::shared_ptr<Core> create(core_type type, int argc, char* argv[])
+    std::shared_ptr<Core> create(CoreType type, int argc, char* argv[])
     {
         return create(type, gEmptyString, argc, argv);
     }
 
     std::shared_ptr<Core>
-        create(core_type type, const std::string& coreName, int argc, char* argv[])
+        create(CoreType type, const std::string& coreName, int argc, char* argv[])
     {
         auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
@@ -168,7 +168,7 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args)
+        FindOrCreate(CoreType type, const std::string& coreName, std::vector<std::string> args)
     {
         std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
@@ -188,7 +188,7 @@ namespace CoreFactory {
         return core;
     }
 
-    std::shared_ptr<Core> FindOrCreate(core_type type,
+    std::shared_ptr<Core> FindOrCreate(CoreType type,
                                        const std::string& coreName,
                                        const std::string& configureString)
     {
@@ -211,7 +211,7 @@ namespace CoreFactory {
     }
 
     std::shared_ptr<Core>
-        FindOrCreate(core_type type, const std::string& coreName, int argc, char* argv[])
+        FindOrCreate(CoreType type, const std::string& coreName, int argc, char* argv[])
     {
         std::shared_ptr<Core> core = findCore(coreName);
         if (core) {
@@ -249,7 +249,7 @@ thread which allows the destructor to fire if need be without issue*/
     static gmlc::concurrency::DelayedDestructor<Core>
         delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<Core, core_type>
+    static gmlc::concurrency::SearchableObjectHolder<Core, CoreType>
         searchableCores;  //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
@@ -260,33 +260,33 @@ thread which allows the destructor to fire if need be without issue*/
         return searchableCores.findObject(name);
     }
 
-    std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
+    std::shared_ptr<Core> findJoinableCoreOfType(CoreType type)
     {
         return searchableCores.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); },
                                           type);
     }
 
-    static void addExtraTypes(const std::string& name, core_type type)
+    static void addExtraTypes(const std::string& name, CoreType type)
     {
         switch (type) {
-            case core_type::INPROC:
-                searchableCores.addType(name, core_type::TEST);
+            case CoreType::INPROC:
+                searchableCores.addType(name, CoreType::TEST);
                 break;
-            case core_type::TEST:
-                searchableCores.addType(name, core_type::INPROC);
+            case CoreType::TEST:
+                searchableCores.addType(name, CoreType::INPROC);
                 break;
-            case core_type::IPC:
-                searchableCores.addType(name, core_type::INTERPROCESS);
+            case CoreType::IPC:
+                searchableCores.addType(name, CoreType::INTERPROCESS);
                 break;
-            case core_type::INTERPROCESS:
-                searchableCores.addType(name, core_type::IPC);
+            case CoreType::INTERPROCESS:
+                searchableCores.addType(name, CoreType::IPC);
                 break;
             default:
                 break;
         }
     }
 
-    bool registerCore(const std::shared_ptr<Core>& core, core_type type)
+    bool registerCore(const std::shared_ptr<Core>& core, CoreType type)
     {
         bool res = false;
         const std::string& cname = (core) ? core->getIdentifier() : std::string{};
@@ -330,7 +330,7 @@ thread which allows the destructor to fire if need be without issue*/
         }
     }
 
-    void addAssociatedCoreType(const std::string& name, core_type type)
+    void addAssociatedCoreType(const std::string& name, CoreType type)
     {
         searchableCores.addType(name, type);
         addExtraTypes(name, type);
@@ -338,14 +338,14 @@ thread which allows the destructor to fire if need be without issue*/
 
     static const std::string helpStr{"--help"};
 
-    void displayHelp(core_type type)
+    void displayHelp(CoreType type)
     {
-        if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED) {
+        if (type == CoreType::DEFAULT || type == CoreType::UNRECOGNIZED) {
             std::cout << "All core types have similar options\n";
-            auto cr = makeCore(core_type::DEFAULT, gEmptyString);
+            auto cr = makeCore(CoreType::DEFAULT, gEmptyString);
             cr->configure(helpStr);
 #ifdef ENABLE_TCP_CORE
-            cr = makeCore(core_type::TCP_SS, gEmptyString);
+            cr = makeCore(CoreType::TCP_SS, gEmptyString);
             cr->configure(helpStr);
 #endif
         } else {

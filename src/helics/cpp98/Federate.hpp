@@ -99,7 +99,7 @@ class FederateInfo {
     {
         helicsFederateInfoSetCoreTypeFromString(fi, coretype.c_str(), hThrowOnError());
     }
-    /** set the core type from an integer \ref helics_core_type
+    /** set the core type from an integer \ref helics_CoreType
     @param coretype an integer code with the federate type
     */
     void setCoreType(int coretype)
@@ -419,7 +419,7 @@ class Federate {
     /** request a time advancement
    @param time the next requested time step
    @param iterate a requested iteration mode
-   @return the granted time step in a structure containing a return time and an iteration_result*/
+   @return the granted time step in a structure containing a return time and an IterationResult*/
     helics_iteration_time requestTimeIterative(helics_time time, helics_iteration_request iterate)
     {
         helics_iteration_time itTime;

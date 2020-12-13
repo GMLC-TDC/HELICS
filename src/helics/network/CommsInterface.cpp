@@ -76,7 +76,7 @@ namespace CommFactory {
         MasterCommBuilder::addBuilder(std::move(cb), name, code);
     }
 
-    std::unique_ptr<CommsInterface> create(core_type type)
+    std::unique_ptr<CommsInterface> create(CoreType type)
     {
         const auto& builder = MasterCommBuilder::getBuilder(static_cast<int>(type));
         return builder->build();
@@ -286,7 +286,7 @@ bool CommsInterface::connect()
             }
             catch (const std::exception& e) {
                 rx_status = connection_status::error;
-                logError(std::string("error in receiver >") + e.what());
+                logError(std::string("ERROR_RESULT in receiver >") + e.what());
             }
         });
     }
@@ -297,7 +297,7 @@ bool CommsInterface::connect()
         }
         catch (const std::exception& e) {
             tx_status = connection_status::error;
-            logError(std::string("error in transmitter >") + e.what());
+            logError(std::string("ERROR_RESULT in transmitter >") + e.what());
         }
     });
     syncLock.unlock();
@@ -538,7 +538,7 @@ bool CommsInterface::isConnected() const
 void CommsInterface::logMessage(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(HELICS_LOG_LEVEL_interfaces, "commMessage||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_INTERFACES, "commMessage||" + name, message);
     } else {
         std::cout << "commMessage||" << name << ":" << message << std::endl;
     }
@@ -547,7 +547,7 @@ void CommsInterface::logMessage(const std::string& message) const
 void CommsInterface::logWarning(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(HELICS_LOG_LEVEL_warning, "commWarning||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_WARNING, "commWarning||" + name, message);
     } else {
         std::cerr << "commWarning||" << name << ":" << message << std::endl;
     }
@@ -556,7 +556,7 @@ void CommsInterface::logWarning(const std::string& message) const
 void CommsInterface::logError(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(HELICS_LOG_LEVEL_error, "commERROR||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_ERROR, "commERROR||" + name, message);
     } else {
         std::cerr << "commERROR||" << name << ":" << message << std::endl;
     }

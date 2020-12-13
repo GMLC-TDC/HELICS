@@ -149,4 +149,4 @@ TEST_P(valuefed_single_transfer, types_publishers9)
 }
 INSTANTIATE_TEST_SUITE_P(valuefed_single_transfer_ci_skip,
                          valuefed_single_transfer,
-                         ::testing::ValuesIn(core_types_single));
+                         ::testing::ValuesIn(CoreTypes_single));

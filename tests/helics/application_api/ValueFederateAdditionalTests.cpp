@@ -101,7 +101,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     helics::Publication pubid(vFed1.get(), "pub1", helics::helicsType<std::string>());
-    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2", helics::data_type::helics_int);
+    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2", helics::DataType::HELICS_INT);
 
     vFed1->setSeparator('-');
     helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(), "V");
@@ -562,7 +562,7 @@ TEST_F(valuefed_add_tests_ci_skip, test_move_calls)
 {
     helics::ValueFederate vFed;
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString = "-f 3 --autobroker";
     vFed = helics::ValueFederate("test1", fi);
     EXPECT_EQ(vFed.getName(), "test1");
@@ -665,7 +665,7 @@ TEST(valuefed_json_tests, json_publish)
 {
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.separator = '/';
     fi.coreName = "json_test2";
     fi.coreInitString = "--autobroker";
@@ -707,7 +707,7 @@ TEST(valuefed_json_tests, test_json_register_publish)
 {
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.separator = '/';
     fi.coreName = "core_pub_json";
     fi.coreInitString = "--autobroker";
@@ -739,7 +739,7 @@ TEST(valuefed_json_tests, test_json_register_publish)
 
 TEST(valuefed_json_tests, test_json_register_publish_error)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.separator = '/';
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed("test2", fi);
@@ -769,18 +769,18 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
 
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_add_single_type_tests_ci_skip,
-                         ::testing::ValuesIn(core_types_single));
+                         ::testing::ValuesIn(CoreTypes_single));
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_add_type_tests_ci_skip,
-                         ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_add_all_type_tests_ci_skip,
-                         ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_all));
 
 TEST(valuefederate, coreApp)
 {
-    helics::CoreApp capp(helics::core_type::TEST, "corename", "-f 1 --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::CoreApp capp(helics::CoreType::TEST, "corename", "-f 1 --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", capp, fi);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
 
@@ -789,7 +789,7 @@ TEST(valuefederate, coreApp)
 
 TEST(valuefederate, core_ptr)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_ptr";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -824,7 +824,7 @@ TEST(valuefederate, from_file_bad3)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_bad_toml";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -842,7 +842,7 @@ TEST(valuefederate, pubAlias)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_alias";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -862,7 +862,7 @@ TEST(valuefederate, pubAlias)
 
 TEST(valuefederate, regJsonFailures)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_pjson";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -877,7 +877,7 @@ TEST(valuefederate, regJsonFailures)
 
 TEST(valuefederate, getInputs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_ipt";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -908,7 +908,7 @@ TEST(valuefederate, getInputs)
 
 TEST(valuefederate, indexed_inputs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_indexipt";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -938,7 +938,7 @@ TEST(valuefederate, indexed_inputs)
 
 TEST(valuefederate, indexed_pubs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_indexpub";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -992,7 +992,7 @@ TEST(valuefederate, indexed_pubs)
 
 TEST(valuefederate, update_query)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_upd_query";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -1053,7 +1053,7 @@ TEST(valuefederate, update_query)
 
 TEST(valuefederate, indexed_targets)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_ind_target";
     fi.coreInitString = "-f 1 --autobroker";
 

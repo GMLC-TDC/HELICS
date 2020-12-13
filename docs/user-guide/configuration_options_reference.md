@@ -68,7 +68,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
 {
   // General
   **"name": "arbitrary federate name",**
-  "core_type": "zmq",
+  "CoreType": "zmq",
   "core_name": "core name",
   "core_init_string" : "",
   "autobroker": false,
@@ -212,13 +212,13 @@ Every federate must have a unique name across the entire federation; this is fun
 
 ---
 
-### `core_type` | `coretype` | `coreType` | `-t` ["zmq"]
+### `CoreType` | `coretype` | `coreType` | `-t` ["zmq"]
 
 _API:_ `helicsFederateInfoSetCoreTypeFromString`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)
 | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetCoreTypeFromString)
-| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreType-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_core_type}})
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreType-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_CoreType}})
 
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). See the [User Guide page on core types](./user-guide/CoreTypes.md) for more details.
 
@@ -357,7 +357,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Int64})
 
-_Property's enumerated name:_ `HELICS_PROPERTY_INT_log_level` [271]
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_LEVEL` [271]
 
 _Valid values:_
 

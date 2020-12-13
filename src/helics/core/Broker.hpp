@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helics-time.hpp"
+#include "helicsTime.hpp"
 
 #include <chrono>
 #include <functional>

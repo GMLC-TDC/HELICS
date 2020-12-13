@@ -17,53 +17,53 @@ using elsewhere is probably not going to work.
 */
 
 /** enumeration of defined print levels*/
-enum log_level : int {
-    no_print = HELICS_LOG_LEVEL_no_print,  //!< never print
-    error = HELICS_LOG_LEVEL_error,  //!< only print errors
-    warning = HELICS_LOG_LEVEL_warning,  //!< print/log warning and errors
-    summary = HELICS_LOG_LEVEL_summary,  //!< print/log summary information
-    connections =
-        HELICS_LOG_LEVEL_connections,  //!< print summary+ federate level connection information
-    interfaces =
-        HELICS_LOG_LEVEL_interfaces,  //!< print connections +interface level connection information
-    timing = HELICS_LOG_LEVEL_timing,  //!< print interfaces+ timing(exec/grant/disconnect)
-    data = HELICS_LOG_LEVEL_data,  //!< print timing+data transmissions
-    trace = HELICS_LOG_LEVEL_trace,  //!< trace level printing (all processed messages)
-    fed = 99999  //!< special logging command for message coming from a fed
+enum LogLevels : int {
+    NO_PRINT = HELICS_LOG_LEVEL_NO_PRINT,  //!< never print
+    ERROR = HELICS_LOG_LEVEL_ERROR,  //!< only print errors
+    WARNING = HELICS_LOG_LEVEL_WARNING,  //!< print/log warning and errors
+    SUMMARY = HELICS_LOG_LEVEL_SUMMARY,  //!< print/log summary information
+    CONNECTIONS =
+        HELICS_LOG_LEVEL_CONNECTIONS,  //!< print summary+ federate level connection information
+    INTERFACES =
+        HELICS_LOG_LEVEL_INTERFACES,  //!< print connections +interface level connection information
+    TIMING = HELICS_LOG_LEVEL_TIMING,  //!< print interfaces+ timing(exec/grant/disconnect)
+    DATA = HELICS_LOG_LEVEL_DATA,  //!< print timing+data transmissions
+    TRACE = HELICS_LOG_LEVEL_TRACE,  //!< trace level printing (all processed messages)
+    FED = 99999  //!< special logging command for message coming from a fed
 };
 
-#define LOG_ERROR(id, ident, message) sendToLogger(id, log_level::error, ident, message)
+#define LOG_ERROR(id, ident, message) sendToLogger(id, LogLevels::ERROR, ident, message)
 #define LOG_ERROR_SIMPLE(message)                                                                  \
-    sendToLogger(global_broker_id_local, log_level::error, getIdentifier(), message)
-#define LOG_WARNING(id, ident, message) sendToLogger(id, log_level::warning, ident, message)
+    sendToLogger(global_broker_id_local, LogLevels::ERROR, getIdentifier(), message)
+#define LOG_WARNING(id, ident, message) sendToLogger(id, LogLevels::WARNING, ident, message)
 
 #define LOG_WARNING_SIMPLE(message)                                                                \
-    sendToLogger(global_broker_id_local, log_level::warning, getIdentifier(), message)
+    sendToLogger(global_broker_id_local, LogLevels::WARNING, getIdentifier(), message)
 
 #ifdef HELICS_ENABLE_LOGGING
 #    define LOG_SUMMARY(id, ident, message)                                                        \
-        if (maxLogLevel >= log_level::summary) {                                                   \
-            sendToLogger(id, log_level::summary, ident, message);                                  \
+        if (maxLogLevel >= LogLevels::SUMMARY) {                                                   \
+            sendToLogger(id, LogLevels::SUMMARY, ident, message);                                  \
         }
 
 #    define LOG_CONNECTIONS(id, ident, message)                                                    \
-        if (maxLogLevel >= log_level::connections) {                                               \
-            sendToLogger(id, log_level::connections, ident, message);                              \
+        if (maxLogLevel >= LogLevels::CONNECTIONS) {                                               \
+            sendToLogger(id, LogLevels::CONNECTIONS, ident, message);                              \
         }
 
 #    define LOG_INTERFACES(id, ident, message)                                                     \
-        if (maxLogLevel >= log_level::interfaces) {                                                \
-            sendToLogger(id, log_level::interfaces, ident, message);                               \
+        if (maxLogLevel >= LogLevels::INTERFACES) {                                                \
+            sendToLogger(id, LogLevels::INTERFACES, ident, message);                               \
         }
 
 #    ifdef HELICS_ENABLE_DEBUG_LOGGING
 #        define LOG_TIMING(id, ident, message)                                                     \
-            if (maxLogLevel >= log_level::timing) {                                                \
-                sendToLogger(id, log_level::timing, ident, message);                               \
+            if (maxLogLevel >= LogLevels::TIMING) {                                                \
+                sendToLogger(id, LogLevels::TIMING, ident, message);                               \
             }
 #        define LOG_DATA_MESSAGES(id, ident, message)                                              \
-            if (maxLogLevel >= log_level::data) {                                                  \
-                sendToLogger(id, log_level::data, ident, message);                                 \
+            if (maxLogLevel >= LogLevels::DATA) {                                                  \
+                sendToLogger(id, LogLevels::DATA, ident, message);                                 \
             }
 #    else
 #        define LOG_TIMING(id, ident, message)
@@ -72,8 +72,8 @@ enum log_level : int {
 
 #    ifdef HELICS_ENABLE_TRACE_LOGGING
 #        define LOG_TRACE(id, ident, message)                                                      \
-            if (maxLogLevel >= log_level::trace) {                                                 \
-                sendToLogger(id, log_level::trace, ident, message);                                \
+            if (maxLogLevel >= LogLevels::TRACE) {                                                 \
+                sendToLogger(id, LogLevels::TRACE, ident, message);                                \
             }
 #    else
 #        define LOG_TRACE(id, ident, message)

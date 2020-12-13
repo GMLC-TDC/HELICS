@@ -25,18 +25,18 @@ struct FederateTestFixture {
     FederateTestFixture();
     ~FederateTestFixture();
 
-    HelicsBroker AddBroker(const std::string& core_type_name, int count);
-    HelicsBroker AddBroker(const std::string& core_type_name,
+    HelicsBroker AddBroker(const std::string& CoreType_name, int count);
+    HelicsBroker AddBroker(const std::string& CoreType_name,
                             const std::string& initialization_string);
 
     void SetupTest(FedCreator ctor,
-                   const std::string& core_type_name,
+                   const std::string& CoreType_name,
                    int count,
                    HelicsTime timeDelta = HELICS_TIME_ZERO,
                    const std::string& name_prefix = "fed");
 
     void AddFederates(FedCreator ctor,
-                      std::string core_type_name,
+                      std::string CoreType_name,
                       int count,
                       HelicsBroker broker,
                       HelicsTime time_delta = HELICS_TIME_ZERO,

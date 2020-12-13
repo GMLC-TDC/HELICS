@@ -84,7 +84,7 @@ helics_bool helicsIsCoreTypeAvailable(const char* type)
 /** this function is based on the lippencott function template
 http://cppsecrets.blogspot.com/2013/12/using-lippincott-function-for.html
 */
-static constexpr char unknown_err_string[] = "unknown error";
+static constexpr char unknown_err_string[] = "UNKNOWN ERROR_RESULT";
 
 void helicsErrorHandler(helics_error* err) noexcept
 {
@@ -224,9 +224,9 @@ helics_core helicsCreateCore(const char* type, const char* name, const char* ini
         return nullptr;
     }
 
-    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    helics::CoreType ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::CoreType::DEFAULT;
 
-    if (ct == helics::core_type::UNRECOGNIZED) {
+    if (ct == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
             err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
@@ -258,9 +258,9 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
     if ((err != nullptr) && (err->error_code != 0)) {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    helics::CoreType ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::CoreType::DEFAULT;
 
-    if (ct == helics::core_type::UNRECOGNIZED) {
+    if (ct == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
             err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
@@ -341,9 +341,9 @@ helics_broker helicsCreateBroker(const char* type, const char* name, const char*
     if ((err != nullptr) && (err->error_code != 0)) {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    helics::CoreType ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::CoreType::DEFAULT;
 
-    if (ct == helics::core_type::UNRECOGNIZED) {
+    if (ct == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
             err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");
@@ -369,9 +369,9 @@ helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int
     if ((err != nullptr) && (err->error_code != 0)) {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::core_type::DEFAULT;
+    helics::CoreType ct = (type != nullptr) ? helics::core::coreTypeFromString(type) : helics::CoreType::DEFAULT;
 
-    if (ct == helics::core_type::UNRECOGNIZED) {
+    if (ct == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
             err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string("core type ") + type + " is not recognized");

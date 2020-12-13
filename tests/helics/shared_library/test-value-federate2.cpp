@@ -22,7 +22,7 @@ class vfed2_type_tests: public ::testing::TestWithParam<const char*>, public Fed
 
 class vfed2_tests: public FederateTestFixture, public ::testing::Test {
 };
-// const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
+// const std::string CoreTypes[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
 /** test block send and receive*/
 
@@ -250,5 +250,5 @@ TEST_F(vfed2_tests, json_register_publish)
 
 INSTANTIATE_TEST_SUITE_P(vfed_tests,
                          vfed2_simple_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed2_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed2_type_tests, ::testing::ValuesIn(CoreTypes));

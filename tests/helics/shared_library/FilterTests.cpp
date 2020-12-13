@@ -29,7 +29,7 @@ class filter_tests: public FederateTestFixture, public ::testing::Test {
 TEST_P(filter_type_tests, registration)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "message");
 
     auto fFed = GetFederateAt(0);
@@ -82,7 +82,7 @@ Test filter info fields
 TEST_P(filter_type_tests, info_tests)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "message");
 
     auto fFed = GetFederateAt(0);
@@ -161,7 +161,7 @@ TEST_F(filter_tests, core_filter_reg)
 TEST_P(filter_type_tests, message_filter_function)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAt(0);
@@ -224,7 +224,7 @@ TEST_P(filter_type_tests, message_filter_function)
 TEST_P(filter_simple_type_tests, function_mObj)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAt(0);
@@ -290,7 +290,7 @@ simulation
 TEST_P(filter_type_tests, function_two_stage)
 {
     helics_broker broker = AddBroker(GetParam(), 3);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter2");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -374,7 +374,7 @@ simulation
 TEST_P(filter_type_tests, function2)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAt(0);
@@ -445,7 +445,7 @@ TEST_P(filter_type_tests, function2)
 TEST_P(filter_type_tests, message_filter_function3)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAt(0);
@@ -1059,7 +1059,7 @@ static void filterFunc1(helics_message mess, void* /*unused*/)
 TEST_F(filter_tests, callback_test)
 {
     helics_broker broker = AddBroker("test", 2);
-    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "filter");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAt(0);
@@ -1127,5 +1127,5 @@ TEST_F(filter_tests, callback_test)
 
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_simple_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(CoreTypes));

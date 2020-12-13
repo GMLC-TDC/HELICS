@@ -6,7 +6,7 @@ Logging in HELICS is normally handled through an independent thread. The thread 
 
 Most of the time the log for a federate is the same as for its core. This is managed through a few properties in the FederateInfo structure which can also be directly specified through the property functions.
 
-- `HELICS_PROPERTY_INT_log_level` General logging level applicable to both file and console logs
+- `HELICS_PROPERTY_INT_LOG_LEVEL` General logging level applicable to both file and console logs
 
 - `HELICS_PROPERTY_INT_file_log_level` Level to log to the file
 
@@ -15,11 +15,11 @@ Most of the time the log for a federate is the same as for its core. This is man
 These properties can be set using the API interface functions
 
 ```c
-helicsFederateInfoSetIntegerProperty(fi,HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_data,&err);
+helicsFederateInfoSetIntegerProperty(fi,HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_data,&err);
 ```
 
 ```python
-h.helicsFederateInfoSetIntegerProperty(fi,h.HELICS_PROPERTY_INT_log_level, h.HELICS_LOG_LEVEL_data)
+h.helicsFederateInfoSetIntegerProperty(fi,h.HELICS_PROPERTY_INT_LOG_LEVEL, h.HELICS_LOG_LEVEL_data)
 ```
 
 NOTE: logging level properties set in a federateInfo will apply to a core as well if it is the first federate registered in the core. After registration log level properties must be set separately for the core and federate.

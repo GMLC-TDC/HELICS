@@ -271,8 +271,8 @@ namespace apps {
                 helics::Time T;
                 if (allow_iteration) {
                     auto ItRes =
-                        fed->requestTimeIterative(runToTime, iteration_request::iterate_if_needed);
-                    if (ItRes.state == iteration_result::next_step) {
+                        fed->requestTimeIterative(runToTime, IterationRequest::ITERATE_IF_NEEDED);
+                    if (ItRes.state == IterationResult::NEXT_STEP) {
                         iteration = 0;
                     }
                     T = ItRes.grantedTime;

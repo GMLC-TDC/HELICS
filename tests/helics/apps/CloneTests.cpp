@@ -23,14 +23,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(clone_tests, simple_clone_test_pub)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "clone_core1";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1("c1", fi);
     c1.setFederateToClone("block1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -53,7 +53,7 @@ TEST(clone_tests, simple_clone_test_pub)
 
 TEST(clone_tests, simple_clone_test_pub2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "clone_core2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1("c1", fi);
@@ -61,7 +61,7 @@ TEST(clone_tests, simple_clone_test_pub2)
     c1.setFederateToClone("block1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
 
     auto& pub2 = vfed.registerPublication("pub2", "double", "m");
 
@@ -92,7 +92,7 @@ TEST(clone_tests, simple_clone_test_pub2)
     auto fi2 = helics::loadFederateInfo("pubtest2.json");
     fi2.coreName = "clone_core3";
     fi2.coreInitString = "--autobroker";
-    fi2.coreType = helics::core_type::TEST;
+    fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
     p1.loadFile("pubtest2.json");
 
@@ -106,7 +106,7 @@ TEST(clone_tests, simple_clone_test_pub2)
 
 TEST(clone_tests, simple_clone_test_message)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "clone_core4";
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     fi.coreInitString = "-f 2 --autobroker";
@@ -141,7 +141,7 @@ TEST(clone_tests, simple_clone_test_message)
     auto fi2 = helics::loadFederateInfo("eptsave.json");
     fi2.coreName = "clone_core5";
     fi2.coreInitString = "--autobroker";
-    fi2.coreType = helics::core_type::TEST;
+    fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
     p1.loadFile("eptsave.json");
 
@@ -155,7 +155,7 @@ TEST(clone_tests, simple_clone_test_message)
 
 TEST(clone_tests, simple_clone_test_combo)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "clone_core6";
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     fi.coreInitString = "-f 2 --autobroker";
@@ -167,7 +167,7 @@ TEST(clone_tests, simple_clone_test_combo)
     auto& ept2 = mfed.registerGlobalEndpoint("ept3");
     mfed.registerEndpoint("e3");
 
-    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
 
     auto& pub2 = mfed.registerPublication("pub2", "double", "m");
 
@@ -199,7 +199,7 @@ TEST(clone_tests, simple_clone_test_combo)
     auto fi2 = helics::loadFederateInfo("combsave.json");
     fi2.coreName = "clone_core7";
     fi2.coreInitString = "--autobroker";
-    fi2.coreType = helics::core_type::TEST;
+    fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
     p1.loadFile("combsave.json");
 
@@ -215,7 +215,7 @@ TEST(clone_tests, simple_clone_test_combo)
 
 TEST(clone_tests, simple_clone_test_sub)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "clone_core8";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Clone c1("c1", fi);
@@ -224,7 +224,7 @@ TEST(clone_tests, simple_clone_test_sub)
 
     helics::ValueFederate vfed("block1", fi);
     helics::ValueFederate vfed2("block2", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
 
     auto& pub2 = vfed.registerPublication("pub2", "double", "m");
 
@@ -269,7 +269,7 @@ TEST(clone_tests, simple_clone_test_sub)
     auto fi2 = helics::loadFederateInfo("subtest.json");
     fi2.coreName = "clone_core9";
     fi2.coreInitString = "--autobroker";
-    fi2.coreType = helics::core_type::TEST;
+    fi2.coreType = helics::CoreType::TEST;
     helics::apps::Player p1("p1", fi2);
     p1.loadFile("subtest.json");
 

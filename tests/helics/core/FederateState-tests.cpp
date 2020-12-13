@@ -28,7 +28,7 @@ TEST_F(federateStateTests, constructor_test)
 {
     // Check setting of name, initial state, and info by the constructor
     EXPECT_EQ(fs->getIdentifier(), "fed_name");
-    EXPECT_EQ(fs->getState(), helics::federate_state::HELICS_CREATED);
+    EXPECT_EQ(fs->getState(), helics::FederateState::HELICS_CREATED);
 
     EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::time_delta), helics::Time::epsilon());
     EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::output_delay), helics::Time::zeroVal());
@@ -184,18 +184,18 @@ TEST_F(federateStateTests, basic_processmessage_test)
     // Test returning when the initialization state is entered
     cmd.setAction(helics::CMD_INIT_GRANT);
     auto fs_process = std::async(std::launch::async, [&]() { return fs->enterInitializingMode(); });
-    EXPECT_EQ(fs->getState(), federate_state::HELICS_CREATED);
+    EXPECT_EQ(fs->getState(), FederateState::HELICS_CREATED);
     fs->addAction(cmd);
     fs_process.wait();
-    EXPECT_TRUE(fs_process.get() == iteration_result::next_step);
-    EXPECT_EQ(fs->getState(), federate_state::HELICS_INITIALIZING);
+    EXPECT_TRUE(fs_process.get() == IterationResult::NEXT_STEP);
+    EXPECT_EQ(fs->getState(), FederateState::HELICS_INITIALIZING);
 
     // Test returning when the finished state is entered
     cmd.setAction(helics::CMD_STOP);
     fs->addAction(cmd);
-    EXPECT_EQ(fs->getState(), federate_state::HELICS_INITIALIZING);
+    EXPECT_EQ(fs->getState(), FederateState::HELICS_INITIALIZING);
     auto fs_process2 = std::async(std::launch::async, [&]() {
-        return fs->enterExecutingMode(iteration_request::no_iterations);
+        return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
 
     fs->global_id =
@@ -204,8 +204,8 @@ TEST_F(federateStateTests, basic_processmessage_test)
     fs->global_id = helics::GlobalFederateId();
     auto state = fs_process2.get();
 
-    EXPECT_TRUE(state == iteration_result::halted);
-    EXPECT_EQ(fs->getState(), federate_state::HELICS_FINISHED);
+    EXPECT_TRUE(state == IterationResult::HALTED);
+    EXPECT_EQ(fs->getState(), FederateState::HELICS_FINISHED);
 
     // Return to created state
     fs->reset();
@@ -219,7 +219,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     fs_process = std::async(std::launch::async, [&]() { return fs->waitSetup(); });
     fs->addAction(cmd);
     fs_process.wait();
-    EXPECT_TRUE(fs_process.get() == iteration_result::next_step);
+    EXPECT_TRUE(fs_process.get() == IterationResult::NEXT_STEP);
     EXPECT_EQ(fs->global_id.load(), fed22);
 
     // Test CMD_FED_ACK message with an error
@@ -229,9 +229,9 @@ TEST_F(federateStateTests, basic_processmessage_test)
     fs_process = std::async(std::launch::async, [&]() { return fs->waitSetup(); });
     fs->addAction(cmd);
     fs_process.wait();
-    EXPECT_TRUE(fs_process.get() == iteration_result::error);
+    EXPECT_TRUE(fs_process.get() == IterationResult::ERROR_RESULT);
     EXPECT_EQ(fs->global_id.load(), fed22);
-    EXPECT_EQ(fs->getState(), federate_state::HELICS_ERROR);
+    EXPECT_EQ(fs->getState(), FederateState::HELICS_ERROR);
 
     // Return to initializing state
     fs->reInit();
@@ -239,20 +239,20 @@ TEST_F(federateStateTests, basic_processmessage_test)
     // Test returning when an error occurs
     cmd.setAction(helics::CMD_ERROR);
     fs_process2 = std::async(std::launch::async, [&]() {
-        return fs->enterExecutingMode(iteration_request::no_iterations);
+        return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
     auto st = fs->getState();
-    EXPECT_TRUE((st == federate_state::HELICS_INITIALIZING) ||
-                (st == federate_state::HELICS_EXECUTING));
+    EXPECT_TRUE((st == FederateState::HELICS_INITIALIZING) ||
+                (st == FederateState::HELICS_EXECUTING));
     fs->addAction(cmd);
     auto res = fs_process2.get();
-    if (res != iteration_result::error) {
-        auto ittime = fs->requestTime(5.0, helics::iteration_request::no_iterations);
+    if (res != IterationResult::ERROR_RESULT) {
+        auto ittime = fs->requestTime(5.0, helics::IterationRequest::NO_ITERATIONS);
         res = ittime.state;
     }
 
-    EXPECT_TRUE(res == iteration_result::error);
-    EXPECT_EQ(fs->getState(), federate_state::HELICS_ERROR);
+    EXPECT_TRUE(res == IterationResult::ERROR_RESULT);
+    EXPECT_EQ(fs->getState(), FederateState::HELICS_ERROR);
 
     fs->reset();
 

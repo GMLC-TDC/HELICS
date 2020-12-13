@@ -28,7 +28,7 @@ class combofed_type_tests:
     public FederateTestFixture {
 };
 
-// const std::string core_types[] = {"udp" };
+// const std::string CoreTypes[] = {"udp" };
 /** test simple creation and destruction*/
 TEST_P(combofed_single_type_tests, initialize_tests)
 {
@@ -279,8 +279,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
 
 INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          combofed_single_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(combofed_tests, combofed_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(combofed_tests, combofed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
                                                      "example_combo_fed.toml"};
@@ -313,9 +313,9 @@ INSTANTIATE_TEST_SUITE_P(combofed_tests,
 
 TEST(comboFederate, constructor2)
 {
-    auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=mf --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
+    auto cr = helics::CoreFactory::create(helics::CoreType::TEST, "--name=mf --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_error);
     helics::CombinationFederate mf1("fed1", cr, fi);
 
     mf1.registerGlobalFilter("filt1");
@@ -329,9 +329,9 @@ TEST(comboFederate, constructor2)
 
 TEST(comboFederate, constructor3)
 {
-    helics::CoreApp cr(helics::core_type::TEST, "--name=mf2 --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
+    helics::CoreApp cr(helics::CoreType::TEST, "--name=mf2 --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_error);
     helics::CombinationFederate mf1("fed1", cr, fi);
 
     mf1.registerGlobalFilter("filt1");

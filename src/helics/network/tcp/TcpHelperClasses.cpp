@@ -71,7 +71,7 @@ void TcpConnection::setErrorCall(
     if (state.load() == connection_state_t::prestart) {
         errorCall = std::move(errorFunc);
     } else {
-        throw(std::runtime_error("cannot set error callback after socket is started"));
+        throw(std::runtime_error("cannot set ERROR_RESULT callback after socket is started"));
     }
 }
 
@@ -137,7 +137,7 @@ void TcpConnection::handle_read(const std::error_code& error, size_t bytes_trans
             }
         } else if (error != asio::error::eof) {
             if (error != asio::error::connection_reset) {
-                std::cerr << "receive error " << error.message() << std::endl;
+                std::cerr << "receive ERROR_RESULT " << error.message() << std::endl;
             }
             state = connection_state_t::halted;
             receivingHalt.trigger();
@@ -179,7 +179,7 @@ void TcpConnection::closeNoWait()
         if (ec) {
             if ((ec.value() != asio::error::not_connected) &&
                 (ec.value() != asio::error::connection_reset)) {
-                std::cerr << "error occurred sending shutdown::" << ec.message() << " "
+                std::cerr << "ERROR_RESULT occurred sending shutdown::" << ec.message() << " "
                           << ec.value() << std::endl;
             }
             ec.clear();
@@ -238,7 +238,7 @@ void TcpConnection::connect_handler(const std::error_code& error)
         connected.activate();
         socket_.set_option(asio::ip::tcp::no_delay(true));
     } else {
-        std::cerr << "connection error " << error.message() << ": code =" << error.value() << '\n';
+        std::cerr << "connection ERROR_RESULT " << error.message() << ": code =" << error.value() << '\n';
         connectionError = true;
         connected.activate();
     }
@@ -335,7 +335,7 @@ bool TcpAcceptor::connect()
         acceptor_.bind(endpoint_, ec);
         if (ec) {
             state = accepting_state_t::opened;
-            std::cout << "acceptor error" << ec << std::endl;
+            std::cout << "acceptor ERROR_RESULT" << ec << std::endl;
             return false;
         }
         state = accepting_state_t::connected;
@@ -456,7 +456,7 @@ void TcpAcceptor::handle_accept(TcpAcceptor::pointer ptr,
         if (errorCall) {
             errorCall(std::move(ptr), error);
         } else {
-            std::cerr << " error in accept::" << error.message() << std::endl;
+            std::cerr << " ERROR_RESULT in accept::" << error.message() << std::endl;
         }
         asio::socket_base::linger optionLinger(true, 0);
         try {
@@ -549,7 +549,7 @@ TcpServer::~TcpServer()
 void TcpServer::initialConnect()
 {
     if (halted.load(std::memory_order_acquire)) {
-        std::cout << "previously halted server" << std::endl;
+        std::cout << "previously HALTED server" << std::endl;
         return;
     }
     for (auto& ep : endpoints) {

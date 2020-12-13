@@ -580,7 +580,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
     return msg;
 }
 
-static constexpr char unknownStr[] = "unknown";
+static constexpr char unknownStr[] = "UNKNOWN";
 
 // Map to translate the action to a description
 static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string, 93>
@@ -632,7 +632,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_bye, "bye"},
         {action_message_def::action_t::cmd_log, "log"},
         {action_message_def::action_t::cmd_warning, "warning"},
-        {action_message_def::action_t::cmd_error, "error"},
+        {action_message_def::action_t::cmd_error, "ERROR_RESULT"},
 
         {action_message_def::action_t::cmd_send_route, "send_route"},
         {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
@@ -647,7 +647,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_time_request, "time_request"},
         {action_message_def::action_t::cmd_send_message, "send_message"},
         {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
-        {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
+        {action_message_def::action_t::cmd_filter_result, "result from running a FILTER"},
         {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
         {action_message_def::action_t::cmd_null_message, "null message"},
 
@@ -656,8 +656,8 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_remove_publication, "remove publisher"},
         {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
         {action_message_def::action_t::cmd_add_filter, "add_filter"},
-        {action_message_def::action_t::cmd_remove_filter, "remove filter"},
-        {action_message_def::action_t::cmd_filter_link, "link filter"},
+        {action_message_def::action_t::cmd_remove_filter, "remove FILTER"},
+        {action_message_def::action_t::cmd_filter_link, "link FILTER"},
         {action_message_def::action_t::cmd_data_link, "data link"},
         {action_message_def::action_t::cmd_reg_input, "reg_input"},
         {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
@@ -665,7 +665,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_reg_end, "reg_end"},
         {action_message_def::action_t::cmd_resend, "reg_resend"},
         {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
-        {action_message_def::action_t::cmd_remove_endpoint, "remove endpoint"},
+        {action_message_def::action_t::cmd_remove_endpoint, "remove ENDPOINT"},
         {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
         {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
         {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
@@ -697,7 +697,7 @@ const char* actionMessageType(action_message_def::action_t action)
 
 // set of strings to translate error codes to something sensible
 static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
-    {connection_error_code, "connection error"},
+    {connection_error_code, "connection ERROR_RESULT"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
     {duplicate_federate_name_error_code, "duplicate federate name detected"},
@@ -739,7 +739,7 @@ std::string prettyPrintString(const ActionMessage& command)
             ret.append(command.name());
             ret.append("--");
             if (checkActionFlag(command, error_flag)) {
-                ret.append("error");
+                ret.append("ERROR_RESULT");
             } else {
                 ret.append(std::to_string(command.dest_id.baseValue()));
             }
@@ -811,17 +811,17 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
     return (-1);
 }
 
-void setIterationFlags(ActionMessage& command, iteration_request iterate)
+void setIterationFlags(ActionMessage& command, IterationRequest iterate)
 {
     switch (iterate) {
-        case iteration_request::force_iteration:
+        case IterationRequest::FORCE_ITERATION:
             setActionFlag(command, iteration_requested_flag);
             setActionFlag(command, required_flag);
             break;
-        case iteration_request::iterate_if_needed:
+        case IterationRequest::ITERATE_IF_NEEDED:
             setActionFlag(command, iteration_requested_flag);
             break;
-        case iteration_request::no_iterations:
+        case IterationRequest::NO_ITERATIONS:
             break;
     }
 }

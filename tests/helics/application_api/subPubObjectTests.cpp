@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST(subscriptionObject, tests)
 {

@@ -23,7 +23,7 @@ class vfed_type_tests:
     public FederateTestFixture_cpp {
 };
 
-// const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
+// const std::string CoreTypes[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
 /** test block send and receive*/
 
@@ -135,7 +135,7 @@ TEST_P(vfed_type_tests, test_async_calls)
     vFed2->finalize();
 }
 //
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 //
 TEST_F(vfed_tests, test_file_load)

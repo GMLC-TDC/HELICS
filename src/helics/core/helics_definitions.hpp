@@ -17,127 +17,130 @@ The defs namespace contains several enumerations for use in functions that take 
 values or small sets of options*/
 namespace defs {
     /** flags that can be used to set different options for a federate*/
-    enum flags : int32_t {
+    enum Flags : int32_t {
         /** flag indicating that a federate is observe only*/
-        observer = HELICS_FLAG_observer,
+        OBSERVER = HELICS_FLAG_OBSERVER,
         /** flag indicating that a federate can only return requested times*/
-        uninterruptible = HELICS_FLAG_uninterruptible,
+        UNINTERRUPTIBLE = HELICS_FLAG_UNINTERRUPTIBLE,
         /** flag indicating that a federate can be interrupted*/
-        interruptible = HELICS_FLAG_interruptible,
+        INTERRUPTIBLE = HELICS_FLAG_INTERRUPTIBLE,
         /** flag specifying that a federate may be slow to respond to pings
         If the federate goes offline there is no good way to detect it so use with caution
         */
-        slow_responding = HELICS_FLAG_slow_responding,
+        SLOW_RESPONDING = HELICS_FLAG_SLOW_RESPONDING,
         /** flag specifying that a federate encountering an internal error should cause and abort
          * for the entire co-simulation
          */
-        terminate_on_error = HELICS_FLAG_terminate_on_error,
+        TERMINATE_ON_ERROR = HELICS_FLAG_TERMINATE_ON_ERROR,
         /** flag indicating that a federate/interface is a signal generator only*/
-        source_only = HELICS_FLAG_source_only,
+        SOURCE_ONLY = HELICS_FLAG_SOURCE_ONLY,
         /** flag indicating a federate/interface should only transmit values if they have
            changed(binary equivalence)*/
-        only_transmit_on_change = HELICS_FLAG_only_transmit_on_change,
+        ONLY_TRANSMIT_ON_CHANGE = HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE,
         /** flag indicating a federate/interface should only trigger an update if a value has
          * changed (binary equivalence)*/
-        only_update_on_change = HELICS_FLAG_only_update_on_change,
+        ONLY_UPDATE_ON_CHANGE = HELICS_FLAG_ONLY_UPDATE_ON_CHANGE,
         /** flag indicating a federate should only grant time if all other federates have already
          * passed the requested time*/
-        wait_for_current_time_update = HELICS_FLAG_wait_for_current_time_update,
+        WAIT_FOR_CURRENT_TIME_UPDATE = HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE,
         /** flag indicating a federate should only operate on a restrictive time policy which means
     no second order projections and potentially very slow time advancement on gap conditions. Should
     only be used in selective circumstances*/
-        restrictive_time_policy = HELICS_FLAG_restrictive_time_policy,
+        RESTRICTIVE_TIME_POLICY = HELICS_FLAG_RESTRICTIVE_TIME_POLICY,
         /** flag indicating that a federate has rollback capability*/
-        rollback = HELICS_FLAG_rollback,
+        ROLLBACK = HELICS_FLAG_ROLLBACK,
         /** flag indicating that a federate performs forward computation and does internal
            rollback*/
-        forward_compute = HELICS_FLAG_forward_compute,
+        FORWARD_COMPUTE = HELICS_FLAG_FORWARD_COMPUTE,
         /** flag indicating that a federate needs to run in real time*/
-        realtime = HELICS_FLAG_realtime,
+        REALTIME = HELICS_FLAG_REALTIME,
         /** flag indicating that the federate will only interact on a single thread*/
-        single_thread_federate = HELICS_FLAG_single_thread_federate,
+        SINGLE_THREAD_FEDERATE = HELICS_FLAG_SINGLE_THREAD_FEDERATE,
         /** used to delay a core from entering initialization mode even if it would otherwise be
            ready*/
-        delay_init_entry = HELICS_FLAG_delay_init_entry,
+        DELAY_INIT_ENTRY = HELICS_FLAG_DELAY_INIT_ENTRY,
         /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-        enable_init_entry = HELICS_FLAG_enable_init_entry,
+        ENABLE_INIT_ENTRY = HELICS_FLAG_ENABLE_INIT_ENTRY,
         /** used to not display warnings on mismatched requested times*/
-        ignore_time_mismatch_warnings = HELICS_FLAG_ignore_time_mismatch_warnings,
+        IGNORE_TIME_MISMATCH_WARNINGS = HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS,
         /** force logging flush*/
-        force_logging_flush = HELICS_FLAG_force_logging_flush,
+        FORCE_LOGGING_FLUSH = HELICS_FLAG_FORCE_LOGGING_FLUSH,
         /** user debugging mode*/
-        debugging = HELICS_FLAG_debugging,
+        DEBUGGING = HELICS_FLAG_DEBUGGING,
         /** dump the logs to a file at the end*/
-        dumplog = HELICS_FLAG_dumplog,
+        DUMPLOG = HELICS_FLAG_DUMPLOG,
         /** make all connections required*/
-        connections_required = HELICS_HANDLE_OPTION_connection_required,
+        CONNECTIONS_REQUIRED = HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,
         /** make all connections optional*/
-        connections_optional = HELICS_HANDLE_OPTION_connection_optional,
+        CONNECTIONS_OPTIONAL = HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL,
         /** make all inputs have strict type checking*/
-        strict_input_type_checking = HELICS_HANDLE_OPTION_strict_type_checking,
+        STRICT_INPUT_TYPE_CHECKING = HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING,
         /** be strict about config files*/
-        strict_config_checking = HELICS_FLAG_strict_config_checking,
+        STRICT_CONFIG_CHECKING = HELICS_FLAG_STRICT_CONFIG_CHECKING,
         /** ignore mismatching units*/
-        ignore_input_unit_mismatch = HELICS_HANDLE_OPTION_ignore_unit_mismatch
+        IGNORE_INPUT_UNIT_MISMATCH = HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH
 
     };
     /** potential errors that might be generated by a helics federate/core/broker */
-    enum errors : int32_t {
-
-        ok = helics_ok, /*!< the function executed successfully */
-        registration_failure = HELICS_ERROR_registration_failure, /*!< registration has failed*/
-        connection_failure =
-            HELICS_ERROR_connection_failure, /*!< the operation to connect has failed*/
-        invalid_object = HELICS_ERROR_invalid_object, /*!< indicator that the object used was not a
-                                                         valid object */
-        invalid_argument = HELICS_ERROR_invalid_argument, /*!< the parameter passed was invalid and
-                                                             unable to be used*/
-        discard = HELICS_ERROR_discard, /*!< the input was discarded and not used for some reason */
-        system_failure = HELICS_ERROR_system_failure, /*!< the federate has terminated unexpectedly
-                                                         and the call cannot be completed*/
-        warning = helics_warning, /*!< the function issued a warning of some kind */
-        invalid_state_transition =
-            HELICS_ERROR_invalid_state_transition, /*!< error issued when an invalid state
-                                                      transition occurred */
-        invalid_function_call =
-            HELICS_ERROR_invalid_function_call, /*!< the call made was invalid in the present state
-                                                                   of the calling object*/
-        execution_failure = HELICS_ERROR_execution_failure, /*!< the function execution has failed*/
-        other = HELICS_ERROR_other, /*!< the function produced a helics error of some other type */
+    enum Errors : int32_t {
+        /** the function executed successfully */
+        OK = HELICS_OK,
+        /** registration has failed*/
+        REGISTRATION_FAILURE = HELICS_ERROR_REGISTRATION_FAILURE,
+        /** the operation to connect has failed*/
+        CONNECTION_FAILURE = HELICS_ERROR_CONNECTION_FAILURE,
+        /** indicator that the object used was not a valid object */
+        INVALID_OBJECT = HELICS_ERROR_INVALID_OBJECT,
+        /** the parameter passed was invalid and unable to be used*/
+        INVALID_ARGUMENT = HELICS_ERROR_INVALID_ARGUMENT,
+        /** the input was discarded and not used for some reason */
+        DISCARD = HELICS_ERROR_DISCARD,
+        /** the federate has terminated unexpectedly and the call cannot be completed*/
+        SYSTEM_FAILURE = HELICS_ERROR_SYSTEM_FAILURE,
+        /** the function issued a warning of some kind */
+        WARNING = HELICS_WARNING,
+        /** error issued when an invalid state transition occurred */
+        INVALID_STATE_TRANSITION = HELICS_ERROR_INVALID_STATE_TRANSITION,
+        /** the call made was invalid in the present state of the calling object*/
+        INVALID_FUNCTION_CALL = HELICS_ERROR_INVALID_FUNCTION_CALL,
+        /** the function execution has failed*/
+        EXECUTION_FAILURE = HELICS_ERROR_EXECUTION_FAILURE,
+        /** the function produced a helics error of some other type */
+        OTHER = HELICS_ERROR_OTHER,
     };
 
     /** integer and time properties that can be set for federates*/
-    enum properties : int32_t {
-        time_delta = HELICS_PROPERTY_TIME_delta,
-        period = HELICS_PROPERTY_TIME_PERIOD,
-        offset = HELICS_PROPERTY_TIME_offset,
-        rt_lag = HELICS_PROPERTY_TIME_rt_lag,
-        rt_lead = HELICS_PROPERTY_TIME_rt_lead,
-        rt_tolerance = HELICS_PROPERTY_TIME_rt_tolerance,
-        input_delay = HELICS_PROPERTY_TIME_input_delay,
-        output_delay = HELICS_PROPERTY_TIME_output_delay,
-        max_iterations = HELICS_PROPERTY_INT_max_iterations,
-        log_level = HELICS_PROPERTY_INT_log_level,
-        file_log_level = HELICS_PROPERTY_INT_file_log_level,
-        console_log_level = HELICS_PROPERTY_INT_console_log_level
+    enum Properties : int32_t {
+        TIME_DELTA = HELICS_PROPERTY_TIME_DELTA,
+        PERIOD = HELICS_PROPERTY_TIME_PERIOD,
+        OFFSET = HELICS_PROPERTY_TIME_OFFSET,
+        RT_LAG = HELICS_PROPERTY_TIME_RT_LAG,
+        RT_LEAD = HELICS_PROPERTY_TIME_RT_LEAD,
+        RT_TOLERANCE = HELICS_PROPERTY_TIME_RT_TOLERANCE,
+        INPUT_DELAY = HELICS_PROPERTY_TIME_INPUT_DELAY,
+        OUTPUT_DELAY = HELICS_PROPERTY_TIME_OUTPUT_DELAY,
+        MAX_ITERATIONS = HELICS_PROPERTY_INT_MAX_ITERATIONS,
+        LOG_LEVEL = HELICS_PROPERTY_INT_LOG_LEVEL,
+        FILE_LOG_LEVEL = HELICS_PROPERTY_INT_FILE_LOG_LEVEL,
+        CONSOLE_LOG_LEVEL = HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL
     };
 
     /** options for handles */
-    enum options : int32_t {
-        connection_required = HELICS_HANDLE_OPTION_connection_required,
-        connection_optional = HELICS_HANDLE_OPTION_connection_optional,
-        single_connection_only = HELICS_HANDLE_OPTION_single_connection_only,
-        multiple_connections_allowed = HELICS_HANDLE_OPTION_multiple_connections_allowed,
-        handle_only_transmit_on_change = HELICS_HANDLE_OPTION_only_transmit_on_change,
-        handle_only_update_on_change = HELICS_HANDLE_OPTION_only_update_on_change,
-        buffer_data = HELICS_HANDLE_OPTION_buffer_data,
-        ignore_interrupts = HELICS_HANDLE_OPTION_ignore_interrupts,
-        strict_type_checking = HELICS_HANDLE_OPTION_strict_type_checking,
-        ignore_unit_mismatch = HELICS_HANDLE_OPTION_ignore_unit_mismatch,
-        multi_input_handling_method = HELICS_HANDLE_OPTION_multi_input_handling_method,
-        input_priority_location = HELICS_HANDLE_OPTION_input_priority_location,
-        clear_priority_list = HELICS_HANDLE_OPTION_clear_priority_list,
-        connections = HELICS_HANDLE_OPTION_connections
+    enum Options : int32_t {
+        CONNECTION_REQUIRED = HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,
+        CONNECTION_OPTIONAL = HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL,
+        SINGLE_CONNECTION_ONLY = HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY,
+        MULTIPLE_CONNECTIONS_ALLOWED = HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED,
+        HANDLE_ONLY_TRANSMIT_ON_CHANGE = HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE,
+        HANDLE_ONLY_UPDATE_ON_CHANGE = HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE,
+        BUFFER_DATA = HELICS_HANDLE_OPTION_BUFFER_DATA,
+        IGNORE_INTERRUPTS = HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS,
+        STRICT_TYPE_CHECKING = HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING,
+        IGNORE_UNIT_MISMATCH = HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH,
+        MULTI_INPUT_HANDLING_METHOD = HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
+        INPUT_PRIORITY_LOCATION = HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION,
+        CLEAR_PRIORITY_LIST = HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST,
+        CONNECTIONS = HELICS_HANDLE_OPTION_CONNECTIONS
     };
 
 }  // namespace defs

@@ -361,8 +361,8 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
 
 INSTANTIATE_TEST_SUITE_P(mfed_tests,
                          mfed_simple_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 // a series of tests exercising the different aspects of message object setting and retrieval
 TEST(message_object, test1)
@@ -370,7 +370,7 @@ TEST(message_object, test1)
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_test, nullptr);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
 
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
@@ -459,7 +459,7 @@ TEST(message_object, copy)
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
     auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_test, nullptr);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
     helicsFederateInfoFree(fi);

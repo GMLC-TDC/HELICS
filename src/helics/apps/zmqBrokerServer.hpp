@@ -54,7 +54,7 @@ namespace apps {
         static zmqServerData generateServerData(int portNumber, int skip);
 
         std::string
-            generateResponseToMessage(zmq::message_t& msg, portData& pdata, core_type ctype);
+            generateResponseToMessage(zmq::message_t& msg, portData& pdata, CoreType ctype);
 #endif
         std::thread mainLoopThread;
         std::mutex threadGuard;

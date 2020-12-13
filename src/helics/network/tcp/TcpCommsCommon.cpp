@@ -64,7 +64,7 @@ namespace tcp {
         if (comm->isConnected()) {
             if ((error != asio::error::eof) && (error != asio::error::operation_aborted)) {
                 if (error != asio::error::connection_reset) {
-                    comm->logError("error message while connected " + error.message() + "code " +
+                    comm->logError("ERROR_RESULT message while connected " + error.message() + "code " +
                                    std::to_string(error.value()));
                 }
             }

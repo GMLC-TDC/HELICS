@@ -341,7 +341,7 @@ TEST_F(timing_tests, sender_finalize_timing_result)
     helics::Publication sender(helics::interface_visibility::global,
                                vFed1,
                                "pub",
-                               helics::data_type::helics_double);
+                               helics::DataType::HELICS_DOUBLE);
     auto& receiver = vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -406,7 +406,7 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
     helics::Publication sender(helics::interface_visibility::global,
                                vFed1,
                                "pub",
-                               helics::data_type::helics_double);
+                               helics::DataType::HELICS_DOUBLE);
     auto& receiver = vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -477,7 +477,7 @@ TEST_F(timing_tests, fast_sender_tests_ci_skip)  // ci_skip
     helics::Publication sender(helics::interface_visibility::global,
                                vFed1,
                                "pub",
-                               helics::data_type::helics_double);
+                               helics::DataType::HELICS_DOUBLE);
     auto& receiver = vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
@@ -510,12 +510,12 @@ TEST_F(timing_tests, dual_fast_sender_tests_ci_skip)  // ci_skip
     helics::Publication sender1(helics::interface_visibility::global,
                                 vFed1,
                                 "pub1",
-                                helics::data_type::helics_double);
+                                helics::DataType::HELICS_DOUBLE);
     auto& receiver1 = vFed2->registerSubscription("pub1");
     helics::Publication sender2(helics::interface_visibility::global,
                                 vFed3,
                                 "pub2",
-                                helics::data_type::helics_double);
+                                helics::DataType::HELICS_DOUBLE);
     auto& receiver2 = vFed2->registerSubscription("pub2");
     vFed1->enterExecutingModeAsync();
     vFed3->enterExecutingModeAsync();

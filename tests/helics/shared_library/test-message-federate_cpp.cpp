@@ -101,7 +101,7 @@ TEST_P(mfed_type_tests, message_federate_send_receive)
     EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
 }
 
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 
 TEST_F(mfed_tests, Message)
 {

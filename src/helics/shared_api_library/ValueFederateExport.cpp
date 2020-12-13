@@ -21,9 +21,9 @@ static const int InputValidationIdentifier = 0x3456'E052;
 /** random integer for validation purposes of publications */
 static const int PublicationValidationIdentifier = 0x97B1'00A5;
 
-static const char* invalidInputString = "The given input object does not point to a valid object";
+static const char* invalidInputString = "The given INPUT object does not point to a valid object";
 
-static const char* invalidPublicationString = "The given publication object does not point to a valid object";
+static const char* invalidPublicationString = "The given PUBLICATION object does not point to a valid object";
 
 static helics::InputObject* verifyInput(helics_input inp, helics_error* err)
 {
@@ -131,7 +131,7 @@ helics_publication
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
         pub->pubPtr = &(
-            fedObj->registerPublication(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
+            fedObj->registerPublication(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::DataType>(type)), AS_STRING(units)));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
     }
@@ -185,7 +185,7 @@ helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
         pub->pubPtr = &(fedObj->registerGlobalPublication(AS_STRING(key),
-                                                          helics::typeNameStringRef(static_cast<helics::data_type>(type)),
+                                                          helics::typeNameStringRef(static_cast<helics::DataType>(type)),
                                                           AS_STRING(units)));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
@@ -234,7 +234,7 @@ helics_input helicsFederateRegisterInput(helics_federate fed, const char* key, h
     try {
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr =
-            &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
+            &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::DataType>(type)), AS_STRING(units)));
         inp->fedptr = std::move(fedObj);
         return addInput(fed, std::move(inp));
     }
@@ -284,7 +284,7 @@ helics_input
     try {
         auto inp = std::make_unique<helics::InputObject>();
         inp->inputPtr =
-            &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::data_type>(type)), AS_STRING(units)));
+            &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::DataType>(type)), AS_STRING(units)));
         inp->fedptr = std::move(fedObj);
         return addInput(fed, std::move(inp));
     }
@@ -328,8 +328,8 @@ void helicsFederatePublishJSON(helics_federate fed, const char* json, helics_err
     }
 }
 
-static constexpr char invalidPubName[] = "the specified publication name is a not a valid publication name";
-static constexpr char invalidPubIndex[] = "the specified publication index is not valid";
+static constexpr char invalidPubName[] = "the specified PUBLICATION name is a not a valid PUBLICATION name";
+static constexpr char invalidPubIndex[] = "the specified PUBLICATION index is not valid";
 
 helics_publication helicsFederateGetPublication(helics_federate fed, const char* key, helics_error* err)
 {
@@ -382,8 +382,8 @@ helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int 
     // LCOV_EXCL_STOP
 }
 
-static constexpr char invalidInputName[] = "the specified input name is a not a recognized input";
-static constexpr char invalidInputIndex[] = "the specified input index is not valid";
+static constexpr char invalidInputName[] = "the specified INPUT name is a not a recognized INPUT";
+static constexpr char invalidInputIndex[] = "the specified INPUT index is not valid";
 
 helics_input helicsFederateGetInput(helics_federate fed, const char* key, helics_error* err)
 {

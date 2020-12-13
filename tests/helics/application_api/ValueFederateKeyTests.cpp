@@ -104,7 +104,7 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     helics::Publication pubid(helics::GLOBAL,
                               vFed1.get(),
                               "pub1",
-                              helics::data_type::helics_string);
+                              helics::DataType::HELICS_STRING);
 
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
@@ -1042,10 +1042,10 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_single_type,
-                         ::testing::ValuesIn(core_types_single));
+                         ::testing::ValuesIn(CoreTypes_single));
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_all_type_tests,
-                         ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_all));
 
 TEST_F(valuefed_tests, empty_get_default)
 {

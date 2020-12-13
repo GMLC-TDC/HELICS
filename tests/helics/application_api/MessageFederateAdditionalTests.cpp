@@ -338,7 +338,7 @@ class PingPongFed {
     std::unique_ptr<helics::MessageFederate> mFed;
     helics::Time delta;  // the minimum time delta for the federate
     std::string name;  //!< the name of the federate
-    helics::core_type coreType;
+    helics::CoreType coreType;
     std::vector<std::pair<helics::Time, std::string>> triggers;
     helics::Endpoint* ep{nullptr};
     int index{0};
@@ -346,7 +346,7 @@ class PingPongFed {
   public:
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
-    PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
+    PingPongFed(const std::string& fname, helics::Time tDelta, helics::CoreType ctype):
         delta(tDelta), name(fname), coreType(ctype)
     {
         if (delta <= 0.0) {
@@ -473,11 +473,11 @@ TEST_P(mfed_add_type_tests, threefedPingPong)
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_single_type_tests,
-                         ::testing::ValuesIn(core_types_single));
-INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_single));
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_all_type_tests,
-                         ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_all));
 
 static constexpr const char* config_files[] = {"example_message_fed.json",
                                                "example_message_fed.toml"};
@@ -569,7 +569,7 @@ TEST_F(mfed_tests, send_message1)
 
 TEST(messageFederate, constructor1)
 {
-    helics::MessageFederate mf1("fed1", "--core_type=test --autobroker --corename=mfc");
+    helics::MessageFederate mf1("fed1", "--CoreType=test --autobroker --corename=mfc");
     // try out loading a file
     EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")),
                  helics::HelicsException);
@@ -598,9 +598,9 @@ TEST(messageFederate, constructor1)
 
 TEST(messageFederate, constructor2)
 {
-    auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=cb --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
+    auto cr = helics::CoreFactory::create(helics::CoreType::TEST, "--name=cb --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_error);
     helics::MessageFederate mf1("fed1", cr, fi);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
@@ -616,10 +616,10 @@ TEST(messageFederate, constructor2)
 
 TEST(messageFederate, constructor3)
 {
-    helics::CoreApp cr("--core_type=test --name=cb2 --autobroker");
+    helics::CoreApp cr("--CoreType=test --name=cb2 --autobroker");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_error);
     helics::MessageFederate mf1("fed1", cr, fi);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
@@ -637,7 +637,7 @@ TEST(messageFederate, constructor4)
 {
     helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
 
-    mf1.setProperty(HELICS_PROPERTY_INT_log_level, HELICS_LOG_LEVEL_error);
+    mf1.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_error);
 
     mf1.registerGlobalFilter("filt1");
     mf1.registerGlobalFilter("filt2");
@@ -650,7 +650,7 @@ TEST(messageFederate, constructor4)
 
 TEST(messageFederate, constructor5)
 {
-    helics::MessageFederate mf1("--core_type=test --autobroker --corename=mfc5 --name=fedmd");
+    helics::MessageFederate mf1("--CoreType=test --autobroker --corename=mfc5 --name=fedmd");
     // try out loading a file
 
     EXPECT_EQ(mf1.getName(), "fedmd");

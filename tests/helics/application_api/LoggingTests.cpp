@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out user-directed logging functionality
  */
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST(logging_tests, basic_logging)
 {
@@ -157,7 +157,7 @@ TEST(logging_tests, check_log_message_functions)
         });
 
     Fed->enterExecutingMode();
-    Fed->logErrorMessage("test ERROR");
+    Fed->logErrorMessage("test ERROR_RESULT");
     Fed->logWarningMessage("test WARNING");
     Fed->logInfoMessage("test INFO");
     Fed->logDebugMessage("test DEBUG");
@@ -167,7 +167,7 @@ TEST(logging_tests, check_log_message_functions)
     auto llock = mlog.lock();
     int order = 0;
     for (auto& m : llock) {
-        if (m.second.find("ERROR") != std::string::npos) {
+        if (m.second.find("ERROR_RESULT") != std::string::npos) {
             EXPECT_EQ(m.first, HELICS_LOG_LEVEL_error);
             EXPECT_EQ(order, 0);
             order = 1;

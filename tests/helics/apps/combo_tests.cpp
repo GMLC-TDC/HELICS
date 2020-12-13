@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore2";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
@@ -43,7 +43,7 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     rec1.addSourceEndpointClone("d1");
     rec1.addSubscription("pub1");
 
-    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
     mfed2.enterExecutingModeAsync();
@@ -85,7 +85,7 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
 
 static void useFile(const std::string& corename, const std::string& file)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = corename;
     fi.coreInitString = "-f 1 --autobroker";
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
@@ -120,7 +120,7 @@ TEST(combo_tests, save_load_file1)
 
 static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore3";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
@@ -136,7 +136,7 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     rec1.addSourceEndpointClone("d1");
     rec1.addSubscription("pub1");
 
-    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
     mfed2.enterExecutingModeAsync();
@@ -184,8 +184,8 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
 
 static void useFileBinary(const std::string& corename, const std::string& file)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.coreType = helics::CoreType::TEST;
     fi.coreName = corename;
     fi.coreInitString = "-f 1 --autobroker";
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
@@ -232,7 +232,7 @@ TEST(combo_tests, save_load_file_binary)
 
 TEST(combo_tests, check_combination_file_load)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore_combo";
     fi.coreInitString = "-f 3 --autobroker";
 

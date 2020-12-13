@@ -30,7 +30,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -40,7 +40,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     auto& p2 = mFed->registerGlobalEndpoint("port2");
     auto& p3 = mFed->registerGlobalEndpoint("port3");
 
-    auto& Filt = helics::make_filter(helics::filter_types::reroute, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::reroute, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     Filt.setString("newdestination", "port3");
 
@@ -79,7 +79,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -89,7 +89,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     auto& p2 = mFed->registerGlobalEndpoint("port2");
     auto& p3 = mFed->registerGlobalEndpoint("port3");
 
-    auto& Filt = helics::make_filter(helics::filter_types::reroute, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::reroute, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     Filt.setString("newdestination", "port3");
 
@@ -141,7 +141,7 @@ endpoint only if condition matches.
 TEST_P(filter_type_tests, message_reroute_filter_condition)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -199,7 +199,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -263,7 +263,7 @@ probability of 0.75.
 TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -272,7 +272,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::filter_types::random_drop, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::random_drop, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     double drop_prob = 0.75;
     Filt.set("dropprob", drop_prob);
@@ -320,7 +320,7 @@ probability of 0.9.
 TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -378,7 +378,7 @@ probability of 0.75.
 TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -387,7 +387,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::filter_types::random_drop, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::random_drop, fFed.get(), "filter1");
     Filt.addDestinationTarget("port2");
     double drop_prob = 0.25;
     Filt.set("dropprob", drop_prob);
@@ -436,7 +436,7 @@ probability of 0.9.
 TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -492,7 +492,7 @@ binomial distribution.
 TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -501,7 +501,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::filter_types::random_delay, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::random_delay, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     Filt.setString("distribution", "binomial");
 
@@ -549,7 +549,7 @@ Test filter info fields
 TEST_P(filter_type_tests, test_filter_info_field_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -594,4 +594,4 @@ TEST_P(filter_type_tests, test_filter_info_field_ci_skip)
     mFed->finalizeComplete();
 }
 
-INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(CoreTypes));

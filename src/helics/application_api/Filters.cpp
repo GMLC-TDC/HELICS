@@ -16,20 +16,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-static const std::map<std::string, filter_types> filterTypes{
-    {"clone", filter_types::clone},
-    {"delay", filter_types::delay},
-    {"randomdelay", filter_types::random_delay},
-    {"random_delay", filter_types::random_delay},
-    {"randomDelay", filter_types::random_delay},
-    {"randomdrop", filter_types::random_drop},
-    {"random_drop", filter_types::random_drop},
-    {"randomDrop", filter_types::random_drop},
-    {"reroute", filter_types::reroute},
-    {"firewall", filter_types::firewall},
-    {"custom", filter_types::custom}};
+static const std::map<std::string, FilterTypes> filterTypes{
+    {"clone", FilterTypes::clone},
+    {"delay", FilterTypes::delay},
+    {"randomdelay", FilterTypes::random_delay},
+    {"random_delay", FilterTypes::random_delay},
+    {"randomDelay", FilterTypes::random_delay},
+    {"randomdrop", FilterTypes::random_drop},
+    {"random_drop", FilterTypes::random_drop},
+    {"randomDrop", FilterTypes::random_drop},
+    {"reroute", FilterTypes::reroute},
+    {"firewall", FilterTypes::firewall},
+    {"custom", FilterTypes::custom}};
 
-filter_types filterTypeFromString(const std::string& filterType) noexcept
+FilterTypes filterTypeFromString(const std::string& filterType) noexcept
 {
     auto fnd = filterTypes.find(filterType);
     if (fnd != filterTypes.end()) {
@@ -41,36 +41,36 @@ filter_types filterTypeFromString(const std::string& filterType) noexcept
     if (fnd != filterTypes.end()) {
         return fnd->second;
     }
-    return filter_types::unrecognized;
+    return FilterTypes::unrecognized;
 }
 
-void addOperations(Filter* filt, filter_types type, Core* /*cptr*/)
+void addOperations(Filter* filt, FilterTypes type, Core* /*cptr*/)
 {
     switch (type) {
-        case filter_types::custom:
+        case FilterTypes::custom:
         default:
             break;
-        case filter_types::random_delay: {
+        case FilterTypes::random_delay: {
             auto op = std::make_shared<RandomDelayFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case filter_types::delay: {
+        case FilterTypes::delay: {
             auto op = std::make_shared<DelayFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case filter_types::random_drop: {
+        case FilterTypes::random_drop: {
             auto op = std::make_shared<RandomDropFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case filter_types::reroute: {
+        case FilterTypes::reroute: {
             auto op = std::make_shared<RerouteFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case filter_types::clone: {
+        case FilterTypes::clone: {
             auto op = std::make_shared<CloneFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case filter_types::firewall: {
+        case FilterTypes::firewall: {
             auto op = std::make_shared<FirewallFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
@@ -201,20 +201,20 @@ void CloningFilter::setString(const std::string& property, const std::string& va
     } else if (property == "dest" || property == "destination" || property == "add destination" ||
                property == "add dest") {
         addDestinationTarget(val);
-    } else if (property == "endpoint" || property == "add endpoint") {
+    } else if (property == "ENDPOINT" || property == "add ENDPOINT") {
         addSourceTarget(val);
         addDestinationTarget(val);
     } else if (property == "remove destination" || property == "remove dest" ||
-               property == "remove source" || property == "remove endpoint") {
+               property == "remove source" || property == "remove ENDPOINT") {
         removeTarget(val);
     } else {
         Filter::setString(property, val);
     }
 }
 
-Filter& make_filter(filter_types type, Federate* mFed, const std::string& name)
+Filter& make_filter(FilterTypes type, Federate* mFed, const std::string& name)
 {
-    if (type == filter_types::clone) {
+    if (type == FilterTypes::clone) {
         Filter& dfilt = mFed->registerCloningFilter(name);
         addOperations(&dfilt, type, mFed->getCorePointer().get());
         dfilt.setString("delivery", name);
@@ -226,11 +226,11 @@ Filter& make_filter(filter_types type, Federate* mFed, const std::string& name)
 }
 
 Filter& make_filter(interface_visibility locality,
-                    filter_types type,
+                    FilterTypes type,
                     Federate* mFed,
                     const std::string& name)
 {
-    if (type == filter_types::clone) {
+    if (type == FilterTypes::clone) {
         Filter& dfilt = (locality == interface_visibility::global) ?
             mFed->registerGlobalCloningFilter(name) :
             mFed->registerCloningFilter(name);
@@ -244,9 +244,9 @@ Filter& make_filter(interface_visibility locality,
     return dfilt;
 }
 
-std::unique_ptr<Filter> make_filter(filter_types type, Core* cr, const std::string& name)
+std::unique_ptr<Filter> make_filter(FilterTypes type, Core* cr, const std::string& name)
 {
-    if (type == filter_types::clone) {
+    if (type == FilterTypes::clone) {
         std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter>(cr, name);
         addOperations(dfilt.get(), type, cr);
         dfilt->setString("delivery", name);
@@ -257,12 +257,12 @@ std::unique_ptr<Filter> make_filter(filter_types type, Core* cr, const std::stri
     return dfilt;
 }
 
-std::unique_ptr<Filter> make_filter(filter_types type, CoreApp& cr, const std::string& name)
+std::unique_ptr<Filter> make_filter(FilterTypes type, CoreApp& cr, const std::string& name)
 {
     return make_filter(type, cr.getCopyofCorePointer().get(), name);
 }
 
-CloningFilter& make_cloning_filter(filter_types type,
+CloningFilter& make_cloning_filter(FilterTypes type,
                                    Federate* mFed,
                                    const std::string& delivery,
                                    const std::string& name)
@@ -276,7 +276,7 @@ CloningFilter& make_cloning_filter(filter_types type,
 }
 
 CloningFilter& make_cloning_filter(interface_visibility locality,
-                                   filter_types type,
+                                   FilterTypes type,
                                    Federate* mFed,
                                    const std::string& delivery,
                                    const std::string& name)
@@ -292,7 +292,7 @@ CloningFilter& make_cloning_filter(interface_visibility locality,
     return dfilt;
 }
 
-std::unique_ptr<CloningFilter> make_cloning_filter(filter_types type,
+std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
                                                    Core* cr,
                                                    const std::string& delivery,
                                                    const std::string& name)
@@ -306,7 +306,7 @@ std::unique_ptr<CloningFilter> make_cloning_filter(filter_types type,
     return dfilt;
 }
 
-std::unique_ptr<CloningFilter> make_cloning_filter(filter_types type,
+std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
                                                    CoreApp& cr,
                                                    const std::string& delivery,
                                                    const std::string& name)

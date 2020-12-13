@@ -106,4 +106,4 @@ TEST_P(vfed_dual_transfer_ci_skip, obj_string)
 
 INSTANTIATE_TEST_SUITE_P(vfed_dual_transfer_tests,
                          vfed_dual_transfer_ci_skip,
-                         ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes));

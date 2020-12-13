@@ -140,7 +140,7 @@ bool waitForInit(helics::Federate* fed,
     std::chrono::milliseconds waitTime{0};
     const std::chrono::milliseconds delta{400};
     while (res != "true") {
-        if (res.find("error") != std::string::npos) {
+        if (res.find("ERROR_RESULT") != std::string::npos) {
             return false;
         }
         std::this_thread::sleep_for(delta);
@@ -174,7 +174,7 @@ bool waitForFed(helics::Federate* fed,
 std::string queryFederateSubscriptions(helics::Federate* fed, const std::string& fedName)
 {
     auto res = fed->query(fedName, "subscriptions");
-    if (res.size() > 2 && res.find("error") == std::string::npos) {
+    if (res.size() > 2 && res.find("ERROR_RESULT") == std::string::npos) {
         res = fed->query("gid_to_name", res);
     }
     return res;

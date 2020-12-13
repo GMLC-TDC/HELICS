@@ -22,7 +22,7 @@ inline std::string generateJsonQuotedString(const std::string& string)
 /** generate a json error response string*/
 inline std::string generateJsonErrorResponse(int code, const std::string& message)
 {
-    return fmt::format("{{\n  \"error\":{{\n    \"code\":{},\n    \"message\":{}\n  }}\n}}",
+    return fmt::format("{{\n  \"ERROR_RESULT\":{{\n    \"code\":{},\n    \"message\":{}\n  }}\n}}",
                        code,
                        generateJsonQuotedString(message));
 }

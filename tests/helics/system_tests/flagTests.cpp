@@ -72,7 +72,7 @@ TEST_P(flag_type_tests, optional_sub)
     vFed1->finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(flag_tests, flag_type_tests, ::testing::ValuesIn(core_types_single));
+INSTANTIATE_TEST_SUITE_P(flag_tests, flag_type_tests, ::testing::ValuesIn(CoreTypes_single));
 
 TEST_F(flag_tests, single_connection_test)
 {

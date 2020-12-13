@@ -327,10 +327,10 @@ std::pair<return_val, std::string>
             }
             if (fields.find("type") != fields.end()) {
                 type = fields.at("type");
-            } else if (fields.find("core_type") != fields.end()) {
-                type = fields.at("core_type");
+            } else if (fields.find("CoreType") != fields.end()) {
+                type = fields.at("CoreType");
             }
-            helics::core_type ctype{helics::core_type::DEFAULT};
+            helics::CoreType ctype{helics::CoreType::DEFAULT};
             if (!type.empty()) {
                 ctype = helics::core::coreTypeFromString(type);
                 if (!helics::core::isCoreTypeAvailable(ctype)) {
@@ -422,13 +422,13 @@ std::pair<return_val, std::string>
         query = "current_state";
     }
     auto res = brkr->query(target.to_string(), query.to_string());
-    if (res.find("\"error\"") == std::string::npos) {
+    if (res.find("\"ERROR_RESULT\"") == std::string::npos) {
         return {return_val::ok, res};
     }
 
     if (autoquery) {
         res = brkr->query(query.to_string(), "current_state");
-        if (res.find("\"error\"") != std::string::npos) {
+        if (res.find("\"ERROR_RESULT\"") != std::string::npos) {
             return {return_val::not_found, "target not found"};
         }
         return {return_val::ok, res};
@@ -533,15 +533,15 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         switch (res.first) {
             case return_val::bad_request:
                 response["status"] = static_cast<int>(http::status::bad_request);
-                response["error"] = res.second;
+                response["ERROR_RESULT"] = res.second;
                 break;
             case return_val::not_found:
                 response["status"] = static_cast<int>(http::status::not_found);
-                response["error"] = res.second;
+                response["ERROR_RESULT"] = res.second;
                 break;
             default:
                 response["status"] = static_cast<int>(res.first);
-                response["error"] = res.second;
+                response["ERROR_RESULT"] = res.second;
                 break;
             case return_val::ok:
                 response["status"] = 0;

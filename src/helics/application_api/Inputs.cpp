@@ -391,7 +391,7 @@ static bool changeDetected(const defV& prevValue, const defV& newVal, double del
 
 bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffer>>& dataV)
 {
-    if (injectionType == data_type::helics_unknown ||
+    if (injectionType == DataType::HELICS_UNKNOWN ||
         static_cast<int32_t>(dataV.size()) != prevInputCount) {
         loadSourceInformation();
         prevInputCount = static_cast<int32_t>(dataV.size());
@@ -400,14 +400,14 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
     res.reserve(dataV.size());
     for (size_t ii = 0; ii < dataV.size(); ++ii) {
         if (dataV[ii]) {
-            auto localTargetType = (injectionType == helics::data_type::helics_multi) ?
+            auto localTargetType = (injectionType == helics::DataType::helics_multi) ?
                 sourceTypes[ii].first :
                 injectionType;
 
             const auto& localUnits = (multiUnits) ? sourceTypes[ii].second : inputUnits;
-            if (localTargetType == helics::data_type::helics_double) {
+            if (localTargetType == helics::DataType::HELICS_DOUBLE) {
                 res.emplace_back(doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
-            } else if (localTargetType == helics::data_type::helics_int) {
+            } else if (localTargetType == helics::DataType::HELICS_INT) {
                 res.emplace_back();
                 integerExtractAndConvert(res.back(), *dataV[ii], localUnits, outputUnits);
             } else {
@@ -416,33 +416,33 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
             }
         }
     }
-    data_type type = data_type::helics_multi;
+    DataType type = DataType::helics_multi;
     switch (inputVectorOp) {
-        case multi_input_handling_method::and_operation:
-        case multi_input_handling_method::or_operation:
-            type = data_type::helics_bool;
+        case MultiInputHandlingMethod::and_operation:
+        case MultiInputHandlingMethod::or_operation:
+            type = DataType::HELICS_BOOL;
             break;
-        case multi_input_handling_method::sum_operation:
-        case multi_input_handling_method::average_operation:
-            type = data_type::helics_vector;
+        case MultiInputHandlingMethod::sum_operation:
+        case MultiInputHandlingMethod::average_operation:
+            type = DataType::HELICS_VECTOR;
             break;
-        case multi_input_handling_method::vectorize_operation:
+        case MultiInputHandlingMethod::vectorize_operation:
             switch (targetType) {
-                case data_type::helics_string:
+                case DataType::HELICS_STRING:
                     type = targetType;
                     break;
-                case data_type::helics_complex:
-                case data_type::helics_complex_vector:
-                    type = data_type::helics_complex_vector;
+                case DataType::HELICS_COMPLEX:
+                case DataType::HELICS_COMPLEX_VECTOR:
+                    type = DataType::HELICS_COMPLEX_VECTOR;
                     break;
                 default:
-                    type = data_type::helics_vector;
+                    type = DataType::HELICS_VECTOR;
                     break;
             }
             break;
         default:
             type =
-                (targetType == data_type::helics_unknown) ? data_type::helics_double : targetType;
+                (targetType == DataType::HELICS_UNKNOWN) ? DataType::HELICS_DOUBLE : targetType;
             break;
     }
     // convert everything to a uniform type
@@ -451,13 +451,13 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
     }
     defV result;
     switch (inputVectorOp) {
-        case multi_input_handling_method::max_operation:
+        case MultiInputHandlingMethod::max_operation:
             result = maxOperation(res);
             break;
-        case multi_input_handling_method::min_operation:
+        case MultiInputHandlingMethod::min_operation:
             result = minOperation(res);
             break;
-        case multi_input_handling_method::and_operation:
+        case MultiInputHandlingMethod::and_operation:
             result = std::all_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
@@ -468,7 +468,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
                 "1" :
                 "0";
             break;
-        case multi_input_handling_method::or_operation:
+        case MultiInputHandlingMethod::or_operation:
             result = std::any_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
@@ -479,20 +479,20 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
                 "1" :
                 "0";
             break;
-        case multi_input_handling_method::sum_operation:
+        case MultiInputHandlingMethod::sum_operation:
             result = vectorSum(res);
             break;
-        case multi_input_handling_method::average_operation:
+        case MultiInputHandlingMethod::average_operation:
             result = vectorAvg(res);
             break;
-        case multi_input_handling_method::diff_operation:
-            if (type == data_type::helics_vector) {
+        case MultiInputHandlingMethod::diff_operation:
+            if (type == DataType::HELICS_VECTOR) {
                 result = vectorDiff(res);
             } else {
                 result = diffOperation(res);
             }
             break;
-        case multi_input_handling_method::vectorize_operation:
+        case MultiInputHandlingMethod::vectorize_operation:
             result = vectorizeOperation(res);
             break;
         default:
@@ -517,16 +517,16 @@ bool Input::checkUpdate(bool assumeUpdate)
     if (changeDetectionEnabled) {
         if (assumeUpdate || fed->isUpdated(*this)) {
             auto dv = fed->getBytes(*this);
-            if (injectionType == data_type::helics_unknown) {
+            if (injectionType == DataType::HELICS_UNKNOWN) {
                 loadSourceInformation();
             }
             auto visitor = [&, this](auto&& arg) {
                 std::remove_reference_t<decltype(arg)> newVal;
                 (void)arg;  // suppress VS2015 warning
-                if (injectionType == helics::data_type::helics_double) {
+                if (injectionType == helics::DataType::HELICS_DOUBLE) {
                     defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
-                } else if (injectionType == helics::data_type::helics_int) {
+                } else if (injectionType == helics::DataType::HELICS_INT) {
                     defV val;
                     integerExtractAndConvert(val, dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
@@ -550,7 +550,7 @@ bool Input::checkUpdate(bool assumeUpdate)
 void Input::setOption(int32_t option, int32_t value)
 {
     if (option == HELICS_HANDLE_OPTION_multi_input_handling_method) {
-        inputVectorOp = static_cast<multi_input_handling_method>(value);
+        inputVectorOp = static_cast<MultiInputHandlingMethod>(value);
     } else {
         Interface::setOption(option, value);
     }
@@ -700,16 +700,16 @@ size_t Input::getVectorSize()
 
 void Input::loadSourceInformation()
 {
-    if (targetType == data_type::helics_unknown) {
+    if (targetType == DataType::HELICS_UNKNOWN) {
         targetType = getTypeFromString(getExtractionType());
     }
     multiUnits = false;
     const auto& iType = getInjectionType();
     const auto& iUnits = getInjectionUnits();
     injectionType = getTypeFromString(iType);
-    if ((injectionType == data_type::helics_multi) || (!iUnits.empty() && iUnits.front() == '[')) {
+    if ((injectionType == DataType::helics_multi) || (!iUnits.empty() && iUnits.front() == '[')) {
         sourceTypes.clear();
-        if (injectionType == data_type::helics_multi) {
+        if (injectionType == DataType::helics_multi) {
             auto jvalue = loadJsonStr(iType);
             for (auto& res : jvalue) {
                 sourceTypes.emplace_back(getTypeFromString(res.asCString()), nullptr);
@@ -790,13 +790,13 @@ char Input::getValueChar()
 {
     auto dv = checkAndGetFedUpdate();
     if (!dv.empty()) {
-        if (injectionType == data_type::helics_unknown) {
+        if (injectionType == DataType::HELICS_UNKNOWN) {
             loadSourceInformation();
         }
 
-        if ((injectionType == data_type::helics_string) ||
-            (injectionType == data_type::helics_any) ||
-            (injectionType == data_type::helics_custom)) {
+        if ((injectionType == DataType::HELICS_STRING) ||
+            (injectionType == DataType::HELICS_ANY) ||
+            (injectionType == DataType::HELICS_CUSTOM)) {
             std::string out;
             valueExtract(dv, injectionType, out);
             if (changeDetectionEnabled) {
@@ -808,7 +808,7 @@ char Input::getValueChar()
             }
         } else {
             int64_t out = invalidValue<int64_t>();
-            if (injectionType == helics::data_type::helics_double) {
+            if (injectionType == helics::DataType::HELICS_DOUBLE) {
                 out = static_cast<int64_t>(doubleExtractAndConvert(dv, inputUnits, outputUnits));
             } else {
                 valueExtract(dv, injectionType, out);

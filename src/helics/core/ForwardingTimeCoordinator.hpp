@@ -112,7 +112,7 @@ class ForwardingTimeCoordinator {
     /** disconnect*/
     void disconnect();
     /** check if entry to the executing state can be granted*/
-    message_processing_result checkExecEntry();
+    MessageProcessingResult checkExecEntry();
 
     /** function to enter the exec Mode
      */

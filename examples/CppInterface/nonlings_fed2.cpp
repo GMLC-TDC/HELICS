@@ -16,7 +16,7 @@ int main(int /*argc*/, char** /*argv*/)
 
     std::string helicsversion = helicscpp::getHelicsVersionString();
 
-    if (helicsversion.find("error") == std::string::npos) {
+    if (helicsversion.find("ERROR_RESULT") == std::string::npos) {
         // this has to do with tests passing on CI builds
         std::cout << "Helics version = " << helicsversion << '\n';
     }
@@ -33,7 +33,7 @@ int main(int /*argc*/, char** /*argv*/)
 
     fi.setProperty(HELICS_PROPERTY_INT_max_iterations, 100);
 
-    fi.setProperty(HELICS_PROPERTY_INT_log_level, 1);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, 1);
 
     /* Create value federate */
     helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestB Federate", fi);

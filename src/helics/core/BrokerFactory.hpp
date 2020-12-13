@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "Broker.hpp"
-#include "core-types.hpp"
+#include "CoreTypes.hpp"
 
 #include <chrono>
 #include <memory>
@@ -58,21 +58,21 @@ namespace BrokerFactory {
      *
      * Invokes initialize() on the instantiated Core object.
      */
-    std::shared_ptr<Broker> create(core_type type, const std::string& configureString);
+    std::shared_ptr<Broker> create(CoreType type, const std::string& configureString);
     /** Create a broker from command line arguments*/
-    std::shared_ptr<Broker> create(core_type type, int argc, char* argv[]);
+    std::shared_ptr<Broker> create(CoreType type, int argc, char* argv[]);
     /** Create a broker from command line arguments in a vector*/
-    std::shared_ptr<Broker> create(core_type type, std::vector<std::string> args);
+    std::shared_ptr<Broker> create(CoreType type, std::vector<std::string> args);
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& brokerName, const std::string& configureString);
+        create(CoreType type, const std::string& brokerName, const std::string& configureString);
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& brokerName, int argc, char* argv[]);
+        create(CoreType type, const std::string& brokerName, int argc, char* argv[]);
 
     /** Create a broker from command line arguments in a vector*/
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& brokerName, std::vector<std::string> args);
+        create(CoreType type, const std::string& brokerName, std::vector<std::string> args);
 
     /** locate a coreBroker by name
 @param brokerName the name of the broker
@@ -80,7 +80,7 @@ namespace BrokerFactory {
     std::shared_ptr<Broker> findBroker(const std::string& brokerName);
 
     /** try to find a joinable broker of a specific type*/
-    std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type);
+    std::shared_ptr<Broker> findJoinableBrokerOfType(CoreType type);
 
     /** get all available brokers*/
     std::vector<std::shared_ptr<Broker>> getAllBrokers();
@@ -94,14 +94,14 @@ controlled by calling cleanUpBrokers earlier if desired
 @param broker a pointer to a Broker object that should be able to be found globally
 @param type the core type associated with a broker
 @return true if the registration was successful false otherwise*/
-    bool registerBroker(const std::shared_ptr<Broker>& broker, core_type type);
+    bool registerBroker(const std::shared_ptr<Broker>& broker, CoreType type);
     /** remove a broker from the registry
 @param name the name of the broker to unregister
 */
     void unregisterBroker(const std::string& name);
 
     /** add a type associated with a broker*/
-    void addAssociatedBrokerType(const std::string& name, core_type type);
+    void addAssociatedBrokerType(const std::string& name, CoreType type);
 
     /** clean up unused brokers
 @details when brokers are unregistered they get put in a holding area that gets cleaned up when a
@@ -125,8 +125,8 @@ issues
  */
     bool copyBrokerIdentifier(const std::string& copyFromName, const std::string& copyToName);
 
-    /** display the help listing for a particular core_type*/
-    void displayHelp(core_type type = core_type::UNRECOGNIZED);
+    /** display the help listing for a particular CoreType*/
+    void displayHelp(CoreType type = CoreType::UNRECOGNIZED);
 
     /** terminate all running Brokers*/
     void terminateAllBrokers();

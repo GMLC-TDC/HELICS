@@ -16,9 +16,9 @@ TEST(prop_tests, intprops)
     EXPECT_EQ(helicsGetPropertyIndex("MAX_ITERATIONS"), HELICS_PROPERTY_INT_max_iterations);
     EXPECT_EQ(helicsGetPropertyIndex("INT_MAX_ITERATIONS"), HELICS_PROPERTY_INT_max_iterations);
 
-    EXPECT_EQ(helicsGetPropertyIndex("log_level"), HELICS_PROPERTY_INT_log_level);
-    EXPECT_EQ(helicsGetPropertyIndex("LOG_LEVEL"), HELICS_PROPERTY_INT_log_level);
-    EXPECT_EQ(helicsGetPropertyIndex("INT_LOG_LEVEL"), HELICS_PROPERTY_INT_log_level);
+    EXPECT_EQ(helicsGetPropertyIndex("log_level"), HELICS_PROPERTY_INT_LOG_LEVEL);
+    EXPECT_EQ(helicsGetPropertyIndex("LOG_LEVEL"), HELICS_PROPERTY_INT_LOG_LEVEL);
+    EXPECT_EQ(helicsGetPropertyIndex("INT_LOG_LEVEL"), HELICS_PROPERTY_INT_LOG_LEVEL);
 
     EXPECT_EQ(helicsGetPropertyIndex("file_log_level"), HELICS_PROPERTY_INT_file_log_level);
     EXPECT_EQ(helicsGetPropertyIndex("FILE_LOG_LEVEL"), HELICS_PROPERTY_INT_file_log_level);

@@ -69,7 +69,7 @@ namespace ipc {
             if (!connected) {
                 disconnecting = true;
                 ActionMessage err(CMD_ERROR);
-                err.messageID = defs::errors::connection_failure;
+                err.messageID = defs::Errors::CONNECTION_FAILURE;
                 err.payload = rxQueue.getError();
                 ActionCallback(std::move(err));
                 setRxStatus(connection_status::error);  // the connection has failed
@@ -93,7 +93,7 @@ namespace ipc {
                     if (!connected) {
                         disconnecting = true;
                         ActionMessage err(CMD_ERROR);
-                        err.messageID = defs::errors::connection_failure;
+                        err.messageID = defs::Errors::CONNECTION_FAILURE;
                         err.payload = rxQueue.getError();
                         ActionCallback(std::move(err));
                         setRxStatus(connection_status::error);  // the connection has failed
@@ -136,7 +136,7 @@ namespace ipc {
             rxQueue.changeState(queue_state_t::closing);
         }
         catch (boost::interprocess::interprocess_exception const& ipe) {
-            logError(std::string("error changing states:") + ipe.what());
+            logError(std::string("ERROR_RESULT changing states:") + ipe.what());
         }
         setRxStatus(connection_status::terminated);
     }
@@ -157,7 +157,7 @@ namespace ipc {
                     ActionMessage err(CMD_ERROR);
                     err.payload = fmt::format("Unable to open broker connection -> {}",
                                               brokerQueue.getError());
-                    err.messageID = defs::errors::connection_failure;
+                    err.messageID = defs::Errors::CONNECTION_FAILURE;
                     ActionCallback(std::move(err));
                     setTxStatus(connection_status::error);
                     return;
@@ -168,7 +168,7 @@ namespace ipc {
         // wait for the receiver to startup
         if (!rxTrigger.wait_forActivation(connectionTimeout)) {
             ActionMessage err(CMD_ERROR);
-            err.messageID = defs::errors::connection_failure;
+            err.messageID = defs::Errors::CONNECTION_FAILURE;
             err.payload = "Unable to link with receiver";
             ActionCallback(std::move(err));
             setTxStatus(connection_status::error);
@@ -193,7 +193,7 @@ namespace ipc {
             }
             if (!conn) {
                 ActionMessage err(CMD_ERROR);
-                err.messageID = defs::errors::connection_failure;
+                err.messageID = defs::Errors::CONNECTION_FAILURE;
                 err.payload =
                     fmt::format("Unable to open receiver connection -> {}", rxQueue.getError());
                 ActionCallback(std::move(err));

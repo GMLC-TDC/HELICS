@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(federateInfo, constructor1)
 {
-    helics::FederateInfo f1("--core_type=test --name fi");
-    EXPECT_EQ(f1.coreType, helics::core_type::TEST);
+    helics::FederateInfo f1("--CoreType=test --name fi");
+    EXPECT_EQ(f1.coreType, helics::CoreType::TEST);
     EXPECT_EQ(f1.defName, "fi");
 }
 
@@ -28,7 +28,7 @@ TEST(federateInfo, constructor2)
     std::vector<std::string> args{"constructor2",
                                   "--name",
                                   "f2",
-                                  "--core_type",
+                                  "--CoreType",
                                   "inproc",
                                   "--flags",
                                   "realtime,,source_only;autobroker"};
@@ -38,7 +38,7 @@ TEST(federateInfo, constructor2)
     }
 
     helics::FederateInfo f1(7, argv);
-    EXPECT_EQ(f1.coreType, helics::core_type::INPROC);
+    EXPECT_EQ(f1.coreType, helics::CoreType::INPROC);
     EXPECT_EQ(f1.defName, "f2");
     EXPECT_TRUE(f1.autobroker);
     EXPECT_EQ(f1.flagProps.size(), 2U);
@@ -47,7 +47,7 @@ TEST(federateInfo, constructor2)
 TEST(federateInfo, constructor_error)
 {
     std::vector<std::string> args{
-        "constructor2", "--name", "f2", "--core_type", "inproc", "--brokerport=hippity_hopity"};
+        "constructor2", "--name", "f2", "--CoreType", "inproc", "--brokerport=hippity_hopity"};
     char* argv[6];
     for (size_t ii = 0; ii < args.size(); ++ii) {
         argv[ii] = &(args[ii][0]);
@@ -59,7 +59,7 @@ TEST(federateInfo, constructor_error)
 TEST(federateInfo, loadArgs1)
 {
     std::vector<std::string> args{
-        "constructor2", "--name", "f2", "--core_type", "zmq", "--flags", "realtime,source_only,17"};
+        "constructor2", "--name", "f2", "--CoreType", "zmq", "--flags", "realtime,source_only,17"};
     char* argv[7];
     for (size_t ii = 0; ii < args.size(); ++ii) {
         argv[ii] = &(args[ii][0]);
@@ -67,7 +67,7 @@ TEST(federateInfo, loadArgs1)
 
     helics::FederateInfo f1;
     f1.loadInfoFromArgs(7, argv);
-    EXPECT_EQ(f1.coreType, helics::core_type::ZMQ);
+    EXPECT_EQ(f1.coreType, helics::CoreType::ZMQ);
     EXPECT_EQ(f1.defName, "f2");
     EXPECT_EQ(f1.flagProps.size(), 3U);
 }
@@ -75,8 +75,8 @@ TEST(federateInfo, loadArgs1)
 TEST(federateInfo, constructor3)
 {
     helics::FederateInfo f1{
-        "--name f3 --core_type ipc --flags realtime;source_only,-buffer_data --port=5000"};
-    EXPECT_EQ(f1.coreType, helics::core_type::INTERPROCESS);
+        "--name f3 --CoreType ipc --flags realtime;source_only,-buffer_data --port=5000"};
+    EXPECT_EQ(f1.coreType, helics::CoreType::INTERPROCESS);
     EXPECT_EQ(f1.defName, "f3");
     EXPECT_EQ(f1.flagProps.size(), 3U);
     EXPECT_EQ(f1.brokerPort, 5000);
@@ -86,8 +86,8 @@ TEST(federateInfo, loadArgs2)
 {
     helics::FederateInfo f1;
     f1.loadInfoFromArgs(
-        "--name f3 --core_type ipc --flags realtime;source_only,-buffer_data --port=5000 --RT_tolerance 200ms");
-    EXPECT_EQ(f1.coreType, helics::core_type::INTERPROCESS);
+        "--name f3 --CoreType ipc --flags realtime;source_only,-buffer_data --port=5000 --RT_tolerance 200ms");
+    EXPECT_EQ(f1.coreType, helics::CoreType::INTERPROCESS);
     EXPECT_EQ(f1.defName, "f3");
     EXPECT_EQ(f1.flagProps.size(), 3U);
     EXPECT_EQ(f1.brokerPort, 5000);
@@ -98,16 +98,16 @@ TEST(federateInfo, loadArgs_error)
 {
     helics::FederateInfo f1;
     EXPECT_NO_THROW(
-        f1.loadInfoFromArgs("--name f3 --core_type ipc --flags unrecognized --port=5000"));
+        f1.loadInfoFromArgs("--name f3 --CoreType ipc --flags unrecognized --port=5000"));
 
-    EXPECT_THROW(f1.loadInfoFromArgs("--name f3 --core_type ipc --brokerport=hippity_hopity"),
+    EXPECT_THROW(f1.loadInfoFromArgs("--name f3 --CoreType ipc --brokerport=hippity_hopity"),
                  helics::InvalidParameter);
 }
 
 TEST(federateInfo, loadArgs_error2)
 {
     std::vector<std::string> args{
-        "constructor2", "--name", "f2", "--core_type", "zmq", "--brokerport=hippity_hopity"};
+        "constructor2", "--name", "f2", "--CoreType", "zmq", "--brokerport=hippity_hopity"};
     char* argv[6];
     for (size_t ii = 0; ii < args.size(); ++ii) {
         argv[ii] = &(args[ii][0]);
@@ -130,7 +130,7 @@ TEST(federateInfo, constructor4)
 TEST(federateInfo, constructor5)
 {
     helics::FederateInfo f1{
-        "--input_delay 50ms --broker_init_string='--loglevel 3 --core_type=zmq'"};
+        "--input_delay 50ms --broker_init_string='--loglevel 3 --CoreType=zmq'"};
     ASSERT_FALSE(f1.brokerInitString.empty());
     EXPECT_EQ(f1.brokerInitString.front(), ' ');
     EXPECT_EQ(f1.timeProps.size(), 1U);
@@ -190,7 +190,7 @@ TEST(federateInfo, loadinfoPropsJson)
     auto f1 = helics::loadFederateInfo(R"({"separator":":"})");
     EXPECT_EQ(f1.separator, ':');
     f1 = helics::loadFederateInfo(R"({"core":"zmq"})");
-    EXPECT_EQ(f1.coreType, helics::core_type::ZMQ);
+    EXPECT_EQ(f1.coreType, helics::CoreType::ZMQ);
     f1 = helics::loadFederateInfo(R"({"core":"fred"})");
     EXPECT_EQ(f1.coreName, "fred");
     EXPECT_THROW(helics::loadFederateInfo("{\"coreType\":\"fred\"}"), helics::InvalidIdentifier);
@@ -219,9 +219,9 @@ TEST(federateInfo, loadinfoPropsJson)
     EXPECT_EQ(f1.intProps.size(), 1U);
     EXPECT_EQ(f1.intProps[0].second, 2);
 
-    EXPECT_EQ(f1.checkIntProperty(HELICS_PROPERTY_INT_log_level, -1), HELICS_LOG_LEVEL_summary);
+    EXPECT_EQ(f1.checkIntProperty(HELICS_PROPERTY_INT_LOG_LEVEL, -1), HELICS_LOG_LEVEL_summary);
 
-    EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"unknown\"}"), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"UNKNOWN\"}"), helics::InvalidIdentifier);
 }
 
 TEST(federateInfo, loadinfoPropsToml)
@@ -229,7 +229,7 @@ TEST(federateInfo, loadinfoPropsToml)
     auto f1 = helics::loadFederateInfo(R"("separator"=":")");
     EXPECT_EQ(f1.separator, ':');
     f1 = helics::loadFederateInfo(R"("core"="zmq")");
-    EXPECT_EQ(f1.coreType, helics::core_type::ZMQ);
+    EXPECT_EQ(f1.coreType, helics::CoreType::ZMQ);
     f1 = helics::loadFederateInfo(R"("core"="fred")");
     EXPECT_EQ(f1.coreName, "fred");
     EXPECT_THROW(helics::loadFederateInfo("\"coreType\"=\"fred\""), helics::InvalidIdentifier);
@@ -237,10 +237,10 @@ TEST(federateInfo, loadinfoPropsToml)
     EXPECT_THROW(helics::loadFederateInfo("\"coretype\"=\"fred\""), helics::InvalidIdentifier);
 
     f1 = helics::loadFederateInfo(R"("coreType"="web")");
-    EXPECT_EQ(f1.coreType, helics::core_type::WEBSOCKET);
+    EXPECT_EQ(f1.coreType, helics::CoreType::WEBSOCKET);
 
     f1 = helics::loadFederateInfo(R"("coretype"="UDP")");
-    EXPECT_EQ(f1.coreType, helics::core_type::UDP);
+    EXPECT_EQ(f1.coreType, helics::CoreType::UDP);
 
     f1 = helics::loadFederateInfo(R"("flags"="autobroker,source_only")");
     EXPECT_EQ(f1.flagProps.size(), 1U);
@@ -263,7 +263,7 @@ TEST(federateInfo, loadinfoPropsToml)
     f1 = helics::loadFederateInfo(R"("loglevel"="summary")");
     EXPECT_EQ(f1.intProps.size(), 1U);
     EXPECT_EQ(f1.intProps[0].second, 2);
-    EXPECT_THROW(helics::loadFederateInfo("\"loglevel\"=\"unknown\""), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("\"loglevel\"=\"UNKNOWN\""), helics::InvalidIdentifier);
 }
 
 TEST(federateInfo, initString)

@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-CoreApp::CoreApp(core_type ctype, const std::string& coreName, std::vector<std::string> args):
+CoreApp::CoreApp(CoreType ctype, const std::string& coreName, std::vector<std::string> args):
     name(coreName)
 {
     auto app = generateParser();
@@ -26,7 +26,7 @@ CoreApp::CoreApp(core_type ctype, const std::string& coreName, std::vector<std::
     }
 }
 
-CoreApp::CoreApp(core_type ctype, std::vector<std::string> args)
+CoreApp::CoreApp(CoreType ctype, std::vector<std::string> args)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
@@ -35,9 +35,9 @@ CoreApp::CoreApp(core_type ctype, std::vector<std::string> args)
     }
 }
 
-CoreApp::CoreApp(std::vector<std::string> args): CoreApp(core_type::DEFAULT, std::move(args)) {}
+CoreApp::CoreApp(std::vector<std::string> args): CoreApp(CoreType::DEFAULT, std::move(args)) {}
 
-CoreApp::CoreApp(core_type ctype, const std::string& coreName, int argc, char* argv[]):
+CoreApp::CoreApp(CoreType ctype, const std::string& coreName, int argc, char* argv[]):
     name(coreName)
 {
     auto app = generateParser();
@@ -47,13 +47,13 @@ CoreApp::CoreApp(core_type ctype, const std::string& coreName, int argc, char* a
     }
 }
 
-CoreApp::CoreApp(core_type ctype, int argc, char* argv[]): CoreApp(ctype, std::string{}, argc, argv)
+CoreApp::CoreApp(CoreType ctype, int argc, char* argv[]): CoreApp(ctype, std::string{}, argc, argv)
 {
 }
 
-CoreApp::CoreApp(int argc, char* argv[]): CoreApp(core_type::DEFAULT, std::string{}, argc, argv) {}
+CoreApp::CoreApp(int argc, char* argv[]): CoreApp(CoreType::DEFAULT, std::string{}, argc, argv) {}
 
-CoreApp::CoreApp(core_type ctype, const std::string& coreName, const std::string& argString):
+CoreApp::CoreApp(CoreType ctype, const std::string& coreName, const std::string& argString):
     name(coreName)
 {
     auto app = generateParser();
@@ -63,7 +63,7 @@ CoreApp::CoreApp(core_type ctype, const std::string& coreName, const std::string
     }
 }
 
-CoreApp::CoreApp(core_type ctype, const std::string& argString):
+CoreApp::CoreApp(CoreType ctype, const std::string& argString):
     CoreApp(ctype, std::string{}, argString)
 {
 }
@@ -101,7 +101,7 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser()
     auto* app_p = app.get();
     app->footer([app_p]() {
         auto coreType =
-            helics::core::coreTypeFromString((*app_p)["--core_type"]->as<std::string>());
+            helics::core::coreTypeFromString((*app_p)["--CoreType"]->as<std::string>());
         CoreFactory::displayHelp(coreType);
         return std::string{};
     });

@@ -255,13 +255,13 @@ namespace apps {
 
     void Source::addPublication(const std::string& key,
                                 const std::string& generator,
-                                data_type type,
+                                DataType type,
                                 Time period,
                                 const std::string& units)
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
-            std::cerr << "publication already exists\n";
+            std::cerr << "PUBLICATION already exists\n";
             return;
         }
         SourceObject newObj(Publication(useLocal ? interface_visibility::local :
@@ -329,7 +329,7 @@ namespace apps {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(key + " was not recognized as a valid publication"));
+            throw(InvalidParameter(key + " was not recognized as a valid PUBLICATION"));
         }
         auto findGen = generatorLookup.find(generator);
         if (findGen != generatorLookup.end()) {
@@ -345,7 +345,7 @@ namespace apps {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(key + " was not recognized as a valid publication"));
+            throw(InvalidParameter(key + " was not recognized as a valid PUBLICATION"));
         }
         sources[fnd->second].generatorIndex = genIndex;
     }

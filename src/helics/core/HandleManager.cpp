@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
-                                          handle_type what,
+                                          InterfaceType what,
                                           const std::string& key,
                                           const std::string& type,
                                           const std::string& units)
@@ -25,7 +25,7 @@ BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
 
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           InterfaceHandle local_id,
-                                          handle_type what,
+                                          InterfaceType what,
                                           const std::string& key,
                                           const std::string& type,
                                           const std::string& units)
@@ -56,16 +56,16 @@ void HandleManager::removeHandle(GlobalHandle handle)
     unique_ids.erase(fnd);
     if (!info.key.empty()) {
         switch (info.handleType) {
-            case handle_type::endpoint:
+            case InterfaceType::ENDPOINT:
                 endpoints.erase(info.key);
                 break;
-            case handle_type::publication:
+            case InterfaceType::PUBLICATION:
                 publications.erase(info.key);
                 break;
-            case handle_type::filter:
+            case InterfaceType::FILTER:
                 filters.erase(info.key);
                 break;
-            case handle_type::input:
+            case InterfaceType::INPUT:
                 inputs.erase(info.key);
                 break;
             default:
@@ -151,7 +151,7 @@ void HandleManager::setHandleOption(InterfaceHandle handle, int32_t option, int3
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         switch (option) {
-            case HELICS_HANDLE_OPTION_connection_required:
+            case HELICS_HANDLE_OPTION_CONNECTION_REQUIRED:
                 if (val != 0) {
                     clearActionFlag(handles[index], optional_flag);
                     setActionFlag(handles[index], required_flag);
@@ -159,7 +159,7 @@ void HandleManager::setHandleOption(InterfaceHandle handle, int32_t option, int3
                     clearActionFlag(handles[index], required_flag);
                 }
                 break;
-            case HELICS_HANDLE_OPTION_connection_optional:
+            case HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL:
                 if (val != 0) {
                     clearActionFlag(handles[index], required_flag);
                     setActionFlag(handles[index], optional_flag);
@@ -179,19 +179,19 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
     bool rvalue{false};
     if (isValidIndex(index, handles)) {
         switch (option) {
-            case HELICS_HANDLE_OPTION_only_update_on_change:
+            case HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE:
                 rvalue = checkActionFlag(handles[index], extra_flag1);
                 break;
-            case HELICS_HANDLE_OPTION_only_transmit_on_change:
+            case HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE:
                 rvalue = checkActionFlag(handles[index], extra_flag2);
                 break;
-            case HELICS_HANDLE_OPTION_connection_required:
+            case HELICS_HANDLE_OPTION_CONNECTION_REQUIRED:
                 rvalue = checkActionFlag(handles[index], required_flag);
                 break;
-            case HELICS_HANDLE_OPTION_connection_optional:
+            case HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL:
                 rvalue = checkActionFlag(handles[index], optional_flag);
                 break;
-            case HELICS_HANDLE_OPTION_single_connection_only:
+            case HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY:
                 rvalue = checkActionFlag(handles[index], extra_flag4);
                 break;
             default:
@@ -224,7 +224,7 @@ BasicHandleInfo* HandleManager::getEndpoint(InterfaceHandle handle)
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         auto& hand = handles[index];
-        if (hand.handleType == handle_type::endpoint) {
+        if (hand.handleType == InterfaceType::ENDPOINT) {
             return &hand;
         }
     }
@@ -237,7 +237,7 @@ const BasicHandleInfo* HandleManager::getEndpoint(InterfaceHandle handle) const
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         auto& hand = handles[index];
-        if (hand.handleType == handle_type::endpoint) {
+        if (hand.handleType == InterfaceType::ENDPOINT) {
             return &hand;
         }
     }
@@ -268,7 +268,7 @@ BasicHandleInfo* HandleManager::getPublication(InterfaceHandle handle)
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         auto& hand = handles[index];
-        if (hand.handleType == handle_type::publication) {
+        if (hand.handleType == InterfaceType::PUBLICATION) {
             return &hand;
         }
     }
@@ -316,7 +316,7 @@ BasicHandleInfo* HandleManager::getFilter(InterfaceHandle handle)
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         auto& hand = handles[index];
-        if (hand.handleType == handle_type::filter) {
+        if (hand.handleType == InterfaceType::FILTER) {
             return &hand;
         }
     }
@@ -334,18 +334,18 @@ LocalFederateId HandleManager::getLocalFedID(InterfaceHandle handle) const
 void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index)
 {
     switch (handle.handleType) {
-        case handle_type::endpoint:
+        case InterfaceType::ENDPOINT:
             endpoints.emplace(handle.key, InterfaceHandle(index));
             break;
-        case handle_type::publication:
+        case InterfaceType::PUBLICATION:
             publications.emplace(handle.key, InterfaceHandle(index));
             break;
-        case handle_type::filter:
+        case InterfaceType::FILTER:
             if (!handle.key.empty()) {
                 filters.emplace(handle.key, InterfaceHandle(index));
             }
             break;
-        case handle_type::input:
+        case InterfaceType::INPUT:
             inputs.emplace(handle.key, InterfaceHandle(index));
             break;
         default:
@@ -355,16 +355,16 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
     unique_ids.emplace(static_cast<uint64_t>(handle.handle), index);
 }
 
-std::string HandleManager::generateName(handle_type what) const
+std::string HandleManager::generateName(InterfaceType what) const
 {
     switch (what) {
-        case handle_type::endpoint:
+        case InterfaceType::ENDPOINT:
             return std::string("_ept_") + std::to_string(handles.size());
-        case handle_type::input:
+        case InterfaceType::INPUT:
             return std::string("_input_") + std::to_string(handles.size());
-        case handle_type::publication:
+        case InterfaceType::PUBLICATION:
             return std::string("_pub_") + std::to_string(handles.size());
-        case handle_type::filter:
+        case InterfaceType::FILTER:
             return std::string("_filter_") + std::to_string(handles.size());
         default:
             return std::string("_handle_") + std::to_string(handles.size());

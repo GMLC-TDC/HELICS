@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/CoreFederateInfo.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "helics/core/core-types.hpp"
+#include "helics/core/CoreTypes.hpp"
 #include "helics/network/test/TestCore.h"
 
 #include "gtest/gtest.h"
@@ -19,11 +19,11 @@ using namespace helics::CoreFactory;
 
 TEST(TestCore_tests, testcore_initialization_test)
 {
-    auto broker = helics::BrokerFactory::create(helics::core_type::TEST, std::string{});
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, std::string{});
     ASSERT_TRUE(broker);
     EXPECT_TRUE(broker->isConnected());
     std::string configureString = std::string("-f 4") + " --broker=" + broker->getIdentifier();
-    auto core = create(helics::core_type::TEST, configureString);
+    auto core = create(helics::CoreType::TEST, configureString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::testcore::TestCore>(core);
 
@@ -45,7 +45,7 @@ TEST(TestCore_tests, testcore_initialization_test)
 TEST(TestCore_tests, testcore_pubsub_value_test)
 {
     const char* configureString = "-f 1 --autobroker";
-    auto core = create(helics::core_type::TEST, configureString);
+    auto core = create(helics::CoreType::TEST, configureString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -116,7 +116,7 @@ TEST(TestCore_tests, testcore_send_receive_test)
 {
     const char* initializationString =
         "--autobroker --broker=\"brk1\" --broker_init_string=\"--name=brk1\"";
-    auto core = create(helics::core_type::TEST, initializationString);
+    auto core = create(helics::CoreType::TEST, initializationString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -181,7 +181,7 @@ TEST(TestCore_tests, testcore_messagefilter_callback_test)
     };
 
     std::string configureString = "--autobroker";
-    auto core = create(helics::core_type::TEST, configureString);
+    auto core = create(helics::CoreType::TEST, configureString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());

@@ -422,6 +422,6 @@ TEST_P(mfed_all_type_tests, time_interruptions)
 
 INSTANTIATE_TEST_SUITE_P(mfed_tests,
                          mfed_single_type_tests,
-                         ::testing::ValuesIn(core_types_single));
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types));
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_all_type_tests, ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_single));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_all_type_tests, ::testing::ValuesIn(CoreTypes_all));

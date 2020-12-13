@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 static auto mfact =
-    BrokerFactory::addBrokerType<MultiBroker>("multi", static_cast<int>(core_type::MULTI));
+    BrokerFactory::addBrokerType<MultiBroker>("multi", static_cast<int>(CoreType::MULTI));
 
 bool allowMultiBroker()
 {
@@ -34,7 +34,7 @@ bool allowMultiBroker()
 
 /*
 static void loadTypeSpecificArgs(
-    helics::core_type ctype,
+    helics::CoreType ctype,
     CommsInterface* comm,
     std::vector<std::string> args)
 {
@@ -43,7 +43,7 @@ static void loadTypeSpecificArgs(
     }
     (void)args;
     switch (ctype) {
-        case core_type::TCP_SS:
+        case CoreType::TCP_SS:
 #ifdef ENABLE_TCP_CORE
         {
             auto* cm = dynamic_cast<tcp::TcpCommsSS*>(comm);
@@ -57,7 +57,7 @@ static void loadTypeSpecificArgs(
         }
 #endif
         break;
-        case core_type::MPI:
+        case CoreType::MPI:
         default:
             break;
     }
@@ -91,17 +91,17 @@ bool MultiBroker::brokerConnect()
         app = netInfo.commandLineParser("");
         app->addTypeOption();
         app->allow_config_extras(CLI::config_extras_mode::error);
-    } else if (type == core_type::MULTI) {
-        type = core_type::DEFAULT;
+    } else if (type == CoreType::MULTI) {
+        type = CoreType::DEFAULT;
     }
     try {
-        if (type == core_type::MULTI) {
+        if (type == CoreType::MULTI) {
             app->get_config_formatter_base()->section("master");
             app->setDefaultCoreType(type);
             app->parse(configString);
             type = app->getCoreType();
         }
-        if (type != core_type::MULTI) {
+        if (type != CoreType::MULTI) {
             if ((netInfo.brokerName.empty()) && (netInfo.brokerAddress.empty())) {
                 CoreBroker::setAsRoot();
             }
@@ -132,10 +132,10 @@ bool MultiBroker::brokerConnect()
         while (moreComms) {
             netInfo = NetworkBrokerData();  // to reset the networkBrokerData
             app->get_config_formatter_base()->section("comms")->index(index);
-            app->setDefaultCoreType(core_type::MULTI);
+            app->setDefaultCoreType(CoreType::MULTI);
             app->parse(configString);
             type = app->getCoreType();
-            if (type != core_type::MULTI) {
+            if (type != CoreType::MULTI) {
                 auto comm = CommFactory::create(type);
                 comm->setCallback([this, index](ActionMessage&& M) {
                     if (M.action() == CMD_REG_BROKER) {
@@ -217,10 +217,10 @@ std::shared_ptr<helicsCLI11App> MultiBroker::generateCLI()
 std::string MultiBroker::generateLocalAddressString() const
 {
     switch (type) {
-        case core_type::INPROC:
-        case core_type::IPC:
-        case core_type::INTERPROCESS:
-        case core_type::TEST:
+        case CoreType::INPROC:
+        case CoreType::IPC:
+        case CoreType::INTERPROCESS:
+        case CoreType::TEST:
             return getIdentifier();
         default:
             break;

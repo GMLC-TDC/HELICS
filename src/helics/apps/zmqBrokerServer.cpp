@@ -150,7 +150,7 @@ namespace apps {
 
     std::string zmqBrokerServer::generateResponseToMessage(zmq::message_t& msg,
                                                            portData& pdata,
-                                                           core_type ctype)
+                                                           CoreType ctype)
     {
         auto sz = msg.size();
         if (sz < 25) {
@@ -166,7 +166,7 @@ namespace apps {
                 return rep.to_string();
             }
         }
-        logMessage("received unknown message of length " + std::to_string(msg.size()));
+        logMessage("received UNKNOWN message of length " + std::to_string(msg.size()));
         return "ignored";
     }
 
@@ -188,7 +188,7 @@ namespace apps {
             handleMessage.emplace_back([this](zmq::socket_t* skt, portData& pdata) {
                 zmq::message_t msg;
                 skt->recv(msg);
-                std::string response = generateResponseToMessage(msg, pdata, core_type::ZMQ);
+                std::string response = generateResponseToMessage(msg, pdata, CoreType::ZMQ);
                 skt->send(response);
             });
         }
@@ -202,7 +202,7 @@ namespace apps {
                 zmq::message_t msg2;
                 skt->recv(msg1);  // should be null
                 skt->recv(msg2);
-                std::string response = generateResponseToMessage(msg2, pdata, core_type::ZMQ_SS);
+                std::string response = generateResponseToMessage(msg2, pdata, CoreType::ZMQ_SS);
                 skt->send(msg1, zmq::send_flags::sndmore);
                 skt->send(std::string{}, zmq::send_flags::sndmore);
                 skt->send(response, zmq::send_flags::dontwait);
@@ -226,7 +226,7 @@ namespace apps {
                 return;
             }
             if (rc < 0) {
-                std::cerr << "ZMQ broker connection error (2)" << std::endl;
+                std::cerr << "ZMQ broker connection ERROR_RESULT (2)" << std::endl;
                 break;
             }
             if (rc > 0) {

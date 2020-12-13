@@ -104,7 +104,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
 
 static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_no_print},
                                                       {"no_print", HELICS_LOG_LEVEL_no_print},
-                                                      {"error", HELICS_LOG_LEVEL_error},
+                                                      {"ERROR_RESULT", HELICS_LOG_LEVEL_error},
                                                       {"warning", HELICS_LOG_LEVEL_warning},
                                                       {"summary", HELICS_LOG_LEVEL_summary},
                                                       {"connections", HELICS_LOG_LEVEL_connections},
@@ -152,7 +152,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
-                   "specify that a broker should cause the federation to terminate on an error");
+                   "specify that a broker should cause the federation to terminate on an ERROR_RESULT");
     auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->add_flag_function(
@@ -215,7 +215,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,
-                     "time to wait after an error state before terminating "
+                     "time to wait after an ERROR_RESULT state before terminating "
                      "like '10s' or '45ms') ")
         ->default_str(std::to_string(static_cast<double>(errorDelay)));
 
@@ -319,8 +319,8 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               std::string_view message) const
 {
     bool alwaysLog{false};
-    if (logLevel > log_level::fed - 100) {
-        logLevel -= static_cast<int>(log_level::fed);
+    if (logLevel > LogLevels::FED - 100) {
+        logLevel -= static_cast<int>(LogLevels::FED);
         alwaysLog = true;
     }
     if ((federateID == parent_broker_id) || (federateID == global_id.load())) {
@@ -332,19 +332,19 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             loggerFunction(logLevel, fmt::format("{} ({})", name, federateID.baseValue()), message);
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
-                if (logLevel >= HELICS_LOG_LEVEL_trace) {
+                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {
                     consoleLogger->log(
                         spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_timing) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_TIMING) {
                     consoleLogger->log(
                         spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_summary) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
                     consoleLogger->log(
                         spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_warning) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_WARNING) {
                     consoleLogger->log(
                         spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_error) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_ERROR) {
                     consoleLogger->log(
                         spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel == -10) {  // dumplog
@@ -361,19 +361,19 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-                if (logLevel >= HELICS_LOG_LEVEL_trace) {
+                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {
                     fileLogger->log(
                         spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_timing) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_TIMING) {
                     fileLogger->log(
                         spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_summary) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
                     fileLogger->log(
                         spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_warning) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_WARNING) {
                     fileLogger->log(
                         spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_error) {
+                } else if (logLevel >= HELICS_LOG_LEVEL_ERROR) {
                     fileLogger->log(
                         spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
                 } else if (logLevel == -10) {  // dumplog
@@ -438,9 +438,9 @@ void BrokerBase::setLoggingFile(const std::string& lfile)
 bool BrokerBase::getFlagValue(int32_t flag) const
 {
     switch (flag) {
-        case HELICS_FLAG_dumplog:
+        case HELICS_FLAG_DUMPLOG:
             return dumplog;
-        case HELICS_FLAG_force_logging_flush:
+        case HELICS_FLAG_FORCE_LOGGING_FLUSH:
             return forceLoggingFlush.load();
         default:
             return false;
@@ -591,7 +591,7 @@ void BrokerBase::queueProcessingLoop()
     auto timerStop = [&, this]() {
         if (!haltTimer(active, ticktimer)) {
             sendToLogger(global_broker_id_local,
-                         log_level::warning,
+                         LogLevels::WARNING,
                          identifier,
                          "timer unable to cancel properly");
         }
@@ -760,10 +760,10 @@ void BrokerBase::baseConfigure(ActionMessage& command)
 {
     if (command.action() == CMD_BASE_CONFIGURE) {
         switch (command.messageID) {
-            case HELICS_FLAG_dumplog:
+            case HELICS_FLAG_DUMPLOG:
                 dumplog = checkActionFlag(command, indicator_flag);
                 break;
-            case HELICS_FLAG_force_logging_flush:
+            case HELICS_FLAG_FORCE_LOGGING_FLUSH:
                 forceLoggingFlush = checkActionFlag(command, indicator_flag);
                 break;
             default:
@@ -823,7 +823,7 @@ const std::string& brokerStateName(BrokerBase::broker_state_t state)
     static const std::string operatingString = "operating";
     static const std::string terminatingString = "terminating";
     static const std::string terminatedString = "terminated";
-    static const std::string erroredString = "error";
+    static const std::string erroredString = "ERROR_RESULT";
     static const std::string otherString = "other";
     switch (state) {
         case BrokerBase::broker_state_t::created:

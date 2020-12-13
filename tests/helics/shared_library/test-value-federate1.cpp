@@ -1081,5 +1081,5 @@ TEST_P(vfed_simple_type_tests, test_info_field)
 
 INSTANTIATE_TEST_SUITE_P(vfed_tests,
                          vfed_simple_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));

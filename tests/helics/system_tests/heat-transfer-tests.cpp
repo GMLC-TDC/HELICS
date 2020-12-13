@@ -215,7 +215,7 @@ class observer {
 
 TEST(heat_transfer_tests, linear_tests)
 {
-    auto wcore = helics::CoreFactory::FindOrCreate(helics::core_type::TEST,
+    auto wcore = helics::CoreFactory::FindOrCreate(helics::CoreType::TEST,
                                                    "wallcore",
                                                    "-f 22 --autobroker");
     Wall w;

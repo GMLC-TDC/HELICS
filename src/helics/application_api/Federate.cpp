@@ -273,9 +273,9 @@ void Federate::enterInitializingModeComplete()
     }
 }
 
-iteration_result Federate::enterExecutingMode(iteration_request iterate)
+IterationResult Federate::enterExecutingMode(IterationRequest iterate)
 {
-    iteration_result res = iteration_result::next_step;
+    IterationResult res = IterationResult::NEXT_STEP;
     switch (currentMode) {
         case modes::startup:
         case modes::pending_init:
@@ -284,21 +284,21 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
         case modes::initializing: {
             res = coreObject->enterExecutingMode(fedID, iterate);
             switch (res) {
-                case iteration_result::next_step:
+                case IterationResult::NEXT_STEP:
                     currentMode = modes::executing;
                     currentTime = timeZero;
                     initializeToExecuteStateTransition();
                     break;
-                case iteration_result::iterating:
+                case IterationResult::ITERATING:
                     currentMode = modes::initializing;
                     updateTime(getCurrentTime(), getCurrentTime());
                     break;
-                case iteration_result::error:
+                case IterationResult::ERROR_RESULT:
                     // LCOV_EXCL_START
                     currentMode = modes::error;
                     break;
                     // LCOV_EXCL_STOP
-                case iteration_result::halted:
+                case IterationResult::HALTED:
                     currentMode = modes::finalize;
                     break;
             }
@@ -314,7 +314,7 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
             break;
         case modes::pending_iterative_time: {
             auto result = requestTimeIterativeComplete();
-            return (result.state == iteration_result::iterating) ? iteration_result::next_step :
+            return (result.state == IterationResult::ITERATING) ? IterationResult::NEXT_STEP :
                                                                    result.state;
         }
         default:
@@ -324,7 +324,7 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
     return res;
 }
 
-void Federate::enterExecutingModeAsync(iteration_request iterate)
+void Federate::enterExecutingModeAsync(IterationRequest iterate)
 {
     switch (currentMode) {
         case modes::startup: {
@@ -361,7 +361,7 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
     }
 }
 
-iteration_result Federate::enterExecutingModeComplete()
+IterationResult Federate::enterExecutingModeComplete()
 {
     switch (currentMode.load()) {
         case modes::pending_exec: {
@@ -369,21 +369,21 @@ iteration_result Federate::enterExecutingModeComplete()
             try {
                 auto res = asyncInfo->execFuture.get();
                 switch (res) {
-                    case iteration_result::next_step:
+                    case IterationResult::NEXT_STEP:
                         currentMode = modes::executing;
                         currentTime = timeZero;
                         initializeToExecuteStateTransition();
                         break;
-                    case iteration_result::iterating:
+                    case IterationResult::ITERATING:
                         currentMode = modes::initializing;
                         updateTime(getCurrentTime(), getCurrentTime());
                         break;
-                    case iteration_result::error:
+                    case IterationResult::ERROR_RESULT:
                         // LCOV_EXCL_START
                         currentMode = modes::error;
                         break;
                         // LCOV_EXCL_STOP
-                    case iteration_result::halted:
+                    case IterationResult::HALTED:
                         currentMode = modes::finalize;
                         break;
                 }
@@ -559,13 +559,13 @@ void Federate::completeOperation()
 
 void Federate::localError(int errorcode)
 {
-    std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + name;
+    std::string errorString = "local ERROR_RESULT " + std::to_string(errorcode) + " in federate " + name;
     localError(errorcode, errorString);
 }
 
 void Federate::globalError(int errorcode)
 {
-    std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + name;
+    std::string errorString = "global ERROR_RESULT " + std::to_string(errorcode) + " in federate " + name;
     globalError(errorcode, errorString);
 }
 
@@ -573,7 +573,7 @@ void Federate::localError(int errorcode, const std::string& message)
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "cannot generate a federation error on uninitialized or disconnected Federate"));
+            "cannot generate a federation ERROR_RESULT on uninitialized or disconnected Federate"));
     }
     completeOperation();
     currentMode = modes::error;
@@ -584,7 +584,7 @@ void Federate::globalError(int errorcode, const std::string& message)
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "cannot generate a federation error on uninitialized or disconnected Federate"));
+            "cannot generate a federation ERROR_RESULT on uninitialized or disconnected Federate"));
     }
     completeOperation();
     currentMode = modes::error;
@@ -615,24 +615,24 @@ Time Federate::requestTime(Time nextInternalTimeStep)
     }
 }
 
-iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iteration_request iterate)
+iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate)
 {
     if (currentMode == modes::executing) {
         auto iterativeTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
         switch (iterativeTime.state) {
-            case iteration_result::next_step:
+            case IterationResult::NEXT_STEP:
                 currentTime = iterativeTime.grantedTime;
                 [[fallthrough]];
-            case iteration_result::iterating:
+            case IterationResult::ITERATING:
                 updateTime(currentTime, oldTime);
                 break;
-            case iteration_result::halted:
+            case IterationResult::HALTED:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
                 currentMode = modes::finalize;
                 break;
-            case iteration_result::error:
+            case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
                 currentMode = modes::error;
                 break;
@@ -641,7 +641,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
         return iterativeTime;
     }
     if (currentMode == modes::finalize) {
-        return {Time::maxVal(), iteration_result::halted};
+        return {Time::maxVal(), IterationResult::HALTED};
     }
     throw(InvalidFunctionCall("cannot call request time in present state"));
 }
@@ -660,7 +660,7 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
     }
 }
 
-void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, iteration_request iterate)
+void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, IterationRequest iterate)
 {
     auto exp = modes::executing;
     if (currentMode.compare_exchange_strong(exp, modes::pending_iterative_time)) {
@@ -700,18 +700,18 @@ iteration_time Federate::requestTimeIterativeComplete()
         auto iterativeTime = asyncInfo->timeRequestIterativeFuture.get();
         Time oldTime = currentTime;
         switch (iterativeTime.state) {
-            case iteration_result::next_step:
+            case IterationResult::NEXT_STEP:
                 currentTime = iterativeTime.grantedTime;
                 [[fallthrough]];
-            case iteration_result::iterating:
+            case IterationResult::ITERATING:
                 updateTime(currentTime, oldTime);
                 break;
-            case iteration_result::halted:
+            case IterationResult::HALTED:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
                 currentMode = modes::finalize;
                 break;
-            case iteration_result::error:
+            case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
                 currentMode = modes::error;
                 break;
@@ -767,7 +767,7 @@ static Filter& generateFilter(Federate* fed,
                               bool global,
                               bool cloning,
                               const std::string& name,
-                              filter_types operation,
+                              FilterTypes operation,
                               const std::string& inputType,
                               const std::string& outputType)
 {
@@ -837,25 +837,25 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             if ((useTypes) && (operation != "custom")) {
                 if (strictConfigChecking) {
                     logMessage(HELICS_LOG_LEVEL_error,
-                               "input and output types may only be specified for custom filters");
+                               "INPUT and output types may only be specified for custom filters");
                     throw(InvalidParameter(
-                        "input and output types may only be specified for custom filters"));
+                        "INPUT and output types may only be specified for custom filters"));
                 }
                 logMessage(HELICS_LOG_LEVEL_warning,
-                           "input and output types may only be specified for custom filters");
+                           "INPUT and output types may only be specified for custom filters");
                 continue;
             }
             if (!useTypes) {
-                if (opType == filter_types::unrecognized) {
+                if (opType == FilterTypes::unrecognized) {
                     if (strictConfigChecking) {
                         std::string emessage =
-                            fmt::format("unrecognized filter operation:{}", operation);
+                            fmt::format("unrecognized FILTER operation:{}", operation);
                         logMessage(HELICS_LOG_LEVEL_error, emessage);
 
                         throw(InvalidParameter(emessage));
                     }
                     logMessage(HELICS_LOG_LEVEL_warning,
-                               fmt::format("unrecognized filter operation:{}", operation));
+                               fmt::format("unrecognized FILTER operation:{}", operation));
                     continue;
                 }
             }
@@ -876,13 +876,13 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                             if (strictConfigChecking) {
                                 logMessage(
                                     HELICS_LOG_LEVEL_error,
-                                    R"(filter properties require "name" and "value" fields)");
+                                    R"(FILTER properties require "name" and "value" fields)");
 
                                 throw(InvalidParameter(
-                                    R"(filter properties require "name" and "value" fields)"));
+                                    R"(FILTER properties require "name" and "value" fields)"));
                             }
                             logMessage(HELICS_LOG_LEVEL_warning,
-                                       R"(filter properties require "name" and "value" fields)");
+                                       R"(FILTER properties require "name" and "value" fields)");
                             continue;
                         }
                         if (prop["value"].isDouble()) {
@@ -895,13 +895,13 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         if (strictConfigChecking) {
                             logMessage(HELICS_LOG_LEVEL_error,
-                                       R"(filter properties require "name" and "value" fields)");
+                                       R"(FILTER properties require "name" and "value" fields)");
 
                             throw(InvalidParameter(
-                                R"(filter properties require "name" and "value" fields)"));
+                                R"(FILTER properties require "name" and "value" fields)"));
                         }
                         logMessage(HELICS_LOG_LEVEL_warning,
-                                   R"(filter properties require "name" and "value" fields)");
+                                   R"(FILTER properties require "name" and "value" fields)");
                         continue;
                     }
                     if (props["value"].isDouble()) {
@@ -956,17 +956,17 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             if ((useTypes) && (operation != "custom")) {
                 if (strictConfigChecking) {
                     logMessage(HELICS_LOG_LEVEL_error,
-                               "input and output types may only be specified for custom filters");
+                               "INPUT and output types may only be specified for custom filters");
                     throw(InvalidParameter(
-                        "input and output types may only be specified for custom filters"));
+                        "INPUT and output types may only be specified for custom filters"));
                 }
                 logMessage(HELICS_LOG_LEVEL_warning,
-                           "input and output types may only be specified for custom filters");
+                           "INPUT and output types may only be specified for custom filters");
                 continue;
             }
             if (!useTypes) {
-                if (opType == filter_types::unrecognized) {
-                    auto emessage = fmt::format("unrecognized filter operation:{}", operation);
+                if (opType == FilterTypes::unrecognized) {
+                    auto emessage = fmt::format("unrecognized FILTER operation:{}", operation);
                     if (strictConfigChecking) {
                         logMessage(HELICS_LOG_LEVEL_error, emessage);
 
@@ -1000,13 +1000,13 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                             if (strictConfigChecking) {
                                 logMessage(
                                     HELICS_LOG_LEVEL_error,
-                                    R"(filter properties require "name" and "value" fields)");
+                                    R"(FILTER properties require "name" and "value" fields)");
 
                                 throw(InvalidParameter(
-                                    R"(filter properties require "name" and "value" fields)"));
+                                    R"(FILTER properties require "name" and "value" fields)"));
                             }
                             logMessage(HELICS_LOG_LEVEL_warning,
-                                       R"(filter properties require "name" and "value" fields)");
+                                       R"(FILTER properties require "name" and "value" fields)");
                             continue;
                         }
                         if (propval.is_floating()) {
@@ -1024,13 +1024,13 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     if ((propname.empty()) || (propval.is_uninitialized())) {
                         if (strictConfigChecking) {
                             logMessage(HELICS_LOG_LEVEL_error,
-                                       R"(filter properties require "name" and "value" fields)");
+                                       R"(FILTER properties require "name" and "value" fields)");
 
                             throw(InvalidParameter(
-                                R"(filter properties require "name" and "value" fields)"));
+                                R"(FILTER properties require "name" and "value" fields)"));
                         }
                         logMessage(HELICS_LOG_LEVEL_warning,
-                                   R"(filter properties require "name" and "value" fields)");
+                                   R"(FILTER properties require "name" and "value" fields)");
                         continue;
                     }
                     if (propval.is_floating()) {

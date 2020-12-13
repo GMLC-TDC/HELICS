@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 int main(int argc, char* argv[])
 {
     helics::helicsCLI11App app("Combination Fed", "ComboFed");
-    std::string targetEndpoint = "endpoint";
+    std::string targetEndpoint = "ENDPOINT";
     std::string vtarget = "fed";
     std::string mtarget = "fed";
-    std::string myendpoint = "endpoint";
+    std::string myendpoint = "ENDPOINT";
     helics::BrokerApp brk;
     std::string brokerArgs = "";
 
@@ -31,8 +31,8 @@ int main(int argc, char* argv[])
         "name of the federate to target");
     app.add_option("--valuetarget", vtarget, "name of the value federate to target", true);
     app.add_option("--messagetarget", mtarget, "name of the message federate to target", true);
-    app.add_option("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
-    app.add_option("--source,-s", myendpoint, "name of the source endpoint", true);
+    app.add_option("--ENDPOINT,-e", targetEndpoint, "name of the target ENDPOINT", true);
+    app.add_option("--source,-s", myendpoint, "name of the source ENDPOINT", true);
     app.add_option("--startbroker", brokerArgs, "start a broker with the specified arguments");
 
     auto ret = app.helics_parse(argc, argv);
@@ -49,14 +49,14 @@ int main(int argc, char* argv[])
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
-    fi.setProperty(helics::defs::properties::log_level, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
     if (app["--startbroker"]->count() > 0) {
         brk = helics::BrokerApp(fi.coreType, brokerArgs);
     }
 
     auto cFed = std::make_unique<helics::CombinationFederate>(std::string{}, fi);
     auto name = cFed->getName();
-    std::cout << " registering endpoint '" << myendpoint << "' for " << name << '\n';
+    std::cout << " registering ENDPOINT '" << myendpoint << "' for " << name << '\n';
 
     // this line actually creates an endpoint
     auto& id = cFed->registerEndpoint(myendpoint);

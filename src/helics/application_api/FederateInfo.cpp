@@ -74,11 +74,11 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"timeoutputdelay", HELICS_PROPERTY_TIME_output_delay},
     {"time_input_delay", HELICS_PROPERTY_TIME_input_delay},
     {"time_output_delay", HELICS_PROPERTY_TIME_output_delay},
-    {"loglevel", HELICS_PROPERTY_INT_log_level},
-    {"log_level", HELICS_PROPERTY_INT_log_level},
-    {"logLevel", HELICS_PROPERTY_INT_log_level},
-    {"intloglevel", HELICS_PROPERTY_INT_log_level},
-    {"int_log_level", HELICS_PROPERTY_INT_log_level},
+    {"loglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"logLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"intloglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"int_log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"consoleloglevel", HELICS_PROPERTY_INT_console_log_level},
     {"console_log_level", HELICS_PROPERTY_INT_console_log_level},
     {"intconsoleloglevel", HELICS_PROPERTY_INT_console_log_level},
@@ -210,7 +210,7 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
     {"input_priority_location", HELICS_HANDLE_OPTION_input_priority_location},
     {"inputprioritylocation", HELICS_HANDLE_OPTION_input_priority_location},
     {"inputPriorityLocation", HELICS_HANDLE_OPTION_input_priority_location},
-    {"multi_input_handling_method", HELICS_HANDLE_OPTION_multi_input_handling_method},
+    {"MultiInputHandlingMethod", HELICS_HANDLE_OPTION_multi_input_handling_method},
     {"multiinputhandlingmethod", HELICS_HANDLE_OPTION_multi_input_handling_method},
     {"multiInputHandlingMethod", HELICS_HANDLE_OPTION_multi_input_handling_method}};
 
@@ -243,7 +243,7 @@ static const std::map<std::string, int> option_value_map{
 
 static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_no_print},
                                                       {"no_print", HELICS_LOG_LEVEL_no_print},
-                                                      {"error", HELICS_LOG_LEVEL_error},
+                                                      {"ERROR_RESULT", HELICS_LOG_LEVEL_error},
                                                       {"warning", HELICS_LOG_LEVEL_warning},
                                                       {"summary", HELICS_LOG_LEVEL_summary},
                                                       {"connections", HELICS_LOG_LEVEL_connections},
@@ -393,7 +393,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           "--core",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
-              if (coreType == core_type::UNRECOGNIZED) {
+              if (coreType == CoreType::UNRECOGNIZED) {
                   coreName = val;
               }
           },
@@ -403,7 +403,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           "--coretype,-t",
           [this](const std::string& val) {
               coreType = coreTypeFromString(val);
-              if (coreType == core_type::UNRECOGNIZED) {
+              if (coreType == CoreType::UNRECOGNIZED) {
                   throw CLI::ValidationError(val + " is NOT a recognized core type");
               }
           },
@@ -495,7 +495,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option_function<Time>(
            "--inputdelay",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_input_delay, val); },
-           "the input delay on incoming communication of the federate (default in ms)")
+           "the INPUT delay on incoming communication of the federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
            "--outputdelay",
@@ -509,7 +509,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->check(CLI::PositiveNumber);
     app->add_option_function<int>(
            "--loglevel",
-           [this](int val) { setProperty(HELICS_PROPERTY_INT_log_level, val); },
+           [this](int val) { setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, val); },
            "the logging level of a federate")
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));

@@ -11,39 +11,39 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <string>
-using helics::data_type;
+using helics::DataType;
 
-data_type getType(const std::string& typeString)
+DataType getType(const std::string& typeString)
 {
     auto tstr = gmlc::utilities::stringOps::trim(typeString);
     // trim the string
     if (tstr.empty()) {
-        return data_type::helics_custom;
+        return DataType::HELICS_CUSTOM;
     }
     if (tstr.size() == 1) {
         switch (tstr[0]) {
             case 'a':
             case 'A':
-                return data_type::helics_any;
+                return DataType::HELICS_ANY;
             case 's':
             case 'S':
-                return data_type::helics_string;
+                return DataType::HELICS_STRING;
             case 'd':
             case 'D':
             case 'f':
             case 'F':
-                return data_type::helics_double;
+                return DataType::HELICS_DOUBLE;
             case 'i':
             case 'I':
-                return data_type::helics_int;
+                return DataType::HELICS_INT;
             case 'c':
             case 'C':
-                return data_type::helics_complex;
+                return DataType::HELICS_COMPLEX;
             case 'v':
             case 'V':
-                return data_type::helics_vector;
+                return DataType::HELICS_VECTOR;
             default:
-                return data_type::helics_custom;
+                return DataType::HELICS_CUSTOM;
         }
     }
 
@@ -52,22 +52,22 @@ data_type getType(const std::string& typeString)
     return helics::getTypeFromString(tstr);
 }
 
-char typeCharacter(data_type type)
+char typeCharacter(DataType type)
 {
     switch (type) {
-        case data_type::helics_string:
+        case DataType::HELICS_STRING:
             return 's';
-        case data_type::helics_double:
+        case DataType::HELICS_DOUBLE:
             return 'd';
-        case data_type::helics_int:
+        case DataType::HELICS_INT:
             return 'i';
-        case data_type::helics_complex:
+        case DataType::HELICS_COMPLEX:
             return 'c';
-        case data_type::helics_vector:
+        case DataType::HELICS_VECTOR:
             return 'v';
-        case data_type::helics_any:
+        case DataType::HELICS_ANY:
             return 'a';
-        case data_type::helics_custom:
+        case DataType::HELICS_CUSTOM:
         default:
             return 'u';
     }

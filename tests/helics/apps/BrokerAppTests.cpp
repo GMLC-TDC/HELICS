@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(BrokerAppTests, constructor1)
 {
-    helics::BrokerApp App(helics::core_type::TEST, "brk1", std::vector<std::string>{});
+    helics::BrokerApp App(helics::CoreType::TEST, "brk1", std::vector<std::string>{});
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
@@ -38,7 +38,7 @@ TEST(BrokerAppTests, constructor1)
 
 TEST(BrokerAppTests, constructor2)
 {
-    helics::BrokerApp App(helics::core_type::TEST, std::vector<std::string>{"brk2", "--name"});
+    helics::BrokerApp App(helics::CoreType::TEST, std::vector<std::string>{"brk2", "--name"});
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -50,7 +50,7 @@ TEST(BrokerAppTests, constructor2)
 
 TEST(BrokerAppTests, constructor3)
 {
-    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--core_type"});
+    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--CoreType"});
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -68,7 +68,7 @@ TEST(BrokerAppTests, constructor4)
     argv[1] = &(args[1][0]);
     argv[2] = &(args[2][0]);
 
-    helics::BrokerApp App(helics::core_type::TEST, 3, argv);
+    helics::BrokerApp App(helics::CoreType::TEST, 3, argv);
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -80,7 +80,7 @@ TEST(BrokerAppTests, constructor4)
 
 TEST(BrokerAppTests, constructor5)
 {
-    std::vector<std::string> args{"constructor4", "--name", "brk5", "--core_type", "test"};
+    std::vector<std::string> args{"constructor4", "--name", "brk5", "--CoreType", "test"};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -100,7 +100,7 @@ TEST(BrokerAppTests, constructor5)
 
 TEST(BrokerAppTests, constructor6)
 {
-    helics::BrokerApp App(helics::core_type::TEST, "brk6", std::vector<std::string>{});
+    helics::BrokerApp App(helics::CoreType::TEST, "brk6", std::vector<std::string>{});
 
     EXPECT_TRUE(App.connect());
     EXPECT_EQ(App.getIdentifier(), "brk6");
@@ -115,7 +115,7 @@ TEST(BrokerAppTests, constructor6)
 
 TEST(BrokerAppTests, constructor8)
 {
-    helics::BrokerApp App(helics::core_type::TEST, "brk8", std::vector<std::string>{});
+    helics::BrokerApp App(helics::CoreType::TEST, "brk8", std::vector<std::string>{});
 
     EXPECT_TRUE(App.connect());
     EXPECT_EQ(App.getIdentifier(), "brk8");
@@ -130,7 +130,7 @@ TEST(BrokerAppTests, constructor8)
 
 TEST(BrokerAppTests, constructor9)
 {
-    helics::BrokerApp App(helics::core_type::TEST, "brk9", std::vector<std::string>{});
+    helics::BrokerApp App(helics::CoreType::TEST, "brk9", std::vector<std::string>{});
 
     helics::BrokerApp App2(std::move(App));
 
@@ -143,7 +143,7 @@ TEST(BrokerAppTests, constructor9)
 
 TEST(BrokerAppTests, constructor10)
 {
-    helics::BrokerApp App(helics::core_type::TEST, "brk10", std::vector<std::string>{});
+    helics::BrokerApp App(helics::CoreType::TEST, "brk10", std::vector<std::string>{});
 
     helics::BrokerApp App2(App.getCopyofBrokerPointer());
     EXPECT_TRUE(App2.isConnected());
@@ -155,9 +155,9 @@ TEST(BrokerAppTests, constructor10)
 
 TEST(BrokerAppTests, constructor11)
 {
-    helics::BrokerApp App(helics::core_type::TEST, "brk11", std::vector<std::string>{});
+    helics::BrokerApp App(helics::CoreType::TEST, "brk11", std::vector<std::string>{});
 
-    helics::BrokerApp App2(helics::core_type::TEST, "brk11", std::vector<std::string>{});
+    helics::BrokerApp App2(helics::CoreType::TEST, "brk11", std::vector<std::string>{});
 
     EXPECT_TRUE(App2.isConnected());
     // App2 should point to the same core
@@ -168,12 +168,12 @@ TEST(BrokerAppTests, constructor11)
 
 TEST(BrokerAppTests, constructor12)
 {
-    EXPECT_THROW(helics::BrokerApp(helics::core_type::NULLCORE,
+    EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE,
                                    "brk12",
                                    std::vector<std::string>{}),
                  helics::HelicsException);
 #ifdef ENABLE_ZMQ_CORE
-    EXPECT_THROW(helics::BrokerApp(helics::core_type::ZMQ,
+    EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ,
                                    "brk12",
                                    std::vector<std::string>{"10.7.5.5", "--local_interface"}),
                  helics::ConnectionFailure);
@@ -196,7 +196,7 @@ TEST(BrokerAppTests, null)
 
 TEST(BrokerAppTests, help)
 {
-    helics::BrokerApp app("--core_type=test --help");
+    helics::BrokerApp app("--CoreType=test --help");
     EXPECT_FALSE(app.isOpenToNewFederates());
     EXPECT_FALSE(app.isConnected());
     EXPECT_FALSE(app.connect());
@@ -209,7 +209,7 @@ TEST(BrokerAppTests, help)
 
 TEST(BrokerAppTests, file_logging_p2)
 {
-    helics::BrokerApp app("--name=loggerBrk1 --core_type=test");
+    helics::BrokerApp app("--name=loggerBrk1 --CoreType=test");
     app.setLoggingLevel(5);
     const std::string lfilename = "logfile3.txt";
     app.setLogFile("logfile3.txt");
@@ -217,7 +217,7 @@ TEST(BrokerAppTests, file_logging_p2)
 
     helics::FederateInfo fi;
     fi.broker = "loggerBrk1";
-    fi.coreType = helics::core_type::TEST;
+    fi.coreType = helics::CoreType::TEST;
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
     Fed->enterExecutingMode();

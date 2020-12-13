@@ -20,31 +20,44 @@ extern "C" {
 
 /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
 typedef enum {
+    /** a default core type that will default to something available*/
     HELICS_CORE_TYPE_DEFAULT =
-        0, /*!< a default core type that will default to something available*/
-    HELICS_CORE_TYPE_ZMQ = 1, /*!< use the Zero MQ networking protocol */
-    HELICS_CORE_TYPE_MPI = 2, /*!< use MPI for operation on a parallel cluster */
-    HELICS_CORE_TYPE_TEST = 3, /*!< use the Test core if all federates are in the same process */
+        0, 
+    /** use the Zero MQ networking protocol */
+    HELICS_CORE_TYPE_ZMQ = 1, 
+    /** use MPI for operation on a parallel cluster */
+    HELICS_CORE_TYPE_MPI = 2, 
+    /** use the Test core if all federates are in the same process */
+    HELICS_CORE_TYPE_TEST = 3, 
     /** interprocess uses memory mapped files to transfer data (for use when all federates are
         on the same machine */
     HELICS_CORE_TYPE_INTERPROCESS = 4,
     /** interprocess uses memory mapped files to transfer data (for use when all federates are
         on the same machine ipc is the same as /ref HELICS_CORE_TYPE_interprocess*/
     HELICS_CORE_TYPE_IPC = 5,
-    HELICS_CORE_TYPE_TCP = 6, /*!< use a generic TCP protocol message stream to send messages */
-    HELICS_CORE_TYPE_UDP = 7, /*!< use UDP packets to send the data */
+    /** use a generic TCP protocol message stream to send messages */
+    HELICS_CORE_TYPE_TCP = 6, 
+    /** use UDP packets to send the data */
+    HELICS_CORE_TYPE_UDP = 7, 
+    /** single socket version of ZMQ core usually for high fed count on the same system*/
     HELICS_CORE_TYPE_ZMQ_SS =
-        10, /*!< single socket version of ZMQ core usually for high fed count on the same system*/
-    HELICS_CORE_TYPE_NNG = 9, /*!< for using the nanomsg communications */
+        10, 
+    /** for using the nanomsg communications */
+    HELICS_CORE_TYPE_NNG = 9, 
+    /** a single socket version of the TCP core for more easily handling firewalls*/
     HELICS_CORE_TYPE_TCP_SS =
-        11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
-    HELICS_CORE_TYPE_HTTP = 12, /*!< a core type using http for communication*/
-    HELICS_CORE_TYPE_WEBSOCKET = 14, /*!< a core using websockets for communication*/
-    HELICS_CORE_TYPE_INPROC = 18, /*!< an in process core type for handling communications in shared
+        11, 
+    /** a core type using http for communication*/
+    HELICS_CORE_TYPE_HTTP = 12, 
+    /** a core using websockets for communication*/
+    HELICS_CORE_TYPE_WEBSOCKET = 14, 
+    /** an in process core type for handling communications in shared
                                      memory it is pretty similar to the test core but stripped from
                                      the "test" components*/
-    HELICS_CORE_TYPE_NULL = 66 /*!< an explicit core type that is recognized but explicitly doesn't
+    HELICS_CORE_TYPE_INPROC = 18, 
+    /** an explicit core type that is recognized but explicitly doesn't
                                   exist, for testing and a few other assorted reasons*/
+    HELICS_CORE_TYPE_NULL = 66 
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
@@ -170,26 +183,40 @@ typedef enum {
 /** enumeration of return values from the C interface functions
  */
 typedef enum {
-    HELICS_ERROR_FATAL = -404, /*!< global fatal error for federation */
-    HELICS_ERROR_EXTERNAL_TYPE = -203, /*!< an unknown non-helics error was produced */
-    HELICS_ERROR_OTHER = -101, /*!< the function produced a helics error of some other type */
+    /** global fatal error for federation */
+    HELICS_ERROR_FATAL = -404, 
+    /** an unknown non-helics error was produced */
+    HELICS_ERROR_EXTERNAL_TYPE = -203, 
+    /** the function produced a helics error of some other type */
+    HELICS_ERROR_OTHER = -101, 
+    /** insufficient space is available to store requested data */
     HELICS_ERROR_INSUFFICIENT_SPACE =
-        -18, /*!< insufficient space is available to store requested data */
+        -18,
     HELICS_ERROR_EXECUTION_FAILURE = -14, /*!< the function execution has failed */
+    /** the call made was invalid in the present state of the calling object */
     HELICS_ERROR_INVALID_FUNCTION_CALL =
-        -10, /*!< the call made was invalid in the present state of the calling object */
+        -10, 
+    /** error issued when an invalid state transition occurred */
     HELICS_ERROR_INVALID_STATE_TRANSITION =
-        -9, /*!< error issued when an invalid state transition occurred */
-    HELICS_WARNING = -8, /*!< the function issued a warning of some kind */
+        -9, 
+    /** the function issued a warning of some kind */
+    HELICS_WARNING = -8, 
+    /** the federate has terminated unexpectedly and the call cannot be completed */
     HELICS_ERROR_SYSTEM_FAILURE =
-        -6, /*!< the federate has terminated unexpectedly and the call cannot be completed */
-    HELICS_ERROR_DISCARD = -5, /*!< the input was discarded and not used for some reason */
+        -6, 
+    /** the input was discarded and not used for some reason */
+    HELICS_ERROR_DISCARD = -5, 
+    /** the parameter passed was invalid and unable to be used */
     HELICS_ERROR_INVALID_ARGUMENT =
-        -4, /*!< the parameter passed was invalid and unable to be used */
-    HELICS_ERROR_INVALID_OBJECT = -3, /*!< indicator that the object used was not a valid object */
-    HELICS_ERROR_CONNECTION_FAILURE = -2, /*!< the operation to connect has failed */
-    HELICS_ERROR_REGISTRATION_FAILURE = -1, /*!< registration has failed */
-    HELICS_OK = 0 /*!< the function executed successfully */
+        -4, 
+    /** indicator that the object used was not a valid object */
+    HELICS_ERROR_INVALID_OBJECT = -3, 
+    /** the operation to connect has failed */
+    HELICS_ERROR_CONNECTION_FAILURE = -2, 
+    /** registration has failed */
+    HELICS_ERROR_REGISTRATION_FAILURE = -1, 
+    /** the function executed successfully */
+    HELICS_OK = 0 
 } HelicsErrorTypes;
 
 /** enumeration of properties that apply to federates*/

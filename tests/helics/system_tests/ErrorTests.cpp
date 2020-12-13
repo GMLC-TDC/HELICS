@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <future>
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 struct error_tests: public FederateTestFixture, public ::testing::Test {
 };
@@ -52,7 +52,7 @@ TEST_F(error_tests, already_init_broker)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
 
     fed1->enterInitializingMode();
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString = std::string("--timeout=1s --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
@@ -62,12 +62,12 @@ TEST_F(error_tests, mismatch_broker_key)
 {
     auto broker = AddBroker("test", 1);
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
-    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::core_type::TEST);
+    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::CoreType::TEST);
     if (core) {
         core->disconnect();
     }
@@ -78,12 +78,12 @@ TEST_F(error_tests, mismatch_broker_key2)
 {
     auto broker = AddBroker("test", "-f 1 --broker_key=tkey2");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
-    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::core_type::TEST);
+    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::CoreType::TEST);
     if (core) {
         core->disconnect();
     }
@@ -94,7 +94,7 @@ TEST_F(error_tests, mismatch_broker_key_success)
 {
     auto broker = AddBroker("test", "--broker_key=tkey");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     helics::ValueFederate fed3("fed2b", fi);
@@ -108,7 +108,7 @@ TEST_F(error_tests, mismatch_broker_key_success_universal_key)
 {
     auto broker = AddBroker("test", "--broker_key=**");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     helics::ValueFederate fed3("fed2b", fi);
@@ -326,7 +326,7 @@ TEST_F(error_tests, duplicate_publication_names4)
     // all 3 of these should publish to the same thing
     auto& pubid = fed1->registerPublication("testkey", "");
 
-    helics::Publication pub(fed1, "testkey", helics::data_type::helics_double);
+    helics::Publication pub(fed1, "testkey", helics::DataType::HELICS_DOUBLE);
     // copy constructor
     helics::Publication pub2(pubid);
 
@@ -512,7 +512,7 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
     helics::cleanupHelicsLibrary();
 }
 
-INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(CoreTypes_simple));
 
 #if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE)
 

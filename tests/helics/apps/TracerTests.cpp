@@ -32,7 +32,7 @@ TEST(tracer_tests, simple_tracer_test)
         lastTime = static_cast<double>(tm);
         lastVal = std::stod(newval);
     };
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "tcore-simple-tracer";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
@@ -40,7 +40,7 @@ TEST(tracer_tests, simple_tracer_test)
     trace1.addSubscription("pub1");
     trace1.setValueCallback(cb);
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -73,7 +73,7 @@ TEST(tracer_tests, tracer_test_message)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "tcore-tracer";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
@@ -147,7 +147,7 @@ class tracer_file_tests: public ::testing::TestWithParam<const char*> {
 TEST_P(tracer_file_tests, simple_tracer_test_files)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = std::string("tcore1") + GetParam();
     fi.coreName.push_back(indx++);
     fi.coreInitString = "-f 2 --autobroker";
@@ -161,8 +161,8 @@ TEST_P(tracer_file_tests, simple_tracer_test_files)
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    helics::Publication pub2(helics::GLOBAL, &vfed, "pub2", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::GLOBAL, &vfed, "pub2", helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(4); });
     vfed.enterExecutingMode();
@@ -203,7 +203,7 @@ class tracer_message_file_tests: public ::testing::TestWithParam<const char*> {
 TEST_P(tracer_message_file_tests, test_message_files)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = std::string("tcore1b") + GetParam();
     fi.coreName.push_back(indx++);
     fi.coreInitString = " -f 2 --autobroker";
@@ -224,8 +224,8 @@ TEST_P(tracer_message_file_tests, test_message_files)
     trace1.setEndpointMessageCallback(cbm);
 
     helics::CombinationFederate cfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
     helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
@@ -262,7 +262,7 @@ TEST_P(tracer_message_file_tests, test_message_files)
 TEST_P(tracer_message_file_tests, test_message_files_cmd)
 {
     std::this_thread::sleep_for(300ms);
-    helics::apps::BrokerApp brk(helics::core_type::IPC, "ipc_broker", "-f 2");
+    helics::apps::BrokerApp brk(helics::CoreType::IPC, "ipc_broker", "-f 2");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
     std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", exampleFile};
 
@@ -280,12 +280,12 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
     trace1.setValueCallback(cb);
 
     helics::FederateInfo fi;
-    fi.coreType = helics::core_type::IPC;
+    fi.coreType = helics::CoreType::IPC;
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed("obj", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
     helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
@@ -327,7 +327,7 @@ TEST(tracer_tests, tracer_test_destendpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "tcore-dep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
@@ -404,7 +404,7 @@ TEST(tracer_tests, srcendpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "tcoresrc";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
@@ -475,7 +475,7 @@ TEST(tracer_tests, tracer_test_endpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "tcore-ep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1("trace1", fi);
@@ -560,7 +560,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     static char indx = 'a';
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = std::string("tcore4") + GetParam();
     fi.coreName.push_back(indx++);
     fi.coreInitString = "-f3 --autobroker";
@@ -634,19 +634,19 @@ INSTANTIATE_TEST_SUITE_P(tracer_tests,
 TEST_P(tracer_message_file_tests, test_message_files_exe)
 {
     std::this_thread::sleep_for(300ms);
-    helics::apps::BrokerApp brk(helics::core_type::ZMQ, "z_broker", "-f 2");
+    helics::apps::BrokerApp brk(helics::CoreType::ZMQ, "z_broker", "-f 2");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
     std::string cmdArg("--name=tracer --coretype=zmq --stop=5s --print --skiplog " + exampleFile);
     exeTestRunner tracerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_app");
     ASSERT_TRUE(tracerExe.isActive());
     auto out = tracerExe.runCaptureOutputAsync(std::string("tracer " + cmdArg));
-    helics::FederateInfo fi(helics::core_type::ZMQ);
+    helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed("obj", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
+    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
     helics::Endpoint& e1 = cfed.registerGlobalEndpoint("d1");
 
     cfed.enterExecutingMode();

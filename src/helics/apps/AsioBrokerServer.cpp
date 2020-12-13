@@ -107,7 +107,7 @@ namespace apps {
             if (isProtocolCommand(m)) {
                 // if the reply is not ignored respond with it otherwise
                 // forward the original message on to the receiver to handle
-                auto rep = generateMessageResponse(m, tcpPortData, core_type::TCP);
+                auto rep = generateMessageResponse(m, tcpPortData, CoreType::TCP);
                 if (rep.action() != CMD_IGNORE) {
                     try {
                         connection->send(rep.packetize());
@@ -155,7 +155,7 @@ namespace apps {
         if (isProtocolCommand(m)) {
             // if the reply is not ignored respond with it otherwise
             // forward the original message on to the receiver to handle
-            auto rep = generateMessageResponse(m, udpPortData, core_type::UDP);
+            auto rep = generateMessageResponse(m, udpPortData, CoreType::UDP);
             if (rep.action() != CMD_IGNORE) {
                 try {
                     server->reply(rep.to_string());

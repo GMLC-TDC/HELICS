@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../core/federate_id.hpp"
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #include "../helics_enums.h"
 #include "FederateInfo.hpp"
 #include "helics/helics-config.h"
@@ -145,19 +145,19 @@ class HELICS_CXX_EXPORT Federate {
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    iteration_result
-        enterExecutingMode(iteration_request iterate = iteration_request::no_iterations);
+    IterationResult
+        enterExecutingMode(IterationRequest iterate = IterationRequest::NO_ITERATIONS);
     /** enter the normal execution mode
     @details call will return immediately but \ref enterExecutingModeComplete should be called to
     complete the operation
     @param iterate an optional flag indicating the desired iteration mode
     */
-    void enterExecutingModeAsync(iteration_request iterate = iteration_request::no_iterations);
+    void enterExecutingModeAsync(IterationRequest iterate = IterationRequest::NO_ITERATIONS);
     /** complete the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializingModeComplete must be
     called before doing other operations
     */
-    iteration_result enterExecutingModeComplete();
+    IterationResult enterExecutingModeComplete();
     /** terminate the simulation
     @details call is will block until the finalize has been acknowledged, no commands that interact
     with the core may be called after this function function */
@@ -220,8 +220,8 @@ class HELICS_CXX_EXPORT Federate {
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration mode
-    @return the granted time step in a structure containing a return time and an iteration_result*/
-    iteration_time requestTimeIterative(Time nextInternalTimeStep, iteration_request iterate);
+    @return the granted time step in a structure containing a return time and an IterationResult*/
+    iteration_time requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate);
 
     /**  request a time advancement and return immediately for asynchronous function.
     @details /ref requestTimeComplete should be called to finish the operation and get the result
@@ -235,7 +235,7 @@ class HELICS_CXX_EXPORT Federate {
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration level (none, require, optional)
     */
-    void requestTimeIterativeAsync(Time nextInternalTimeStep, iteration_request iterate);
+    void requestTimeIterativeAsync(Time nextInternalTimeStep, IterationRequest iterate);
 
     /** request a time advancement
     @return the granted time step*/
@@ -541,28 +541,28 @@ specific name of a federate, core, or broker
     */
     void logErrorMessage(const std::string& message) const
     {
-        logMessage(HELICS_LOG_LEVEL_error, message);
+        logMessage(HELICS_LOG_LEVEL_ERROR, message);
     }
     /** log a warning message to the federate Logger
     @param message the message to log
     */
     void logWarningMessage(const std::string& message) const
     {
-        logMessage(HELICS_LOG_LEVEL_warning, message);
+        logMessage(HELICS_LOG_LEVEL_WARNING, message);
     }
     /** log an info message to the federate Logger
     @param message the message to log
     */
     void logInfoMessage(const std::string& message) const
     {
-        logMessage(HELICS_LOG_LEVEL_summary, message);
+        logMessage(HELICS_LOG_LEVEL_SUMMARY, message);
     }
     /** log a debug message to the federate Logger
     @param message the message to log
     */
     void logDebugMessage(const std::string& message) const
     {
-        logMessage(HELICS_LOG_LEVEL_data, message);
+        logMessage(HELICS_LOG_LEVEL_DATA, message);
     }
     /** call to complete async operation with no output*/
     void completeOperation();

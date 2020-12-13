@@ -113,7 +113,7 @@ TEST(other_tests, federate_global_value)
     const char* argv[4];
     argv[0] = "";
     argv[1] = "--corename=gcore";
-    argv[2] = "--core_type=test";
+    argv[2] = "--CoreType=test";
     argv[3] = "--period=1.0";
 
     auto fi = helicsCreateFederateInfo();
@@ -209,7 +209,7 @@ TEST(other_tests, federate_add_dependency)
     const char* argv[4];
     argv[0] = "";
     argv[1] = "--corename=dcore";
-    argv[2] = "--core_type=test";
+    argv[2] = "--CoreType=test";
     argv[3] = "--period=1.0";
 
     auto fi = helicsCreateFederateInfo();
@@ -300,7 +300,7 @@ TEST(other_tests, broker_creation)
 TEST(federate_tests, federateGeneratedLocalError)
 {
     auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_test, nullptr);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetCoreName(fi, "core_full_le", nullptr);
     helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
 
@@ -309,7 +309,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
-    helicsFederateLocalError(fed1, 9827, "user generated error");
+    helicsFederateLocalError(fed1, 9827, "user generated ERROR_RESULT");
 
     auto err = helicsErrorInitialize();
     helicsFederateRequestTime(fed1, 3.0, &err);
@@ -324,7 +324,7 @@ TEST(federate_tests, federateGeneratedLocalError)
 TEST(federate_tests, federateGeneratedGlobalError)
 {
     auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_test, nullptr);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
     helicsFederateInfoSetCoreName(fi, "core_full_ge", nullptr);
     helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
 
@@ -333,7 +333,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
-    helicsFederateGlobalError(fed1, 9827, "user generated global error");
+    helicsFederateGlobalError(fed1, 9827, "user generated global ERROR_RESULT");
 
     auto err = helicsErrorInitialize();
     helicsFederateRequestTime(fed1, 3.0, &err);

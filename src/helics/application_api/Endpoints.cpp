@@ -174,14 +174,14 @@ void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& cal
 void Endpoint::addSourceFilter(const std::string& filterName)
 {
     if (cr != nullptr) {
-        cr->addSourceTarget(handle, filterName, handle_type::filter);
+        cr->addSourceTarget(handle, filterName, InterfaceType::FILTER);
     }
 }
 /** add a named filter to an endpoint for all messages going to the endpoint*/
 void Endpoint::addDestinationFilter(const std::string& filterName)
 {
     if (cr != nullptr) {
-        cr->addDestinationTarget(handle, filterName, handle_type::filter);
+        cr->addDestinationTarget(handle, filterName, InterfaceType::FILTER);
     }
 }
 }  // namespace helics

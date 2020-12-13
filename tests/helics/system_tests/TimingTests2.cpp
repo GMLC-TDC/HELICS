@@ -302,14 +302,14 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     val2 = sub2.getValue<double>();
     EXPECT_DOUBLE_EQ(val2, 3.5);
 
-    auto itTime = vFed2->requestTimeIterative(4.0, helics::iteration_request::iterate_if_needed);
-    EXPECT_EQ(itTime.state, helics::iteration_result::iterating);
+    auto itTime = vFed2->requestTimeIterative(4.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+    EXPECT_EQ(itTime.state, helics::IterationResult::ITERATING);
     EXPECT_EQ(itTime.grantedTime, 3.0);
     val2 = sub2.getValue<double>();
     EXPECT_DOUBLE_EQ(val2, 9.3);
 
-    itTime = vFed2->requestTimeIterative(4.0, helics::iteration_request::iterate_if_needed);
-    EXPECT_EQ(itTime.state, helics::iteration_result::next_step);
+    itTime = vFed2->requestTimeIterative(4.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+    EXPECT_EQ(itTime.state, helics::IterationResult::NEXT_STEP);
     EXPECT_EQ(itTime.grantedTime, 4.0);
     val2 = sub2.getValue<double>();
     EXPECT_DOUBLE_EQ(val2, 9.3);
@@ -317,8 +317,8 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed2->finalize();
 
     // Now test the wait_for_current_time with iteration enabled
-    auto itTime3 = vFed3->requestTimeIterative(3.0, helics::iteration_request::iterate_if_needed);
-    EXPECT_EQ(itTime3.state, helics::iteration_result::next_step);
+    auto itTime3 = vFed3->requestTimeIterative(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+    EXPECT_EQ(itTime3.state, helics::IterationResult::NEXT_STEP);
     EXPECT_EQ(itTime3.grantedTime, 3.0);
     val3 = sub3.getValue<double>();
     EXPECT_DOUBLE_EQ(val3, 9.3);

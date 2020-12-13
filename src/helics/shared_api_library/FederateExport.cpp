@@ -240,7 +240,7 @@ void helicsFederateInfoSetCoreType(HelicsFederateInfo fi, int coretype, HelicsEr
     if (info == nullptr) {
         return;
     }
-    info->coreType = static_cast<helics::core_type>(coretype);
+    info->coreType = static_cast<helics::CoreType>(coretype);
 }
 
 void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* coretype, HelicsError* err)
@@ -250,11 +250,11 @@ void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* 
         return;
     }
     if (coretype == nullptr) {
-        info->coreType = helics::core_type::DEFAULT;
+        info->coreType = helics::CoreType::DEFAULT;
         return;
     }
     auto ctype = helics::core::coreTypeFromString(coretype);
-    if (ctype == helics::core_type::UNRECOGNIZED) {
+    if (ctype == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
             err->error_code = HELICS_ERROR_invalid_argument;
             err->message = getMasterHolder()->addErrorString(std::string(coretype) + " is not a valid core type");
@@ -717,32 +717,32 @@ void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err)
     }
 }
 
-static helics::iteration_request getIterationRequest(HelicsIterationRequest iterate)
+static helics::IterationRequest getIterationRequest(HelicsIterationRequest iterate)
 {
     switch (iterate) {
         case HELICS_ITERATION_REQUEST_NO_ITERATION:
         default:
-            return helics::iteration_request::no_iterations;
+            return helics::IterationRequest::NO_ITERATIONS;
         case HELICS_ITERATION_REQUEST_FORCE_ITERATION:
-            return helics::iteration_request::force_iteration;
+            return helics::IterationRequest::FORCE_ITERATION;
 
         case HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED:
-            return helics::iteration_request::iterate_if_needed;
+            return helics::IterationRequest::ITERATE_IF_NEEDED;
     }
 }
 
-static HelicsIterationResult getIterationStatus(helics::iteration_result iterationState)
+static HelicsIterationResult getIterationStatus(helics::IterationResult iterationState)
 {
     switch (iterationState) {
-        case helics::iteration_result::next_step:
+        case helics::IterationResult::NEXT_STEP:
             return HELICS_ITERATION_RESULT_NEXT_STEP;
-        case helics::iteration_result::iterating:
+        case helics::IterationResult::ITERATING:
             return HELICS_ITERATION_RESULT_ITERATING;
-        case helics::iteration_result::error:
+        case helics::IterationResult::ERROR_RESULT:
         default:
             // most cases of this return error directly without going through this function
             return HELICS_ITERATION_RESULT_ERROR;  // LCOV_EXCL_LINE
-        case helics::iteration_result::halted:
+        case helics::IterationResult::HALTED:
             return HELICS_ITERATION_RESULT_HALTED;
     }
 }

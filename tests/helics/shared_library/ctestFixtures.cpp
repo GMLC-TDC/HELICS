@@ -19,18 +19,18 @@ static bool hasIndexCode(const std::string& type_name)
     return false;
 }
 
-static auto StartBrokerImp(const std::string& core_type_name, std::string initialization_string)
+static auto StartBrokerImp(const std::string& CoreType_name, std::string initialization_string)
 {
-    if (core_type_name.compare(0, 3, "tcp") == 0) {
+    if (CoreType_name.compare(0, 3, "tcp") == 0) {
         initialization_string += " --reuse_address";
-    } else if (core_type_name.compare(0, 3, "ipc") == 0) {
+    } else if (CoreType_name.compare(0, 3, "ipc") == 0) {
         initialization_string += " --client";
     }
-    if (hasIndexCode(core_type_name)) {
-        std::string new_type(core_type_name.begin(), core_type_name.end() - 2);
+    if (hasIndexCode(CoreType_name)) {
+        std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
         return helicsCreateBroker(new_type.c_str(), NULL, initialization_string.c_str(), 0);
     }
-    return helicsCreateBroker(core_type_name.c_str(), NULL, initialization_string.c_str(), 0);
+    return helicsCreateBroker(CoreType_name.c_str(), NULL, initialization_string.c_str(), 0);
 }
 
 bool FederateTestFixture::hasIndexCode(const std::string& type_name)
@@ -92,19 +92,19 @@ FederateTestFixture::~FederateTestFixture()
     helicsCleanupLibrary();
 }
 
-helics_broker FederateTestFixture::AddBroker(const std::string& core_type_name, int count)
+helics_broker FederateTestFixture::AddBroker(const std::string& CoreType_name, int count)
 {
-    return AddBroker(core_type_name, std::string("-f") + std::to_string(count));
+    return AddBroker(CoreType_name, std::string("-f") + std::to_string(count));
 }
 
-helics_broker FederateTestFixture::AddBroker(const std::string& core_type_name,
+helics_broker FederateTestFixture::AddBroker(const std::string& CoreType_name,
                                              const std::string& initialization_string)
 {
     helics_broker broker;
     if (extraBrokerArgs.empty()) {
-        broker = StartBrokerImp(core_type_name, initialization_string);
+        broker = StartBrokerImp(CoreType_name, initialization_string);
     } else {
-        broker = StartBrokerImp(core_type_name, initialization_string + " " + extraBrokerArgs);
+        broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
     }
     assert(helicsBrokerIsValid(broker) == helics_true);
     brokers.push_back(broker);
@@ -112,29 +112,29 @@ helics_broker FederateTestFixture::AddBroker(const std::string& core_type_name,
 }
 
 void FederateTestFixture::SetupTest(FedCreator ctor,
-                                    const std::string& core_type_name,
+                                    const std::string& CoreType_name,
                                     int count,
                                     helics_time time_delta,
                                     const std::string& name_prefix)
 {
-    ctype = core_type_name;
-    helics_broker broker = AddBroker(core_type_name, count);
+    ctype = CoreType_name;
+    helics_broker broker = AddBroker(CoreType_name, count);
     assert(helicsBrokerIsValid(broker) == helics_true);
-    AddFederates(ctor, core_type_name, count, broker, time_delta, name_prefix);
+    AddFederates(ctor, CoreType_name, count, broker, time_delta, name_prefix);
 }
 
 void FederateTestFixture::AddFederates(FedCreator ctor,
-                                       std::string core_type_name,
+                                       std::string CoreType_name,
                                        int count,
                                        helics_broker broker,
                                        helics_time time_delta,
                                        const std::string& name_prefix)
 {
-    bool hasIndex = hasIndexCode(core_type_name);
-    int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
+    bool hasIndex = hasIndexCode(CoreType_name);
+    int setup = (hasIndex) ? getIndexCode(CoreType_name) : 1;
     if (hasIndex) {
-        core_type_name.pop_back();
-        core_type_name.pop_back();
+        CoreType_name.pop_back();
+        CoreType_name.pop_back();
     }
 
     std::string initString = std::string("--broker=");
@@ -148,14 +148,14 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
     }
 
     helics_federate_info fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreTypeFromString(fi, core_type_name.c_str(), &err);
+    helicsFederateInfoSetCoreTypeFromString(fi, CoreType_name.c_str(), &err);
     helicsFederateInfoSetTimeProperty(fi, HELICS_PROPERTY_TIME_delta, time_delta, &err);
 
     switch (setup) {
         case 1:
         default: {
             auto init = initString + " --federates " + std::to_string(count);
-            auto core = helicsCreateCore(core_type_name.c_str(), NULL, init.c_str(), &err);
+            auto core = helicsCreateCore(CoreType_name.c_str(), NULL, init.c_str(), &err);
 
             helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
             assert(err.errorCode == 0);
@@ -174,7 +174,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii) {
                 auto init = initString + " --federates 1";
-                auto core = helicsCreateCore(core_type_name.c_str(), NULL, init.c_str(), &err);
+                auto core = helicsCreateCore(CoreType_name.c_str(), NULL, init.c_str(), &err);
 
                 helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
                 assert(err.errorCode == 0);
@@ -187,8 +187,8 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
         } break;
         case 3: {
             auto subbroker =
-                AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
-            auto newTypeString = core_type_name;
+                AddBroker(CoreType_name, initString + " --federates " + std::to_string(count));
+            auto newTypeString = CoreType_name;
             newTypeString.push_back('_');
             newTypeString.push_back('2');
             for (int ii = 0; ii < count; ++ii) {
@@ -196,11 +196,11 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             }
         } break;
         case 4: {
-            auto newTypeString = core_type_name;
+            auto newTypeString = CoreType_name;
             newTypeString.push_back('_');
             newTypeString.push_back('2');
             for (int ii = 0; ii < count; ++ii) {
-                auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
+                auto subbroker = AddBroker(CoreType_name, initString + " --federates 1");
                 AddFederates(ctor, newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         } break;
