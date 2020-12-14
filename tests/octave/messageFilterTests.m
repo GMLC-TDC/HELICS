@@ -18,8 +18,8 @@ end
 %! try
 %!    helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 %!    helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-%!   helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
-%!    helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
+%!   helicsFederateInfoSetTimeProperty(fedInfo,HELICS_PROPERTY_TIME_DELTA, 0.01);
+%!    helicsFederateInfoSetIntegerProperty(fedInfo,HELICS_PROPERTY_INT_LOG_LEVEL,1);
 %! catch e
 %!     disp(e.message)
 %!     disp(e.stack(1))
@@ -113,12 +113,12 @@ end
 %!
 %! helicsFederateRegisterGlobalEndpoint(mFed, 'port2', 'random');
 %!
-%! f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_custom,'filter1');
+%! f1=helicsFederateRegisterGlobalFilter(fFed,helics.HELICS_FILTER_TYPE_CUSTOM,'filter1');
 %! helicsFilterAddSourceTarget(f1,'port1');
-%! f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_delay,'filter2');
+%! f2=helicsFederateRegisterGlobalFilter(fFed,helics.HELICS_FILTER_TYPE_DELAY,'filter2');
 %! helicsFilterAddDestinationTarget(f2,'port2');
 %! helicsFederateRegisterEndpoint(fFed,'fout','');
-%! f3=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_random_delay,'filter3');
+%! f3=helicsFederateRegisterFilter(fFed,helics.HELICS_FILTER_TYPE_RANDOM_DELAY,'filter3');
 %! helicsFilterAddSourceTarget(f3,'fed2/fout');
 %!
 %! helicsFederateEnterExecutingModeAsync(mFed);
@@ -155,7 +155,7 @@ end
 %!
 %! p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
 %!
-%! f1=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_delay,'filter1');
+%! f1=helicsFederateRegisterFilter(fFed,helics.HELICS_FILTER_TYPE_DELAY,'filter1');
 %! helicsFilterAddSourceTarget(f1,'port1');
 %! helicsFilterSet(f1,'delay',2.5);
 %!
