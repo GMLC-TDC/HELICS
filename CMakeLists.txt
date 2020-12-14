@@ -1059,7 +1059,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
 
     set(CPACK_PACKAGE_EXECUTABLES
-        "helics_broker"
+        "HelicsBroker"
         "Helics Broker"
         "helics_app"
         "Helics app executable"

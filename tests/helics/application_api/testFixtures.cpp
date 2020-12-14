@@ -58,8 +58,8 @@ FederateTestFixture::~FederateTestFixture()
 {
     for (auto& fed : federates) {
         if (fed &&
-            (!((fed->getCurrentMode() == helics::Federate::modes::finalize) ||
-               (fed->getCurrentMode() == helics::Federate::modes::error)))) {
+            (!((fed->getCurrentMode() == helics::Federate::Modes::FINALIZE) ||
+               (fed->getCurrentMode() == helics::Federate::Modes::ERROR_STATE)))) {
             fed->finalize();
         }
     }
@@ -83,7 +83,7 @@ FederateTestFixture::~FederateTestFixture()
 void FederateTestFixture::FullDisconnect()
 {
     for (auto& fed : federates) {
-        if (fed && fed->getCurrentMode() != helics::Federate::modes::finalize) {
+        if (fed && fed->getCurrentMode() != helics::Federate::Modes::FINALIZE) {
             fed->finalize();
         }
     }

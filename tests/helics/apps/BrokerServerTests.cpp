@@ -85,7 +85,7 @@ TEST_P(BrokerServerTests, execution_tests)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto fed2 = ValueFederate("fed2", fi);
     auto& sub = fed2.registerSubscription("key1");
-    sub.setOption(HELICS_HANDLE_OPTION_connection_required);
+    sub.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed1.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed2.enterExecutingMode());
     fed1.enterExecutingModeComplete();
@@ -113,7 +113,7 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto fed2 = ValueFederate("fed2", fi);
     auto& sub2 = fed2.registerSubscription("key1");
-    sub2.setOption(HELICS_HANDLE_OPTION_connection_required);
+    sub2.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed1.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed2.enterExecutingMode());
     fed1.enterExecutingModeComplete();
@@ -126,7 +126,7 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto fed4 = ValueFederate("fed4", fi);
     auto& sub4 = fed4.registerSubscription("key1");
-    sub4.setOption(HELICS_HANDLE_OPTION_connection_required);
+    sub4.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed3.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed4.enterExecutingMode());
     fed3.enterExecutingModeComplete();

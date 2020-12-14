@@ -40,7 +40,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     auto& p2 = mFed->registerGlobalEndpoint("port2");
     auto& p3 = mFed->registerGlobalEndpoint("port3");
 
-    auto& Filt = helics::make_filter(helics::FilterTypes::reroute, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::REROUTE, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     Filt.setString("newdestination", "port3");
 
@@ -48,7 +48,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -72,7 +72,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
@@ -89,7 +89,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     auto& p2 = mFed->registerGlobalEndpoint("port2");
     auto& p3 = mFed->registerGlobalEndpoint("port3");
 
-    auto& Filt = helics::make_filter(helics::FilterTypes::reroute, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::REROUTE, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     Filt.setString("newdestination", "port3");
 
@@ -97,7 +97,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -129,7 +129,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     EXPECT_EQ(m2->data.size(), data.size());
     mFed->finalize();
     fFed->finalize();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /**
@@ -164,7 +164,7 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "endpt2");
 
@@ -186,7 +186,7 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /**
@@ -223,7 +223,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -251,7 +251,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /**
@@ -272,7 +272,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::FilterTypes::random_drop, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::RANDOM_DROP, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     double drop_prob = 0.75;
     Filt.set("dropprob", drop_prob);
@@ -281,7 +281,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -308,7 +308,7 @@ TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /**
@@ -340,7 +340,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -366,7 +366,7 @@ TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /**
@@ -387,7 +387,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::FilterTypes::random_drop, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::RANDOM_DROP, fFed.get(), "filter1");
     Filt.addDestinationTarget("port2");
     double drop_prob = 0.25;
     Filt.set("dropprob", drop_prob);
@@ -396,7 +396,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -456,7 +456,7 @@ TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -501,7 +501,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::FilterTypes::random_delay, fFed.get(), "filter1");
+    auto& Filt = helics::make_filter(helics::FilterTypes::RANDOM_DELAY, fFed.get(), "filter1");
     Filt.addSourceTarget("port1");
     Filt.setString("distribution", "binomial");
 
@@ -512,7 +512,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(100, 'a');
     p1.sendTo(data, "port2");
 
@@ -540,7 +540,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /**

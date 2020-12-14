@@ -28,8 +28,8 @@ TEST_F(update_tests, test_single_update)
     auto pub = fedA->registerGlobalPublication<std::string>("pub1");
 
     auto sub = fedB->registerSubscription("pub1");
-    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     sub.setDefault(3.1);
     double testValue = 4.79;
@@ -76,8 +76,8 @@ TEST_F(update_tests, test_single_update_string)
     auto pub = fedA->registerGlobalPublication<double>("pub1");
 
     auto sub = fedB->registerSubscription("pub1");
-    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     sub.setDefault(3.1);
     double testValue = 4.79;
@@ -141,8 +141,8 @@ TEST_F(update_tests, test_single_update_vector)
     auto pub = fedA->registerGlobalPublication<std::vector<double>>("pub1");
 
     auto sub = fedB->registerSubscription("pub1");
-    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     sub.setDefault(3.1);
     double testValue = 4.79;
@@ -206,8 +206,8 @@ TEST_F(update_tests, test_single_update_vector_char_ptr)
     auto pub = fedA->registerGlobalPublication<std::vector<double>>("pub1");
 
     auto sub = fedB->registerSubscription("pub1");
-    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     sub.setDefault(3.1);
     double testValue = 4.79;
@@ -271,8 +271,8 @@ TEST_F(update_tests, test_single_update_vector_ptr)
     auto pub = fedA->registerGlobalPublication<std::vector<double>>("pub1");
 
     auto sub = fedB->registerSubscription("pub1");
-    fedA->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    fedB->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     sub.setDefault(3.1);
     double testValue = 4.79;

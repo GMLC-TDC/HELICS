@@ -152,8 +152,8 @@ class Broker {
   */
     std::string query(const std::string& target, const std::string& queryStr) const
     {
-        // returns helics_query
-        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        // returns HelicsQuery
+        HelicsQuery q = helicsCreateQuery(target.c_str(), queryStr.c_str());
         std::string result(helicsQueryBrokerExecute(q, broker, hThrowOnError()));
         helicsQueryFree(q);
         return result;
@@ -168,7 +168,7 @@ class Broker {
         helicsBrokerSendCommand(broker, target.c_str(), command.c_str(), hThrowOnError());
     }
 
-    void setTimeBarrier(helics_time barrierTime)
+    void setTimeBarrier(HelicsTime barrierTime)
     {
         helicsBrokerSetTimeBarrier(broker, barrierTime, HELICS_IGNORE_ERROR);
     }
@@ -176,7 +176,7 @@ class Broker {
     void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
 
   protected:
-    helics_broker broker;  //!< underlying broker information
+    HelicsBroker broker;  //!< underlying broker information
 };
 
 }  // namespace helicscpp

@@ -214,7 +214,7 @@ TEST(broker_timeout_tests, maintain_connection_ci_skip)
 
     helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreName = "c3";
-    fi.setProperty(HELICS_PROPERTY_TIME_delta, 0.01);
+    fi.setProperty(HELICS_PROPERTY_TIME_DELTA, 0.01);
     auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
 
     Fed1->registerGlobalPublication<std::string>("pub1");

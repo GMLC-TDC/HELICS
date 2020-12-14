@@ -17,17 +17,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 static const std::map<std::string, FilterTypes> filterTypes{
-    {"clone", FilterTypes::clone},
-    {"delay", FilterTypes::delay},
-    {"randomdelay", FilterTypes::random_delay},
-    {"random_delay", FilterTypes::random_delay},
-    {"randomDelay", FilterTypes::random_delay},
-    {"randomdrop", FilterTypes::random_drop},
-    {"random_drop", FilterTypes::random_drop},
-    {"randomDrop", FilterTypes::random_drop},
-    {"reroute", FilterTypes::reroute},
-    {"firewall", FilterTypes::firewall},
-    {"custom", FilterTypes::custom}};
+    {"clone", FilterTypes::CLONE},
+    {"delay", FilterTypes::DELAY},
+    {"randomdelay", FilterTypes::RANDOM_DELAY},
+    {"random_delay", FilterTypes::RANDOM_DELAY},
+    {"randomDelay", FilterTypes::RANDOM_DELAY},
+    {"randomdrop", FilterTypes::RANDOM_DROP},
+    {"random_drop", FilterTypes::RANDOM_DROP},
+    {"randomDrop", FilterTypes::RANDOM_DROP},
+    {"reroute", FilterTypes::REROUTE},
+    {"firewall", FilterTypes::FIREWALL},
+    {"custom", FilterTypes::CUSTOM}};
 
 FilterTypes filterTypeFromString(const std::string& filterType) noexcept
 {
@@ -41,36 +41,36 @@ FilterTypes filterTypeFromString(const std::string& filterType) noexcept
     if (fnd != filterTypes.end()) {
         return fnd->second;
     }
-    return FilterTypes::unrecognized;
+    return FilterTypes::UNRECOGNIZED;
 }
 
 void addOperations(Filter* filt, FilterTypes type, Core* /*cptr*/)
 {
     switch (type) {
-        case FilterTypes::custom:
+        case FilterTypes::CUSTOM:
         default:
             break;
-        case FilterTypes::random_delay: {
+        case FilterTypes::RANDOM_DELAY: {
             auto op = std::make_shared<RandomDelayFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case FilterTypes::delay: {
+        case FilterTypes::DELAY: {
             auto op = std::make_shared<DelayFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case FilterTypes::random_drop: {
+        case FilterTypes::RANDOM_DROP: {
             auto op = std::make_shared<RandomDropFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case FilterTypes::reroute: {
+        case FilterTypes::REROUTE: {
             auto op = std::make_shared<RerouteFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case FilterTypes::clone: {
+        case FilterTypes::CLONE: {
             auto op = std::make_shared<CloneFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
-        case FilterTypes::firewall: {
+        case FilterTypes::FIREWALL: {
             auto op = std::make_shared<FirewallFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
@@ -214,7 +214,7 @@ void CloningFilter::setString(const std::string& property, const std::string& va
 
 Filter& make_filter(FilterTypes type, Federate* mFed, const std::string& name)
 {
-    if (type == FilterTypes::clone) {
+    if (type == FilterTypes::CLONE) {
         Filter& dfilt = mFed->registerCloningFilter(name);
         addOperations(&dfilt, type, mFed->getCorePointer().get());
         dfilt.setString("delivery", name);
@@ -230,7 +230,7 @@ Filter& make_filter(interface_visibility locality,
                     Federate* mFed,
                     const std::string& name)
 {
-    if (type == FilterTypes::clone) {
+    if (type == FilterTypes::CLONE) {
         Filter& dfilt = (locality == interface_visibility::global) ?
             mFed->registerGlobalCloningFilter(name) :
             mFed->registerCloningFilter(name);
@@ -246,7 +246,7 @@ Filter& make_filter(interface_visibility locality,
 
 std::unique_ptr<Filter> make_filter(FilterTypes type, Core* cr, const std::string& name)
 {
-    if (type == FilterTypes::clone) {
+    if (type == FilterTypes::CLONE) {
         std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter>(cr, name);
         addOperations(dfilt.get(), type, cr);
         dfilt->setString("delivery", name);

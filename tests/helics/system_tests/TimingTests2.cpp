@@ -91,9 +91,9 @@ TEST_F(timing_tests2, small_period_test)
 {
     SetupTest<helics::MessageFederate>("test", 3);
     auto rx = GetFederateAs<helics::MessageFederate>(0);
-    rx->setProperty(helics::defs::properties::time_delta, 1.0);
-    rx->setProperty(helics::defs::properties::period, 0.000001);
-    rx->setProperty(helics::defs::properties::offset, 0.0);
+    rx->setProperty(helics::defs::Properties::TIME_DELTA, 1.0);
+    rx->setProperty(helics::defs::Properties::PERIOD, 0.000001);
+    rx->setProperty(helics::defs::Properties::OFFSET, 0.0);
     auto send1 = GetFederateAs<helics::MessageFederate>(1);
     auto send2 = GetFederateAs<helics::MessageFederate>(2);
 
@@ -170,9 +170,9 @@ TEST_F(timing_tests2, ring_test3)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-    vFed1->setFlagOption(helics::defs::restrictive_time_policy);
-    vFed2->setFlagOption(helics::defs::restrictive_time_policy);
-    vFed3->setFlagOption(helics::defs::restrictive_time_policy);
+    vFed1->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
+    vFed2->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
+    vFed3->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
@@ -253,7 +253,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
 
-    vFed3->setFlagOption(helics::defs::wait_for_current_time_update);
+    vFed3->setFlagOption(helics::defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE);
 
     auto pub1 = vFed1->registerGlobalPublication<double>("pub1");
 

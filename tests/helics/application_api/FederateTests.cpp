@@ -34,11 +34,11 @@ TEST(federate_tests, federate_initialize_tests)
     auto name = std::string(core->getFederateName(Fed->getID()));
 
     EXPECT_EQ(name, Fed->getName());
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::startup);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
     Fed->enterInitializingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::initializing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
     Fed->enterExecutingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     Fed = nullptr;  // force the destructor
 }
 
@@ -49,11 +49,11 @@ TEST(federate_tests, time_step_tests)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::startup);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
     Fed->enterInitializingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::initializing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
     Fed->enterExecutingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto res = Fed->requestTime(1.0);
     EXPECT_EQ(res, 1.0);
@@ -74,11 +74,11 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::startup);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
     Fed->enterInitializingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::initializing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
     Fed->enterExecutingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto res = Fed->requestTime(1.0);
     EXPECT_EQ(res, 1.0);
@@ -93,7 +93,7 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
     EXPECT_TRUE(!cptr->isConnected());
     res = Fed->requestTime(4.0);
     EXPECT_EQ(res, helics::Time::maxVal());
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 #ifdef ENABLE_ZMQ_CORE
@@ -128,8 +128,8 @@ TEST(federate_tests, federate_multiple_federates)
 
     auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
 
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::startup);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::startup);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
 
     EXPECT_TRUE(Fed1->getID() != Fed2->getID());
 
@@ -137,14 +137,14 @@ TEST(federate_tests, federate_multiple_federates)
     Fed2->enterInitializingMode();
 
     f1finish.wait();
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::initializing);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::initializing);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
 
     f1finish = std::async(std::launch::async, [&]() { Fed1->enterExecutingMode(); });
     Fed2->enterExecutingMode();
     f1finish.wait();
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto f1step = std::async(std::launch::async, [&]() { return Fed1->requestTime(1.0); });
     auto f2step = Fed2->requestTime(1.0);
@@ -179,21 +179,21 @@ TEST(federate_tests, multiple_federates_multi_cores)
 
     auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
 
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::startup);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::startup);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
 
     auto f1finish = std::async(std::launch::async, [&]() { Fed1->enterInitializingMode(); });
     Fed2->enterInitializingMode();
 
     f1finish.wait();
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::initializing);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::initializing);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
 
     f1finish = std::async(std::launch::async, [&]() { Fed1->enterExecutingMode(); });
     Fed2->enterExecutingMode();
     f1finish.wait();
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto f1step = std::async(std::launch::async, [&]() { return Fed1->requestTime(1.0); });
     auto f2step = Fed2->requestTime(1.0);
@@ -226,8 +226,8 @@ TEST(federate_tests, multiple_federates_async_calls)
 
     auto Fed2 = std::make_shared<helics::Federate>("fed2", fi);
 
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::startup);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::startup);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
 
     EXPECT_NE(Fed1->getID(), Fed2->getID());
 
@@ -243,14 +243,14 @@ TEST(federate_tests, multiple_federates_async_calls)
 
     Fed1->enterInitializingModeComplete();
 
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::initializing);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::initializing);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
 
     Fed1->enterExecutingModeAsync();
     Fed2->enterExecutingMode();
     Fed1->enterExecutingModeComplete();
-    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     Fed1->requestTimeAsync(1.0);
     auto f2step = Fed2->requestTime(1.0);
@@ -469,7 +469,7 @@ TEST(federate_tests, enterInit)
     EXPECT_NO_THROW(Fed1->enterInitializingMode());
     EXPECT_NO_THROW(Fed1->enterInitializingModeComplete());
 
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::initializing);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::INITIALIZING);
     EXPECT_NO_THROW(Fed1->finalize());
 }
 
@@ -483,7 +483,7 @@ TEST(federate_tests, enterInitComplete)
     // this should be the same as just calling enterInitializingMode
     EXPECT_NO_THROW(Fed1->enterInitializingModeComplete());
 
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::initializing);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::INITIALIZING);
     Fed1->finalize();
 }
 
@@ -495,7 +495,7 @@ TEST(federate_tests, enterExec)
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
     Fed1->enterInitializingModeAsync();
-    Fed1->setProperty(helics_properties::HELICS_PROPERTY_TIME_delta, helics::Time(1.0));
+    Fed1->setProperty(helics::defs::Properties::TIME_DELTA, helics::Time(1.0));
     // make sure it doesn't error if called twice
     EXPECT_NO_THROW(Fed1->enterInitializingModeAsync());
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
@@ -503,7 +503,7 @@ TEST(federate_tests, enterExec)
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
     EXPECT_NO_THROW(Fed1->enterExecutingModeComplete());
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::executing);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::EXECUTING);
     Fed1->finalizeComplete();
 }
 
@@ -606,7 +606,7 @@ TEST(federate_tests, enterExecAsyncIterative)
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
     auto res = Fed1->enterExecutingModeComplete();
     EXPECT_EQ(res, helics::IterationResult::ITERATING);
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::initializing);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::INITIALIZING);
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     EXPECT_NO_THROW(Fed1->finalize());
@@ -628,7 +628,7 @@ TEST(federate_tests, enterRequestTimeAsyncIterative)
     EXPECT_TRUE(Fed1->isAsyncOperationCompleted());
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
     EXPECT_EQ(Fed1->getCurrentTime(), 1.0);
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::executing);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::EXECUTING);
 
     Fed1->requestTimeIterativeAsync(37.0, helics::IterationRequest::FORCE_ITERATION);
     while (!Fed1->isAsyncOperationCompleted()) {
@@ -673,7 +673,7 @@ TEST(federate_tests, enterRequestTimeAsyncFinalize)
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(1.0);
     EXPECT_NO_THROW(Fed1->finalize());
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, enterRequestTimeAsyncFinalizeAsync)
@@ -688,7 +688,7 @@ TEST(federate_tests, enterRequestTimeAsyncFinalizeAsync)
     Fed1->requestTimeAsync(1.0);
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     Fed1->finalizeComplete();
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, enterEnterExecAsyncFinalize)
@@ -701,7 +701,7 @@ TEST(federate_tests, enterEnterExecAsyncFinalize)
     Fed1->enterInitializingMode();
     Fed1->enterExecutingModeAsync();
     EXPECT_NO_THROW(Fed1->finalize());
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, enterEnterInitAsyncFinalize)
@@ -713,7 +713,7 @@ TEST(federate_tests, enterEnterInitAsyncFinalize)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
     Fed1->enterInitializingModeAsync();
     EXPECT_NO_THROW(Fed1->finalize());
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, enterEnterExecAsyncFinalizeAsync)
@@ -727,7 +727,7 @@ TEST(federate_tests, enterEnterExecAsyncFinalizeAsync)
     Fed1->enterExecutingModeAsync();
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     Fed1->finalizeComplete();
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, enterEnterInitAsyncFinalizeAsync)
@@ -740,7 +740,7 @@ TEST(federate_tests, enterEnterInitAsyncFinalizeAsync)
     Fed1->enterInitializingModeAsync();
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     Fed1->finalizeComplete();
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, enterExecPendingTimeIterative)
@@ -755,7 +755,7 @@ TEST(federate_tests, enterExecPendingTimeIterative)
     auto it = Fed1->enterExecutingMode();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
     Fed1->finalizeComplete();
-    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
 
 TEST(federate_tests, forceErrorExec)
@@ -872,7 +872,7 @@ TEST(federate_tests, federateGeneratedlocalErrorEscalation)
     fi.coreInitString = "-f 1 --autobroker --error_timeout=0";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
-    Fed1->setFlagOption(helics::defs::flags::terminate_on_error);
+    Fed1->setFlagOption(helics::defs::Flags::TERMINATE_ON_ERROR);
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
     Fed1->localError(9827, "user generated global ERROR_RESULT");

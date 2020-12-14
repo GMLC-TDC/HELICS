@@ -56,9 +56,9 @@ FederateTestFixture::~FederateTestFixture()
 {
     for (auto& fed : federates) {
         if (fed) {
-            helics_federate_state state = helicsFederateGetState(fed, nullptr);
-            helics_core core = helicsFederateGetCore(fed, nullptr);
-            if (state != helics_state_finalize) {
+            HelicsFederateState state = helicsFederateGetState(fed, nullptr);
+            HelicsCore core = helicsFederateGetCore(fed, nullptr);
+            if (state != HELICS_STATE_FINALIZE) {
                 helicsFederateFinalize(fed, nullptr);
             }
             helicsFederateFree(fed);
@@ -74,14 +74,14 @@ FederateTestFixture::~FederateTestFixture()
         if (helicsBrokerIsValid(broker) == HELICS_FALSE) {
             continue;
         }
-        helics_bool res;
+        HelicsBool res;
         if (ctype.compare(0, 3, "tcp") == 0) {
             res = helicsBrokerWaitForDisconnect(broker, 2000, nullptr);
         } else {
             res = helicsBrokerWaitForDisconnect(broker, 200, nullptr);
         }
 
-        if (res != helics_true) {
+        if (res != HELICS_TRUE) {
             printf("forcing disconnect\n");
             helicsBrokerDisconnect(broker, nullptr);
         }
@@ -92,21 +92,21 @@ FederateTestFixture::~FederateTestFixture()
     helicsCleanupLibrary();
 }
 
-helics_broker FederateTestFixture::AddBroker(const std::string& CoreType_name, int count)
+HelicsBroker FederateTestFixture::AddBroker(const std::string& CoreType_name, int count)
 {
     return AddBroker(CoreType_name, std::string("-f") + std::to_string(count));
 }
 
-helics_broker FederateTestFixture::AddBroker(const std::string& CoreType_name,
+HelicsBroker FederateTestFixture::AddBroker(const std::string& CoreType_name,
                                              const std::string& initialization_string)
 {
-    helics_broker broker;
+    HelicsBroker broker;
     if (extraBrokerArgs.empty()) {
         broker = StartBrokerImp(CoreType_name, initialization_string);
     } else {
         broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
     }
-    assert(helicsBrokerIsValid(broker) == helics_true);
+    assert(helicsBrokerIsValid(broker) == HELICS_TRUE);
     brokers.push_back(broker);
     return broker;
 }
@@ -114,20 +114,20 @@ helics_broker FederateTestFixture::AddBroker(const std::string& CoreType_name,
 void FederateTestFixture::SetupTest(FedCreator ctor,
                                     const std::string& CoreType_name,
                                     int count,
-                                    helics_time time_delta,
+                                    HelicsTime time_delta,
                                     const std::string& name_prefix)
 {
     ctype = CoreType_name;
-    helics_broker broker = AddBroker(CoreType_name, count);
-    assert(helicsBrokerIsValid(broker) == helics_true);
+    HelicsBroker broker = AddBroker(CoreType_name, count);
+    assert(helicsBrokerIsValid(broker) == HELICS_TRUE);
     AddFederates(ctor, CoreType_name, count, broker, time_delta, name_prefix);
 }
 
 void FederateTestFixture::AddFederates(FedCreator ctor,
                                        std::string CoreType_name,
                                        int count,
-                                       helics_broker broker,
-                                       helics_time time_delta,
+                                       HelicsBroker broker,
+                                       HelicsTime time_delta,
                                        const std::string& name_prefix)
 {
     bool hasIndex = hasIndexCode(CoreType_name);
@@ -149,7 +149,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
 
     helics_federate_info fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreTypeFromString(fi, CoreType_name.c_str(), &err);
-    helicsFederateInfoSetTimeProperty(fi, HELICS_PROPERTY_TIME_delta, time_delta, &err);
+    helicsFederateInfoSetTimeProperty(fi, HELICS_PROPERTY_TIME_DELTA, time_delta, &err);
 
     switch (setup) {
         case 1:
@@ -208,7 +208,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
     helicsFederateInfoFree(fi);
 }
 
-helics_federate FederateTestFixture::GetFederateAt(int index)
+HelicsFederate FederateTestFixture::GetFederateAt(int index)
 {
     if (index < static_cast<int>(federates.size())) {
         return federates.at(index);

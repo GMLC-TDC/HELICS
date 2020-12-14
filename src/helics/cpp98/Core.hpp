@@ -31,14 +31,14 @@ class Core {
         core = helicsCreateCoreFromArgs(type.c_str(), name.c_str(), argc, argv, hThrowOnError());
     }
     /** construct a core from a core pointer */
-    explicit Core(helics_core cr) HELICS_NOTHROW: core(cr) {}
+    explicit Core(HelicsCore cr) HELICS_NOTHROW: core(cr) {}
 
     /** destructor*/
     ~Core() { helicsCoreFree(core); }
     /** implicit operator so the object can be used with the c api functions natively*/
-    operator helics_core() { return core; }
-    /** explicitly get the base helics_core object*/
-    helics_core baseObject() const { return core; }
+    operator HelicsCore() { return core; }
+    /** explicitly get the base HelicsCore object*/
+    HelicsCore baseObject() const { return core; }
     /** check if the core is connected to the broker*/
     bool isConnected() const { return (helicsCoreIsConnected(core) != HELICS_FALSE); }
     /** copy constructor*/
@@ -92,9 +92,9 @@ class Core {
     equivalent behavior
     @param type the type of filter to create
     @param name the name of the filter (can be NULL)
-    @return a helics_filter object
+    @return a HelicsFilter object
     */
-    Filter registerFilter(helics_filter_type type, const std::string& name = std::string())
+    Filter registerFilter(HelicsFilterTypes type, const std::string& name = std::string())
     {
         return Filter(helicsCoreRegisterFilter(core, type, name.c_str(), hThrowOnError()));
     }
@@ -103,7 +103,7 @@ class Core {
     @details cloning filters copy a message and send it to multiple locations source and destination
     can be added through other functions
     @param deliveryEndpoint the specified endpoint to deliver the message
-    @return a helics_filter object
+    @return a HelicsFilter object
     */
     CloningFilter registerCloningFilter(const std::string& deliveryEndpoint)
     {
@@ -142,15 +142,15 @@ if the query was not valid
 */
     std::string query(const std::string& target, const std::string& queryStr) const
     {
-        // returns helics_query
-        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        // returns HelicsQuery
+        HelicsQuery q = helicsCreateQuery(target.c_str(), queryStr.c_str());
         std::string result(helicsQueryCoreExecute(q, core, hThrowOnError()));
         helicsQueryFree(q);
         return result;
     }
 
   protected:
-    helics_core core;  //!< reference to the underlying core object
+    HelicsCore core;  //!< reference to the underlying core object
 };
 
 }  // namespace helicscpp

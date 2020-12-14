@@ -28,7 +28,7 @@ TEST_P(flag_type_tests, optional_pub)
 
     auto& ipt2 = vFed1->registerInput<double>("ipt2");
     auto& ipt3 = vFed1->registerInput<double>("ipt3");
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
     ipt2.addTarget("tom");
     ipt3.addTarget("harry");
@@ -53,7 +53,7 @@ TEST_P(flag_type_tests, optional_sub)
     auto& pub1 = vFed1->registerPublication<double>("pub1");
 
     pub1.addTarget("bob");
-    pub1.setOption(helics::defs::options::connection_optional);
+    pub1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     pub1.addTarget("tom");
     pub1.addTarget("harry");
     std::atomic<int> warnings{0};
@@ -67,7 +67,7 @@ TEST_P(flag_type_tests, optional_sub)
 
     vFed1->enterExecutingMode();
     EXPECT_EQ(warnings.load(), 1);
-    EXPECT_TRUE(pub1.getOption(helics::defs::options::connection_optional));
+    EXPECT_TRUE(pub1.getOption(helics::defs::Options::CONNECTION_OPTIONAL));
 
     vFed1->finalize();
 }
@@ -83,7 +83,7 @@ TEST_F(flag_tests, single_connection_test)
 
     auto& pub1 = vFed1->registerPublication<double>("pub1");
     auto& pub2 = vFed1->registerPublication<double>("pub2");
-    ipt1.setOption(helics::defs::options::single_connection_only);
+    ipt1.setOption(helics::defs::Options::SINGLE_CONNECTION_ONLY);
     pub1.addTarget("ipt1");
     pub2.addTarget("ipt1");
 
@@ -101,7 +101,7 @@ TEST_F(flag_tests, single_connection_test_pub)
 
     auto& ipt2 = vFed1->registerGlobalInput<double>("ipt2");
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
-    pub1.setOption(helics::defs::options::single_connection_only);
+    pub1.setOption(helics::defs::Options::SINGLE_CONNECTION_ONLY);
     ipt1.addTarget("pub1");
     ipt2.addTarget("pub1");
 
@@ -118,10 +118,10 @@ TEST_F(flag_tests, type_match_check)
     auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1");
 
     vFed1->registerGlobalPublication<double>("pub1");
-    ipt1.setOption(helics::defs::options::strict_type_checking);
+    ipt1.setOption(helics::defs::Options::STRICT_TYPE_CHECKING);
     ipt1.addTarget("pub1");
     vFed1->enterExecutingMode();
-    EXPECT_TRUE(ipt1.getOption(helics::defs::options::strict_type_checking));
+    EXPECT_TRUE(ipt1.getOption(helics::defs::Options::STRICT_TYPE_CHECKING));
     vFed1->finalize();
 }
 
@@ -133,7 +133,7 @@ TEST_F(flag_tests, type_mismatch_error)
     auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1");
 
     vFed1->registerGlobalPublication<std::vector<double>>("pub1");
-    ipt1.setOption(helics::defs::options::strict_type_checking);
+    ipt1.setOption(helics::defs::Options::STRICT_TYPE_CHECKING);
     ipt1.addTarget("pub1");
     EXPECT_THROW(vFed1->enterExecutingMode(), helics::ConnectionFailure);
     vFed1->finalize();
@@ -143,7 +143,7 @@ TEST_F(flag_tests, type_mismatch_error_fed_level)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics::defs::flags::strict_input_type_checking);
+    vFed1->setFlagOption(helics::defs::Flags::STRICT_INPUT_TYPE_CHECKING);
     // register the publications
     auto& ipt1 = vFed1->registerGlobalInput<double>("ipt1");
 
@@ -161,7 +161,7 @@ TEST_F(flag_tests, type_mismatch_error2)
     auto& ipt1 = vFed1->registerGlobalInput("ipt1", "custom", "V");
 
     vFed1->registerGlobalPublication("pub1", "other");
-    ipt1.setOption(helics::defs::options::strict_type_checking);
+    ipt1.setOption(helics::defs::Options::STRICT_TYPE_CHECKING);
     ipt1.addTarget("pub1");
     EXPECT_THROW(vFed1->enterExecutingMode(), helics::ConnectionFailure);
     vFed1->finalize();
@@ -173,9 +173,9 @@ TEST_F(flag_tests, slow_federate)
     // and captured
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(HELICS_FLAG_slow_responding);
+    vFed1->setFlagOption(HELICS_FLAG_SLOW_RESPONDING);
     vFed1->enterExecutingMode();
-    EXPECT_TRUE(vFed1->getFlagOption(HELICS_FLAG_slow_responding));
+    EXPECT_TRUE(vFed1->getFlagOption(HELICS_FLAG_SLOW_RESPONDING));
     vFed1->finalize();
 }
 
@@ -183,7 +183,7 @@ TEST_F(flag_tests, only_update_on_change_fedlevel)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics::defs::options::handle_only_update_on_change);
+    vFed1->setFlagOption(helics::defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE);
 
     // register the publications
     auto& ipt1 = vFed1->registerGlobalInput("ipt1", "double", "V");
@@ -208,7 +208,7 @@ TEST_F(flag_tests, only_transmit_on_change_fedlevel)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics::defs::options::handle_only_transmit_on_change);
+    vFed1->setFlagOption(helics::defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE);
 
     // register the publications
     auto& ipt1 = vFed1->registerGlobalInput("ipt1", "double", "V");

@@ -27,7 +27,7 @@ NOTE: logging level properties set in a federateInfo will apply to a core as wel
 There are several levels used inside HELICS for logging
 
 - `HELICS_LOG_LEVEL_no_print` Don't print anything
-- `HELICS_LOG_LEVEL_error` Error and faults from within HELICS
+- `HELICS_LOG_LEVEL_ERROR` Error and faults from within HELICS
 - `HELICS_LOG_LEVEL_warning` Warning messages of things that might be incorrect or unusual
 - `HELICS_LOG_LEVEL_summary` Summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
 - `HELICS_LOG_LEVEL_connections` Log a message for each connection event (federate connection/disconnection)
@@ -136,10 +136,10 @@ setLoggingCallback (const std::function<void(int, const std::string &, const std
 
 ```c
 void
-helicsFederateSetLoggingCallback (helics_federate fed,
+helicsFederateSetLoggingCallback (HelicsFederate fed,
                                   void (*logger) (int loglevel, const char *identifier, const char *message, void *userData),
                                   void *userdata,
-                                  helics_error *err);
+                                  HelicsError *err);
 ```
 
 These functions are not available in the language API's yet

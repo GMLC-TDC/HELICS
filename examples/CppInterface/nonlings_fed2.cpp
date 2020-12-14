@@ -29,9 +29,9 @@ int main(int /*argc*/, char** /*argv*/)
     /* Federate init string */
     fi.setCoreInit(fedinitstring);
 
-    fi.setProperty(HELICS_PROPERTY_TIME_delta, deltat);
+    fi.setProperty(HELICS_PROPERTY_TIME_DELTA, deltat);
 
-    fi.setProperty(HELICS_PROPERTY_INT_max_iterations, 100);
+    fi.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
 
     fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, 1);
 
@@ -43,7 +43,7 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << " Subscription registered\n";
 
     /* Register the publication */
-    helicscpp::Publication pub = vfed->registerGlobalPublication("testB", HELICS_DATA_TYPE_double);
+    helicscpp::Publication pub = vfed->registerGlobalPublication("testB", HELICS_DATA_TYPE_DOUBLE);
     std::cout << " Publication registered\n";
 
     /* Enter initialization state */
@@ -56,14 +56,14 @@ int main(int /*argc*/, char** /*argv*/)
     vfed->enterExecutingMode();  // can throw helicscpp::InvalidStateTransition exception
     std::cout << " Entered execution state\n";
 
-    helics_time currenttime = 0.0;
-    helicscpp::helics_iteration_time currenttimeiter;
-    currenttimeiter.status = HELICS_ITERATION_RESULT_iterating;
+    HelicsTime currenttime = 0.0;
+    helicscpp::HelicsIterationTime currenttimeiter;
+    currenttimeiter.status = HELICS_ITERATION_RESULT_ITERATING;
 
     // int           isupdated;
     double tol = 1E-8;
     int helics_iter = 0;
-    while (currenttimeiter.status == HELICS_ITERATION_RESULT_iterating) {
+    while (currenttimeiter.status == HELICS_ITERATION_RESULT_ITERATING) {
         //    xprv = x;
         double x = sub.getDouble();
         ++helics_iter;
@@ -92,7 +92,7 @@ int main(int /*argc*/, char** /*argv*/)
             std::cout << "Fed2: publishing y" << std::endl;
         }
         currenttimeiter =
-            vfed->requestTimeIterative(currenttime, HELICS_ITERATION_REQUEST_iterate_if_needed);
+            vfed->requestTimeIterative(currenttime, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED);
         yprv = y;
     }
 

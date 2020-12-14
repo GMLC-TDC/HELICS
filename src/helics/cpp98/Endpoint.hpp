@@ -63,7 +63,7 @@ class Message {
     /** cast to a helics_message object*/
     operator helics_message() const { return mo; }
     /** check if a message_object is valid*/
-    bool isValid() const { return (helicsMessageIsValid(mo) == helics_true); }
+    bool isValid() const { return (helicsMessageIsValid(mo) == HELICS_TRUE); }
     /** get the message source endpoint name*/
     const char* source() const { return helicsMessageGetSource(mo); }
     /** set the message source*/
@@ -151,9 +151,9 @@ class Message {
     /** get a the data as a null terminated C string*/
     const char* c_str() const { return helicsMessageGetString(mo); }
     /** get the time of the message*/
-    helics_time time() const { return helicsMessageGetTime(mo); }
+    HelicsTime time() const { return helicsMessageGetTime(mo); }
     /** set the time the message should be scheduled for*/
-    Message& time(helics_time val)
+    Message& time(HelicsTime val)
     {
         helicsMessageSetTime(mo, val, hThrowOnError());
         return *this;
@@ -161,13 +161,13 @@ class Message {
     /** set an indexed flag in the message*/
     Message& setFlag(int flag, bool val)
     {
-        helicsMessageSetFlagOption(mo, flag, val ? helics_true : HELICS_FALSE, hThrowOnError());
+        helicsMessageSetFlagOption(mo, flag, val ? HELICS_TRUE : HELICS_FALSE, hThrowOnError());
         return *this;
     }
     /** check an indexed flag in the message valid numbers are [0,15]*/
     bool getFlagOption(int flag) const
     {
-        return (helicsMessageGetFlagOption(mo, flag) == helics_true);
+        return (helicsMessageGetFlagOption(mo, flag) == HELICS_TRUE);
     }
     /** get the messageID*/
     int messageID() const { return helicsMessageGetMessageID(mo); }
@@ -216,7 +216,7 @@ class Endpoint {
     /** get the base helics_endpoint object for use in the c API functions*/
     helics_endpoint baseObject() const { return ep; }
     /** check if the input is valid */
-    bool isValid() const { return (helicsEndpointIsValid(ep) == helics_true); }
+    bool isValid() const { return (helicsEndpointIsValid(ep) == HELICS_TRUE); }
     /* Checks if endpoint has unread messages **/
     bool hasMessage() const
     {
@@ -264,7 +264,7 @@ class Endpoint {
    @param data_size the length of the data
    @param time the time to send the message
    */
-    void sendAt(const char* data, size_t data_size, helics_time time)
+    void sendAt(const char* data, size_t data_size, HelicsTime time)
     {
         helicsEndpointSendBytesAt(ep, data, static_cast<int>(data_size), time, hThrowOnError());
     }
@@ -274,7 +274,7 @@ class Endpoint {
     @param dest destination to send the message to
     @param time the time to send the message
     */
-    void sendToAt(const void* data, size_t data_size, const std::string& dest, helics_time time)
+    void sendToAt(const void* data, size_t data_size, const std::string& dest, HelicsTime time)
     {
         helicsEndpointSendBytesToAt(
             ep, data, static_cast<int>(data_size), dest.c_str(), time, hThrowOnError());
@@ -300,7 +300,7 @@ class Endpoint {
      @param data the information to send
      @param time the time the message should be delivered
    */
-    void sendAt(const std::string& data, helics_time time)
+    void sendAt(const std::string& data, HelicsTime time)
     {
         helicsEndpointSendBytesAt(
             ep, &(data[0]), static_cast<int>(data.size()), time, hThrowOnError());
@@ -310,7 +310,7 @@ class Endpoint {
      @param dest the target endpoint to send the data to
      @param time the time the message should be delivered
    */
-    void sendToAt(const std::string& data, const std::string& dest, helics_time time)
+    void sendToAt(const std::string& data, const std::string& dest, HelicsTime time)
     {
         helicsEndpointSendBytesToAt(
             ep, &(data[0]), static_cast<int>(data.size()), dest.c_str(), time, hThrowOnError());
@@ -337,7 +337,7 @@ class Endpoint {
      @param data the information to send
       @param time the time the message should be delivered
    */
-    void sendAt(const std::vector<char>& data, helics_time time)
+    void sendAt(const std::vector<char>& data, HelicsTime time)
     {
         helicsEndpointSendBytesAt(
             ep, data.data(), static_cast<int>(data.size()), time, hThrowOnError());
@@ -347,7 +347,7 @@ class Endpoint {
      @param data the information to send
       @param time the time the message should be delivered
    */
-    void sendToAt(const std::vector<char>& data, const std::string& dest, helics_time time)
+    void sendToAt(const std::vector<char>& data, const std::string& dest, HelicsTime time)
     {
         helicsEndpointSendBytesToAt(
             ep, data.data(), static_cast<int>(data.size()), dest.c_str(), time, hThrowOnError());

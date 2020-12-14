@@ -126,7 +126,7 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 - Update units library to include some typical natural gas units and conversions
 - Use a separate action for automated pr generation
 - Update the CLI11 library
-- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `helics_bool` was already an int.
+- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `HelicsBool` was already an int.
 - In the case of multiple sources, `getInjectionType`, and `getInjectionUnits` now will return a json string vector.
 - The CMake build generation now uses a central location for all build artifacts instead of individual directories.
 - Updated the ASIO library to 1-16
@@ -746,7 +746,7 @@ This is a major revision so this changelog will not capture all the changes that
 - update cereal library with latest bug fixes
 - update jsoncpp with latest version
 - update cppzmq with the latest version
-- moved helics_broker executable code to the apps repository
+- moved HelicsBroker executable code to the apps repository
 - the CXX shared library can now be built alongside the C shared library and can be built on Windows.
 
 ### Fixed

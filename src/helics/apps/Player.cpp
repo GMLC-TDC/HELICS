@@ -64,7 +64,7 @@ namespace apps {
         auto app = generateParser();
 
         if (!deactivated) {
-            fed->setFlagOption(HELICS_FLAG_source_only);
+            fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
             app->helics_parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -115,7 +115,7 @@ namespace apps {
 
     Player::Player(const std::string& appName, const FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Player::Player(const std::string& appName,
@@ -123,19 +123,19 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Player::Player(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Player::Player(const std::string& appName, const std::string& configString):
         App(appName, configString)
     {
-        fed->setFlagOption(HELICS_FLAG_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
         Player::loadJsonFile(configString);
     }
 
@@ -608,7 +608,7 @@ namespace apps {
     void Player::initialize()
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             sortTags();
             generatePublications();
             generateEndpoints();
@@ -652,10 +652,10 @@ namespace apps {
     void Player::runTo(Time stopTime_input)
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             initialize();
         }
-        if (md < Federate::modes::executing) {
+        if (md < Federate::Modes::EXECUTING) {
             sendInformation(-Time::epsilon());
 
             fed->enterExecutingMode();

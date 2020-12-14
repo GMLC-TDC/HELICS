@@ -34,7 +34,7 @@ namespace helics {
 namespace apps {
     Tracer::Tracer(const std::string& appName, FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
     Tracer::Tracer(std::vector<std::string> args): App("tracer", std::move(args)) { processArgs(); }
@@ -45,7 +45,7 @@ namespace apps {
     {
         auto app = buildArgParserApp();
         if (!deactivated) {
-            fed->setFlagOption(HELICS_FLAG_observer);
+            fed->setFlagOption(HELICS_FLAG_OBSERVER);
             app->parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -60,18 +60,18 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
     Tracer::Tracer(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(HELICS_FLAG_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
     Tracer::Tracer(const std::string& name, const std::string& file): App(name, file)
     {
-        fed->setFlagOption(HELICS_FLAG_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
         Tracer::loadJsonFile(file);
     }
 
@@ -205,7 +205,7 @@ namespace apps {
     void Tracer::initialize()
     {
         auto state = fed->getCurrentMode();
-        if (state == Federate::modes::startup) {
+        if (state == Federate::Modes::STARTUP) {
             generateInterfaces();
 
             fed->enterInitializingMode();
@@ -345,12 +345,12 @@ namespace apps {
     void Tracer::runTo(Time runToTime)
     {
         auto state = fed->getCurrentMode();
-        if (state == Federate::modes::startup) {
+        if (state == Federate::Modes::STARTUP) {
             initialize();
-            state = Federate::modes::initializing;
+            state = Federate::Modes::INITIALIZING;
         }
 
-        if (state == Federate::modes::initializing) {
+        if (state == Federate::Modes::INITIALIZING) {
             fed->enterExecutingMode();
             captureForCurrentTime(0.0);
         }

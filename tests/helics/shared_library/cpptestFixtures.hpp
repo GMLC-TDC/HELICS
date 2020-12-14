@@ -29,7 +29,7 @@ struct FederateTestFixture_cpp {
     template<class FedType>
     void SetupTest(const std::string& CoreType_name,
                    int count,
-                   helics_time time_delta = helics_time_zero,
+                   HelicsTime time_delta = HELICS_TIME_ZERO,
                    const std::string& name_prefix = "fed")
     {
         ctype = CoreType_name;
@@ -50,7 +50,7 @@ struct FederateTestFixture_cpp {
     void AddFederates(std::string CoreType_name,
                       int count,
                       helicscpp::Broker& broker,
-                      helics_time time_delta = helics_time_zero,
+                      HelicsTime time_delta = helics_time_zero,
                       const std::string& name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode(CoreType_name);
@@ -73,7 +73,7 @@ struct FederateTestFixture_cpp {
         helicscpp::FederateInfo fi;
 
         fi.setCoreType(CoreType_name);
-        fi.setProperty(HELICS_PROPERTY_TIME_delta, time_delta);
+        fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         switch (setup) {
             case 1:
             default: {

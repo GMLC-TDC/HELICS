@@ -5,16 +5,16 @@
 #include "ov-complex.h"
 
 /* throw a helics error */
-static octave_value Helics_ErrorType(helics_error *err) {
+static octave_value Helics_ErrorType(HelicsError *err) {
 switch (err->error_code)
   {
   case HELICS_ERROR_registration_failure:
     return "helics:registration_failure";
   case   HELICS_ERROR_connection_failure:
     return "helics:connection_failure";
-  case   HELICS_ERROR_invalid_object:
+  case   HELICS_ERROR_INVALID_OBJECT:
     return "helics:invalid_object";
-  case   HELICS_ERROR_invalid_argument:
+  case   HELICS_ERROR_INVALID_ARGUMENT:
     return "helics:invalid_argument";
   case   HELICS_ERROR_discard:
     return "helics:discard";
@@ -34,7 +34,7 @@ switch (err->error_code)
     return "helics:error";
   }
 }
-static octave_value throwHelicsOctaveError(helics_error *err) {
+static octave_value throwHelicsOctaveError(HelicsError *err) {
  octave_value type(Helics_ErrorType(err));
   std::string r(err->message);
   r += " (" + type.string_value() + ")";
@@ -45,14 +45,14 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 %}
 
 
-%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+%typemap(in, numinputs=0) HelicsError * (HelicsError etemp) {
     etemp=helicsErrorInitialize();
     $1=&etemp;
 }
 
-%typemap(freearg) helics_error *
+%typemap(freearg) HelicsError *
 {
-    if ($1->error_code!=helics_ok)
+    if ($1->error_code!=HELICS_OK)
     {
         throwHelicsOctaveError($1);
     }

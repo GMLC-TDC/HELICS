@@ -16,7 +16,7 @@ set(common_test_headers)
 set(common_test_sources TimeTests.cpp JsonGenerationTests.cpp SmallBufferTests.cpp)
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers})
-target_link_libraries(common-tests PRIVATE helics_core helics_test_base fmt::fmt)
+target_link_libraries(common-tests PRIVATE HelicsCore helics_test_base fmt::fmt)
 set_target_properties(common-tests PROPERTIES FOLDER tests)
 
 add_test(NAME common-tests COMMAND common-tests)

@@ -3295,7 +3295,7 @@ void CommonCore::processCommand(ActionMessage&& command)
 
                 } else {
                     sendToLogger(parent_broker_id,
-                                 LogLevels::ERROR,
+                                 LogLevels::ERROR_LEVEL,
                                  getFederateNameNoThrow(command.source_id),
                                  command.payload.to_string());
                     auto fed = loopFederates.find(command.source_id);
@@ -3988,7 +3988,7 @@ void CommonCore::checkDependencies()
     bool issource = false;
     auto checkdep = [this, &isobs, &issource](auto& fed) {
         if (fed->endpointCount() > 0) {
-            if (fed->getOptionFlag(defs::Flags::observer)) {
+            if (fed->getOptionFlag(defs::Flags::OBSERVER)) {
                 timeCoord->removeDependency(fed->global_id);
                 ActionMessage rmdep(CMD_REMOVE_DEPENDENT);
 
@@ -3996,7 +3996,7 @@ void CommonCore::checkDependencies()
                 rmdep.dest_id = fed->global_id.load();
                 fed->addAction(rmdep);
                 isobs = true;
-            } else if (fed->getOptionFlag(defs::Flags::source_only)) {
+            } else if (fed->getOptionFlag(defs::Flags::SOURCE_ONLY)) {
                 timeCoord->removeDependent(fed->global_id);
                 ActionMessage rmdep(CMD_REMOVE_DEPENDENCY);
 

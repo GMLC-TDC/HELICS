@@ -71,14 +71,14 @@ for how to setup support in your preferred editor or IDE.
 8. C interface functions should begin with helicsXXXX
 
    ```cpp
-   helics_bool helicsBrokerIsConnected (HelicsBroker broker);
+   HelicsBool helicsBrokerIsConnected (HelicsBroker broker);
    ```
 
 9. C interface function should be of the format helics{Class}{Action}
    or helics{Action} if no class is appropriate
 
    ```cpp
-   helics_bool helicsBrokerIsConnected (HelicsBroker broker);
+   HelicsBool helicsBrokerIsConnected (HelicsBroker broker);
 
    const char *helicsGetVersion ();
    ```

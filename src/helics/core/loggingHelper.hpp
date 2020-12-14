@@ -19,7 +19,7 @@ using elsewhere is probably not going to work.
 /** enumeration of defined print levels*/
 enum LogLevels : int {
     NO_PRINT = HELICS_LOG_LEVEL_NO_PRINT,  //!< never print
-    ERROR = HELICS_LOG_LEVEL_ERROR,  //!< only print errors
+    ERROR_LEVEL = HELICS_LOG_LEVEL_ERROR,  //!< only print errors
     WARNING = HELICS_LOG_LEVEL_WARNING,  //!< print/log warning and errors
     SUMMARY = HELICS_LOG_LEVEL_SUMMARY,  //!< print/log summary information
     CONNECTIONS =
@@ -32,9 +32,9 @@ enum LogLevels : int {
     FED = 99999  //!< special logging command for message coming from a fed
 };
 
-#define LOG_ERROR(id, ident, message) sendToLogger(id, LogLevels::ERROR, ident, message)
+#define LOG_ERROR(id, ident, message) sendToLogger(id, LogLevels::ERROR_LEVEL, ident, message)
 #define LOG_ERROR_SIMPLE(message)                                                                  \
-    sendToLogger(global_broker_id_local, LogLevels::ERROR, getIdentifier(), message)
+    sendToLogger(global_broker_id_local, LogLevels::ERROR_LEVEL, getIdentifier(), message)
 #define LOG_WARNING(id, ident, message) sendToLogger(id, LogLevels::WARNING, ident, message)
 
 #define LOG_WARNING_SIMPLE(message)                                                                \

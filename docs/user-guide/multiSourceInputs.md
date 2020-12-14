@@ -65,13 +65,13 @@ auto& in1 = vFed1->registerInput<double>("");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::options::multi_input_handling_method,
+    in1.setOption(helics::defs::Options::multi_input_handling_method,
                   helics::multi_input_handling_method::average);
 ```
 
 ```c
 /*errors are ignored here*/
-helics_input in1 = helicsFederateRegisterInput("",HELICS_DATA_TYPE_double,"",nullptr);
+HelicsInput in1 = helicsFederateRegisterInput("",HELICS_DATA_TYPE_DOUBLE,"",nullptr);
 helicsInputAddTarget(in1,"pub1",nullptr);
 helicsInputAddTarget(in1,"pub2",nullptr);
 helicsInputAddTarget(in1,"pub2",nullptr);
@@ -80,7 +80,7 @@ helicsInputSetOption(in1,HELICS_HANDLE_OPTION_multi_input_handling_method,HELICS
 ```
 
 ```python
-in1 = h.helicsFederateRegisterInput("",h.HELICS_DATA_TYPE_double,"");
+in1 = h.helicsFederateRegisterInput("",h.HELICS_DATA_TYPE_DOUBLE,"");
 h.helicsInputAddTarget(in1,"pub1");
 h.helicsInputAddTarget(in1,"pub2");
 h.helicsInputAddTarget(in1,"pub2");

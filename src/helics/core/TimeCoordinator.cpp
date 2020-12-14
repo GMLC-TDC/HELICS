@@ -773,22 +773,22 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
 void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
 {
     switch (timeProperty) {
-        case defs::properties::output_delay:
+        case defs::Properties::OUTPUT_DELAY:
             info.outputDelay = propertyVal;
             break;
-        case defs::properties::input_delay:
+        case defs::Properties::INPUT_DELAY:
             info.inputDelay = propertyVal;
             break;
-        case defs::properties::time_delta:
+        case defs::Properties::TIME_DELTA:
             info.timeDelta = propertyVal;
             if (info.timeDelta <= timeZero) {
                 info.timeDelta = timeEpsilon;
             }
             break;
-        case defs::properties::period:
+        case defs::Properties::PERIOD:
             info.period = propertyVal;
             break;
-        case defs::properties::offset:
+        case defs::Properties::OFFSET:
             info.offset = propertyVal;
             break;
         default:
@@ -799,7 +799,7 @@ void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
 /** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setProperty(int intProperty, int propertyVal)
 {
-    if (intProperty == defs::properties::max_iterations) {
+    if (intProperty == defs::Properties::MAX_ITERATIONS) {
         info.maxIterations = propertyVal;
     } else {
         setProperty(intProperty, Time(static_cast<double>(propertyVal)));
@@ -810,13 +810,13 @@ void TimeCoordinator::setProperty(int intProperty, int propertyVal)
 void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
 {
     switch (optionFlag) {
-        case defs::flags::uninterruptible:
+        case defs::Flags::UNINTERRUPTIBLE:
             info.uninterruptible = value;
             break;
-        case defs::flags::wait_for_current_time_update:
+        case defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE:
             info.wait_for_current_time_updates = value;
             break;
-        case defs::flags::restrictive_time_policy:
+        case defs::Flags::RESTRICTIVE_TIME_POLICY:
             info.restrictive_time_policy = value;
             break;
         default:
@@ -827,15 +827,15 @@ void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
 Time TimeCoordinator::getTimeProperty(int timeProperty) const
 {
     switch (timeProperty) {
-        case defs::properties::output_delay:
+        case defs::Properties::OUTPUT_DELAY:
             return info.outputDelay;
-        case defs::properties::input_delay:
+        case defs::Properties::INPUT_DELAY:
             return info.inputDelay;
-        case defs::properties::time_delta:
+        case defs::Properties::TIME_DELTA:
             return info.timeDelta;
-        case defs::properties::period:
+        case defs::Properties::PERIOD:
             return info.period;
-        case defs::properties::offset:
+        case defs::Properties::OFFSET:
             return info.offset;
         default:
             return Time::minVal();
@@ -846,7 +846,7 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
     switch (intProperty) {  // NOLINT
-        case defs::properties::max_iterations:
+        case defs::Properties::MAX_ITERATIONS:
             return info.maxIterations;
         default:
             // TODO(PT): make this something consistent
@@ -858,13 +858,13 @@ int TimeCoordinator::getIntegerProperty(int intProperty) const
 bool TimeCoordinator::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {
-        case defs::flags::uninterruptible:
+        case defs::Flags::UNINTERRUPTIBLE:
             return info.uninterruptible;
-        case defs::flags::interruptible:
+        case defs::Flags::INTERRUPTIBLE:
             return !info.uninterruptible;
-        case defs::flags::wait_for_current_time_update:
+        case defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE:
             return info.wait_for_current_time_updates;
-        case defs::flags::restrictive_time_policy:
+        case defs::Flags::RESTRICTIVE_TIME_POLICY:
             return info.restrictive_time_policy;
         default:
             throw(std::invalid_argument("flag not recognized"));

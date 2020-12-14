@@ -400,7 +400,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
     res.reserve(dataV.size());
     for (size_t ii = 0; ii < dataV.size(); ++ii) {
         if (dataV[ii]) {
-            auto localTargetType = (injectionType == helics::DataType::helics_multi) ?
+            auto localTargetType = (injectionType == helics::DataType::HELICS_MULTI) ?
                 sourceTypes[ii].first :
                 injectionType;
 
@@ -416,17 +416,17 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
             }
         }
     }
-    DataType type = DataType::helics_multi;
+    DataType type = DataType::HELICS_MULTI;
     switch (inputVectorOp) {
-        case MultiInputHandlingMethod::and_operation:
-        case MultiInputHandlingMethod::or_operation:
+        case MultiInputHandlingMethod::AND_OPERATION:
+        case MultiInputHandlingMethod::OR_OPERATION:
             type = DataType::HELICS_BOOL;
             break;
-        case MultiInputHandlingMethod::sum_operation:
-        case MultiInputHandlingMethod::average_operation:
+        case MultiInputHandlingMethod::SUM_OPERATION:
+        case MultiInputHandlingMethod::AVERAGE_OPERATION:
             type = DataType::HELICS_VECTOR;
             break;
-        case MultiInputHandlingMethod::vectorize_operation:
+        case MultiInputHandlingMethod::VECTORIZE_OPERATION:
             switch (targetType) {
                 case DataType::HELICS_STRING:
                     type = targetType;
@@ -451,13 +451,13 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
     }
     defV result;
     switch (inputVectorOp) {
-        case MultiInputHandlingMethod::max_operation:
+        case MultiInputHandlingMethod::MAX_OPERATION:
             result = maxOperation(res);
             break;
-        case MultiInputHandlingMethod::min_operation:
+        case MultiInputHandlingMethod::MIN_OPERATION:
             result = minOperation(res);
             break;
-        case MultiInputHandlingMethod::and_operation:
+        case MultiInputHandlingMethod::AND_OPERATION:
             result = std::all_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
@@ -468,7 +468,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
                 "1" :
                 "0";
             break;
-        case MultiInputHandlingMethod::or_operation:
+        case MultiInputHandlingMethod::OR_OPERATION:
             result = std::any_of(res.begin(),
                                  res.end(),
                                  [](auto& val) {
@@ -479,20 +479,20 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
                 "1" :
                 "0";
             break;
-        case MultiInputHandlingMethod::sum_operation:
+        case MultiInputHandlingMethod::SUM_OPERATION:
             result = vectorSum(res);
             break;
-        case MultiInputHandlingMethod::average_operation:
+        case MultiInputHandlingMethod::AVERAGE_OPERATION:
             result = vectorAvg(res);
             break;
-        case MultiInputHandlingMethod::diff_operation:
+        case MultiInputHandlingMethod::DIFF_OPERATION:
             if (type == DataType::HELICS_VECTOR) {
                 result = vectorDiff(res);
             } else {
                 result = diffOperation(res);
             }
             break;
-        case MultiInputHandlingMethod::vectorize_operation:
+        case MultiInputHandlingMethod::VECTORIZE_OPERATION:
             result = vectorizeOperation(res);
             break;
         default:
@@ -549,7 +549,7 @@ bool Input::checkUpdate(bool assumeUpdate)
 
 void Input::setOption(int32_t option, int32_t value)
 {
-    if (option == HELICS_HANDLE_OPTION_multi_input_handling_method) {
+    if (option == HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD) {
         inputVectorOp = static_cast<MultiInputHandlingMethod>(value);
     } else {
         Interface::setOption(option, value);
@@ -559,7 +559,7 @@ void Input::setOption(int32_t option, int32_t value)
 /** get the current value of a flag for the handle*/
 int32_t Input::getOption(int32_t option) const
 {
-    if (option == HELICS_HANDLE_OPTION_multi_input_handling_method) {
+    if (option == HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD) {
         return static_cast<int32_t>(inputVectorOp);
     }
     return Interface::getOption(option);
@@ -707,9 +707,9 @@ void Input::loadSourceInformation()
     const auto& iType = getInjectionType();
     const auto& iUnits = getInjectionUnits();
     injectionType = getTypeFromString(iType);
-    if ((injectionType == DataType::helics_multi) || (!iUnits.empty() && iUnits.front() == '[')) {
+    if ((injectionType == DataType::HELICS_MULTI) || (!iUnits.empty() && iUnits.front() == '[')) {
         sourceTypes.clear();
-        if (injectionType == DataType::helics_multi) {
+        if (injectionType == DataType::HELICS_MULTI) {
             auto jvalue = loadJsonStr(iType);
             for (auto& res : jvalue) {
                 sourceTypes.emplace_back(getTypeFromString(res.asCString()), nullptr);

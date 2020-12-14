@@ -28,14 +28,14 @@ FedObject* getFedObject(HelicsFederate fed, HelicsError* err) noexcept
 {
     HELICS_ERROR_CHECK(err, nullptr);
     if (fed == nullptr) {
-        assignError(err, HELICS_ERROR_invalid_object, invalidFedString);
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFedString);
         return nullptr;
     }
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     if (fedObj->valid == fedValidationIdentifier) {
         return fedObj;
     }
-    assignError(err, HELICS_ERROR_invalid_object, invalidFedString);
+    assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFedString);
     return nullptr;
 }
 }  // namespace helics
@@ -60,7 +60,7 @@ helics::ValueFederate* getValueFed(HelicsFederate fed, HelicsError* err)
             return rval;
         }
     }
-    assignError(err, HELICS_ERROR_invalid_object, notValueFedString);
+    assignError(err, HELICS_ERROR_INVALID_OBJECT, notValueFedString);
     return nullptr;
 }
 
@@ -78,7 +78,7 @@ helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err)
             return rval;
         }
     }
-    assignError(err, HELICS_ERROR_invalid_object, notMessageFedString);
+    assignError(err, HELICS_ERROR_INVALID_OBJECT, notMessageFedString);
     return nullptr;
 }
 
@@ -103,7 +103,7 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, 
             return rval;
         }
     }
-    assignError(err, HELICS_ERROR_invalid_object, notValueFedString);
+    assignError(err, HELICS_ERROR_INVALID_OBJECT, notValueFedString);
     return nullptr;
 }
 
@@ -119,7 +119,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(HelicsFederate f
             return rval;
         }
     }
-    assignError(err, HELICS_ERROR_invalid_object, notMessageFedString);
+    assignError(err, HELICS_ERROR_INVALID_OBJECT, notMessageFedString);
     return nullptr;
 }
 
@@ -137,16 +137,16 @@ static const char* invalidFedInfoString = "helics Federate info object was not v
 
 static helics::FederateInfo* getFedInfo(HelicsFederateInfo fi, HelicsError* err)
 {
-    if ((err != nullptr) && (err->error_code != 0)) {
+    if ((err != nullptr) && (err->errorCode != 0)) {
         return nullptr;
     }
     if (fi == nullptr) {
-        assignError(err, HELICS_ERROR_invalid_object, invalidFedInfoString);
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFedInfoString);
         return nullptr;
     }
     auto* ptr = reinterpret_cast<helics::FederateInfo*>(fi);
     if (ptr->uniqueKey != FederateInfoValidationIdentifier) {
-        assignError(err, HELICS_ERROR_invalid_object, invalidFedInfoString);
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidFedInfoString);
         return nullptr;
     }
     return ptr;
@@ -256,7 +256,7 @@ void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* 
     auto ctype = helics::core::coreTypeFromString(coretype);
     if (ctype == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
-            err->error_code = HELICS_ERROR_invalid_argument;
+            err->errorCode = HELICS_ERROR_INVALID_ARGUMENT;
             err->message = getMasterHolder()->addErrorString(std::string(coretype) + " is not a valid core type");
             return;
         }
@@ -969,17 +969,17 @@ HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed, Helics
     }
 }
 
-static const std::map<helics::Federate::modes, HelicsFederateState> modeEnumConversions{
-    {helics::Federate::modes::error, HelicsFederateState::HELICS_STATE_ERROR},
-    {helics::Federate::modes::startup, HelicsFederateState::HELICS_STATE_STARTUP},
-    {helics::Federate::modes::executing, HelicsFederateState::HELICS_STATE_EXECUTION},
-    {helics::Federate::modes::finalize, HelicsFederateState::HELICS_STATE_FINALIZE},
-    {helics::Federate::modes::pending_exec, HelicsFederateState::HELICS_STATE_PENDING_EXEC},
-    {helics::Federate::modes::pending_init, HelicsFederateState::HELICS_STATE_PENDING_INIT},
-    {helics::Federate::modes::pending_iterative_time, HelicsFederateState::HELICS_STATE_PENDING_ITERATIVE_TIME},
-    {helics::Federate::modes::pending_time, HelicsFederateState::HELICS_STATE_PENDING_TIME},
-    {helics::Federate::modes::initializing, HelicsFederateState::HELICS_STATE_INITIALIZATION},
-    {helics::Federate::modes::pending_finalize, HelicsFederateState::HELICS_STATE_PENDING_FINALIZE}};
+static const std::map<helics::Federate::Modes, HelicsFederateState> modeEnumConversions{
+    {helics::Federate::Modes::ERROR_STATE, HelicsFederateState::HELICS_STATE_ERROR},
+    {helics::Federate::Modes::STARTUP, HelicsFederateState::HELICS_STATE_STARTUP},
+    {helics::Federate::Modes::EXECUTING, HelicsFederateState::HELICS_STATE_EXECUTION},
+    {helics::Federate::Modes::FINALIZE, HelicsFederateState::HELICS_STATE_FINALIZE},
+    {helics::Federate::Modes::PENDING_EXEC, HelicsFederateState::HELICS_STATE_PENDING_EXEC},
+    {helics::Federate::Modes::PENDING_INIT, HelicsFederateState::HELICS_STATE_PENDING_INIT},
+    {helics::Federate::Modes::PENDING_ITERATIVE_TIME, HelicsFederateState::HELICS_STATE_PENDING_ITERATIVE_TIME},
+    {helics::Federate::Modes::PENDING_TIME, HelicsFederateState::HELICS_STATE_PENDING_TIME},
+    {helics::Federate::Modes::INITIALIZING, HelicsFederateState::HELICS_STATE_INITIALIZATION},
+    {helics::Federate::Modes::PENDING_FINALIZE, HelicsFederateState::HELICS_STATE_PENDING_FINALIZE}};
 
 HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err)
 {
@@ -1198,22 +1198,22 @@ void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsErr
 
 void helicsFederateLogErrorMessage(HelicsFederate fed, const char* logmessage, HelicsError* err)
 {
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_error, logmessage, err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_ERROR, logmessage, err);
 }
 
 void helicsFederateLogWarningMessage(HelicsFederate fed, const char* logmessage, HelicsError* err)
 {
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_warning, logmessage, err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_WARNING, logmessage, err);
 }
 
 void helicsFederateLogInfoMessage(HelicsFederate fed, const char* logmessage, HelicsError* err)
 {
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_summary, logmessage, err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_SUMMARY, logmessage, err);
 }
 
 void helicsFederateLogDebugMessage(HelicsFederate fed, const char* logmessage, HelicsError* err)
 {
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_data, logmessage, err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_DATA, logmessage, err);
 }
 
 void helicsFederateLogLevelMessage(HelicsFederate fed, int loglevel, const char* logmessage, HelicsError* err)

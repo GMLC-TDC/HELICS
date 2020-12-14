@@ -155,8 +155,8 @@ static constexpr frozen::unordered_map<frozen::string, DataType, 56> typeMap{
     {"default", DataType::HELICS_ANY},
     {"time", DataType::HELICS_TIME},
     {"tm", DataType::HELICS_TIME},
-    {"multi", DataType::helics_multi},
-    {"many", DataType::helics_multi},
+    {"multi", DataType::HELICS_MULTI},
+    {"many", DataType::HELICS_MULTI},
     {"def", DataType::HELICS_ANY},
     {"any", DataType::HELICS_ANY},
     {"", DataType::HELICS_ANY},
@@ -202,7 +202,7 @@ static const std::unordered_map<std::string, DataType> demangle_names{
 DataType getTypeFromString(std::string_view typeName)
 {
     if (!typeName.empty() && typeName.front() == '[') {
-        return DataType::helics_multi;
+        return DataType::HELICS_MULTI;
     }
     const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
     if (res != typeMap.end()) {

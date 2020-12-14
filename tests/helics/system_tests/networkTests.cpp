@@ -27,7 +27,7 @@ TEST_F(network_tests, test_external_tcp)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -43,7 +43,7 @@ TEST_F(network_tests, test_external_tcp_ipv4)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -60,7 +60,7 @@ TEST_F(network_tests, test_external_tcpss)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -76,7 +76,7 @@ TEST_F(network_tests, test_external_tcpss_ipv4)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -96,7 +96,7 @@ TEST_F(network_tests, test_external_udp)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -112,7 +112,7 @@ TEST_F(network_tests, test_external_udp_ipv4)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();

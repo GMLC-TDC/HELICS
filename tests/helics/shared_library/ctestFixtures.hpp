@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define CE(command)                                                                                \
     helicsErrorClear(&err);                                                                        \
     command;                                                                                       \
-    EXPECT_TRUE(err.errorCode == helics_ok) << err.message
+    EXPECT_TRUE(err.errorCode == HELICS_OK) << err.message
 
 #define HELICS_SIZE_MAX 512
 
@@ -42,13 +42,13 @@ struct FederateTestFixture {
                       HelicsTime time_delta = HELICS_TIME_ZERO,
                       const std::string& name_prefix = "fed");
 
-    helics_federate GetFederateAt(int index);
+    HelicsFederate GetFederateAt(int index);
 
     std::vector<HelicsBroker> brokers;
-    std::vector<helics_federate> federates;
+    std::vector<HelicsFederate> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
-    helics_error err;
+    HelicsError err;
 
     std::string ctype;
 

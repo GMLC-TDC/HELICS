@@ -22,27 +22,27 @@ TEST_F(iteration_tests, execution_iteration_test)
     auto vFed1 = GetFederateAt(0);
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", HELICS_DATA_TYPE_double, "", nullptr);
+        vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
 
     auto subid = helicsFederateRegisterSubscription(vFed1, "pub1", "", nullptr);
-    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_delta, 1.0, nullptr);
+    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, nullptr);
 
     helicsFederateEnterInitializingMode(vFed1, nullptr);
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
 
     auto comp =
         helicsFederateEnterExecutingModeIterative(vFed1,
-                                                  HELICS_ITERATION_REQUEST_iterate_if_needed,
+                                                  HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                                   nullptr);
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_iterating);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_ITERATING);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
 
     comp = helicsFederateEnterExecutingModeIterative(vFed1,
-                                                     HELICS_ITERATION_REQUEST_iterate_if_needed,
+                                                     HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                                      nullptr);
 
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_next_step);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_NEXT_STEP);
 
     auto val2 = helicsInputGetDouble(subid, nullptr);
 
@@ -50,9 +50,9 @@ TEST_F(iteration_tests, execution_iteration_test)
 }
 
 // do an init iteration loop for convergence
-std::pair<double, int> runInitIterations(helics_federate vfed, int index, int total)
+std::pair<double, int> runInitIterations(HelicsFederate vfed, int index, int total)
 {
-    auto pub = helicsFederateRegisterPublication(vfed, "pub", HELICS_DATA_TYPE_double, "", nullptr);
+    auto pub = helicsFederateRegisterPublication(vfed, "pub", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     helicsPublicationSetMinimumChange(pub, 0.01, nullptr);
     std::string low_target = "fed";
     low_target += std::to_string((index == 0) ? total - 1 : index - 1);
@@ -69,13 +69,13 @@ std::pair<double, int> runInitIterations(helics_federate vfed, int index, int to
     helicsFederateEnterInitializingMode(vfed, nullptr);
     auto cval = index2 + 0.5;
 
-    auto itres = HELICS_ITERATION_RESULT_iterating;
+    auto itres = HELICS_ITERATION_RESULT_ITERATING;
     int itcount = 0;
-    while (itres == HELICS_ITERATION_RESULT_iterating) {
+    while (itres == HELICS_ITERATION_RESULT_ITERATING) {
         helicsPublicationPublishDouble(pub, cval, nullptr);
         itres =
             helicsFederateEnterExecutingModeIterative(vfed,
-                                                      HELICS_ITERATION_REQUEST_iterate_if_needed,
+                                                      HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                                       nullptr);
         auto val1 = helicsInputGetDouble(sub_high, nullptr);
         auto val2 = helicsInputGetDouble(sub_low, nullptr);
@@ -88,7 +88,7 @@ std::pair<double, int> runInitIterations(helics_federate vfed, int index, int to
 }
 
 // a test with an iterative loop with a bunch of federates
-std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<helics_federate>& fedVec)
+std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<HelicsFederate>& fedVec)
 {
     auto N = static_cast<int>(fedVec.size());
     std::vector<std::future<std::pair<double, int>>> futures;
@@ -134,7 +134,7 @@ TEST_F(iteration_tests, execution_iteration_loop3)
 {
     int N = 5;
     SetupTest(helicsCreateValueFederate, "test", N);
-    std::vector<helics_federate> vfeds(N);
+    std::vector<HelicsFederate> vfeds(N);
     for (int ii = 0; ii < N; ++ii) {
         vfeds[ii] = GetFederateAt(ii);
     }
@@ -154,7 +154,7 @@ TEST_F(iteration_tests, execution_iteration_test_2fed)
     auto vFed2 = GetFederateAt(1);
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", HELICS_DATA_TYPE_double, "", nullptr);
+        vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
 
     auto subid = helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
@@ -166,18 +166,18 @@ TEST_F(iteration_tests, execution_iteration_test_2fed)
     helicsFederateEnterExecutingModeAsync(vFed1, nullptr);
     auto comp =
         helicsFederateEnterExecutingModeIterative(vFed2,
-                                                  HELICS_ITERATION_REQUEST_iterate_if_needed,
+                                                  HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                                   nullptr);
 
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_iterating);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_ITERATING);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
 
     comp = helicsFederateEnterExecutingModeIterative(vFed2,
-                                                     HELICS_ITERATION_REQUEST_iterate_if_needed,
+                                                     HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                                      nullptr);
 
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_next_step);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_NEXT_STEP);
 
     auto val2 = helicsInputGetDouble(subid, nullptr);
     helicsFederateEnterExecutingModeComplete(vFed1, nullptr);
@@ -191,27 +191,27 @@ TEST_F(iteration_tests, time_iteration_test)
     auto vFed1 = GetFederateAt(0);
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", HELICS_DATA_TYPE_double, "", nullptr);
+        vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
 
     auto subid = helicsFederateRegisterSubscription(vFed1, "pub1", "", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 1.0, nullptr);
-    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_delta, 1.0, nullptr);
+    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, nullptr);
     helicsFederateEnterExecutingMode(vFed1, nullptr);
 
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
 
-    helics_iteration_result comp;
+    HelicsIterationResult comp;
     auto grantedTime = helicsFederateRequestTimeIterative(
-        vFed1, 1.0, HELICS_ITERATION_REQUEST_iterate_if_needed, &comp, nullptr);
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_iterating);
+        vFed1, 1.0, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &comp, nullptr);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_ITERATING);
     EXPECT_EQ(grantedTime, 0.0);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
 
     grantedTime = helicsFederateRequestTimeIterative(
-        vFed1, 1.0, HELICS_ITERATION_REQUEST_iterate_if_needed, &comp, nullptr);
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_next_step);
+        vFed1, 1.0, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &comp, nullptr);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_NEXT_STEP);
     EXPECT_EQ(grantedTime, 1.0);
     auto val2 = helicsInputGetDouble(subid, nullptr);
 
@@ -226,12 +226,12 @@ TEST_F(iteration_tests, time_iteration_test_2fed)
     auto vFed2 = GetFederateAt(1);
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", HELICS_DATA_TYPE_double, "", nullptr);
+        vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
 
     auto subid = helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 1.0, nullptr);
-    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_delta, 1.0, nullptr);
+    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, nullptr);
 
     helicsFederateEnterExecutingModeAsync(vFed1, nullptr);
     helicsFederateEnterExecutingMode(vFed2, nullptr);
@@ -240,19 +240,19 @@ TEST_F(iteration_tests, time_iteration_test_2fed)
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
 
     helicsFederateRequestTimeAsync(vFed1, 1.0, nullptr);
-    helics_iteration_result comp;
+    HelicsIterationResult comp;
     auto grantedTime = helicsFederateRequestTimeIterative(
-        vFed2, 1.0, HELICS_ITERATION_REQUEST_iterate_if_needed, &comp, nullptr);
+        vFed2, 1.0, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &comp, nullptr);
 
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_iterating);
-    EXPECT_EQ(grantedTime, helics_time_zero);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_ITERATING);
+    EXPECT_EQ(grantedTime, HELICS_TIME_ZERO);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
 
     grantedTime = helicsFederateRequestTimeIterative(
-        vFed2, 1.0, HELICS_ITERATION_REQUEST_iterate_if_needed, &comp, nullptr);
+        vFed2, 1.0, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &comp, nullptr);
 
-    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_next_step);
+    EXPECT_TRUE(comp == HELICS_ITERATION_RESULT_NEXT_STEP);
     EXPECT_EQ(grantedTime, 1.0);
     auto val2 = helicsInputGetDouble(subid, nullptr);
     helicsFederateRequestTimeComplete(vFed1, nullptr);
@@ -268,11 +268,11 @@ TEST_F(iteration_tests, test_iteration_counter)
     auto vFed2 = GetFederateAt(1);
     // register the publications
     auto pub1 = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", helics_data_type::HELICS_DATA_TYPE_int, nullptr, nullptr);
+        vFed1, "pub1", HelicsDataTypes::HELICS_DATA_TYPE_INT, nullptr, nullptr);
 
     auto sub1 = helicsFederateRegisterSubscription(vFed2, "pub1", nullptr, nullptr);
     auto pub2 = helicsFederateRegisterGlobalPublication(
-        vFed2, "pub2", helics_data_type::HELICS_DATA_TYPE_int, nullptr, nullptr);
+        vFed2, "pub2", HelicsDataTypes::HELICS_DATA_TYPE_INT, nullptr, nullptr);
 
     auto sub2 = helicsFederateRegisterSubscription(vFed1, "pub2", nullptr, nullptr);
     helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 1.0, nullptr);
@@ -304,25 +304,25 @@ TEST_F(iteration_tests, test_iteration_counter)
 
         helicsFederateRequestTimeIterativeAsync(vFed1,
                                                 1.0,
-                                                HELICS_ITERATION_REQUEST_iterate_if_needed,
+                                                HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED,
                                                 nullptr);
-        helics_iteration_result state;
+        HelicsIterationResult state;
 
         auto grantedTime = helicsFederateRequestTimeIterative(
-            vFed2, 1.0, HELICS_ITERATION_REQUEST_iterate_if_needed, &state, nullptr);
+            vFed2, 1.0, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, &state, nullptr);
         if (c1 <= 10) {
-            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_iterating);
+            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_ITERATING);
             EXPECT_EQ(grantedTime, 0.0);
         } else {
-            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_next_step);
+            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_NEXT_STEP);
             EXPECT_EQ(grantedTime, 1.0);
         }
         grantedTime = helicsFederateRequestTimeIterativeComplete(vFed1, &state, nullptr);
         if (c1 <= 10) {
-            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_iterating);
+            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_ITERATING);
             EXPECT_EQ(grantedTime, 0.0);
         } else {
-            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_next_step);
+            EXPECT_TRUE(state == HELICS_ITERATION_RESULT_NEXT_STEP);
             EXPECT_EQ(grantedTime, 1.0);
         }
     }

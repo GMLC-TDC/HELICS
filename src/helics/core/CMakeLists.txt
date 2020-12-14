@@ -86,18 +86,18 @@ if(NOT HELICS_DISABLE_ASIO)
     list(APPEND INCLUDE_FILES MessageTimer.hpp)
 endif()
 
-add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
+add_library(HelicsCore STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 target_link_libraries(
-    helics_core PUBLIC helics_common PRIVATE spdlog::spdlog fmt::fmt compile_flags_target
+    HelicsCore PUBLIC helics_common PRIVATE spdlog::spdlog fmt::fmt compile_flags_target
 )
 
-add_library(HELICS::core ALIAS helics_core)
+add_library(HELICS::core ALIAS HelicsCore)
 
 target_compile_options(
-    helics_core
+    HelicsCore
     PRIVATE $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
 )
 
 # adding a definition flag for some interaction with the shared library
-target_compile_definitions(helics_core PUBLIC HELICS_STATIC_CORE_LIBRARY)
+target_compile_definitions(HelicsCore PUBLIC HELICS_STATIC_CORE_LIBRARY)

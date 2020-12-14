@@ -74,8 +74,8 @@ The second is a blocking call and will only return if a command is available.
 Equivalent calls in the C API are
 
 ```c
-const char *helicsFederateGetCommand(helics_federate fed, helics_error *err);
-const char *helicsFederateWaitCommand(helics_federate fed, helics_error *err);
+const char *helicsFederateGetCommand(HelicsFederate fed, HelicsError *err);
+const char *helicsFederateWaitCommand(HelicsFederate fed, HelicsError *err);
 ```
 
 The only error paths are if the federate is not valid or not in a state to receive commands.

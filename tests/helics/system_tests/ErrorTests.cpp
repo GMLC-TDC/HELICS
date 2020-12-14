@@ -165,10 +165,10 @@ TEST_F(error_tests, duplicate_publication_names2)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
         // this should do nothing
         EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -176,10 +176,10 @@ TEST_F(error_tests, duplicate_publication_names2)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
         // this should do nothing
         EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -197,8 +197,8 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->setFlagOption(HELICS_FLAG_terminate_on_error);
-    fed2->setFlagOption(HELICS_FLAG_terminate_on_error);
+    fed1->setFlagOption(HELICS_FLAG_TERMINATE_ON_ERROR);
+    fed2->setFlagOption(HELICS_FLAG_TERMINATE_ON_ERROR);
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
 
@@ -210,7 +210,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -218,7 +218,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -235,10 +235,10 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->getCorePointer()->setFlagOption(helics::gLocalCoreId,
-                                          HELICS_FLAG_terminate_on_error,
+                                          HELICS_FLAG_TERMINATE_ON_ERROR,
                                           true);
     fed2->getCorePointer()->setFlagOption(helics::gLocalCoreId,
-                                          HELICS_FLAG_terminate_on_error,
+                                          HELICS_FLAG_TERMINATE_ON_ERROR,
                                           true);
 
     fed1->registerGlobalPublication("testkey", "");
@@ -252,7 +252,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -260,7 +260,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -287,7 +287,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
     }
     catch (const helics::HelicsException&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -295,7 +295,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
     }
     catch (const helics::HelicsException&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -410,7 +410,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::options::connection_required, true);
+    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED, true);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -430,7 +430,7 @@ TEST_F(error_tests, missing_required_pub_with_default)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->registerGlobalPublication("t1", "");
-    fed2->setFlagOption(helics::defs::flags::connections_required, true);
+    fed2->setFlagOption(helics::defs::Flags::CONNECTIONS_REQUIRED, true);
     fed2->registerSubscription("abcd", "");
 
     fed1->enterInitializingModeAsync();
@@ -457,7 +457,7 @@ TEST_F(error_tests, mismatched_units)
     fed1->registerGlobalPublication("t1", "double", "V");
     fed2->registerSubscription("t1", "m");
     auto& sub = fed3->registerSubscription("t1", "m");
-    sub.setOption(helics::defs::options::ignore_unit_mismatch);
+    sub.setOption(helics::defs::Options::IGNORE_UNIT_MISMATCH);
     fed1->enterExecutingModeAsync();
     fed2->enterExecutingModeAsync();
     EXPECT_NO_THROW(fed3->enterExecutingMode());
@@ -481,10 +481,10 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     auto fed3 = GetFederateAs<helics::ValueFederate>(2);
 
     fed1->registerGlobalPublication("t1", "double", "V");
-    fed2->setFlagOption(HELICS_FLAG_terminate_on_error);
+    fed2->setFlagOption(HELICS_FLAG_TERMINATE_ON_ERROR);
     fed2->registerSubscription("t1", "m");
     auto& sub = fed3->registerSubscription("t1", "m");
-    sub.setOption(helics::defs::options::ignore_unit_mismatch);
+    sub.setOption(helics::defs::Options::IGNORE_UNIT_MISMATCH);
     fed1->enterExecutingModeAsync();
     fed2->enterExecutingModeAsync();
     try {

@@ -28,16 +28,16 @@ TEST_F(federateStateTests, constructor_test)
 {
     // Check setting of name, initial state, and info by the constructor
     EXPECT_EQ(fs->getIdentifier(), "fed_name");
-    EXPECT_EQ(fs->getState(), helics::FederateState::HELICS_CREATED);
+    EXPECT_EQ(fs->getState(), helics::FederateStates::HELICS_CREATED);
 
-    EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::time_delta), helics::Time::epsilon());
-    EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::output_delay), helics::Time::zeroVal());
-    EXPECT_EQ(fs->getTimeProperty(helics::defs::properties::input_delay), helics::Time::zeroVal());
+    EXPECT_EQ(fs->getTimeProperty(helics::defs::Properties::TIME_DELTA), helics::Time::epsilon());
+    EXPECT_EQ(fs->getTimeProperty(helics::defs::Properties::OUTPUT_DELAY), helics::Time::zeroVal());
+    EXPECT_EQ(fs->getTimeProperty(helics::defs::Properties::INPUT_DELAY), helics::Time::zeroVal());
     EXPECT_EQ(fs->getTimeProperty(HELICS_PROPERTY_TIME_PERIOD), helics::Time::zeroVal());
-    EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::observer), false);
-    EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::uninterruptible), false);
-    EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::interruptible), true);
-    EXPECT_EQ(fs->getOptionFlag(helics::defs::flags::source_only), false);
+    EXPECT_EQ(fs->getOptionFlag(helics::defs::Flags::OBSERVER), false);
+    EXPECT_EQ(fs->getOptionFlag(helics::defs::Flags::UNINTERRUPTIBLE), false);
+    EXPECT_EQ(fs->getOptionFlag(helics::defs::Flags::INTERRUPTIBLE), true);
+    EXPECT_EQ(fs->getOptionFlag(helics::defs::Flags::SOURCE_ONLY), false);
 
     // Check other default state values
     EXPECT_EQ(fs->getQueueSize(), 0U);
@@ -57,7 +57,7 @@ TEST_F(federateStateTests, constructor_test)
     // EXPECT_EQ(fs->time_minDe, helics::Time::zeroVal());
     // EXPECT_EQ(fs->time_minTe, helics::Time::zeroVal());
     // EXPECT_EQ(fs->time_event, helics::Time::zeroVal());
-    EXPECT_EQ(fs->getIntegerProperty(helics::defs::properties::max_iterations), 50);
+    EXPECT_EQ(fs->getIntegerProperty(helics::defs::Properties::MAX_ITERATIONS), 50);
 }
 
 TEST_F(federateStateTests, create_input_test)
@@ -184,16 +184,16 @@ TEST_F(federateStateTests, basic_processmessage_test)
     // Test returning when the initialization state is entered
     cmd.setAction(helics::CMD_INIT_GRANT);
     auto fs_process = std::async(std::launch::async, [&]() { return fs->enterInitializingMode(); });
-    EXPECT_EQ(fs->getState(), FederateState::HELICS_CREATED);
+    EXPECT_EQ(fs->getState(), FederateStates::HELICS_CREATED);
     fs->addAction(cmd);
     fs_process.wait();
     EXPECT_TRUE(fs_process.get() == IterationResult::NEXT_STEP);
-    EXPECT_EQ(fs->getState(), FederateState::HELICS_INITIALIZING);
+    EXPECT_EQ(fs->getState(), FederateStates::HELICS_INITIALIZING);
 
     // Test returning when the finished state is entered
     cmd.setAction(helics::CMD_STOP);
     fs->addAction(cmd);
-    EXPECT_EQ(fs->getState(), FederateState::HELICS_INITIALIZING);
+    EXPECT_EQ(fs->getState(), FederateStates::HELICS_INITIALIZING);
     auto fs_process2 = std::async(std::launch::async, [&]() {
         return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
@@ -205,7 +205,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     auto state = fs_process2.get();
 
     EXPECT_TRUE(state == IterationResult::HALTED);
-    EXPECT_EQ(fs->getState(), FederateState::HELICS_FINISHED);
+    EXPECT_EQ(fs->getState(), FederateStates::HELICS_FINISHED);
 
     // Return to created state
     fs->reset();
@@ -231,7 +231,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     fs_process.wait();
     EXPECT_TRUE(fs_process.get() == IterationResult::ERROR_RESULT);
     EXPECT_EQ(fs->global_id.load(), fed22);
-    EXPECT_EQ(fs->getState(), FederateState::HELICS_ERROR);
+    EXPECT_EQ(fs->getState(), FederateStates::HELICS_ERROR);
 
     // Return to initializing state
     fs->reInit();
@@ -242,8 +242,8 @@ TEST_F(federateStateTests, basic_processmessage_test)
         return fs->enterExecutingMode(IterationRequest::NO_ITERATIONS);
     });
     auto st = fs->getState();
-    EXPECT_TRUE((st == FederateState::HELICS_INITIALIZING) ||
-                (st == FederateState::HELICS_EXECUTING));
+    EXPECT_TRUE((st == FederateStates::HELICS_INITIALIZING) ||
+                (st == FederateStates::HELICS_EXECUTING));
     fs->addAction(cmd);
     auto res = fs_process2.get();
     if (res != IterationResult::ERROR_RESULT) {
@@ -252,7 +252,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     }
 
     EXPECT_TRUE(res == IterationResult::ERROR_RESULT);
-    EXPECT_EQ(fs->getState(), FederateState::HELICS_ERROR);
+    EXPECT_EQ(fs->getState(), FederateStates::HELICS_ERROR);
 
     fs->reset();
 

@@ -2191,7 +2191,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
 
 void CoreBroker::processError(ActionMessage& command)
 {
-    sendToLogger(command.source_id, LogLevels::ERROR, std::string(), command.payload.to_string());
+    sendToLogger(command.source_id, LogLevels::ERROR_LEVEL, std::string(), command.payload.to_string());
     if (command.source_id == global_broker_id_local) {
         brokerState = broker_state_t::errored;
         broadcast(command);

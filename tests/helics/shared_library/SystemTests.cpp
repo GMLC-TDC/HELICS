@@ -64,9 +64,9 @@ TEST(other_tests, core_global_value)
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
     EXPECT_EQ(err.errorCode, 0);
     auto connected = helicsCoreConnect(cr, &err);
-    EXPECT_EQ(connected, helics_true);
+    EXPECT_EQ(connected, HELICS_TRUE);
     EXPECT_EQ(err.errorCode, 0);
-    EXPECT_EQ(helicsCoreIsConnected(cr), helics_true);
+    EXPECT_EQ(helicsCoreIsConnected(cr), HELICS_TRUE);
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsCoreSetGlobal(cr, "testglobal", globalVal.c_str(), &err);
@@ -214,7 +214,7 @@ TEST(other_tests, federate_add_dependency)
 
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoLoadFromArgs(fi, 4, argv, &err);
-    helicsFederateInfoSetFlagOption(fi, HELICS_FLAG_source_only, helics_true, &err);
+    helicsFederateInfoSetFlagOption(fi, HELICS_FLAG_SOURCE_ONLY, HELICS_TRUE, &err);
 
     auto fed1 = helicsCreateMessageFederate("fed1", fi, &err);
     EXPECT_EQ(err.errorCode, 0);

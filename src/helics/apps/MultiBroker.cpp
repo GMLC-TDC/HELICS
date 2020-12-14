@@ -164,7 +164,7 @@ bool MultiBroker::brokerConnect()
     catch (const CLI::Error& e) {
         std::ostringstream ss;
         app->exit(e, ss, ss);
-        CoreBroker::loggerFunction(HELICS_LOG_LEVEL_error, getIdentifier(), ss.str());
+        CoreBroker::loggerFunction(HELICS_LOG_LEVEL_ERROR, getIdentifier(), ss.str());
         brokerDisconnect();
         return false;
     }

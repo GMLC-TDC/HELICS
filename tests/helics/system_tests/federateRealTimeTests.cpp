@@ -31,9 +31,9 @@ TEST_F(federate_realtime_tests, federate_delay_tests_ci_skip)
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreName = "cdelay";
     fi.coreInitString = std::string("-f 1 --broker=") + broker->getIdentifier();
-    fi.setFlagOption(helics::defs::flags::realtime);
-    fi.setProperty(helics::defs::properties::rt_lead, 0.1);
-    fi.setProperty(helics::defs::properties::period, 0.5);
+    fi.setFlagOption(helics::defs::Flags::REALTIME);
+    fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
+    fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
 
     helics::Publication pubid(helics::GLOBAL, fed, "pub1", helics::DataType::HELICS_DOUBLE);
@@ -71,12 +71,12 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
 
     fi.coreName = "adelay";
     fi.coreInitString = std::string("-f 2 --broker=") + broker->getIdentifier();
-    fi.setFlagOption(helics::defs::flags::realtime);
-    fi.setProperty(helics::defs::properties::rt_lag, 0.1);
-    fi.setProperty(helics::defs::properties::rt_lead, 0.1);
-    fi.setProperty(helics::defs::properties::period, 0.5);
+    fi.setFlagOption(helics::defs::Flags::REALTIME);
+    fi.setProperty(helics::defs::Properties::RT_LAG, 0.1);
+    fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
+    fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.setFlagOption(helics::defs::flags::realtime, false);
+    fi.setFlagOption(helics::defs::Flags::REALTIME, false);
     auto fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
     helics::Publication pubid(helics::GLOBAL, fed2, "pub1", helics::DataType::HELICS_DOUBLE);
     std::atomic<int> warnCounter{0};
@@ -121,14 +121,14 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreName = "ctrig";
     fi.coreInitString = std::string("-f 2 --broker=") + broker->getIdentifier();
-    fi.setFlagOption(helics::defs::flags::realtime);
-    fi.setProperty(helics::defs::properties::rt_lag, 0.1);
-    fi.setProperty(helics::defs::properties::rt_lead, 0.1);
-    fi.setProperty(helics::defs::properties::period, 0.5);
-    fi.setProperty(helics::defs::properties::log_level, 0);
+    fi.setFlagOption(helics::defs::Flags::REALTIME);
+    fi.setProperty(helics::defs::Properties::RT_LAG, 0.1);
+    fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
+    fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 0);
 
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
-    fi.setFlagOption(helics::defs::flags::realtime, false);
+    fi.setFlagOption(helics::defs::Flags::REALTIME, false);
     auto fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
     helics::Publication pubid(helics::GLOBAL, fed2, "pub1", helics::DataType::HELICS_DOUBLE);
 

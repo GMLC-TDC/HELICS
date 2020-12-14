@@ -43,12 +43,12 @@ TEST(CoreConfig, getFlagTests)
 {
     auto cr =
         helics::CoreFactory::create(helics::CoreType::TEST, "--force_logging_flush --dumplog");
-    cr->setFlagOption(helics::gLocalCoreId, HELICS_FLAG_delay_init_entry, true);
+    cr->setFlagOption(helics::gLocalCoreId, HELICS_FLAG_DELAY_INIT_ENTRY, true);
 
-    EXPECT_TRUE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_delay_init_entry));
-    EXPECT_FALSE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_enable_init_entry));
+    EXPECT_TRUE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_DELAY_INIT_ENTRY));
+    EXPECT_FALSE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_ENABLE_INIT_ENTRY));
 
-    EXPECT_TRUE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_force_logging_flush));
-    EXPECT_TRUE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_dumplog));
+    EXPECT_TRUE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_FORCE_LOGGING_FLUSH));
+    EXPECT_TRUE(cr->getFlagOption(helics::gLocalCoreId, HELICS_FLAG_DUMPLOG));
     cr->disconnect();
 }

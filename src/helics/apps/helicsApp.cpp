@@ -197,7 +197,7 @@ namespace apps {
     void App::initialize()
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             fed->enterInitializingMode();
         }
     }

@@ -138,7 +138,7 @@ HELICS can be installed on Linux (and macOS) using Spack, a package manager aime
 
 ## Docker
 
-Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/helics/repository/docker/helics/helics). This image does not include any libraries for linking just the executables. `helics_broker`, `helics_app`, `helics_recorder`, `helics_player`, and `helics_broker_server`. Other images are expected to be available in the future. See [Docker](https://github.com/GMLC-TDC/HELICS/blob/master/docs/docker.md) for a few more details.
+Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/helics/repository/docker/helics/helics). This image does not include any libraries for linking just the executables. `HelicsBroker`, `helics_app`, `helics_recorder`, `helics_player`, and `helics_broker_server`. Other images are expected to be available in the future. See [Docker](https://github.com/GMLC-TDC/HELICS/blob/master/docs/docker.md) for a few more details.
 
 ## Tools with HELICS support
 

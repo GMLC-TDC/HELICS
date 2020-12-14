@@ -317,7 +317,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `HELICS_FLAG_source_only` [4]
+_Property's enumerated name:_ `HELICS_FLAG_SOURCE_ONLY` [4]
 
 Used to indicate to the federation that this federate is only producing data and has no inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
 
@@ -331,7 +331,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `HELICS_FLAG_observer` [0]
+_Property's enumerated name:_ `HELICS_FLAG_OBSERVER` [0]
 
 Used to indicate to the federation that this federate produces no data and only has inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
 
@@ -362,7 +362,7 @@ _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_LEVEL` [271]
 _Valid values:_
 
 - -1 - no logging - `HELICS_LOG_LEVEL_no_print`
-- 0 - error - `HELICS_LOG_LEVEL_error`
+- 0 - error - `HELICS_LOG_LEVEL_ERROR`
 - 1 - warning - `HELICS_LOG_LEVEL_warning`
 - 2 - summary - `HELICS_LOG_LEVEL_summary`
 - 3 - connections - `HELICS_LOG_LEVEL_connections`
@@ -499,7 +499,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `HELICS_PROPERTY_TIME_delta` [137]
+_Property's enumerated name:_ `HELICS_PROPERTY_TIME_DELTA` [137]
 
 timeDelta has some similarities to `period`; where `period` constrained the granted time to regular intervals, `timeDelta` constrains the grant time to a minimum amount from the last granted time. Units are handled the same as in `period`.
 
@@ -1004,7 +1004,7 @@ _API:_ `helicsFederateRegisterFilter`
 ([C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#ae51e3c5dc5a974b3f1ec4c37e4901580)
 | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federate)
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterFilter)
-| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterFilter-Tuple{HELICS.Federate,Union{Int64,%20HELICS.Lib.helics_filter_type},String}))
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterFilter-Tuple{HELICS.Federate,Union{Int64,%20HELICS.Lib.HelicsFilterTypes},String}))
 to create/register the filter and then `helicsFilterAddSourceTarget`
 ([C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#ae3c07304f81645db5f92fd4a3b9e53ce)
 | [C](https://docs.helics.org/en/v3userguide/c-api-reference/index.html#filter)
@@ -1066,7 +1066,7 @@ _API:_ `helicsFederateRegisterFilter`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#ae51e3c5dc5a974b3f1ec4c37e4901580)
 | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federate)
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterFilter)
-| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterFilter-Tuple{HELICS.Federate,Union{Int64,%20HELICS.Lib.helics_filter_type},String})
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterFilter-Tuple{HELICS.Federate,Union{Int64,%20HELICS.Lib.HelicsFilterTypes},String})
 
 Filters have a predefined set of operations they can perform. The following list defines the valid operations for filters. Most filters require additional specifications in properties data structure, an example of which is shown for each filter type.
 

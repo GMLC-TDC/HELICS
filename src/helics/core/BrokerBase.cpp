@@ -102,20 +102,20 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
     return hApp;
 }
 
-static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_no_print},
-                                                      {"no_print", HELICS_LOG_LEVEL_no_print},
-                                                      {"ERROR_RESULT", HELICS_LOG_LEVEL_error},
-                                                      {"warning", HELICS_LOG_LEVEL_warning},
-                                                      {"summary", HELICS_LOG_LEVEL_summary},
-                                                      {"connections", HELICS_LOG_LEVEL_connections},
+static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
+                                                      {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
+                                                      {"ERROR_RESULT", HELICS_LOG_LEVEL_ERROR},
+                                                      {"warning", HELICS_LOG_LEVEL_WARNING},
+                                                      {"summary", HELICS_LOG_LEVEL_SUMMARY},
+                                                      {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
                                                       /** connections+ interface definitions*/
-                                                      {"interfaces", HELICS_LOG_LEVEL_interfaces},
+                                                      {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
                                                       /** interfaces + timing message*/
-                                                      {"timing", HELICS_LOG_LEVEL_timing},
+                                                      {"timing", HELICS_LOG_LEVEL_TIMING},
                                                       /** timing+ data transfer notices*/
-                                                      {"data", HELICS_LOG_LEVEL_data},
+                                                      {"data", HELICS_LOG_LEVEL_DATA},
                                                       /** all internal messages*/
-                                                      {"trace", HELICS_LOG_LEVEL_trace}};
+                                                      {"trace", HELICS_LOG_LEVEL_TRACE}};
 
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
@@ -417,7 +417,7 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
         }
     }
 
-    sendToLogger(global_id.load(), HELICS_LOG_LEVEL_error, identifier, estring);
+    sendToLogger(global_id.load(), HELICS_LOG_LEVEL_ERROR, identifier, estring);
 }
 
 void BrokerBase::setLoggingFile(const std::string& lfile)

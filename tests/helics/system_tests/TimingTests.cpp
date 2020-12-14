@@ -53,8 +53,8 @@ TEST_F(timing_tests, simple_timing_test2)
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    vFed1->setFlagOption(HELICS_FLAG_ignore_time_mismatch_warnings);
-    vFed2->setFlagOption(HELICS_FLAG_ignore_time_mismatch_warnings);
+    vFed1->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed2->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
 
@@ -87,8 +87,8 @@ TEST_F(timing_tests, simple_timing_test_message)
 
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.6);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.45);
-    vFed1->setFlagOption(HELICS_FLAG_ignore_time_mismatch_warnings);
-    vFed2->setFlagOption(HELICS_FLAG_ignore_time_mismatch_warnings);
+    vFed1->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed2->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
     auto& ept1 = vFed1->registerGlobalEndpoint("e1");
     vFed2->registerGlobalEndpoint("e2");
     vFed1->enterExecutingModeAsync();
@@ -119,9 +119,9 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    vFed2->setFlagOption(HELICS_FLAG_uninterruptible);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE);
 
     auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     vFed2->registerSubscription("pub1");
@@ -164,13 +164,13 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     auto& IP2 = vFed2->registerSubscription("pub1");
     // test with the handle option vs the federate option
-    IP2.setOption(helics::defs::options::ignore_interrupts);
+    IP2.setOption(helics::defs::Options::IGNORE_INTERRUPTS);
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
         for (helics::Time t = 1.0; t <= 100.0; t += 1.0) {
@@ -209,11 +209,11 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed2->setFlagOption(HELICS_FLAG_uninterruptible);
+    vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
@@ -261,7 +261,7 @@ TEST_F(timing_tests, timing_with_input_delay)
 
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.1);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.1);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_input_delay, 0.1);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_INPUT_DELAY, 0.1);
 
     auto& ept1 = vFed1->registerGlobalEndpoint("e1");
     vFed2->registerGlobalEndpoint("e2");
@@ -304,7 +304,7 @@ TEST_F(timing_tests, timing_with_minDelta_change)
     res = vFed1->requestTime(1.0);
     EXPECT_EQ(res, 2.0);
 
-    vFed1->setProperty(HELICS_PROPERTY_TIME_delta, 0.1);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 0.1);
     res = vFed1->requestTime(res);
     EXPECT_EQ(res, 2.1);
     vFed1->finalize();

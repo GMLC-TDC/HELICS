@@ -23,12 +23,12 @@ extern "C" {
 /**
  * opaque object representing an input
  */
-typedef void* helics_input;
+typedef void* HelicsInput;
 typedef void* HelicsInput;
 /**
  * opaque object representing a publication
  */
-typedef void* helics_publication;
+typedef void* HelicsPublication;
 typedef void* HelicsPublication;
 /**
  * opaque object representing an endpoint
@@ -39,24 +39,24 @@ typedef void* HelicsEndpoint;
 /**
  * opaque object representing a filter
  */
-typedef void* helics_filter;
+typedef void* HelicsFilter;
 typedef void* HelicsFilter;
 
 /**
  * opaque object representing a core
  */
-typedef void* helics_core;
+typedef void* HelicsCore;
 typedef void* HelicsCore;
 
 /**
  * opaque object representing a broker
  */
-typedef void* helics_broker;
+typedef void* HelicsBroker;
 typedef void* HelicsBroker;
 /**
  * opaque object representing a federate
  */
-typedef void* helics_federate;
+typedef void* HelicsFederate;
 typedef void* HelicsFederate;
 
 /**
@@ -68,7 +68,7 @@ typedef void* HelicsFederateInfo;
 /**
  * opaque object representing a query
  */
-typedef void* helics_query;
+typedef void* HelicsQuery;
 typedef void* HelicsQuery;
 
 /**
@@ -86,7 +86,7 @@ typedef void* HelicsMessage;
 /**
  * time definition used in the C interface to helics
  */
-typedef double helics_time;
+typedef double HelicsTime;
 typedef double HelicsTime;
 
 const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
@@ -98,7 +98,7 @@ const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774; /*!< definition of tim
 /**
  * defining a boolean type for use in the helics interface
  */
-typedef int helics_bool;
+typedef int HelicsBool;
 typedef int HelicsBool;
 
 const HelicsBool HELICS_TRUE = 1; /*!< indicator used for a true response */
@@ -156,12 +156,12 @@ typedef HelicsComplex helics_complex;
  * if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string,
  * otherwise it will be an empty string
  */
-typedef struct helics_error {
+typedef struct HelicsError {
     int32_t errorCode; /*!< an error code associated with the error*/
     const char* message; /*!< a message associated with the error*/
-} helics_error;
+} HelicsError;
 
-typedef helics_error HelicsError;
+typedef HelicsError HelicsError;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

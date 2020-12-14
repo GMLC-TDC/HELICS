@@ -47,8 +47,8 @@ class BrokerObject {
     int valid{0};
 };
 
-/** get the brokerObject from a helics_broker and verify it is valid*/
-BrokerObject* getBrokerObject(helics_broker broker, HelicsError* err) noexcept;
+/** get the brokerObject from a HelicsBroker and verify it is valid*/
+BrokerObject* getBrokerObject(HelicsBroker broker, HelicsError* err) noexcept;
 /** object wrapping a core for the c-api*/
 class CoreObject {
   public:
@@ -96,7 +96,7 @@ class FedObject {
     ~FedObject();
 };
 
-/** get the FedObject from a helics_broker and verify it is valid*/
+/** get the FedObject from a HelicsBroker and verify it is valid*/
 FedObject* getFedObject(HelicsFederate fed, HelicsError* err) noexcept;
 
 /** object wrapping a subscription*/
@@ -175,7 +175,7 @@ extern const std::string nullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HelicsError_invalid_argument, nullStringArgument.c_str());                                                   \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, nullStringArgument.c_str());                                                   \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)

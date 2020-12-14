@@ -356,7 +356,7 @@ TEST_P(player_file_tests, test_files_exe)
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     exeTestRunner playerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_player");
 
-    exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_broker");
+    exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "HelicsBroker");
 
     ASSERT_TRUE(playerExe.isActive());
     ASSERT_TRUE(brokerExe.isActive());
@@ -655,7 +655,7 @@ TEST( player_tests,simple_player_test_exe)
 {
     static exeTestRunner playerExe (HELICS_BIN_LOC "apps/", "helics_player");
 
-    static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "helics_broker");
+    static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "HelicsBroker");
 
     auto res = brokerExe.runAsync ("1 --coretype=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";

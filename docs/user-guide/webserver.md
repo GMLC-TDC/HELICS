@@ -1,6 +1,6 @@
 # Interacting with a Running Simulation
 
-Starting in HELICS 2.4 there is a webserver that can be run with the helics_broker or helics_broker_server.
+Starting in HELICS 2.4 there is a webserver that can be run with the HelicsBroker or helics_broker_server.
 This requires using a boost version >=1.70.
 The Webserver can be disabled by the `HELICS_DISABLE_BOOST=ON` or `HELICS_DISABLE_WEBSERVER=ON` options being set.
 

@@ -29,25 +29,25 @@ class filter_tests: public FederateTestFixture, public ::testing::Test {
 TEST_P(filter_type_tests, registration)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "FILTER");
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "message");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, HELICS_TIME_ZERO, "FILTER");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, HELICS_TIME_ZERO, "message");
 
     auto fFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
     helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     helicsFederateRegisterGlobalEndpoint(mFed, "port2", nullptr, &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err));
+    EXPECT_EQ(err.errorCode, HELICS_OK);
+    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter1", &err));
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter2", &err));
     CE(helicsFilterAddDestinationTarget(f2, "port2", &err));
     EXPECT_TRUE(f2 != f1);
     CE(auto ep1 = helicsFederateRegisterEndpoint(fFed, "fout", "", &err));
     EXPECT_TRUE(ep1 != nullptr);
-    CE(auto f3 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "c4", &err));
-    EXPECT_EQ(helicsFilterIsValid(f3), helics_true);
+    CE(auto f3 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "c4", &err));
+    EXPECT_EQ(helicsFilterIsValid(f3), HELICS_TRUE);
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
     EXPECT_TRUE(f3 != f2);
 
@@ -72,8 +72,8 @@ TEST_P(filter_type_tests, registration)
     CE(helicsFederateFinalize(fFed, &err));
     CE(helicsFederateFinalizeComplete(mFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 /**
@@ -82,8 +82,8 @@ Test filter info fields
 TEST_P(filter_type_tests, info_tests)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "FILTER");
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "message");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, HELICS_TIME_ZERO, "FILTER");
+    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, HELICS_TIME_ZERO, "message");
 
     auto fFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
@@ -94,17 +94,17 @@ TEST_P(filter_type_tests, info_tests)
     CE(helicsEndpointSetInfo(p1, "p1_test", &err));
     CE(helicsEndpointSetInfo(p2, "p2_test", &err));
 
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err));
+    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter1", &err));
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     CE(helicsFilterSetInfo(f1, "f1_test", &err));
 
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter2", &err));
     CE(helicsFilterAddDestinationTarget(f2, "port2", &err));
     CE(helicsFilterSetInfo(f2, "f2_test", &err));
 
     CE(auto ep1 = helicsFederateRegisterEndpoint(fFed, "fout", "", &err));
     CE(helicsEndpointSetInfo(ep1, "ep1_test", &err));
-    CE(auto f3 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "c4", &err));
+    CE(auto f3 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "c4", &err));
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
     CE(helicsFilterSetInfo(f3, "f3_test", &err));
 
@@ -138,11 +138,11 @@ TEST_F(filter_tests, core_filter_reg)
     EXPECT_EQ(core1IdentifierString, "core1");
 
     CE(auto sourceFilter1 = helicsCoreRegisterFilter(
-           core1, helics_filter_type::HELICS_FILTER_TYPE_delay, "core1SourceFilter", &err));
+           core1, HelicsFilterTypes::HELICS_FILTER_TYPE_DELAY, "core1SourceFilter", &err));
 
     CE(helicsFilterAddSourceTarget(sourceFilter1, "ep1", &err));
     CE(auto destinationFilter1 = helicsCoreRegisterFilter(
-           core1, helics_filter_type::HELICS_FILTER_TYPE_delay, "core1DestinationFilter", &err));
+           core1, HelicsFilterTypes::HELICS_FILTER_TYPE_DELAY, "core1DestinationFilter", &err));
 
     helicsFilterAddDestinationTarget(destinationFilter1, "ep2", &err);
     CE(auto cloningFilter1 = helicsCoreRegisterCloningFilter(core1, "ep3", &err));
@@ -160,7 +160,7 @@ TEST_F(filter_tests, core_filter_reg)
 
 TEST_P(filter_type_tests, message_filter_function)
 {
-    helics_broker broker = AddBroker(GetParam(), 2);
+    HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -168,13 +168,13 @@ TEST_P(filter_type_tests, message_filter_function)
     auto mFed = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        mFed, HELICS_FLAG_ignore_time_mismatch_warnings, helics_true, &err));
+        mFed, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter1", &err);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
@@ -183,8 +183,8 @@ TEST_P(filter_type_tests, message_filter_function)
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
@@ -218,12 +218,12 @@ TEST_P(filter_type_tests, message_filter_function)
     CE(helicsFederateFinalize(fFed, &err));
     CE(helicsFederateFinalizeComplete(mFed, &err));
     CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_P(filter_simple_type_tests, function_mObj)
 {
-    helics_broker broker = AddBroker(GetParam(), 2);
+    HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -231,13 +231,13 @@ TEST_P(filter_simple_type_tests, function_mObj)
     auto mFed = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        mFed, HELICS_FLAG_ignore_time_mismatch_warnings, helics_true, &err));
+        mFed, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter1", &err);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
@@ -246,8 +246,8 @@ TEST_P(filter_simple_type_tests, function_mObj)
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
@@ -281,7 +281,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
     CE(helicsFederateFinalize(fFed, &err));
     CE(helicsFederateFinalizeComplete(mFed, &err));
     CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
@@ -289,7 +289,7 @@ simulation
 */
 TEST_P(filter_type_tests, function_two_stage)
 {
-    helics_broker broker = AddBroker(GetParam(), 3);
+    HelicsBroker broker = AddBroker(GetParam(), 3);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter2");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
@@ -300,16 +300,16 @@ TEST_P(filter_type_tests, function_two_stage)
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter1", &err);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
 
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 1.25, &err));
 
-    CE(auto f2 = helicsFederateRegisterFilter(fFed2, HELICS_FILTER_TYPE_delay, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed2, HELICS_FILTER_TYPE_DELAY, "filter2", &err));
     CE(helicsFilterAddSourceTarget(f2, "port1", &err));
     EXPECT_TRUE(f2 != nullptr);
     CE(helicsFilterSet(f2, "delay", 1.25, &err));
@@ -320,8 +320,8 @@ TEST_P(filter_type_tests, function_two_stage)
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed2, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
@@ -363,7 +363,7 @@ TEST_P(filter_type_tests, function_two_stage)
     CE(helicsFederateFinalizeComplete(mFed, &err));
     CE(helicsFederateFinalizeComplete(fFed, &err));
     CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 /** test two filter operators
@@ -373,7 +373,7 @@ simulation
 
 TEST_P(filter_type_tests, function2)
 {
-    helics_broker broker = AddBroker(GetParam(), 2);
+    HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -382,14 +382,14 @@ TEST_P(filter_type_tests, function2)
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
 
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter1", &err));
+    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter1", &err));
     helicsFilterAddSourceTarget(f1, "port1", nullptr);
     EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
 
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_delay, "filter2", &err));
+    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter2", &err));
     helicsFilterAddSourceTarget(f2, "port2", nullptr);
     EXPECT_TRUE(f2 != nullptr);
     CE(helicsFilterSet(f2, "delay", 2.5, &err));
@@ -402,8 +402,8 @@ TEST_P(filter_type_tests, function2)
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
@@ -439,12 +439,12 @@ TEST_P(filter_type_tests, function2)
     CE(helicsFederateFinalize(fFed, &err));
     CE(helicsFederateFinalizeComplete(mFed, &err));
     CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_P(filter_type_tests, message_filter_function3)
 {
-    helics_broker broker = AddBroker(GetParam(), 2);
+    HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -453,19 +453,19 @@ TEST_P(filter_type_tests, message_filter_function3)
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "random", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
 
     CE(auto f1 =
-           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err));
+           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter1", &err));
     EXPECT_TRUE(f1 != nullptr);
     helicsFilterAddSourceTarget(f1, "port1", nullptr);
     CE(auto f2 =
-           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_delay, "filter2", &err));
+           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter2", &err));
     helicsFilterAddSourceTarget(f2, "port1", nullptr);
 
     helicsFederateRegisterEndpoint(fFed, "fout", "", &err);
     CE(auto f3 =
-           helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_random_delay, "filter3", &err));
+           helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_RANDOM_DELAY, "filter3", &err));
     helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
 
     CE(helicsFilterSet(f2, "delay", 2.5, &err));
@@ -474,8 +474,8 @@ TEST_P(filter_type_tests, message_filter_function3)
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data = "hello world";
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
@@ -510,12 +510,12 @@ TEST_P(filter_type_tests, message_filter_function3)
     CE(helicsFederateFinalize(mFed, &err));
     CE(helicsFederateFinalize(fFed, &err));
     CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(filter_tests, clone_test)
 {
-    helics_broker broker = AddBroker("test", 3);
+    HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -530,7 +530,7 @@ TEST_F(filter_tests, clone_test)
 
     auto f1 = helicsFederateRegisterCloningFilter(dcFed, nullptr, &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.errorCode == helics_ok);
+    EXPECT_TRUE(err.errorCode == HELICS_OK);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
@@ -539,8 +539,8 @@ TEST_F(filter_tests, clone_test)
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
@@ -551,9 +551,9 @@ TEST_F(filter_tests, clone_test)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -563,9 +563,9 @@ TEST_F(filter_tests, clone_test)
 
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -580,12 +580,12 @@ TEST_F(filter_tests, clone_test)
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
     CE(state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(filter_tests, clone_test_connections)
 {
-    helics_broker broker = AddBroker("test", 3);
+    HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -600,7 +600,7 @@ TEST_F(filter_tests, clone_test_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.errorCode == helics_ok);
+    EXPECT_TRUE(err.errorCode == HELICS_OK);
 
     auto cr = helicsFederateGetCore(sFed, &err);
 
@@ -625,8 +625,8 @@ TEST_F(filter_tests, clone_test_connections)
     EXPECT_TRUE(filteredEndpoints.find("srcFilters") != std::string::npos);
     helicsQueryFree(q);
 
-    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
@@ -637,9 +637,9 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -649,9 +649,9 @@ TEST_F(filter_tests, clone_test_connections)
 
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -666,12 +666,12 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
     CE(state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(filter_tests, clone_test_broker_connections)
 {
-    helics_broker broker = AddBroker("test", 3);
+    HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -686,7 +686,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.errorCode == helics_ok);
+    EXPECT_TRUE(err.errorCode == HELICS_OK);
 
     CE(helicsBrokerAddSourceFilterToEndpoint(brokers[0], "filt1", "src", &err));
 
@@ -701,8 +701,8 @@ TEST_F(filter_tests, clone_test_broker_connections)
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
@@ -713,9 +713,9 @@ TEST_F(filter_tests, clone_test_broker_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -725,9 +725,9 @@ TEST_F(filter_tests, clone_test_broker_connections)
 
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -742,13 +742,13 @@ TEST_F(filter_tests, clone_test_broker_connections)
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
     CE(state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 // this tests using a remote core to connect an endpoint to a cloning destination filter
 TEST_F(filter_tests, clone_test_dest_connections)
 {
-    helics_broker broker = AddBroker("test", 3);
+    HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 2.0, "dest_clone");
@@ -762,7 +762,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.errorCode == helics_ok);
+    EXPECT_TRUE(err.errorCode == HELICS_OK);
 
     auto cr = helicsFederateGetCore(sFed, &err);
 
@@ -787,8 +787,8 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_TRUE(filteredEndpoints.find("cloningdestFilter") != std::string::npos);
     helicsQueryFree(q);
 
-    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
@@ -831,12 +831,12 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_EQ(helicsMessageGetByteCount(m3), static_cast<int64_t>(data.size()));
 
     CE(state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(filter_tests, clone_test_broker_dest_connections)
 {
-    helics_broker broker = AddBroker("test", 3);
+    HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -851,7 +851,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
-    EXPECT_TRUE(err.errorCode == helics_ok);
+    EXPECT_TRUE(err.errorCode == HELICS_OK);
 
     CE(helicsBrokerAddDestinationFilterToEndpoint(brokers[0], "filt1", "dest", &err));
 
@@ -866,8 +866,8 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
 
@@ -878,9 +878,9 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -899,9 +899,9 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         res2 = helicsFederateHasMessage(dcFed);
     }
 
-    EXPECT_EQ(res2, helics_true);
+    EXPECT_EQ(res2, HELICS_TRUE);
 
-    if (res2 == helics_true) {
+    if (res2 == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
@@ -914,12 +914,12 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
     CE(state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(filter_tests, multi_clone_test)
 {
-    helics_broker broker = AddBroker("test", 4);
+    HelicsBroker broker = AddBroker("test", 4);
     AddFederates(helicsCreateMessageFederate, "test", 2, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -952,8 +952,8 @@ TEST_F(filter_tests, multi_clone_test)
     CE(helicsFederateEnterExecutingModeComplete(sFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     std::string data2(400, 'b');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "dest", &err));
@@ -970,18 +970,18 @@ TEST_F(filter_tests, multi_clone_test)
     auto mcnt = helicsEndpointPendingMessagesCount(p3);
     EXPECT_EQ(mcnt, 2);
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
-    if (res == helics_true) {
+    if (res == HELICS_TRUE) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(helicsMessageGetSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src");
         EXPECT_STREQ(helicsMessageGetDestination(m2), "dest");
         EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage(dFed);
-        EXPECT_EQ(res, helics_true);
+        EXPECT_EQ(res, HELICS_TRUE);
 
-        if (res == helics_true) {
+        if (res == HELICS_TRUE) {
             m2 = helicsFederateGetMessage(dFed);
             EXPECT_STREQ(helicsMessageGetSource(m2), "src2");
             EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "src2");
@@ -994,7 +994,7 @@ TEST_F(filter_tests, multi_clone_test)
     mcnt = helicsEndpointPendingMessagesCount(p4);
     EXPECT_EQ(mcnt, 2);
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_EQ(res, helics_true);
+    EXPECT_EQ(res, HELICS_TRUE);
 
     if (res != HELICS_FALSE) {
         auto m2 = helicsFederateGetMessage(dcFed);
@@ -1004,7 +1004,7 @@ TEST_F(filter_tests, multi_clone_test)
         EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "dest");
         EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage(dcFed);
-        EXPECT_EQ(res, helics_true);
+        EXPECT_EQ(res, HELICS_TRUE);
 
         if (res != HELICS_FALSE) {
             m2 = helicsFederateGetMessage(dcFed);
@@ -1024,7 +1024,7 @@ TEST_F(filter_tests, multi_clone_test)
     CE(helicsFederateFinalizeComplete(sFed2, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
     CE(state = helicsFederateGetState(sFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(filter_tests, file_load)
@@ -1058,7 +1058,7 @@ static void filterFunc1(helics_message mess, void* /*unused*/)
 
 TEST_F(filter_tests, callback_test)
 {
-    helics_broker broker = AddBroker("test", 2);
+    HelicsBroker broker = AddBroker("test", 2);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "FILTER");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "message");
 
@@ -1066,15 +1066,15 @@ TEST_F(filter_tests, callback_test)
     auto mFed = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        mFed, HELICS_FLAG_ignore_time_mismatch_warnings, helics_true, &err));
+        mFed, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
 
-    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_custom, "filter1", &err);
-    auto f2 = helicsFederateRegisterFilter(mFed, HELICS_FILTER_TYPE_delay, "dfilter", &err);
+    auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter1", &err);
+    auto f2 = helicsFederateRegisterFilter(mFed, HELICS_FILTER_TYPE_DELAY, "dfilter", &err);
 
-    EXPECT_EQ(err.errorCode, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     CE(helicsFilterSetCustomCallback(f1, filterFunc1, nullptr, &err));
     EXPECT_EQ(err.errorCode, 0);
@@ -1087,8 +1087,8 @@ TEST_F(filter_tests, callback_test)
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
 
-    CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
     std::string data(500, 'a');
     CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
 
@@ -1122,7 +1122,7 @@ TEST_F(filter_tests, callback_test)
     CE(helicsFederateFinalize(fFed, &err));
     CE(helicsFederateFinalizeComplete(mFed, &err));
     CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 INSTANTIATE_TEST_SUITE_P(filter_tests,

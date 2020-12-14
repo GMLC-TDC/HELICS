@@ -252,7 +252,7 @@ void CoreApp::setReadyToInit()
 void CoreApp::haltInit()
 {
     if (core) {
-        core->setFlagOption(gLocalCoreId, HELICS_FLAG_delay_init_entry, true);
+        core->setFlagOption(gLocalCoreId, HELICS_FLAG_DELAY_INIT_ENTRY, true);
     }
 }
 

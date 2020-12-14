@@ -50,11 +50,11 @@ TEST_P(mfed_single_type_tests, send_receive)
 
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed1->registerGlobalEndpoint("ep2", "random");
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     epid.sendTo(data, "ep2");
@@ -76,7 +76,7 @@ TEST_P(mfed_single_type_tests, send_receive)
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_single_type_tests, send_receive_obj)
@@ -88,11 +88,11 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
     Endpoint epid(mFed1.get(), "ep1");
 
     Endpoint epid2(GLOBAL, mFed1.get(), "ep2", "random");
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     epid.sendTo(data, "ep2");
@@ -114,7 +114,7 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_type_tests, send_receive_2fed)
@@ -126,15 +126,15 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -169,8 +169,8 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     mFed1->finalize();
     mFed2->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_F(mfed_tests, send_receive_2fed_extra)
@@ -181,13 +181,13 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -222,8 +222,8 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_type_tests, send_receive_2fed_obj)
@@ -237,15 +237,15 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
 
     Endpoint epid2(GLOBAL, mFed2.get(), "ep2", "random");
 
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -281,8 +281,8 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
     mFed2->finalize();
     mFed1->finalizeComplete();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
@@ -294,15 +294,15 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
-    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     epid.setDefaultDestination("ep2");
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data1(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -356,8 +356,8 @@ TEST_P(mfed_all_type_tests, send_receive_2fed_multisend)
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_all_type_tests, time_interruptions)
@@ -368,15 +368,15 @@ TEST_P(mfed_all_type_tests, time_interruptions)
 
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
-    mFed1->setProperty(HELICS_PROPERTY_TIME_delta, 1);
-    mFed2->setProperty(HELICS_PROPERTY_TIME_delta, 0.5);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 0.5);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -416,8 +416,8 @@ TEST_P(mfed_all_type_tests, time_interruptions)
     EXPECT_EQ(gtime, 2.0);
     mFed2->finalize();
     mFed1->finalizeComplete();
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_tests,

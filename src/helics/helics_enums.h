@@ -89,7 +89,7 @@ typedef enum {
 } HelicsDataTypes;
 
 /** single character data type  this is intentionally the same as string*/
-#define HELICS_DATE_TYPE_CHAR HELICS_DATE_TYPE_STRING
+#define HELICS_DATA_TYPE_CHAR HELICS_DATA_TYPE_STRING
 
 /** enumeration of possible federate flags*/
 typedef enum {

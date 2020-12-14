@@ -18,8 +18,8 @@ namespace helicscpp {
 /** C++98 interface for a helics Input*/
 class Input {
   public:
-    /** construct from a helics_input object*/
-    explicit Input(helics_input hsub) HELICS_NOTHROW: inp(hsub) {}
+    /** construct from a HelicsInput object*/
+    explicit Input(HelicsInput hsub) HELICS_NOTHROW: inp(hsub) {}
     /** default constructor*/
     Input() HELICS_NOTHROW: inp(HELICS_NULL_POINTER) {}
     /** copy constructor*/
@@ -30,12 +30,12 @@ class Input {
         inp = input.inp;
         return *this;
     }
-    /** cast to helics_input object*/
-    operator helics_input() const { return inp; }
+    /** cast to HelicsInput object*/
+    operator HelicsInput() const { return inp; }
     /** extract the base object*/
-    helics_input baseObject() const { return inp; }
+    HelicsInput baseObject() const { return inp; }
     /** check if the input is valid */
-    bool isValid() const { return (helicsInputIsValid(inp) == helics_true); }
+    bool isValid() const { return (helicsInputIsValid(inp) == HELICS_TRUE); }
     /** add a publication target to the input*/
     void addTarget(const std::string& target)
     {
@@ -57,7 +57,7 @@ class Input {
     /** set the default bool value*/
     void setDefault(bool val)
     {
-        helicsInputSetDefaultBoolean(inp, val ? helics_true : HELICS_FALSE, HELICS_IGNORE_ERROR);
+        helicsInputSetDefaultBoolean(inp, val ? HELICS_TRUE : HELICS_FALSE, HELICS_IGNORE_ERROR);
     }
     /** set the default double value*/
     void setDefault(double val) { helicsInputSetDefaultDouble(inp, val, HELICS_IGNORE_ERROR); }
@@ -141,8 +141,8 @@ class Input {
     /** get the value as a boolean*/
     bool getBoolean()
     {
-        helics_bool val = helicsInputGetBoolean(inp, HELICS_IGNORE_ERROR);
-        return (val == helics_true);
+        HelicsBool val = helicsInputGetBoolean(inp, HELICS_IGNORE_ERROR);
+        return (val == HELICS_TRUE);
     }
     /** get the value as a double*/
     double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
@@ -174,7 +174,7 @@ class Input {
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 
     /** Get the last time an input was updated **/
-    helics_time getLastUpdateTime() const { return helicsInputLastUpdateTime(inp); }
+    HelicsTime getLastUpdateTime() const { return helicsInputLastUpdateTime(inp); }
 
     /** clear the updated flag*/
     void clearUpdate() { helicsInputClearUpdate(inp); }
@@ -207,7 +207,7 @@ class Input {
     int32_t getOption(int32_t option) { return helicsInputGetOption(inp, option); }
 
   private:
-    helics_input inp;  //!< the reference to the underlying publication
+    HelicsInput inp;  //!< the reference to the underlying publication
 };
 
 }  // namespace helicscpp

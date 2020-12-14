@@ -18,10 +18,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-void helicsBrokerSetLoggingCallback(helics_broker broker,
+void helicsBrokerSetLoggingCallback(HelicsBroker broker,
                                     void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
                                     void* userdata,
-                                    helics_error* err)
+                                    HelicsError* err)
 {
     auto* brk = getBroker(broker, err);
     if (brk == nullptr) {
@@ -43,10 +43,10 @@ void helicsBrokerSetLoggingCallback(helics_broker broker,
     }
 }
 
-void helicsCoreSetLoggingCallback(helics_core core,
+void helicsCoreSetLoggingCallback(HelicsCore core,
                                   void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
                                   void* userdata,
-                                  helics_error* err)
+                                  HelicsError* err)
 {
     auto* cr = getCore(core, err);
     if (cr == nullptr) {
@@ -69,10 +69,10 @@ void helicsCoreSetLoggingCallback(helics_core core,
     }
 }
 
-void helicsFederateSetLoggingCallback(helics_federate fed,
+void helicsFederateSetLoggingCallback(HelicsFederate fed,
                                       void (*logger)(int loglevel, const char* identifier, const char* message, void* userdata),
                                       void* userdata,
-                                      helics_error* err)
+                                      HelicsError* err)
 {
     auto* fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
@@ -95,10 +95,10 @@ void helicsFederateSetLoggingCallback(helics_federate fed,
     }
 }
 
-void helicsFederateSetQueryCallback(helics_federate fed,
+void helicsFederateSetQueryCallback(HelicsFederate fed,
                                     void (*queryAnswer)(const char* query, int querySize, helics_query_buffer buffer, void* userdata),
                                     void* userdata,
-                                    helics_error* err)
+                                    HelicsError* err)
 {
     auto* fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
@@ -122,21 +122,21 @@ void helicsFederateSetQueryCallback(helics_federate fed,
     }
 }
 
-void helicsQueryBufferFill(helics_query_buffer buffer, const char* string, int stringSize, helics_error* err)
+void helicsQueryBufferFill(helics_query_buffer buffer, const char* string, int stringSize, HelicsError* err)
 {
     static const char* invalidBuffer = "The given buffer is not valid";
 
-    if (((err) != nullptr) && ((err)->error_code != 0)) {
+    if (((err) != nullptr) && ((err)->errorCode != 0)) {
         return;
     }
     if (buffer == nullptr) {
-        assignError(err, HELICS_ERROR_invalid_object, invalidBuffer);
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidBuffer);
         return;
     }
 
     auto* bufferStr = reinterpret_cast<std::string*>(buffer);
     if (bufferStr->empty() || bufferStr->back() != '>') {
-        assignError(err, HELICS_ERROR_invalid_object, invalidBuffer);
+        assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidBuffer);
         return;
     }
     if (stringSize <= 0 || string == nullptr) {

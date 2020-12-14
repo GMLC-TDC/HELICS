@@ -4,10 +4,10 @@ Starting in HELICS 2.5 there is a Multi Broker type that allows connection with 
 
 ## Starting a multiBroker
 
-A multibroker can be started as BrokerApp or a helics_broker. For the HELICS Broker the configuration must given as a file since each of the core types linked must be configured independently. Using the helics_broker the startup commands would look something like
+A multibroker can be started as BrokerApp or a HelicsBroker. For the HELICS Broker the configuration must given as a file since each of the core types linked must be configured independently. Using the HelicsBroker the startup commands would look something like
 
 ```sh
-helics_broker --CoreType multi --config=helics_mb_config.json --name=broker1
+HelicsBroker --CoreType multi --config=helics_mb_config.json --name=broker1
 ```
 
 A couple example configurations follow.
