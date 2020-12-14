@@ -772,7 +772,7 @@ class Core {
   "federation",  "broker", "core", or the name of a specific object/core/broker
   @param target the specific target of the command
   @param commandStr the actual command
-  @param source
+  @param source the designated source of the command, for return values or indication
   */
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,

@@ -388,8 +388,6 @@ class HELICS_CXX_EXPORT Federate {
     void sendCommand(const std::string& target, const std::string& commandStr);
 
     /** get a command for the Federate
- @param target  the target of the command can be "federation", "federate", "broker", "core", or a
- specific name of a federate, core, or broker
  @return a pair of strings <command,source> with the command instructions for the federate; the
  command string will be empty if no command is given
  */
@@ -397,8 +395,6 @@ class HELICS_CXX_EXPORT Federate {
 
     /** get a command for the Federate, if there is none the call will block until a command is
 received
-@param target  the target of the command can be "federation", "federate", "broker", "core", or a
-specific name of a federate, core, or broker
 @return a pair of strings <command,source> with the command instructions for the federate
 */
     std::pair<std::string, std::string> waitCommand();

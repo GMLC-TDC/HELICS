@@ -70,7 +70,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         ${helics_apps_broker_files}
     )
 
-    target_link_libraries(helics_apps PUBLIC helics_application_api)
+    target_link_libraries(helics_apps PUBLIC HELICS::application_api)
     target_link_libraries(
         helics_apps PRIVATE HELICS::compile_flags_target spdlog::spdlog fmt::fmt helics::zmq
     )
@@ -92,7 +92,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     if(HELICS_BUILD_APP_EXECUTABLES)
         add_executable(helics_player playerMain.cpp)
-        target_link_libraries(helics_player PUBLIC helics_apps)
+        target_link_libraries(helics_player PUBLIC HELICS::apps)
         target_link_libraries(helics_player PRIVATE compile_flags_target)
         set_target_properties(helics_player PROPERTIES FOLDER apps)
         install(TARGETS helics_player ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -100,7 +100,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         add_executable(helics_recorder recorderMain.cpp)
-        target_link_libraries(helics_recorder PUBLIC helics_apps)
+        target_link_libraries(helics_recorder PUBLIC HELICS::apps)
         set_target_properties(helics_recorder PROPERTIES FOLDER apps)
         target_link_libraries(helics_recorder PRIVATE compile_flags_target)
         install(TARGETS helics_recorder ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -108,7 +108,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         add_executable(HelicsBroker helics-broker.cpp)
-        target_link_libraries(HelicsBroker PUBLIC helics_apps)
+        target_link_libraries(HelicsBroker PUBLIC HELICS::apps)
         target_link_libraries(HelicsBroker PRIVATE compile_flags_target)
         set_target_properties(HelicsBroker PROPERTIES FOLDER apps)
         set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
@@ -120,7 +120,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         set_property(TEST broker_version_return broker_help_return PROPERTY LABELS Continuous)
 
         add_executable(helics_broker_server helics-broker-server.cpp)
-        target_link_libraries(helics_broker_server PUBLIC helics_apps)
+        target_link_libraries(helics_broker_server PUBLIC HELICS::apps)
         target_link_libraries(helics_broker_server PRIVATE compile_flags_target)
         set_target_properties(helics_broker_server PROPERTIES FOLDER apps)
         set(HELICS_BROKER_SERVER_LOC ${CMAKE_CURRENT_BINARY_DIR}
@@ -131,7 +131,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
 
         add_executable(helics_app appMain.cpp)
-        target_link_libraries(helics_app PUBLIC helics_apps)
+        target_link_libraries(helics_app PUBLIC HELICS::apps)
         target_link_libraries(helics_app PRIVATE spdlog::spdlog compile_flags_target)
         set_target_properties(helics_app PROPERTIES FOLDER apps)
         install(TARGETS helics_app ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -158,7 +158,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
         target_link_libraries(helicscpp-apps PUBLIC HELICS::helicscpp)
         target_link_libraries(
-            helicscpp-apps PRIVATE helics_common spdlog::spdlog fmt::fmt HELICS::utilities
+            helicscpp-apps PRIVATE HELICS::common spdlog::spdlog fmt::fmt HELICS::utilities
         )
 
         # add and alias library to match the find_package

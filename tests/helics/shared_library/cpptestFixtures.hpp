@@ -50,7 +50,7 @@ struct FederateTestFixture_cpp {
     void AddFederates(std::string CoreType_name,
                       int count,
                       helicscpp::Broker& broker,
-                      HelicsTime time_delta = helics_time_zero,
+                      HelicsTime time_delta = HELICS_TIME_ZERO,
                       const std::string& name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode(CoreType_name);
