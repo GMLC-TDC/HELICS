@@ -6,30 +6,30 @@
 
 /* throw a helics error */
 static octave_value Helics_ErrorType(HelicsError *err) {
-switch (err->error_code)
+switch (err->errorCode)
   {
-  case HELICS_ERROR_registration_failure:
+  case HELICS_ERROR_REGISTRATION_FAILURE:
     return "helics:registration_failure";
-  case   HELICS_ERROR_connection_failure:
+  case   HELICS_ERROR_CONNECTION_FAILURE:
     return "helics:connection_failure";
   case   HELICS_ERROR_INVALID_OBJECT:
     return "helics:invalid_object";
   case   HELICS_ERROR_INVALID_ARGUMENT:
     return "helics:invalid_argument";
-  case   HELICS_ERROR_discard:
+  case   HELICS_ERROR_DISCARD:
     return "helics:discard";
-  case HELICS_ERROR_system_failure:
+  case HELICS_ERROR_SYSTEM_FAILURE:
     return "helics:system_failure";
-  case   HELICS_ERROR_invalid_state_transition:
+  case   HELICS_ERROR_INVALID_STATE_TRANSITION:
     return "helics:invalid_state_transition";
-  case   HELICS_ERROR_invalid_function_call:
+  case   HELICS_ERROR_INVALID_FUNCTION_CALL:
     return "helics:invalid_function_call";
-  case   HELICS_ERROR_execution_failure:
+  case   HELICS_ERROR_EXECUTION_FAILURE:
     return "helics:execution_failure";
-  case   HELICS_ERROR_insufficient_space:
+  case   HELICS_ERROR_INSUFFICIENT_SPACE:
     return "helics:insufficient_space";
-  case   HELICS_ERROR_other:
-  case   HELICS_ERROR_external_type:
+  case   HELICS_ERROR_OTHER:
+  case   HELICS_ERROR_EXTERNAL_TYPE:
   default:
     return "helics:error";
   }
@@ -52,7 +52,7 @@ static octave_value throwHelicsOctaveError(HelicsError *err) {
 
 %typemap(freearg) HelicsError *
 {
-    if ($1->error_code!=HELICS_OK)
+    if ($1->errorCode!=HELICS_OK)
     {
         throwHelicsOctaveError($1);
     }

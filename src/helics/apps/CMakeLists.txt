@@ -107,16 +107,16 @@ if(HELICS_BUILD_APP_LIBRARY)
                 COMPONENT applications
         )
 
-        add_executable(HelicsBroker helics-broker.cpp)
-        target_link_libraries(HelicsBroker PUBLIC HELICS::apps)
-        target_link_libraries(HelicsBroker PRIVATE compile_flags_target)
-        set_target_properties(HelicsBroker PROPERTIES FOLDER apps)
+        add_executable(helics_broker helics-broker.cpp)
+        target_link_libraries(helics_broker PUBLIC HELICS::apps)
+        target_link_libraries(helics_broker PRIVATE compile_flags_target)
+        set_target_properties(helics_broker PROPERTIES FOLDER apps)
         set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
             CACHE INTERNAL "build folder location of the broker"
         )
 
-        add_test(NAME broker_version_return COMMAND HelicsBroker --version)
-        add_test(NAME broker_help_return COMMAND HelicsBroker --help)
+        add_test(NAME broker_version_return COMMAND helics_broker --version)
+        add_test(NAME broker_help_return COMMAND helics_broker --help)
         set_property(TEST broker_version_return broker_help_return PROPERTY LABELS Continuous)
 
         add_executable(helics_broker_server helics-broker-server.cpp)
@@ -126,7 +126,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         set(HELICS_BROKER_SERVER_LOC ${CMAKE_CURRENT_BINARY_DIR}
             CACHE INTERNAL "build folder location of the broker server"
         )
-        install(TARGETS HelicsBroker helics_broker_server ${HELICS_EXPORT_COMMAND}
+        install(TARGETS helics_broker helics_broker_server ${HELICS_EXPORT_COMMAND}
                 DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications
         )
 
