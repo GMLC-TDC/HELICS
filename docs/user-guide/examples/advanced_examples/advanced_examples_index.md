@@ -70,13 +70,7 @@ The Advanced Examples are similar in theme to the [Base Example](../fundamental_
 
 Every time charging is terminated on an EV, a new EV to take its place is randomly assigned a supported charging level and initial SOC. 
 
-<a name="differences-compared-to-the-fundamental-examples">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Differences Compared to the Fundamental Examples
-</span>
-</strong>
-</a>
+## Differences compared to fundamental example
 
 There are a few important distinctions between the Fundamental Examples and the Advanced Examples, which can be grouped into __HELICS__ differences and __research question complexity__ differences.
 
