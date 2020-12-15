@@ -27,42 +27,42 @@ struct FederateTestFixture {
     FederateTestFixture() = default;
     ~FederateTestFixture();
 
-    helics::BrokerApp AddBroker(const std::string& core_type_name, int count);
-    helics::BrokerApp AddBroker(const std::string& core_type_name,
+    helics::BrokerApp AddBroker(const std::string& CoreType_name, int count);
+    helics::BrokerApp AddBroker(const std::string& CoreType_name,
                                 const std::string& initialization_string);
 
     template<class FedType>
-    void SetupTest(const std::string& core_type_name,
+    void SetupTest(const std::string& CoreType_name,
                    int count,
                    helics::Time time_delta = helics::timeZero,
                    const std::string& name_prefix = defaultNamePrefix)
     {
-        ctype = core_type_name;
-        auto broker = AddBroker(core_type_name, count);
+        ctype = CoreType_name;
+        auto broker = AddBroker(CoreType_name, count);
         if (!broker.isConnected()) {
             broker.forceTerminate();
             broker.reset();
             helics::cleanupHelicsLibrary();
-            broker = AddBroker(core_type_name, count);
+            broker = AddBroker(CoreType_name, count);
             if (!broker.isConnected()) {
                 throw(std::runtime_error("Unable to connect rootbroker"));
             }
         }
-        AddFederates<FedType>(core_type_name, count, broker, time_delta, name_prefix);
+        AddFederates<FedType>(CoreType_name, count, broker, time_delta, name_prefix);
     }
 
     template<class FedType>
-    void AddFederates(std::string core_type_name,
+    void AddFederates(std::string CoreType_name,
                       int count,
                       helics::BrokerApp& broker,
                       helics::Time time_delta = helics::timeZero,
                       const std::string& name_prefix = defaultNamePrefix)
     {
-        bool hasIndex = hasIndexCode(core_type_name);
-        int setup = (hasIndex) ? getIndexCode(core_type_name) : 1;
+        bool hasIndex = hasIndexCode(CoreType_name);
+        int setup = (hasIndex) ? getIndexCode(CoreType_name) : 1;
         if (hasIndex) {
-            core_type_name.pop_back();
-            core_type_name.pop_back();
+            CoreType_name.pop_back();
+            CoreType_name.pop_back();
         }
 
         std::string initString = std::string("--broker=") + broker.getIdentifier() +
@@ -73,21 +73,21 @@ struct FederateTestFixture {
             initString.append(extraCoreArgs);
         }
 
-        helics::FederateInfo fi(helics::coreTypeFromString(core_type_name));
+        helics::FederateInfo fi(helics::coreTypeFromString(CoreType_name));
         if (time_delta != helics::timeZero) {
-            fi.setProperty(helics_property_time_delta, time_delta);
+            fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         }
 
         switch (setup) {
             case 1:
             default: {
                 size_t offset = federates.size();
-                auto core_type = helics::coreTypeFromString(core_type_name);
-                //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" +
+                auto CoreType = helics::coreTypeFromString(CoreType_name);
+                //  auto core = helics::CoreFactory::create (CoreType, name_prefix + "_core_" +
                 //  std::to_string (offset),
                 //                                          initString + " --federates " +
                 //                                          std::to_string (count));
-                helics::CoreApp core(core_type,
+                helics::CoreApp core(CoreType,
                                      initString + " --federates " + std::to_string(count));
                 fi.coreName = core.getIdentifier();
 
@@ -99,15 +99,15 @@ struct FederateTestFixture {
                 }
             } break;
             case 2: {  // each federate has its own core
-                auto core_type = helics::coreTypeFromString(core_type_name);
+                auto CoreType = helics::coreTypeFromString(CoreType_name);
                 size_t offset = federates.size();
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ++ii) {
                     //     auto core =
-                    //     helics::CoreFactory::create (core_type, name_prefix + "_core_" +
+                    //     helics::CoreFactory::create (CoreType, name_prefix + "_core_" +
                     //     std::to_string (ii + offset),
                     //                                    initString + " --federates 1");
-                    helics::CoreApp core(core_type, initString + " --federates 1");
+                    helics::CoreApp core(CoreType, initString + " --federates 1");
                     fi.coreName = core.getIdentifier();
 
                     auto fedname = name_prefix + std::to_string(ii + offset);
@@ -117,14 +117,14 @@ struct FederateTestFixture {
             } break;
             case 3: {
                 auto subbroker =
-                    AddBroker(core_type_name, initString + " --federates " + std::to_string(count));
-                //    auto subbroker = AddBroker(core_type_name, initString + " --federates " +
+                    AddBroker(CoreType_name, initString + " --federates " + std::to_string(count));
+                //    auto subbroker = AddBroker(CoreType_name, initString + " --federates " +
                 //    std::to_string(count) +
                 //        " --name=subbroker_" + name_prefix);
                 if (!subbroker.isConnected()) {
                     throw(std::runtime_error("Unable to connect subbroker"));
                 }
-                auto newTypeString = core_type_name;
+                auto newTypeString = CoreType_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
@@ -132,12 +132,12 @@ struct FederateTestFixture {
                 }
             } break;
             case 4: {
-                auto newTypeString = core_type_name;
+                auto newTypeString = CoreType_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
-                    auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
-                    //    auto subbroker = AddBroker(core_type_name, initString + " --federates 1
+                    auto subbroker = AddBroker(CoreType_name, initString + " --federates 1");
+                    //    auto subbroker = AddBroker(CoreType_name, initString + " --federates 1
                     //    --name=subbroker_" +
                     //        name_prefix + std::to_string(ii));
                     if (!subbroker->isConnected()) {
@@ -148,11 +148,11 @@ struct FederateTestFixture {
             } break;
             case 5:  // pairs of federates per core
             {
-                auto core_type = helics::coreTypeFromString(core_type_name);
+                auto CoreType = helics::coreTypeFromString(CoreType_name);
                 size_t offset = federates.size();
                 federates.resize(count + offset);
                 for (int ii = 0; ii < count; ii += 2) {
-                    helics::CoreApp core(core_type,
+                    helics::CoreApp core(CoreType,
                                          initString + " --federates " +
                                              std::to_string((ii < count - 1) ? 2 : 1));
                     fi.coreName = core.getIdentifier();
@@ -169,13 +169,13 @@ struct FederateTestFixture {
             } break;
             case 6:  // pairs of cores per subbroker
             {
-                auto newTypeString = core_type_name;
+                auto newTypeString = CoreType_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('5');
                 for (int ii = 0; ii < count; ii += 4) {
                     int fedcnt = (ii > count - 3) ? 4 : (count - ii);
                     auto subbroker =
-                        AddBroker(core_type_name,
+                        AddBroker(CoreType_name,
                                   initString + " --federates " + std::to_string(fedcnt));
                     if (!subbroker->isConnected()) {
                         throw(std::runtime_error("Unable to connect subbroker(mode 4)"));
@@ -186,11 +186,11 @@ struct FederateTestFixture {
             } break;
             case 7:  // two layers of subbrokers
             {
-                auto newTypeString = core_type_name;
+                auto newTypeString = CoreType_name;
                 newTypeString.push_back('_');
                 newTypeString.push_back('4');
                 for (int ii = 0; ii < count; ++ii) {
-                    auto subbroker = AddBroker(core_type_name, initString + " --federates 1");
+                    auto subbroker = AddBroker(CoreType_name, initString + " --federates 1");
                     if (!subbroker->isConnected()) {
                         throw(std::runtime_error("Unable to connect subbroker(mode 4)"));
                     }

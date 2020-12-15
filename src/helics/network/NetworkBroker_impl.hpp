@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../core/core-types.hpp"
+#include "../core/CoreTypes.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "NetworkBroker.hpp"
 
@@ -30,7 +30,7 @@ constexpr const char* tstr[] = {"default",
                                 "undef",
                                 "undef",
                                 "http",
-                                "unknown"};
+                                "UNKNOWN"};
 
 constexpr const char* tcodeStr(int tcode)
 {

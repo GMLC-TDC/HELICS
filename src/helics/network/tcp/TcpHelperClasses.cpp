@@ -549,7 +549,7 @@ TcpServer::~TcpServer()
 void TcpServer::initialConnect()
 {
     if (halted.load(std::memory_order_acquire)) {
-        std::cout << "previously halted server" << std::endl;
+        std::cout << "previously HALTED server" << std::endl;
         return;
     }
     for (auto& ep : endpoints) {

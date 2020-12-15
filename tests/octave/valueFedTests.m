@@ -18,8 +18,8 @@ end
 %! try
 %!    helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 %!    helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-%!   helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
-%!    helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
+%!   helicsFederateInfoSetTimeProperty(fedInfo,HELICS_PROPERTY_TIME_DELTA, 0.01);
+%!    helicsFederateInfoSetIntegerProperty(fedInfo,HELICS_PROPERTY_INT_LOG_LEVEL,1);
 %! catch e
 %!     disp(e.message)
 %!     disp(e.stack(1))
@@ -132,7 +132,7 @@ end
 %!     testValue2 = 'I am a string';
 %!     testVal2 = 0.0;
 %! try
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_named_point, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_NAMED_POINT, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultNamedPoint(subid, defaultValue, defVal);
@@ -193,7 +193,7 @@ end
 %!     testValue1 = 1;
 %!     testValue2 = 0;
 %!
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_boolean, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_BOOLEAN, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultBoolean(subid, defaultValue);
@@ -254,9 +254,9 @@ end
 %! assert(success)
 %!
 %! try
-%!     pubid1 = helicsFederateRegisterPublication(feds.vFed, 'pub1', helics_data_type_string, '');
-%!     pubid2 = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub2', helics_data_type_int, '');
-%!     pubid3 = helicsFederateRegisterPublication(feds.vFed, 'pub3', helics_data_type_double, 'V');
+%!     pubid1 = helicsFederateRegisterPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
+%!     pubid2 = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub2', HELICS_DATA_TYPE_INT, '');
+%!     pubid3 = helicsFederateRegisterPublication(feds.vFed, 'pub3', HELICS_DATA_TYPE_DOUBLE, 'V');
 %!
 %!     publication_key = helicsPublicationGetKey(pubid1);
 %!
@@ -305,7 +305,7 @@ end
 %!     testValue1 = 2.7586;
 %!     testValue2 = 1e27;
 %!
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_double, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_DOUBLE, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultDouble(subid, defaultValue);
@@ -372,7 +372,7 @@ end
 %!     testValue1 = 2.7586+ 342.25626j;
 %!     testValue2 = 1e27-0.3e-2j;
 %!
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_complex, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_COMPLEX, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultComplex(subid, defaultValue);
@@ -437,7 +437,7 @@ end
 %!     testValue1 = int64(-27);
 %!     testValue2 = int64(0);
 %!
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_int, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_INT, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultInteger(subid, defaultValue);
@@ -502,7 +502,7 @@ end
 %!     testValue1 = 'this is a longer test string to bypass sso';
 %!     testValue2 = '';
 %!
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_string, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultString(subid, defaultValue);
@@ -568,7 +568,7 @@ end
 %!     testValue1 = ones(22,1);
 %!     testValue2 = [99.1;-99;2;0.0;-1e35;4.56e-7];
 %!
-%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_vector, '');
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_VECTOR, '');
 %!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 %!
 %!     helicsInputSetDefaultVector(subid, defaultValue);

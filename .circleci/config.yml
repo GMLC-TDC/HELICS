@@ -16,10 +16,14 @@ aliases:
       make install
       cd ${OCTAVETEST}
       # this return the write error code in RESULT
-      octave -W -V --eval "source('runTestsCIRCLECI.m');"
-      RESULT=$?
-      echo "*** Octave test result: "${RESULT}
-      exit $RESULT
+      res=$(octave -W -V --eval "source('runTestsCIRCLECI.m');")
+      echo "$res" 
+      if [[ "$res" == *"failed"* ]]; then
+         echo "*** Octave tests FAILED: "
+         exit -1
+      fi
+      echo "*** Octave tests PASSED "
+      exit 0
 
   - &run_helics_tests
     name: run_helics_tests

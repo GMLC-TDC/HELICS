@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../core/core-types.hpp"
+#include "../../core/CoreTypes.hpp"
 #include "../NetworkBroker.hpp"
 
 #include <memory>
@@ -19,11 +19,11 @@ namespace tcp {
     class TcpCommsSS;
     /** implementation for the core that uses TCP messages to communicate*/
     using TcpBroker =
-        NetworkBroker<TcpComms, interface_type::tcp, static_cast<int>(core_type::TCP)>;
+        NetworkBroker<TcpComms, interface_type::tcp, static_cast<int>(CoreType::TCP)>;
 
     /** single socket version of the TCP broker*/
     class TcpBrokerSS final:
-        public NetworkBroker<TcpCommsSS, interface_type::tcp, static_cast<int>(core_type::TCP_SS)> {
+        public NetworkBroker<TcpCommsSS, interface_type::tcp, static_cast<int>(CoreType::TCP_SS)> {
       public:
         /** default constructor*/
         explicit TcpBrokerSS(bool rootBroker = false) noexcept;

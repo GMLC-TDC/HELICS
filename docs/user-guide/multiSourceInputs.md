@@ -14,43 +14,43 @@ A few flags are available to control or modify this behavior including limiting 
 
 There are several flags and handle options which can control this for Inputs
 
-- `helics_handle_option_single_connection_only` : If set to true specified that an input may have only 1 connection
-- `helics_handle_option_multiple_connections_allowed`: if set to true then multiple connections are allowed
-- `helics_handle_option_connections`: takes an integer number of connections specifying that an input must have N number of connections or an error will be generated.
+- `HELICS_HANDLE_OPTION_single_connection_only` : If set to true specified that an input may have only 1 connection
+- `HELICS_HANDLE_OPTION_multiple_connections_allowed`: if set to true then multiple connections are allowed
+- `HELICS_HANDLE_OPTION_connections`: takes an integer number of connections specifying that an input must have N number of connections or an error will be generated.
 
 ### Controlling priority
 
 The default priority of the inputs if they are published at the same time and only a single value is retrieved is in order of connection. This may not be desired so a few handle options are available to manipulate it.
 
-- `helics_handle_option_input_priority_location` takes a value specifying the input source index to give priority to. If given multiple times it establishes an ordering of the inputs. So in the case of timing ties they can be ordered. For example if the option is called first with a given value of 2 then again with 1 and an input has 3 sources. If they all tie the source with index 1 will have highest priority, and in the case of a tie between sources 0 and 2, source 2 will have priority.
-- `helics_handle_option_clear_priority_list` will erase the existing priority list.
+- `HELICS_HANDLE_OPTION_input_priority_location` takes a value specifying the input source index to give priority to. If given multiple times it establishes an ordering of the inputs. So in the case of timing ties they can be ordered. For example if the option is called first with a given value of 2 then again with 1 and an input has 3 sources. If they all tie the source with index 1 will have highest priority, and in the case of a tie between sources 0 and 2, source 2 will have priority.
+- `HELICS_HANDLE_OPTION_clear_priority_list` will erase the existing priority list.
 
 ## Reduction operations on multiple inputs
 
 The priority of the inputs is only applicable if the default operation to retrieve a single value is used. The option
-`helics_handle_option_multi_input_handling_method` can be used to specify a reduction operation on all the inputs to process them in some fashion a number of operations are available.
+`HELICS_HANDLE_OPTION_multi_input_handling_method` can be used to specify a reduction operation on all the inputs to process them in some fashion a number of operations are available.
 
 ```eval_rst
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 | method                                    | Description                                                                                                                                  |
 +===========================================+==============================================================================================================================================+
-| ``helics_multi_input_no_op``              | default operation to pick the highest priority value                                                                                         |
+| ``HELICS_MULTI_INPUT_no_op``              | default operation to pick the highest priority value                                                                                         |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_vectorize_operation``| take all the values and collapse to a single vector, converts strings into a JSON string vector                                               |
+| ``HELICS_MULTI_INPUT_vectorize_operation``| take all the values and collapse to a single vector, converts strings into a JSON string vector                                               |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-|``helics_multi_input_and_operation``       | treat all inputs as booleans and perform an `and` operation                                                                                  |
+|``HELICS_MULTI_INPUT_and_operation``       | treat all inputs as booleans and perform an `and` operation                                                                                  |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_or_operation``       | treat all inputs as boolean and perform an `or` operation                                                                                    |
+| ``HELICS_MULTI_INPUT_or_operation``       | treat all inputs as boolean and perform an `or` operation                                                                                    |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-|``helics_multi_input_sum_operation``       | sum all the inputs after converting to double vector                                                                                         |
+|``HELICS_MULTI_INPUT_sum_operation``       | sum all the inputs after converting to double vector                                                                                         |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_diff_operation``     | if the input type is specified as a double subtract the sum of remaining values from the first, if it is a vector do a vector diff operation |
+| ``HELICS_MULTI_INPUT_diff_operation``     | if the input type is specified as a double subtract the sum of remaining values from the first, if it is a vector do a vector diff operation |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_max_operation``      | pick the biggest value                                                                                                                       |
+| ``HELICS_MULTI_INPUT_max_operation``      | pick the biggest value                                                                                                                       |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_min_operation``      | pick the smallest value                                                                                                                      |
+| ``HELICS_MULTI_INPUT_min_operation``      | pick the smallest value                                                                                                                      |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_average_operation``  | take a numerical average of all values                                                                                                       |
+| ``HELICS_MULTI_INPUT_average_operation``  | take a numerical average of all values                                                                                                       |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
@@ -65,26 +65,26 @@ auto& in1 = vFed1->registerInput<double>("");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::options::multi_input_handling_method,
+    in1.setOption(helics::defs::Options::multi_input_handling_method,
                   helics::multi_input_handling_method::average);
 ```
 
 ```c
 /*errors are ignored here*/
-helics_input in1 = helicsFederateRegisterInput("",helics_data_type_double,"",nullptr);
+HelicsInput in1 = helicsFederateRegisterInput("",HELICS_DATA_TYPE_DOUBLE,"",nullptr);
 helicsInputAddTarget(in1,"pub1",nullptr);
 helicsInputAddTarget(in1,"pub2",nullptr);
 helicsInputAddTarget(in1,"pub2",nullptr);
-helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation, nullptr);
+helicsInputSetOption(in1,HELICS_HANDLE_OPTION_multi_input_handling_method,HELICS_MULTI_INPUT_average_operation, nullptr);
 
 ```
 
 ```python
-in1 = h.helicsFederateRegisterInput("",h.helics_data_type_double,"");
+in1 = h.helicsFederateRegisterInput("",h.HELICS_DATA_TYPE_DOUBLE,"");
 h.helicsInputAddTarget(in1,"pub1");
 h.helicsInputAddTarget(in1,"pub2");
 h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation);
+h.helicsInputSetOption(in1,HELICS_HANDLE_OPTION_multi_input_handling_method,HELICS_MULTI_INPUT_average_operation);
 
 ```
 

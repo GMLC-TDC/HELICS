@@ -111,7 +111,7 @@ TEST_P(query_type, publication_fed_queries)
     vFed2->finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(query, query_type, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(query, query_type, ::testing::ValuesIn(CoreTypes));
 
 TEST_F(query, federate_map)
 {
@@ -841,7 +841,7 @@ TEST_F(query, queries_query)
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query("core", qstr);
-        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced and error in core";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in core";
         try {
             auto v = loadJsonStr(qres);
         }

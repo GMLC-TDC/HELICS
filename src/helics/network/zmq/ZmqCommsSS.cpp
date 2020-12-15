@@ -416,7 +416,7 @@ namespace zeromq {
                                 if (!isDisconnectCommand(cmd)) {
                                     logWarning(
                                         std::string(
-                                            "unknown route and no broker, dropping message ") +
+                                            "UNKNOWN route and no broker, dropping message ") +
                                         prettyPrintString(cmd));
                                 }
                             }

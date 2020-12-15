@@ -23,13 +23,13 @@ class vfed_type_tests:
     public FederateTestFixture_cpp {
 };
 
-// const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
+// const std::string CoreTypes[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
 /** test block send and receive*/
 
 TEST_P(vfed_type_tests, test_block_send_receive)
 {
-    helics_time gtime;
+    HelicsTime gtime;
     std::string s(500, ';');
     int len = static_cast<int>(s.size());
     SCOPED_TRACE("calling setup");
@@ -39,13 +39,13 @@ TEST_P(vfed_type_tests, test_block_send_receive)
     ASSERT_TRUE((vFed1));
     auto pubid1 = vFed1->registerPublication("pub1", "string", "");
     EXPECT_TRUE(pubid1.baseObject() != nullptr);
-    auto pubid2 = vFed1->registerGlobalPublication("pub2", helics_data_type_int, "");
+    auto pubid2 = vFed1->registerGlobalPublication("pub2", HELICS_DATA_TYPE_INT, "");
     EXPECT_TRUE(pubid2.baseObject() != nullptr);
     auto pubid3 = vFed1->registerPublication("pub3", "");
     EXPECT_TRUE(pubid3.baseObject() != nullptr);
     auto sub1 = vFed1->registerSubscription("fed0/pub3");
     SCOPED_TRACE("reg opt1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     SCOPED_TRACE("set Delta");
     vFed1->enterExecutingMode();
     SCOPED_TRACE("publish");
@@ -74,18 +74,18 @@ TEST_P(vfed_type_tests, test_block_send_receive)
 
 TEST_P(vfed_type_tests, test_async_calls)
 {
-    helics_time gtime;
-    helics_time f1time;
-    // helics_federate_state state;
+    HelicsTime gtime;
+    HelicsTime f1time;
+    // HelicsFederateState state;
     SetupTest<helicscpp::ValueFederate>(GetParam(), 2);
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helicscpp::ValueFederate>(1);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication("pub1", helics_data_type_string, "");
+    auto pubid = vFed1->registerGlobalPublication("pub1", HELICS_DATA_TYPE_STRING, "");
     auto subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
@@ -135,7 +135,7 @@ TEST_P(vfed_type_tests, test_async_calls)
     vFed2->finalize();
 }
 //
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 //
 TEST_F(vfed_tests, test_file_load)

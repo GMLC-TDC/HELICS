@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-template class NetworkBroker<tcp::TcpComms, interface_type::tcp, static_cast<int>(core_type::TCP)>;
+template class NetworkBroker<tcp::TcpComms, interface_type::tcp, static_cast<int>(CoreType::TCP)>;
 namespace tcp {
     TcpBrokerSS::TcpBrokerSS(bool rootBroker) noexcept: NetworkBroker(rootBroker) {}
 

@@ -12,17 +12,17 @@
 %}
 
 %apply double *OUTPUT {double*};
-%apply helics_time *OUTPUT {helics_time*};
+%apply HelicsTime *OUTPUT {HelicsTime*};
 
 %apply int *OUTPUT{int *};
 %apply long long *OUTPUT{int64_t *};
-%apply int *OUTPUT{helics_federate_state *state};
-%apply int *OUTPUT{helics_iteration_result *};
+%apply int *OUTPUT{HelicsFederateState *state};
+%apply int *OUTPUT{HelicsIterationResult *};
 %apply long long {int64_t};
 
 %ignore helicsErrorInitialize;
 %ignore helicsErrorClear;
-%ignore helics_error;
+%ignore HelicsError;
 %ignore helicsMessageGetRawDataPointer;
 %ignore helicsMessageResize;
 

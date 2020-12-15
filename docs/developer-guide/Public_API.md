@@ -26,8 +26,8 @@ The public API includes the following
   - Inputs.hpp
   - BrokerApp.hpp (New in 2.3 Moved from App library)
   - CoreApp.hpp (New in 2.3)- Operations and some capabilities may be added or tweaked in the next revision
-  - timeOperations.hpp (New in 2.3)- previously functions were in helics-time.hpp
-  - typeOperations.hpp (New in 2.3)- previously functions were in core-types.hpp
+  - timeOperations.hpp (New in 2.3)- previously functions were in helicsTime.hpp
+  - typeOperations.hpp (New in 2.3)- previously functions were in CoreTypes.hpp
   - Exceptions: Any function or method dealing with Inputs with data from multiple sources is subject to change, the vector subscriptions, and vector inputs are subject to change. The functionality related to PublishJSON is considered experimental and may change in the future. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries. The data returned via queries is subject to change, in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers.
 
 - Core library headers
@@ -37,9 +37,9 @@ The public API includes the following
   - CoreFactory.hpp (Header is deprecated for public API in 2.3 use CoreApp instead)
   - BrokerFactory.hpp (Header is deprecated for public API in 2.3 use BrokerApp instead)
   - core-exceptions.hpp
-  - core-types.hpp (string operation functions moved to typeOperations.hpp in 2.3, though are still available for compatibility reasons in the Public API)
+  - CoreTypes.hpp (string operation functions moved to typeOperations.hpp in 2.3, though are still available for compatibility reasons in the Public API)
   - core-data.hpp
-  - helics-time.hpp (string operation functions moved to timeOperations.hpp in 2.3, though are still available for compatibility reasons in the Public API)
+  - helicsTime.hpp (string operation functions moved to timeOperations.hpp in 2.3, though are still available for compatibility reasons in the Public API)
   - CoreFederateInfo.hpp
   - helicsVersion.hpp
   - federate_id.hpp

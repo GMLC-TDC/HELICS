@@ -17,8 +17,8 @@ namespace helicscpp {
 /** object managing a filter in the C++98 interface*/
 class Filter {
   public:
-    /** construct from C level helics_filter object*/
-    explicit Filter(helics_filter hfilt) HELICS_NOTHROW: filt(hfilt) {}
+    /** construct from C level HelicsFilter object*/
+    explicit Filter(HelicsFilter hfilt) HELICS_NOTHROW: filt(hfilt) {}
     /** default constructor*/
     Filter() HELICS_NOTHROW: filt(HELICS_NULL_POINTER) {}
     /** copy constructor*/
@@ -31,11 +31,11 @@ class Filter {
     }
 
     /** cast operator to get the underlying object*/
-    operator helics_filter() const { return filt; }
-    /** get the underlying helics_filter object*/
-    helics_filter baseObject() const { return filt; }
+    operator HelicsFilter() const { return filt; }
+    /** get the underlying HelicsFilter object*/
+    HelicsFilter baseObject() const { return filt; }
     /** check if the filter is valid */
-    bool isValid() const { return (helicsFilterIsValid(filt) == helics_true); }
+    bool isValid() const { return (helicsFilterIsValid(filt) == HELICS_TRUE); }
     /** get the name for the filter*/
     const char* getName() const { return helicsFilterGetName(filt); }
     /** set a property on a filter
@@ -83,7 +83,7 @@ class Filter {
     }
 
   protected:
-    helics_filter filt;  //!< the reference to the underlying publication
+    HelicsFilter filt;  //!< the reference to the underlying publication
 };
 
 /** cloning filter extends some operations on filters
@@ -91,7 +91,7 @@ class Filter {
 class CloningFilter: public Filter {
   public:
     /** construct from underlying filter object*/
-    explicit CloningFilter(helics_filter hfilt) HELICS_NOTHROW: Filter(hfilt) {}
+    explicit CloningFilter(HelicsFilter hfilt) HELICS_NOTHROW: Filter(hfilt) {}
     /** default constructor*/
     CloningFilter() HELICS_NOTHROW{};
     /** copy constructor*/

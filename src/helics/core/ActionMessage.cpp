@@ -647,7 +647,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_time_request, "time_request"},
         {action_message_def::action_t::cmd_send_message, "send_message"},
         {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
-        {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
+        {action_message_def::action_t::cmd_filter_result, "result from running a FILTER"},
         {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
         {action_message_def::action_t::cmd_null_message, "null message"},
 
@@ -697,7 +697,7 @@ const char* actionMessageType(action_message_def::action_t action)
 
 // set of strings to translate error codes to something sensible
 static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
-    {connection_error_code, "connection error"},
+    {connection_error_code, "connection error_result"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
     {duplicate_federate_name_error_code, "duplicate federate name detected"},
@@ -811,17 +811,17 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
     return (-1);
 }
 
-void setIterationFlags(ActionMessage& command, iteration_request iterate)
+void setIterationFlags(ActionMessage& command, IterationRequest iterate)
 {
     switch (iterate) {
-        case iteration_request::force_iteration:
+        case IterationRequest::FORCE_ITERATION:
             setActionFlag(command, iteration_requested_flag);
             setActionFlag(command, required_flag);
             break;
-        case iteration_request::iterate_if_needed:
+        case IterationRequest::ITERATE_IF_NEEDED:
             setActionFlag(command, iteration_requested_flag);
             break;
-        case iteration_request::no_iterations:
+        case IterationRequest::NO_ITERATIONS:
             break;
     }
 }

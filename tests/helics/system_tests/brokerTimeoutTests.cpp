@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST(broker_timeout_tests, core_fail_timeout)
 {
@@ -175,10 +175,10 @@ TEST(broker_timeout_tests, core_fail_timeout_no_timer_ci_skip)
 TEST(broker_timeout_tests, core_fail_error)
 {
     auto brk =
-        helics::BrokerFactory::create(helics::core_type::TEST, "--timeout=200ms --tick 50ms");
+        helics::BrokerFactory::create(helics::CoreType::TEST, "--timeout=200ms --tick 50ms");
     brk->connect();
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "c3";
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
@@ -209,12 +209,12 @@ TEST(broker_timeout_tests, core_fail_error)
 #ifdef ENABLE_ZMQ_CORE
 TEST(broker_timeout_tests, maintain_connection_ci_skip)
 {
-    auto brk = helics::BrokerFactory::create(helics::core_type::ZMQ, "--timeout=100ms");
+    auto brk = helics::BrokerFactory::create(helics::CoreType::ZMQ, "--timeout=100ms");
     brk->connect();
 
-    helics::FederateInfo fi(helics::core_type::ZMQ);
+    helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreName = "c3";
-    fi.setProperty(helics_property_time_delta, 0.01);
+    fi.setProperty(HELICS_PROPERTY_TIME_DELTA, 0.01);
     auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
 
     Fed1->registerGlobalPublication<std::string>("pub1");

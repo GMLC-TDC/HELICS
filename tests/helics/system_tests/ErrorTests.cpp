@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <future>
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 struct error_tests: public FederateTestFixture, public ::testing::Test {
 };
@@ -52,7 +52,7 @@ TEST_F(error_tests, already_init_broker)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
 
     fed1->enterInitializingMode();
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString = std::string("--timeout=1s --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
@@ -62,12 +62,12 @@ TEST_F(error_tests, mismatch_broker_key)
 {
     auto broker = AddBroker("test", 1);
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
-    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::core_type::TEST);
+    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::CoreType::TEST);
     if (core) {
         core->disconnect();
     }
@@ -78,12 +78,12 @@ TEST_F(error_tests, mismatch_broker_key2)
 {
     auto broker = AddBroker("test", "-f 1 --broker_key=tkey2");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     EXPECT_THROW(helics::ValueFederate fed3("fed222", fi), helics::RegistrationFailure);
     broker->disconnect();
-    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::core_type::TEST);
+    auto core = helics::CoreFactory::findJoinableCoreOfType(helics::CoreType::TEST);
     if (core) {
         core->disconnect();
     }
@@ -94,7 +94,7 @@ TEST_F(error_tests, mismatch_broker_key_success)
 {
     auto broker = AddBroker("test", "--broker_key=tkey");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     helics::ValueFederate fed3("fed2b", fi);
@@ -108,7 +108,7 @@ TEST_F(error_tests, mismatch_broker_key_success_universal_key)
 {
     auto broker = AddBroker("test", "--broker_key=**");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString =
         std::string("--timeout=1s --broker_key=tkey --broker=") + broker->getIdentifier();
     helics::ValueFederate fed3("fed2b", fi);
@@ -165,10 +165,10 @@ TEST_F(error_tests, duplicate_publication_names2)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
         // this should do nothing
         EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -176,10 +176,10 @@ TEST_F(error_tests, duplicate_publication_names2)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
         // this should do nothing
         EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -197,8 +197,8 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->setFlagOption(helics_flag_terminate_on_error);
-    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed1->setFlagOption(HELICS_FLAG_TERMINATE_ON_ERROR);
+    fed2->setFlagOption(HELICS_FLAG_TERMINATE_ON_ERROR);
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
 
@@ -210,7 +210,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -218,7 +218,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -235,10 +235,10 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->getCorePointer()->setFlagOption(helics::gLocalCoreId,
-                                          helics_flag_terminate_on_error,
+                                          HELICS_FLAG_TERMINATE_ON_ERROR,
                                           true);
     fed2->getCorePointer()->setFlagOption(helics::gLocalCoreId,
-                                          helics_flag_terminate_on_error,
+                                          HELICS_FLAG_TERMINATE_ON_ERROR,
                                           true);
 
     fed1->registerGlobalPublication("testkey", "");
@@ -252,7 +252,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -260,7 +260,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -287,7 +287,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
     }
     catch (const helics::HelicsException&) {
         gotException = true;
-        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
 
     try {
@@ -295,7 +295,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
     }
     catch (const helics::HelicsException&) {
         gotException = true;
-        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
     }
     EXPECT_TRUE(gotException);
 
@@ -326,7 +326,7 @@ TEST_F(error_tests, duplicate_publication_names4)
     // all 3 of these should publish to the same thing
     auto& pubid = fed1->registerPublication("testkey", "");
 
-    helics::Publication pub(fed1, "testkey", helics::data_type::helics_double);
+    helics::Publication pub(fed1, "testkey", helics::DataType::HELICS_DOUBLE);
     // copy constructor
     helics::Publication pub2(pubid);
 
@@ -410,7 +410,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::options::connection_required, true);
+    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED, true);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -430,7 +430,7 @@ TEST_F(error_tests, missing_required_pub_with_default)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->registerGlobalPublication("t1", "");
-    fed2->setFlagOption(helics::defs::flags::connections_required, true);
+    fed2->setFlagOption(helics::defs::Flags::CONNECTIONS_REQUIRED, true);
     fed2->registerSubscription("abcd", "");
 
     fed1->enterInitializingModeAsync();
@@ -457,7 +457,7 @@ TEST_F(error_tests, mismatched_units)
     fed1->registerGlobalPublication("t1", "double", "V");
     fed2->registerSubscription("t1", "m");
     auto& sub = fed3->registerSubscription("t1", "m");
-    sub.setOption(helics::defs::options::ignore_unit_mismatch);
+    sub.setOption(helics::defs::Options::IGNORE_UNIT_MISMATCH);
     fed1->enterExecutingModeAsync();
     fed2->enterExecutingModeAsync();
     EXPECT_NO_THROW(fed3->enterExecutingMode());
@@ -481,10 +481,10 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     auto fed3 = GetFederateAs<helics::ValueFederate>(2);
 
     fed1->registerGlobalPublication("t1", "double", "V");
-    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed2->setFlagOption(HELICS_FLAG_TERMINATE_ON_ERROR);
     fed2->registerSubscription("t1", "m");
     auto& sub = fed3->registerSubscription("t1", "m");
-    sub.setOption(helics::defs::options::ignore_unit_mismatch);
+    sub.setOption(helics::defs::Options::IGNORE_UNIT_MISMATCH);
     fed1->enterExecutingModeAsync();
     fed2->enterExecutingModeAsync();
     try {
@@ -512,7 +512,7 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
     helics::cleanupHelicsLibrary();
 }
 
-INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(CoreTypes_simple));
 
 #if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE)
 

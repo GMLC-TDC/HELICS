@@ -5,7 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 
 #include <future>
 #include <map>
@@ -16,7 +16,7 @@ namespace helics {
 class AsyncFedCallInfo {
   public:
     std::future<void> initFuture; /**future for the Enter initialization call*/
-    std::future<iteration_result> execFuture; /** future for the enter execution mode call*/
+    std::future<IterationResult> execFuture; /** future for the enter execution mode call*/
     std::future<Time> timeRequestFuture; /** future for the timeRequest call*/
     std::future<iteration_time>
         timeRequestIterativeFuture; /** future for the time request iterative call*/

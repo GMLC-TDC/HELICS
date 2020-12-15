@@ -214,7 +214,7 @@ namespace CommFactory {
         return cbld;
     }
 
-    std::unique_ptr<CommsInterface> create(core_type type);
+    std::unique_ptr<CommsInterface> create(CoreType type);
     std::unique_ptr<CommsInterface> create(const std::string& type);
 
 }  // namespace CommFactory

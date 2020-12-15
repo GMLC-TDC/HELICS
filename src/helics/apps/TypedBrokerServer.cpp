@@ -29,7 +29,7 @@ static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
 
 /** find an existing broker or start a new one*/
 static std::pair<std::shared_ptr<Broker>, bool>
-    findBroker(const ActionMessage& rx, core_type ctype, int startPort)
+    findBroker(const ActionMessage& rx, CoreType ctype, int startPort)
 {
     std::string brkname;
     std::string brkinit;
@@ -64,7 +64,7 @@ static std::pair<std::shared_ptr<Broker>, bool>
 
 ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rxcmd,
                                                          portData& pdata,
-                                                         core_type ctype)
+                                                         CoreType ctype)
 {
     //   std::cout << "received data length " << msg.size () << std::endl;
     switch (rxcmd.action()) {

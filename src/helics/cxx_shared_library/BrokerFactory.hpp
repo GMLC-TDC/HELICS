@@ -26,28 +26,28 @@ namespace BrokerFactory {
      *
      * Invokes initialize() on the instantiated Core object.
      */
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(CoreType type,
                                                             const std::string& initializationString)
     {
         BrokerApp brk(type, initializationString);
         return brk.getCopyofBrokerPointer();
     }
     /** Create a broker from command line arguments*/
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type, int argc, char* argv[])
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(CoreType type, int argc, char* argv[])
     {
         BrokerApp brk(type, argc, argv);
         return brk.getCopyofBrokerPointer();
     }
 
     /** Create a broker from command line arguments in a vector*/
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(CoreType type,
                                                             std::vector<std::string> args)
     {
         BrokerApp brk(type, args);
         return brk.getCopyofBrokerPointer();
     }
 
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(core_type type,
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create(CoreType type,
                                                             const std::string& broker_name,
                                                             const std::string& initializationString)
     {
@@ -56,7 +56,7 @@ namespace BrokerFactory {
     }
 
     HELICS_SHARED_DEPRECATED std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, int argc, char* argv[])
+        create(CoreType type, const std::string& broker_name, int argc, char* argv[])
     {
         BrokerApp brk(type, broker_name, argc, argv);
         return brk.getCopyofBrokerPointer();
@@ -64,7 +64,7 @@ namespace BrokerFactory {
 
     /** Create a broker from command line arguments in a vector*/
     HELICS_SHARED_DEPRECATED std::shared_ptr<Broker>
-        create(core_type type, const std::string& broker_name, std::vector<std::string> args)
+        create(CoreType type, const std::string& broker_name, std::vector<std::string> args)
     {
         BrokerApp brk(type, broker_name, args);
         return brk.getCopyofBrokerPointer();
@@ -79,7 +79,7 @@ namespace BrokerFactory {
     }
 
     /** try to find a joinable broker of a specific type*/
-    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
+    HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> findJoinableBrokerOfType(CoreType type)
     {
         return nullptr;
     }
@@ -129,7 +129,7 @@ issues
         return false;
     }
 
-    /** display the help listing for a particular core_type*/
-    HELICS_SHARED_DEPRECATED void displayHelp(core_type type = core_type::UNRECOGNIZED) {}
+    /** display the help listing for a particular CoreType*/
+    HELICS_SHARED_DEPRECATED void displayHelp(CoreType type = CoreType::UNRECOGNIZED) {}
 }  // namespace BrokerFactory
 }  // namespace helics

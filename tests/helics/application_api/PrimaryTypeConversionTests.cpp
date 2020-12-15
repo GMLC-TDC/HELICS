@@ -49,8 +49,8 @@ TEST(type_conversion_tests, vectorNorm_tests)
 
 TEST(type_conversion_tests, string_type_tests)
 {
-    EXPECT_TRUE(helicsType<std::string>() == data_type::helics_string);
-    // EXPECT_TRUE(helicsType<char *>() == data_type::helics_string);
+    EXPECT_TRUE(helicsType<std::string>() == DataType::HELICS_STRING);
+    // EXPECT_TRUE(helicsType<char *>() == DataType::HELICS_STRING);
 }
 
 TEST(type_conversion_tests, string_converstion_tests)
@@ -93,8 +93,8 @@ TEST(type_conversion_tests, string_converstion_tests_negative)
 
 TEST(type_conversion_tests, double_type_tests)
 {
-    EXPECT_TRUE(helicsType<double>() == data_type::helics_double);
-    EXPECT_TRUE(helicsType<float>() == data_type::helics_custom);
+    EXPECT_TRUE(helicsType<double>() == DataType::HELICS_DOUBLE);
+    EXPECT_TRUE(helicsType<float>() == DataType::HELICS_CUSTOM);
     EXPECT_TRUE(isConvertableType<float>() == true);
     EXPECT_TRUE(isConvertableType<double>() == false);
 }
@@ -133,8 +133,8 @@ TEST(type_conversion_tests, double_conversion_tests3)
 
 TEST(type_conversion_tests, integer_type_tests)
 {
-    EXPECT_TRUE(helicsType<int64_t>() == data_type::helics_int);
-    EXPECT_TRUE(helicsType<int>() == data_type::helics_custom);
+    EXPECT_TRUE(helicsType<int64_t>() == DataType::HELICS_INT);
+    EXPECT_TRUE(helicsType<int>() == DataType::HELICS_CUSTOM);
     EXPECT_TRUE(isConvertableType<int>() == true);
     EXPECT_TRUE(isConvertableType<int64_t>() == false);
 
@@ -149,27 +149,27 @@ TEST(type_conversion_tests, integer_type_tests)
 
 TEST(type_conversion_tests, namedType_tests)
 {
-    EXPECT_TRUE(getTypeFromString("int") == data_type::helics_int);
-    EXPECT_TRUE(getTypeFromString("INT") == data_type::helics_int);
-    EXPECT_TRUE(getTypeFromString("char") == data_type::helics_string);
-    EXPECT_TRUE(getTypeFromString(typeid(int).name()) == data_type::helics_int);
-    EXPECT_TRUE(getTypeFromString(typeid(float).name()) == data_type::helics_double);
-    EXPECT_TRUE(getTypeFromString(typeid(std::string).name()) == data_type::helics_string);
-    EXPECT_TRUE(getTypeFromString(typeid(char*).name()) == data_type::helics_string);
-    EXPECT_TRUE(getTypeFromString(typeid(const char*).name()) == data_type::helics_string);
-    EXPECT_TRUE(getTypeFromString(typeid(double).name()) == data_type::helics_double);
-    EXPECT_TRUE(getTypeFromString(typeid(bool).name()) == data_type::helics_bool);
-    EXPECT_TRUE(getTypeFromString(typeid(int64_t).name()) == data_type::helics_int);
-    EXPECT_TRUE(getTypeFromString(typeid(char).name()) == data_type::helics_string);
+    EXPECT_TRUE(getTypeFromString("int") == DataType::HELICS_INT);
+    EXPECT_TRUE(getTypeFromString("INT") == DataType::HELICS_INT);
+    EXPECT_TRUE(getTypeFromString("char") == DataType::HELICS_STRING);
+    EXPECT_TRUE(getTypeFromString(typeid(int).name()) == DataType::HELICS_INT);
+    EXPECT_TRUE(getTypeFromString(typeid(float).name()) == DataType::HELICS_DOUBLE);
+    EXPECT_TRUE(getTypeFromString(typeid(std::string).name()) == DataType::HELICS_STRING);
+    EXPECT_TRUE(getTypeFromString(typeid(char*).name()) == DataType::HELICS_STRING);
+    EXPECT_TRUE(getTypeFromString(typeid(const char*).name()) == DataType::HELICS_STRING);
+    EXPECT_TRUE(getTypeFromString(typeid(double).name()) == DataType::HELICS_DOUBLE);
+    EXPECT_TRUE(getTypeFromString(typeid(bool).name()) == DataType::HELICS_BOOL);
+    EXPECT_TRUE(getTypeFromString(typeid(int64_t).name()) == DataType::HELICS_INT);
+    EXPECT_TRUE(getTypeFromString(typeid(char).name()) == DataType::HELICS_STRING);
     EXPECT_TRUE(getTypeFromString(typeid(std::complex<double>).name()) ==
-                data_type::helics_complex);
-    EXPECT_TRUE(getTypeFromString("COMPLEX") == data_type::helics_complex);
-    EXPECT_TRUE(getTypeFromString("map") == data_type::helics_custom);
-    EXPECT_TRUE(getTypeFromString("any") == data_type::helics_any);
-    EXPECT_TRUE(getTypeFromString("") == data_type::helics_any);
+                DataType::HELICS_COMPLEX);
+    EXPECT_TRUE(getTypeFromString("COMPLEX") == DataType::HELICS_COMPLEX);
+    EXPECT_TRUE(getTypeFromString("map") == DataType::HELICS_CUSTOM);
+    EXPECT_TRUE(getTypeFromString("any") == DataType::HELICS_ANY);
+    EXPECT_TRUE(getTypeFromString("") == DataType::HELICS_ANY);
     EXPECT_TRUE(getTypeFromString(typeid(std::vector<std::complex<double>>).name()) ==
-                data_type::helics_complex_vector);
-    EXPECT_TRUE(getTypeFromString(typeid(Time).name()) == data_type::helics_time);
+                DataType::HELICS_COMPLEX_VECTOR);
+    EXPECT_TRUE(getTypeFromString(typeid(Time).name()) == DataType::HELICS_TIME);
 }
 
 TEST(type_conversion_tests, integer_conversion_tests)
@@ -193,8 +193,8 @@ TEST(type_conversion_tests, integer_conversion_tests)
 
 TEST(type_conversion_tests, namedpoint_type_tests)
 {
-    EXPECT_TRUE(helicsType<NamedPoint>() == data_type::helics_named_point);
-    // EXPECT_TRUE(helicsType<char *>() == data_type::helics_string);
+    EXPECT_TRUE(helicsType<NamedPoint>() == DataType::HELICS_NAMED_POINT);
+    // EXPECT_TRUE(helicsType<char *>() == DataType::HELICS_STRING);
 }
 
 TEST(type_conversion_tests, namedpoint_conversion_tests)

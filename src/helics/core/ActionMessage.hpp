@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ActionMessageDefintions.hpp"
 #include "SmallBuffer.hpp"
-#include "basic_core_types.hpp"
+#include "basic_CoreTypes.hpp"
 
 #include <memory>
 #include <string>
@@ -332,6 +332,6 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage);
 std::string errorMessageString(const ActionMessage& command);
 
 /** set the flags for an iteration request*/
-void setIterationFlags(ActionMessage& command, iteration_request iterate);
+void setIterationFlags(ActionMessage& command, IterationRequest iterate);
 
 }  // namespace helics

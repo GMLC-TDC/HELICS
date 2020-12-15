@@ -85,7 +85,7 @@ namespace inproc {
                 if (!tbroker) {
                     if (autoBroker) {
                         tbroker = std::static_pointer_cast<CoreBroker>(
-                            BrokerFactory::create(core_type::INPROC, brokerName, brokerInitString));
+                            BrokerFactory::create(CoreType::INPROC, brokerName, brokerInitString));
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
@@ -114,12 +114,12 @@ namespace inproc {
         } else if (!serverMode) {
             milliseconds totalSleep(0);
             while (!tbroker) {
-                auto broker = BrokerFactory::findJoinableBrokerOfType(core_type::INPROC);
+                auto broker = BrokerFactory::findJoinableBrokerOfType(CoreType::INPROC);
                 tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
                 if (!tbroker) {
                     if (autoBroker) {
                         tbroker = std::static_pointer_cast<CoreBroker>(
-                            BrokerFactory::create(core_type::INPROC, "", brokerInitString));
+                            BrokerFactory::create(CoreType::INPROC, "", brokerInitString));
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
@@ -215,7 +215,7 @@ namespace inproc {
                         tbroker->addActionMessage(std::move(cmd));
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(std::string("unknown route, message dropped ") +
+                            logWarning(std::string("UNKNOWN route, message dropped ") +
                                        prettyPrintString(cmd));
                         }
                     }

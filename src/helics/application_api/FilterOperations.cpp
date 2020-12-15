@@ -296,10 +296,10 @@ void RerouteFilterOperation::setString(const std::string& property, const std::s
             cond->insert(val);
         }
         catch (const std::regex_error& re) {
-            std::cerr << "filter expression is not a valid Regular expression " << re.what()
+            std::cerr << "FILTER expression is not a valid Regular expression " << re.what()
                       << std::endl;
             throw(helics::InvalidParameter(
-                std::string("filter expression is not a valid Regular expression ") + re.what()));
+                std::string("FILTER expression is not a valid Regular expression ") + re.what()));
         }
     }
 }

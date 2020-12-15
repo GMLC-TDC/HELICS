@@ -64,7 +64,7 @@ namespace apps {
         auto app = generateParser();
 
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_source_only);
+            fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
             app->helics_parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -86,9 +86,9 @@ namespace apps {
                "--datatype",
                [this](CLI::results_t res) {
                    defType = helics::getTypeFromString(res[0]);
-                   return (defType != helics::data_type::helics_custom);
+                   return (defType != helics::DataType::HELICS_CUSTOM);
                },
-               "type of the publication data type to use",
+               "type of the PUBLICATION data type to use",
                false)
             ->take_last()
             ->ignore_underscore();
@@ -105,7 +105,7 @@ namespace apps {
                        return false;
                    }
                },
-               "the default units on the timestamps used in file based input",
+               "the default units on the timestamps used in file based INPUT",
                false)
             ->take_last()
             ->ignore_underscore();
@@ -115,7 +115,7 @@ namespace apps {
 
     Player::Player(const std::string& appName, const FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Player::Player(const std::string& appName,
@@ -123,19 +123,19 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Player::Player(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Player::Player(const std::string& appName, const std::string& configString):
         App(appName, configString)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
         Player::loadJsonFile(configString);
     }
 
@@ -305,7 +305,7 @@ namespace apps {
                         messages[mIndex].mess.data = decode(std::move(blk[5]));
                         break;
                     default:
-                        std::cerr << "unknown message format line " << lcount << '\n';
+                        std::cerr << "UNKNOWN message format line " << lcount << '\n';
                         break;
                 }
                 ++mIndex;
@@ -328,7 +328,7 @@ namespace apps {
                         points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                     } else {
                         std::cerr
-                            << "lines without publication name but follow one with a publication line "
+                            << "lines without PUBLICATION name but follow one with a PUBLICATION line "
                             << lcount << '\n';
                     }
                     points[pIndex].value = blk[1];
@@ -378,7 +378,7 @@ namespace apps {
                     points[pIndex].value = blk[3];
                     ++pIndex;
                 } else {
-                    std::cerr << "unknown publish format line " << lcount << '\n';
+                    std::cerr << "UNKNOWN publish format line " << lcount << '\n';
                 }
             }
         }
@@ -608,7 +608,7 @@ namespace apps {
     void Player::initialize()
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             sortTags();
             generatePublications();
             generateEndpoints();
@@ -652,10 +652,10 @@ namespace apps {
     void Player::runTo(Time stopTime_input)
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             initialize();
         }
-        if (md < Federate::modes::executing) {
+        if (md < Federate::Modes::EXECUTING) {
             sendInformation(-Time::epsilon());
 
             fed->enterExecutingMode();
@@ -713,18 +713,18 @@ namespace apps {
                     nextPrintTime += nextPrintTimeStep;
                 }
             } else {
-                fed->requestTimeIterative(nextSendTime, iteration_request::force_iteration);
+                fed->requestTimeIterative(nextSendTime, IterationRequest::FORCE_ITERATION);
                 ++currentIteration;
                 sendInformation(nextSendTime, currentIteration);
             }
         }
     }
 
-    void Player::addPublication(const std::string& key, data_type type, const std::string& pubUnits)
+    void Player::addPublication(const std::string& key, DataType type, const std::string& pubUnits)
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
-            std::cerr << "publication already exists\n";
+            std::cerr << "PUBLICATION already exists\n";
         }
         if (!useLocal) {
             publications.emplace_back(GLOBAL, fed.get(), key, type, pubUnits);

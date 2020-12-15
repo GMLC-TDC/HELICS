@@ -62,87 +62,87 @@ namespace helics {
 
 #ifdef ENABLE_ZMQ_CORE
 static auto zmqc =
-    CoreFactory::addCoreType<zeromq::ZmqCore>("zmq", static_cast<int>(core_type::ZMQ));
+    CoreFactory::addCoreType<zeromq::ZmqCore>("zmq", static_cast<int>(CoreType::ZMQ));
 static auto zmqb =
-    BrokerFactory::addBrokerType<zeromq::ZmqBroker>("zmq", static_cast<int>(core_type::ZMQ));
+    BrokerFactory::addBrokerType<zeromq::ZmqBroker>("zmq", static_cast<int>(CoreType::ZMQ));
 static auto zmqssc =
-    CoreFactory::addCoreType<zeromq::ZmqCoreSS>("zmqss", static_cast<int>(core_type::ZMQ_SS));
+    CoreFactory::addCoreType<zeromq::ZmqCoreSS>("zmqss", static_cast<int>(CoreType::ZMQ_SS));
 static auto zmqssb =
-    BrokerFactory::addBrokerType<zeromq::ZmqBrokerSS>("zmqss", static_cast<int>(core_type::ZMQ_SS));
+    BrokerFactory::addBrokerType<zeromq::ZmqBrokerSS>("zmqss", static_cast<int>(CoreType::ZMQ_SS));
 static auto zmqcomm =
-    CommFactory::addCommType<zeromq::ZmqComms>("zmq", static_cast<int>(core_type::ZMQ));
+    CommFactory::addCommType<zeromq::ZmqComms>("zmq", static_cast<int>(CoreType::ZMQ));
 static auto zmqcommss =
-    CommFactory::addCommType<zeromq::ZmqCommsSS>("zmqss", static_cast<int>(core_type::ZMQ_SS));
+    CommFactory::addCommType<zeromq::ZmqCommsSS>("zmqss", static_cast<int>(CoreType::ZMQ_SS));
 #endif
 
 #ifdef ENABLE_TCP_CORE
-static auto tcpc = CoreFactory::addCoreType<tcp::TcpCore>("tcp", static_cast<int>(core_type::TCP));
+static auto tcpc = CoreFactory::addCoreType<tcp::TcpCore>("tcp", static_cast<int>(CoreType::TCP));
 static auto tcpb =
-    BrokerFactory::addBrokerType<tcp::TcpBroker>("tcp", static_cast<int>(core_type::TCP));
+    BrokerFactory::addBrokerType<tcp::TcpBroker>("tcp", static_cast<int>(CoreType::TCP));
 static auto tcpssc =
-    CoreFactory::addCoreType<tcp::TcpCoreSS>("tcpss", static_cast<int>(core_type::TCP_SS));
+    CoreFactory::addCoreType<tcp::TcpCoreSS>("tcpss", static_cast<int>(CoreType::TCP_SS));
 static auto tcpssb =
-    BrokerFactory::addBrokerType<tcp::TcpBrokerSS>("tcpss", static_cast<int>(core_type::TCP_SS));
+    BrokerFactory::addBrokerType<tcp::TcpBrokerSS>("tcpss", static_cast<int>(CoreType::TCP_SS));
 static auto tcpcomm =
-    CommFactory::addCommType<tcp::TcpComms>("tcp", static_cast<int>(core_type::TCP));
+    CommFactory::addCommType<tcp::TcpComms>("tcp", static_cast<int>(CoreType::TCP));
 static auto tcpcommss =
-    CommFactory::addCommType<tcp::TcpCommsSS>("tcpss", static_cast<int>(core_type::TCP_SS));
+    CommFactory::addCommType<tcp::TcpCommsSS>("tcpss", static_cast<int>(CoreType::TCP_SS));
 #endif
 
 #ifdef ENABLE_MPI_CORE
-static auto mpic = CoreFactory::addCoreType<mpi::MpiCore>("mpi", static_cast<int>(core_type::MPI));
+static auto mpic = CoreFactory::addCoreType<mpi::MpiCore>("mpi", static_cast<int>(CoreType::MPI));
 static auto mpib =
-    BrokerFactory::addBrokerType<mpi::MpiBroker>("mpi", static_cast<int>(core_type::MPI));
+    BrokerFactory::addBrokerType<mpi::MpiBroker>("mpi", static_cast<int>(CoreType::MPI));
 static auto mpocomm =
-    CommFactory::addCommType<mpi::MpiComms>("mpi", static_cast<int>(core_type::MPI));
+    CommFactory::addCommType<mpi::MpiComms>("mpi", static_cast<int>(CoreType::MPI));
 #endif
 
 #ifdef ENABLE_UDP_CORE
-static auto udpc = CoreFactory::addCoreType<udp::UdpCore>("udp", static_cast<int>(core_type::UDP));
+static auto udpc = CoreFactory::addCoreType<udp::UdpCore>("udp", static_cast<int>(CoreType::UDP));
 static auto udpb =
-    BrokerFactory::addBrokerType<udp::UdpBroker>("udp", static_cast<int>(core_type::UDP));
+    BrokerFactory::addBrokerType<udp::UdpBroker>("udp", static_cast<int>(CoreType::UDP));
 static auto udpcomm =
-    CommFactory::addCommType<udp::UdpComms>("udp", static_cast<int>(core_type::UDP));
+    CommFactory::addCommType<udp::UdpComms>("udp", static_cast<int>(CoreType::UDP));
 #endif
 
 #ifdef ENABLE_IPC_CORE
-static auto ipcc = CoreFactory::addCoreType<ipc::IpcCore>("ipc", static_cast<int>(core_type::IPC));
+static auto ipcc = CoreFactory::addCoreType<ipc::IpcCore>("ipc", static_cast<int>(CoreType::IPC));
 static auto ipcb =
-    BrokerFactory::addBrokerType<ipc::IpcBroker>("ipc", static_cast<int>(core_type::IPC));
+    BrokerFactory::addBrokerType<ipc::IpcBroker>("ipc", static_cast<int>(CoreType::IPC));
 static auto ipcc2 =
     CoreFactory::addCoreType<ipc::IpcCore>("interprocess",
-                                           static_cast<int>(core_type::INTERPROCESS));
+                                           static_cast<int>(CoreType::INTERPROCESS));
 static auto ipcb2 =
     BrokerFactory::addBrokerType<ipc::IpcBroker>("interprocess",
-                                                 static_cast<int>(core_type::INTERPROCESS));
+                                                 static_cast<int>(CoreType::INTERPROCESS));
 
 static auto ipccomm1 =
-    CommFactory::addCommType<ipc::IpcComms>("ipc", static_cast<int>(core_type::IPC));
+    CommFactory::addCommType<ipc::IpcComms>("ipc", static_cast<int>(CoreType::IPC));
 static auto ipccomm2 =
-    CommFactory::addCommType<ipc::IpcComms>("ipc", static_cast<int>(core_type::INTERPROCESS));
+    CommFactory::addCommType<ipc::IpcComms>("ipc", static_cast<int>(CoreType::INTERPROCESS));
 
 #endif
 
 #ifdef ENABLE_INPROC_CORE
 static auto iprcc =
-    CoreFactory::addCoreType<inproc::InprocCore>("inproc", static_cast<int>(core_type::INPROC));
+    CoreFactory::addCoreType<inproc::InprocCore>("inproc", static_cast<int>(CoreType::INPROC));
 static auto iprcb =
     BrokerFactory::addBrokerType<inproc::InprocBroker>("inproc",
-                                                       static_cast<int>(core_type::INPROC));
+                                                       static_cast<int>(CoreType::INPROC));
 
 static auto inproccomm =
-    CommFactory::addCommType<inproc::InprocComms>("inproc", static_cast<int>(core_type::INPROC));
+    CommFactory::addCommType<inproc::InprocComms>("inproc", static_cast<int>(CoreType::INPROC));
 
 #endif
 
 #ifdef ENABLE_TEST_CORE
 static auto testc =
-    CoreFactory::addCoreType<testcore::TestCore>("test", static_cast<int>(core_type::TEST));
+    CoreFactory::addCoreType<testcore::TestCore>("test", static_cast<int>(CoreType::TEST));
 static auto testb =
-    BrokerFactory::addBrokerType<testcore::TestBroker>("test", static_cast<int>(core_type::TEST));
+    BrokerFactory::addBrokerType<testcore::TestBroker>("test", static_cast<int>(CoreType::TEST));
 
 static auto testcomm =
-    CommFactory::addCommType<testcore::TestComms>("test", static_cast<int>(core_type::TEST));
+    CommFactory::addCommType<testcore::TestComms>("test", static_cast<int>(CoreType::TEST));
 
 #endif
 

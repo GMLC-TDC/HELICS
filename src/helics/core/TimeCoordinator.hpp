@@ -82,8 +82,8 @@ class TimeCoordinator {
   public:
     GlobalFederateId source_id{
         0};  //!< the identifier for inserting into the source id field of any generated messages;
-    iteration_request iterating{
-        iteration_request::no_iterations};  //!< indicator that the coordinator should be iterating
+    IterationRequest iterating{
+        IterationRequest::NO_ITERATIONS};  //!< indicator that the coordinator should be iterating
                                             //!< if need be
     bool checkingExec{
         false};  //!< flag indicating that the coordinator is trying to enter the exec mode
@@ -195,23 +195,23 @@ class TimeCoordinator {
     void removeDependent(GlobalFederateId fedID);
 
     /** check if entry to the executing state can be granted*/
-    message_processing_result checkExecEntry();
+    MessageProcessingResult checkExecEntry();
     /** request a time
     @param nextTime the new requested time
-    @param iterate the mode of iteration to use (no_iteration, force_iteration, iterate_if_needed)
+    @param iterate the mode of iteration to use (no_iteration, FORCE_ITERATION, ITERATE_IF_NEEDED)
     @param newValueTime  the time of the next value
     @param newMessageTime the time of the next message
     */
     void timeRequest(Time nextTime,
-                     iteration_request iterate,
+                     IterationRequest iterate,
                      Time newValueTime,
                      Time newMessageTime);
     /** function to enter the exec Mode
-    @param mode the mode of iteration_request (no_iteration, force_iteration, iterate_if_needed)
+    @param mode the mode of iteration_request (no_iteration, FORCE_ITERATION, ITERATE_IF_NEEDED)
     */
-    void enteringExecMode(iteration_request mode);
+    void enteringExecMode(IterationRequest mode);
     /** check if it is valid to grant a time*/
-    message_processing_result checkTimeGrant();
+    MessageProcessingResult checkTimeGrant();
     /** disconnect*/
     void disconnect();
     /** generate a local Error*/
