@@ -4,6 +4,7 @@
 ```eval_rst
 .. toctree::
     :maxdepth: 1
+    :hidden:
 
     multiSourceInputs
     broker_hierarchies
