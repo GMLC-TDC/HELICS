@@ -21,6 +21,7 @@ The Advanced Examples teach four concepts to build on a default setup:
 
 ![](../../../img/user_guide_combinations_advanced.png)
 
+# Test
 
 The Advanced Examples are modular, each building upon the [base example](./advanced_default.md). Users are encouraged to dive into a specific concept to build their HELICS knowledge once they have mastered the default setup in the [base example](./advanced_default.md).
 
