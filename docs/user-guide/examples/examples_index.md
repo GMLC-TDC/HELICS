@@ -4,6 +4,7 @@
 .. toctree::
     :maxdepth: 1
     :hidden:
+    :titlesonly:
     
     fundamental_examples_index
     advanced_examples_index
