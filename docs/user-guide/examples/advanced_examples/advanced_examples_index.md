@@ -108,7 +108,15 @@ In the [Fundamental Base Example](../fundamental_examples/fundamental_default.md
 This existence of two values for one property is not uncommon and is as much a feature as a bug. If this system were to be implemented in actual hardware, the only way that a charger would know the SOC of a battery would be through some kind of external **measurement**. And certainly there would be times where the charger would have even less information (such as the specific relationship between SOC and effective resistance) and would have to use historical data, heuristics, or smarter algorithms to know how to charge the battery effectively. Simulation allows us to use two separate models and thus independently model the actual SOC as known by the battery and the estimated SOC as calculated by the charger. 
 
 
-**TODO: Talk about how a fully charged EV is replaced in the model**
+Since the decision to declare an EV fully charged has been abstracted away from the Charger and Battery (to the Controller), a slightly different procedure is used to disconnect a charged EV from the charger and replace it with a new one to be charged. In this advanced example, a mini-protocol has been designed and implemented:
+
+1. The Charger receives a message from the Controller indicating the EV should be considered fully charged.
+2. The Charger reduces the Charging voltage to zero volts and publishes it.
+3. The Battery, detecting this change in charging voltage, infers that it is fully charged. The Battery federate instantiates a new EV with a battery at a random initial state of charge. The Battery federate also calculates a charging current of zero amps and publishes it.
+4. The Charger federate, seeing a charging current of zero amps, infers a new EV has been set up to charge, randomly assigns one of three charging powers, and publishes this new charging voltage.
+
+At this point the co-simulation proceeds as previously defined. The Battery uses its internal knowledge of the state-of-charge to define the charging current which the Charger uses to estimate the state-of-charge and sends on to the Controller. The Controller sends back a message to the Charger based on this state-of-charge estimate indicating whether the EV should continue to be charged or not.
+
 
 
 <a name="helics-components">
@@ -130,14 +138,15 @@ The HELICS components introduced in the Fundamental Examples are extended in the
 5. Send and Receive Communication between Federates
 6. Finalize Co-simulation
 
-
-<a name="federates-with-infinite-time">
+<a name="initilizaiton-mode">
 <strong>
 <span style="color:black;text-decoration:underline;">
-Federates with infinite time
+Initialization Mode
 </span>
 </strong>
 </a>
+
+
 
 Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
 
@@ -178,3 +187,21 @@ If the early time steps of the simulation are not as important (a model warm up 
 add examples for where this is inserted in the code
 
 ```
+
+<a name="examples-covered-in-advanced-examples">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Examples Covered in Advanced Examples
+</span>
+</strong>
+</a>
+
+Using the [Advanced Default Example](./advanced_default.md) as the starting point, the following examples have also been constructed:
+
+- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value handle.
+- [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
+- **Multiple Brokers**
+	- [**Connecting Multiple Core Types (Multi-Protocol Broker)**](./advanced_brokers_multibroker.md) - Demonstration of how to configure a multi-protocol broker
+	- [**Broker Hierarchies**](./advanced_brokers_hierarchies.md) - Purpose of broker hierarchies and how to configure a HELICS co-simulation to implement one.
+	- [**Simultaneous co-simulations**](./advanced_brokers_simultaneous.md) - Demonstration of how to run multiple independent federations simultaneously on a single compute node.
+- [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.
