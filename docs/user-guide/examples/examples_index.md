@@ -1,5 +1,13 @@
 # Examples
 
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+    
+    fundamental_examples_index
+    advanced_examples_index
+```
 
 
 
