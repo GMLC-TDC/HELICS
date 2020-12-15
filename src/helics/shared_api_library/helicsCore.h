@@ -454,7 +454,7 @@ HELICS_EXPORT void helicsBrokerFree(HelicsBroker broker);
  *
  * @return An opaque value federate object.
  */
-HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, helics_federate_info fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 
 /**
  * Create a value federate from a JSON file, JSON string, or TOML file.
@@ -484,7 +484,7 @@ HELICS_EXPORT HelicsFederate helicsCreateValueFederateFromConfig(const char* con
  *
  * @return An opaque message federate object.
  */
-HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, helics_federate_info fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 
 /**
  * Create a message federate from a JSON file or JSON string or TOML file.
@@ -515,7 +515,7 @@ HELICS_EXPORT HelicsFederate helicsCreateMessageFederateFromConfig(const char* c
  *
  * @return An opaque value federate object nullptr if the object creation failed.
  */
-HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, helics_federate_info fi, HelicsError* err);
+HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 
 /**
  * Create a combination federate from a JSON file or JSON string or TOML file.
@@ -549,9 +549,9 @@ HELICS_EXPORT HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError
 /**
  * Create a federate info object for specifying federate information when constructing a federate.
  *
- * @return A helics_federate_info object which is a reference to the created object.
+ * @return A HelicsFederateInfo object which is a reference to the created object.
  */
-HELICS_EXPORT helics_federate_info helicsCreateFederateInfo(void);
+HELICS_EXPORT HelicsFederateInfo helicsCreateFederateInfo(void);
 
 /**
  * Create a federate info object from an existing one and clone the information.
@@ -561,9 +561,9 @@ HELICS_EXPORT helics_federate_info helicsCreateFederateInfo(void);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- *  @return A helics_federate_info object which is a reference to the created object.
+ *  @return A HelicsFederateInfo object which is a reference to the created object.
  */
-HELICS_EXPORT helics_federate_info helicsFederateInfoClone(helics_federate_info fi, HelicsError* err);
+HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, HelicsError* err);
 
 /**
  * Load federate info from command line arguments.
@@ -575,12 +575,12 @@ HELICS_EXPORT helics_federate_info helicsFederateInfoClone(helics_federate_info 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromArgs(helics_federate_info fi, int argc, const char* const* argv, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Delete the memory associated with a federate info object.
  */
-HELICS_EXPORT void helicsFederateInfoFree(helics_federate_info fi);
+HELICS_EXPORT void helicsFederateInfoFree(HelicsFederateInfo fi);
 
 /**
  * Check if a federate_object is valid.
@@ -598,7 +598,7 @@ HELICS_EXPORT HelicsBool helicsFederateIsValid(HelicsFederate fed);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, HelicsError* err);
 
 /**
  * Set the initialization string for the core usually in the form of command line arguments.
@@ -609,7 +609,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreName(helics_federate_info fi, const 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* coreInit, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fi, const char* coreInit, HelicsError* err);
 
 /**
  * Set the initialization string that a core will pass to a generated broker usually in the form of command line arguments.
@@ -620,7 +620,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreInitString(helics_federate_info fi, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* brokerInit, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fi, const char* brokerInit, HelicsError* err);
 
 /**
  * Set the core type by integer code.
@@ -632,7 +632,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(helics_federate_info fi
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, int coretype, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fi, int coretype, HelicsError* err);
 
 /**
  * Set the core type from a string.
@@ -643,7 +643,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, int co
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char* coretype, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* coretype, HelicsError* err);
 
 /**
  * Set the name or connection information for a broker.
@@ -655,7 +655,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(helics_federate_info 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fi, const char* broker, HelicsError* err);
 
 /**
  * Set the key for a broker connection.
@@ -667,7 +667,7 @@ HELICS_EXPORT void helicsFederateInfoSetBroker(helics_federate_info fi, const ch
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerkey, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fi, const char* brokerkey, HelicsError* err);
 
 /**
  * Set the port to use for the broker.
@@ -680,7 +680,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int brokerPort, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fi, int brokerPort, HelicsError* err);
 
 /**
  * Set the local port to use.
@@ -692,7 +692,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetLocalPort(helics_federate_info fi, const char* localPort, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fi, const char* localPort, HelicsError* err);
 
 /**
  * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
@@ -740,7 +740,7 @@ HELICS_EXPORT int helicsGetOptionValue(const char* val);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, HelicsBool value, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
 
 /**
  * Set the separator character in the info structure.
@@ -753,7 +753,7 @@ HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char separator, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
 
 /**
  * Set the output delay for a federate.
@@ -766,7 +766,7 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
+    helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
 // TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
@@ -781,7 +781,7 @@ HELICS_EXPORT void
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int intProperty, int propertyValue, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, int intProperty, int propertyValue, HelicsError* err);
 
 /**
  * Load interfaces from a file.

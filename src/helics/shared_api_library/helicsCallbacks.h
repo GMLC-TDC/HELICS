@@ -94,7 +94,7 @@ HELICS_EXPORT void
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
-                                                 void (*filtCall)(helics_message message, void* userData),
+                                                 void (*filtCall)(HelicsMessage message, void* userData),
                                                  void* userdata,
                                                  HelicsError* err);
 
@@ -117,7 +117,7 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
 
 HELICS_EXPORT void
     helicsFederateSetQueryCallback(HelicsFederate fed,
-                                   void (*queryAnswer)(const char* query, int querySize, helics_query_buffer buffer, void* userdata),
+                                   void (*queryAnswer)(const char* query, int querySize, HelicsQueryBuffer buffer, void* userdata),
                                    void* userdata,
                                    HelicsError* err);
 
@@ -134,7 +134,7 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsQueryBufferFill(helics_query_buffer buffer, const char* str, int strSize, HelicsError* err);
+HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

@@ -947,14 +947,14 @@ TEST_F(function_tests, messageFed_messageObject)
     EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
-    helics_message mess0 = helicsEndpointGetMessage(ept1);
+    HelicsMessage mess0 = helicsEndpointGetMessage(ept1);
     EXPECT_EQ(helicsMessageGetByteCount(mess0), 0);
 
     mess0 = helicsFederateGetMessage(mFed1);
     EXPECT_EQ(helicsMessageGetByteCount(mess0), 0);
 
     // send a series of different messages testing different code paths
-    helics_message mess1 = helicsFederateCreateMessage(mFed1, nullptr);
+    HelicsMessage mess1 = helicsFederateCreateMessage(mFed1, nullptr);
 
     helicsMessageSetTime(mess1, 0.0, nullptr);
     helicsMessageSetOriginalSource(mess1, nullptr, nullptr);

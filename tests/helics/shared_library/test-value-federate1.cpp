@@ -550,7 +550,7 @@ void runFederateTestComplex2(const char* core,
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(helics_complex hc = helicsInputGetComplexObject(subid, &err));
+    CE(HelicsComplex hc = helicsInputGetComplexObject(subid, &err));
     // make sure the string is what we expect
     EXPECT_EQ(hc.real, testValue1_r);
     EXPECT_EQ(hc.imag, testValue1_i);

@@ -96,7 +96,7 @@ void helicsFederateSetLoggingCallback(HelicsFederate fed,
 }
 
 void helicsFederateSetQueryCallback(HelicsFederate fed,
-                                    void (*queryAnswer)(const char* query, int querySize, helics_query_buffer buffer, void* userdata),
+                                    void (*queryAnswer)(const char* query, int querySize, HelicsQueryBuffer buffer, void* userdata),
                                     void* userdata,
                                     HelicsError* err)
 {
@@ -122,7 +122,7 @@ void helicsFederateSetQueryCallback(HelicsFederate fed,
     }
 }
 
-void helicsQueryBufferFill(helics_query_buffer buffer, const char* string, int stringSize, HelicsError* err)
+void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int stringSize, HelicsError* err)
 {
     static const char* invalidBuffer = "The given buffer is not valid";
 

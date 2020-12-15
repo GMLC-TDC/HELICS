@@ -187,7 +187,7 @@ helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
 /** create a message object from a message pointer*/
-helics_message createAPIMessage(std::unique_ptr<helics::Message>& mess);
+HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& mess);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);

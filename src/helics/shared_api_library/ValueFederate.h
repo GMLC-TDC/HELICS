@@ -592,7 +592,7 @@ HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
  *
  * @return A HelicsComplex structure with the value.
  */
-HELICS_EXPORT helics_complex helicsInputGetComplexObject(HelicsInput ipt, HelicsError* err);
+HELICS_EXPORT HelicsComplex helicsInputGetComplexObject(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a pair of double forming a complex number from a subscriptions.

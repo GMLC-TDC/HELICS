@@ -24,69 +24,69 @@ extern "C" {
  * opaque object representing an input
  */
 typedef void* HelicsInput;
-typedef void* HelicsInput;
+//typedef void* helics_input;
 /**
  * opaque object representing a publication
  */
 typedef void* HelicsPublication;
-typedef void* HelicsPublication;
+//typedef void* helics_publication;
 /**
  * opaque object representing an endpoint
  */
-typedef void* helics_endpoint;
+//typedef void* HelicsEndpoint;
 typedef void* HelicsEndpoint;
 
 /**
  * opaque object representing a filter
  */
-typedef void* HelicsFilter;
+//typedef void* helics_filter;
 typedef void* HelicsFilter;
 
 /**
  * opaque object representing a core
  */
-typedef void* HelicsCore;
+//typedef void* helics_core;
 typedef void* HelicsCore;
 
 /**
  * opaque object representing a broker
  */
-typedef void* HelicsBroker;
+//typedef void* helics_broker;
 typedef void* HelicsBroker;
 /**
  * opaque object representing a federate
  */
-typedef void* HelicsFederate;
+//typedef void* helics_federate;
 typedef void* HelicsFederate;
 
 /**
  * opaque object representing a filter info object structure
  */
-typedef void* helics_federate_info;
+//typedef void* HelicsFederateInfo;
 typedef void* HelicsFederateInfo;
 
 /**
  * opaque object representing a query
  */
-typedef void* HelicsQuery;
+//typedef void* helics_query;
 typedef void* HelicsQuery;
 
 /**
  * opaque object representing a string buffer for a query
  */
-typedef void* helics_query_buffer;
+//typedef void* helics_query_buffer;
 typedef void* HelicsQueryBuffer;
 
 /**
  * opaque object representing a message
  */
-typedef void* helics_message;
+//typedef void* HelicsMessage;
 typedef void* HelicsMessage;
 
 /**
  * time definition used in the C interface to helics
  */
-typedef double HelicsTime;
+//typedef double helics_time;
 typedef double HelicsTime;
 
 const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
@@ -98,7 +98,7 @@ const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774; /*!< definition of tim
 /**
  * defining a boolean type for use in the helics interface
  */
-typedef int HelicsBool;
+//typedef int helics_bool;
 typedef int HelicsBool;
 
 const HelicsBool HELICS_TRUE = 1; /*!< indicator used for a true response */
@@ -148,7 +148,7 @@ typedef struct HelicsComplex {
     double imag;
 } HelicsComplex;
 
-typedef HelicsComplex helics_complex;
+//typedef HelicsComplex helics_complex;
 
 /**
  * helics error object
@@ -161,7 +161,7 @@ typedef struct HelicsError {
     const char* message; /*!< a message associated with the error*/
 } HelicsError;
 
-typedef HelicsError HelicsError;
+//typedef HelicsError helics_error;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

@@ -149,7 +149,7 @@ class Input {
     /** get the value as a complex number*/
     std::complex<double> getComplex()
     {
-        helics_complex hc = helicsInputGetComplexObject(inp, HELICS_IGNORE_ERROR);
+        HelicsComplex hc = helicsInputGetComplexObject(inp, HELICS_IGNORE_ERROR);
         std::complex<double> result(hc.real, hc.imag);
         return result;
     }

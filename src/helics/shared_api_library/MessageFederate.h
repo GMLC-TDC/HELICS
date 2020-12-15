@@ -40,7 +40,7 @@ extern "C" {
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
+HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
 /**
  * Create an endpoint.
@@ -60,7 +60,7 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(HelicsFederate fed,
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed,
+HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed,
                                                                    const char* name,
                                                                    const char* type,
                                                                    HelicsError* err);
@@ -85,7 +85,7 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(HelicsFederat
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
+HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
                                                                      const char* name,
                                                                      const char* type,
                                                                      HelicsError* err);
@@ -109,7 +109,7 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(HelicsFeder
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
+HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
                                                                            const char* name,
                                                                            const char* type,
                                                                            HelicsError* err);
@@ -123,12 +123,12 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(Helic
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_endpoint object.
+ * @return A HelicsEndpoint object.
  * @forcpponly
  *         The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, HelicsError* err);
+HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, HelicsError* err);
 
 /**
  * Get an endpoint by its index, typically already created via registerInterfaces file or something of that nature.
@@ -139,12 +139,12 @@ HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(HelicsFederate fed, cons
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_endpoint.
+ * @return A HelicsEndpoint.
  * @forcpponly
  *         It will be NULL if given an invalid index.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, HelicsError* err);
+HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, HelicsError* err);
 
 /**
  * Check if an endpoint is valid.
@@ -153,7 +153,7 @@ HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex(HelicsFederate fe
  *
  * @return HELICS_TRUE if the Endpoint object represents a valid endpoint.
  */
-HELICS_EXPORT HelicsBool helicsEndpointIsValid(helics_endpoint endpoint);
+HELICS_EXPORT HelicsBool helicsEndpointIsValid(HelicsEndpoint endpoint);
 
 /**
  * Set the default destination for an endpoint if no other endpoint is given.
@@ -164,7 +164,7 @@ HELICS_EXPORT HelicsBool helicsEndpointIsValid(helics_endpoint endpoint);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dst, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, const char* dst, HelicsError* err);
 
 /**
  * Get the default destination for an endpoint.
@@ -173,7 +173,7 @@ HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint,
  *
  * @return A string with the default destination.
  */
-HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint);
+HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint);
 
 /**
  * Send a message to the targeted destination.
@@ -185,7 +185,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendBytes(helics_endpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Send a message to the specified destination.
@@ -206,7 +206,7 @@ HELICS_EXPORT void helicsEndpointSendBytes(helics_endpoint endpoint, const void*
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsEndpointSendBytesTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dst, HelicsError* err);
+    helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int inputDataLength, const char* dst, HelicsError* err);
 
 /**
  * Send a message to the specified destination at a specific time.
@@ -229,7 +229,7 @@ HELICS_EXPORT void
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
+HELICS_EXPORT void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
                                                const void* data,
                                                int inputDataLength,
                                                const char* dst,
@@ -252,7 +252,7 @@ HELICS_EXPORT void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
  */
 
 HELICS_EXPORT void
-    helicsEndpointSendBytesAt(helics_endpoint endpoint, const void* data, int inputDataLength, HelicsTime time, HelicsError* err);
+    helicsEndpointSendBytesAt(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsTime time, HelicsError* err);
 
 /**
  * Send a message object from a specific endpoint.
@@ -263,7 +263,7 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message message, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
 /**
  * Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
@@ -275,7 +275,7 @@ HELICS_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_me
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(helics_endpoint endpoint, helics_message message, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
 /**
  * Subscribe an endpoint to a publication.
@@ -286,7 +286,7 @@ HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(helics_endpoint endpoint, h
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSubscribe(HelicsEndpoint endpoint, const char* key, HelicsError* err);
 
 /**
  * Check if the federate has any outstanding messages.
@@ -304,7 +304,7 @@ HELICS_EXPORT HelicsBool helicsFederateHasMessage(HelicsFederate fed);
  *
  * @return HELICS_TRUE if the endpoint has a message, HELICS_FALSE otherwise.
  */
-HELICS_EXPORT HelicsBool helicsEndpointHasMessage(helics_endpoint endpoint);
+HELICS_EXPORT HelicsBool helicsEndpointHasMessage(HelicsEndpoint endpoint);
 
 /**
  * Returns the number of pending receives for the specified destination endpoint.
@@ -318,7 +318,7 @@ HELICS_EXPORT int helicsFederatePendingMessagesCount(HelicsFederate fed);
  *
  * @param endpoint The endpoint to query.
  */
-HELICS_EXPORT int helicsEndpointPendingMessagesCount(helics_endpoint endpoint);
+HELICS_EXPORT int helicsEndpointPendingMessagesCount(HelicsEndpoint endpoint);
 
 /**
  * Receive a packet from a particular endpoint.
@@ -327,7 +327,7 @@ HELICS_EXPORT int helicsEndpointPendingMessagesCount(helics_endpoint endpoint);
  *
  * @return A message object.
  */
-HELICS_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
+HELICS_EXPORT HelicsMessage helicsEndpointGetMessage(HelicsEndpoint endpoint);
 
 /**
  * Create a new empty message object.
@@ -339,9 +339,9 @@ HELICS_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  *
- * @return A new helics_message.
+ * @return A new HelicsMessage.
  */
-HELICS_EXPORT helics_message helicsEndpointCreateMessage(helics_endpoint endpoint, HelicsError* err);
+HELICS_EXPORT HelicsMessage helicsEndpointCreateMessage(HelicsEndpoint endpoint, HelicsError* err);
 
 /**
  * Receive a communication message for any endpoint in the federate.
@@ -350,9 +350,9 @@ HELICS_EXPORT helics_message helicsEndpointCreateMessage(helics_endpoint endpoin
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
  *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
  *
- * @return A helics_message which references the data in the message.
+ * @return A HelicsMessage which references the data in the message.
  */
-HELICS_EXPORT helics_message helicsFederateGetMessage(HelicsFederate fed);
+HELICS_EXPORT HelicsMessage helicsFederateGetMessage(HelicsFederate fed);
 
 /**
  * Create a new empty message object.
@@ -364,9 +364,9 @@ HELICS_EXPORT helics_message helicsFederateGetMessage(HelicsFederate fed);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  *
- * @return A helics_message containing the message data.
+ * @return A HelicsMessage containing the message data.
  */
-HELICS_EXPORT helics_message helicsFederateCreateMessage(HelicsFederate fed, HelicsError* err);
+HELICS_EXPORT HelicsMessage helicsFederateCreateMessage(HelicsFederate fed, HelicsError* err);
 
 /**
  * Clear all stored messages from a federate.
@@ -384,7 +384,7 @@ HELICS_EXPORT void helicsFederateClearMessages(HelicsFederate fed);
  *
  * @return The defined type of the endpoint.
  */
-HELICS_EXPORT const char* helicsEndpointGetType(helics_endpoint endpoint);
+HELICS_EXPORT const char* helicsEndpointGetType(HelicsEndpoint endpoint);
 
 /**
  * Get the name of an endpoint.
@@ -393,7 +393,7 @@ HELICS_EXPORT const char* helicsEndpointGetType(helics_endpoint endpoint);
  *
  * @return The name of the endpoint.
  */
-HELICS_EXPORT const char* helicsEndpointGetName(helics_endpoint endpoint);
+HELICS_EXPORT const char* helicsEndpointGetName(HelicsEndpoint endpoint);
 
 /**
  * Get the number of endpoints in a federate.
@@ -411,7 +411,7 @@ HELICS_EXPORT int helicsFederateGetEndpointCount(HelicsFederate fed);
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT const char* helicsEndpointGetInfo(helics_endpoint end);
+HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
 
 /**
  * Set the data in the info field for a filter.
@@ -422,7 +422,7 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(helics_endpoint end);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* info, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -434,7 +434,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* i
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option, int value, HelicsError* err);
+HELICS_EXPORT void helicsEndpointSetOption(HelicsEndpoint endpoint, int option, int value, HelicsError* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -443,7 +443,7 @@ HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option,
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @return the value of the option, for boolean options will be 0 or 1
  */
-HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint endpoint, int option);
+HELICS_EXPORT int helicsEndpointGetOption(HelicsEndpoint endpoint, int option);
 
 /**
  * add a source target to an endpoint,  Specifying an endpoint to receive undirected messages from
@@ -454,7 +454,7 @@ HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint endpoint, int option);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const char* targetEndpoint, HelicsError* err);
+HELICS_EXPORT void helicsEndpointAddSourceTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
 /**
  * add a destination target to an endpoint,  Specifying an endpoint to send undirected messages to
@@ -465,7 +465,7 @@ HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, const char* targetEndpoint, HelicsError* err);
+HELICS_EXPORT void helicsEndpointAddDestinationTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
 /**
  * remove an endpoint from being targeted
@@ -476,7 +476,7 @@ HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const char* targetEndpoint, HelicsError* err);
+HELICS_EXPORT void helicsEndpointRemoveTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
 /**
  * add a source Filter to an endpoint
@@ -487,7 +487,7 @@ HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const ch
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddSourceFilter(helics_endpoint endpoint, const char* filterName, HelicsError* err);
+HELICS_EXPORT void helicsEndpointAddSourceFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
 
 /**
  * add a destination filter to an endpoint
@@ -498,7 +498,7 @@ HELICS_EXPORT void helicsEndpointAddSourceFilter(helics_endpoint endpoint, const
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddDestinationFilter(helics_endpoint endpoint, const char* filterName, HelicsError* err);
+HELICS_EXPORT void helicsEndpointAddDestinationFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
 
 /**
  * \defgroup Message operation functions
@@ -513,7 +513,7 @@ HELICS_EXPORT void helicsEndpointAddDestinationFilter(helics_endpoint endpoint, 
  *
  * @return A string with the source endpoint.
  */
-HELICS_EXPORT const char* helicsMessageGetSource(helics_message message);
+HELICS_EXPORT const char* helicsMessageGetSource(HelicsMessage message);
 
 /**
  * Get the destination endpoint of a message.
@@ -522,7 +522,7 @@ HELICS_EXPORT const char* helicsMessageGetSource(helics_message message);
  *
  * @return A string with the destination endpoint.
  */
-HELICS_EXPORT const char* helicsMessageGetDestination(helics_message message);
+HELICS_EXPORT const char* helicsMessageGetDestination(HelicsMessage message);
 
 /**
  * Get the original source endpoint of a message, the source may have been modified by filters or other actions.
@@ -531,7 +531,7 @@ HELICS_EXPORT const char* helicsMessageGetDestination(helics_message message);
  *
  * @return A string with the source of a message.
  */
-HELICS_EXPORT const char* helicsMessageGetOriginalSource(helics_message message);
+HELICS_EXPORT const char* helicsMessageGetOriginalSource(HelicsMessage message);
 
 /**
  * Get the original destination endpoint of a message, the destination may have been modified by filters or other actions.
@@ -540,7 +540,7 @@ HELICS_EXPORT const char* helicsMessageGetOriginalSource(helics_message message)
  *
  * @return A string with the original destination of a message.
  */
-HELICS_EXPORT const char* helicsMessageGetOriginalDestination(helics_message message);
+HELICS_EXPORT const char* helicsMessageGetOriginalDestination(HelicsMessage message);
 
 /**
  * Get the helics time associated with a message.
@@ -549,7 +549,7 @@ HELICS_EXPORT const char* helicsMessageGetOriginalDestination(helics_message mes
  *
  * @return The time associated with a message.
  */
-HELICS_EXPORT HelicsTime helicsMessageGetTime(helics_message message);
+HELICS_EXPORT HelicsTime helicsMessageGetTime(HelicsMessage message);
 
 /**
  * Get the payload of a message as a string.
@@ -558,7 +558,7 @@ HELICS_EXPORT HelicsTime helicsMessageGetTime(helics_message message);
  *
  * @return A string representing the payload of a message.
  */
-HELICS_EXPORT const char* helicsMessageGetString(helics_message message);
+HELICS_EXPORT const char* helicsMessageGetString(HelicsMessage message);
 
 /**
  * Get the messageID of a message.
@@ -567,7 +567,7 @@ HELICS_EXPORT const char* helicsMessageGetString(helics_message message);
  *
  * @return The messageID.
  */
-HELICS_EXPORT int helicsMessageGetMessageID(helics_message message);
+HELICS_EXPORT int helicsMessageGetMessageID(HelicsMessage message);
 
 /**
  * Check if a flag is set on a message.
@@ -577,7 +577,7 @@ HELICS_EXPORT int helicsMessageGetMessageID(helics_message message);
  *
  * @return The flags associated with a message.
  */
-HELICS_EXPORT HelicsBool helicsMessageGetFlagOption(helics_message message, int flag);
+HELICS_EXPORT HelicsBool helicsMessageGetFlagOption(HelicsMessage message, int flag);
 
 /**
  * Get the size of the data payload in bytes.
@@ -586,7 +586,7 @@ HELICS_EXPORT HelicsBool helicsMessageGetFlagOption(helics_message message, int 
  *
  * @return The size of the data payload.
  */
-HELICS_EXPORT int helicsMessageGetByteCount(helics_message message);
+HELICS_EXPORT int helicsMessageGetByteCount(HelicsMessage message);
 
 /**
  * Get the raw data for a message object.
@@ -603,7 +603,7 @@ HELICS_EXPORT int helicsMessageGetByteCount(helics_message message);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsMessageGetBytes(helics_message message, void* data, int maxMessageLength, int* actualSize, HelicsError* err);
+HELICS_EXPORT void helicsMessageGetBytes(HelicsMessage message, void* data, int maxMessageLength, int* actualSize, HelicsError* err);
 
 /**
  * Get a pointer to the raw data of a message.
@@ -612,7 +612,7 @@ HELICS_EXPORT void helicsMessageGetBytes(helics_message message, void* data, int
  *
  * @return A pointer to the raw data in memory, the pointer may be NULL if the message is not a valid message.
  */
-HELICS_EXPORT void* helicsMessageGetBytesPointer(helics_message message);
+HELICS_EXPORT void* helicsMessageGetBytesPointer(HelicsMessage message);
 
 /**
  * A check if the message contains a valid payload.
@@ -621,7 +621,7 @@ HELICS_EXPORT void* helicsMessageGetBytesPointer(helics_message message);
  *
  * @return HELICS_TRUE if the message contains a payload.
  */
-HELICS_EXPORT HelicsBool helicsMessageIsValid(helics_message message);
+HELICS_EXPORT HelicsBool helicsMessageIsValid(HelicsMessage message);
 
 /**
  * Set the source of a message.
@@ -632,7 +632,7 @@ HELICS_EXPORT HelicsBool helicsMessageIsValid(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetSource(helics_message message, const char* src, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetSource(HelicsMessage message, const char* src, HelicsError* err);
 
 /**
  * Set the destination of a message.
@@ -643,7 +643,7 @@ HELICS_EXPORT void helicsMessageSetSource(helics_message message, const char* sr
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetDestination(helics_message message, const char* dst, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetDestination(HelicsMessage message, const char* dst, HelicsError* err);
 
 /**
  * Set the original source of a message.
@@ -654,7 +654,7 @@ HELICS_EXPORT void helicsMessageSetDestination(helics_message message, const cha
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetOriginalSource(helics_message message, const char* src, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetOriginalSource(HelicsMessage message, const char* src, HelicsError* err);
 
 /**
  * Set the original destination of a message.
@@ -665,7 +665,7 @@ HELICS_EXPORT void helicsMessageSetOriginalSource(helics_message message, const 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message message, const char* dst, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetOriginalDestination(HelicsMessage message, const char* dst, HelicsError* err);
 
 /**
  * Set the delivery time for a message.
@@ -676,7 +676,7 @@ HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message message, c
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetTime(helics_message message, HelicsTime time, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetTime(HelicsMessage message, HelicsTime time, HelicsError* err);
 
 /**
  * Resize the data buffer for a message.
@@ -690,7 +690,7 @@ HELICS_EXPORT void helicsMessageSetTime(helics_message message, HelicsTime time,
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageResize(helics_message message, int newSize, HelicsError* err);
+HELICS_EXPORT void helicsMessageResize(HelicsMessage message, int newSize, HelicsError* err);
 
 /**
  * Reserve space in a buffer but don't actually resize.
@@ -703,7 +703,7 @@ HELICS_EXPORT void helicsMessageResize(helics_message message, int newSize, Heli
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageReserve(helics_message message, int reserveSize, HelicsError* err);
+HELICS_EXPORT void helicsMessageReserve(HelicsMessage message, int reserveSize, HelicsError* err);
 
 /**
  * Set the message ID for the message.
@@ -716,14 +716,14 @@ HELICS_EXPORT void helicsMessageReserve(helics_message message, int reserveSize,
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetMessageID(helics_message message, int32_t messageID, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetMessageID(HelicsMessage message, int32_t messageID, HelicsError* err);
 
 /**
  * Clear the flags of a message.
  *
  * @param message The message object in question
  */
-HELICS_EXPORT void helicsMessageClearFlags(helics_message message);
+HELICS_EXPORT void helicsMessageClearFlags(HelicsMessage message);
 
 /**
  * Set a flag on a message.
@@ -735,7 +735,7 @@ HELICS_EXPORT void helicsMessageClearFlags(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetFlagOption(helics_message message, int flag, HelicsBool flagValue, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, HelicsBool flagValue, HelicsError* err);
 
 /**
  * Set the data payload of a message as a string.
@@ -746,7 +746,7 @@ HELICS_EXPORT void helicsMessageSetFlagOption(helics_message message, int flag, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetString(helics_message message, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError* err);
 
 /**
  * Set the data payload of a message as raw data.
@@ -758,7 +758,7 @@ HELICS_EXPORT void helicsMessageSetString(helics_message message, const char* st
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetData(helics_message message, const void* data, int inputDataLength, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Append data to the payload.
@@ -770,7 +770,7 @@ HELICS_EXPORT void helicsMessageSetData(helics_message message, const void* data
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageAppendData(helics_message message, const void* data, int inputDataLength, HelicsError* err);
+HELICS_EXPORT void helicsMessageAppendData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Copy a message object.
@@ -781,7 +781,7 @@ HELICS_EXPORT void helicsMessageAppendData(helics_message message, const void* d
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageCopy(helics_message src_message, helics_message dst_message, HelicsError* err);
+HELICS_EXPORT void helicsMessageCopy(HelicsMessage src_message, HelicsMessage dst_message, HelicsError* err);
 
 /**
  * Clone a message object.
@@ -791,7 +791,7 @@ HELICS_EXPORT void helicsMessageCopy(helics_message src_message, helics_message 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT helics_message helicsMessageClone(helics_message message, HelicsError* err);
+HELICS_EXPORT HelicsMessage helicsMessageClone(HelicsMessage message, HelicsError* err);
 
 /**
  * Free a message object from memory
@@ -800,7 +800,7 @@ HELICS_EXPORT helics_message helicsMessageClone(helics_message message, HelicsEr
  * to the system that the memory for this message is done being used and can be reused for a new message.
  * helicsFederateClearMessages() can also be used to clear up all stored messages at once
  */
-HELICS_EXPORT void helicsMessageFree(helics_message message);
+HELICS_EXPORT void helicsMessageFree(HelicsMessage message);
 
 /**
  * Reset a message to empty state
@@ -810,7 +810,7 @@ HELICS_EXPORT void helicsMessageFree(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageClear(helics_message message, HelicsError* err);
+HELICS_EXPORT void helicsMessageClear(HelicsMessage message, HelicsError* err);
 
 /**@}*/
 #ifdef __cplusplus

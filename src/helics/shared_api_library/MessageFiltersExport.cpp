@@ -472,7 +472,7 @@ int helicsFilterGetOption(HelicsFilter filt, int option)
 }
 
 void helicsFilterSetCustomCallback(HelicsFilter filt,
-                                   void (*filtCall)(helics_message message, void* userData),
+                                   void (*filtCall)(HelicsMessage message, void* userData),
                                    void* userdata,
                                    HelicsError* err)
 {

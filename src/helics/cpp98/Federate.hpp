@@ -50,7 +50,7 @@ class FederateInfo {
     /** copy assignment for federateInfo*/
     FederateInfo& operator=(const FederateInfo& fedInfo)
     {
-        helics_federate_info fi_new = helicsFederateClone(fedInfo.fi, hThrowOnError());
+        HelicsFederateInfo fi_new = helicsFederateClone(fedInfo.fi, hThrowOnError());
         helicsFederateInfoFree(fi);
         fi = fi_new;
         return *this;
@@ -161,11 +161,11 @@ class FederateInfo {
     {
         return helicsFederateGetCommandSource(fi, HELICS_IGNORE_ERROR);
     }
-    /** get the underlying helics_federate_info object*/
-    helics_federate_info getInfo() { return fi; }
+    /** get the underlying HelicsFederateInfo object*/
+    HelicsFederateInfo getInfo() { return fi; }
 
   private:
-    helics_federate_info fi;  //!< handle for the underlying federate_info object
+    HelicsFederateInfo fi;  //!< handle for the underlying federate_info object
 };
 
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0

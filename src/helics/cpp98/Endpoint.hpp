@@ -26,8 +26,8 @@ class Message {
     explicit Message(const Federate& fed);
     /** create a message associated with an endpoint*/
     explicit Message(const Endpoint& ept);
-    /** construct from a helics_message object*/
-    explicit Message(helics_message hmo) HELICS_NOTHROW: mo(hmo) {}
+    /** construct from a HelicsMessage object*/
+    explicit Message(HelicsMessage hmo) HELICS_NOTHROW: mo(hmo) {}
 
     /** copy constructor*/
     Message(const Message& mess) HELICS_NOTHROW:
@@ -60,8 +60,8 @@ class Message {
             helicsMessageFree(mo);
         }
     }
-    /** cast to a helics_message object*/
-    operator helics_message() const { return mo; }
+    /** cast to a HelicsMessage object*/
+    operator HelicsMessage() const { return mo; }
     /** check if a message_object is valid*/
     bool isValid() const { return (helicsMessageIsValid(mo) == HELICS_TRUE); }
     /** get the message source endpoint name*/
@@ -179,9 +179,9 @@ class Message {
     }
     /** release a C message_object from the structure
     @details for use with the C shared library*/
-    helics_message release()
+    HelicsMessage release()
     {
-        helics_message mreturn = mo;
+        HelicsMessage mreturn = mo;
         mo = HELICS_NULL_POINTER;
         return mreturn;
     }
@@ -193,14 +193,14 @@ class Message {
     Message& newMessageObject(const Endpoint& ept);
 
   private:
-    helics_message mo;  //!< C shared library message_object
+    HelicsMessage mo;  //!< C shared library message_object
 };
 
 /** Class to manage helics endpoint operations*/
 class Endpoint {
   public:
-    /** construct from a helics_endpoint object*/
-    explicit Endpoint(helics_endpoint hep) HELICS_NOTHROW: ep(hep) {}
+    /** construct from a HelicsEndpoint object*/
+    explicit Endpoint(HelicsEndpoint hep) HELICS_NOTHROW: ep(hep) {}
     /** default constructor*/
     Endpoint() HELICS_NOTHROW: ep(HELICS_NULL_POINTER) {}
     /** copy constructor*/
@@ -211,10 +211,10 @@ class Endpoint {
         ep = endpoint.ep;
         return *this;
     }
-    /** cast to a helics_endpoint object*/
-    operator helics_endpoint() { return ep; }
-    /** get the base helics_endpoint object for use in the c API functions*/
-    helics_endpoint baseObject() const { return ep; }
+    /** cast to a HelicsEndpoint object*/
+    operator HelicsEndpoint() { return ep; }
+    /** get the base HelicsEndpoint object for use in the c API functions*/
+    HelicsEndpoint baseObject() const { return ep; }
     /** check if the input is valid */
     bool isValid() const { return (helicsEndpointIsValid(ep) == HELICS_TRUE); }
     /* Checks if endpoint has unread messages **/
@@ -375,7 +375,7 @@ class Endpoint {
     {
         // returns helicsStatus
         helicsEndpointSendMessageZeroCopy(ep,
-                                          static_cast<helics_message>(message),
+                                          static_cast<HelicsMessage>(message),
                                           hThrowOnError());
         message.release();
     }
@@ -393,7 +393,7 @@ class Endpoint {
     }
 
   private:
-    helics_endpoint ep;  //!< the underlying helics_endpoint object
+    HelicsEndpoint ep;  //!< the underlying HelicsEndpoint object
 };
 
 inline Message::Message(const Endpoint& ept):
@@ -403,7 +403,7 @@ inline Message::Message(const Endpoint& ept):
 
 inline Message& Message::newMessageObject(const Endpoint& ept)
 {
-    helics_message newmo = helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError());
+    HelicsMessage newmo = helicsEndpointCreateMessage(ept.baseObject(), hThrowOnError());
     if (mo != HELICS_NULL_POINTER) {
         helicsMessageFree(mo);
     }

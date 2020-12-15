@@ -794,14 +794,14 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     CE(helicsFederateFinalize(sFed, nullptr));
 
-    helics_message m2;
+    HelicsMessage m2;
     auto dFedExec = [&]() {
         helicsFederateRequestTime(dFed, 1.0, nullptr);
         m2 = helicsEndpointGetMessage(p2);
         helicsFederateFinalize(dFed, nullptr);
     };
 
-    helics_message m3;
+    HelicsMessage m3;
     auto dcFedExec = [&]() {
         helicsFederateRequestTime(dcFed, 2.0, nullptr);
         auto res = helicsFederateHasMessage(dcFed);
@@ -1050,7 +1050,7 @@ TEST_F(filter_tests, file_load)
     // mFed.disconnect ();
 }
 
-static void filterFunc1(helics_message mess, void* /*unused*/)
+static void filterFunc1(HelicsMessage mess, void* /*unused*/)
 {
     auto time = helicsMessageGetTime(mess);
     helicsMessageSetTime(mess, time + 2.5, nullptr);

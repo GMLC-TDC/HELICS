@@ -96,7 +96,7 @@ TEST_P(query_tests, broker_queries)
 }
 
 static void
-    queryTest(const char* query, int stringSize, helics_query_buffer buffer, void* /*unused*/)
+    queryTest(const char* query, int stringSize, HelicsQueryBuffer buffer, void* /*unused*/)
 {
     std::string q(query, stringSize);
     if (q == "abc") {

@@ -147,7 +147,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
         initString.append(extraCoreArgs);
     }
 
-    helics_federate_info fi = helicsCreateFederateInfo();
+    HelicsFederateInfo fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreTypeFromString(fi, CoreType_name.c_str(), &err);
     helicsFederateInfoSetTimeProperty(fi, HELICS_PROPERTY_TIME_DELTA, time_delta, &err);
 
