@@ -52,9 +52,9 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, Heli
  * @return A HelicsFilter object.
  */
 HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed,
-                                                               HelicsFilterTypes type,
-                                                               const char* name,
-                                                               HelicsError* err);
+                                                              HelicsFilterTypes type,
+                                                              const char* name,
+                                                              HelicsError* err);
 
 /**
  * Create a cloning Filter on the specified federate.

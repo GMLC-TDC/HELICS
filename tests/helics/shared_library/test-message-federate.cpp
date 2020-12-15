@@ -359,9 +359,7 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
     EXPECT_TRUE(mFed2State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(mfed_tests,
-                         mfed_simple_type_tests,
-                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 // a series of tests exercising the different aspects of message object setting and retrieval

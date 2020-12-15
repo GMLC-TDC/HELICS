@@ -168,9 +168,7 @@ TEST(BrokerAppTests, constructor11)
 
 TEST(BrokerAppTests, constructor12)
 {
-    EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE,
-                                   "brk12",
-                                   std::vector<std::string>{}),
+    EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE, "brk12", std::vector<std::string>{}),
                  helics::HelicsException);
 #ifdef ENABLE_ZMQ_CORE
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ,

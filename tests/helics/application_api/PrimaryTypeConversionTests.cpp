@@ -161,8 +161,7 @@ TEST(type_conversion_tests, namedType_tests)
     EXPECT_TRUE(getTypeFromString(typeid(bool).name()) == DataType::HELICS_BOOL);
     EXPECT_TRUE(getTypeFromString(typeid(int64_t).name()) == DataType::HELICS_INT);
     EXPECT_TRUE(getTypeFromString(typeid(char).name()) == DataType::HELICS_STRING);
-    EXPECT_TRUE(getTypeFromString(typeid(std::complex<double>).name()) ==
-                DataType::HELICS_COMPLEX);
+    EXPECT_TRUE(getTypeFromString(typeid(std::complex<double>).name()) == DataType::HELICS_COMPLEX);
     EXPECT_TRUE(getTypeFromString("COMPLEX") == DataType::HELICS_COMPLEX);
     EXPECT_TRUE(getTypeFromString("map") == DataType::HELICS_CUSTOM);
     EXPECT_TRUE(getTypeFromString("any") == DataType::HELICS_ANY);

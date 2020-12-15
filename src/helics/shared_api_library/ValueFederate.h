@@ -96,11 +96,8 @@ HELICS_EXPORT HelicsPublication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT HelicsPublication helicsFederateRegisterGlobalPublication(HelicsFederate fed,
-                                                                         const char* key,
-                                                                         HelicsDataTypes type,
-                                                                         const char* units,
-                                                                         HelicsError* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
  * Register a global publication with a defined type.
@@ -118,11 +115,8 @@ HELICS_EXPORT HelicsPublication helicsFederateRegisterGlobalPublication(HelicsFe
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT HelicsPublication helicsFederateRegisterGlobalTypePublication(HelicsFederate fed,
-                                                                             const char* key,
-                                                                             const char* type,
-                                                                             const char* units,
-                                                                             HelicsError* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**
  * Register a named input.

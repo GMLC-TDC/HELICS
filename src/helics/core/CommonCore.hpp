@@ -19,8 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
-#include "helicsTime.hpp"
 #include "helics/helics-config.h"
+#include "helicsTime.hpp"
 
 #include "json/forwards.h"
 #include <any>

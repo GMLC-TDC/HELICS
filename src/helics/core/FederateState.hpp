@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "CoreTypes.hpp"
 #include "InterfaceInfo.hpp"
 #include "core-data.hpp"
-#include "CoreTypes.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helicsTime.hpp"
 

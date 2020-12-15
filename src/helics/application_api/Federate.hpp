@@ -57,7 +57,7 @@ class HELICS_CXX_EXPORT Federate {
         /** the federate has finished executing normally final values may be retrieved */
         FINALIZE = 3,
         /** error state no core communication is possible but values can be retrieved */
-        ERROR_STATE = 4,  
+        ERROR_STATE = 4,
         // the following states are for asynchronous operations
         /** indicator that the federate is pending entry to initialization state */
         PENDING_INIT = 5,
@@ -66,10 +66,9 @@ class HELICS_CXX_EXPORT Federate {
         /** state that the federate is pending a timeRequest */
         PENDING_TIME = 7,
         /** state that the federate is pending an iterative time request */
-        PENDING_ITERATIVE_TIME =
-            8,
+        PENDING_ITERATIVE_TIME = 8,
         /** state that the federate is pending a finalize call */
-        PENDING_FINALIZE = 9  
+        PENDING_FINALIZE = 9
     };
 
   protected:
@@ -154,8 +153,7 @@ class HELICS_CXX_EXPORT Federate {
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    IterationResult
-        enterExecutingMode(IterationRequest iterate = IterationRequest::NO_ITERATIONS);
+    IterationResult enterExecutingMode(IterationRequest iterate = IterationRequest::NO_ITERATIONS);
     /** enter the normal execution mode
     @details call will return immediately but \ref enterExecutingModeComplete should be called to
     complete the operation

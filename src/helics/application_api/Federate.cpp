@@ -315,7 +315,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
         case Modes::PENDING_ITERATIVE_TIME: {
             auto result = requestTimeIterativeComplete();
             return (result.state == IterationResult::ITERATING) ? IterationResult::NEXT_STEP :
-                                                                   result.state;
+                                                                  result.state;
         }
         default:
             throw(InvalidFunctionCall("cannot transition from current state to execution state"));

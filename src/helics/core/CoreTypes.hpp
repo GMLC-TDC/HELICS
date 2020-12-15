@@ -46,7 +46,7 @@ enum class CoreType : int {
     UDP = HELICS_CORE_TYPE_UDP,  //!< use UDP packets to send the data
     NNG = HELICS_CORE_TYPE_NNG,  //!< reserved for future Nanomsg implementation
     ZMQ_SS = HELICS_CORE_TYPE_ZMQ_SS,  //!< single socket version of ZMQ core for better
-                                         //!< scalability performance
+                                       //!< scalability performance
     HTTP = HELICS_CORE_TYPE_HTTP,  //!< core/broker using web traffic
     WEBSOCKET = HELICS_CORE_TYPE_WEBSOCKET,  //!< core/broker using web sockets
     INPROC = HELICS_CORE_TYPE_INPROC,  //!< core/broker using a stripped down in process core type
@@ -100,14 +100,14 @@ enum class InterfaceType : char {
 
 constexpr auto ITERATION_COMPLETE =
     helics::IterationRequest::NO_ITERATIONS;  //!< simplified alias to indicate that iterations
-                                               //!< have concluded
+                                              //!< have concluded
 constexpr auto NO_ITERATION =
     helics::IterationRequest::NO_ITERATIONS;  //!< simplified alias to indicate that no iterations
-                                               //!< are needed
+                                              //!< are needed
 constexpr auto FORCE_ITERATION =
     helics::IterationRequest::FORCE_ITERATION;  //!< simplified alias to force an iteration
 constexpr auto ITERATE_IF_NEEDED =
     helics::IterationRequest::ITERATE_IF_NEEDED;  //!< simplified alias to indicate that helics
-                                                   //!< should iterate if warranted
+                                                  //!< should iterate if warranted
 
 #endif

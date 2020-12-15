@@ -185,7 +185,7 @@ bool TimeCoordinator::updateNextExecutionTime()
         time_exec = std::min(time_requested, time_exec);
         if (time_exec <= time_granted) {
             time_exec = (iterating == IterationRequest::NO_ITERATIONS) ? getNextPossibleTime() :
-                                                                          time_granted;
+                                                                         time_granted;
         }
         if ((time_exec - time_granted) > timeZero) {
             time_exec = generateAllowedTime(time_exec);

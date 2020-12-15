@@ -98,7 +98,7 @@ HelicsBroker FederateTestFixture::AddBroker(const std::string& CoreType_name, in
 }
 
 HelicsBroker FederateTestFixture::AddBroker(const std::string& CoreType_name,
-                                             const std::string& initialization_string)
+                                            const std::string& initialization_string)
 {
     HelicsBroker broker;
     if (extraBrokerArgs.empty()) {

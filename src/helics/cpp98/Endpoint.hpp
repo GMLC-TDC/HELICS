@@ -374,9 +374,7 @@ class Endpoint {
     void sendMessageZeroCopy(Message& message)
     {
         // returns helicsStatus
-        helicsEndpointSendMessageZeroCopy(ep,
-                                          static_cast<HelicsMessage>(message),
-                                          hThrowOnError());
+        helicsEndpointSendMessageZeroCopy(ep, static_cast<HelicsMessage>(message), hThrowOnError());
         message.release();
     }
     /** get the name of the endpoint*/

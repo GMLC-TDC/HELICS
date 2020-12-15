@@ -18,9 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-BrokerApp::BrokerApp(CoreType ctype,
-                     const std::string& broker_name,
-                     std::vector<std::string> args):
+BrokerApp::BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> args):
     name(broker_name)
 {
     auto app = generateParser(ctype == CoreType::MULTI);

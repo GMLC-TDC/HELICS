@@ -441,8 +441,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
             }
             break;
         default:
-            type =
-                (targetType == DataType::HELICS_UNKNOWN) ? DataType::HELICS_DOUBLE : targetType;
+            type = (targetType == DataType::HELICS_UNKNOWN) ? DataType::HELICS_DOUBLE : targetType;
             break;
     }
     // convert everything to a uniform type
@@ -794,8 +793,7 @@ char Input::getValueChar()
             loadSourceInformation();
         }
 
-        if ((injectionType == DataType::HELICS_STRING) ||
-            (injectionType == DataType::HELICS_ANY) ||
+        if ((injectionType == DataType::HELICS_STRING) || (injectionType == DataType::HELICS_ANY) ||
             (injectionType == DataType::HELICS_CUSTOM)) {
             std::string out;
             valueExtract(dv, injectionType, out);

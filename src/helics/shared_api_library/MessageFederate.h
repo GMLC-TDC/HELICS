@@ -60,10 +60,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, 
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed,
-                                                                   const char* name,
-                                                                   const char* type,
-                                                                   HelicsError* err);
+HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
 /**
  * Create a targeted endpoint.  Targeted endpoints have specific destinations predefined and do not allow sending messages to other
@@ -86,9 +83,9 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate
  * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
-                                                                     const char* name,
-                                                                     const char* type,
-                                                                     HelicsError* err);
+                                                                    const char* name,
+                                                                    const char* type,
+                                                                    HelicsError* err);
 
 /**
  * Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other
@@ -110,9 +107,9 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFedera
  * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
-                                                                           const char* name,
-                                                                           const char* type,
-                                                                           HelicsError* err);
+                                                                          const char* name,
+                                                                          const char* type,
+                                                                          HelicsError* err);
 
 /**
  * Get an endpoint object from a name.

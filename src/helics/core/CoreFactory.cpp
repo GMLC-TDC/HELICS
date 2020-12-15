@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFactory.hpp"
 
 #include "CommonCore.hpp"
-#include "core-exceptions.hpp"
 #include "CoreTypes.hpp"
+#include "core-exceptions.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
@@ -157,8 +157,7 @@ namespace CoreFactory {
         return create(type, gEmptyString, argc, argv);
     }
 
-    std::shared_ptr<Core>
-        create(CoreType type, const std::string& coreName, int argc, char* argv[])
+    std::shared_ptr<Core> create(CoreType type, const std::string& coreName, int argc, char* argv[])
     {
         auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
@@ -188,9 +187,8 @@ namespace CoreFactory {
         return core;
     }
 
-    std::shared_ptr<Core> FindOrCreate(CoreType type,
-                                       const std::string& coreName,
-                                       const std::string& configureString)
+    std::shared_ptr<Core>
+        FindOrCreate(CoreType type, const std::string& coreName, const std::string& configureString)
     {
         std::shared_ptr<Core> core = findCore(coreName);
         if (core) {

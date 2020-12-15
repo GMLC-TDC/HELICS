@@ -869,10 +869,10 @@ HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, HelicsError* err)
 }
 
 HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
-                                               HelicsTime requestTime,
-                                               HelicsIterationRequest iterate,
-                                               HelicsIterationResult* outIteration,
-                                               HelicsError* err)
+                                              HelicsTime requestTime,
+                                              HelicsIterationRequest iterate,
+                                              HelicsIterationResult* outIteration,
+                                              HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
@@ -927,10 +927,7 @@ HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, HelicsError* er
     }
 }
 
-void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed,
-                                             HelicsTime requestTime,
-                                             HelicsIterationRequest iterate,
-                                             HelicsError* err)
+void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {

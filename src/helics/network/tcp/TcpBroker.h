@@ -18,8 +18,7 @@ namespace tcp {
     class TcpComms;
     class TcpCommsSS;
     /** implementation for the core that uses TCP messages to communicate*/
-    using TcpBroker =
-        NetworkBroker<TcpComms, interface_type::tcp, static_cast<int>(CoreType::TCP)>;
+    using TcpBroker = NetworkBroker<TcpComms, interface_type::tcp, static_cast<int>(CoreType::TCP)>;
 
     /** single socket version of the TCP broker*/
     class TcpBrokerSS final:
