@@ -7,6 +7,7 @@ The Advanced Examples teach four concepts to build on a default setup:
 ```eval_rst
 .. toctree::
     :maxdepth: 1
+    :hidden:
     
     advanced_default
     advanced_brokers_simultaneous
