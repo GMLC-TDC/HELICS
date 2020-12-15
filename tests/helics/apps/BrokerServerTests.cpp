@@ -153,8 +153,8 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
 }
 
 const std::vector<std::pair<const char*, CoreType>> tvals{{"--zmq", CoreType::ZMQ},
-                                                           {"--zmqss", CoreType::ZMQ_SS},
-                                                           {"--tcp", CoreType::TCP},
-                                                           {"--udp", CoreType::UDP}};
+                                                          {"--zmqss", CoreType::ZMQ_SS},
+                                                          {"--tcp", CoreType::TCP},
+                                                          {"--udp", CoreType::UDP}};
 
 INSTANTIATE_TEST_SUITE_P(broker_server_tests, BrokerServerTests, ::testing::ValuesIn(tvals));

@@ -27,7 +27,7 @@ struct FederateTestFixture {
 
     HelicsBroker AddBroker(const std::string& CoreType_name, int count);
     HelicsBroker AddBroker(const std::string& CoreType_name,
-                            const std::string& initialization_string);
+                           const std::string& initialization_string);
 
     void SetupTest(FedCreator ctor,
                    const std::string& CoreType_name,

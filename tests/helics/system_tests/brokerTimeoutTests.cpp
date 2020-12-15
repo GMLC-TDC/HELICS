@@ -174,8 +174,7 @@ TEST(broker_timeout_tests, core_fail_timeout_no_timer_ci_skip)
 
 TEST(broker_timeout_tests, core_fail_error)
 {
-    auto brk =
-        helics::BrokerFactory::create(helics::CoreType::TEST, "--timeout=200ms --tick 50ms");
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "--timeout=200ms --tick 50ms");
     brk->connect();
 
     helics::FederateInfo fi(helics::CoreType::TEST);

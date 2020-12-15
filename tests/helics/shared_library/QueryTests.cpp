@@ -95,8 +95,7 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateFinalizeComplete(vFed1, &err));
 }
 
-static void
-    queryTest(const char* query, int stringSize, HelicsQueryBuffer buffer, void* /*unused*/)
+static void queryTest(const char* query, int stringSize, HelicsQueryBuffer buffer, void* /*unused*/)
 {
     std::string q(query, stringSize);
     if (q == "abc") {

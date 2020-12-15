@@ -141,11 +141,8 @@ HelicsPublication
     return nullptr;
 }
 
-HelicsPublication helicsFederateRegisterGlobalTypePublication(HelicsFederate fed,
-                                                               const char* key,
-                                                               const char* type,
-                                                               const char* units,
-                                                               HelicsError* err)
+HelicsPublication
+    helicsFederateRegisterGlobalTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err)
 {
     // now generate a generic subscription
     auto fedObj = getValueFedSharedPtr(fed, err);
@@ -164,11 +161,8 @@ HelicsPublication helicsFederateRegisterGlobalTypePublication(HelicsFederate fed
     return nullptr;
 }
 
-HelicsPublication helicsFederateRegisterGlobalPublication(HelicsFederate fed,
-                                                           const char* key,
-                                                           HelicsDataTypes type,
-                                                           const char* units,
-                                                           HelicsError* err)
+HelicsPublication
+    helicsFederateRegisterGlobalPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err)
 {
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {

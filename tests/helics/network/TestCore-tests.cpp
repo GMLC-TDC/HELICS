@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/CoreFederateInfo.hpp"
-#include "helics/core/core-exceptions.hpp"
 #include "helics/core/CoreTypes.hpp"
+#include "helics/core/core-exceptions.hpp"
 #include "helics/network/test/TestCore.h"
 
 #include "gtest/gtest.h"

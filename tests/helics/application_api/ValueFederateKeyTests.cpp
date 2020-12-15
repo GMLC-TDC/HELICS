@@ -101,10 +101,7 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     ASSERT_TRUE(vFed1);
     // register the publications
-    helics::Publication pubid(helics::GLOBAL,
-                              vFed1.get(),
-                              "pub1",
-                              helics::DataType::HELICS_STRING);
+    helics::Publication pubid(helics::GLOBAL, vFed1.get(), "pub1", helics::DataType::HELICS_STRING);
 
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);

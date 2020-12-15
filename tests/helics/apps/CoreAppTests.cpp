@@ -176,9 +176,7 @@ TEST(CoreAppTests, constructor9)
 
 TEST(CoreAppTests, constructor10)
 {
-    helics::CoreApp App(helics::CoreType::TEST,
-                        "core10",
-                        std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core10", std::vector<std::string>{"--autobroker"});
 
     helics::CoreApp App2(App.getCopyofCorePointer());
 

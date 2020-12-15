@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerFactory.hpp"
 
 #include "CoreBroker.hpp"
-#include "core-exceptions.hpp"
 #include "CoreTypes.hpp"
+#include "core-exceptions.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"

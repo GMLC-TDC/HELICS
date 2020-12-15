@@ -38,9 +38,7 @@ static auto StartBrokerImp(const std::string& CoreType_name, std::string initial
         std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
         return std::make_shared<helicscpp::Broker>(new_type, std::string(), initialization_string);
     }
-    return std::make_shared<helicscpp::Broker>(CoreType_name,
-                                               std::string(),
-                                               initialization_string);
+    return std::make_shared<helicscpp::Broker>(CoreType_name, std::string(), initialization_string);
 }
 
 bool FederateTestFixture_cpp::hasIndexCode(const std::string& type_name)

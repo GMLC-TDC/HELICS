@@ -183,24 +183,24 @@ typedef enum {
  */
 typedef enum {
     /** don't print anything except a few catastrophic errors*/
-               HELICS_LOG_LEVEL_NO_PRINT = -1,
-               /** only print error level indicators*/
-               HELICS_LOG_LEVEL_ERROR = 0,
-               /** only print warnings and errors*/
-               HELICS_LOG_LEVEL_WARNING = 1,
-               /** warning errors and summary level information*/
-               HELICS_LOG_LEVEL_SUMMARY = 2,
-               /** summary+ notices about federate and broker connections +messages about network
-                  connections*/
-               HELICS_LOG_LEVEL_CONNECTIONS = 3,
-               /** connections+ interface definitions*/
-               HELICS_LOG_LEVEL_INTERFACES = 4,
-               /** interfaces + timing message*/
-               HELICS_LOG_LEVEL_TIMING = 5,
-               /** timing+ data transfer notices*/
-               HELICS_LOG_LEVEL_DATA = 6,
-               /** all internal messages*/
-               HELICS_LOG_LEVEL_TRACE = 7
+    HELICS_LOG_LEVEL_NO_PRINT = -1,
+    /** only print error level indicators*/
+    HELICS_LOG_LEVEL_ERROR = 0,
+    /** only print warnings and errors*/
+    HELICS_LOG_LEVEL_WARNING = 1,
+    /** warning errors and summary level information*/
+    HELICS_LOG_LEVEL_SUMMARY = 2,
+    /** summary+ notices about federate and broker connections +messages about network
+       connections*/
+    HELICS_LOG_LEVEL_CONNECTIONS = 3,
+    /** connections+ interface definitions*/
+    HELICS_LOG_LEVEL_INTERFACES = 4,
+    /** interfaces + timing message*/
+    HELICS_LOG_LEVEL_TIMING = 5,
+    /** timing+ data transfer notices*/
+    HELICS_LOG_LEVEL_DATA = 6,
+    /** all internal messages*/
+    HELICS_LOG_LEVEL_TRACE = 7
 } HelicsLogLevels;
 
 /** enumeration of return values from the C interface functions
@@ -574,8 +574,7 @@ HELICS_EXPORT HelicsCore helicsCreateCore(const char* type, const char* name, co
  *
  * @return A HelicsCore object.
  */
-HELICS_EXPORT HelicsCore
-    helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
+HELICS_EXPORT HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Create a new reference to an existing core.
@@ -1244,8 +1243,7 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void
-    helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
 // TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
@@ -1423,8 +1421,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, 
  * @return An iteration structure with field containing the time and iteration status.
  */
 HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterative(HelicsFederate fed,
-                                                                                HelicsIterationRequest iterate,
-                                                                                HelicsError* err);
+                                                                              HelicsIterationRequest iterate,
+                                                                              HelicsError* err);
 
 /**
  * Request an iterative entry to the execution mode.
@@ -1539,10 +1537,10 @@ HELICS_EXPORT HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, Helic
  * @endPythonOnly
  */
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
-                                                             HelicsTime requestTime,
-                                                             HelicsIterationRequest iterate,
-                                                             HelicsIterationResult* outIteration,
-                                                             HelicsError* err);
+                                                            HelicsTime requestTime,
+                                                            HelicsIterationRequest iterate,
+                                                            HelicsIterationResult* outIteration,
+                                                            HelicsError* err);
 
 /**
  * Request the next time for federate execution in an asynchronous call.
@@ -1582,10 +1580,8 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, H
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed,
-                                                           HelicsTime requestTime,
-                                                           HelicsIterationRequest iterate,
-                                                           HelicsError* err);
+HELICS_EXPORT void
+    helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err);
 
 /**
  * Complete an iterative time request asynchronous call.
@@ -1602,8 +1598,8 @@ HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed,
  * @endPythonOnly
  */
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed,
-                                                                     HelicsIterationResult* outIterate,
-                                                                     HelicsError* err);
+                                                                    HelicsIterationResult* outIterate,
+                                                                    HelicsError* err);
 
 /**
  * Get the name of the federate.
@@ -2164,11 +2160,8 @@ HELICS_EXPORT HelicsPublication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT HelicsPublication helicsFederateRegisterGlobalPublication(HelicsFederate fed,
-                                                                         const char* key,
-                                                                         HelicsDataTypes type,
-                                                                         const char* units,
-                                                                         HelicsError* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
  * Register a global publication with a defined type.
@@ -2186,11 +2179,8 @@ HELICS_EXPORT HelicsPublication helicsFederateRegisterGlobalPublication(HelicsFe
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT HelicsPublication helicsFederateRegisterGlobalTypePublication(HelicsFederate fed,
-                                                                             const char* key,
-                                                                             const char* type,
-                                                                             const char* units,
-                                                                             HelicsError* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**
  * Register a named input.
@@ -3909,9 +3899,9 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, Heli
  * @return A HelicsFilter object.
  */
 HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed,
-                                                               HelicsFilterTypes type,
-                                                               const char* name,
-                                                               HelicsError* err);
+                                                              HelicsFilterTypes type,
+                                                              const char* name,
+                                                              HelicsError* err);
 
 /**
  * Create a cloning Filter on the specified federate.

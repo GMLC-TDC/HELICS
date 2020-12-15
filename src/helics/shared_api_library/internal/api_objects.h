@@ -152,7 +152,7 @@ class QueryObject {
 /** definitions to simplify error returns if an error already exists*/
 #define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
     do {                                                                                                                                   \
-        if (((err) != nullptr) && ((err)->errorCode != 0)) {                                                                              \
+        if (((err) != nullptr) && ((err)->errorCode != 0)) {                                                                               \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)

@@ -95,8 +95,7 @@ HELICS_EXPORT HelicsCore helicsCreateCore(const char* type, const char* name, co
  *
  * @return A HelicsCore object.
  */
-HELICS_EXPORT HelicsCore
-    helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
+HELICS_EXPORT HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Create a new reference to an existing core.
@@ -765,8 +764,7 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char se
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void
-    helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
 // TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
@@ -944,8 +942,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, 
  * @return An iteration structure with field containing the time and iteration status.
  */
 HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterative(HelicsFederate fed,
-                                                                                HelicsIterationRequest iterate,
-                                                                                HelicsError* err);
+                                                                              HelicsIterationRequest iterate,
+                                                                              HelicsError* err);
 
 /**
  * Request an iterative entry to the execution mode.
@@ -1060,10 +1058,10 @@ HELICS_EXPORT HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, Helic
  * @endPythonOnly
  */
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
-                                                             HelicsTime requestTime,
-                                                             HelicsIterationRequest iterate,
-                                                             HelicsIterationResult* outIteration,
-                                                             HelicsError* err);
+                                                            HelicsTime requestTime,
+                                                            HelicsIterationRequest iterate,
+                                                            HelicsIterationResult* outIteration,
+                                                            HelicsError* err);
 
 /**
  * Request the next time for federate execution in an asynchronous call.
@@ -1103,10 +1101,8 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, H
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed,
-                                                           HelicsTime requestTime,
-                                                           HelicsIterationRequest iterate,
-                                                           HelicsError* err);
+HELICS_EXPORT void
+    helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err);
 
 /**
  * Complete an iterative time request asynchronous call.
@@ -1123,8 +1119,8 @@ HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed,
  * @endPythonOnly
  */
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed,
-                                                                     HelicsIterationResult* outIterate,
-                                                                     HelicsError* err);
+                                                                    HelicsIterationResult* outIterate,
+                                                                    HelicsError* err);
 
 /**
  * Get the name of the federate.

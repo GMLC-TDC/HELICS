@@ -521,8 +521,7 @@ void CommonCore::enterInitializingMode(LocalFederateId federateID)
     throw(InvalidFunctionCall("federate already has requested entry to initializing State"));
 }
 
-IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID,
-                                                IterationRequest iterate)
+IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, IterationRequest iterate)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {

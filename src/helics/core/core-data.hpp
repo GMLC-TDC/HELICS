@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "SmallBuffer.hpp"
-#include "helicsTime.hpp"
 #include "helics/helics-config.h"
+#include "helicsTime.hpp"
 
 #include <memory>
 #include <string>

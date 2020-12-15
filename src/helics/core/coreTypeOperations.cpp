@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "coreTypeOperations.hpp"
 
-#include "core-exceptions.hpp"
 #include "CoreTypes.hpp"
+#include "core-exceptions.hpp"
 #include "helics/helics-config.h"
 
 #include <algorithm>

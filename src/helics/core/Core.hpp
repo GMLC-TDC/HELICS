@@ -203,7 +203,7 @@ class Core {
      *@return an iteration result enumeration value indicating the current state of iterations
      */
     virtual IterationResult enterExecutingMode(LocalFederateId federateID,
-                                                IterationRequest iterate = NO_ITERATION) = 0;
+                                               IterationRequest iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
