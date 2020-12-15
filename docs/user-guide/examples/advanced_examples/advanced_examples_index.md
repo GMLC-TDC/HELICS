@@ -1,3 +1,5 @@
+:tocdepth: 1
+
 # Advanced Examples
 
 
@@ -8,7 +10,6 @@ The Advanced Examples teach four concepts to build on a default setup:
 .. toctree::
     :maxdepth: 1
     :hidden:
-    :titlesonly:
     
     advanced_default
     advanced_brokers_simultaneous
