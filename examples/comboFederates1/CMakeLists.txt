@@ -16,7 +16,7 @@ set_target_properties(comboFed PROPERTIES FOLDER examples)
 if(HELICS_BUILD_TESTS AND NOT MSVC)
     add_test(NAME comboFed_broker_example
              COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 --broker
-                     $<TARGET_FILE:HelicsBroker> $<TARGET_FILE:comboFed>
+                     $<TARGET_FILE:helics_broker> $<TARGET_FILE:comboFed>
     )
     set_property(TEST comboFed_broker_example PROPERTY LABELS Continuous)
 endif()

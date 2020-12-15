@@ -422,7 +422,7 @@ namespace udp {
                         }
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(std::string("(udp) UNKNOWN route, message dropped ") +
+                            logWarning(std::string("(udp) unknown route, message dropped ") +
                                        prettyPrintString(cmd));
                         }
                     }

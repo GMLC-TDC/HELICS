@@ -580,7 +580,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
     return msg;
 }
 
-static constexpr char unknownStr[] = "UNKNOWN";
+static constexpr char unknownStr[] = "unknown";
 
 // Map to translate the action to a description
 static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string, 93>

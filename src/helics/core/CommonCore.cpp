@@ -621,7 +621,7 @@ const std::string& CommonCore::getFederateName(LocalFederateId federateID) const
     return fed->getIdentifier();
 }
 
-static const std::string unknownString("#UNKNOWN");
+static const std::string unknownString("#unknown");
 
 const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateID) const noexcept
 {

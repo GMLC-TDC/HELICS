@@ -166,7 +166,7 @@ namespace apps {
                 return rep.to_string();
             }
         }
-        logMessage("received UNKNOWN message of length " + std::to_string(msg.size()));
+        logMessage("received unknown message of length " + std::to_string(msg.size()));
         return "ignored";
     }
 

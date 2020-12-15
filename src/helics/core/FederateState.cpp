@@ -1098,7 +1098,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_WARNING:
             if (cmd.payload.empty()) {
                 cmd.payload = commandErrorString(cmd.messageID);
-                if (cmd.payload.to_string() == "UNKNOWN") {
+                if (cmd.payload.to_string() == "unknown") {
                     cmd.payload.append(" code:");
                     cmd.payload.append(std::to_string(cmd.messageID));
                 }
@@ -1118,7 +1118,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     setState(HELICS_ERROR);
                     if (cmd.payload.empty()) {
                         errorString = commandErrorString(cmd.messageID);
-                        if (errorString == "UNKNOWN") {
+                        if (errorString == "unknown") {
                             errorString += " code:" + std::to_string(cmd.messageID);
                         }
                     } else {
@@ -1323,7 +1323,7 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
                         fmt::format("property {} not used on INPUT {}", cmd.messageID, ipt->key));
                 } else {
                     LOG_WARNING(
-                        fmt::format("property {} not used on due to UNKNOWN INPUT", cmd.messageID));
+                        fmt::format("property {} not used on due to unknown INPUT", cmd.messageID));
                 }
             }
             break;
@@ -1337,11 +1337,11 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             if (!used) {
                 auto* pub = interfaceInformation.getPublication(cmd.dest_handle);
                 if (pub != nullptr) {
-                    LOG_WARNING(fmt::format("property {} not used on Publication {}",
+                    LOG_WARNING(fmt::format("property {} not used on PUBLICATION {}",
                                             cmd.messageID,
                                             pub->key));
                 } else {
-                    LOG_WARNING(fmt::format("property {} not used on due to UNKNOWN Publication",
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown PUBLICATION",
                                             cmd.messageID));
                 }
             }
@@ -1355,11 +1355,11 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             if (!used) {
                 auto* ept = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (ept != nullptr) {
-                    LOG_WARNING(fmt::format("property {} not used on Endpoint {}",
+                    LOG_WARNING(fmt::format("property {} not used on ENDPOINT {}",
                                             cmd.messageID,
                                             ept->key));
                 } else {
-                    LOG_WARNING(fmt::format("property {} not used on due to UNKNOWN Endpoint",
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown ENDPOINT",
                                             cmd.messageID));
                 }
             }

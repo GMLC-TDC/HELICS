@@ -1402,7 +1402,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                 default:
                     LOG_WARNING(global_broker_id_local,
                                 getIdentifier(),
-                                "UNKNOWN command in interface addition code section\n");
+                                "unknown command in interface addition code section\n");
                     break;
             }
         } else {
