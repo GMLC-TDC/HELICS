@@ -178,7 +178,7 @@ Some library reorganization, additional static analysis(CppLint and clang-tidy),
 - Update FMT library to version 6.2.0
 - The core and broker Factories use a map instead of a fixed list which is a step toward allowing user defined cores
 - Updated CLI11 included code to customized version to allow configuration of cores and brokers through Json files
-- The ordering of the HELICS_ERROR_types enum is in ascending order
+- The ordering of the `HelicsErrorTypes` enum is in ascending order
 - Refactored the Matlab and Java swig interface builds to enable standalone builds
 
 ### Fixed
@@ -548,7 +548,7 @@ Minor release which fixes a few bugs and add some JSON related input and queries
 
 - a few possible race conditions found by thread-sanitizer
 - cleared up a couple scenarios that were triggering occasional test failure in the system tests
-- `HelicsBroker` and `helics_app` were returning non-zero return values when `--version` or `--help` were used, they now return 0 in those cases
+- `helics_broker` and `helics_app` were returning non-zero return values when `--version` or `--help` were used, they now return 0 in those cases
 - a small memory leak when a JSON stream builder was created and not destroyed properly
 - an inconsistency between the `helics_time_maxtime` in the C shared library and the maxTime value used in C++, this could in some cases result in failing termination conditions
 
@@ -668,7 +668,7 @@ This is a major revision so this changelog will not capture all the changes that
 - working octave interface for Linux
 - some additional tests for the shared library
 - TOML readers for interface description in Federates
-- interactive command line for HelicsBroker
+- interactive command line for helics_broker
 - a few new queries on brokers see [Queries](docs/user_guide/Queries.md)
 - CPACK can now build a dmg files
 - Players can have multiline comments in input file and omit the tag for repeated messages
@@ -746,7 +746,7 @@ This is a major revision so this changelog will not capture all the changes that
 - update cereal library with latest bug fixes
 - update jsoncpp with latest version
 - update cppzmq with the latest version
-- moved HelicsBroker executable code to the apps repository
+- moved helics_broker executable code to the apps repository
 - the CXX shared library can now be built alongside the C shared library and can be built on Windows.
 
 ### Fixed

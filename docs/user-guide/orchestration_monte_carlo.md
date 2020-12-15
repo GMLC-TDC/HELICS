@@ -188,7 +188,7 @@ co-simulation.
   "federates": [
     {
       "directory": ".",
-      "exec": "HelicsBroker --federates=2 --loglevel=5 --type=tcpss --port 12345",
+      "exec": "helics_broker --federates=2 --loglevel=5 --type=tcpss --port 12345",
       "host": "broker",
       "name": "broker_0",
       "loglevel": 3
