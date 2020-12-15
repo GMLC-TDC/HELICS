@@ -1620,7 +1620,7 @@ int FederateState::checkInterfaces()
                 LOG_ERROR(fmt::format("Connection Error: {}", issue.second));
                 break;
             default:
-                LOG_ERROR(fmt::format("ERROR_RESULT code {}: {}", issue.first, issue.second));
+                LOG_ERROR(fmt::format("error code {}: {}", issue.first, issue.second));
                 break;
         }
     }
@@ -1678,12 +1678,12 @@ void FederateState::logMessage(int level,
 const std::string& fedStateString(FederateStates state)
 {
     static const std::string c1{"created"};
-    static const std::string estate{"ERROR_RESULT"};
+    static const std::string estate{"error"};
     static const std::string init{"initializing"};
     static const std::string dis{"disconnected"};
     static const std::string exec{"executing"};
     static const std::string term{"terminating"};
-    static const std::string unk{"UNKNOWN"};
+    static const std::string unk{"unknown"};
 
     switch (state) {
         case FederateStates::HELICS_CREATED:

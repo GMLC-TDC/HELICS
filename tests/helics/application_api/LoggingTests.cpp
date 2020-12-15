@@ -157,32 +157,32 @@ TEST(logging_tests, check_log_message_functions)
         });
 
     Fed->enterExecutingMode();
-    Fed->logErrorMessage("test ERROR_RESULT");
-    Fed->logWarningMessage("test WARNING");
-    Fed->logInfoMessage("test INFO");
-    Fed->logDebugMessage("test DEBUG");
+    Fed->logErrorMessage("test error");
+    Fed->logWarningMessage("test warning");
+    Fed->logInfoMessage("test info");
+    Fed->logDebugMessage("test debug");
     Fed->requestNextStep();
     Fed->finalize();
 
     auto llock = mlog.lock();
     int order = 0;
     for (auto& m : llock) {
-        if (m.second.find("ERROR_RESULT") != std::string::npos) {
+        if (m.second.find("error") != std::string::npos) {
             EXPECT_EQ(m.first, HELICS_LOG_LEVEL_ERROR);
             EXPECT_EQ(order, 0);
             order = 1;
         }
-        if (m.second.find("WARNING") != std::string::npos) {
+        if (m.second.find("warning") != std::string::npos) {
             EXPECT_EQ(m.first, HELICS_LOG_LEVEL_WARNING);
             EXPECT_EQ(order, 1);
             order = 2;
         }
-        if (m.second.find("INFO") != std::string::npos) {
+        if (m.second.find("info") != std::string::npos) {
             EXPECT_EQ(m.first, HELICS_LOG_LEVEL_SUMMARY);
             EXPECT_EQ(order, 2);
             order = 3;
         }
-        if (m.second.find("DEBUG") != std::string::npos) {
+        if (m.second.find("debug") != std::string::npos) {
             EXPECT_GT(m.first, HELICS_LOG_LEVEL_SUMMARY);
             EXPECT_EQ(order, 3);
             order = 4;

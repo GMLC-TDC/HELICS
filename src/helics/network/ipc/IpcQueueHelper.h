@@ -76,7 +76,7 @@ namespace ipc {
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     ++tries;
                     if (tries > 20) {
-                        std::cout << "ERROR_RESULT in connecting to process lock\n";
+                        std::cout << "error in connecting to process lock\n";
                         state = newState;
                         return false;
                     }

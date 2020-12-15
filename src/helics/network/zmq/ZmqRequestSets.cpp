@@ -22,7 +22,7 @@ namespace zeromq {
             zsock->connect(routeInfo);
         }
         catch (const zmq::error_t& ze) {
-            std::cerr << "ERROR_RESULT connecting to " << routeInfo << " " << ze.what() << std::endl;
+            std::cerr << "error connecting to " << routeInfo << " " << ze.what() << std::endl;
             return;
         }
         zsock->setsockopt(ZMQ_LINGER, 200);

@@ -415,7 +415,7 @@ TEST_F(query, current_state)
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
 
-    vFed1->localError(-3, "test ERROR_RESULT");
+    vFed1->localError(-3, "test error");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     res = core->query("root", "current_state");
@@ -424,7 +424,7 @@ TEST_F(query, current_state)
     EXPECT_EQ(val["federates"].size(), 2U);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["brokers"].size(), 0U);
-    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "ERROR_RESULT");
+    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
 
     vFed2->finalize();
 
@@ -460,7 +460,7 @@ TEST_F(query, global_state)
     EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
     EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "executing");
 
-    vFed1->localError(-3, "test ERROR_RESULT");
+    vFed1->localError(-3, "test error");
 
     EXPECT_THROW(vFed1->requestTime(2.0), helics::HelicsException);
     res = core->query("root", "global_state");
@@ -469,9 +469,9 @@ TEST_F(query, global_state)
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
     if (val["cores"][0]["federates"][0]["name"].asString() == "fed0") {
-        EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "ERROR_RESULT");
+        EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "error");
     } else {
-        EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "ERROR_RESULT");
+        EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
     }
 
     vFed2->finalize();
@@ -483,7 +483,7 @@ TEST_F(query, global_state)
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
-    EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "ERROR_RESULT");
+    EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
     EXPECT_STREQ(val["cores"][0]["state"].asCString(), "disconnected");
     core = nullptr;
 
@@ -507,14 +507,14 @@ TEST_F(query, current_state_core)
     EXPECT_EQ(val["federates"].size(), 1U);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
 
-    vFed1->localError(-3, "test ERROR_RESULT");
+    vFed1->localError(-3, "test error");
     EXPECT_THROW(vFed1->requestTime(1.0), helics::HelicsException);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     res = vFed1->query("core", "current_state");
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 1U);
-    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "ERROR_RESULT");
+    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
 
     vFed2->finalize();
 
@@ -828,7 +828,7 @@ TEST_F(query, queries_query)
     auto vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query(qstr);
-        EXPECT_EQ(qres.find("ERROR_RESULT"), std::string::npos) << qstr << " produced an ERROR_RESULT";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error";
         try {
             auto v = loadJsonStr(qres);
         }
@@ -841,7 +841,7 @@ TEST_F(query, queries_query)
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query("core", qstr);
-        EXPECT_EQ(qres.find("ERROR_RESULT"), std::string::npos) << qstr << " produced and ERROR_RESULT in core";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in core";
         try {
             auto v = loadJsonStr(qres);
         }
@@ -854,7 +854,7 @@ TEST_F(query, queries_query)
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
         auto qres = vFed1->query("root", qstr);
-        EXPECT_EQ(qres.find("ERROR_RESULT"), std::string::npos) << qstr << " produced an ERROR_RESULT in root";
+        EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in root";
         try {
             auto v = loadJsonStr(qres);
         }

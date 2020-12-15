@@ -286,7 +286,7 @@ bool CommsInterface::connect()
             }
             catch (const std::exception& e) {
                 rx_status = connection_status::error;
-                logError(std::string("ERROR_RESULT in receiver >") + e.what());
+                logError(std::string("error in receiver >") + e.what());
             }
         });
     }
@@ -297,7 +297,7 @@ bool CommsInterface::connect()
         }
         catch (const std::exception& e) {
             tx_status = connection_status::error;
-            logError(std::string("ERROR_RESULT in transmitter >") + e.what());
+            logError(std::string("error in transmitter >") + e.what());
         }
     });
     syncLock.unlock();

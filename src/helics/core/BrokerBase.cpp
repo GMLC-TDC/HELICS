@@ -104,7 +104,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
 
 static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
                                                       {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"ERROR_RESULT", HELICS_LOG_LEVEL_ERROR},
+                                                      {"error", HELICS_LOG_LEVEL_ERROR},
                                                       {"warning", HELICS_LOG_LEVEL_WARNING},
                                                       {"summary", HELICS_LOG_LEVEL_SUMMARY},
                                                       {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
@@ -152,7 +152,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
-                   "specify that a broker should cause the federation to terminate on an ERROR_RESULT");
+                   "specify that a broker should cause the federation to terminate on an error");
     auto* logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->add_flag_function(
@@ -215,7 +215,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,
-                     "time to wait after an ERROR_RESULT state before terminating "
+                     "time to wait after an error state before terminating "
                      "like '10s' or '45ms') ")
         ->default_str(std::to_string(static_cast<double>(errorDelay)));
 
@@ -823,7 +823,7 @@ const std::string& brokerStateName(BrokerBase::broker_state_t state)
     static const std::string operatingString = "operating";
     static const std::string terminatingString = "terminating";
     static const std::string terminatedString = "terminated";
-    static const std::string erroredString = "ERROR_RESULT";
+    static const std::string erroredString = "error";
     static const std::string otherString = "other";
     switch (state) {
         case BrokerBase::broker_state_t::created:

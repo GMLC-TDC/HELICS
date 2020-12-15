@@ -356,9 +356,13 @@ TEST_P(player_file_tests, test_files_exe)
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     exeTestRunner playerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_player");
 
-    exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "HelicsBroker");
+    exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_broker");
 
     ASSERT_TRUE(playerExe.isActive());
+    if (!brokerExe.isActive()) {
+        std::cout << " unable to locate helics_broker in " << HELICS_INSTALL_LOC << " or "
+                  << HELICS_BUILD_LOC << std::endl;
+    }
     ASSERT_TRUE(brokerExe.isActive());
     auto res = brokerExe.runAsync("-f 2 --coretype=zmq --name=zmq_broker");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
@@ -655,7 +659,7 @@ TEST( player_tests,simple_player_test_exe)
 {
     static exeTestRunner playerExe (HELICS_BIN_LOC "apps/", "helics_player");
 
-    static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "HelicsBroker");
+    static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "helics_broker");
 
     auto res = brokerExe.runAsync ("1 --coretype=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";

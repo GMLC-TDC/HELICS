@@ -422,13 +422,13 @@ std::pair<return_val, std::string>
         query = "current_state";
     }
     auto res = brkr->query(target.to_string(), query.to_string());
-    if (res.find("\"ERROR_RESULT\"") == std::string::npos) {
+    if (res.find("\"error\"") == std::string::npos) {
         return {return_val::ok, res};
     }
 
     if (autoquery) {
         res = brkr->query(query.to_string(), "current_state");
-        if (res.find("\"ERROR_RESULT\"") != std::string::npos) {
+        if (res.find("\"error\"") != std::string::npos) {
             return {return_val::not_found, "target not found"};
         }
         return {return_val::ok, res};
@@ -533,15 +533,15 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         switch (res.first) {
             case return_val::bad_request:
                 response["status"] = static_cast<int>(http::status::bad_request);
-                response["ERROR_RESULT"] = res.second;
+                response["error"] = res.second;
                 break;
             case return_val::not_found:
                 response["status"] = static_cast<int>(http::status::not_found);
-                response["ERROR_RESULT"] = res.second;
+                response["error"] = res.second;
                 break;
             default:
                 response["status"] = static_cast<int>(res.first);
-                response["ERROR_RESULT"] = res.second;
+                response["error"] = res.second;
                 break;
             case return_val::ok:
                 response["status"] = 0;

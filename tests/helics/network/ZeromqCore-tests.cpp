@@ -244,7 +244,7 @@ TEST(ZMQCore, zmqComms_broker_test_transmit)
         repSocket.bind(defServer);
     }
     catch (const zmq::error_t& ze) {
-        std::cerr << "ERROR_RESULT repbind (broker test transmit) " << ze.what() << std::endl;
+        std::cerr << "error repbind (broker test transmit) " << ze.what() << std::endl;
         std::this_thread::sleep_for(200ms);
         GTEST_FAIL() << "Unable to bind Socket";
     }
@@ -254,7 +254,7 @@ TEST(ZMQCore, zmqComms_broker_test_transmit)
         pullSocket.bind(defRoute1);
     }
     catch (const zmq::error_t& ze) {
-        std::cerr << "ERROR_RESULT pullbind (broker test transmit)" << ze.what() << std::endl;
+        std::cerr << "error pullbind (broker test transmit)" << ze.what() << std::endl;
         repSocket.close();
         std::this_thread::sleep_for(200ms);
         GTEST_FAIL() << "Unable to bind Socket";
@@ -296,7 +296,7 @@ TEST(ZMQCore, zmqComms_rx)
         repSocket.bind(defServer);
     }
     catch (const zmq::error_t& ze) {
-        std::cerr << "ERROR_RESULT repbind (zmqComms_rx_test) " << ze.what() << std::endl;
+        std::cerr << "error repbind (zmqComms_rx_test) " << ze.what() << std::endl;
         std::this_thread::sleep_for(200ms);
         GTEST_FAIL() << "Unable to bind Socket";
     }
@@ -306,7 +306,7 @@ TEST(ZMQCore, zmqComms_rx)
         pullSocket.bind(defRoute1);
     }
     catch (const zmq::error_t& ze) {
-        std::cerr << "ERROR_RESULT pullbind (zmqComms_rx_test)" << ze.what() << std::endl;
+        std::cerr << "error pullbind (zmqComms_rx_test)" << ze.what() << std::endl;
         repSocket.close();
         std::this_thread::sleep_for(200ms);
         GTEST_FAIL() << "Unable to bind Socket";
@@ -527,7 +527,7 @@ TEST(ZMQCore, zmqCore_initialization)
         repSocket.bind(defServer);
     }
     catch (const zmq::error_t& ze) {
-        std::cerr << "ERROR_RESULT repbind (zmqCore_initialization_test) " << ze.what() << std::endl;
+        std::cerr << "error repbind (zmqCore_initialization_test) " << ze.what() << std::endl;
         std::this_thread::sleep_for(200ms);
         GTEST_FAIL() << "Unable to bind Socket";
     }
@@ -537,7 +537,7 @@ TEST(ZMQCore, zmqCore_initialization)
         pullSocket.bind(defRoute1);
     }
     catch (const zmq::error_t& ze) {
-        std::cerr << "ERROR_RESULT pullbind (zmqCore_initialization_test)" << ze.what() << std::endl;
+        std::cerr << "error pullbind (zmqCore_initialization_test)" << ze.what() << std::endl;
         repSocket.close();
         std::this_thread::sleep_for(200ms);
         GTEST_FAIL() << "Unable to bind Socket";

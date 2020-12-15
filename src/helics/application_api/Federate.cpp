@@ -559,13 +559,13 @@ void Federate::completeOperation()
 
 void Federate::localError(int errorcode)
 {
-    std::string errorString = "local ERROR_RESULT " + std::to_string(errorcode) + " in federate " + name;
+    std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + name;
     localError(errorcode, errorString);
 }
 
 void Federate::globalError(int errorcode)
 {
-    std::string errorString = "global ERROR_RESULT " + std::to_string(errorcode) + " in federate " + name;
+    std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + name;
     globalError(errorcode, errorString);
 }
 
@@ -573,7 +573,7 @@ void Federate::localError(int errorcode, const std::string& message)
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "cannot generate a federation ERROR_RESULT on uninitialized or disconnected Federate"));
+            "cannot generate a federation error on uninitialized or disconnected Federate"));
     }
     completeOperation();
     currentMode = Modes::ERROR_STATE;
@@ -584,7 +584,7 @@ void Federate::globalError(int errorcode, const std::string& message)
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "cannot generate a federation ERROR_RESULT on uninitialized or disconnected Federate"));
+            "cannot generate a federation error on uninitialized or disconnected Federate"));
     }
     completeOperation();
     currentMode = Modes::ERROR_STATE;
@@ -720,7 +720,7 @@ iteration_time Federate::requestTimeIterativeComplete()
         return iterativeTime;
     }
     throw(InvalidFunctionCall(
-        "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
+        "cannot call complete requestTimeIterative without first calling requestTimeIterativeAsync function"));
 }
 
 void Federate::updateTime(Time /*newTime*/, Time /*oldTime*/)

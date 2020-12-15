@@ -16,7 +16,7 @@ int main(int /*argc*/, char** /*argv*/)
 
     std::string helicsversion = helicscpp::getHelicsVersionString();
 
-    if (helicsversion.find("ERROR_RESULT") == std::string::npos) {
+    if (helicsversion.find("error") == std::string::npos) {
         // this has to do with tests passing on CI builds
         std::cout << "Helics version = " << helicsversion << '\n';
     }

@@ -84,7 +84,7 @@ HelicsBool helicsIsCoreTypeAvailable(const char* type)
 /** this function is based on the lippencott function template
 http://cppsecrets.blogspot.com/2013/12/using-lippincott-function-for.html
 */
-static constexpr char unknown_err_string[] = "UNKNOWN ERROR_RESULT";
+static constexpr char unknown_err_string[] = "UNKNOWN error";
 
 void helicsErrorHandler(HelicsError* err) noexcept
 {

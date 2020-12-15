@@ -44,10 +44,10 @@ TEST(error_generation, egen1)
     EXPECT_NO_THROW(V = loadJsonStr(estring));
     EXPECT_TRUE(V.isObject());
 
-    EXPECT_TRUE(V["ERROR_RESULT"].isObject());
-    EXPECT_TRUE(V["ERROR_RESULT"]["code"].isInt());
-    EXPECT_EQ(V["ERROR_RESULT"]["code"].asInt(), code);
-    EXPECT_STREQ(V["ERROR_RESULT"]["message"].asCString(), message.c_str());
+    EXPECT_TRUE(V["error"].isObject());
+    EXPECT_TRUE(V["error"]["code"].isInt());
+    EXPECT_EQ(V["error"]["code"].asInt(), code);
+    EXPECT_STREQ(V["error"]["message"].asCString(), message.c_str());
 }
 
 TEST(error_generation, egen2)
@@ -59,8 +59,8 @@ TEST(error_generation, egen2)
     EXPECT_NO_THROW(V = loadJsonStr(estring));
     EXPECT_TRUE(V.isObject());
 
-    EXPECT_TRUE(V["ERROR_RESULT"].isObject());
-    EXPECT_TRUE(V["ERROR_RESULT"]["code"].isInt());
-    EXPECT_EQ(V["ERROR_RESULT"]["code"].asInt(), code);
-    EXPECT_EQ(V["ERROR_RESULT"]["message"].asString(), message);
+    EXPECT_TRUE(V["error"].isObject());
+    EXPECT_TRUE(V["error"]["code"].isInt());
+    EXPECT_EQ(V["error"]["code"].asInt(), code);
+    EXPECT_EQ(V["error"]["message"].asString(), message);
 }

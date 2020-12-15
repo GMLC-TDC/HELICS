@@ -835,7 +835,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
 
     Fed1->enterExecutingMode();
-    Fed1->localError(9827, "user generated ERROR_RESULT");
+    Fed1->localError(9827, "user generated error");
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::HelicsException);
 
@@ -854,7 +854,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
 
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
-    Fed1->globalError(9827, "user generated global ERROR_RESULT");
+    Fed1->globalError(9827, "user generated global error");
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::HelicsException);
 
@@ -875,7 +875,7 @@ TEST(federate_tests, federateGeneratedlocalErrorEscalation)
     Fed1->setFlagOption(helics::defs::Flags::TERMINATE_ON_ERROR);
     Fed1->enterExecutingMode();
     Fed1->requestTimeAsync(2.0);
-    Fed1->localError(9827, "user generated global ERROR_RESULT");
+    Fed1->localError(9827, "user generated global error");
 
     EXPECT_THROW(Fed1->requestTime(3.0), helics::HelicsException);
 
@@ -907,14 +907,14 @@ TEST(federate_tests, queryTest1)
     cr.reset();
     Fed1->disconnect();
     qres = Fed1->query("corename");
-    EXPECT_NE(qres.find("ERROR_RESULT"), std::string::npos);
+    EXPECT_NE(qres.find("error"), std::string::npos);
     qres = Fed1->query("subscriptions");
-    EXPECT_NE(qres.find("ERROR_RESULT"), std::string::npos);
+    EXPECT_NE(qres.find("error"), std::string::npos);
     qres = Fed1->query("root", "subscriptions");
-    EXPECT_NE(qres.find("ERROR_RESULT"), std::string::npos);
+    EXPECT_NE(qres.find("error"), std::string::npos);
 
     qres = Fed1->queryComplete(helics::query_id_t{4});
-    EXPECT_NE(qres.find("ERROR_RESULT"), std::string::npos);
+    EXPECT_NE(qres.find("error"), std::string::npos);
 
     EXPECT_FALSE(Fed1->isQueryCompleted(helics::query_id_t{2}));
     EXPECT_NO_THROW(Fed1->logMessage(10, "test log message"));

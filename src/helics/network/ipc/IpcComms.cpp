@@ -136,7 +136,7 @@ namespace ipc {
             rxQueue.changeState(queue_state_t::closing);
         }
         catch (boost::interprocess::interprocess_exception const& ipe) {
-            logError(std::string("ERROR_RESULT changing states:") + ipe.what());
+            logError(std::string("error changing states:") + ipe.what());
         }
         setRxStatus(connection_status::terminated);
     }

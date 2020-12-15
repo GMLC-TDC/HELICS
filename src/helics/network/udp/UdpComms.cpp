@@ -102,7 +102,7 @@ namespace udp {
                     continue;
                 }
                 if (t_cnt == std::chrono::milliseconds(0)) {
-                    logWarning(fmt::format("bind ERROR_RESULT on UDP socket {} :{}",
+                    logWarning(fmt::format("bind error on UDP socket {} :{}",
                                            makePortAddress(localTargetAddress, PortNumber),
                                            error.what()));
                 }
@@ -202,7 +202,7 @@ namespace udp {
                     transmitSocket.send_to(asio::buffer(m.to_string()), broker_endpoint, 0, error);
                     if (error) {
                         logError(
-                            fmt::format("ERROR_RESULT in initial send to broker {}", error.message()));
+                            fmt::format("error in initial send to broker {}", error.message()));
                         if (PortNumber.load() <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
@@ -240,7 +240,7 @@ namespace udp {
                     auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
                     if (error) {
                         logError(
-                            fmt::format("ERROR_RESULT in initial receive broker {}", error.message()));
+                            fmt::format("error in initial receive broker {}", error.message()));
                         if (PortNumber.load() <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
@@ -286,7 +286,7 @@ namespace udp {
                 }
             }
             catch (std::exception& e) {
-                logError(std::string("ERROR_RESULT connecting to broker ") + e.what());
+                logError(std::string("error connecting to broker ") + e.what());
                 PortNumber = -1;
                 promisePort.set_value(-1);
                 setTxStatus(connection_status::error);

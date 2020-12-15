@@ -632,7 +632,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_bye, "bye"},
         {action_message_def::action_t::cmd_log, "log"},
         {action_message_def::action_t::cmd_warning, "warning"},
-        {action_message_def::action_t::cmd_error, "ERROR_RESULT"},
+        {action_message_def::action_t::cmd_error, "error"},
 
         {action_message_def::action_t::cmd_send_route, "send_route"},
         {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
@@ -739,7 +739,7 @@ std::string prettyPrintString(const ActionMessage& command)
             ret.append(command.name());
             ret.append("--");
             if (checkActionFlag(command, error_flag)) {
-                ret.append("ERROR_RESULT");
+                ret.append("error");
             } else {
                 ret.append(std::to_string(command.dest_id.baseValue()));
             }

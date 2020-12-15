@@ -117,7 +117,7 @@ namespace zeromq {
             controlSocket.bind(controlsockString.c_str());
         }
         catch (const zmq::error_t& e) {
-            logError(std::string("binding ERROR_RESULT on internal comms socket:") + e.what());
+            logError(std::string("binding error on internal comms socket:") + e.what());
             setRxStatus(connection_status::error);
             return;
         }
@@ -276,7 +276,7 @@ namespace zeromq {
                         ++cnt2;
                         rc = zmq::poll(&poller, 1, connectionTimeout);
                         if (rc < 0) {
-                            logError("ZMQ broker connection ERROR_RESULT (2)");
+                            logError("ZMQ broker connection error (2)");
                             setTxStatus(connection_status::error);
                             break;
                         }

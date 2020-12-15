@@ -243,7 +243,7 @@ static const std::map<std::string, int> option_value_map{
 
 static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
                                                       {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"ERROR_RESULT", HELICS_LOG_LEVEL_ERROR},
+                                                      {"error", HELICS_LOG_LEVEL_ERROR},
                                                       {"warning", HELICS_LOG_LEVEL_WARNING},
                                                       {"summary", HELICS_LOG_LEVEL_SUMMARY},
                                                       {"connections", HELICS_LOG_LEVEL_CONNECTIONS},

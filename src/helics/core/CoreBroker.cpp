@@ -34,7 +34,7 @@ const std::string& state_string(connection_state state)
     static const std::string c1{"connected"};
     static const std::string init{"init_requested"};
     static const std::string operating{"operating"};
-    static const std::string estate{"ERROR_RESULT"};
+    static const std::string estate{"error"};
     static const std::string dis{"disconnected"};
     switch (state) {
         case connection_state::operating:

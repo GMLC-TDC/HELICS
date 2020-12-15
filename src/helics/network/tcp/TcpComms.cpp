@@ -254,7 +254,7 @@ namespace tcp {
                     brokerConnection->send(m.packetize());
                 }
                 catch (const std::system_error& error) {
-                    logError(std::string("ERROR_RESULT in initial send to broker ") + error.what());
+                    logError(std::string("error in initial send to broker ") + error.what());
                     return terminate(connection_status::error);
                 }
                 std::vector<char> rx(512);
@@ -323,7 +323,7 @@ namespace tcp {
             }
         }
         catch (std::exception& e) {
-            logError(std::string("ERROR_RESULT connecting with Broker") + e.what());
+            logError(std::string("error connecting with Broker") + e.what());
             return terminate(connection_status::error);
         }
         return true;

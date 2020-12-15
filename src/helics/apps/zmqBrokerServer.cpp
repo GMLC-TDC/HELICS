@@ -226,7 +226,7 @@ namespace apps {
                 return;
             }
             if (rc < 0) {
-                std::cerr << "ZMQ broker connection ERROR_RESULT (2)" << std::endl;
+                std::cerr << "ZMQ broker connection error (2)" << std::endl;
                 break;
             }
             if (rc > 0) {

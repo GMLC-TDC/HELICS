@@ -46,7 +46,7 @@ namespace helics {
 const std::string& state_string(operation_state state)
 {
     static const std::string c1{"connected"};
-    static const std::string estate{"ERROR_RESULT"};
+    static const std::string estate{"error"};
     static const std::string dis{"disconnected"};
     switch (state) {
         case operation_state::operating:
@@ -367,7 +367,7 @@ void CommonCore::globalError(LocalFederateId federateID,
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        throw(InvalidIdentifier("federateID not valid ERROR_RESULT"));
+        throw(InvalidIdentifier("federateID not valid error"));
     }
     ActionMessage m(CMD_GLOBAL_ERROR);
     m.source_id = fed->global_id.load();
@@ -390,7 +390,7 @@ void CommonCore::localError(LocalFederateId federateID,
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        throw(InvalidIdentifier("federateID not valid ERROR_RESULT"));
+        throw(InvalidIdentifier("federateID not valid error"));
     }
     ActionMessage m(CMD_LOCAL_ERROR);
     m.source_id = fed->global_id.load();
@@ -574,7 +574,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
         }
     }
     if (fed == nullptr) {
-        throw(RegistrationFailure("UNKNOWN allocation ERROR_RESULT occurred"));
+        throw(RegistrationFailure("unknown allocation error occurred"));
     }
     // setting up the Logger
     // auto ptr = fed.get();
@@ -2760,7 +2760,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             if (command.name() == identifier) {
                 if (checkActionFlag(command, error_flag)) {
                     auto estring =
-                        std::string("broker responded with ERROR_RESULT: ") + errorMessageString(command);
+                        std::string("broker responded with error: ") + errorMessageString(command);
                     setErrorState(command.messageID, estring);
                     errorRespondDelayedMessages(estring);
                     LOG_ERROR(parent_broker_id, identifier, estring);
@@ -2799,7 +2799,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     LOG_ERROR(
                         parent_broker_id,
                         identifier,
-                        fmt::format("broker responded with ERROR_RESULT for registration of {}::{}\n",
+                        fmt::format("broker responded with error for registration of {}::{}\n",
                                     command.name(),
                                     commandErrorString(command.messageID)));
                 } else {
