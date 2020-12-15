@@ -1436,7 +1436,7 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
     }
     const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept != nullptr) {
-        throw(RegistrationFailure("ENDPOINT name is already used"));
+        throw(RegistrationFailure("endpoint name is already used"));
     }
     const auto& handle = createBasicHandle(fed->global_id,
                                            fed->local_id,
@@ -1469,7 +1469,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
     }
     const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept != nullptr) {
-        throw(RegistrationFailure("ENDPOINT name is already used"));
+        throw(RegistrationFailure("endpoint name is already used"));
     }
     auto flags = fed->getInterfaceFlags();
     flags |= (1U << targetted_flag);
@@ -1684,7 +1684,7 @@ void CommonCore::sendTo(InterfaceHandle sourceHandle,
     }
 
     if (hndl->handleType != InterfaceType::ENDPOINT) {
-        throw(InvalidIdentifier("handle does not point to an ENDPOINT"));
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
     if (checkActionFlag(*hndl, targetted_flag)) {
         throw(InvalidFunctionCall("targeted endpoints may not specify a destination"));
@@ -1714,7 +1714,7 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
     }
 
     if (hndl->handleType != InterfaceType::ENDPOINT) {
-        throw(InvalidIdentifier("handle does not point to an ENDPOINT"));
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
     if (checkActionFlag(*hndl, targetted_flag)) {
         throw(InvalidFunctionCall("targeted endpoints may not specify a destination"));
@@ -1772,7 +1772,7 @@ void CommonCore::send(InterfaceHandle sourceHandle, const void* data, uint64_t l
         throw(InvalidIdentifier("handle is not valid"));
     }
     if (hndl->handleType != InterfaceType::ENDPOINT) {
-        throw(InvalidIdentifier("handle does not point to an ENDPOINT"));
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
     auto* fed = getFederateAt(hndl->local_fed_id);
     auto targets = fed->getMessageDestinations(sourceHandle);
@@ -1797,7 +1797,7 @@ void CommonCore::sendAt(InterfaceHandle sourceHandle, const void* data, uint64_t
         throw(InvalidIdentifier("handle is not valid"));
     }
     if (hndl->handleType != InterfaceType::ENDPOINT) {
-        throw(InvalidIdentifier("handle does not point to an ENDPOINT"));
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
     auto* fed = getFederateAt(hndl->local_fed_id);
     auto targets = fed->getMessageDestinations(sourceHandle);
@@ -1834,7 +1834,7 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
         throw(InvalidIdentifier("handle is not valid"));
     }
     if (hndl->handleType != InterfaceType::ENDPOINT) {
-        throw(InvalidIdentifier("handle does not point to an ENDPOINT"));
+        throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
     ActionMessage m(std::move(message));
 

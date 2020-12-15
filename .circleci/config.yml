@@ -17,8 +17,8 @@ aliases:
       cd ${OCTAVETEST}
       # this return the write error code in RESULT
       res=$(octave -W -V --eval "source('runTestsCIRCLECI.m');")
+      echo "$res" 
       if [[ "$res" == *"failed"* ]]; then
-         echo "$res" 
          echo "*** Octave tests FAILED: "
          exit -1
       fi

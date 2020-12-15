@@ -287,8 +287,7 @@ enum class DataType : int {
     HELICS_CUSTOM = HELICS_DATA_TYPE_RAW,
     HELICS_ANY = HELICS_DATA_TYPE_ANY,
     HELICS_MULTI = HELICS_DATA_TYPE_MULTI,
-    HELICS_UNKNOWN = 262355,
-
+    HELICS_UNKNOWN = 262355
 };
 
 inline constexpr bool isBytesType(DataType type)

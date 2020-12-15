@@ -1567,7 +1567,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate ENDPOINT names ({})", m.name());
+        eret.payload = fmt::format("Duplicate endpoint names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }

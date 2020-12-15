@@ -165,7 +165,7 @@ namespace apps {
                     if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub") ||
                         (blk[0] == "tag")) {
                         addSubscription(removeQuotes(blk[1]));
-                    } else if ((blk[0] == "ENDPOINT") || (blk[0] == "ept") || (blk[0] == "e")) {
+                    } else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e")) {
                         addEndpoint(removeQuotes(blk[1]));
                     } else if ((blk[0] == "sourceclone") || (blk[0] == "source") ||
                                (blk[0] == "src")) {
@@ -443,7 +443,7 @@ namespace apps {
         app->add_flag("--print", printMessage, "print messages to the screen");
         app->add_flag("--skiplog", skiplog, "print messages to the screen through cout");
         auto* clone_group = app->add_option_group(
-            "cloning", "Options related to ENDPOINT cloning operations and specifications");
+            "cloning", "Options related to endpoint cloning operations and specifications");
         clone_group->add_option("--clone", "existing endpoints to clone all packets to and from")
             ->each([this](const std::string& clone) {
                 addDestEndpointClone(clone);
@@ -464,7 +464,7 @@ namespace apps {
         clone_group
             ->add_option(
                 "--destclone",
-                "existing endpoints to capture all packets with the specified ENDPOINT as a "
+                "existing endpoints to capture all packets with the specified endpoint as a "
                 "destination, this argument may be specified multiple time")
             ->each([this](const std::string& clone) { addSourceEndpointClone(clone); })
             ->delimiter(',')

@@ -656,8 +656,8 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_remove_publication, "remove publisher"},
         {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
         {action_message_def::action_t::cmd_add_filter, "add_filter"},
-        {action_message_def::action_t::cmd_remove_filter, "remove FILTER"},
-        {action_message_def::action_t::cmd_filter_link, "link FILTER"},
+        {action_message_def::action_t::cmd_remove_filter, "remove filter"},
+        {action_message_def::action_t::cmd_filter_link, "link filter"},
         {action_message_def::action_t::cmd_data_link, "data link"},
         {action_message_def::action_t::cmd_reg_input, "reg_input"},
         {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
@@ -665,7 +665,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_reg_end, "reg_end"},
         {action_message_def::action_t::cmd_resend, "reg_resend"},
         {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
-        {action_message_def::action_t::cmd_remove_endpoint, "remove ENDPOINT"},
+        {action_message_def::action_t::cmd_remove_endpoint, "remove endpoint"},
         {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
         {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
         {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
@@ -697,7 +697,7 @@ const char* actionMessageType(action_message_def::action_t action)
 
 // set of strings to translate error codes to something sensible
 static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
-    {connection_error_code, "connection ERROR_RESULT"},
+    {connection_error_code, "connection error_result"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
     {duplicate_federate_name_error_code, "duplicate federate name detected"},

@@ -39,13 +39,13 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
                 auto& connAct = conn.as_array();
                 brk->dataLink(connAct[0].as_string(), connAct[1].as_string());
             } else {
-                std::string pub = getOrDefault(conn, "PUBLICATION", std::string());
+                std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
                     addTargets(conn, "targets", [brk, &pub](const std::string& target) {
                         brk->dataLink(pub, target);
                     });
                 } else {
-                    std::string ipt = getOrDefault(conn, "INPUT", std::string());
+                    std::string ipt = getOrDefault(conn, "input", std::string());
                     addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
                         brk->dataLink(target, ipt);
                     });
@@ -61,7 +61,7 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
                 auto& filtAct = filt.as_array();
                 brk->addSourceFilterToEndpoint(filtAct[0].as_string(), filtAct[1].as_string());
             } else {
-                std::string fname = getOrDefault(filt, "FILTER", std::string());
+                std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
                     auto asrc = [brk, &fname](const std::string& ept) {
                         brk->addSourceFilterToEndpoint(fname, ept);
@@ -110,13 +110,13 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             if (conn.isArray()) {
                 brk->dataLink(conn[0].asString(), conn[1].asString());
             } else {
-                std::string pub = getOrDefault(conn, "PUBLICATION", std::string());
+                std::string pub = getOrDefault(conn, "publication", std::string());
                 if (!pub.empty()) {
                     addTargets(conn, "targets", [brk, &pub](const std::string& target) {
                         brk->dataLink(pub, target);
                     });
                 } else {
-                    std::string ipt = getOrDefault(conn, "INPUT", std::string());
+                    std::string ipt = getOrDefault(conn, "input", std::string());
                     addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
                         brk->dataLink(target, ipt);
                     });
@@ -129,7 +129,7 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             if (filt.isArray()) {
                 brk->addSourceFilterToEndpoint(filt[0].asString(), filt[1].asString());
             } else {
-                std::string fname = getOrDefault(filt, "FILTER", std::string());
+                std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
                     auto asrc = [brk, &fname](const std::string& ept) {
                         brk->addSourceFilterToEndpoint(fname, ept);

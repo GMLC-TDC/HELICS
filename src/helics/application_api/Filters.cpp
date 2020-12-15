@@ -201,11 +201,11 @@ void CloningFilter::setString(const std::string& property, const std::string& va
     } else if (property == "dest" || property == "destination" || property == "add destination" ||
                property == "add dest") {
         addDestinationTarget(val);
-    } else if (property == "ENDPOINT" || property == "add ENDPOINT") {
+    } else if (property == "endpoint" || property == "add endpoint") {
         addSourceTarget(val);
         addDestinationTarget(val);
     } else if (property == "remove destination" || property == "remove dest" ||
-               property == "remove source" || property == "remove ENDPOINT") {
+               property == "remove source" || property == "remove endpoint") {
         removeTarget(val);
     } else {
         Filter::setString(property, val);

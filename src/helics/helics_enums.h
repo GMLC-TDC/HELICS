@@ -328,7 +328,6 @@ typedef enum {
     /** a customizable filter type that can perform different actions on a message based on
        firewall like rules*/
     HELICS_FILTER_TYPE_FIREWALL = 6
-
 } HelicsFilterTypes;
 
 #ifdef __cplusplus
