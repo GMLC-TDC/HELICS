@@ -17,7 +17,7 @@ TEST(InfoClass_tests, basichandleinfo_test)
     helics::BasicHandleInfo defHnd;
     EXPECT_TRUE(!defHnd.handle.isValid());
     EXPECT_TRUE(!defHnd.local_fed_id.isValid());
-    EXPECT_TRUE(defHnd.handleType == helics::handle_type::unknown);
+    EXPECT_TRUE(defHnd.handleType == helics::InterfaceType::UNKNOWN);
     EXPECT_EQ(defHnd.flags, 0);
     EXPECT_TRUE(defHnd.key.empty());
     EXPECT_TRUE(defHnd.type.empty());
@@ -26,14 +26,14 @@ TEST(InfoClass_tests, basichandleinfo_test)
     // Constructor with last parameter default value
     helics::BasicHandleInfo hnd1(helics::GlobalFederateId(15),
                                  helics::InterfaceHandle(10),
-                                 helics::handle_type::endpoint,
+                                 helics::InterfaceType::ENDPOINT,
                                  "key",
                                  "type",
                                  "units");
     EXPECT_EQ(hnd1.getInterfaceHandle().baseValue(), 10);
     EXPECT_EQ(hnd1.getFederateId().baseValue(), 15);
     EXPECT_TRUE(!hnd1.local_fed_id.isValid());
-    EXPECT_TRUE(hnd1.handleType == helics::handle_type::endpoint);
+    EXPECT_TRUE(hnd1.handleType == helics::InterfaceType::ENDPOINT);
     EXPECT_EQ(hnd1.flags, 0);
     EXPECT_EQ(hnd1.key, "key");
     EXPECT_EQ(hnd1.type, "type");
@@ -42,14 +42,14 @@ TEST(InfoClass_tests, basichandleinfo_test)
     // Constructor overriding last parameter default value
     helics::BasicHandleInfo hnd2(helics::GlobalFederateId(1500),
                                  helics::InterfaceHandle(100),
-                                 helics::handle_type::endpoint,
+                                 helics::InterfaceType::ENDPOINT,
                                  "key",
                                  "type",
                                  "units");
     EXPECT_EQ(hnd2.getInterfaceHandle().baseValue(), 100);
     EXPECT_EQ(hnd2.getFederateId().baseValue(), 1500);
     EXPECT_TRUE(!hnd2.local_fed_id.isValid());
-    EXPECT_TRUE(hnd2.handleType == helics::handle_type::endpoint);
+    EXPECT_TRUE(hnd2.handleType == helics::InterfaceType::ENDPOINT);
     EXPECT_EQ(hnd1.flags, 0);
     EXPECT_EQ(hnd2.key, "key");
     EXPECT_EQ(hnd2.type, "type");
@@ -61,14 +61,14 @@ TEST(InfoClass_tests, basichandleinfo_test)
     // destFilter should be false, and target should be equal to what was passed in for units
     helics::BasicHandleInfo srcFiltHnd(helics::GlobalFederateId(2),
                                        helics::InterfaceHandle(1),
-                                       helics::handle_type::filter,
+                                       helics::InterfaceType::FILTER,
                                        "key",
                                        "type_in",
                                        "type_out");
     EXPECT_EQ(srcFiltHnd.getInterfaceHandle().baseValue(), 1);
     EXPECT_EQ(srcFiltHnd.getFederateId().baseValue(), 2);
     EXPECT_TRUE(!srcFiltHnd.local_fed_id.isValid());
-    EXPECT_TRUE(srcFiltHnd.handleType == helics::handle_type::filter);
+    EXPECT_TRUE(srcFiltHnd.handleType == helics::InterfaceType::FILTER);
     EXPECT_EQ(hnd1.flags, 0);
     EXPECT_EQ(srcFiltHnd.key, "key");
     EXPECT_EQ(srcFiltHnd.type_in, "type_in");
@@ -78,14 +78,14 @@ TEST(InfoClass_tests, basichandleinfo_test)
     // destFilter should be true, and target should be equal to what was passed in for units
     helics::BasicHandleInfo dstFiltHnd(helics::GlobalFederateId(3),
                                        helics::InterfaceHandle(7),
-                                       helics::handle_type::filter,
+                                       helics::InterfaceType::FILTER,
                                        "key",
                                        "type_in",
                                        "type_out");
     EXPECT_EQ(dstFiltHnd.getInterfaceHandle().baseValue(), 7);
     EXPECT_EQ(dstFiltHnd.getFederateId().baseValue(), 3);
     EXPECT_TRUE(!dstFiltHnd.local_fed_id.isValid());
-    EXPECT_TRUE(dstFiltHnd.handleType == helics::handle_type::filter);
+    EXPECT_TRUE(dstFiltHnd.handleType == helics::InterfaceType::FILTER);
     EXPECT_EQ(dstFiltHnd.key, "key");
     EXPECT_EQ(dstFiltHnd.type_in, "type_in");
     EXPECT_EQ(dstFiltHnd.type_out, "type_out");

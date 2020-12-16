@@ -28,7 +28,7 @@ class combofed_type_tests:
     public FederateTestFixture {
 };
 
-// const std::string core_types[] = {"udp" };
+// const std::string CoreTypes[] = {"udp" };
 /** test simple creation and destruction*/
 TEST_P(combofed_single_type_tests, initialize_tests)
 {
@@ -37,11 +37,11 @@ TEST_P(combofed_single_type_tests, initialize_tests)
 
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(combofed_single_type_tests, publication_registration)
@@ -55,7 +55,7 @@ TEST_P(combofed_single_type_tests, publication_registration)
     auto& pubid3 = vFed1->registerPublication("pub3", "double", "V");
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto& sv = pubid.getKey();
     auto& sv2 = pubid2.getKey();
@@ -72,7 +72,7 @@ TEST_P(combofed_single_type_tests, publication_registration)
     EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(combofed_single_type_tests, single_transfer)
@@ -84,7 +84,7 @@ TEST_P(combofed_single_type_tests, single_transfer)
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto& subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");
@@ -120,7 +120,7 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto& sv = epid.getKey();
     auto& sv2 = epid2.getKey();
@@ -135,7 +135,7 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
     EXPECT_TRUE(mFed1->getEndpoint("ep2").getHandle() == epid2.getHandle());
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(combofed_type_tests, send_receive_2fed)
@@ -147,15 +147,15 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     auto& epid = mFed1->registerEndpoint("ep1");
     auto& epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -188,8 +188,8 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     mFed1->finalize();
     mFed2->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(combofed_type_tests, multimode_transfer)
@@ -206,8 +206,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
 
     auto& subid = cFed2->registerSubscription("pub1");
 
-    cFed1->setProperty(helics_property_time_delta, 1.0);
-    cFed2->setProperty(helics_property_time_delta, 1.0);
+    cFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    cFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { cFed1->enterExecutingMode(); });
     cFed2->enterExecutingMode();
@@ -215,8 +215,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
     // publish string1 at time=0.0;
     pubid.publish("string1");
 
-    EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
@@ -273,14 +273,14 @@ TEST_P(combofed_type_tests, multimode_transfer)
     cFed1->finalize();
     cFed2->finalize();
 
-    EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          combofed_single_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(combofed_tests, combofed_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(combofed_tests, combofed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
                                                      "example_combo_fed.toml"};
@@ -313,9 +313,9 @@ INSTANTIATE_TEST_SUITE_P(combofed_tests,
 
 TEST(comboFederate, constructor2)
 {
-    auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=mf --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    auto cr = helics::CoreFactory::create(helics::CoreType::TEST, "--name=mf --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
     helics::CombinationFederate mf1("fed1", cr, fi);
 
     mf1.registerGlobalFilter("filt1");
@@ -329,9 +329,9 @@ TEST(comboFederate, constructor2)
 
 TEST(comboFederate, constructor3)
 {
-    helics::CoreApp cr(helics::core_type::TEST, "--name=mf2 --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    helics::CoreApp cr(helics::CoreType::TEST, "--name=mf2 --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
     helics::CombinationFederate mf1("fed1", cr, fi);
 
     mf1.registerGlobalFilter("filt1");

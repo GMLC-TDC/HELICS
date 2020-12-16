@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/core/core-types.hpp"
+#include "helics/core/CoreTypes.hpp"
 #include "helics/network/udp/UdpBroker.h"
 #include "helics/network/udp/UdpComms.h"
 #include "helics/network/udp/UdpCore.h"
@@ -294,7 +294,7 @@ TEST(UdpCore, udpCore_initialization)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::string initializationString =
         "-f 1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1 --noack_connect";
-    auto core = helics::CoreFactory::create(helics::core_type::UDP, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::UDP, initializationString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -336,9 +336,9 @@ TEST(UdpCore, udpCore_core_broker_default)
     std::this_thread::sleep_for(500ms);
     std::string initializationString = "-f 1";
 
-    auto broker = helics::BrokerFactory::create(helics::core_type::UDP, initializationString);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::UDP, initializationString);
 
-    auto core = helics::CoreFactory::create(helics::core_type::UDP, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::UDP, initializationString);
     bool connected = broker->isConnected();
     EXPECT_TRUE(connected);
     connected = core->connect();
@@ -358,7 +358,7 @@ TEST(UdpCore, udpCore_core_broker_default)
 TEST(UdpCore, commFactory)
 {
     auto comm = helics::CommFactory::create("udp");
-    auto comm2 = helics::CommFactory::create(helics::core_type::UDP);
+    auto comm2 = helics::CommFactory::create(helics::CoreType::UDP);
 
     EXPECT_TRUE(dynamic_cast<helics::udp::UdpComms*>(comm.get()) != nullptr);
     EXPECT_TRUE(dynamic_cast<helics::udp::UdpComms*>(comm2.get()) != nullptr);

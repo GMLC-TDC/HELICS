@@ -39,7 +39,7 @@ void TimeCoordinator::setMessageSender(
     }
 }
 
-void TimeCoordinator::enteringExecMode(iteration_request mode)
+void TimeCoordinator::enteringExecMode(IterationRequest mode)
 {
     if (executionMode) {
         return;
@@ -48,7 +48,7 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
-    if (iterating != iteration_request::no_iterations) {
+    if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(execreq, iterating);
     }
     transmitTimingMessage(execreq);
@@ -138,14 +138,14 @@ void TimeCoordinator::localError()
 }
 
 void TimeCoordinator::timeRequest(Time nextTime,
-                                  iteration_request iterate,
+                                  IterationRequest iterate,
                                   Time newValueTime,
                                   Time newMessageTime)
 {
     iterating = iterate;
 
-    if (iterating != iteration_request::no_iterations) {
-        if (nextTime < time_granted || iterating == iteration_request::force_iteration) {
+    if (iterating != IterationRequest::NO_ITERATIONS) {
+        if (nextTime < time_granted || iterating == IterationRequest::FORCE_ITERATION) {
             nextTime = time_granted;
         }
     } else {
@@ -184,8 +184,8 @@ bool TimeCoordinator::updateNextExecutionTime()
         }
         time_exec = std::min(time_requested, time_exec);
         if (time_exec <= time_granted) {
-            time_exec = (iterating == iteration_request::no_iterations) ? getNextPossibleTime() :
-                                                                          time_granted;
+            time_exec = (iterating == IterationRequest::NO_ITERATIONS) ? getNextPossibleTime() :
+                                                                         time_granted;
         }
         if ((time_exec - time_granted) > timeZero) {
             time_exec = generateAllowedTime(time_exec);
@@ -198,7 +198,7 @@ bool TimeCoordinator::updateNextExecutionTime()
 void TimeCoordinator::updateNextPossibleEventTime()
 {
     time_next =
-        (iterating == iteration_request::no_iterations) ? getNextPossibleTime() : time_granted;
+        (iterating == IterationRequest::NO_ITERATIONS) ? getNextPossibleTime() : time_granted;
 
     if (info.uninterruptible) {
         time_next = time_requested;
@@ -224,7 +224,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
     }
     if (valueUpdateTime < time_value) {
         auto ptime = time_value;
-        if (iterating != iteration_request::no_iterations) {
+        if (iterating != IterationRequest::NO_ITERATIONS) {
             time_value = (valueUpdateTime <= time_granted) ? time_granted : valueUpdateTime;
         } else {
             auto nextPossibleTime = getNextPossibleTime();
@@ -320,7 +320,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
     if (messageUpdateTime < time_message) {
         auto ptime = time_message;
-        if (iterating != iteration_request::no_iterations) {
+        if (iterating != IterationRequest::NO_ITERATIONS) {
             time_message = (messageUpdateTime <= time_granted) ? time_granted : messageUpdateTime;
         } else {
             auto nextPossibleTime = getNextPossibleTime();
@@ -389,7 +389,7 @@ bool TimeCoordinator::updateTimeFactors()
     return update;
 }
 
-message_processing_result TimeCoordinator::checkTimeGrant()
+MessageProcessingResult TimeCoordinator::checkTimeGrant()
 {
     bool update = updateTimeFactors();
     if (time_exec == Time::maxVal()) {
@@ -397,28 +397,28 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             time_granted = Time::maxVal();
             time_grantBase = Time::maxVal();
             disconnect();
-            return message_processing_result::halted;
+            return MessageProcessingResult::HALTED;
         }
     }
     if (time_block <= time_exec) {
-        return message_processing_result::continue_processing;
+        return MessageProcessingResult::CONTINUE_PROCESSING;
     }
-    if ((iterating == iteration_request::no_iterations) ||
-        (time_exec > time_granted && iterating == iteration_request::iterate_if_needed)) {
+    if ((iterating == IterationRequest::NO_ITERATIONS) ||
+        (time_exec > time_granted && iterating == IterationRequest::ITERATE_IF_NEEDED)) {
         iteration = 0;
         if (time_allow > time_exec) {
             updateTimeGrant();
-            return message_processing_result::next_step;
+            return MessageProcessingResult::NEXT_STEP;
         }
         if (time_allow == time_exec) {
             if (time_requested > time_exec || !info.wait_for_current_time_updates) {
                 if (time_requested <= time_exec) {
                     updateTimeGrant();
-                    return message_processing_result::next_step;
+                    return MessageProcessingResult::NEXT_STEP;
                 }
                 if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
                     updateTimeGrant();
-                    return message_processing_result::next_step;
+                    return MessageProcessingResult::NEXT_STEP;
                 }
             }
         }
@@ -426,14 +426,14 @@ message_processing_result TimeCoordinator::checkTimeGrant()
         if (time_allow > time_exec) {
             ++iteration;
             updateTimeGrant();
-            return message_processing_result::iterating;
+            return MessageProcessingResult::ITERATING;
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
             if (dependencies.checkIfReadyForTimeGrant(true, time_exec)) {
                 ++iteration;
                 updateTimeGrant();
-                return message_processing_result::iterating;
+                return MessageProcessingResult::ITERATING;
             }
         }
     }
@@ -442,7 +442,7 @@ message_processing_result TimeCoordinator::checkTimeGrant()
     if ((!dependents.empty()) && (update)) {
         sendTimeRequest();
     }
-    return message_processing_result::continue_processing;
+    return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
 void TimeCoordinator::sendTimeRequest() const
@@ -453,7 +453,7 @@ void TimeCoordinator::sendTimeRequest() const
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
 
-    if (iterating != iteration_request::no_iterations) {
+    if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
@@ -464,7 +464,7 @@ void TimeCoordinator::sendTimeRequest() const
 
 void TimeCoordinator::updateTimeGrant()
 {
-    if (iterating != iteration_request::force_iteration) {
+    if (iterating != IterationRequest::FORCE_ITERATION) {
         time_granted = time_exec;
         time_grantBase = time_granted;
     }
@@ -472,7 +472,7 @@ void TimeCoordinator::updateTimeGrant()
     treq.source_id = source_id;
     treq.actionTime = time_granted;
     treq.counter = iteration;
-    if (iterating != iteration_request::no_iterations) {
+    if (iterating != IterationRequest::NO_ITERATIONS) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
     transmitTimingMessage(treq);
@@ -574,36 +574,36 @@ void TimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
     }
 }
 
-message_processing_result TimeCoordinator::checkExecEntry()
+MessageProcessingResult TimeCoordinator::checkExecEntry()
 {
-    auto ret = message_processing_result::continue_processing;
+    auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     if (time_block <= timeZero) {
         return ret;
     }
-    if (!dependencies.checkIfReadyForExecEntry(iterating != iteration_request::no_iterations)) {
+    if (!dependencies.checkIfReadyForExecEntry(iterating != IterationRequest::NO_ITERATIONS)) {
         return ret;
     }
     switch (iterating) {
-        case iteration_request::no_iterations:
-            ret = message_processing_result::next_step;
+        case IterationRequest::NO_ITERATIONS:
+            ret = MessageProcessingResult::NEXT_STEP;
             break;
-        case iteration_request::iterate_if_needed:
+        case IterationRequest::ITERATE_IF_NEEDED:
             if (hasInitUpdates) {
                 if (iteration >= info.maxIterations) {
-                    ret = message_processing_result::next_step;
+                    ret = MessageProcessingResult::NEXT_STEP;
                 } else {
-                    ret = message_processing_result::iterating;
+                    ret = MessageProcessingResult::ITERATING;
                 }
             } else {
-                ret = message_processing_result::next_step;
+                ret = MessageProcessingResult::NEXT_STEP;
             }
             break;
-        case iteration_request::force_iteration:
-            ret = message_processing_result::iterating;
+        case IterationRequest::FORCE_ITERATION:
+            ret = MessageProcessingResult::ITERATING;
             break;
     }
 
-    if (ret == message_processing_result::next_step) {
+    if (ret == MessageProcessingResult::NEXT_STEP) {
         time_granted = timeZero;
         time_grantBase = time_granted;
         executionMode = true;
@@ -612,7 +612,7 @@ message_processing_result TimeCoordinator::checkExecEntry()
         ActionMessage execgrant(CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
         transmitTimingMessage(execgrant);
-    } else if (ret == message_processing_result::iterating) {
+    } else if (ret == MessageProcessingResult::ITERATING) {
         dependencies.resetIteratingExecRequests();
         hasInitUpdates = false;
         ++iteration;
@@ -681,12 +681,12 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 if (dep->Tnext > time_exec) {
                     return message_process_result::delay_processing;
                 }
-                if ((iterating != iteration_request::no_iterations) && (time_exec == dep->Tnext)) {
+                if ((iterating != IterationRequest::NO_ITERATIONS) && (time_exec == dep->Tnext)) {
                     return message_process_result::delay_processing;
                 }
                 break;
             case DependencyInfo::time_state_t::exec_requested_iterative:
-                if ((iterating != iteration_request::no_iterations) && (checkingExec)) {
+                if ((iterating != IterationRequest::NO_ITERATIONS) && (checkingExec)) {
                     return message_process_result::delay_processing;
                 }
                 break;
@@ -773,22 +773,22 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
 void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
 {
     switch (timeProperty) {
-        case defs::properties::output_delay:
+        case defs::Properties::OUTPUT_DELAY:
             info.outputDelay = propertyVal;
             break;
-        case defs::properties::input_delay:
+        case defs::Properties::INPUT_DELAY:
             info.inputDelay = propertyVal;
             break;
-        case defs::properties::time_delta:
+        case defs::Properties::TIME_DELTA:
             info.timeDelta = propertyVal;
             if (info.timeDelta <= timeZero) {
                 info.timeDelta = timeEpsilon;
             }
             break;
-        case defs::properties::period:
+        case defs::Properties::PERIOD:
             info.period = propertyVal;
             break;
-        case defs::properties::offset:
+        case defs::Properties::OFFSET:
             info.offset = propertyVal;
             break;
         default:
@@ -799,7 +799,7 @@ void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
 /** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setProperty(int intProperty, int propertyVal)
 {
-    if (intProperty == defs::properties::max_iterations) {
+    if (intProperty == defs::Properties::MAX_ITERATIONS) {
         info.maxIterations = propertyVal;
     } else {
         setProperty(intProperty, Time(static_cast<double>(propertyVal)));
@@ -810,13 +810,13 @@ void TimeCoordinator::setProperty(int intProperty, int propertyVal)
 void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
 {
     switch (optionFlag) {
-        case defs::flags::uninterruptible:
+        case defs::Flags::UNINTERRUPTIBLE:
             info.uninterruptible = value;
             break;
-        case defs::flags::wait_for_current_time_update:
+        case defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE:
             info.wait_for_current_time_updates = value;
             break;
-        case defs::flags::restrictive_time_policy:
+        case defs::Flags::RESTRICTIVE_TIME_POLICY:
             info.restrictive_time_policy = value;
             break;
         default:
@@ -827,15 +827,15 @@ void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
 Time TimeCoordinator::getTimeProperty(int timeProperty) const
 {
     switch (timeProperty) {
-        case defs::properties::output_delay:
+        case defs::Properties::OUTPUT_DELAY:
             return info.outputDelay;
-        case defs::properties::input_delay:
+        case defs::Properties::INPUT_DELAY:
             return info.inputDelay;
-        case defs::properties::time_delta:
+        case defs::Properties::TIME_DELTA:
             return info.timeDelta;
-        case defs::properties::period:
+        case defs::Properties::PERIOD:
             return info.period;
-        case defs::properties::offset:
+        case defs::Properties::OFFSET:
             return info.offset;
         default:
             return Time::minVal();
@@ -846,7 +846,7 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
     switch (intProperty) {  // NOLINT
-        case defs::properties::max_iterations:
+        case defs::Properties::MAX_ITERATIONS:
             return info.maxIterations;
         default:
             // TODO(PT): make this something consistent
@@ -858,13 +858,13 @@ int TimeCoordinator::getIntegerProperty(int intProperty) const
 bool TimeCoordinator::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {
-        case defs::flags::uninterruptible:
+        case defs::Flags::UNINTERRUPTIBLE:
             return info.uninterruptible;
-        case defs::flags::interruptible:
+        case defs::Flags::INTERRUPTIBLE:
             return !info.uninterruptible;
-        case defs::flags::wait_for_current_time_update:
+        case defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE:
             return info.wait_for_current_time_updates;
-        case defs::flags::restrictive_time_policy:
+        case defs::Flags::RESTRICTIVE_TIME_POLICY:
             return info.restrictive_time_policy;
         default:
             throw(std::invalid_argument("flag not recognized"));

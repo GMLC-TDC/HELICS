@@ -202,8 +202,8 @@ class Core {
      *
      *@return an iteration result enumeration value indicating the current state of iterations
      */
-    virtual iteration_result enterExecutingMode(LocalFederateId federateID,
-                                                iteration_request iterate = NO_ITERATION) = 0;
+    virtual IterationResult enterExecutingMode(LocalFederateId federateID,
+                                               IterationRequest iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.
@@ -285,7 +285,7 @@ class Core {
      the state of the iteration
      */
     virtual iteration_time
-        requestTimeIterative(LocalFederateId federateID, Time next, iteration_request iterate) = 0;
+        requestTimeIterative(LocalFederateId federateID, Time next, IterationRequest iterate) = 0;
 
     /**
      * Returns the current reiteration count for the specified federate.
@@ -556,7 +556,7 @@ class Core {
     */
     virtual void addDestinationTarget(InterfaceHandle handle,
                                       std::string_view dest,
-                                      handle_type hint = handle_type::unknown) = 0;
+                                      InterfaceType hint = InterfaceType::UNKNOWN) = 0;
 
     /** add a source target,  the handle can be a subscription, input, filter or endpoint
     @details for subscriptions and inputs this establishes a link from a publication, for endpoints
@@ -567,7 +567,7 @@ class Core {
     */
     virtual void addSourceTarget(InterfaceHandle handle,
                                  std::string_view name,
-                                 handle_type hint = handle_type::unknown) = 0;
+                                 InterfaceType hint = InterfaceType::UNKNOWN) = 0;
 
     /**
     * get the destination targets for an interface
@@ -772,7 +772,7 @@ class Core {
   "federation",  "broker", "core", or the name of a specific object/core/broker
   @param target the specific target of the command
   @param commandStr the actual command
-  @param source
+  @param source the designated source of the command, for return values or indication
   */
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,

@@ -86,7 +86,7 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateEnterInitializingModeComplete(vFed1, &err));
     // expected to be false since it isn't associated with a asynchronous query
     auto qcomplete = helicsQueryIsCompleted(q1);
-    EXPECT_EQ(qcomplete, helics_false);
+    EXPECT_EQ(qcomplete, HELICS_FALSE);
 
     helicsQueryFree(q1);
     helicsCoreFree(core);
@@ -95,8 +95,7 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateFinalizeComplete(vFed1, &err));
 }
 
-static void
-    queryTest(const char* query, int stringSize, helics_query_buffer buffer, void* /*unused*/)
+static void queryTest(const char* query, int stringSize, HelicsQueryBuffer buffer, void* /*unused*/)
 {
     std::string q(query, stringSize);
     if (q == "abc") {
@@ -129,4 +128,4 @@ TEST_F(query_test_single, queries_callback_test)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-INSTANTIATE_TEST_SUITE_P(query_tests, query_tests, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(query_tests, query_tests, ::testing::ValuesIn(CoreTypes));

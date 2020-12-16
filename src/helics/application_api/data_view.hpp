@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../core/core-data.hpp"
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 

@@ -1,6 +1,6 @@
 %include "octave_maps.i"
 
 %ignore helicsInputGetComplexObject;
-%ignore helics_complex;
+%ignore HelicsComplex;
 
 %include "../helics.i"

@@ -29,7 +29,7 @@ static const bool amb = helics::allowMultiBroker();
 
 TEST(MultiBroker, constructor1)
 {
-    helics::BrokerApp App(helics::core_type::MULTI, "brk1", "--core_type test");
+    helics::BrokerApp App(helics::CoreType::MULTI, "brk1", "--CoreType test");
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
@@ -41,9 +41,9 @@ TEST(MultiBroker, constructor1)
 
 TEST(MultiBroker, connect1)
 {
-    helics::BrokerApp b(helics::core_type::MULTI, "brk2", "--core_type test");
+    helics::BrokerApp b(helics::CoreType::MULTI, "brk2", "--CoreType test");
     EXPECT_TRUE(b.connect());
-    helics::CoreApp c1(helics::core_type::TEST, "--brokername=brk2 --name=core1b");
+    helics::CoreApp c1(helics::CoreType::TEST, "--brokername=brk2 --name=core1b");
     EXPECT_TRUE(c1.connect());
 
     helics::Federate fedb("fedb", c1);
@@ -60,18 +60,18 @@ TEST(MultiBroker, connect1)
 #if defined(ENABLE_ZMQ_CORE)
 TEST(MultiBroker, file2)
 {
-    using helics::core_type;
+    using helics::CoreType;
     const std::string config = "--config=" + std::string(TEST_DIR) + "multiBroker2.json";
-    helics::BrokerApp App(core_type::MULTI, "brkf2", config);
+    helics::BrokerApp App(CoreType::MULTI, "brkf2", config);
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
     EXPECT_TRUE(App.isOpenToNewFederates());
     EXPECT_EQ(App.getIdentifier(), "brkf2");
 
-    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::TEST);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::ZMQ);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::ZMQ);
     EXPECT_TRUE(brk1);
     brk1.reset();
     App.forceTerminate();
@@ -83,20 +83,20 @@ TEST(MultiBroker, file2)
 #    if defined(ENABLE_TCP_CORE) && defined(ENABLE_IPC_CORE)
 TEST(MultiBroker, file3)
 {
-    using helics::core_type;
+    using helics::CoreType;
     const std::string config = "--config=" + std::string(TEST_DIR) + "multiBroker3.json";
-    helics::BrokerApp App(core_type::MULTI, "brkf3", config);
+    helics::BrokerApp App(CoreType::MULTI, "brkf3", config);
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
     EXPECT_TRUE(App.isOpenToNewFederates());
     EXPECT_EQ(App.getIdentifier(), "brkf3");
 
-    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::ZMQ);
+    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::ZMQ);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::IPC);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::IPC);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TCP);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::TCP);
     EXPECT_TRUE(brk1);
     brk1.reset();
     App.forceTerminate();
@@ -110,20 +110,20 @@ TEST(MultiBroker, file3)
 #    if defined(ENABLE_ZMQ_CORE) && defined(ENABLE_TCP_CORE)
 TEST(MultiBroker, file1)
 {
-    using helics::core_type;
+    using helics::CoreType;
     const std::string config = "--config=" + std::string(TEST_DIR) + "multiBroker1.json";
-    helics::BrokerApp App(core_type::MULTI, "brkf1", config);
+    helics::BrokerApp App(CoreType::MULTI, "brkf1", config);
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
     EXPECT_TRUE(App.isOpenToNewFederates());
     EXPECT_EQ(App.getIdentifier(), "brkf1");
 
-    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::TEST);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::ZMQ);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::ZMQ);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TCP);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::TCP);
     EXPECT_TRUE(brk1);
 
     App.forceTerminate();
@@ -134,20 +134,20 @@ TEST(MultiBroker, file1)
 
 TEST(MultiBroker, file4)
 {
-    using helics::core_type;
+    using helics::CoreType;
     const std::string config = "--config=" + std::string(TEST_DIR) + "multiBroker4.json";
-    helics::BrokerApp App(core_type::MULTI, "brkf4", config);
+    helics::BrokerApp App(CoreType::MULTI, "brkf4", config);
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
     EXPECT_TRUE(App.isOpenToNewFederates());
     EXPECT_EQ(App.getIdentifier(), "brkf4");
 
-    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::ZMQ);
+    auto brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::ZMQ);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::TEST);
     EXPECT_TRUE(brk1);
-    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(core_type::TCP);
+    brk1 = helics::BrokerFactory::findJoinableBrokerOfType(CoreType::TCP);
     EXPECT_TRUE(brk1);
     brk1.reset();
     App.forceTerminate();
@@ -158,23 +158,23 @@ TEST(MultiBroker, file4)
 
 TEST(MultiBroker, link2)
 {
-    using helics::core_type;
+    using helics::CoreType;
     const std::string config = "-f 2 --config=" + std::string(TEST_DIR) + "multiBroker1.json";
-    helics::BrokerApp App(core_type::MULTI, "brkmt1", config);
+    helics::BrokerApp App(CoreType::MULTI, "brkmt1", config);
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
     EXPECT_TRUE(App.isOpenToNewFederates());
     EXPECT_EQ(App.getIdentifier(), "brkmt1");
 
-    helics::CoreApp c1(helics::core_type::TEST, "--brokername=brkmt1 --name=core1t");
+    helics::CoreApp c1(helics::CoreType::TEST, "--brokername=brkmt1 --name=core1t");
     EXPECT_TRUE(c1.connect());
 
     helics::ValueFederate fedA("fedA", c1);
     auto& pub = fedA.registerGlobalPublication<double>("key");
     fedA.enterExecutingModeAsync();
 
-    helics::CoreApp c2(helics::core_type::ZMQ, "--name=core1z");
+    helics::CoreApp c2(helics::CoreType::ZMQ, "--name=core1z");
     EXPECT_TRUE(c2.connect());
 
     helics::ValueFederate fedB("fedB", c2);

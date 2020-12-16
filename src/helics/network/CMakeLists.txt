@@ -131,7 +131,7 @@ endif(ENABLE_MPI_CORE)
 add_library(helics_network STATIC ${NETWORK_SRC_FILES} ${NETWORK_INCLUDE_FILES})
 
 target_link_libraries(
-    helics_network PUBLIC helics_core PRIVATE fmt::fmt compile_flags_target helics::zmq
+    helics_network PUBLIC HELICS::core PRIVATE fmt::fmt compile_flags_target helics::zmq
 )
 
 if(TARGET Boost::boost AND NOT HELICS_DISABLE_BOOST)

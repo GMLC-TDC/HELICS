@@ -33,14 +33,14 @@ TEST_P(vfed_simple_type_tests, initialize_tests)
     ASSERT_FALSE(vFed1 == nullptr);
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
 
-    helics_federate_state state;
+    HelicsFederateState state;
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
     CE(helicsFederateFinalize(vFed1, &err));
 
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(vfed_single_tests, publication_registration)
@@ -49,16 +49,16 @@ TEST_F(vfed_single_tests, publication_registration)
     auto vFed1 = GetFederateAt(0);
 
     auto pubid =
-        helicsFederateRegisterPublication(vFed1, "pub1", helics_data_type_string, "", &err);
+        helicsFederateRegisterPublication(vFed1, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
     auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed1, "pub2", "int", "", &err);
 
     auto pubid3 =
-        helicsFederateRegisterPublication(vFed1, "pub3", helics_data_type_double, "V", &err);
+        helicsFederateRegisterPublication(vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V", &err);
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
 
-    helics_federate_state state;
+    HelicsFederateState state;
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
     auto sv = helicsPublicationGetKey(pubid);
     EXPECT_STREQ(sv, "fed0/pub1");
@@ -78,7 +78,7 @@ TEST_F(vfed_single_tests, publication_registration)
     CE(helicsFederateFinalize(vFed1, &err));
 
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(vfed_single_tests, publisher_registration)
@@ -87,16 +87,16 @@ TEST_F(vfed_single_tests, publisher_registration)
     auto vFed1 = GetFederateAt(0);
 
     auto pubid =
-        helicsFederateRegisterPublication(vFed1, "pub1", helics_data_type_string, "", &err);
+        helicsFederateRegisterPublication(vFed1, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
     auto pubid2 =
-        helicsFederateRegisterGlobalPublication(vFed1, "pub2", helics_data_type_int, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed1, "pub2", HELICS_DATA_TYPE_INT, "", &err);
     auto pubid3 =
-        helicsFederateRegisterPublication(vFed1, "pub3", helics_data_type_double, "V", &err);
+        helicsFederateRegisterPublication(vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V", &err);
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
 
-    helics_federate_state state;
+    HelicsFederateState state;
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
     auto sv = helicsPublicationGetKey(pubid);
     auto sv2 = helicsPublicationGetKey(pubid2);
@@ -116,7 +116,7 @@ TEST_F(vfed_single_tests, publisher_registration)
     CE(helicsFederateFinalize(vFed1, &err));
 
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(vfed_single_tests, subscription_registration)
@@ -124,16 +124,16 @@ TEST_F(vfed_single_tests, subscription_registration)
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
-    helicsFederateSetFlagOption(vFed1, helics_handle_option_connection_optional, helics_true, &err);
+    helicsFederateSetFlagOption(vFed1, HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL, HELICS_TRUE, &err);
     auto subid = helicsFederateRegisterSubscription(vFed1, "sub1", "V", &err);
     auto subid2 = helicsFederateRegisterSubscription(vFed1, "sub2", "", &err);
 
     auto subid3 = helicsFederateRegisterSubscription(vFed1, "sub3", "V", &err);
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
 
-    helics_federate_state state;
+    HelicsFederateState state;
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
     auto sv = helicsSubscriptionGetKey(subid);
     auto sv2 = helicsSubscriptionGetKey(subid2);
@@ -156,19 +156,19 @@ TEST_F(vfed_single_tests, subscription_registration)
     CE(helicsFederateFinalize(vFed1, &err));
 
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(vfed_single_tests, subscription_and_publication_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
-    helicsFederateSetFlagOption(vFed1, helics_handle_option_connection_optional, helics_true, &err);
+    helicsFederateSetFlagOption(vFed1, HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL, HELICS_TRUE, &err);
     // register the publications
     auto pubid =
-        helicsFederateRegisterPublication(vFed1, "pub1", helics_data_type_string, "", &err);
+        helicsFederateRegisterPublication(vFed1, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
     auto pubid2 =
-        helicsFederateRegisterGlobalPublication(vFed1, "pub2", helics_data_type_int, "volts", &err);
+        helicsFederateRegisterGlobalPublication(vFed1, "pub2", HELICS_DATA_TYPE_INT, "volts", &err);
 
     auto pubid3 = helicsFederateRegisterTypePublication(vFed1, "pub3", "double", "V", &err);
 
@@ -179,9 +179,9 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     // enter execution
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
 
-    helics_federate_state state;
+    HelicsFederateState state;
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_execution);
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
     auto sv = helicsSubscriptionGetKey(subid);
     auto sv2 = helicsSubscriptionGetKey(subid2);
@@ -228,14 +228,14 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
 
     // this one should be invalid
     auto pubid_d = helicsFederateGetPublicationByIndex(vFed1, 5, &err);
-    EXPECT_NE(err.error_code, 0);
+    EXPECT_NE(err.errorCode, 0);
     EXPECT_EQ(pubid_d, nullptr);
     helicsErrorClear(&err);
 
     CE(helicsFederateFinalize(vFed1, &err));
 
     CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == helics_state_finalize);
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
 TEST_F(vfed_single_tests, default_value_tests)
@@ -243,44 +243,44 @@ TEST_F(vfed_single_tests, default_value_tests)
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
-    auto inp_raw1 = helicsFederateRegisterInput(vFed1, "key1", helics_data_type_raw, "raw", &err);
-    auto inp_raw2 = helicsFederateRegisterInput(vFed1, "key2", helics_data_type_raw, "raw", &err);
+    auto inp_raw1 = helicsFederateRegisterInput(vFed1, "key1", HELICS_DATA_TYPE_RAW, "raw", &err);
+    auto inp_raw2 = helicsFederateRegisterInput(vFed1, "key2", HELICS_DATA_TYPE_RAW, "raw", &err);
 
-    auto inp_bool = helicsFederateRegisterInput(vFed1, "key3", helics_data_type_boolean, "", &err);
+    auto inp_bool = helicsFederateRegisterInput(vFed1, "key3", HELICS_DATA_TYPE_BOOLEAN, "", &err);
 
-    auto inp_time = helicsFederateRegisterInput(vFed1, "key4", helics_data_type_time, "", &err);
+    auto inp_time = helicsFederateRegisterInput(vFed1, "key4", HELICS_DATA_TYPE_TIME, "", &err);
 
-    auto inp_char = helicsFederateRegisterInput(vFed1, "key5", helics_data_type_char, "", &err);
+    auto inp_char = helicsFederateRegisterInput(vFed1, "key5", HELICS_DATA_TYPE_CHAR, "", &err);
 
-    auto inp_vect = helicsFederateRegisterInput(vFed1, "key6", helics_data_type_vector, "V", &err);
+    auto inp_vect = helicsFederateRegisterInput(vFed1, "key6", HELICS_DATA_TYPE_VECTOR, "V", &err);
 
     auto inp_double =
-        helicsFederateRegisterInput(vFed1, "key7", helics_data_type_double, "kW", &err);
+        helicsFederateRegisterInput(vFed1, "key7", HELICS_DATA_TYPE_DOUBLE, "kW", &err);
 
     auto inp_double2 =
-        helicsFederateRegisterInput(vFed1, "key8", helics_data_type_double, "", &err);
+        helicsFederateRegisterInput(vFed1, "key8", HELICS_DATA_TYPE_DOUBLE, "", &err);
 
     auto inp_np =
-        helicsFederateRegisterInput(vFed1, "key9", helics_data_type_named_point, "", &err);
+        helicsFederateRegisterInput(vFed1, "key9", HELICS_DATA_TYPE_NAMED_POINT, "", &err);
 
     helicsInputSetMinimumChange(inp_double, 1100.0, &err);
     helicsInputSetDefaultDouble(inp_double, 10000.0, &err);
 
-    helicsInputSetOption(inp_double2, helics_handle_option_connection_required, helics_true, &err);
-    EXPECT_EQ(helicsInputIsValid(inp_double2), helics_true);
+    helicsInputSetOption(inp_double2, HELICS_HANDLE_OPTION_CONNECTION_REQUIRED, HELICS_TRUE, &err);
+    EXPECT_EQ(helicsInputIsValid(inp_double2), HELICS_TRUE);
     // anonymous publication
-    auto pub = helicsFederateRegisterPublication(vFed1, nullptr, helics_data_type_int, "MW", &err);
-    helicsPublicationSetOption(pub, helics_handle_option_connection_required, helics_true, &err);
+    auto pub = helicsFederateRegisterPublication(vFed1, nullptr, HELICS_DATA_TYPE_INT, "MW", &err);
+    helicsPublicationSetOption(pub, HELICS_HANDLE_OPTION_CONNECTION_REQUIRED, HELICS_TRUE, &err);
     helicsPublicationAddTarget(pub, "fed0/key7", &err);
     helicsPublicationAddTarget(pub, "fed0/key8", &err);
-    EXPECT_EQ(helicsPublicationIsValid(pub), helics_true);
+    EXPECT_EQ(helicsPublicationIsValid(pub), HELICS_TRUE);
 
     helicsInputSetDefaultBytes(inp_raw1, nullptr, -2, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     char data[256] = "this is a string";
     helicsInputSetDefaultBytes(inp_raw2, data, 30, &err);
 
-    helicsInputSetDefaultBoolean(inp_bool, helics_true, &err);
+    helicsInputSetDefaultBoolean(inp_bool, HELICS_TRUE, &err);
 
     helicsInputSetDefaultTime(inp_time, 12.3, &err);
     helicsInputSetDefaultChar(inp_char, 'q', &err);
@@ -289,7 +289,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsInputSetDefaultNamedPoint(inp_np, data, 15.7, &err);
 
     helicsFederateEnterExecutingMode(vFed1, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     EXPECT_STREQ(helicsInputGetInjectionUnits(inp_double), "MW");
     EXPECT_STREQ(helicsInputGetInjectionUnits(inp_double2), "MW");
     EXPECT_STREQ(helicsInputGetType(inp_double), "double");
@@ -300,14 +300,14 @@ TEST_F(vfed_single_tests, default_value_tests)
     int actSize = 56;
     // this should not be an error
     helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     EXPECT_EQ(actSize, 0);
 
-    auto optset = helicsInputGetOption(inp_double2, helics_handle_option_connection_required);
-    EXPECT_EQ(optset, helics_true);
+    auto optset = helicsInputGetOption(inp_double2, HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    EXPECT_EQ(optset, HELICS_TRUE);
 
-    optset = helicsPublicationGetOption(pub, helics_handle_option_connection_required);
-    EXPECT_EQ(optset, helics_true);
+    optset = helicsPublicationGetOption(pub, HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    EXPECT_EQ(optset, HELICS_TRUE);
     helicsPublicationPublishInteger(pub, 12, &err);
 
     helicsFederateRequestNextStep(vFed1, &err);
@@ -317,8 +317,8 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsPublicationPublishInteger(pub, 13, &err);
 
     helicsFederateRequestNextStep(vFed1, &err);
-    EXPECT_EQ(helicsInputIsUpdated(inp_double), helics_false);
-    EXPECT_EQ(helicsInputIsUpdated(inp_double2), helics_true);
+    EXPECT_EQ(helicsInputIsUpdated(inp_double), HELICS_FALSE);
+    EXPECT_EQ(helicsInputIsUpdated(inp_double2), HELICS_TRUE);
 
     EXPECT_DOUBLE_EQ(helicsInputGetDouble(inp_double, &err), 12000.0);
     EXPECT_DOUBLE_EQ(helicsInputGetDouble(inp_double2, &err), 13.0);
@@ -327,25 +327,25 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     helicsFederateRequestNextStep(vFed1, &err);
 
-    EXPECT_EQ(helicsInputIsUpdated(inp_double), helics_true);
-    EXPECT_EQ(helicsInputIsUpdated(inp_double2), helics_true);
+    EXPECT_EQ(helicsInputIsUpdated(inp_double), HELICS_TRUE);
+    EXPECT_EQ(helicsInputIsUpdated(inp_double2), HELICS_TRUE);
 
     helicsInputClearUpdate(inp_double);
     helicsInputClearUpdate(inp_double2);
 
-    EXPECT_EQ(helicsInputIsUpdated(inp_double), helics_false);
-    EXPECT_EQ(helicsInputIsUpdated(inp_double2), helics_false);
+    EXPECT_EQ(helicsInputIsUpdated(inp_double), HELICS_FALSE);
+    EXPECT_EQ(helicsInputIsUpdated(inp_double2), HELICS_FALSE);
 
     char out[8] = "";
     int actLen = 66;
     double rval = 19.0;
     helicsInputGetNamedPoint(inp_np, nullptr, 5, &actLen, &rval, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     EXPECT_EQ(actLen, 0);
     EXPECT_DOUBLE_EQ(rval, 15.7);
     rval = 19.0;
     helicsInputGetNamedPoint(inp_np, out, 8, &actLen, &rval, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     EXPECT_STREQ(out, "this is");
     EXPECT_EQ(actLen, 8);
     EXPECT_DOUBLE_EQ(rval, 15.7);
@@ -354,8 +354,8 @@ TEST_F(vfed_single_tests, default_value_tests)
 }
 TEST_P(vfed_type_tests, single_transfer)
 {
-    // helics_time stime = 1.0;
-    helics_time gtime;
+    // HelicsTime stime = 1.0;
+    HelicsTime gtime;
 #define STRINGLEN 100
     char s[STRINGLEN] = "n2";
 
@@ -364,7 +364,7 @@ TEST_P(vfed_type_tests, single_transfer)
 
     // register the publications
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_string, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
 
     CE(helicsFederateEnterExecutingMode(vFed, &err));
@@ -411,16 +411,16 @@ void runFederateTestDouble(const char* core,
                            double testValue1,
                            double testValue2)
 {
-    helics_time gtime;
+    HelicsTime gtime;
     double val1 = 0;
     double* val = &val1;
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
     // register the publications
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_double, "", nullptr);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", nullptr);
     CE(helicsInputSetDefaultDouble(subid, defaultValue, &err));
 
@@ -465,17 +465,17 @@ void runFederateTestComplex(const char* core,
                             double testValue2_r,
                             double testValue2_i)
 {
-    helics_time gtime;
+    HelicsTime gtime;
     double val1_r = 0.0;
     double val1_i = 0.0;
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
 
     // register the publications
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_complex, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_COMPLEX, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", &err);
     CE(helicsInputSetDefaultComplex(subid, defaultValue_r, defaultValue_i, &err));
 
@@ -524,10 +524,10 @@ void runFederateTestComplex2(const char* core,
                              double testValue2_r,
                              double testValue2_i)
 {
-    helics_time gtime;
+    HelicsTime gtime;
     double val1_r = 0.0;
     double val1_i = 0.0;
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
@@ -550,7 +550,7 @@ void runFederateTestComplex2(const char* core,
     EXPECT_EQ(gtime, 1.0);
 
     // get the value
-    CE(helics_complex hc = helicsInputGetComplexObject(subid, &err));
+    CE(HelicsComplex hc = helicsInputGetComplexObject(subid, &err));
     // make sure the string is what we expect
     EXPECT_EQ(hc.real, testValue1_r);
     EXPECT_EQ(hc.imag, testValue1_i);
@@ -579,17 +579,17 @@ void runFederateTestInteger(const char* core,
                             int64_t testValue1,
                             int64_t testValue2)
 {
-    helics_time gtime;
+    HelicsTime gtime;
     int64_t val1 = 0;
     int64_t* val = &val1;
 
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     // register the publications
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_int, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_INT, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", &err);
     CE(helicsInputSetDefaultInteger(subid, defaultValue, &err));
     CE(helicsFederateEnterExecutingMode(vFed, &err));
@@ -627,26 +627,26 @@ void runFederateTestInteger(const char* core,
 
 void runFederateTestBool(const char* core, bool defaultValue, bool testValue1, bool testValue2)
 {
-    helics_time gtime;
-    helics_bool val1 = 0;
-    helics_bool* val = &val1;
+    HelicsTime gtime;
+    HelicsBool val1 = 0;
+    HelicsBool* val = &val1;
 
     FederateTestFixture fixture;
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
     // register the publications
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_boolean, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_BOOLEAN, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", &err);
-    CE(helicsInputSetDefaultDouble(subid, defaultValue ? helics_true : helics_false, &err));
+    CE(helicsInputSetDefaultDouble(subid, defaultValue ? HELICS_TRUE : HELICS_FALSE, &err));
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
     // publish string1 at time=0.0;
-    CE(helicsPublicationPublishBoolean(pubid, testValue1 ? helics_true : helics_false, &err));
+    CE(helicsPublicationPublishBoolean(pubid, testValue1 ? HELICS_TRUE : HELICS_FALSE, &err));
     CE(*val = helicsInputGetBoolean(subid, &err));
 
-    EXPECT_EQ(*val, defaultValue ? helics_true : helics_false);
+    EXPECT_EQ(*val, defaultValue ? HELICS_TRUE : HELICS_FALSE);
 
     CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
     EXPECT_EQ(gtime, 1.0);
@@ -654,21 +654,21 @@ void runFederateTestBool(const char* core, bool defaultValue, bool testValue1, b
     // get the value
     CE(*val = helicsInputGetBoolean(subid, &err));
     // make sure the string is what we expect
-    EXPECT_EQ(*val, testValue1 ? helics_true : helics_false);
+    EXPECT_EQ(*val, testValue1 ? HELICS_TRUE : HELICS_FALSE);
 
     // publish a second string
-    CE(helicsPublicationPublishBoolean(pubid, testValue2 ? helics_true : helics_false, &err));
+    CE(helicsPublicationPublishBoolean(pubid, testValue2 ? HELICS_TRUE : HELICS_FALSE, &err));
 
     // make sure the value is still what we expect
     CE(*val = helicsInputGetBoolean(subid, &err));
-    EXPECT_EQ(*val, testValue1 ? helics_true : helics_false);
+    EXPECT_EQ(*val, testValue1 ? HELICS_TRUE : HELICS_FALSE);
     // advance time
     CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
 
     CE(*val = helicsInputGetBoolean(subid, &err));
-    EXPECT_EQ(*val, testValue2 ? helics_true : helics_false);
+    EXPECT_EQ(*val, testValue2 ? HELICS_TRUE : HELICS_FALSE);
 
     CE(helicsFederateFinalize(vFed, &err));
 }
@@ -678,16 +678,16 @@ void runFederateTestString(const char* core,
                            const char* testValue1,
                            const char* testValue2)
 {
-    helics_time gtime;
+    HelicsTime gtime;
 #define STRINGSIZE 100
     char str[STRINGSIZE] = "";
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
     // register the publications
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_string, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", &err);
     CE(helicsInputSetDefaultString(subid, defaultValue, &err));
 
@@ -736,17 +736,17 @@ void runFederateTestVectorD(const char* core,
                             int len1,
                             int len2)
 {
-    helics_time gtime;
+    HelicsTime gtime;
     int maxlen = (len1 > len2) ? len1 : len2;
     maxlen = (maxlen > len) ? maxlen : len;
     auto* val = new double[maxlen];
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
     // register the interfaces
     auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", helics_data_type_vector, "", &err);
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_VECTOR, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
     CE(helicsInputSetDefaultVector(subid, defaultValue, len, &err));
     CE(helicsFederateEnterExecutingMode(vFed, &err));
@@ -823,17 +823,17 @@ void runFederateTestNamedPoint(const char* core,
                                const char* testValue2,
                                double testVal2)
 {
-    helics_time gtime;
+    HelicsTime gtime;
 #define STRINGSIZE 100
     char str[STRINGSIZE] = "";
 
     FederateTestFixture fixture;
-    helics_error err = helicsErrorInitialize();
+    HelicsError err = helicsErrorInitialize();
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication(
-        vFed, "pub1", helics_data_type_named_point, "", &err);
+        vFed, "pub1", HELICS_DATA_TYPE_NAMED_POINT, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", "", &err);
     CE(helicsInputSetDefaultNamedPoint(subid, defaultValue, defVal, &err));
 
@@ -952,19 +952,19 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
 
-    helicsFederateSetFlagOption(vFed, helics_handle_option_connection_optional, helics_true, &err);
+    helicsFederateSetFlagOption(vFed, HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL, HELICS_TRUE, &err);
     // register the publications
-    helics_publication pubid = helicsFederateRegisterTypePublication(vFed, "pub1", "", "", &err);
-    helics_publication pubid2 =
+    HelicsPublication pubid = helicsFederateRegisterTypePublication(vFed, "pub1", "", "", &err);
+    HelicsPublication pubid2 =
         helicsFederateRegisterGlobalTypePublication(vFed, "pub2", "int", "", &err);
-    helics_publication pubid3 =
-        helicsFederateRegisterPublication(vFed, "pub3", helics_data_type_double, "V", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    HelicsPublication pubid3 =
+        helicsFederateRegisterPublication(vFed, "pub3", HELICS_DATA_TYPE_DOUBLE, "V", &err);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
     // these aren't meant to match the publications
     auto subid = helicsFederateRegisterSubscription(vFed, "sub1", "", &err);
     auto subid2 = helicsFederateRegisterSubscription(vFed, "sub2", "", &err);
     auto subid3 = helicsFederateRegisterSubscription(vFed, "sub3", "V", &err);
-    EXPECT_EQ(err.error_code, helics_ok);
+    EXPECT_EQ(err.errorCode, HELICS_OK);
     // enter execution
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
@@ -1005,8 +1005,8 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
 
 TEST_P(vfed_type_tests, single_transfer_publisher)
 {
-    //    helics_time stime = 1.0;
-    helics_time gtime;
+    //    HelicsTime stime = 1.0;
+    HelicsTime gtime;
 
     char s[STRINGLEN] = "n2";
     int len = 0;
@@ -1052,7 +1052,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
 {
     SetupTest(helicsCreateValueFederate, GetParam(), 1, 1.0);
     auto vFed = GetFederateAt(0);
-    helicsFederateSetFlagOption(vFed, helics_handle_option_connection_optional, helics_true, &err);
+    helicsFederateSetFlagOption(vFed, HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL, HELICS_TRUE, &err);
     // register the publications/subscriptions
 
     auto subid1 = helicsFederateRegisterSubscription(vFed, "sub1", "", &err);
@@ -1073,13 +1073,11 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     CE(helicsFederateFinalize(vFed, &err));
 
     CE(auto wait = helicsCoreWaitForDisconnect(cr, 70, &err));
-    if (wait == helics_false) {
+    if (wait == HELICS_FALSE) {
         wait = helicsCoreWaitForDisconnect(cr, 500, &err);
     }
-    EXPECT_EQ(wait, helics_true);
+    EXPECT_EQ(wait, HELICS_TRUE);
 }
 
-INSTANTIATE_TEST_SUITE_P(vfed_tests,
-                         vfed_simple_type_tests,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(core_types));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));

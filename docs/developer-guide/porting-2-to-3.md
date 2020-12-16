@@ -28,14 +28,16 @@ A list of known PRs that made breaking changes is also provided.
 
 ### C Shared API
 
-- Only 1 header is now used `#include<helics/helics.h>` for all uses of the C shared library in C/C++ code no other headers are needed, the other headers are no longer available.
+- Only 1 header is now used `#include <helics/helics.h>` for all uses of the C shared library in C/C++ code no other headers are needed, the other headers are no longer available.
 - Removed `helics_message` struct -- call functions to set fields instead. `helicsEndpointGetMessage` and `helicsFederateGetMessage` returning this struct were removed -- call functions to get field values instead. Changed in [#1363][1].
-- `helics_message_object` typedef was renamed to `helics_message` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `helics_message`. Changed in [#1363][1].
+- `helics_message_object` typedef was renamed to `HelicsMessage` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `HelicsMessage`. Changed in [#1363][1].
 - Renamed `helicsEndpointSendMessageObject` to `helicsEndpointSendMessage`, `helicsSendMessageObjectZeroCopy` to `helicsSendMessageZeroCopy`, `helicsEndpointGetMessageObject` to `helicsEndpointGetMessage`, `helicsEndpointCreateMessageObject` to `helicsEndpointCreateMessage`, `helicsFederateGetMessageObject` to `helicsFederateGetMessage`, and `helicsFederateCreateMessageObject` to `helicsFederateCreateMessage`. Changed in [#1363][1].
 - Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [#1363][1].
+- all constants such as flags and properties are now CAPITAL_SNAKE_CASE  
+- all structures are now CamelCase,  though the old form will be available in helics3 though will be deprecated at some point.  
 
 ### C++98 API (wrapper around the C Shared API)
 
-- Removed the `helics_message` struct, and renamed `helics_message_object` to `helics_message`. Direct setting of struct fields should be done through API functions instead. This affects a few functions in the `Message` class in `Endpoint.hpp`; the explicit constructor and `release()` methods now take `helics_message` arguments, and `operator helics_message_object()` becomes `operator helics_message()`. Changed in [#1363][1].
+- Removed the `helics_message` struct, and renamed `helics_message_object` to `HelicsMessage`. Direct setting of struct fields should be done through API functions instead. This affects a few functions in the `Message` class in `Endpoint.hpp`; the explicit constructor and `release()` methods now take `HelicsMessage` arguments, and `operator helics_message_object()` becomes `operator HelicsMessage()`. Changed in [#1363][1].
 
 [1]: https://github.com/GMLC-TDC/HELICS/pull/1363 "PR #1363"

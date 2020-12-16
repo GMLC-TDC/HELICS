@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/core/core-types.hpp"
+#include "helics/core/CoreTypes.hpp"
 #include "helics/network/zmq/ZmqBroker.h"
 #include "helics/network/zmq/ZmqComms.h"
 #include "helics/network/zmq/ZmqContextManager.h"
@@ -517,7 +517,7 @@ TEST(ZMQCore, zmqCore_initialization)
     std::this_thread::sleep_for(400ms);
     std::string initializationString =
         "-f 1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
-    auto core = helics::CoreFactory::create(helics::core_type::ZMQ, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::ZMQ, initializationString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -573,9 +573,9 @@ TEST(ZMQCore, zmqCore_core_broker_default)
     std::this_thread::sleep_for(400ms);
     std::string initializationString = "-f 1";
 
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, initializationString);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, initializationString);
 
-    auto core = helics::CoreFactory::create(helics::core_type::ZMQ, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::ZMQ, initializationString);
     bool connected = broker->isConnected();
     EXPECT_TRUE(connected);
     connected = core->connect();
@@ -593,7 +593,7 @@ TEST(ZMQCore, zmqCore_core_broker_default)
 TEST(ZMQCore, commFactory)
 {
     auto comm = helics::CommFactory::create("zmq");
-    auto comm2 = helics::CommFactory::create(helics::core_type::ZMQ);
+    auto comm2 = helics::CommFactory::create(helics::CoreType::ZMQ);
 
     EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms*>(comm.get()) != nullptr);
     EXPECT_TRUE(dynamic_cast<helics::zeromq::ZmqComms*>(comm2.get()) != nullptr);

@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerFactory.hpp"
 
 #include "CoreBroker.hpp"
+#include "CoreTypes.hpp"
 #include "core-exceptions.hpp"
-#include "core-types.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
@@ -86,25 +86,25 @@ namespace BrokerFactory {
         MasterBrokerBuilder::addBuilder(std::move(cb), name, code);
     }
 
-    std::shared_ptr<Broker> makeBroker(core_type type, const std::string& name)
+    std::shared_ptr<Broker> makeBroker(CoreType type, const std::string& name)
     {
-        if (type == core_type::NULLCORE) {
+        if (type == CoreType::NULLCORE) {
             throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         }
-        if (type == core_type::DEFAULT) {
+        if (type == CoreType::DEFAULT) {
             return MasterBrokerBuilder::getDefaultBuilder()->build(name);
         }
         return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->build(name);
     }
 
-    std::shared_ptr<Broker> create(core_type type, const std::string& configureString)
+    std::shared_ptr<Broker> create(CoreType type, const std::string& configureString)
     {
         static const std::string emptyString;
         return create(type, emptyString, configureString);
     }
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& brokerName, const std::string& configureString)
+        create(CoreType type, const std::string& brokerName, const std::string& configureString)
     {
         auto broker = makeBroker(type, brokerName);
         if (!broker) {
@@ -119,14 +119,14 @@ namespace BrokerFactory {
         return broker;
     }
 
-    std::shared_ptr<Broker> create(core_type type, int argc, char* argv[])
+    std::shared_ptr<Broker> create(CoreType type, int argc, char* argv[])
     {
         static const std::string emptyString;
         return create(type, emptyString, argc, argv);
     }
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& brokerName, int argc, char* argv[])
+        create(CoreType type, const std::string& brokerName, int argc, char* argv[])
     {
         auto broker = makeBroker(type, brokerName);
         broker->configureFromArgs(argc, argv);
@@ -138,14 +138,14 @@ namespace BrokerFactory {
         return broker;
     }
 
-    std::shared_ptr<Broker> create(core_type type, std::vector<std::string> args)
+    std::shared_ptr<Broker> create(CoreType type, std::vector<std::string> args)
     {
         static const std::string emptyString;
         return create(type, emptyString, std::move(args));
     }
 
     std::shared_ptr<Broker>
-        create(core_type type, const std::string& brokerName, std::vector<std::string> args)
+        create(CoreType type, const std::string& brokerName, std::vector<std::string> args)
     {
         auto broker = makeBroker(type, brokerName);
         broker->configureFromVector(std::move(args));
@@ -176,7 +176,7 @@ thread which allows the destructor to fire if need be without issue*/
     static gmlc::concurrency::DelayedDestructor<Broker>
         delayedDestroyer(destroyerCallFirst);  //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<Broker, core_type>
+    static gmlc::concurrency::SearchableObjectHolder<Broker, CoreType>
         searchableBrokers;  //!< the object managing the searchable objects
 
     // this will trip the line when it is destroyed at global destruction time
@@ -187,7 +187,7 @@ thread which allows the destructor to fire if need be without issue*/
         return searchableBrokers.findObject(brokerName);
     }
 
-    std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
+    std::shared_ptr<Broker> findJoinableBrokerOfType(CoreType type)
     {
         return searchableBrokers.findObject([](auto& ptr) { return ptr->isOpenToNewFederates(); },
                                             type);
@@ -197,26 +197,26 @@ thread which allows the destructor to fire if need be without issue*/
 
     bool brokersActive() { return !searchableBrokers.empty(); }
 
-    static void addExtraTypes(const std::string& name, core_type type)
+    static void addExtraTypes(const std::string& name, CoreType type)
     {
         switch (type) {
-            case core_type::INPROC:
-                searchableBrokers.addType(name, core_type::TEST);
+            case CoreType::INPROC:
+                searchableBrokers.addType(name, CoreType::TEST);
                 break;
-            case core_type::TEST:
-                searchableBrokers.addType(name, core_type::INPROC);
+            case CoreType::TEST:
+                searchableBrokers.addType(name, CoreType::INPROC);
                 break;
-            case core_type::IPC:
-                searchableBrokers.addType(name, core_type::INTERPROCESS);
+            case CoreType::IPC:
+                searchableBrokers.addType(name, CoreType::INTERPROCESS);
                 break;
-            case core_type::INTERPROCESS:
-                searchableBrokers.addType(name, core_type::IPC);
+            case CoreType::INTERPROCESS:
+                searchableBrokers.addType(name, CoreType::IPC);
                 break;
             default:
                 break;
         }
     }
-    bool registerBroker(const std::shared_ptr<Broker>& broker, core_type type)
+    bool registerBroker(const std::shared_ptr<Broker>& broker, CoreType type)
     {
         bool registered = false;
         const std::string& bname = (broker) ? broker->getIdentifier() : std::string{};
@@ -264,7 +264,7 @@ thread which allows the destructor to fire if need be without issue*/
         }
     }
 
-    void addAssociatedBrokerType(const std::string& name, core_type type)
+    void addAssociatedBrokerType(const std::string& name, CoreType type)
     {
         searchableBrokers.addType(name, type);
         addExtraTypes(name, type);
@@ -272,14 +272,14 @@ thread which allows the destructor to fire if need be without issue*/
 
     static const std::string helpStr{"--help"};
 
-    void displayHelp(core_type type)
+    void displayHelp(CoreType type)
     {
-        if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED) {
+        if (type == CoreType::DEFAULT || type == CoreType::UNRECOGNIZED) {
             std::cout << "All core types have similar options\n";
-            auto brk = makeBroker(core_type::DEFAULT, std::string{});
+            auto brk = makeBroker(CoreType::DEFAULT, std::string{});
             brk->configure(helpStr);
 #ifdef ENABLE_TCP_CORE
-            brk = makeBroker(core_type::TCP_SS, std::string{});
+            brk = makeBroker(CoreType::TCP_SS, std::string{});
             brk->configure(helpStr);
 #endif
         } else {

@@ -29,23 +29,23 @@ int getIndexCode(const std::string& type_name)
     return static_cast<int>(type_name.back() - '0');
 }
 
-auto StartBrokerImp(const std::string& core_type_name, const std::string& initialization_string)
+auto StartBrokerImp(const std::string& CoreType_name, const std::string& initialization_string)
 {
-    helics::core_type type;
-    if (hasIndexCode(core_type_name)) {
-        std::string new_type(core_type_name.begin(), core_type_name.end() - 2);
+    helics::CoreType type;
+    if (hasIndexCode(CoreType_name)) {
+        std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
         type = helics::core::coreTypeFromString(new_type);
     } else {
-        type = helics::core::coreTypeFromString(core_type_name);
+        type = helics::core::coreTypeFromString(CoreType_name);
     }
     std::shared_ptr<helics::Broker> broker;
     switch (type) {
-        case helics::core_type::TCP:
+        case helics::CoreType::TCP:
             broker =
                 helics::BrokerFactory::create(type, initialization_string + " --reuse_address");
             break;
-        case helics::core_type::IPC:
-        case helics::core_type::INTERPROCESS:
+        case helics::CoreType::IPC:
+        case helics::CoreType::INTERPROCESS:
             broker = helics::BrokerFactory::create(type, initialization_string + " --client");
             break;
         default:
@@ -58,8 +58,8 @@ FederateTestFixture::~FederateTestFixture()
 {
     for (auto& fed : federates) {
         if (fed &&
-            (!((fed->getCurrentMode() == helics::Federate::modes::finalize) ||
-               (fed->getCurrentMode() == helics::Federate::modes::error)))) {
+            (!((fed->getCurrentMode() == helics::Federate::Modes::FINALIZE) ||
+               (fed->getCurrentMode() == helics::Federate::Modes::ERROR_STATE)))) {
             fed->finalize();
         }
     }
@@ -83,7 +83,7 @@ FederateTestFixture::~FederateTestFixture()
 void FederateTestFixture::FullDisconnect()
 {
     for (auto& fed : federates) {
-        if (fed && fed->getCurrentMode() != helics::Federate::modes::finalize) {
+        if (fed && fed->getCurrentMode() != helics::Federate::Modes::FINALIZE) {
             fed->finalize();
         }
     }
@@ -97,21 +97,21 @@ void FederateTestFixture::FullDisconnect()
     helics::cleanupHelicsLibrary();
 }
 
-std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker(const std::string& core_type_name,
+std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker(const std::string& CoreType_name,
                                                                int count)
 {
-    return AddBroker(core_type_name, std::string("-f ") + std::to_string(count));
+    return AddBroker(CoreType_name, std::string("-f ") + std::to_string(count));
 }
 
 std::shared_ptr<helics::Broker>
-    FederateTestFixture::AddBroker(const std::string& core_type_name,
+    FederateTestFixture::AddBroker(const std::string& CoreType_name,
                                    const std::string& initialization_string)
 {
     std::shared_ptr<helics::Broker> broker;
     if (extraBrokerArgs.empty()) {
-        broker = StartBrokerImp(core_type_name, initialization_string);
+        broker = StartBrokerImp(CoreType_name, initialization_string);
     } else {
-        broker = StartBrokerImp(core_type_name, initialization_string + " " + extraBrokerArgs);
+        broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
     }
     broker->setLoggingLevel(0);
     brokers.push_back(broker);

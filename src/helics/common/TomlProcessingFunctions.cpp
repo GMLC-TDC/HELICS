@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TomlProcessingFunctions.hpp"
 
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #include "../utilities/timeStringOps.hpp"
 
 #include <fstream>

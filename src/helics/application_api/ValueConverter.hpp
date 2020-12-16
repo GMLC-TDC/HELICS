@@ -71,7 +71,7 @@ namespace detail {
                                              size_t size);
 
     /** detect the contained data type,  assumes data is at least 1 byte long*/
-    HELICS_CXX_EXPORT data_type detectType(const std::byte* data);
+    HELICS_CXX_EXPORT DataType detectType(const std::byte* data);
 
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, double& val);
     HELICS_CXX_EXPORT void convertFromBinary(const std::byte* data, std::int64_t& val);

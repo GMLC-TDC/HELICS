@@ -18,6 +18,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - Minimum build requirements to C++17
 - Many of the API functions now use `string_view` instead of `const std::string &`
 - The C shared library now comes with only a single header `helics.h` this should be included for all uses of the C shared library
+- The style of enumerations and structures was changed to match an updated [style guide](./docs/developer-guide/style.md)
 
 ### Fixed
 
@@ -126,7 +127,7 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 - Update units library to include some typical natural gas units and conversions
 - Use a separate action for automated pr generation
 - Update the CLI11 library
-- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `helics_bool` was already an int.
+- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `HelicsBool` was already an int.
 - In the case of multiple sources, `getInjectionType`, and `getInjectionUnits` now will return a json string vector.
 - The CMake build generation now uses a central location for all build artifacts instead of individual directories.
 - Updated the ASIO library to 1-16
@@ -160,13 +161,13 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 - A few missing message operators to the C++98 API, such as `data`, `append`, `setFlag`, `checkFlag`, `sendMessageZeroCopy`
 - Made the Message class return a self Reference for the setters
 - A test to run the helics-broker executable as part of the CI tests
-- A bug in the helics_broker that no longer ran correct defaults
+- A bug in the HelicsBroker that no longer ran correct defaults
 - A "version_all" query, to retrieve the version of HELICS in use for all cores/brokers, and a "version" query to retrieve the version of a specific target.
 - A series of checks for markdown, spelling, shellcheck, python formatting, cpplint, end-of-line and automated generation of PR scripts for the formatting updates.
 - Some level of automated scaling for benchmarks for small systems
 - API functions for retrieving the build flags used to generate the library
 - Some additional message interpreters to aid in debugging
-- A test using the standalone `helics_broker` to run an example
+- A test using the standalone `HelicsBroker` to run an example
 
 ## [2.5.0][] - 2020-04-26
 
@@ -178,7 +179,7 @@ Some library reorganization, additional static analysis(CppLint and clang-tidy),
 - Update FMT library to version 6.2.0
 - The core and broker Factories use a map instead of a fixed list which is a step toward allowing user defined cores
 - Updated CLI11 included code to customized version to allow configuration of cores and brokers through Json files
-- The ordering of the helics_error_types enum is in ascending order
+- The ordering of the `HelicsErrorTypes` enum is in ascending order
 - Refactored the Matlab and Java swig interface builds to enable standalone builds
 
 ### Fixed

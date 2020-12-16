@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** test the assignment and retrieval of global value from a broker object*/
 TEST(broker_tests, global_value_test)
 {
-    auto brk = helics::BrokerFactory::create(helics::core_type::TEST, "gbroker", "-f2 --root");
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "gbroker", "-f2 --root");
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     brk->setGlobal("testglobal", globalVal);

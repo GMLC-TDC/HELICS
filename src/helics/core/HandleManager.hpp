@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "BasicHandleInfo.hpp"
 #include "Core.hpp"
-#include "helics-time.hpp"
+#include "helicsTime.hpp"
 
 #include <deque>
 #include <string>
@@ -40,14 +40,14 @@ class HandleManager {
     HandleManager() = default;
     /** add a handle to manage*/
     BasicHandleInfo& addHandle(GlobalFederateId fed_id,
-                               handle_type what,
+                               InterfaceType what,
                                const std::string& key,
                                const std::string& type,
                                const std::string& units);
     /** add a handle to manage*/
     BasicHandleInfo& addHandle(GlobalFederateId fed_id,
                                InterfaceHandle local_id,
-                               handle_type what,
+                               InterfaceType what,
                                const std::string& key,
                                const std::string& type,
                                const std::string& units);
@@ -109,7 +109,7 @@ class HandleManager {
 
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);
-    std::string generateName(handle_type what) const;
+    std::string generateName(InterfaceType what) const;
 };
 
 }  // namespace helics

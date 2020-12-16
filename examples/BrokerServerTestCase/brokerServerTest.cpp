@@ -20,13 +20,13 @@ int main(int argc, char** argv)
     helics::apps::BrokerServer bserv(args);
     bserv.startServers();
 
-    auto crA1 = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=brokerA");
+    auto crA1 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerA");
 
     crA1->connect();
     helics::FederateInfo fi;
 
     helics::CombinationFederate fedA1("fedA_1", crA1, fi);
-    auto crA2 = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=brokerA");
+    auto crA2 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerA");
 
     fedA1.registerGlobalPublication<double>("pub1", "V");
     fedA1.registerPublication<std::string>("pub_string", "");
@@ -43,11 +43,11 @@ int main(int argc, char** argv)
 
     fedA2.registerSubscription("fedA_1/pub_string");
 
-    auto crB1 = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=brokerB");
+    auto crB1 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerB");
     crB1->connect();
     helics::CombinationFederate fedB1("fedB_1", crB1, fi);
 
-    auto crB2 = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=brokerB");
+    auto crB2 = helics::CoreFactory::create(helics::CoreType::ZMQ, "--brokername=brokerB");
     crB2->connect();
     helics::CombinationFederate fedB2("fedB_2", crB2, fi);
     std::chrono::seconds timeout(30);

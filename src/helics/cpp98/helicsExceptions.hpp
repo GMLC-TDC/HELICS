@@ -44,15 +44,15 @@ class hThrowOnError {
     exception */
     ~hThrowOnError() HELICS_THROWS_EXCEPTION
     {
-        if (eObj.error_code != 0) {
-            throw HelicsException(eObj.error_code, eObj.message);
+        if (eObj.errorCode != 0) {
+            throw HelicsException(eObj.errorCode, eObj.message);
         }
     }
-    /** this is an implicit conversion operation for use with helics_error*/
-    operator helics_error*() { return &eObj; }
+    /** this is an implicit conversion operation for use with HelicsError*/
+    operator HelicsError*() { return &eObj; }
 
   private:
-    helics_error eObj;  //!< holder for a helics error object which is used in the C interface
+    HelicsError eObj;  //!< holder for a helics error object which is used in the C interface
 };
 }  // namespace helicscpp
 

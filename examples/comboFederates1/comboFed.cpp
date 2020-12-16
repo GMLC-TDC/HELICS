@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     std::string mtarget = "fed";
     std::string myendpoint = "endpoint";
     helics::BrokerApp brk;
-    std::string brokerArgs = "";
+    std::string brokerArgs;
 
     app.add_option_function<std::string>(
         "--target,-t",
@@ -41,7 +41,8 @@ int main(int argc, char* argv[])
     if (ret == helics::helicsCLI11App::parse_output::help_call) {
         (void)(fi.loadInfoFromArgs("--help"));
         return 0;
-    } else if (ret != helics::helicsCLI11App::parse_output::ok) {
+    }
+    if (ret != helics::helicsCLI11App::parse_output::ok) {
         return -1;
     }
     fi.defName = "fed";
@@ -49,7 +50,7 @@ int main(int argc, char* argv[])
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
-    fi.setProperty(helics::defs::properties::log_level, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
     if (app["--startbroker"]->count() > 0) {
         brk = helics::BrokerApp(fi.coreType, brokerArgs);
     }
@@ -74,7 +75,7 @@ int main(int argc, char* argv[])
     std::cout << "entered exec State\n";
     for (int i = 1; i < 10; ++i) {
         std::string message =
-            "message sent from " + name + " to " + etarget + " at time " + std::to_string(i);
+            std::string("message sent from ") + name + " to " + etarget + " at time " + std::to_string(i);
         id.sendTo(message.data(), message.size(), etarget);
         pubid.publish(i);
         std::cout << message << std::endl;

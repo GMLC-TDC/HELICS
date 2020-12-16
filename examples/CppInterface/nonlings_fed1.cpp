@@ -42,8 +42,8 @@ int main(int /*argc*/, char** /*argv*/)
 
     /* Federate init string */
     fi.setCoreInit(fedinitstring);
-    fi.setProperty(helics_property_time_delta, deltat);
-    fi.setProperty(helics_property_int_max_iterations, 100);
+    fi.setProperty(HELICS_PROPERTY_TIME_DELTA, deltat);
+    fi.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
 
     // fi.setLoggingLevel(5);
 
@@ -64,9 +64,9 @@ int main(int /*argc*/, char** /*argv*/)
 
     double x = 0.0;
     double xprv = 100.0; /*yprv = 100,*/
-    helics_time currenttime = 0.0;
-    helicscpp::helics_iteration_time currenttimeiter;
-    currenttimeiter.status = helics_iteration_result_iterating;
+    HelicsTime currenttime = 0.0;
+    helicscpp::HelicsIterationTime currenttimeiter;
+    currenttimeiter.status = HELICS_ITERATION_RESULT_ITERATING;
     // int isUpdated;
     double tol = 1E-8;
 
@@ -76,7 +76,7 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << " Entered execution state\n";
 
     int helics_iter = 0;
-    while (currenttimeiter.status == helics_iteration_result_iterating) {
+    while (currenttimeiter.status == HELICS_ITERATION_RESULT_ITERATING) {
         //    yprv = y;
         double y = sub.getDouble();
         bool newt_conv = false;
@@ -105,7 +105,7 @@ int main(int /*argc*/, char** /*argv*/)
             std::cout << "Fed1: publishing new x\n";
         }
         currenttimeiter =
-            vfed->requestTimeIterative(currenttime, helics_iteration_request_iterate_if_needed);
+            vfed->requestTimeIterative(currenttime, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED);
         xprv = x;
     }
 

@@ -29,7 +29,7 @@ using ::testing::HasSubstr;
 
 TEST(CoreAppTests, constructor1)
 {
-    helics::CoreApp App(helics::core_type::TEST, "core1", std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core1", std::vector<std::string>{"--autobroker"});
 
     EXPECT_FALSE(App.isConnected());
 
@@ -43,7 +43,7 @@ TEST(CoreAppTests, constructor1)
 
 TEST(CoreAppTests, constructor2)
 {
-    helics::CoreApp App(helics::core_type::TEST,
+    helics::CoreApp App(helics::CoreType::TEST,
                         std::vector<std::string>{"--autobroker", "core2", "--name"});
 
     EXPECT_FALSE(App.isConnected());
@@ -59,7 +59,7 @@ TEST(CoreAppTests, constructor2)
 TEST(CoreAppTests, constructor3)
 {
     helics::CoreApp App(
-        std::vector<std::string>{"--autobroker", "core3", "--name", "test", "--core_type"});
+        std::vector<std::string>{"--autobroker", "core3", "--name", "test", "--CoreType"});
 
     EXPECT_FALSE(App.isConnected());
 
@@ -80,7 +80,7 @@ TEST(CoreAppTests, constructor4)
     argv[2] = &(args[2][0]);
     argv[3] = &(args[3][0]);
 
-    helics::CoreApp App(helics::core_type::TEST, 4, argv);
+    helics::CoreApp App(helics::CoreType::TEST, 4, argv);
 
     EXPECT_FALSE(App.isConnected());
 
@@ -95,7 +95,7 @@ TEST(CoreAppTests, constructor4)
 TEST(CoreAppTests, constructor5)
 {
     std::vector<std::string> args{
-        "constructor4", "--autobroker", "--name", "core5", "--core_type", "test"};
+        "constructor4", "--autobroker", "--name", "core5", "--CoreType", "test"};
     char* argv[6];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -118,7 +118,7 @@ TEST(CoreAppTests, constructor5)
 
 TEST(CoreAppTests, constructor6)
 {
-    helics::CoreApp App(helics::core_type::TEST, "core6", std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core6", std::vector<std::string>{"--autobroker"});
 
     EXPECT_FALSE(App.isConnected());
 
@@ -135,7 +135,7 @@ TEST(CoreAppTests, constructor6)
 
 TEST(CoreAppTests, constructor7)
 {
-    helics::CoreApp App(helics::core_type::TEST, "core7", std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core7", std::vector<std::string>{"--autobroker"});
 
     EXPECT_THROW(helics::CoreApp App2("core9"), helics::ConnectionFailure);
     App.forceTerminate();
@@ -143,7 +143,7 @@ TEST(CoreAppTests, constructor7)
 
 TEST(CoreAppTests, constructor8)
 {
-    helics::CoreApp App(helics::core_type::TEST, "core8", std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core8", std::vector<std::string>{"--autobroker"});
 
     EXPECT_FALSE(App.isConnected());
 
@@ -160,7 +160,7 @@ TEST(CoreAppTests, constructor8)
 
 TEST(CoreAppTests, constructor9)
 {
-    helics::CoreApp App(helics::core_type::TEST, "core9", std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core9", std::vector<std::string>{"--autobroker"});
 
     helics::CoreApp App2(std::move(App));
 
@@ -176,9 +176,7 @@ TEST(CoreAppTests, constructor9)
 
 TEST(CoreAppTests, constructor10)
 {
-    helics::CoreApp App(helics::core_type::TEST,
-                        "core10",
-                        std::vector<std::string>{"--autobroker"});
+    helics::CoreApp App(helics::CoreType::TEST, "core10", std::vector<std::string>{"--autobroker"});
 
     helics::CoreApp App2(App.getCopyofCorePointer());
 
@@ -207,7 +205,7 @@ TEST(CoreAppTests, null)
 
 TEST(CoreAppTests, help)
 {
-    helics::CoreApp app("--core_type=test --help");
+    helics::CoreApp app("--CoreType=test --help");
     EXPECT_FALSE(app.isOpenToNewFederates());
     EXPECT_FALSE(app.isConnected());
     EXPECT_FALSE(app.connect());
@@ -220,7 +218,7 @@ TEST(CoreAppTests, help)
 
 TEST(CoreAppTests, file_logging_p2)
 {
-    helics::CoreApp app("--autobroker --name=loggerCore1 --core_type=test");
+    helics::CoreApp app("--autobroker --name=loggerCore1 --CoreType=test");
     app.setLoggingLevel(5);
     const std::string lfilename = "logfile2.txt";
     app.setLogFile("logfile2.txt");
@@ -252,10 +250,10 @@ TEST(CoreAppTests, file_logging_p2)
 TEST(CoreAppTests, core_global_file_ci_skip)
 {
     helics::BrokerFactory::terminateAllBrokers();
-    helics::BrokerApp brk(helics::core_type::TEST, "be1", "-f2");
+    helics::BrokerApp brk(helics::CoreType::TEST, "be1", "-f2");
     brk.connect();
     brk.setGlobal("GlobalB", "excited");
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_globale3";
     fi.coreInitString = "-f 1";
 
@@ -304,9 +302,9 @@ TEST(CoreAppTests, core_global_file_ci_skip)
 
 TEST(CoreAppTests, readyToInit)
 {
-    helics::BrokerApp b(helics::core_type::TEST, "brkt1", "-f1");
+    helics::BrokerApp b(helics::CoreType::TEST, "brkt1", "-f1");
     EXPECT_TRUE(b.connect());
-    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt1 --name=core1b");
+    helics::CoreApp c1(helics::CoreType::TEST, "--broker=brkt1 --name=core1b");
     EXPECT_TRUE(c1.connect());
     c1.haltInit();
 

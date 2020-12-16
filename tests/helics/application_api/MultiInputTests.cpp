@@ -86,7 +86,7 @@ TEST_F(multiInput, order2)
 
     pub1.publish(4.0);
     pub2.publish(5.0);
-    EXPECT_EQ(in1.getOption(defs::connections), 2);
+    EXPECT_EQ(in1.getOption(defs::Options::CONNECTIONS), 2);
 
     vFed1->requestNextStep();
     val = in1.getValue<double>();
@@ -106,7 +106,7 @@ TEST_F(multiInput, priority)
     auto& in1 = vFed1->registerInput<double>("");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
-    in1.setOption(defs::options::input_priority_location, 1);
+    in1.setOption(defs::Options::INPUT_PRIORITY_LOCATION, 1);
     vFed1->enterExecutingMode();
 
     EXPECT_EQ(in1.getPublicationType(), "double");
@@ -126,9 +126,9 @@ TEST_F(multiInput, priority)
     vFed1->requestNextStep();
     val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 4.0);
-    auto fval = in1.getOption(defs::options::clear_priority_list);
+    auto fval = in1.getOption(defs::Options::CLEAR_PRIORITY_LIST);
     EXPECT_EQ(fval, 0);
-    in1.setOption(defs::options::clear_priority_list);
+    in1.setOption(defs::Options::CLEAR_PRIORITY_LIST);
 
     pub2.publish(6.0);
     pub1.publish(7.0);
@@ -136,7 +136,7 @@ TEST_F(multiInput, priority)
     vFed1->requestNextStep();
     val = in1.getValue<double>();
     EXPECT_DOUBLE_EQ(val, 7.0);
-    fval = in1.getOption(defs::options::clear_priority_list);
+    fval = in1.getOption(defs::Options::CLEAR_PRIORITY_LIST);
     EXPECT_NE(fval, 0);
 
     vFed1->finalize();
@@ -156,8 +156,8 @@ TEST_F(multiInput, max)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::max_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::MAX_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -194,8 +194,8 @@ TEST_F(multiInput, min)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::min_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::MIN_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -232,8 +232,8 @@ TEST_F(multiInput, and)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::and_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::AND_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(true);
@@ -270,8 +270,8 @@ TEST_F(multiInput, or)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::or_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::OR_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(true);
@@ -316,8 +316,8 @@ TEST_F(multiInput, sum)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::sum_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::SUM_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -354,8 +354,8 @@ TEST_F(multiInput, average)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::options::multi_input_handling_method,
-                  helics::multi_input_handling_method::average_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::AVERAGE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -390,8 +390,8 @@ TEST_F(multiInput, diff)
     auto& in1 = vFed1->registerInput<double>("");
     in1.addTarget("pub1");
     in1.addTarget("pub2");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::diff_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::DIFF_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -426,8 +426,8 @@ TEST_F(multiInput, vectorize)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::vectorize_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::VECTORIZE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -464,8 +464,8 @@ TEST_F(multiInput, vectorize_string)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::vectorize_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::VECTORIZE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish("test1");
@@ -501,8 +501,8 @@ TEST_F(multiInput, vectorizeComplex)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::vectorize_operation);
+    in1.setOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::VECTORIZE_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(2.0);
@@ -539,8 +539,8 @@ TEST_F(multiInput, max_units)
     in1.addTarget("pub1");
     in1.addTarget("pub2");
     in1.addTarget("pub3");
-    in1.setOption(helics::defs::multi_input_handling_method,
-                  helics::multi_input_handling_method::max_operation);
+    in1.setOption(helics::defs::MULTI_INPUT_HANDLING_METHOD,
+                  helics::MultiInputHandlingMethod::MAX_OPERATION);
     vFed1->enterExecutingMode();
 
     pub1.publish(1.0);
@@ -571,11 +571,11 @@ TEST_F(multiInput, file_config_json)
     auto& p2 = vFed.getPublication(1);
     auto& i1 = vFed.getInput(0);
     vFed.enterExecutingMode();
-    auto res = i1.getOption(helics::defs::options::connections);
+    auto res = i1.getOption(helics::defs::Options::CONNECTIONS);
     EXPECT_EQ(res, 2);
-    res = i1.getOption(helics::defs::options::multi_input_handling_method);
+    res = i1.getOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD);
 
-    EXPECT_EQ(res, helics_multi_input_average_operation);
+    EXPECT_EQ(res, HELICS_MULTI_INPUT_AVERAGE_OPERATION);
 
     p1.publish(11.3);
     p2.publish(14.7);
@@ -596,11 +596,11 @@ TEST_F(multiInput, file_config_toml)
     auto& p2 = vFed.getPublication(1);
     auto& i1 = vFed.getInput(0);
     vFed.enterExecutingMode();
-    auto res = i1.getOption(helics::defs::options::connections);
+    auto res = i1.getOption(helics::defs::Options::CONNECTIONS);
     EXPECT_EQ(res, 2);
-    res = i1.getOption(helics::defs::options::multi_input_handling_method);
+    res = i1.getOption(helics::defs::Options::MULTI_INPUT_HANDLING_METHOD);
 
-    EXPECT_EQ(res, helics_multi_input_average_operation);
+    EXPECT_EQ(res, HELICS_MULTI_INPUT_AVERAGE_OPERATION);
 
     p1.publish(11.3);
     p2.publish(14.7);

@@ -32,7 +32,7 @@ namespace apps {
       protected:
         /** generate a reply to a message*/
         static ActionMessage
-            generateMessageResponse(const ActionMessage& rxcmd, portData& pdata, core_type ctype);
+            generateMessageResponse(const ActionMessage& rxcmd, portData& pdata, CoreType ctype);
         /** get an open port for broker to start*/
         static int getOpenPort(portData& pd);
         /* assign a port in the portData structure*/

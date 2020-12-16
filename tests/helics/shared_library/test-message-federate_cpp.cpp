@@ -30,13 +30,13 @@ TEST_P(mfed_type_tests, message_federate_initialize_tests)
 
     mFed1->enterExecutingMode();
 
-    helics_federate_state mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_state_execution);
+    HelicsFederateState mFed1State = mFed1->getCurrentMode();
+    EXPECT_TRUE(mFed1State == HELICS_STATE_EXECUTION);
 
     mFed1->finalize();
 
     mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
 TEST_P(mfed_type_tests, message_federate_endpoint_registration)
@@ -49,8 +49,8 @@ TEST_P(mfed_type_tests, message_federate_endpoint_registration)
 
     mFed1->enterExecutingMode();
 
-    helics_federate_state mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_state_execution);
+    HelicsFederateState mFed1State = mFed1->getCurrentMode();
+    EXPECT_TRUE(mFed1State == HELICS_STATE_EXECUTION);
 
     EXPECT_EQ(std::string(epid.getName()), "fed0/ep1");
     EXPECT_EQ(std::string(epid2.getName()), "ep2");
@@ -61,7 +61,7 @@ TEST_P(mfed_type_tests, message_federate_endpoint_registration)
     mFed1->finalize();
 
     mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
 TEST_P(mfed_type_tests, message_federate_send_receive)
@@ -77,7 +77,7 @@ TEST_P(mfed_type_tests, message_federate_send_receive)
     std::string data(500, 'a');
 
     epid.sendToAt(data, "ep2", 0.0);
-    helics_time time = mFed1->requestTime(1.0);
+    HelicsTime time = mFed1->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
 
@@ -98,10 +98,10 @@ TEST_P(mfed_type_tests, message_federate_send_receive)
     mFed1->finalize();
 
     auto mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types_simple));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 
 TEST_F(mfed_tests, Message)
 {
@@ -123,7 +123,7 @@ TEST_F(mfed_tests, Message)
     epid.sendMessageZeroCopy(m1);
 
     mFed1->requestTimeAsync(2.0);
-    helics_time time = mFed2->requestTime(1.0);
+    HelicsTime time = mFed2->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
 
@@ -177,7 +177,7 @@ TEST_F(mfed_tests, message_create_from_fed)
     mess.data(data);
 
     epid.sendMessage(mess);
-    helics_time time = mFed1->requestTime(1.0);
+    HelicsTime time = mFed1->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
 
@@ -198,7 +198,7 @@ TEST_F(mfed_tests, message_create_from_fed)
     mFed1->finalize();
 
     auto mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
 TEST_F(mfed_tests, message_create_from_ept)
@@ -219,7 +219,7 @@ TEST_F(mfed_tests, message_create_from_ept)
     mess.data(data);
 
     epid.sendMessage(mess);
-    helics_time time = mFed1->requestTime(1.0);
+    HelicsTime time = mFed1->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
 
@@ -240,7 +240,7 @@ TEST_F(mfed_tests, message_create_from_ept)
     mFed1->finalize();
 
     auto mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
 TEST_F(mfed_tests, message_create_from_fed_after)
@@ -262,7 +262,7 @@ TEST_F(mfed_tests, message_create_from_fed_after)
     mess.data(data);
 
     epid.sendMessage(mess);
-    helics_time time = mFed1->requestTime(1.0);
+    HelicsTime time = mFed1->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
 
@@ -283,7 +283,7 @@ TEST_F(mfed_tests, message_create_from_fed_after)
     mFed1->finalize();
 
     auto mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
 TEST_F(mfed_tests, message_create_from_ept_after)
@@ -304,7 +304,7 @@ TEST_F(mfed_tests, message_create_from_ept_after)
     mess.data(data);
 
     epid.sendMessage(mess);
-    helics_time time = mFed1->requestTime(1.0);
+    HelicsTime time = mFed1->requestTime(1.0);
 
     EXPECT_EQ(time, 1.0);
 
@@ -325,5 +325,5 @@ TEST_F(mfed_tests, message_create_from_ept_after)
     mFed1->finalize();
 
     auto mFed1State = mFed1->getCurrentMode();
-    EXPECT_TRUE(mFed1State == helics_federate_state::helics_state_finalize);
+    EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }

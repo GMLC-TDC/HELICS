@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "CoreTypes.hpp"
 #include "InterfaceInfo.hpp"
 #include "core-data.hpp"
-#include "core-types.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
-#include "helics-time.hpp"
+#include "helicsTime.hpp"
 
 #include <atomic>
 #include <chrono>
@@ -60,7 +60,7 @@ class FederateState {
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
+    std::atomic<FederateStates> state{HELICS_CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{false};  //!< flag indicating that values should only be
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
@@ -128,7 +128,7 @@ class FederateState {
     Time nextMessageTime() const;
 
     /** update the federate state */
-    void setState(federate_state newState);
+    void setState(FederateStates newState);
 
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed(const ActionMessage& cmd) const;
@@ -145,7 +145,7 @@ class FederateState {
     /** get the name of the federate*/
     const std::string& getIdentifier() const { return name; }
     /** get the current state of the federate*/
-    federate_state getState() const;
+    FederateStates getState() const;
     /** get the information that comes from the interface including timing information*/
     InterfaceInfo& interfaces() { return interfaceInformation; }
     /** const version of the interface info retrieval function*/
@@ -253,7 +253,7 @@ class FederateState {
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processQueue() noexcept;
+    MessageProcessingResult processQueue() noexcept;
 
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
@@ -264,11 +264,11 @@ class FederateState {
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processDelayQueue() noexcept;
+    MessageProcessingResult processDelayQueue() noexcept;
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processActionMessage(ActionMessage& cmd);
+    MessageProcessingResult processActionMessage(ActionMessage& cmd);
     /** fill event list
     @param currentTime the time of the update
     */
@@ -312,20 +312,20 @@ class FederateState {
     void setCoreObject(CommonCore* parent);
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/
-    iteration_result waitSetup();
+    IterationResult waitSetup();
     /** process until the initialization state has been entered or there is a failure*/
-    iteration_result enterInitializingMode();
+    IterationResult enterInitializingMode();
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingMode(iteration_request iterate);
+    IterationResult enterExecutingMode(IterationRequest iterate);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param iterate the type of iteration requested
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time requestTime(Time nextTime, iteration_request iterate);
+    iteration_time requestTime(Time nextTime, IterationRequest iterate);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */
@@ -340,7 +340,7 @@ class FederateState {
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
     */
-    iteration_result genericUnspecifiedQueueProcess();
+    IterationResult genericUnspecifiedQueueProcess();
     /** function to process the queue until a disconnect_fed_ack is received*/
     void finalize();
 
@@ -389,13 +389,13 @@ class FederateState {
     /** route a message either forward to parent or add to queue*/
     void routeMessage(const ActionMessage& msg);
     /** create an interface*/
-    void createInterface(handle_type htype,
+    void createInterface(InterfaceType htype,
                          InterfaceHandle handle,
                          const std::string& key,
                          const std::string& type,
                          const std::string& units);
     /** close an interface*/
-    void closeInterface(InterfaceHandle handle, handle_type type);
+    void closeInterface(InterfaceHandle handle, InterfaceType type);
     /** send a command to a federate*/
     void sendCommand(ActionMessage& command);
 
@@ -406,5 +406,5 @@ class FederateState {
 };
 
 /** convert the state into a human readable string*/
-const std::string& fedStateString(federate_state state);
+const std::string& fedStateString(FederateStates state);
 }  // namespace helics

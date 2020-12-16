@@ -16,7 +16,7 @@ struct config_tests: public FederateTestFixture, public ::testing::Test {
 /** test simple creation and destruction*/
 TEST_F(config_tests, control_file_test)
 {
-    helics_broker broker = AddBroker("zmq", 1);
+    HelicsBroker broker = AddBroker("zmq", 1);
     EXPECT_TRUE(nullptr != broker);
 
     std::string testFile(TEST_DIR);

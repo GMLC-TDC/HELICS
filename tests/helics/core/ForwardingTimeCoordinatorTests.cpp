@@ -148,21 +148,21 @@ TEST(ftc_tests, execMode_entry)
     ftc.addDependency(fed2);
     ftc.addDependency(fed3);
     ftc.enteringExecMode();
-    // message_processing_result
+    // MessageProcessingResult
     auto ret = ftc.checkExecEntry();
-    EXPECT_TRUE(ret == message_processing_result::continue_processing);
+    EXPECT_TRUE(ret == MessageProcessingResult::CONTINUE_PROCESSING);
 
     ActionMessage execReady(CMD_EXEC_REQUEST);
     execReady.source_id = fed2;
     auto modified = ftc.processTimeMessage(execReady);
     EXPECT_TRUE(modified);
     ret = ftc.checkExecEntry();
-    EXPECT_TRUE(ret == message_processing_result::continue_processing);
+    EXPECT_TRUE(ret == MessageProcessingResult::CONTINUE_PROCESSING);
     execReady.source_id = fed3;
     modified = ftc.processTimeMessage(execReady);
     EXPECT_TRUE(modified);
     ret = ftc.checkExecEntry();
-    EXPECT_TRUE(ret == message_processing_result::next_step);
+    EXPECT_TRUE(ret == MessageProcessingResult::NEXT_STEP);
 }
 
 void getFTCtoExecMode(ForwardingTimeCoordinator& ftc)
@@ -174,7 +174,7 @@ void getFTCtoExecMode(ForwardingTimeCoordinator& ftc)
         ftc.processTimeMessage(execReady);
     }
     auto ret = ftc.checkExecEntry();
-    EXPECT_TRUE(ret == message_processing_result::next_step);
+    EXPECT_TRUE(ret == MessageProcessingResult::NEXT_STEP);
 
     ActionMessage execGrant(CMD_EXEC_GRANT);
     for (auto dep : depList) {

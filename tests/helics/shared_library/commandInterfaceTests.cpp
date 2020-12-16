@@ -20,7 +20,7 @@ TEST_F(command_tests, federate_federate_command)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
     // register the publications
-    helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
+    helicsFederateRegisterGlobalPublication(vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
     helicsFederateSendCommand(vFed1, helicsFederateGetName(vFed2), "test", nullptr);
@@ -45,7 +45,7 @@ TEST_F(command_tests, core_federate_command)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
     // register the publications
-    helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
+    helicsFederateRegisterGlobalPublication(vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
     auto core = helicsFederateGetCore(vFed1, nullptr);
@@ -72,7 +72,7 @@ TEST_F(command_tests, broker_federate_command)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
     // register the publications
-    helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
+    helicsFederateRegisterGlobalPublication(vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
     helicsBrokerSendCommand(brokers[0], helicsFederateGetName(vFed2), "test", nullptr);

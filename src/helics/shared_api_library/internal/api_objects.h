@@ -47,8 +47,8 @@ class BrokerObject {
     int valid{0};
 };
 
-/** get the brokerObject from a helics_broker and verify it is valid*/
-BrokerObject* getBrokerObject(helics_broker broker, helics_error* err) noexcept;
+/** get the brokerObject from a HelicsBroker and verify it is valid*/
+BrokerObject* getBrokerObject(HelicsBroker broker, HelicsError* err) noexcept;
 /** object wrapping a core for the c-api*/
 class CoreObject {
   public:
@@ -60,8 +60,8 @@ class CoreObject {
     ~CoreObject();
 };
 
-/** get the CoreObject from a helics_core and verify it is valid*/
-CoreObject* getCoreObject(helics_core core, helics_error* err) noexcept;
+/** get the CoreObject from a HelicsCore and verify it is valid*/
+CoreObject* getCoreObject(HelicsCore core, HelicsError* err) noexcept;
 
 class InputObject;
 class PublicationObject;
@@ -96,8 +96,8 @@ class FedObject {
     ~FedObject();
 };
 
-/** get the FedObject from a helics_broker and verify it is valid*/
-FedObject* getFedObject(helics_federate fed, helics_error* err) noexcept;
+/** get the FedObject from a HelicsBroker and verify it is valid*/
+FedObject* getFedObject(HelicsFederate fed, HelicsError* err) noexcept;
 
 /** object wrapping a subscription*/
 class InputObject {
@@ -152,16 +152,16 @@ class QueryObject {
 /** definitions to simplify error returns if an error already exists*/
 #define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
     do {                                                                                                                                   \
-        if (((err) != nullptr) && ((err)->error_code != 0)) {                                                                              \
+        if (((err) != nullptr) && ((err)->errorCode != 0)) {                                                                               \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
 
 /** assign an error string and code to an error object if it exists*/
-inline void assignError(helics_error* err, int errorCode, const char* string)
+inline void assignError(HelicsError* err, int errorCode, const char* string)
 {
     if (err != nullptr) {
-        err->error_code = errorCode;
+        err->errorCode = errorCode;
         err->message = string;
     }
 }
@@ -175,33 +175,33 @@ extern const std::string nullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, helics_error_invalid_argument, nullStringArgument.c_str());                                                   \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, nullStringArgument.c_str());                                                   \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
 
-helics::Federate* getFed(helics_federate fed, helics_error* err);
-helics::ValueFederate* getValueFed(helics_federate fed, helics_error* err);
-helics::MessageFederate* getMessageFed(helics_federate fed, helics_error* err);
-helics::Core* getCore(helics_core core, helics_error* err);
-helics::Broker* getBroker(helics_broker broker, helics_error* err);
-helics::Message* getMessageObj(helics_message message, helics_error* err);
+helics::Federate* getFed(HelicsFederate fed, HelicsError* err);
+helics::ValueFederate* getValueFed(HelicsFederate fed, HelicsError* err);
+helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
+helics::Core* getCore(HelicsCore core, HelicsError* err);
+helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
+helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
 /** create a message object from a message pointer*/
-helics_message createAPIMessage(std::unique_ptr<helics::Message>& mess);
+HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& mess);
 
-std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed, helics_error* err);
-std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed, helics_error* err);
-std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_federate fed, helics_error* err);
-std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core, helics_error* err);
+std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(HelicsFederate fed, HelicsError* err);
+std::shared_ptr<helics::Core> getCoreSharedPtr(HelicsCore core, HelicsError* err);
 /**centralized error handler for the C interface*/
-void helicsErrorHandler(helics_error* err) noexcept;
+void helicsErrorHandler(HelicsError* err) noexcept;
 /** check if the output argument string is valid
 @details  it takes and const char * since it doesn't modify it but it is intended to checked for output strings
 function checks the output String is not nullptr and if the maxlen >0
 fill the err term if it is not valid and return false,  otherwise return true if everything looks fine
 
 */
-bool checkOutArgString(const char* outputString, int maxlen, helics_error* err);
+bool checkOutArgString(const char* outputString, int maxlen, HelicsError* err);
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder {

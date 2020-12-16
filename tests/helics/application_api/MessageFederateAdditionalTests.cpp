@@ -44,12 +44,12 @@ TEST_P(mfed_add_single_type_tests, initialize_tests)
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     mFed1->finalize();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_F(mfed_tests, endpoint_registration)
@@ -62,7 +62,7 @@ TEST_F(mfed_tests, endpoint_registration)
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto& sv = epid.getKey();
     auto& sv2 = epid2.getKey();
@@ -77,7 +77,7 @@ TEST_F(mfed_tests, endpoint_registration)
     EXPECT_TRUE(mFed1->getEndpoint("ep2").getHandle() == epid2.getHandle());
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 // same as previous test case but using endpoint objects
@@ -90,7 +90,7 @@ TEST_P(mfed_add_single_type_tests, endpoint_registration_objs)
     helics::Endpoint epid2(helics::GLOBAL, mFed1.get(), "ep2", "random");
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto const& sv = epid.getName();
     auto const& sv2 = epid2.getName();
@@ -104,7 +104,7 @@ TEST_P(mfed_add_single_type_tests, endpoint_registration_objs)
     EXPECT_TRUE(mFed1->getEndpoint("ep2").getHandle() == epid2.getHandle());
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback)
@@ -124,11 +124,11 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
 
     mFed1->setMessageNotificationCallback(mend);
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     epid.sendTo(data, "ep2");
@@ -152,7 +152,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
@@ -172,11 +172,11 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
     ep2.setCallback(mend);
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     ep1.sendTo(data, "ep2");
@@ -198,7 +198,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
@@ -218,11 +218,11 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
     ep2.setCallback(mend);
 
-    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     ep1.sendTo(data, "ep2");
@@ -244,7 +244,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
@@ -264,15 +264,15 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setProperty(helics_property_time_delta, 1.0);
-    mFed2->setProperty(helics_property_time_delta, 1.0);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::executing);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     helics::SmallBuffer data1(500, std::byte{'a'});
     helics::SmallBuffer data2(400, std::byte{'b'});
@@ -326,8 +326,8 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     mFed2->finalize();
     mFed1->finalizeComplete();
 
-    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 //#define ENABLE_OUTPUT
@@ -338,7 +338,7 @@ class PingPongFed {
     std::unique_ptr<helics::MessageFederate> mFed;
     helics::Time delta;  // the minimum time delta for the federate
     std::string name;  //!< the name of the federate
-    helics::core_type coreType;
+    helics::CoreType coreType;
     std::vector<std::pair<helics::Time, std::string>> triggers;
     helics::Endpoint* ep{nullptr};
     int index{0};
@@ -346,7 +346,7 @@ class PingPongFed {
   public:
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
-    PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
+    PingPongFed(const std::string& fname, helics::Time tDelta, helics::CoreType ctype):
         delta(tDelta), name(fname), coreType(ctype)
     {
         if (delta <= 0.0) {
@@ -360,7 +360,7 @@ class PingPongFed {
         helics::FederateInfo fi(coreType);
         fi.coreName = "pptest";
         fi.coreInitString = "-f 3";
-        fi.setProperty(helics_property_time_delta, delta);
+        fi.setProperty(HELICS_PROPERTY_TIME_DELTA, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string("about to create federate ") + name + "\n";
 #endif
@@ -473,11 +473,11 @@ TEST_P(mfed_add_type_tests, threefedPingPong)
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_single_type_tests,
-                         ::testing::ValuesIn(core_types_single));
-INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes_single));
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_all_type_tests,
-                         ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_all));
 
 static constexpr const char* config_files[] = {"example_message_fed.json",
                                                "example_message_fed.toml"};
@@ -569,7 +569,7 @@ TEST_F(mfed_tests, send_message1)
 
 TEST(messageFederate, constructor1)
 {
-    helics::MessageFederate mf1("fed1", "--core_type=test --autobroker --corename=mfc");
+    helics::MessageFederate mf1("fed1", "--CoreType=test --autobroker --corename=mfc");
     // try out loading a file
     EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")),
                  helics::HelicsException);
@@ -598,9 +598,9 @@ TEST(messageFederate, constructor1)
 
 TEST(messageFederate, constructor2)
 {
-    auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=cb --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    auto cr = helics::CoreFactory::create(helics::CoreType::TEST, "--name=cb --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
     helics::MessageFederate mf1("fed1", cr, fi);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
@@ -616,10 +616,10 @@ TEST(messageFederate, constructor2)
 
 TEST(messageFederate, constructor3)
 {
-    helics::CoreApp cr("--core_type=test --name=cb2 --autobroker");
+    helics::CoreApp cr("--CoreType=test --name=cb2 --autobroker");
 
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
     helics::MessageFederate mf1("fed1", cr, fi);
 
     mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
@@ -637,7 +637,7 @@ TEST(messageFederate, constructor4)
 {
     helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
 
-    mf1.setProperty(helics_property_int_log_level, helics_log_level_error);
+    mf1.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
 
     mf1.registerGlobalFilter("filt1");
     mf1.registerGlobalFilter("filt2");
@@ -650,7 +650,7 @@ TEST(messageFederate, constructor4)
 
 TEST(messageFederate, constructor5)
 {
-    helics::MessageFederate mf1("--core_type=test --autobroker --corename=mfc5 --name=fedmd");
+    helics::MessageFederate mf1("--CoreType=test --autobroker --corename=mfc5 --name=fedmd");
     // try out loading a file
 
     EXPECT_EQ(mf1.getName(), "fedmd");

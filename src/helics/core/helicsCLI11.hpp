@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 #undef CLI11_EXPERIMENTAL_OPTIONAL
-#include "core-types.hpp"
-#include "helics-time.hpp"
+#include "CoreTypes.hpp"
+#include "helicsTime.hpp"
 #if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #    include "../application_api/timeOperations.hpp"
 #    include "../application_api/typeOperations.hpp"
@@ -145,7 +145,7 @@ class helicsCLI11App: public CLI::App {
               "--coretype,-t",
               [this](const std::string& val) {
                   coreType = coreTypeFromString(val);
-                  if (coreType == core_type::UNRECOGNIZED) {
+                  if (coreType == CoreType::UNRECOGNIZED) {
                       throw CLI::ValidationError(val + " is NOT a recognized core type");
                   }
               },
@@ -154,14 +154,14 @@ class helicsCLI11App: public CLI::App {
             ->ignore_case()
             ->ignore_underscore();
     }
-    core_type getCoreType() const { return coreType; }
+    CoreType getCoreType() const { return coreType; }
     /** set default core type*/
-    void setDefaultCoreType(core_type type) { coreType = type; }
+    void setDefaultCoreType(CoreType type) { coreType = type; }
 
   private:
     std::vector<std::function<void()>> cbacks;
     std::vector<std::string> remArgs;
-    core_type coreType{core_type::DEFAULT};
+    CoreType coreType{CoreType::DEFAULT};
 };
 }  // namespace helics
 

@@ -42,7 +42,7 @@ TEST_P(filter_single_type_test, message_filter_registration)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "message");
     // broker->setLoggingLevel (3);
     broker.reset();
@@ -75,7 +75,7 @@ TEST_P(filter_single_type_test, message_filter_registration)
     fFed->finalize();
     // std::cout << "fFed returned\n";
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     FullDisconnect();
 }
 
@@ -86,7 +86,7 @@ simulation
 TEST_P(filter_single_type_test, message_filter_function)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -106,7 +106,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -143,7 +143,7 @@ TEST_P(filter_single_type_test, message_filter_function)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /** test a filter operator
@@ -154,7 +154,7 @@ simulation
 TEST_P(filter_single_type_test, message_filter_object)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -163,7 +163,7 @@ TEST_P(filter_single_type_test, message_filter_object)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& Filt = helics::make_filter(helics::filter_types::delay, fFed.get());
+    auto& Filt = helics::make_filter(helics::FilterTypes::DELAY, fFed.get());
     Filt.addSourceTarget("port1");
     Filt.set("delay", 2.5);
 
@@ -171,7 +171,7 @@ TEST_P(filter_single_type_test, message_filter_object)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -204,7 +204,7 @@ TEST_P(filter_single_type_test, message_filter_object)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /** test a remove dest filter operator
@@ -215,7 +215,7 @@ simulation
 TEST_P(filter_single_type_test, message_dest_filter_function)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -235,7 +235,7 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -267,7 +267,7 @@ TEST_P(filter_single_type_test, message_dest_filter_function)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /** test a remote dest filter operator
@@ -297,7 +297,7 @@ TEST_P(filter_all_type_test, message_dest_filter_function_t2)
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
 
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -326,7 +326,7 @@ TEST_P(filter_all_type_test, message_dest_filter_function_t2)
     mFed1->finalizeAsync();
     mFed2->finalize();
     mFed1->finalizeComplete();
-    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /** test a remove dest filter operator
@@ -337,7 +337,7 @@ simulation
 TEST_P(filter_single_type_test, message_dest_filter_object)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -347,7 +347,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
     auto f1 =
-        helics::make_filter(helics::filter_types::delay, fFed->getCorePointer().get(), "filter1");
+        helics::make_filter(helics::FilterTypes::DELAY, fFed->getCorePointer().get(), "filter1");
     f1->addDestinationTarget("port2");
     f1->set("delay", 2.5);
 
@@ -355,7 +355,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -390,7 +390,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     helics::cleanupHelicsLibrary();
     EXPECT_TRUE(!filterCore->isConnected());
     EXPECT_TRUE(!mCore->isConnected());
@@ -418,7 +418,7 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     fFed2->enterExecutingModeComplete();
 
     auto& p2Name = p2.getName();
-    EXPECT_TRUE(fFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, p2Name);
 
@@ -471,8 +471,8 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     fFed2->finalize();
     mFed->finalizeComplete();
     fFed1->finalizeComplete();
-    EXPECT_TRUE(fFed1->getCurrentMode() == helics::Federate::modes::finalize);
-    if (fFed1->getCurrentMode() != helics::Federate::modes::finalize) {
+    EXPECT_TRUE(fFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    if (fFed1->getCurrentMode() != helics::Federate::Modes::FINALIZE) {
         correct = false;
     }
     helics::cleanupHelicsLibrary();
@@ -488,7 +488,7 @@ simulation
 TEST_P(filter_single_type_test, message_filter_function_two_stage)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -514,7 +514,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage)
 TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_target)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -542,7 +542,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_targe
 TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_target_dest)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -571,7 +571,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_targe
 TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_link)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -601,7 +601,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
 TEST_F(filter_tests, message_filter_function_two_stage_brokerApp_filter_link)
 {
     auto broker = AddBroker("test", 3);
-    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "message");
 
@@ -632,7 +632,7 @@ TEST_F(filter_tests, message_filter_function_two_stage_brokerApp_filter_link)
 TEST_F(filter_tests, message_filter_function_two_stage_coreApp_filter_link)
 {
     auto broker = AddBroker("test", 3);
-    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "message");
 
@@ -663,7 +663,7 @@ TEST_F(filter_tests, message_filter_function_two_stage_coreApp_filter_link)
 TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_link_switch_order)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -686,7 +686,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
 TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_link_late)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -714,7 +714,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
     broker->addSourceFilterToEndpoint("filter1", "port1");
     broker->addDestinationFilterToEndpoint("filter2", "port2");
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -740,7 +740,7 @@ simulation
 TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
 {
     auto broker = AddBroker(GetParam(), 3);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
@@ -754,11 +754,11 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
 
-    auto& f1 = helics::make_filter(helics::filter_types::delay, fFed.get(), "filter1");
+    auto& f1 = helics::make_filter(helics::FilterTypes::DELAY, fFed.get(), "filter1");
     f1.addSourceTarget("port1");
     f1.set("delay", 1.25);
 
-    auto& f2 = helics::make_filter(helics::filter_types::delay, fFed.get(), "filter2");
+    auto& f2 = helics::make_filter(helics::FilterTypes::DELAY, fFed.get(), "filter2");
     f2.addSourceTarget("port1");
     f2.set("delay", 1.25);
 
@@ -768,7 +768,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
     fFed->enterExecutingModeComplete();
     fFed2->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -811,7 +811,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_object)
     fFed2->finalize();
     mFed->finalizeComplete();
     fFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     helics::cleanupHelicsLibrary();
     EXPECT_TRUE(!filterCore->isConnected());
     EXPECT_TRUE(!mCore->isConnected());
@@ -824,7 +824,7 @@ simulation
 TEST_P(filter_single_type_test, message_filter_function2)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -847,7 +847,7 @@ TEST_P(filter_single_type_test, message_filter_function2)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -881,13 +881,13 @@ TEST_P(filter_single_type_test, message_filter_function2)
     mFed->finalizeAsync();
     fFed->finalize();
     mFed->finalizeComplete();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(filter_single_type_test, message_filter_function2_rem_target)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -910,7 +910,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -955,7 +955,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
 
     mFed->finalize();
     fFed->finalize();
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 class filter_test: public ::testing::Test, public FederateTestFixture {
@@ -986,7 +986,7 @@ TEST_F(filter_test, message_clone_test)
     sFed->enterExecutingModeComplete();
     dcFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "dest");
 
@@ -1025,7 +1025,7 @@ TEST_F(filter_test, message_clone_test)
     dcFed->finalize();
     sFed->finalizeComplete();
     dFed->finalizeComplete();
-    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_F(filter_test, message_multi_clone_test)
@@ -1058,7 +1058,7 @@ TEST_F(filter_test, message_multi_clone_test)
     sFed2->enterExecutingModeComplete();
     dcFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     helics::SmallBuffer data2(400, 'b');
     p1.sendTo(data, "dest");
@@ -1127,7 +1127,7 @@ TEST_F(filter_test, message_multi_clone_test)
     sFed->finalizeComplete();
     sFed2->finalizeComplete();
     dFed->finalizeComplete();
-    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(sFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 /** test whether a core termination when it should
@@ -1136,7 +1136,7 @@ TEST_F(filter_test, message_multi_clone_test)
 TEST_P(filter_single_type_test, test_filter_core_termination)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -1156,7 +1156,7 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
     mFed->enterExecutingMode();
     fFed->enterExecutingModeComplete();
 
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
     p1.sendTo(data, "port2");
 
@@ -1192,10 +1192,10 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
         std::this_thread::sleep_for(std::chrono::milliseconds(400));
     }
     EXPECT_TRUE(!c2->isConnected());
-    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_single_type_test,
-                         ::testing::ValuesIn(core_types_simple));
-INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));

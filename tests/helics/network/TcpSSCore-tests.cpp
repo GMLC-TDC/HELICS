@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/core/core-types.hpp"
+#include "helics/core/CoreTypes.hpp"
 #include "helics/network/networkDefaults.hpp"
 #include "helics/network/tcp/TcpBroker.h"
 #include "helics/network/tcp/TcpCommsSS.h"
@@ -341,7 +341,7 @@ TEST(TcpSSCore, tcpSSCore_initialization)
     std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
     std::string initializationString = "-f 1 --name=core1";
-    auto core = helics::CoreFactory::create(helics::core_type::TCP_SS, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::TCP_SS, initializationString);
 
     ASSERT_TRUE(core);
     EXPECT_TRUE(core->isConfigured());
@@ -426,9 +426,9 @@ TEST(TcpSSCore, tcpSSCore_core_broker_default)
     std::this_thread::sleep_for(std::chrono::milliseconds(400));
     std::string initializationString = "-f 1";
 
-    auto broker = helics::BrokerFactory::create(helics::core_type::TCP_SS, initializationString);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TCP_SS, initializationString);
     ASSERT_TRUE(broker);
-    auto core = helics::CoreFactory::create(helics::core_type::TCP_SS, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::TCP_SS, initializationString);
     ASSERT_TRUE(core);
     bool connected = broker->isConnected();
     EXPECT_TRUE(connected);
@@ -449,7 +449,7 @@ TEST(TcpSSCore, tcpSSCore_core_broker_default)
 TEST(TcpSSCore, commFactory)
 {
     auto comm = helics::CommFactory::create("tcpss");
-    auto comm2 = helics::CommFactory::create(helics::core_type::TCP_SS);
+    auto comm2 = helics::CommFactory::create(helics::CoreType::TCP_SS);
 
     EXPECT_TRUE(dynamic_cast<helics::tcp::TcpCommsSS*>(comm.get()) != nullptr);
     EXPECT_TRUE(dynamic_cast<helics::tcp::TcpCommsSS*>(comm2.get()) != nullptr);
