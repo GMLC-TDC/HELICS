@@ -15,7 +15,7 @@ namespace inproc {
 
     /** implementation for the core that uses IPC messages to communicate*/
     using InprocBroker =
-        NetworkBroker<InprocComms, interface_type::inproc, static_cast<int>(CoreType::INPROC)>;
+        NetworkBroker<InprocComms, InterfaceTypes::INPROC, static_cast<int>(CoreType::INPROC)>;
 
 }  // namespace inproc
 }  // namespace helics

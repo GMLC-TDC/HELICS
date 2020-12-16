@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-NetworkCommsInterface::NetworkCommsInterface(interface_type type,
+NetworkCommsInterface::NetworkCommsInterface(InterfaceTypes type,
                                              CommsInterface::thread_generation threads) noexcept:
     CommsInterface(threads),
     networkType(type)
@@ -84,8 +84,8 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     PortNumber = netInfo.portNumber;
     maxRetries = netInfo.maxRetries;
     switch (networkType) {
-        case interface_type::tcp:
-        case interface_type::udp:
+        case InterfaceTypes::TCP:
+        case InterfaceTypes::UDP:
             removeProtocol(brokerTargetAddress);
             removeProtocol(localTargetAddress);
             break;
@@ -98,7 +98,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             localTargetAddress = localHostString;
         } else if (bTarget.empty()) {
             switch (interfaceNetwork) {
-                case interface_networks::local:
+                case InterfaceNetworks::LOCAL:
                     localTargetAddress = localHostString;
                     break;
                 default:

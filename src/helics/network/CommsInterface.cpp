@@ -113,15 +113,15 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
         brokerInitString = netInfo.brokerInitString;
         autoBroker = netInfo.autobroker;
         switch (netInfo.server_mode) {
-            case NetworkBrokerData::server_mode_options::server_active:
-            case NetworkBrokerData::server_mode_options::server_default_active:
+            case NetworkBrokerData::ServerModeOptions::SERVER_ACTIVE:
+            case NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE:
                 serverMode = true;
                 break;
-            case NetworkBrokerData::server_mode_options::server_deactivated:
-            case NetworkBrokerData::server_mode_options::server_default_deactivated:
+            case NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED:
+            case NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_DEACTIVATED:
                 serverMode = false;
                 break;
-            case NetworkBrokerData::server_mode_options::unspecified:
+            case NetworkBrokerData::ServerModeOptions::UNSPECIFIED:
                 break;
         }
         propertyUnLock();
@@ -130,7 +130,7 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 
 void CommsInterface::loadTargetInfo(const std::string& localTarget,
                                     const std::string& brokerTarget,
-                                    interface_networks targetNetwork)
+                                    InterfaceNetworks targetNetwork)
 {
     if (propertyLock()) {
         localTargetAddress = localTarget;

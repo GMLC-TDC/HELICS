@@ -30,7 +30,7 @@ class MultiBroker: public CoreBroker {
     std::unique_ptr<CommsInterface>
         masterComm;  //!< the primary comms object or the one that links with the master
     NetworkBrokerData netInfo{
-        interface_type::tcp};  //!< structure containing the networking information
+        InterfaceTypes::TCP};  //!< structure containing the networking information
     std::string configFile;  //!< the name of the config file in use
     std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
     CoreType type{CoreType::MULTI};  //!< the core type of the master controller

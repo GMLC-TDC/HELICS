@@ -17,10 +17,10 @@ namespace tcp {
     class TcpComms;
     class TcpCommsSS;
     /** implementation for the core that uses tcp messages to communicate*/
-    using TcpCore = NetworkCore<TcpComms, interface_type::tcp>;
+    using TcpCore = NetworkCore<TcpComms, InterfaceTypes::TCP>;
 
     /** implementation for the core that uses tcp messages to communicate*/
-    class TcpCoreSS final: public NetworkCore<TcpCommsSS, interface_type::tcp> {
+    class TcpCoreSS final: public NetworkCore<TcpCommsSS, InterfaceTypes::TCP> {
       public:
         /** default constructor*/
         TcpCoreSS() noexcept;

@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-template<class COMMS, interface_type baseline = interface_type::ip>
+template<class COMMS, InterfaceTypes baseline = InterfaceTypes::IP>
 class NetworkCore: public CommsBroker<COMMS, CommonCore> {
   public:
     /** default constructor*/

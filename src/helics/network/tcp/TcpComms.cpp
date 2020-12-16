@@ -22,7 +22,7 @@ namespace helics {
 namespace tcp {
     using asio::ip::tcp;
 
-    TcpComms::TcpComms() noexcept: NetworkCommsInterface(interface_type::tcp) {}
+    TcpComms::TcpComms() noexcept: NetworkCommsInterface(InterfaceTypes::TCP) {}
 
     int TcpComms::getDefaultBrokerPort() const { return DEFAULT_TCP_BROKER_PORT_NUMBER; }
 

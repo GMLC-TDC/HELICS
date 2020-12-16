@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-enum class interface_networks : char;
+enum class InterfaceNetworks : char;
 
 /** implementation of a generic communications interface
  */
@@ -41,7 +41,7 @@ class CommsInterface {
     virtual void loadNetworkInfo(const NetworkBrokerData& netInfo);
     void loadTargetInfo(const std::string& localTarget,
                         const std::string& brokerTarget,
-                        interface_networks targetNetwork = interface_networks::local);
+                        InterfaceNetworks targetNetwork = InterfaceNetworks::LOCAL);
     /** transmit a message along a particular route
      */
     void transmit(route_id rid, const ActionMessage& cmd);
@@ -147,7 +147,7 @@ class CommsInterface {
     // communication to not spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
         false};  //!< flag indicating that the comm system is in the process of disconnecting
-    interface_networks interfaceNetwork = interface_networks::local;
+    InterfaceNetworks interfaceNetwork = InterfaceNetworks::LOCAL;
 
   private:
     std::thread queue_transmitter;  //!< single thread for sending data

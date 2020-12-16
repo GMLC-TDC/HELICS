@@ -16,7 +16,7 @@ TEST(networkData_tests, basic_test)
     parser->helics_parse("--broker=bob --local_interface=harry --ipv4");
     EXPECT_EQ(bdata.brokerAddress, "bob");
     EXPECT_EQ(bdata.localInterface, "harry");
-    EXPECT_TRUE(bdata.interfaceNetwork == helics::interface_networks::ipv4);
+    EXPECT_TRUE(bdata.interfaceNetwork == helics::InterfaceNetworks::IPV4);
     parser->helics_parse("--brokername=tom --brokerport=20755 --port 45");
     EXPECT_EQ(bdata.brokerName, "tom");
     EXPECT_EQ(bdata.brokerPort, 20755);
@@ -37,13 +37,13 @@ TEST(networkData_tests, networkbrokerdata_removeProtocol_test)
 
 TEST(networkData_tests, networkbrokerdata_addProtocol_test)
 {
-    EXPECT_EQ(helics::addProtocol("127.0.0.1", helics::interface_type::tcp), "tcp://127.0.0.1");
+    EXPECT_EQ(helics::addProtocol("127.0.0.1", helics::InterfaceTypes::TCP), "tcp://127.0.0.1");
 }
 
 TEST(networkData_tests, networkbrokerdata_insertProtocol_test)
 {
     std::string networkAddress = "127.0.0.1";
-    helics::insertProtocol(networkAddress, helics::interface_type::tcp);
+    helics::insertProtocol(networkAddress, helics::InterfaceTypes::TCP);
     EXPECT_EQ(networkAddress, "tcp://127.0.0.1");
 }
 
