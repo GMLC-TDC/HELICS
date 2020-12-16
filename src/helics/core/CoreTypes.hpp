@@ -53,7 +53,6 @@ enum class CoreType : int {
     NULLCORE = HELICS_CORE_TYPE_NULL,  //!< explicit core type that doesn't exist
     UNRECOGNIZED = 22,  //!< unknown
     MULTI = 45  //!< use the multi-broker
-
 };
 
 /** enumeration of the possible message processing results*/
@@ -64,7 +63,7 @@ enum class MessageProcessingResult : signed char {
     NEXT_STEP = 0,  //!< indicator that the iterations have completed
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
-    ERROR_RESULT = 7,  //!< indicator that an error has occurred
+    ERROR_RESULT = 7  //!< indicator that an error has occurred
 };
 /** function to check if the message processing result should be returned or processing continued*/
 inline bool returnableResult(MessageProcessingResult result)
@@ -77,14 +76,14 @@ enum class IterationResult : signed char {
                     //!< the next step
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
-    ERROR_RESULT = 7,  //!< indicator that an error has occurred
+    ERROR_RESULT = 7  //!< indicator that an error has occurred
 };
 
 /** enumeration of the possible iteration requests by a federate*/
 enum class IterationRequest : signed char {
     NO_ITERATIONS = 0,  //!< indicator that the iterations have completed
     FORCE_ITERATION = 1,  //!< force an iteration whether it is needed or not
-    ITERATE_IF_NEEDED = 2,  //!< indicator that the iterations need to continue
+    ITERATE_IF_NEEDED = 2  //!< indicator that the iterations need to continue
 };
 
 /** define the type of the handle*/
@@ -93,7 +92,7 @@ enum class InterfaceType : char {
     PUBLICATION = 'p',  //!< handle to output interface
     INPUT = 'i',  //!< handle to a input interface
     ENDPOINT = 'e',  //!< handle to an endpoint
-    FILTER = 'f',  //!< handle to a filter
+    FILTER = 'f'  //!< handle to a filter
 };
 
 }  // namespace helics

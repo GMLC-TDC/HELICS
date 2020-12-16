@@ -18,6 +18,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - Minimum build requirements to C++17
 - Many of the API functions now use `string_view` instead of `const std::string &`
 - The C shared library now comes with only a single header `helics.h` this should be included for all uses of the C shared library
+- The style of enumerations and structures was changed to match an updated [style guide](./docs/developer-guide/style.md)
 
 ### Fixed
 
