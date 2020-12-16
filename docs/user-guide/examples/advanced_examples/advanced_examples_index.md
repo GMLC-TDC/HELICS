@@ -1,25 +1,10 @@
-:tocdepth: 1
-
 # Advanced Examples
 
 
 The Advanced Examples teach four concepts to build on a default setup:
 
 
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-    :hidden:
-    
-    advanced_default
-    advanced_brokers_simultaneous
-    advanced_brokers_hierarchies
-    advanced_brokers_multibroker
-    advanced_query
-    advanced_multi_input
-    advanced_orchestration
 
-```
 
 ![](../../../img/user_guide_combinations_advanced.png)
 
