@@ -74,8 +74,8 @@ int main(int argc, char* argv[])
     cFed->enterExecutingMode();
     std::cout << "entered exec State\n";
     for (int i = 1; i < 10; ++i) {
-        std::string message =
-            std::string("message sent from ") + name + " to " + etarget + " at time " + std::to_string(i);
+        std::string message = std::string("message sent from ") + name + " to " + etarget +
+            " at time " + std::to_string(i);
         id.sendTo(message.data(), message.size(), etarget);
         pubid.publish(i);
         std::cout << message << std::endl;

@@ -33,8 +33,8 @@ A list of known PRs that made breaking changes is also provided.
 - `helics_message_object` typedef was renamed to `HelicsMessage` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `HelicsMessage`. Changed in [#1363][1].
 - Renamed `helicsEndpointSendMessageObject` to `helicsEndpointSendMessage`, `helicsSendMessageObjectZeroCopy` to `helicsSendMessageZeroCopy`, `helicsEndpointGetMessageObject` to `helicsEndpointGetMessage`, `helicsEndpointCreateMessageObject` to `helicsEndpointCreateMessage`, `helicsFederateGetMessageObject` to `helicsFederateGetMessage`, and `helicsFederateCreateMessageObject` to `helicsFederateCreateMessage`. Changed in [#1363][1].
 - Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [#1363][1].
-- all constants such as flags and properties are now CAPITAL_SNAKE_CASE  
-- all structures are now CamelCase,  though the old form will be available in helics3 though will be deprecated at some point.  
+- all constants such as flags and properties are now CAPITAL_SNAKE_CASE
+- all structures are now CamelCase, though the old form will be available in helics3 though will be deprecated at some point.
 
 ### C++98 API (wrapper around the C Shared API)
 
