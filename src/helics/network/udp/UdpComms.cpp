@@ -23,7 +23,7 @@ namespace helics {
 namespace udp {
     using asio::ip::udp;
     UdpComms::UdpComms():
-        NetworkCommsInterface(interface_type::udp), promisePort(std::promise<int>())
+        NetworkCommsInterface(InterfaceTypes::UDP), promisePort(std::promise<int>())
     {
         futurePort = promisePort.get_future();
     }
@@ -46,9 +46,9 @@ namespace udp {
     /** destructor*/
     UdpComms::~UdpComms() { disconnect(); }
 
-    static inline auto udpnet(interface_networks net)
+    static inline auto udpnet(InterfaceNetworks net)
     {
-        return (net != interface_networks::ipv6) ? udp::v4() : udp::v6();
+        return (net != InterfaceNetworks::IPV6) ? udp::v4() : udp::v6();
     }
 
     void UdpComms::queue_rx_function()

@@ -20,13 +20,13 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out user-directed logging functionality
  */
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST(logging_tests, basic_logging)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -117,7 +117,7 @@ TEST(logging_tests, check_log_message)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -146,7 +146,7 @@ TEST(logging_tests, check_log_message_functions)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, helics_log_level_trace);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -157,33 +157,33 @@ TEST(logging_tests, check_log_message_functions)
         });
 
     Fed->enterExecutingMode();
-    Fed->logErrorMessage("test ERROR");
-    Fed->logWarningMessage("test WARNING");
-    Fed->logInfoMessage("test INFO");
-    Fed->logDebugMessage("test DEBUG");
+    Fed->logErrorMessage("test error");
+    Fed->logWarningMessage("test warning");
+    Fed->logInfoMessage("test info");
+    Fed->logDebugMessage("test debug");
     Fed->requestNextStep();
     Fed->finalize();
 
     auto llock = mlog.lock();
     int order = 0;
     for (auto& m : llock) {
-        if (m.second.find("ERROR") != std::string::npos) {
-            EXPECT_EQ(m.first, helics_log_level_error);
+        if (m.second.find("error") != std::string::npos) {
+            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_ERROR);
             EXPECT_EQ(order, 0);
             order = 1;
         }
-        if (m.second.find("WARNING") != std::string::npos) {
-            EXPECT_EQ(m.first, helics_log_level_warning);
+        if (m.second.find("warning") != std::string::npos) {
+            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_WARNING);
             EXPECT_EQ(order, 1);
             order = 2;
         }
-        if (m.second.find("INFO") != std::string::npos) {
-            EXPECT_EQ(m.first, helics_log_level_summary);
+        if (m.second.find("info") != std::string::npos) {
+            EXPECT_EQ(m.first, HELICS_LOG_LEVEL_SUMMARY);
             EXPECT_EQ(order, 2);
             order = 3;
         }
-        if (m.second.find("DEBUG") != std::string::npos) {
-            EXPECT_GT(m.first, helics_log_level_summary);
+        if (m.second.find("debug") != std::string::npos) {
+            EXPECT_GT(m.first, HELICS_LOG_LEVEL_SUMMARY);
             EXPECT_EQ(order, 3);
             order = 4;
         }
@@ -194,7 +194,7 @@ TEST(logging_tests, check_log_message_levels)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -228,7 +228,7 @@ TEST(logging_tests, check_log_message_levels_high)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, 9);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 9);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -262,7 +262,7 @@ TEST(logging_tests, dumplog)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::log_level, -1);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_NO_PRINT);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
     auto cr = Fed->getCorePointer();
@@ -279,8 +279,8 @@ TEST(logging_tests, dumplog)
     this will generate 1 and at most 2 messages in the log callback
     Thus the check for this is that there is a least 2 and at most 3 messages
     in the log block, to indicate that the set and clear was successful*/
-    Fed->setFlagOption(helics_flag_dumplog);
-    Fed->setFlagOption(helics_flag_dumplog, false);
+    Fed->setFlagOption(HELICS_FLAG_DUMPLOG);
+    Fed->setFlagOption(HELICS_FLAG_DUMPLOG, false);
 
     Fed->finalize();
     cr->waitForDisconnect();

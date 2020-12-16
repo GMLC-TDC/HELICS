@@ -121,7 +121,7 @@ h.helicsFederateSetFlagOption(fi, 6, True)
 By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the cosimulation is no longer valid. It is therefore generally a good idea to set the following flag in your simulator federate so that its execution will be terminated if an error occurs anywhere in the cosimulation.
 
 ```python
-h.helicsFederateSetFlagOption(fed, helics_flag_terminate_on_error)
+h.helicsFederateSetFlagOption(fed, HELICS_FLAG_terminate_on_error)
 ```
 
 This will prevent your federate from hanging in the event that another federate fails.

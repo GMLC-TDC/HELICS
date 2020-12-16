@@ -76,7 +76,7 @@ namespace CommFactory {
         MasterCommBuilder::addBuilder(std::move(cb), name, code);
     }
 
-    std::unique_ptr<CommsInterface> create(core_type type)
+    std::unique_ptr<CommsInterface> create(CoreType type)
     {
         const auto& builder = MasterCommBuilder::getBuilder(static_cast<int>(type));
         return builder->build();
@@ -113,15 +113,15 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
         brokerInitString = netInfo.brokerInitString;
         autoBroker = netInfo.autobroker;
         switch (netInfo.server_mode) {
-            case NetworkBrokerData::server_mode_options::server_active:
-            case NetworkBrokerData::server_mode_options::server_default_active:
+            case NetworkBrokerData::ServerModeOptions::SERVER_ACTIVE:
+            case NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE:
                 serverMode = true;
                 break;
-            case NetworkBrokerData::server_mode_options::server_deactivated:
-            case NetworkBrokerData::server_mode_options::server_default_deactivated:
+            case NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED:
+            case NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_DEACTIVATED:
                 serverMode = false;
                 break;
-            case NetworkBrokerData::server_mode_options::unspecified:
+            case NetworkBrokerData::ServerModeOptions::UNSPECIFIED:
                 break;
         }
         propertyUnLock();
@@ -130,7 +130,7 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 
 void CommsInterface::loadTargetInfo(const std::string& localTarget,
                                     const std::string& brokerTarget,
-                                    interface_networks targetNetwork)
+                                    InterfaceNetworks targetNetwork)
 {
     if (propertyLock()) {
         localTargetAddress = localTarget;
@@ -538,7 +538,7 @@ bool CommsInterface::isConnected() const
 void CommsInterface::logMessage(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(helics_log_level_interfaces, "commMessage||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_INTERFACES, "commMessage||" + name, message);
     } else {
         std::cout << "commMessage||" << name << ":" << message << std::endl;
     }
@@ -547,7 +547,7 @@ void CommsInterface::logMessage(const std::string& message) const
 void CommsInterface::logWarning(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(helics_log_level_warning, "commWarning||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_WARNING, "commWarning||" + name, message);
     } else {
         std::cerr << "commWarning||" << name << ":" << message << std::endl;
     }
@@ -556,7 +556,7 @@ void CommsInterface::logWarning(const std::string& message) const
 void CommsInterface::logError(const std::string& message) const
 {
     if (loggingCallback) {
-        loggingCallback(helics_log_level_error, "commERROR||" + name, message);
+        loggingCallback(HELICS_LOG_LEVEL_ERROR, "commERROR||" + name, message);
     } else {
         std::cerr << "commERROR||" << name << ":" << message << std::endl;
     }

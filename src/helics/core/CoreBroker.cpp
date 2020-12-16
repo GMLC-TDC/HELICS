@@ -617,13 +617,13 @@ std::string CoreBroker::generateFederationSummary() const
     int filt = 0;
     for (const auto& hand : handles) {
         switch (hand.handleType) {
-            case handle_type::publication:
+            case InterfaceType::PUBLICATION:
                 ++pubs;
                 break;
-            case handle_type::input:
+            case InterfaceType::INPUT:
                 ++ipts;
                 break;
-            case handle_type::endpoint:
+            case InterfaceType::ENDPOINT:
                 ++epts;
                 break;
             default:
@@ -823,7 +823,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         LOG_ERROR(global_broker_id_local, getIdentifier(), lcom);
                         ActionMessage elink(CMD_ERROR);
                         elink.payload = lcom;
-                        elink.messageID = defs::errors::connection_failure;
+                        elink.messageID = defs::Errors::CONNECTION_FAILURE;
                         broadcast(elink);
                         brokerState = broker_state_t::errored;
                         addActionMessage(CMD_USER_DISCONNECT);
@@ -881,7 +881,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             {
                 timeCoord->enteringExecMode();
                 auto res = timeCoord->checkExecEntry();
-                if (res == message_processing_result::next_step) {
+                if (res == MessageProcessingResult::NEXT_STEP) {
                     enteredExecutionMode = true;
                 }
             }
@@ -1029,7 +1029,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 timeCoord->processTimeMessage(command);
                 if (!enteredExecutionMode) {
                     auto res = timeCoord->checkExecEntry();
-                    if (res == message_processing_result::next_step) {
+                    if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
                         LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
                     }
@@ -1172,7 +1172,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
 void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
 {
     switch (cmd.messageID) {
-        case defs::flags::enable_init_entry:
+        case defs::Flags::ENABLE_INIT_ENTRY:
             /*if (delayInitCounter <= 1)
         {
             delayInitCounter = 0;
@@ -1195,7 +1195,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
         }
         break;
         */
-        case defs::properties::log_level:
+        case defs::Properties::LOG_LEVEL:
             setLogLevel(cmd.getExtraData());
             break;
         case UPDATE_LOGGING_CALLBACK:
@@ -1307,7 +1307,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             if (ept != nullptr) {
                 auto fed = _federates.find(ept->getFederateId());
                 if (fed->state < connection_state::error) {
-                    if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                    if (command.counter == static_cast<uint16_t>(InterfaceType::ENDPOINT)) {
                         command.setAction(CMD_ADD_ENDPOINT);
                         toggleActionFlag(command, destination_target);
                     } else {
@@ -1325,7 +1325,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                     command.setDestination(ept->handle);
                     routeMessage(command);
                     command.setAction(CMD_ADD_ENDPOINT);
-                    if (command.counter == static_cast<uint16_t>(handle_type::endpoint)) {
+                    if (command.counter == static_cast<uint16_t>(InterfaceType::ENDPOINT)) {
                         toggleActionFlag(command, destination_target);
                         command.name(ept->key);
                         command.setString(typeStringLoc, ept->type);
@@ -1366,7 +1366,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                             // an anonymous publisher is adding an input
                             auto& apub = handles.addHandle(command.source_id,
                                                            command.source_handle,
-                                                           handle_type::publication,
+                                                           InterfaceType::PUBLICATION,
                                                            std::string(),
                                                            command.getString(typeStringLoc),
                                                            command.getString(unitStringLoc));
@@ -1385,7 +1385,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                             // an anonymous filter is adding an endpoint
                             auto& afilt = handles.addHandle(command.source_id,
                                                             command.source_handle,
-                                                            handle_type::filter,
+                                                            InterfaceType::FILTER,
                                                             std::string(),
                                                             command.getString(typeStringLoc),
                                                             command.getString(typeOutStringLoc));
@@ -1515,14 +1515,14 @@ void CoreBroker::addPublication(ActionMessage& m)
     if (handles.getPublication(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = defs::errors::registration_failure;
-        eret.payload = fmt::format("Duplicate publication names ({})", m.name());
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+        eret.payload = fmt::format("Duplicate PUBLICATION names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
     auto& pub = handles.addHandle(m.source_id,
                                   m.source_handle,
-                                  handle_type::publication,
+                                  InterfaceType::PUBLICATION,
                                   std::string(m.name()),
                                   m.getString(0),
                                   m.getString(1));
@@ -1540,14 +1540,14 @@ void CoreBroker::addInput(ActionMessage& m)
     if (handles.getInput(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = defs::errors::registration_failure;
-        eret.payload = fmt::format("Duplicate input names ({})", m.name());
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+        eret.payload = fmt::format("Duplicate INPUT names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
     auto& inp = handles.addHandle(m.source_id,
                                   m.source_handle,
-                                  handle_type::input,
+                                  InterfaceType::INPUT,
                                   std::string(m.name()),
                                   m.getString(0),
                                   m.getString(1));
@@ -1566,14 +1566,14 @@ void CoreBroker::addEndpoint(ActionMessage& m)
     if (handles.getEndpoint(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = defs::errors::registration_failure;
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
         eret.payload = fmt::format("Duplicate endpoint names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
     auto& ept = handles.addHandle(m.source_id,
                                   m.source_handle,
-                                  handle_type::endpoint,
+                                  InterfaceType::ENDPOINT,
                                   std::string(m.name()),
                                   m.getString(typeStringLoc),
                                   m.getString(unitStringLoc));
@@ -1603,15 +1603,15 @@ void CoreBroker::addFilter(ActionMessage& m)
     if (handles.getFilter(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = defs::errors::registration_failure;
-        eret.payload = fmt::format("Duplicate filter names ({})", m.name());
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+        eret.payload = fmt::format("Duplicate FILTER names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
 
     auto& filt = handles.addHandle(m.source_id,
                                    m.source_handle,
-                                   handle_type::filter,
+                                   InterfaceType::FILTER,
                                    std::string(m.name()),
                                    m.getString(typeStringLoc),
                                    m.getString(typeOutStringLoc));
@@ -1933,39 +1933,39 @@ void CoreBroker::executeInitializationOperations()
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);
                 eMiss.source_id = global_broker_id_local;
-                eMiss.messageID = defs::errors::connection_failure;
+                eMiss.messageID = defs::Errors::CONNECTION_FAILURE;
                 unknownHandles.processRequiredUnknowns([this, &eMiss](const std::string& target,
                                                                       char type,
                                                                       GlobalHandle handle) {
                     switch (type) {
                         case 'p':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required publication target {}",
+                                fmt::format("Unable to connect to required PUBLICATION target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         case 'i':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required input target {}",
+                                fmt::format("Unable to connect to required INPUT target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         case 'f':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required filter target {}",
+                                fmt::format("Unable to connect to required FILTER target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         case 'e':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required endpoint target {}",
+                                fmt::format("Unable to connect to required ENDPOINT target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         default:
                             // LCOV_EXCL_START
                             eMiss.payload =
-                                fmt::format("Unable to connect to required unknown target {}",
+                                fmt::format("Unable to connect to required UNKNOWN target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
@@ -1983,28 +1983,28 @@ void CoreBroker::executeInitializationOperations()
             }
             ActionMessage wMiss(CMD_WARNING);
             wMiss.source_id = global_broker_id_local;
-            wMiss.messageID = defs::errors::connection_failure;
+            wMiss.messageID = defs::Errors::CONNECTION_FAILURE;
             unknownHandles.processNonOptionalUnknowns([this, &wMiss](const std::string& target,
                                                                      char type,
                                                                      GlobalHandle handle) {
                 switch (type) {
                     case 'p':
                         wMiss.payload =
-                            fmt::format("Unable to connect to publication target {}", target);
+                            fmt::format("Unable to connect to PUBLICATION target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     case 'i':
-                        wMiss.payload = fmt::format("Unable to connect to input target {}", target);
+                        wMiss.payload = fmt::format("Unable to connect to INPUT target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     case 'f':
                         wMiss.payload =
-                            fmt::format("Unable to connect to filter target {}", target);
+                            fmt::format("Unable to connect to FILTER target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     case 'e':
                         wMiss.payload =
-                            fmt::format("Unable to connect to endpoint target {}", target);
+                            fmt::format("Unable to connect to ENDPOINT target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     default:
@@ -2027,7 +2027,7 @@ void CoreBroker::executeInitializationOperations()
     broadcast(m);
     timeCoord->enteringExecMode();
     auto res = timeCoord->checkExecEntry();
-    if (res == message_processing_result::next_step) {
+    if (res == MessageProcessingResult::NEXT_STEP) {
         enteredExecutionMode = true;
     }
     logFlush();
@@ -2113,7 +2113,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         transmit(getRoute(m.dest_id), m);
 
         const auto* iface = handles.findHandle(target.first);
-        if (iface->handleType == handle_type::endpoint) {
+        if (iface->handleType == InterfaceType::ENDPOINT) {
             // notify the endpoint about its endpoint
             m.setAction(CMD_ADD_ENDPOINT);
             m.name(iface->key);
@@ -2191,7 +2191,10 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
 
 void CoreBroker::processError(ActionMessage& command)
 {
-    sendToLogger(command.source_id, log_level::error, std::string(), command.payload.to_string());
+    sendToLogger(command.source_id,
+                 LogLevels::ERROR_LEVEL,
+                 std::string(),
+                 command.payload.to_string());
     if (command.source_id == global_broker_id_local) {
         brokerState = broker_state_t::errored;
         broadcast(command);
@@ -2261,7 +2264,7 @@ void CoreBroker::processDisconnect(ActionMessage& command)
                     if (!enteredExecutionMode) {
                         timeCoord->processTimeMessage(command);
                         auto res = timeCoord->checkExecEntry();
-                        if (res == message_processing_result::next_step) {
+                        if (res == MessageProcessingResult::NEXT_STEP) {
                             enteredExecutionMode = true;
                         }
                     } else {
@@ -2447,7 +2450,7 @@ void CoreBroker::setLoggingLevel(int logLevel)
 {
     ActionMessage cmd(CMD_BROKER_CONFIGURE);
     cmd.dest_id = global_id.load();
-    cmd.messageID = defs::properties::log_level;
+    cmd.messageID = defs::Properties::LOG_LEVEL;
     cmd.setExtraData(logLevel);
     addActionMessage(cmd);
 }
@@ -2692,25 +2695,25 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request)
         return generateStringVector_if(
             handles,
             [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::input); });
+            [](auto& handle) { return (handle.handleType == InterfaceType::INPUT); });
     }
     if (request == "publications") {
         return generateStringVector_if(
             handles,
             [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::publication); });
+            [](auto& handle) { return (handle.handleType == InterfaceType::PUBLICATION); });
     }
     if (request == "filters") {
         return generateStringVector_if(
             handles,
             [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::filter); });
+            [](auto& handle) { return (handle.handleType == InterfaceType::FILTER); });
     }
     if (request == "endpoints") {
         return generateStringVector_if(
             handles,
             [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::endpoint); });
+            [](auto& handle) { return (handle.handleType == InterfaceType::ENDPOINT); });
     }
 
     if (request == "dependson") {
@@ -3161,7 +3164,7 @@ void CoreBroker::checkDependencies()
                 routeMessage(addDep);
             } else {
                 ActionMessage logWarning(CMD_LOG, parent_broker_id, newdep.second);
-                logWarning.messageID = warning;
+                logWarning.messageID = WARNING;
                 logWarning.payload =
                     "unable to locate " + newdep.first + " to establish dependency";
                 routeMessage(logWarning);

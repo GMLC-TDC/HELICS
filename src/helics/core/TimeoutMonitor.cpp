@@ -24,7 +24,7 @@ void TimeoutMonitor::tick(CommonCore* core)
             // brokerReconnect()
             const std::string message{"core lost connection with broker"};
             core->sendToLogger(core->global_broker_id_local,
-                               log_level::error,
+                               LogLevels::ERROR_LEVEL,
                                core->getIdentifier(),
                                message);
             core->sendErrorToFederates(-5, message);
@@ -96,7 +96,7 @@ void TimeoutMonitor::tick(CoreBroker* brk)
             // try to reset the connection to the broker
             // brokerReconnect()
             brk->sendToLogger(brk->global_broker_id_local,
-                              log_level::error,
+                              LogLevels::ERROR_LEVEL,
                               brk->getIdentifier(),
                               "broker lost connection with parent");
             brk->sendErrorToImmediateBrokers(-5);

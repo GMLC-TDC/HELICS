@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/core/core-types.hpp"
+#include "helics/core/CoreTypes.hpp"
 #include "helics/network/networkDefaults.hpp"
 #include "helics/network/tcp/TcpBroker.h"
 #include "helics/network/tcp/TcpComms.h"
@@ -425,7 +425,7 @@ TEST(TcpCore, tcpCore_initialization)
     std::atomic<int> counter{0};
     std::string initializationString =
         "-f 1 --brokerport=24160  --port=24180 --local_interface=localhost --name=core1 --noack_connect";
-    auto core = helics::CoreFactory::create(helics::core_type::TCP, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::TCP, initializationString);
 
     ASSERT_TRUE(core);
     EXPECT_TRUE(core->isConfigured());
@@ -487,9 +487,9 @@ TEST(TcpCore, tcpCore_core_broker_default)
     std::this_thread::sleep_for(300ms);
     std::string initializationString = "--reuse_address";
 
-    auto broker = helics::BrokerFactory::create(helics::core_type::TCP, initializationString);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TCP, initializationString);
     ASSERT_TRUE(broker);
-    auto core = helics::CoreFactory::create(helics::core_type::TCP, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::TCP, initializationString);
     ASSERT_TRUE(core);
     bool connected = broker->isConnected();
     EXPECT_TRUE(connected);
@@ -512,7 +512,7 @@ TEST(TcpCore, tcpCore_core_broker_default)
 TEST(TcpCore, commFactory)
 {
     auto comm = helics::CommFactory::create("tcp");
-    auto comm2 = helics::CommFactory::create(helics::core_type::TCP);
+    auto comm2 = helics::CommFactory::create(helics::CoreType::TCP);
 
     EXPECT_TRUE(dynamic_cast<helics::tcp::TcpComms*>(comm.get()) != nullptr);
     EXPECT_TRUE(dynamic_cast<helics::tcp::TcpComms*>(comm2.get()) != nullptr);

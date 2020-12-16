@@ -266,14 +266,14 @@ bool ForwardingTimeCoordinator::hasActiveTimeDependencies() const
     return dependencies.hasActiveTimeDependencies();
 }
 
-message_processing_result ForwardingTimeCoordinator::checkExecEntry()
+MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
 {
-    auto ret = message_processing_result::continue_processing;
+    auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     if (!dependencies.checkIfReadyForExecEntry(false)) {
         return ret;
     }
 
-    ret = message_processing_result::next_step;
+    ret = MessageProcessingResult::NEXT_STEP;
 
     executionMode = true;
     time_next = timeZero;

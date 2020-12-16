@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace udp {
     class UdpComms;
-    using UdpCore = NetworkCore<UdpComms, interface_type::udp>;
+    using UdpCore = NetworkCore<UdpComms, InterfaceTypes::UDP>;
 
 }  // namespace udp
 }  // namespace helics

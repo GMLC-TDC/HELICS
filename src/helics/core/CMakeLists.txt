@@ -38,9 +38,9 @@ set(PUBLIC_INCLUDE_FILES
     CoreFactory.hpp
     BrokerFactory.hpp
     core-exceptions.hpp
-    core-types.hpp
+    CoreTypes.hpp
     core-data.hpp
-    helics-time.hpp
+    helicsTime.hpp
     CoreFederateInfo.hpp
     helicsVersion.hpp
     federate_id.hpp
@@ -57,7 +57,7 @@ set(INCLUDE_FILES
     ForwardingTimeCoordinator.hpp
     loggingHelper.hpp
     global_federate_id.hpp
-    basic_core_types.hpp
+    basic_CoreTypes.hpp
     TimeoutMonitor.h
     CoreBroker.hpp
     InterfaceInfo.hpp
@@ -89,7 +89,7 @@ endif()
 add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 target_link_libraries(
-    helics_core PUBLIC helics_common PRIVATE spdlog::spdlog fmt::fmt compile_flags_target
+    helics_core PUBLIC HELICS::common PRIVATE spdlog::spdlog fmt::fmt compile_flags_target
 )
 
 add_library(HELICS::core ALIAS helics_core)

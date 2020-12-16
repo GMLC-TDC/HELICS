@@ -103,11 +103,11 @@ void Publication::publishInt(int64_t val)
 void Publication::publish(char val)
 {
     switch (pubType) {
-        case data_type::helics_bool:
+        case DataType::HELICS_BOOL:
             publish(!((val == '0') || (val == 'f') || (val == 0) || (val == 'F') || (val == '-')));
             break;
-        case data_type::helics_string:
-        case data_type::helics_named_point:
+        case DataType::HELICS_STRING:
+        case DataType::HELICS_NAMED_POINT:
             publishString({&val, 1});
             break;
         default:
@@ -299,7 +299,7 @@ void Publication::publish(double val, const units::precise_unit& units)
     }
 }
 
-SmallBuffer typeConvert(data_type type, const defV& val)
+SmallBuffer typeConvert(DataType type, const defV& val)
 {
     switch (val.index()) {
         case double_loc:  // double

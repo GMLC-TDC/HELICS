@@ -27,7 +27,7 @@ TEST_F(network_tests, test_external_tcp)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -43,7 +43,7 @@ TEST_F(network_tests, test_external_tcp_ipv4)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -60,7 +60,7 @@ TEST_F(network_tests, test_external_tcpss)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -76,7 +76,7 @@ TEST_F(network_tests, test_external_tcpss_ipv4)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -96,7 +96,7 @@ TEST_F(network_tests, test_external_udp)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -112,7 +112,7 @@ TEST_F(network_tests, test_external_udp_ipv4)
     // register the publications
     auto& ipt1 = vFed1->registerInput<double>("ipt1");
 
-    ipt1.setOption(helics::defs::options::connection_optional);
+    ipt1.setOption(helics::defs::Options::CONNECTION_OPTIONAL);
     ipt1.addTarget("bob");
 
     vFed1->enterExecutingMode();
@@ -125,10 +125,10 @@ TEST_F(network_tests, test_external_udp_ipv4)
 TEST_F(network_tests, test_otherport)
 {
     const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33200";
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fi("--core_type=ZMQ --broker=tcp://127.0.0.1:33200");
+    helics::FederateInfo fi("--CoreType=ZMQ --broker=tcp://127.0.0.1:33200");
     helics::ValueFederate fed1("fed1", fi);
 
     fed1.enterExecutingMode();
@@ -142,10 +142,10 @@ TEST_F(network_tests, test_otherport)
 TEST_F(network_tests, test_otherport2)
 {
     const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:20200";
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fi("--core_type=ZMQ --broker=tcp://127.0.0.1:20200");
+    helics::FederateInfo fi("--CoreType=ZMQ --broker=tcp://127.0.0.1:20200");
     helics::ValueFederate fed1("fed1", fi);
 
     fed1.enterExecutingMode();
@@ -159,10 +159,10 @@ TEST_F(network_tests, test_otherport2)
 TEST_F(network_tests, test_otherport_fail)
 {
     const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33100";
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fi("--core_type=ZMQ --broker=tcp://127.0.0.1:33198 --timeout=100ms");
+    helics::FederateInfo fi("--CoreType=ZMQ --broker=tcp://127.0.0.1:33198 --timeout=100ms");
     EXPECT_THROW(helics::ValueFederate fed1("fed1", fi), helics::RegistrationFailure);
 
     if (broker->isConnected()) {

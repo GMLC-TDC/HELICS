@@ -21,9 +21,9 @@ TEST(logging_tests, check_log_message)
 {
     auto fi = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, helics_core_type_test, &err);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, helics_property_int_log_level, 5, &err);
+    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 5, &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -36,13 +36,13 @@ TEST(logging_tests, check_log_message)
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogInfoMessage(fed, "test MEXAGE", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     auto llock = mlog.lock();
     bool found = false;
     for (auto& m : llock) {
@@ -59,9 +59,9 @@ TEST(logging_tests, check_log_message_levels)
 {
     auto fi = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, helics_core_type_test, &err);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, helics_property_int_log_level, 5, &err);
+    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 5, &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -75,14 +75,14 @@ TEST(logging_tests, check_log_message_levels)
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
     helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 
     auto llock = mlog.lock();
     bool found_low = false;
@@ -106,9 +106,9 @@ TEST(logging_tests, check_log_message_levels_high)
 {
     auto fi = helicsCreateFederateInfo();
     auto err = helicsErrorInitialize();
-    helicsFederateInfoSetCoreType(fi, helics_core_type_test, &err);
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, helics_property_int_log_level, 9, &err);
+    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 9, &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -121,14 +121,14 @@ TEST(logging_tests, check_log_message_levels_high)
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
     helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 
     auto llock = mlog.lock();
     bool found_low = false;
@@ -160,7 +160,7 @@ TEST(logging_tests, core_logging)
     };
     auto err = helicsErrorInitialize();
     helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     helicsCoreDisconnect(core, nullptr);
     helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
@@ -180,7 +180,7 @@ TEST(logging_tests, broker_logging)
     };
     auto err = helicsErrorInitialize();
     helicsBrokerSetLoggingCallback(broker, logg, &mlog, &err);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
     helicsBrokerDisconnect(broker, nullptr);
     helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
@@ -197,7 +197,7 @@ TEST(logging_tests, broker_logging_file)
     helicsCloseLibrary();
     EXPECT_TRUE(ghc::filesystem::exists(lfile));
     ghc::filesystem::remove(lfile);
-    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(err.errorCode, 0);
 }
 
 TEST(logging_tests, core_logging_file)

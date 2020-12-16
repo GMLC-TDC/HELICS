@@ -84,24 +84,23 @@ SPDX-License-Identifier: BSD-3-Clause
 constexpr const char* ztypes[] = {ZMQTEST ZMQSSTEST ZMQTEST2 ZMQTEST3 ZMQSSTEST2 ZMQTEST4};
 #endif
 
-constexpr const char* core_types[] =
+constexpr const char* CoreTypes[] =
     {"test", ZMQTEST3 IPCTEST2 TCPTEST INPROCTEST2 ZMQTEST UDPTEST TCPSSTEST ZMQSSTEST INPROCTEST3};
 
-constexpr const char* core_types_2[] = {IPCTEST2 TCPTEST2 ZMQSSTEST2 "test_2",
-                                        TCPSSTEST2 ZMQTEST2 UDPTEST2};
+constexpr const char* CoreTypes_2[] = {IPCTEST2 TCPTEST2 ZMQSSTEST2 "test_2",
+                                       TCPSSTEST2 ZMQTEST2 UDPTEST2};
 
-constexpr const char* core_types_simple[] = {
+constexpr const char* CoreTypes_simple[] = {
     INPROCTEST TCPSSTEST ZMQSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
-constexpr const char* core_types_single[] = {INPROCTEST TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST
-                                             "test_3",
-                                             ZMQTEST3 TCPTEST3 ZMQSSTEST UDPTEST3};
-constexpr const char* core_types_all[] = {
+constexpr const char* CoreTypes_single[] = {INPROCTEST TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST
+                                            "test_3",
+                                            ZMQTEST3 TCPTEST3 ZMQSSTEST UDPTEST3};
+constexpr const char* CoreTypes_all[] = {
     INPROCTEST TCPSSTEST ZMQSSTEST IPCTEST2 TCPTEST INPROCTEST2 ZMQTEST UDPTEST TCPSSTEST2 "test_3",
     ZMQTEST3 IPCTEST ZMQTEST2 UDPTEST2 ZMQSSTEST2 TCPTEST2 UDPTEST3 TCPTEST3 INPROCTEST4 ZMQTEST4
         TCPTEST4 UDPTEST4};
 
-constexpr const char* core_types_extended[] = {
-    IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 ZMQSSTEST2 TCPTEST3 INPROCTEST4 ZMQTEST4 TCPTEST4
-        UDPTEST4};
+constexpr const char* CoreTypes_extended[] = {IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 ZMQSSTEST2
+                                                  TCPTEST3 INPROCTEST4 ZMQTEST4 TCPTEST4 UDPTEST4};
 
 constexpr const char* defaultNamePrefix = "fed";

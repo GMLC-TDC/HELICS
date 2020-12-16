@@ -20,13 +20,13 @@ TEST_F(timing_tests, simple_timing_test)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
 
-    CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 0.5, &err));
-    CE(helicsFederateSetTimeProperty(vFed2, helics_property_time_period, 0.5, &err));
+    CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 0.5, &err));
+    CE(helicsFederateSetTimeProperty(vFed2, HELICS_PROPERTY_TIME_PERIOD, 0.5, &err));
 
     CE(helicsFederateSetFlagOption(
-        vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed1, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     CE(helicsFederateSetFlagOption(
-        vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed2, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
 
     auto pub = helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "double", "", &err);
     CE(helicsFederateRegisterSubscription(vFed2, "pub1", "", &err));
@@ -34,7 +34,7 @@ TEST_F(timing_tests, simple_timing_test)
     CE(helicsFederateEnterExecutingMode(vFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(vFed1, &err));
     CE(helicsPublicationPublishDouble(pub, 0.27, &err));
-    helics_time gtime;
+    HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed1, 2.0, &err));
     EXPECT_EQ(gtime, 2.0);
 
@@ -55,22 +55,22 @@ TEST_F(timing_tests, simple_timing_test2)
     auto vFed2 = GetFederateAt(1);
 
     CE(helicsFederateSetFlagOption(
-        vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed1, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     CE(helicsFederateSetFlagOption(
-        vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed2, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
 
-    CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 0.5, &err));
-    CE(helicsFederateSetTimeProperty(vFed2, helics_property_time_period, 0.5, &err));
+    CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 0.5, &err));
+    CE(helicsFederateSetTimeProperty(vFed2, HELICS_PROPERTY_TIME_PERIOD, 0.5, &err));
 
     auto pub = helicsFederateRegisterGlobalPublication(
-        vFed1, "pub1", helics_data_type_double, "", nullptr);
+        vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
     helicsFederateRegisterSubscription(vFed2, "pub1", "", nullptr);
 
     CE(helicsFederateEnterExecutingModeAsync(vFed1, &err));
     CE(helicsFederateEnterExecutingMode(vFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(vFed1, &err));
 
-    helics_time gtime;
+    HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed1, 0.32, &err));
 
     // check that the request is only granted at the appropriate period
@@ -96,23 +96,23 @@ TEST_F(timing_tests, simple_timing_test_message)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
 
-    CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 0.6, &err));
-    CE(helicsFederateSetTimeProperty(vFed2, helics_property_time_period, 0.45, &err));
+    CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 0.6, &err));
+    CE(helicsFederateSetTimeProperty(vFed2, HELICS_PROPERTY_TIME_PERIOD, 0.45, &err));
 
     CE(helicsFederateSetFlagOption(
-        vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed1, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     CE(helicsFederateSetFlagOption(
-        vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed2, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
 
     auto ept1 = helicsFederateRegisterGlobalEndpoint(vFed1, "e1", "", &err);
     helicsFederateRegisterGlobalEndpoint(vFed2, "e2", "", &err);
-    ASSERT_EQ(err.error_code, 0);
+    ASSERT_EQ(err.errorCode, 0);
     CE(helicsFederateEnterExecutingModeAsync(vFed1, &err));
     CE(helicsFederateEnterExecutingMode(vFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(vFed1, &err));
     CE(helicsFederateRequestTimeAsync(vFed2, 3.5, &err));
 
-    helics_time gtime;
+    HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed1, 0.32, &err));
 
     // check that the request is only granted at the appropriate period
@@ -140,15 +140,15 @@ TEST_F(timing_tests, timing_with_input_delay)
     auto vFed1 = GetFederateAt(0);
     auto vFed2 = GetFederateAt(1);
 
-    CE(helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 0.1, &err));
-    CE(helicsFederateSetTimeProperty(vFed2, helics_property_time_period, 0.1, &err));
+    CE(helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 0.1, &err));
+    CE(helicsFederateSetTimeProperty(vFed2, HELICS_PROPERTY_TIME_PERIOD, 0.1, &err));
 
-    CE(helicsFederateSetTimeProperty(vFed2, helics_property_time_input_delay, 0.1, &err));
+    CE(helicsFederateSetTimeProperty(vFed2, HELICS_PROPERTY_TIME_INPUT_DELAY, 0.1, &err));
 
     CE(helicsFederateSetFlagOption(
-        vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed1, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
     CE(helicsFederateSetFlagOption(
-        vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+        vFed2, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
 
     auto ept1 = helicsFederateRegisterGlobalEndpoint(vFed1, "e1", "", nullptr);
     helicsFederateRegisterGlobalEndpoint(vFed2, "e2", "", nullptr);
@@ -157,7 +157,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(helicsFederateEnterExecutingMode(vFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(vFed1, &err));
     CE(helicsFederateRequestTimeAsync(vFed2, 2.0, &err));
-    helics_time gtime;
+    HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed1, 1.0, &err));
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(gtime, 1.0);
@@ -171,7 +171,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(gtime = helicsFederateRequestTimeComplete(vFed1, &err));
     EXPECT_DOUBLE_EQ(gtime, 1.9);
 
-    CE(auto tres = helicsFederateGetTimeProperty(vFed1, helics_property_time_period, &err));
+    CE(auto tres = helicsFederateGetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, &err));
     EXPECT_DOUBLE_EQ(tres, 0.1);
 
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
@@ -187,7 +187,7 @@ TEST_F(timing_tests, timing_with_minDelta_change)
 
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
-    helics_time gtime;
+    HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
     // check that the request is only granted at the appropriate period
 
@@ -197,7 +197,7 @@ TEST_F(timing_tests, timing_with_minDelta_change)
     CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
     EXPECT_EQ(gtime, 2.0);
 
-    CE(helicsFederateSetTimeProperty(vFed, helics_property_time_delta, 0.1, &err));
+    CE(helicsFederateSetTimeProperty(vFed, HELICS_PROPERTY_TIME_DELTA, 0.1, &err));
     CE(gtime = helicsFederateRequestTime(vFed, gtime, &err));
     EXPECT_EQ(gtime, 2.1);
     CE(helicsFederateFinalize(vFed, &err));
@@ -209,25 +209,25 @@ TEST_F(timing_tests, timing_with_period_change)
     auto vFed = GetFederateAt(0);
 
     CE(helicsFederateSetFlagOption(
-        vFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
-    CE(helicsFederateSetTimeProperty(vFed, helics_property_time_period, 1.0, &err));
+        vFed, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, HELICS_TRUE, &err));
+    CE(helicsFederateSetTimeProperty(vFed, HELICS_PROPERTY_TIME_PERIOD, 1.0, &err));
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
-    helics_time gtime;
+    HelicsTime gtime;
     CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
     // check that the request is only granted at the appropriate period
 
     EXPECT_EQ(gtime, 1.0);
     CE(auto val =
-           helicsFederateGetFlagOption(vFed, helics_flag_ignore_time_mismatch_warnings, &err));
+           helicsFederateGetFlagOption(vFed, HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS, &err));
 
-    EXPECT_EQ(val, helics_true);
+    EXPECT_EQ(val, HELICS_TRUE);
 
     // purposely requesting 1.0 to test min delta
     CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
     EXPECT_EQ(gtime, 2.0);
 
-    CE(helicsFederateSetTimeProperty(vFed, helics_property_time_period, 0.1, &err));
+    CE(helicsFederateSetTimeProperty(vFed, HELICS_PROPERTY_TIME_PERIOD, 0.1, &err));
     CE(gtime = helicsFederateRequestTime(vFed, gtime, &err));
     EXPECT_EQ(gtime, 2.1);
     CE(helicsFederateFinalize(vFed, &err));
@@ -238,10 +238,10 @@ TEST_F(timing_tests, max_time_consistency)
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed = GetFederateAt(0);
     CE(helicsFederateEnterExecutingMode(vFed, &err));
-    helics_time gtime;
-    CE(gtime = helicsFederateRequestTime(vFed, helics_time_maxtime, &err));
-    EXPECT_GE(gtime, helics_time_maxtime);
+    HelicsTime gtime;
+    CE(gtime = helicsFederateRequestTime(vFed, HELICS_TIME_MAXTIME, &err));
+    EXPECT_GE(gtime, HELICS_TIME_MAXTIME);
     CE(helicsFederateFinalize(vFed, &err));
     CE(gtime = helicsFederateGetCurrentTime(vFed, &err));
-    EXPECT_GE(gtime, helics_time_maxtime);
+    EXPECT_GE(gtime, HELICS_TIME_MAXTIME);
 }

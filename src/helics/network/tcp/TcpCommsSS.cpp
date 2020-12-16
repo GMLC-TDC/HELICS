@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace tcp {
     TcpCommsSS::TcpCommsSS() noexcept:
-        NetworkCommsInterface(interface_type::tcp, CommsInterface::thread_generation::single)
+        NetworkCommsInterface(InterfaceTypes::TCP, CommsInterface::thread_generation::single)
     {
     }
 
@@ -396,7 +396,7 @@ namespace tcp {
                     } else {
                         if (!isDisconnectCommand(cmd)) {
                             logWarning(std::string(
-                                           "(tcpss) unknown message destination message dropped ") +
+                                           "(tcpss) UNKNOWN message destination message dropped ") +
                                        prettyPrintString(cmd));
                         }
                     }

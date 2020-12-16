@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-template class NetworkCore<tcp::TcpComms, interface_type::tcp>;
+template class NetworkCore<tcp::TcpComms, InterfaceTypes::TCP>;
 namespace tcp {
     TcpCoreSS::TcpCoreSS() noexcept {}
 

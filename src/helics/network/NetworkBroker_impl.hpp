@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../core/core-types.hpp"
+#include "../core/CoreTypes.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "NetworkBroker.hpp"
 
@@ -30,7 +30,7 @@ constexpr const char* tstr[] = {"default",
                                 "undef",
                                 "undef",
                                 "http",
-                                "unknown"};
+                                "UNKNOWN"};
 
 constexpr const char* tcodeStr(int tcode)
 {
@@ -43,21 +43,21 @@ constexpr const char* defInterface[] = {"127.0.0.1",
                                         "_ipc_broker",
                                         ""};
 
-template<class COMMS, interface_type baseline, int tcode>
+template<class COMMS, InterfaceTypes baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(bool rootBroker) noexcept:
     CommsBroker<COMMS, CoreBroker>(rootBroker)
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
+    netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE;
 }
 
-template<class COMMS, interface_type baseline, int tcode>
+template<class COMMS, InterfaceTypes baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(const std::string& broker_name):
     CommsBroker<COMMS, CoreBroker>(broker_name)
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
+    netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE;
 }
 
-template<class COMMS, interface_type baseline, int tcode>
+template<class COMMS, InterfaceTypes baseline, int tcode>
 std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateCLI()
 {
     auto app = CoreBroker::generateCLI();
@@ -66,7 +66,7 @@ std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateC
     return app;
 }
 
-template<class COMMS, interface_type baseline, int tcode>
+template<class COMMS, InterfaceTypes baseline, int tcode>
 bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
 {
     std::lock_guard<std::mutex> lock(dataMutex);
@@ -86,7 +86,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
     return res;
 }
 
-template<class COMMS, interface_type baseline, int tcode>
+template<class COMMS, InterfaceTypes baseline, int tcode>
 std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() const
 {
     std::string add;
@@ -95,9 +95,9 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() 
     } else {
         std::lock_guard<std::mutex> lock(dataMutex);
         switch (baseline) {
-            case interface_type::tcp:
-            case interface_type::ip:
-            case interface_type::udp:
+            case InterfaceTypes::TCP:
+            case InterfaceTypes::IP:
+            case InterfaceTypes::UDP:
                 if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*')) {
                     add = makePortAddress(
                         netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
@@ -106,8 +106,8 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() 
                     add = makePortAddress(netInfo.localInterface, netInfo.portNumber);
                 }
                 break;
-            case interface_type::inproc:
-            case interface_type::ipc:
+            case InterfaceTypes::INPROC:
+            case InterfaceTypes::IPC:
             default:
                 if (!netInfo.localInterface.empty()) {
                     add = netInfo.localInterface;

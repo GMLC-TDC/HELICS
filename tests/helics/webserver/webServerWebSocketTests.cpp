@@ -103,7 +103,7 @@ class webTest: public ::testing::Test {
         return result;
     }
 
-    static std::shared_ptr<helics::Broker> addBroker(helics::core_type ctype,
+    static std::shared_ptr<helics::Broker> addBroker(helics::CoreType ctype,
                                                      const std::string& init)
     {
         auto brk = helics::BrokerFactory::create(ctype, init);
@@ -113,7 +113,7 @@ class webTest: public ::testing::Test {
         return brk;
     }
 
-    static std::shared_ptr<helics::Core> addCore(helics::core_type ctype, const std::string& init)
+    static std::shared_ptr<helics::Core> addCore(helics::CoreType ctype, const std::string& init)
     {
         auto cr = helics::CoreFactory::create(ctype, init);
         if (cr) {
@@ -172,7 +172,7 @@ TEST_F(webTest, test1)
 
 TEST_F(webTest, single)
 {
-    addBroker(helics::core_type::ZMQ, "--name=brk1");
+    addBroker(helics::CoreType::ZMQ, "--name=brk1");
     Json::Value query;
     query["command"] = "query";
     query["query"] = "brokers";
@@ -186,7 +186,7 @@ TEST_F(webTest, single)
 
 TEST_F(webTest, pair)
 {
-    addBroker(helics::core_type::TEST, "--name=brk2");
+    addBroker(helics::CoreType::TEST, "--name=brk2");
     Json::Value query;
     query["command"] = "query";
     query["broker"] = "brokers";
@@ -238,7 +238,7 @@ TEST_F(webTest, singleNonJson)
 
 TEST_F(webTest, core)
 {
-    auto cr = addCore(helics::core_type::TEST, "--name=cr1 -f2");
+    auto cr = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
     EXPECT_TRUE(cr->connect());
 
     Json::Value query;
@@ -329,7 +329,7 @@ TEST_F(webTest, createBrokerUUID)
 {
     Json::Value v1;
     v1["command"] = "create";
-    v1["core_type"] = "ZMQ";
+    v1["CoreType"] = "ZMQ";
     v1["num_feds"] = 3;
     auto result = sendText(generateJsonString(v1));
     auto val = loadJson(result);
@@ -383,10 +383,10 @@ TEST_F(webTest, timeBlock)
     Json::Value create;
     create["broker"] = "brk_timerws";
     create["command"] = "create";
-    create["core_type"] = "ZMQ";
+    create["CoreType"] = "ZMQ";
     create["num_feds"] = 1;
     sendText(generateJsonString(create));
-    auto cr = addCore(helics::core_type::ZMQ, "--name=c_timer -f1 --broker=brk_timerws");
+    auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timerws");
     EXPECT_TRUE(cr->connect());
 
     helics::ValueFederate vFed("fed1", cr);

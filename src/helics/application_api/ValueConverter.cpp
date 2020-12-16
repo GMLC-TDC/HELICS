@@ -178,20 +178,20 @@ namespace detail {
             std::to_integer<size_t>(data[7]);
     }
 
-    static constexpr const frozen::unordered_map<std::int8_t, helics::data_type, 8> typeDetect{
-        {std::to_integer<std::int8_t>(intCode), data_type::helics_int},
-        {std::to_integer<std::int8_t>(doubleCode), data_type::helics_double},
-        {std::to_integer<std::int8_t>(complexCode), data_type::helics_complex},
-        {std::to_integer<std::int8_t>(vectorCode), data_type::helics_vector},
-        {std::to_integer<std::int8_t>(cvCode), data_type::helics_complex_vector},
-        {std::to_integer<std::int8_t>(npCode), data_type::helics_named_point},
-        {std::to_integer<std::int8_t>(customCode), data_type::helics_custom},
-        {std::to_integer<std::int8_t>(stringCode), data_type::helics_string}};
+    static constexpr const frozen::unordered_map<std::int8_t, helics::DataType, 8> typeDetect{
+        {std::to_integer<std::int8_t>(intCode), DataType::HELICS_INT},
+        {std::to_integer<std::int8_t>(doubleCode), DataType::HELICS_DOUBLE},
+        {std::to_integer<std::int8_t>(complexCode), DataType::HELICS_COMPLEX},
+        {std::to_integer<std::int8_t>(vectorCode), DataType::HELICS_VECTOR},
+        {std::to_integer<std::int8_t>(cvCode), DataType::HELICS_COMPLEX_VECTOR},
+        {std::to_integer<std::int8_t>(npCode), DataType::HELICS_NAMED_POINT},
+        {std::to_integer<std::int8_t>(customCode), DataType::HELICS_CUSTOM},
+        {std::to_integer<std::int8_t>(stringCode), DataType::HELICS_STRING}};
 
-    data_type detectType(const std::byte* data)
+    DataType detectType(const std::byte* data)
     {
         const auto* res = typeDetect.find(std::to_integer<std::int8_t>(data[0]));
-        return (res != typeDetect.end()) ? res->second : data_type::helics_unknown;
+        return (res != typeDetect.end()) ? res->second : DataType::HELICS_UNKNOWN;
     }
 
     void convertFromBinary(const std::byte* data, double& val)

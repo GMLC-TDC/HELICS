@@ -50,7 +50,7 @@ class FederateInfo {
     /** copy assignment for federateInfo*/
     FederateInfo& operator=(const FederateInfo& fedInfo)
     {
-        helics_federate_info fi_new = helicsFederateClone(fedInfo.fi, hThrowOnError());
+        HelicsFederateInfo fi_new = helicsFederateClone(fedInfo.fi, hThrowOnError());
         helicsFederateInfoFree(fi);
         fi = fi_new;
         return *this;
@@ -99,7 +99,7 @@ class FederateInfo {
     {
         helicsFederateInfoSetCoreTypeFromString(fi, coretype.c_str(), hThrowOnError());
     }
-    /** set the core type from an integer \ref helics_core_type
+    /** set the core type from an integer \ref helics_CoreType
     @param coretype an integer code with the federate type
     */
     void setCoreType(int coretype)
@@ -122,20 +122,20 @@ class FederateInfo {
     }
     /** set a flag
     @param flag /ref helics_federate_flags
-    @param value the value of the flag usually helics_true or helics_false
+    @param value the value of the flag usually HELICS_TRUE or HELICS_FALSE
     */
     void setFlagOption(int flag, bool value = true)
     {
         helicsFederateInfoSetFlagOption(fi,
                                         flag,
-                                        value ? helics_true : helics_false,
+                                        value ? HELICS_TRUE : HELICS_FALSE,
                                         HELICS_NULL_POINTER);
     }
     /** set a time federate or core property
     @param timeProperty /ref helics_federate_properties an integer code with the property
     @param timeValue the value to set the property to
     */
-    void setProperty(int timeProperty, helics_time timeValue)
+    void setProperty(int timeProperty, HelicsTime timeValue)
     {
         helicsFederateInfoSetTimeProperty(fi, timeProperty, timeValue, HELICS_NULL_POINTER);
     }
@@ -161,11 +161,11 @@ class FederateInfo {
     {
         return helicsFederateGetCommandSource(fi, HELICS_IGNORE_ERROR);
     }
-    /** get the underlying helics_federate_info object*/
-    helics_federate_info getInfo() { return fi; }
+    /** get the underlying HelicsFederateInfo object*/
+    HelicsFederateInfo getInfo() { return fi; }
 
   private:
-    helics_federate_info fi;  //!< handle for the underlying federate_info object
+    HelicsFederateInfo fi;  //!< handle for the underlying federate_info object
 };
 
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
@@ -173,7 +173,7 @@ namespace details {
     /** helper function for the callback executor for queries*/
     inline void helicCppQueryCallbackExecutor(const char* query,
                                               int stringSize,
-                                              helics_query_buffer buffer,
+                                              HelicsQueryBuffer buffer,
                                               void* userData)
     {
         auto cback = reinterpret_cast<std::function<std::string(const std::string&)>*>(userData);
@@ -187,9 +187,9 @@ namespace details {
 /** an iteration time structure */
 typedef struct {
   public:
-    helics_time grantedTime;  //!< the time of the granted step
-    helics_iteration_result status;  //!< the convergence state
-} helics_iteration_time;
+    HelicsTime grantedTime;  //!< the time of the granted step
+    HelicsIterationResult status;  //!< the convergence state
+} HelicsIterationTime;
 
 /** Federate object managing a C++98 Federate object*/
 class Federate {
@@ -238,10 +238,10 @@ class Federate {
         }
 #endif
     }
-    /** cast operator to get the underlying helics_federate object*/
-    operator helics_federate() const { return fed; }
-    /** get the underlying helics_federate object*/
-    helics_federate baseObject() const { return fed; }
+    /** cast operator to get the underlying HelicsFederate object*/
+    operator HelicsFederate() const { return fed; }
+    /** get the underlying HelicsFederate object*/
+    HelicsFederate baseObject() const { return fed; }
     /** set a flag for the federate
    @param flag an index into the flag /ref flag-definitions.h
    @param flagValue the value of the flag defaults to true
@@ -250,14 +250,14 @@ class Federate {
     {
         helicsFederateSetFlagOption(fed,
                                     flag,
-                                    flagValue ? helics_true : helics_false,
+                                    flagValue ? HELICS_TRUE : HELICS_FALSE,
                                     hThrowOnError());
     }
     /**  set a time property option for the federate
     @param tProperty an index of the option to set
     @param timeValue  and integer option value for an integer based property
     */
-    void setProperty(int tProperty, helics_time timeValue)
+    void setProperty(int tProperty, HelicsTime timeValue)
     {
         helicsFederateSetTimeProperty(fed, tProperty, timeValue, hThrowOnError());
     }
@@ -275,12 +275,12 @@ class Federate {
     */
     bool getFlagOption(int flag) const
     {
-        return (helicsFederateGetFlagOption(fed, flag, hThrowOnError()) != helics_false);
+        return (helicsFederateGetFlagOption(fed, flag, hThrowOnError()) != HELICS_FALSE);
     }
     /** get the value of a time option for the federate
     @param tProperty the option to get
     */
-    helics_time getTimeProperty(int tProperty) const
+    HelicsTime getTimeProperty(int tProperty) const
     {
         return helicsFederateGetTimeProperty(fed, tProperty, hThrowOnError());
     }
@@ -309,7 +309,7 @@ class Federate {
         helicsFederateRegisterInterfaces(fed, configString.c_str(), hThrowOnError());
     }
     /** get the current state of the federate*/
-    helics_federate_state getCurrentMode() const
+    HelicsFederateState getCurrentMode() const
     {
         return helicsFederateGetState(fed, HELICS_NULL_POINTER);
     }
@@ -345,11 +345,11 @@ class Federate {
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    helics_iteration_result
-        enterExecutingMode(helics_iteration_request iterate = helics_iteration_request_no_iteration)
+    HelicsIterationResult
+        enterExecutingMode(HelicsIterationRequest iterate = HELICS_ITERATION_REQUEST_NO_ITERATION)
     {
-        helics_iteration_result out_iterate = helics_iteration_result_next_step;
-        if (iterate == helics_iteration_request_no_iteration) {
+        HelicsIterationResult out_iterate = HELICS_ITERATION_RESULT_NEXT_STEP;
+        if (iterate == HELICS_ITERATION_REQUEST_NO_ITERATION) {
             helicsFederateEnterExecutingMode(fed, hThrowOnError());
         } else {
             out_iterate = helicsFederateEnterExecutingModeIterative(fed, iterate, hThrowOnError());
@@ -362,9 +362,9 @@ class Federate {
     @param iterate an optional flag indicating the desired iteration mode
     */
     void enterExecutingModeAsync(
-        helics_iteration_request iterate = helics_iteration_request_no_iteration)
+        HelicsIterationRequest iterate = HELICS_ITERATION_REQUEST_NO_ITERATION)
     {
-        if (iterate == helics_iteration_request_no_iteration) {
+        if (iterate == HELICS_ITERATION_REQUEST_NO_ITERATION) {
             helicsFederateEnterExecutingModeAsync(fed, hThrowOnError());
             exec_async_iterate = false;
         } else {
@@ -377,9 +377,9 @@ class Federate {
     @details call will not block but will return quickly.  The enterInitializingModeComplete must be
     called before doing other operations
     */
-    helics_iteration_result enterExecutingModeComplete()
+    HelicsIterationResult enterExecutingModeComplete()
     {
-        helics_iteration_result out_iterate = helics_iteration_result_next_step;
+        HelicsIterationResult out_iterate = HELICS_ITERATION_RESULT_NEXT_STEP;
         if (exec_async_iterate) {
             out_iterate = helicsFederateEnterExecutingModeIterativeComplete(fed, hThrowOnError());
         } else {
@@ -397,32 +397,32 @@ class Federate {
     /** complete the asynchronous terminate pair*/
     void finalizeComplete() { helicsFederateFinalizeComplete(fed, hThrowOnError()); }
     /** get the current time from a federate */
-    helics_time getCurrentTime() { return helicsFederateGetCurrentTime(fed, hThrowOnError()); }
+    HelicsTime getCurrentTime() { return helicsFederateGetCurrentTime(fed, hThrowOnError()); }
     /** request a time advancement
    @param time the next requested time step
    @return the granted time step*/
-    helics_time requestTime(helics_time time)
+    HelicsTime requestTime(HelicsTime time)
     {
         return helicsFederateRequestTime(fed, time, hThrowOnError());
     }
     /** request a time advancement to the next allowed time
     @return the granted time step*/
-    helics_time requestNextStep() { return helicsFederateRequestNextStep(fed, hThrowOnError()); }
+    HelicsTime requestNextStep() { return helicsFederateRequestNextStep(fed, hThrowOnError()); }
 
     /** request a time advancement to the next allowed time
     @param timeDelta the amount of time requested to advance
     @return the granted time step*/
-    helics_time requestTimeAdvance(helics_time timeDelta)
+    HelicsTime requestTimeAdvance(HelicsTime timeDelta)
     {
         return helicsFederateRequestTimeAdvance(fed, timeDelta, hThrowOnError());
     }
     /** request a time advancement
    @param time the next requested time step
    @param iterate a requested iteration mode
-   @return the granted time step in a structure containing a return time and an iteration_result*/
-    helics_iteration_time requestTimeIterative(helics_time time, helics_iteration_request iterate)
+   @return the granted time step in a structure containing a return time and an IterationResult*/
+    HelicsIterationTime requestTimeIterative(HelicsTime time, HelicsIterationRequest iterate)
     {
-        helics_iteration_time itTime;
+        HelicsIterationTime itTime;
         itTime.grantedTime = helicsFederateRequestTimeIterative(
             fed, time, iterate, &(itTime.status), hThrowOnError());
         return itTime;
@@ -431,7 +431,7 @@ class Federate {
     @details /ref requestTimeComplete should be called to finish the operation and get the result
     @param time the next requested time step
     */
-    void requestTimeAsync(helics_time time)
+    void requestTimeAsync(HelicsTime time)
     {
         helicsFederateRequestTimeAsync(fed, time, hThrowOnError());
     }
@@ -442,14 +442,14 @@ class Federate {
   @param time the next requested time step
   @param iterate a requested iteration level (none, require, optional)
   */
-    void requestTimeIterativeAsync(helics_time time, helics_iteration_request iterate)
+    void requestTimeIterativeAsync(HelicsTime time, HelicsIterationRequest iterate)
     {
         helicsFederateRequestTimeIterativeAsync(fed, time, iterate, hThrowOnError());
     }
 
     /** request a time advancement
    @return the granted time step*/
-    helics_time requestTimeComplete()
+    HelicsTime requestTimeComplete()
     {
         return helicsFederateRequestTimeComplete(fed, hThrowOnError());
     }
@@ -457,9 +457,9 @@ class Federate {
     /** finalize the time advancement request
   @return the granted time step in an iteration_time structure which contains a time and iteration
   result*/
-    helics_iteration_time requestTimeIterativeComplete()
+    HelicsIterationTime requestTimeIterativeComplete()
     {
-        helics_iteration_time itTime;
+        HelicsIterationTime itTime;
         itTime.grantedTime =
             helicsFederateRequestTimeIterativeComplete(fed, &(itTime.status), hThrowOnError());
         return itTime;
@@ -480,8 +480,8 @@ class Federate {
     */
     std::string query(const std::string& target, const std::string& queryStr) const
     {
-        // returns helics_query
-        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        // returns HelicsQuery
+        HelicsQuery q = helicsCreateQuery(target.c_str(), queryStr.c_str());
         std::string result(helicsQueryExecute(q, fed, hThrowOnError()));
         helicsQueryFree(q);
         return result;
@@ -500,15 +500,15 @@ class Federate {
     */
     std::string query(const std::string& queryStr) const
     {
-        // returns helics_query
-        helics_query q = helicsCreateQuery(HELICS_NULL_POINTER, queryStr.c_str());
+        // returns HelicsQuery
+        HelicsQuery q = helicsCreateQuery(HELICS_NULL_POINTER, queryStr.c_str());
         std::string result(helicsQueryExecute(q, fed, hThrowOnError()));
         helicsQueryFree(q);
         return result;
     }
 
     void setQueryCallback(
-        void (*queryAnswer)(const char* query, int querySize, helics_query_buffer, void* userdata),
+        void (*queryAnswer)(const char* query, int querySize, HelicsQueryBuffer, void* userdata),
         void* userdata)
 
     {
@@ -532,7 +532,7 @@ class Federate {
     @param type the type of the filter to register
     @param filterName the name of the filter
     */
-    Filter registerFilter(helics_filter_type type, const std::string& filterName = std::string())
+    Filter registerFilter(HelicsFilterTypes type, const std::string& filterName = std::string())
     {
         return Filter(helicsFederateRegisterFilter(fed, type, filterName.c_str(), hThrowOnError()));
     }
@@ -541,7 +541,7 @@ class Federate {
     @details cloning filters copy a message and send it to multiple locations source and destination
     can be added through other functions
     @param deliveryEndpoint the specified endpoint to deliver the message
-    @return a helics_filter object
+    @return a HelicsFilter object
     */
     CloningFilter registerCloningFilter(const std::string& deliveryEndpoint)
     {
@@ -553,7 +553,7 @@ class Federate {
   @param type the type of the filter to register
   @param filterName the name of the filter
   */
-    Filter registerGlobalFilter(helics_filter_type type,
+    Filter registerGlobalFilter(HelicsFilterTypes type,
                                 const std::string& filterName = std::string())
     {
         return Filter(
@@ -650,12 +650,12 @@ class Federate {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }
     /** get a Core Object*/
-    helics_core getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
+    HelicsCore getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
     /** get the C object for use in the C library*/
-    helics_federate getObject() const { return fed; }
+    HelicsFederate getObject() const { return fed; }
 
   protected:
-    helics_federate fed;  //!< underlying helics_federate object
+    HelicsFederate fed;  //!< underlying HelicsFederate object
     bool exec_async_iterate;  //!< indicator that the federate is in an async operation
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
   private:

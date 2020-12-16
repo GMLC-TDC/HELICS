@@ -141,24 +141,24 @@ HELICS_CXX_EXPORT void valueExtract(const defV& dv, char& val);
 /** extract the value from a variant to a bool*/
 HELICS_CXX_EXPORT void valueExtract(const defV& dv, bool& val);
 
-HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, std::string& val);
+HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, std::string& val);
 
 HELICS_CXX_EXPORT void
-    valueExtract(const data_view& dv, data_type baseType, std::vector<double>& val);
+    valueExtract(const data_view& dv, DataType baseType, std::vector<double>& val);
 
 HELICS_CXX_EXPORT void
-    valueExtract(const data_view& dv, data_type baseType, std::complex<double>& val);
+    valueExtract(const data_view& dv, DataType baseType, std::complex<double>& val);
 
 HELICS_CXX_EXPORT void
-    valueExtract(const data_view& dv, data_type baseType, std::vector<std::complex<double>>& val);
+    valueExtract(const data_view& dv, DataType baseType, std::vector<std::complex<double>>& val);
 
-HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, NamedPoint& val);
+HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, NamedPoint& val);
 
-HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, Time& val);
+HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, Time& val);
 
-HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, bool& val);
+HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, bool& val);
 
-HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, defV& val);
+HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, defV& val);
 
 /** extract the value from a variant to a numerical type*/
 template<class X>
@@ -206,24 +206,24 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
 /** assume it is some numeric type (int or double)*/
 template<class X>
 std::enable_if_t<std::is_arithmetic<X>::value>
-    valueExtract(const data_view& dv, data_type baseType, X& val)
+    valueExtract(const data_view& dv, DataType baseType, X& val)
 {
     switch (baseType) {
-        case data_type::helics_any: {
+        case DataType::HELICS_ANY: {
             defV val_dv;
             valueExtract(dv, baseType, val_dv);
             valueExtract(val_dv, val);
             break;
         }
-        case data_type::helics_string:
+        case DataType::HELICS_STRING:
         default:
             val = static_cast<X>(
                 getDoubleFromString(ValueConverter<std::string_view>::interpret(dv)));
             break;
-        case data_type::helics_bool:
+        case DataType::HELICS_BOOL:
             val = static_cast<X>((ValueConverter<std::string_view>::interpret(dv) != "0"));
             break;
-        case data_type::helics_named_point: {
+        case DataType::HELICS_NAMED_POINT: {
             auto npval = ValueConverter<NamedPoint>::interpret(dv);
             if (std::isnan(npval.value)) {
                 try {
@@ -240,38 +240,38 @@ std::enable_if_t<std::is_arithmetic<X>::value>
 
             break;
         }
-        case data_type::helics_double: {
+        case DataType::HELICS_DOUBLE: {
             auto V = ValueConverter<double>::interpret(dv);
             val = static_cast<X>(V);
             break;
         }
-        case data_type::helics_int:
-        case data_type::helics_time: {
+        case DataType::HELICS_INT:
+        case DataType::HELICS_TIME: {
             auto V = ValueConverter<int64_t>::interpret(dv);
             val = static_cast<X>(V);
             break;
         }
 
-        case data_type::helics_vector: {
+        case DataType::HELICS_VECTOR: {
             auto V = ValueConverter<std::vector<double>>::interpret(dv);
             val = static_cast<X>(vectorNorm(V));
             break;
         }
-        case data_type::helics_complex: {
+        case DataType::HELICS_COMPLEX: {
             auto V = ValueConverter<std::complex<double>>::interpret(dv);
             val = static_cast<X>(std::abs(V));
             break;
         }
-        case data_type::helics_complex_vector: {
+        case DataType::HELICS_COMPLEX_VECTOR: {
             auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
             val = static_cast<X>(vectorNorm(V));
             break;
         }
-        case data_type::helics_custom:
+        case DataType::HELICS_CUSTOM:
             throw(std::invalid_argument("unrecognized helics type"));
     }
 }
 
-HELICS_CXX_EXPORT void valueConvert(defV& val, data_type newType);
+HELICS_CXX_EXPORT void valueConvert(defV& val, DataType newType);
 
 }  // namespace helics

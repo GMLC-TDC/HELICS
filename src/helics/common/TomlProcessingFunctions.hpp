@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 them using the toml library
 */
 
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #ifdef __GNUC__
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wshadow"

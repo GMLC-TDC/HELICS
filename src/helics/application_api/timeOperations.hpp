@@ -5,7 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #include "helics_cxx_export.h"
 
 #include <string>

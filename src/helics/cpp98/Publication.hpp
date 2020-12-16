@@ -18,8 +18,8 @@ namespace helicscpp {
 /** C++98 interface for a publication object*/
 class Publication {
   public:
-    /** construct from a helics_publication*/
-    explicit Publication(helics_publication hpub) HELICS_NOTHROW: pub(hpub) {}
+    /** construct from a HelicsPublication*/
+    explicit Publication(HelicsPublication hpub) HELICS_NOTHROW: pub(hpub) {}
     /** default constructor*/
     Publication() HELICS_NOTHROW: pub(HELICS_NULL_POINTER) {}
     /** copy constructor*/
@@ -32,13 +32,13 @@ class Publication {
     }
     // there is no need for move operators since copying the underlying object is fine, it is a
     // non-owning pointer
-    /** cast operator to the underlying helics_publication object*/
-    operator helics_publication() const { return pub; }
-    /** return the underlying helics_publication object*/
-    helics_publication baseObject() const { return pub; }
+    /** cast operator to the underlying HelicsPublication object*/
+    operator HelicsPublication() const { return pub; }
+    /** return the underlying HelicsPublication object*/
+    HelicsPublication baseObject() const { return pub; }
 
     /** check if the publication is valid */
-    bool isValid() const { return (helicsPublicationIsValid(pub) == helics_true); }
+    bool isValid() const { return (helicsPublicationIsValid(pub) == HELICS_TRUE); }
 
     /** Methods to publish values **/
 
@@ -91,7 +91,7 @@ class Publication {
     /** publish a boolean value*/
     void publish(bool val)
     {
-        helicsPublicationPublishBoolean(pub, val ? helics_true : helics_false, HELICS_IGNORE_ERROR);
+        helicsPublicationPublishBoolean(pub, val ? HELICS_TRUE : HELICS_FALSE, HELICS_IGNORE_ERROR);
     }
     /** get the key for the publication*/
     const char* getKey() const { return helicsPublicationGetKey(pub); }
@@ -109,7 +109,7 @@ class Publication {
     }
 
   private:
-    helics_publication pub;  //!< the reference to the underlying publication
+    HelicsPublication pub;  //!< the reference to the underlying publication
 };
 
 }  // namespace helicscpp

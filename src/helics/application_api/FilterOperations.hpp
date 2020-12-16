@@ -11,7 +11,7 @@ file defines some common filter operations
 */
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #include "gmlc/libguarded/cow_guarded.hpp"
 
 #include <atomic>

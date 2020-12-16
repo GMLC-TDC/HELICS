@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-using helics::core_type;
+using helics::CoreType;
 
 static void BMecho_singleCore(benchmark::State& state)
 {
@@ -28,7 +28,7 @@ static void BMecho_singleCore(benchmark::State& state)
 
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
-        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+        auto wcore = helics::CoreFactory::create(CoreType::INPROC,
                                                  std::string("--autobroker --federates=") +
                                                      std::to_string(feds + 1));
         EchoHub hub;
@@ -65,7 +65,7 @@ BENCHMARK(BMecho_singleCore)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BMecho_multiCore(benchmark::State& state, core_type cType)
+static void BMecho_multiCore(benchmark::State& state, CoreType cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -77,7 +77,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
             helics::BrokerFactory::create(cType,
                                           "brokerb",
                                           std::string("--federates=") + std::to_string(feds + 1));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel(HELICS_LOG_LEVEL_NO_PRINT);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
         // this is to delay until the threads are ready
@@ -117,7 +117,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
 
 static constexpr int64_t maxscale{1U << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, CoreType::INPROC)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -125,7 +125,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, inprocCore, core_type::INPROC)
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMecho_multiCore, zmqCore, CoreType::ZMQ)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -133,7 +133,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMecho_multiCore, zmqssCore, CoreType::ZMQ_SS)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -144,7 +144,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMecho_multiCore, ipcCore, CoreType::IPC)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -155,7 +155,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMecho_multiCore, tcpCore, CoreType::TCP)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -163,7 +163,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMecho_multiCore, tcpssCore, CoreType::TCP_SS)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -174,7 +174,7 @@ BENCHMARK_CAPTURE(BMecho_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BMecho_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMecho_multiCore, udpCore, CoreType::UDP)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)

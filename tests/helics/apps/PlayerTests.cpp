@@ -17,13 +17,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(player_tests, simple_player_test)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
 
     fi.coreName = "pcore1";
     fi.coreInitString = "-f2 --autobroker";
     helics::apps::Player play1("player1", fi);
 
-    play1.addPublication("pub1", helics::data_type::helics_double);
+    play1.addPublication("pub1", helics::DataType::HELICS_DOUBLE);
     play1.addPoint(1.0, "pub1", 0.5);
     play1.addPoint(2.0, "pub1", 0.7);
     play1.addPoint(3.0, "pub1", 0.8);
@@ -55,12 +55,12 @@ TEST(player_tests, simple_player_test)
 
 TEST(player_tests, simple_player_test_diff_inputs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
 
-    play1.addPublication("pub1", helics::data_type::helics_double);
+    play1.addPublication("pub1", helics::DataType::HELICS_DOUBLE);
     play1.addPoint(1.0, "pub1", "v[3.0,4.0]");
     play1.addPoint(2.0, "pub1", "0.7");
     play1.addPoint(3.0, "pub1", std::complex<double>(0.0, 0.8));
@@ -97,12 +97,12 @@ TEST(player_tests, simple_player_test_diff_inputs)
 
 TEST(player_tests, simple_player_test_iterative)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore3";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
 
-    play1.addPublication("pub1", helics::data_type::helics_double);
+    play1.addPublication("pub1", helics::DataType::HELICS_DOUBLE);
     play1.addPoint(1.0, 0, "pub1", 0.5);
     play1.addPoint(1.0, 1, "pub1", 0.7);
     play1.addPoint(1.0, 2, "pub1", 0.8);
@@ -111,34 +111,34 @@ TEST(player_tests, simple_player_test_iterative)
     auto& sub1 = vfed.registerSubscription("pub1");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
     vfed.enterExecutingMode();
-    auto retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    auto retTime = vfed.requestTimeIterative(5, helics::IterationRequest::ITERATE_IF_NEEDED);
     EXPECT_EQ(retTime.grantedTime, 1.0);
-    EXPECT_TRUE(retTime.state == helics::iteration_result::next_step);
+    EXPECT_TRUE(retTime.state == helics::IterationResult::NEXT_STEP);
     auto val = sub1.getValue<double>();
     EXPECT_EQ(val, 0.5);
 
-    retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    retTime = vfed.requestTimeIterative(5, helics::IterationRequest::ITERATE_IF_NEEDED);
     EXPECT_EQ(retTime.grantedTime, 1.0);
-    EXPECT_TRUE(retTime.state == helics::iteration_result::iterating);
+    EXPECT_TRUE(retTime.state == helics::IterationResult::ITERATING);
     val = sub1.getValue<double>();
     EXPECT_EQ(val, 0.7);
 
-    retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    retTime = vfed.requestTimeIterative(5, helics::IterationRequest::ITERATE_IF_NEEDED);
     EXPECT_EQ(retTime.grantedTime, 1.0);
-    EXPECT_TRUE(retTime.state == helics::iteration_result::iterating);
+    EXPECT_TRUE(retTime.state == helics::IterationResult::ITERATING);
     val = sub1.getValue<double>();
     EXPECT_EQ(val, 0.8);
 
-    retTime = vfed.requestTimeIterative(5, helics::iteration_request::iterate_if_needed);
+    retTime = vfed.requestTimeIterative(5, helics::IterationRequest::ITERATE_IF_NEEDED);
     EXPECT_EQ(retTime.grantedTime, 5.0);
-    EXPECT_TRUE(retTime.state == helics::iteration_result::next_step);
+    EXPECT_TRUE(retTime.state == helics::IterationResult::NEXT_STEP);
     vfed.finalize();
     fut.get();
 }
 
 TEST(player_tests, simple_player_test2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore4";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
@@ -199,7 +199,7 @@ class player_file_tests: public ::testing::TestWithParam<const char*> {
 TEST_P(player_file_tests, test_files)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = std::string("pcore5") + GetParam();
     fi.coreName.push_back(indx++);
     fi.coreInitString = "-f 2 --autobroker";
@@ -245,7 +245,7 @@ TEST_P(player_file_tests, test_files)
 TEST(player_tests, simple_player_mlinecomment)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore6-mline";
     fi.coreName.push_back(indx++);
     fi.coreInitString = " -f 2 --autobroker";
@@ -293,7 +293,7 @@ TEST(player_tests, simple_player_mlinecomment)
 TEST_P(player_file_tests, test_files_cmd)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    helics::apps::BrokerApp brk(helics::core_type::IPC, "ipc_broker", "-f 2");
+    helics::apps::BrokerApp brk(helics::CoreType::IPC, "ipc_broker", "-f 2");
 
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
 
@@ -308,7 +308,7 @@ TEST_P(player_file_tests, test_files_cmd)
 
     helics::apps::Player play1(5, argv);
 
-    helics::FederateInfo fi(helics::core_type::IPC);
+    helics::FederateInfo fi(helics::CoreType::IPC);
     fi.coreInitString = "--broker=ipc_broker";
 
     helics::ValueFederate vfed("obj", fi);
@@ -359,12 +359,16 @@ TEST_P(player_file_tests, test_files_exe)
     exeTestRunner brokerExe(HELICS_INSTALL_LOC, HELICS_BUILD_LOC, "helics_broker");
 
     ASSERT_TRUE(playerExe.isActive());
+    if (!brokerExe.isActive()) {
+        std::cout << " unable to locate helics_broker in " << HELICS_INSTALL_LOC << " or "
+                  << HELICS_BUILD_LOC << std::endl;
+    }
     ASSERT_TRUE(brokerExe.isActive());
     auto res = brokerExe.runAsync("-f 2 --coretype=zmq --name=zmq_broker");
     std::string exampleFile = std::string(TEST_DIR) + GetParam();
     auto res2 = playerExe.runCaptureOutputAsync("--name=player --coretype=zmq " + exampleFile);
 
-    helics::FederateInfo fi(helics::core_type::ZMQ);
+    helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreInitString = "";
 
     helics::ValueFederate vfed("fed", fi);
@@ -410,7 +414,7 @@ INSTANTIATE_TEST_SUITE_P(player_tests, player_file_tests, ::testing::ValuesIn(si
 
 TEST(player_tests, simple_player_testjson)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore7";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
@@ -451,7 +455,7 @@ TEST(player_tests, simple_player_testjson)
 
 TEST(player_tests, player_test_message)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore8";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
@@ -479,7 +483,7 @@ TEST(player_tests, player_test_message)
 
 TEST(player_tests, player_test_message2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore9";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
@@ -529,7 +533,7 @@ TEST(player_tests, player_test_message2)
 
 TEST(player_tests, player_test_message3)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcore10";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
@@ -588,7 +592,7 @@ class player_message_file_tests: public ::testing::TestWithParam<const char*> {
 TEST_P(player_message_file_tests, message_test_files)
 {
     static char indx = 'a';
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = std::string("pcore11") + GetParam();
     fi.coreName.push_back(indx++);
     fi.coreInitString = "-f 2 --autobroker";
