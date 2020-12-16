@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-using helics::core_type;
+using helics::CoreType;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 static void BMphold_singleCore(benchmark::State& state)
 {
@@ -27,7 +27,7 @@ static void BMphold_singleCore(benchmark::State& state)
 
         int fed_count = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(fed_count));
-        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+        auto wcore = helics::CoreFactory::create(CoreType::INPROC,
                                                  std::string("--autobroker --federates=") +
                                                      std::to_string(fed_count));
         std::vector<PholdFederate> feds(fed_count);
@@ -72,7 +72,7 @@ BENCHMARK(BMphold_singleCore)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BMphold_multiCore(benchmark::State& state, core_type cType)
+static void BMphold_multiCore(benchmark::State& state, CoreType cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -84,7 +84,7 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
             helics::BrokerFactory::create(cType,
                                           "brokerb",
                                           std::string("--federates=") + std::to_string(fed_count));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel(HELICS_LOG_LEVEL_NO_PRINT);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--log_level=no_print --federates=1"));
         std::vector<PholdFederate> feds(fed_count);
@@ -133,7 +133,7 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
 
 static constexpr int64_t maxscale{1 << (5 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMphold_multiCore, inprocCore, CoreType::INPROC)
     ->RangeMultiplier(2)
     ->Range(1, maxscale * 2)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -141,7 +141,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, inprocCore, core_type::INPROC)
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMphold_multiCore, zmqCore, CoreType::ZMQ)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -149,7 +149,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMphold_multiCore, zmqssCore, CoreType::ZMQ_SS)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -160,7 +160,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMphold_multiCore, ipcCore, CoreType::IPC)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -171,7 +171,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMphold_multiCore, tcpCore, CoreType::TCP)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -179,7 +179,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMphold_multiCore, tcpssCore, CoreType::TCP_SS)
     ->RangeMultiplier(2)
     ->Range(1, 1)  // This is set to 1; any higher seems to result in deadlock (OS buffer limit?)
     ->Iterations(1)
@@ -190,7 +190,7 @@ BENCHMARK_CAPTURE(BMphold_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BMphold_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMphold_multiCore, udpCore, CoreType::UDP)
     ->RangeMultiplier(2)
     ->Range(1, maxscale / 2)
     ->Iterations(1)

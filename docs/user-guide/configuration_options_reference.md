@@ -68,7 +68,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
 {
   // General
   **"name": "arbitrary federate name",**
-  "core_type": "zmq",
+  "CoreType": "zmq",
   "core_name": "core name",
   "core_init_string" : "",
   "autobroker": false,
@@ -212,7 +212,7 @@ Every federate must have a unique name across the entire federation; this is fun
 
 ---
 
-### `core_type` | `coretype` | `coreType` | `-t` ["zmq"]
+### `CoreType` | `coretype` | `coreType` | `-t` ["zmq"]
 
 _API:_ `helicsFederateInfoSetCoreTypeFromString`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)

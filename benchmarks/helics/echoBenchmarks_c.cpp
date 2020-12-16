@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../ThirdParty/concurrency/gmlc/concurrency/Barrier.hpp"
-#include "helics/chelics.h"
+#include "helics/helics.h"
 
 #define USING_HELICS_C_SHARED_LIB
 #include "helics_benchmark_main.h"
@@ -21,11 +21,11 @@ SPDX-License-Identifier: BSD-3-Clause
 /** class implementing the hub for an echo test*/
 class EchoHub_c {
   public:
-    helics_time finalTime{0.1};  // final time
+    HelicsTime finalTime{0.1};  // final time
   private:
-    helics_federate vFed{nullptr};
-    std::vector<helics_publication> pubs;
-    std::vector<helics_input> subs;
+    HelicsFederate vFed{nullptr};
+    std::vector<HelicsPublication> pubs;
+    std::vector<HelicsInput> subs;
     int cnt_{10};
     bool initialized{false};
     bool readyToRun{false};
@@ -57,7 +57,7 @@ class EchoHub_c {
         for (int ii = 0; ii < cnt_; ++ii) {
             auto leafname = std::string("leafrx_") + std::to_string(ii);
             pubs.push_back(helicsFederateRegisterGlobalPublication(
-                vFed, leafname.c_str(), helics_data_type_string, "", nullptr));
+                vFed, leafname.c_str(), HELICS_DATA_TYPE_STRING, "", nullptr));
             auto leafname2 = std::string("leafsend_") + std::to_string(ii);
             subs.push_back(
                 helicsFederateRegisterSubscription(vFed, leafname2.c_str(), "", nullptr));
@@ -77,10 +77,10 @@ class EchoHub_c {
     void mainLoop()
     {
         char buffer[256];
-        auto cTime = helics_time_zero;
+        auto cTime = HELICS_TIME_ZERO;
         while (cTime <= finalTime) {
             for (int ii = 0; ii < cnt_; ++ii) {
-                if (helicsInputIsUpdated(subs[ii]) == helics_true) {
+                if (helicsInputIsUpdated(subs[ii]) == HELICS_TRUE) {
                     int actLen{0};
                     helicsInputGetString(subs[ii], buffer, 256, &actLen, nullptr);
                     helicsPublicationPublishBytes(pubs[ii], buffer, actLen, nullptr);
@@ -94,9 +94,9 @@ class EchoHub_c {
 
 class EchoLeaf_c {
   private:
-    helics_federate vFed{nullptr};
-    helics_publication pub{nullptr};
-    helics_input sub{nullptr};
+    HelicsFederate vFed{nullptr};
+    HelicsPublication pub{nullptr};
+    HelicsInput sub{nullptr};
 
     int index_{0};
     bool initialized{false};
@@ -126,7 +126,7 @@ class EchoLeaf_c {
 
         auto leafname = std::string("leafsend_") + std::to_string(index);
         pub = helicsFederateRegisterGlobalPublication(
-            vFed, leafname.c_str(), helics_data_type_string, "", nullptr);
+            vFed, leafname.c_str(), HELICS_DATA_TYPE_STRING, "", nullptr);
         auto leafname2 = std::string("leafrx_") + std::to_string(index);
         sub = helicsFederateRegisterSubscription(vFed, leafname2.c_str(), "", nullptr);
 
@@ -156,7 +156,7 @@ class EchoLeaf_c {
             if (cnt <= iter) {
                 helicsPublicationPublishString(pub, txstring.c_str(), nullptr);
             }
-            if (helicsInputIsUpdated(sub) != helics_false) {
+            if (helicsInputIsUpdated(sub) != HELICS_FALSE) {
                 int actLen{0};
                 helicsInputGetString(sub, tbuffer, 256, &actLen, nullptr);
                 if (std::string(tbuffer) != txstring) {
@@ -218,7 +218,7 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
 {
     for (auto _ : state) {
         state.PauseTiming();
-        if (helicsIsCoreTypeAvailable(cTypeString.c_str()) == helics_false) {
+        if (helicsIsCoreTypeAvailable(cTypeString.c_str()) == HELICS_FALSE) {
             state.ResumeTiming();
             return;
         }
@@ -238,7 +238,7 @@ static void BMecho_multiCore(benchmark::State& state, const std::string& cTypeSt
         EchoHub_c hub;
         hub.initialize(helicsCoreGetIdentifier(wcore), feds);
         std::vector<EchoLeaf_c> leafs(feds);
-        std::vector<helics_core> cores(feds);
+        std::vector<HelicsCore> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helicsCreateCore(cTypeString.c_str(),
                                          nullptr,

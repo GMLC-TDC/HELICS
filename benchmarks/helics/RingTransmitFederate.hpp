@@ -39,7 +39,7 @@ class RingTransmit: public BenchmarkFederate {
 
     void doParamInit(helics::FederateInfo& fi) override
     {
-        fi.setFlagOption(helics_flag_restrictive_time_policy);
+        fi.setFlagOption(HELICS_FLAG_RESTRICTIVE_TIME_POLICY);
         if (index == 0) {
             // fi.setProperty(helics_property_int_log_level, helics_log_level_timing);
         }

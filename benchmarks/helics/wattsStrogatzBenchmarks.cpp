@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-using helics::core_type;
+using helics::CoreType;
 
 static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 
@@ -48,7 +48,7 @@ static void BM_wattsStrogatz2_singleCore(benchmark::State& state)
 
         gmlc::concurrency::Barrier brr(feds);
         auto wcore = helics::CoreFactory::create(
-            core_type::INPROC,
+            CoreType::INPROC,
             std::string(
                 "--autobroker --federates=2 --restrictive_time_policy --broker_init_string=\"--restrictive_time_policy\""));
 
@@ -82,7 +82,7 @@ BENCHMARK(BM_wattsStrogatz2_singleCore)
     ->UseRealTime()
     ->Iterations(3);
 
-static void BM_wattsStrogatz_multiCore(benchmark::State& state, core_type cType)
+static void BM_wattsStrogatz_multiCore(benchmark::State& state, CoreType cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -137,21 +137,21 @@ static void BM_wattsStrogatz_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, inprocCore, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Apply(WattsStrogatzArguments)
     ->UseRealTime();
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, zmqCore, CoreType::ZMQ)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->Apply(WattsStrogatzArguments)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, zmqssCore, CoreType::ZMQ_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->Apply(WattsStrogatzArguments)
@@ -160,7 +160,7 @@ BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, ipcCore, CoreType::IPC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Apply(WattsStrogatzArguments)
     ->UseRealTime();
@@ -168,14 +168,14 @@ BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, tcpCore, CoreType::TCP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->Apply(WattsStrogatzArguments)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, tcpssCore, CoreType::TCP_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->Apply(WattsStrogatzArguments)
@@ -185,7 +185,7 @@ BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, tcpssCore, core_type::TCP_SS)
 // Register the UDP benchmarks
 // The UDP benchmark starts hanging if too many messages are sent.
 #ifdef ENABLE_UDP_CORE
-BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BM_wattsStrogatz_multiCore, udpCore, CoreType::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->Apply(WattsStrogatzArguments)

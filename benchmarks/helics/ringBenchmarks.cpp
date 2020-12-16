@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-using helics::core_type;
+using helics::CoreType;
 
 static void BMring2_singleCore(benchmark::State& state)
 {
@@ -25,7 +25,7 @@ static void BMring2_singleCore(benchmark::State& state)
         state.PauseTiming();
         int feds = 2;
         gmlc::concurrency::Barrier brr(feds);
-        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+        auto wcore = helics::CoreFactory::create(CoreType::INPROC,
                                                  std::string("--autobroker --federates=2"));
 
         std::vector<RingTransmit> links(feds);
@@ -61,7 +61,7 @@ BENCHMARK(BMring2_singleCore)
     ->UseRealTime()
     ->Iterations(1);
 
-static void BMring_multiCore(benchmark::State& state, core_type cType)
+static void BMring_multiCore(benchmark::State& state, CoreType cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -70,7 +70,7 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
         auto broker =
             helics::BrokerFactory::create(cType,
                                           std::string("--federates=") + std::to_string(feds));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel(HELICS_LOG_LEVEL_NO_PRINT);
 
         std::vector<RingTransmit> links(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
@@ -114,7 +114,7 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -126,7 +126,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, core_type::INPROC)
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, CoreType::ZMQ)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -136,7 +136,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, CoreType::ZMQ_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -148,7 +148,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, CoreType::IPC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -158,7 +158,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, CoreType::TCP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -168,7 +168,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMring_multiCore, tcpssCore, CoreType::TCP_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -181,7 +181,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMring_multiCore, udpCore, CoreType::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
