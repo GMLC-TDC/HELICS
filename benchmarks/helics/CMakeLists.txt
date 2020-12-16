@@ -85,12 +85,8 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     target_compile_definitions(
         echoBenchmarks_c PRIVATE "HELICS_BENCHMARK_SHIFT_FACTOR=(${HELICS_BENCHMARK_SHIFT_FACTOR})"
     )
-    target_include_directories(
-        echoBenchmarks_c PRIVATE ${HELICS_SOURCE_DIR}/ThirdParty
-    )
-    target_include_directories(
-        echoBenchmarks_c PRIVATE ${HELICS_SOURCE_DIR}/src
-    )
+    target_include_directories(echoBenchmarks_c PRIVATE ${HELICS_SOURCE_DIR}/ThirdParty)
+    target_include_directories(echoBenchmarks_c PRIVATE ${HELICS_SOURCE_DIR}/src)
     install(TARGETS echoBenchmarks_c ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
             COMPONENT benchmarks
     )

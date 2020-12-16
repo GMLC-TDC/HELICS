@@ -159,7 +159,6 @@ std::string getLocalExternalAddressV6(const std::string& server);
 
 /** generate an interface that matches a defined server or network specification
  */
-std::string
-    generateMatchingInterfaceAddress(const std::string& server,
-                                     InterfaceNetworks network = InterfaceNetworks::LOCAL);
+std::string generateMatchingInterfaceAddress(const std::string& server,
+                                             InterfaceNetworks network = InterfaceNetworks::LOCAL);
 }  // namespace helics
