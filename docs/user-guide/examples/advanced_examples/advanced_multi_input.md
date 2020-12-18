@@ -28,7 +28,7 @@ This demonstrates the use of federation queries and performs dynamic configurati
 	
 	
 
-## Where is the code
+## Where is the code?
 
 This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
@@ -42,7 +42,7 @@ This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HEL
 
 
 
-## What is this co-simulation doing
+## What is this co-simulation doing?
 
 This example shows how to use inputs, allowing multiple publications to arrive at the same input handle (similar to a subscription, as you'll see) and a demonstration on one method of managing data conflicts that can arise.
 
