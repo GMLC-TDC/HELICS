@@ -27,9 +27,9 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ![Common HELICS architecture](../../img/helics_architecture_1.png)
 
-### Multi-threading
+### Multiple Federates on a Single Core
 
-The architecture below shows a scenario where more than one federate is associated with a single core. For most simulators that have already been integrated with HELICS this architecture would generally not be used. For simulators that are multi-threaded by nature, HELICS can be configured this way to facilitate message passing between threads. For a co-simulation that exists entirely within a single executable, this architecture will provide the highest performance. For example, of a large number of small controllers are written as a single, multi-threaded application (perhaps all the thermostats in an commercial building are being managed by a centralized controller), particularly where there is communication between the threads, using a single core inside a single multi-threaded application (with essentially one thread per federate) will provide the highest level of performance.
+The architecture below shows a scenario where more than one federate is associated with a single core. For most simulators that have already been integrated with HELICS this architecture will generally not be used. For simulators that are multi-threaded by nature and typically represent multiple independent simulated entities (federates to HELICS), HELICS can be configured to facilitate message passing between threads. For a co-simulation that exists entirely within a single executable, this architecture will provide the highest performance. For example, if a large number of small controllers are written as a single, multi-threaded application (perhaps all the thermostats in a large commercial building are being managed by a centralized controller), particularly where there is communication between the federates, using a single core inside a single multi-threaded application (with typically one thread per federate) will provide the highest level of performance.
 
 ![Multi-threading allowing multiple federates on a single HELICS core](../../img/helics_architecture_2.png)
 
