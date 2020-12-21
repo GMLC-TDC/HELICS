@@ -33,13 +33,7 @@ This page describes the model -- what is the research question addressed, and wh
 	* [Finalize Co-simulation](#finalize-co-simulation)
 
 
-<a name="where-is-the-code">
-<strong>
-<span style="font-size:larger;color:black;text-decoration:underline;">
-Where is the code?
-</span>
-</strong>
-</a>
+## Where is the code?
 
 The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
 
