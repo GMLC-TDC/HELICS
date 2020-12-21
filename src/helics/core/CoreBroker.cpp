@@ -2494,7 +2494,8 @@ enum subqueries : std::uint16_t {
     dependency_graph = 3,
     data_flow_graph = 4,
     version_all = 5,
-    global_state = 6
+    global_state = 6,
+    global_time_debugging = 7
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2504,6 +2505,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"data_flow_graph", {data_flow_graph, false}},
     {"version_all", {version_all, false}},
     {"global_state", {global_state, true}},
+    {"global_time_debugging", {global_time_debugging, true}},
 };
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request)
@@ -2823,6 +2825,14 @@ void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t 
         case global_state:
             base["state"] = brokerStateName(brokerState.load());
             base["status"] = isConnected();
+            break;
+        case global_time_debugging:
+            base["state"] = brokerStateName(brokerState.load());
+            if (timeCoord && !timeCoord->empty())
+            {
+                base["time"] = Json::Value();
+                timeCoord->generateDebuggingTimeInfo(base["time"]);
+            }
             break;
     }
 }

@@ -1993,6 +1993,7 @@ enum subqueries : std::uint16_t {
     dependency_graph = 3,
     data_flow_graph = 4,
     global_state = 6,
+    global_time_debugging = 7
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2000,6 +2001,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
     {"global_state", {global_state, true}},
+    {"global_time_debugging", {global_time_debugging, true}},
 };
 
 void CommonCore::setQueryCallback(local_federate_id federateID,
@@ -2228,6 +2230,13 @@ void CommonCore::initializeMapBuilder(const std::string& request,
             break;
         case global_state:
             base["state"] = brokerStateName(brokerState.load());
+            break;
+        case global_time_debugging:
+            base["state"] = brokerStateName(brokerState.load());
+            if (timeCoord && !timeCoord->empty()) {
+                base["time"] = Json::Value();
+                timeCoord->generateDebuggingTimeInfo(base["time"]);
+            }
             break;
         default:
             break;

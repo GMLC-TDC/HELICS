@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
+#include "json/forwards.h"
 
 #include <atomic>
 #include <functional>
@@ -17,20 +18,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
 /** class managing the coordination of time in HELICS for forwarding object (cores, brokers)
 the time coordinator manages dependencies and computes whether time can advance or enter execution
 mode
 */
 class ForwardingTimeCoordinator {
   private:
-    // the variables for time coordination
-    Time time_next{timeZero};  //!< the next possible internal event time
-    Time time_minminDe{timeZero};  //!< the minimum  of the minimum dependency event Time
-    Time time_minDe{timeZero};  //!< the minimum event time of the dependencies
 
-    DependencyInfo::time_state_t time_state{
-        DependencyInfo::time_state_t::time_requested};  //!< the current forwarding time state
-    global_federate_id lastMinFed{};  //!< the latest minimum fed
+    // the variables for time coordination
+      DependencyInfo main;
+      DependencyInfo minExcl;
+
+    
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
@@ -75,7 +75,11 @@ class ForwardingTimeCoordinator {
     const DependencyInfo* getDependencyInfo(global_federate_id ofed) const;
     /** check whether a federate is a dependency*/
     bool isDependency(global_federate_id ofed) const;
-
+    /** check whether a timeCoordinator has any dependencies or dependents*/
+    bool empty() const
+    {
+        return dependents.empty() && dependencies.empty();
+    }
   private:
     /**send out the latest time request command*/
     void sendTimeRequest() const;
@@ -120,10 +124,12 @@ class ForwardingTimeCoordinator {
 
     /** generate a string with the current time status*/
     std::string printTimeStatus() const;
+    /** generate debugging time information*/
+    void generateDebuggingTimeInfo(Json::Value& base) const;
 
     /** check if there are any active Time dependencies*/
     bool hasActiveTimeDependencies() const;
     /** get the current next time*/
-    Time getNextTime() const { return time_next; }
+    Time getNextTime() const { return main.next; }
 };
 }  // namespace helics

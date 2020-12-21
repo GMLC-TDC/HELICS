@@ -1754,6 +1754,15 @@ std::string FederateState::processQueryActual(const std::string& query) const
         base["state"] = fedStateString(state.load());
         return generateJsonString(base);
     }
+    if (query == "global_time_debugging") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["state"] = fedStateString(state.load());
+        timeCoord->generateDebuggingTimeInfo(base);
+        return generateJsonString(base);
+    }
     if (query == "timeconfig") {
         Json::Value base;
         timeCoord->generateConfig(base);

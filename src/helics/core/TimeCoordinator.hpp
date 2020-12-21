@@ -222,5 +222,8 @@ class TimeCoordinator {
     bool hasActiveTimeDependencies() const;
     /** generate a configuration string(JSON)*/
     void generateConfig(Json::Value& base) const;
+
+    /** generate debugging time information*/
+    void generateDebuggingTimeInfo(Json::Value& base) const;
 };
 }  // namespace helics

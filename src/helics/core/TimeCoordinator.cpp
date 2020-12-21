@@ -61,7 +61,7 @@ void TimeCoordinator::disconnect()
     if (sendMessageFunction) {
         std::set<global_federate_id> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
-            if (dep.Tnext < Time::maxVal()) {
+            if (dep.next < Time::maxVal()) {
                 connections.insert(dep.fedID);
             }
         }
@@ -104,7 +104,7 @@ void TimeCoordinator::localError()
     if (sendMessageFunction) {
         std::set<global_federate_id> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
-            if (dep.Tnext < Time::maxVal()) {
+            if (dep.next < Time::maxVal()) {
                 connections.insert(dep.fedID);
             }
         }
@@ -266,6 +266,33 @@ void TimeCoordinator::generateConfig(Json::Value& base) const
     }
 }
 
+void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const {
+    generateConfig(base);
+        base["granted"] = static_cast<double>(time_granted);
+        base["requested"] = static_cast<double>(time_requested);
+    base["exec"] = static_cast<double>(time_exec);
+    base["allow"] = static_cast<double>(time_allow);
+    base["value"] = static_cast<double>(time_value);
+    base["message"] = static_cast<double>(time_message);
+    base["minde"] = static_cast<double>(time_minDe);
+        base["minminde"]=static_cast<double>(time_minminDe);
+    base["dependencies"] = Json::arrayValue;
+        for (auto dep : dependencies)
+        {
+        Json::Value depblock;
+            depblock["id"] = dep.fedID.baseValue();
+        depblock["state"] = static_cast<int>(dep.time_state);
+            depblock["next"] = static_cast<double>(dep.next);
+        depblock["te"] = static_cast<double>(dep.Te);
+            depblock["minde"] = static_cast<double>(dep.minDe);
+        base["dependencies"].append(depblock);
+    }
+    base["dependents"] = Json::arrayValue;
+    for (auto dep : dependents) {
+        base["dependents"].append(dep.baseValue());
+    }
+
+}
 bool TimeCoordinator::hasActiveTimeDependencies() const
 {
     return dependencies.hasActiveTimeDependencies();
@@ -344,12 +371,12 @@ bool TimeCoordinator::updateTimeFactors()
     Time minminDe = std::min(time_value, time_message);
     Time minDe = minminDe;
     for (auto& dep : dependencies) {
-        if (dep.Tnext < minNext) {
-            minNext = dep.Tnext;
+        if (dep.next < minNext) {
+            minNext = dep.next;
         }
-        if (dep.Tdemin >= dep.Tnext) {
-            if (dep.Tdemin < minminDe) {
-                minminDe = dep.Tdemin;
+        if (dep.minDe >= dep.next) {
+            if (dep.minDe < minminDe) {
+                minminDe = dep.minDe;
             }
         } else {
             // this minimum dependent event time received was invalid and can't be trusted
@@ -672,20 +699,20 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             return message_process_result::no_effect;
         }
         switch (dep->time_state) {
-            case DependencyInfo::time_state_t::time_requested:
-                if (dep->Tnext > time_exec) {
+            case time_state_t::time_requested:
+                if (dep->next > time_exec) {
                     return message_process_result::delay_processing;
                 }
                 break;
-            case DependencyInfo::time_state_t::time_requested_iterative:
-                if (dep->Tnext > time_exec) {
+            case time_state_t::time_requested_iterative:
+                if (dep->next > time_exec) {
                     return message_process_result::delay_processing;
                 }
-                if ((iterating != iteration_request::no_iterations) && (time_exec == dep->Tnext)) {
+                if ((iterating != iteration_request::no_iterations) && (time_exec == dep->next)) {
                     return message_process_result::delay_processing;
                 }
                 break;
-            case DependencyInfo::time_state_t::exec_requested_iterative:
+            case time_state_t::exec_requested_iterative:
                 if ((iterating != iteration_request::no_iterations) && (checkingExec)) {
                     return message_process_result::delay_processing;
                 }

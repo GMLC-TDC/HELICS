@@ -12,9 +12,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <set>
 #include <string>
 #include <vector>
+#include "json/json.h"
+
 namespace helics {
 void ForwardingTimeCoordinator::enteringExecMode()
 {
@@ -26,13 +29,57 @@ void ForwardingTimeCoordinator::enteringExecMode()
     execreq.source_id = source_id;
     transmitTimingMessage(execreq);
 }
+/*
+void ForwardingTimeCoordinator::disconnect()
+{
+if (sendMessageFunction) {
+        if (dependencies.empty())
+        {
+            return;
+        }
+        ActionMessage bye(CMD_DISCONNECT);
+        bye.source_id = source_id;
+        if (dependencies.size() == 1)
+        {
+            auto& dep = *dependencies.begin();
+            if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent)
+            {
+                bye.dest_id = dep.fedID;
+                if (bye.dest_id == source_id) {
+                    processTimeMessage(bye);
+                } else {
+                    sendMessageFunction(bye);
+                }
+            }
 
+        }
+        else
+        {
+            ActionMessage multi(CMD_MULTI_MESSAGE);
+            for (auto dep : dependencies) {
+                if ((dep.dependency && dep.next < Time::maxVal())||dep.dependent) {
+                    bye.dest_id = dep.fedID;
+                            if (dep.fedID == source_id) {
+                                processTimeMessage(bye);
+                            } else {
+                                appendMessage(multi, bye);
+                            }
+
+                }
+            }
+            sendMessageFunction(multi);
+        }
+
+
+    }
+}
+*/
 void ForwardingTimeCoordinator::disconnect()
 {
     if (sendMessageFunction) {
         std::set<global_federate_id> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
-            if (dep.Tnext < Time::maxVal()) {
+            if (dep.next < Time::maxVal()) {
                 connections.insert(dep.fedID);
             }
         }
@@ -69,37 +116,28 @@ static inline bool isBroker(global_federate_id id)
     return ((id.baseValue() == 1) || (id.baseValue() >= 0x7000'0000));
 }
 
-class minTimeSet {
-  public:
-    Time minNext = Time::maxVal();
-    Time minminDe = Time::maxVal();
-    Time minDe = minminDe;
-    global_federate_id minFed;
-    DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
-};
-
-static minTimeSet generateMinTimeSet(const TimeDependencies& dependencies,
+static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
                                      bool restricted,
                                      global_federate_id ignore = global_federate_id())
 {
-    minTimeSet mTime;
+    DependencyInfo mTime(Time::maxVal());
     for (auto& dep : dependencies) {
         if (dep.fedID == ignore) {
             continue;
         }
-        if (dep.Tnext < mTime.minNext) {
-            mTime.minNext = dep.Tnext;
-            mTime.tState = dep.time_state;
-        } else if (dep.Tnext == mTime.minNext) {
-            if (dep.time_state == DependencyInfo::time_state_t::time_granted) {
-                mTime.tState = dep.time_state;
+        if (dep.next < mTime.next) {
+            mTime.next = dep.next;
+            mTime.time_state = dep.time_state;
+        } else if (dep.next == mTime.next) {
+            if (dep.time_state == time_state_t::time_granted) {
+                mTime.time_state = dep.time_state;
             }
         }
-        if (dep.Tdemin >= dep.Tnext) {
-            if (dep.Tdemin < mTime.minminDe) {
-                mTime.minminDe = dep.Tdemin;
+        if (dep.minDe >= dep.next) {
+            if (dep.minDe < mTime.minminDe) {
+                mTime.minminDe = dep.minDe;
                 mTime.minFed = dep.fedID;
-            } else if (dep.Tdemin == mTime.minminDe) {
+            } else if (dep.minDe == mTime.minminDe) {
                 mTime.minFed = global_federate_id();
             }
         } else {
@@ -116,8 +154,8 @@ static minTimeSet generateMinTimeSet(const TimeDependencies& dependencies,
     mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
 
     if (!restricted && mTime.minminDe < Time::maxVal()) {
-        if (mTime.minminDe > mTime.minNext) {
-            mTime.minNext = mTime.minminDe;
+        if (mTime.minminDe > mTime.next) {
+            mTime.next = mTime.minminDe;
         }
     }
     return mTime;
@@ -127,35 +165,35 @@ void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy);
 
-    bool update = (time_state != mTime.tState);
-    time_state = mTime.tState;
+    bool update = (main.time_state != mTime.time_state);
+    main.time_state = mTime.time_state;
 
-    Time prev_next = time_next;
-    time_next = mTime.minNext;
+    Time prev_next = main.next;
+    main.next = mTime.next;
 
-    if (mTime.minDe != time_minDe) {
+    if (mTime.minDe != main.minDe) {
         update = true;
-        time_minDe = mTime.minDe;
+        main.minDe = mTime.minDe;
     }
-    if (mTime.minminDe != time_minminDe) {
-        time_minminDe = mTime.minminDe;
+    if (mTime.minminDe != main.minminDe) {
+        main.minminDe = mTime.minminDe;
         update = true;
     }
 
-    if (!restrictive_time_policy && time_minminDe < Time::maxVal()) {
-        if (time_minminDe > time_next) {
-            time_next = time_minminDe;
+    if (!restrictive_time_policy && main.minminDe < Time::maxVal()) {
+        if (main.minminDe > main.next) {
+            main.next = main.minminDe;
         }
     }
     //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id,
     //    static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
-    if (prev_next != time_next) {
+    if (prev_next != main.next) {
         update = true;
     }
 
-    if (mTime.minFed != lastMinFed) {
-        lastMinFed = mTime.minFed;
+    if (mTime.minFed != main.minFed) {
+        main.minFed = mTime.minFed;
         if (isBroker(mTime.minFed)) {
             update = true;
         }
@@ -170,11 +208,11 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
     if (!sendMessageFunction) {
         return;
     }
-    if (time_state == DependencyInfo::time_state_t::time_granted) {
+    if (main.time_state == time_state_t::time_granted) {
         ActionMessage upd(CMD_TIME_GRANT);
         upd.source_id = source_id;
         //    upd.source_handle = lastMinFed;
-        upd.actionTime = time_next;
+        upd.actionTime = main.next;
         if (iterating) {
             setActionFlag(upd, iteration_requested_flag);
         }
@@ -183,9 +221,10 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
         ActionMessage upd(CMD_TIME_REQUEST);
         upd.source_id = source_id;
         //    upd.source_handle = lastMinFed;
-        upd.actionTime = time_next;
-        upd.Te = time_minDe;
-        upd.Tdemin = time_minminDe;
+        upd.actionTime = main.next;
+        upd.Te = main.minDe;
+        upd.Tdemin = main.minminDe;
+        upd.setExtraData(main.minFed.baseValue());
         if (iterating) {
             setActionFlag(upd, iteration_requested_flag);
         }
@@ -196,12 +235,37 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
     }
 }
 
+
+void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
+{
+    base["type"] = "forwarding";
+    base["next"] = static_cast<double>(main.next);
+    base["minde"] = static_cast<double>(main.minDe);
+    base["minminde"] = static_cast<double>(main.minminDe);
+    base["minfed"] = main.minFed.baseValue();
+    base["minfedActual"] = main.minFedActual.baseValue();
+    base["dependencies"] = Json::arrayValue;
+    for (auto dep : dependencies) {
+        Json::Value depblock;
+        depblock["id"] = dep.fedID.baseValue();
+        depblock["state"] = static_cast<int>(dep.time_state);
+        depblock["next"] = static_cast<double>(dep.next);
+        depblock["te"] = static_cast<double>(dep.Te);
+        depblock["minde"] = static_cast<double>(dep.minDe);
+        depblock["minfed"] = dep.minFed.baseValue();
+        base["dependencies"].append(depblock);
+    }
+    for (auto dep : dependents) {
+        base["dependents"].append(dep.baseValue());
+    }
+}
+
 std::string ForwardingTimeCoordinator::printTimeStatus() const
 {
     return fmt::format(R"raw({{"time_next":{}, "minDe":{}, "minminDe":{}}})raw",
-                       static_cast<double>(time_next),
-                       static_cast<double>(time_minDe),
-                       static_cast<double>(time_minminDe));
+                       static_cast<double>(main.next),
+                       static_cast<double>(main.minDe),
+                       static_cast<double>(main.minminDe));
 }
 
 bool ForwardingTimeCoordinator::isDependency(global_federate_id ofed) const
@@ -216,6 +280,8 @@ bool ForwardingTimeCoordinator::addDependency(global_federate_id fedID)
 
 bool ForwardingTimeCoordinator::addDependent(global_federate_id fedID)
 {
+    dependencies.addDependent(fedID);
+
     if (dependents.empty()) {
         dependents.push_back(fedID);
         return true;
@@ -239,6 +305,7 @@ void ForwardingTimeCoordinator::removeDependency(global_federate_id fedID)
 
 void ForwardingTimeCoordinator::removeDependent(global_federate_id fedID)
 {
+    dependencies.removeDependent(fedID);
     auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
     if (dep != dependents.end()) {
         if (*dep == fedID) {
@@ -276,10 +343,10 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
     ret = message_processing_result::next_step;
 
     executionMode = true;
-    time_next = timeZero;
-    time_state = DependencyInfo::time_state_t::time_granted;
-    time_minDe = timeZero;
-    time_minminDe = timeZero;
+    main.next = timeZero;
+    main.time_state = time_state_t::time_granted;
+    main.minDe = timeZero;
+    main.minminDe = timeZero;
 
     ActionMessage execgrant(CMD_EXEC_GRANT);
     execgrant.source_id = source_id;
@@ -295,17 +362,17 @@ ActionMessage
     auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy, iFed);
     ActionMessage nTime(msg);
 
-    nTime.actionTime = mTime.minNext;
+    nTime.actionTime = mTime.next;
     nTime.Tdemin = mTime.minminDe;
     nTime.Te = mTime.minDe;
     nTime.dest_id = iFed;
-
-    if (mTime.tState == DependencyInfo::time_state_t::time_granted) {
+    nTime.setExtraData(mTime.minFed.baseValue());
+    if (mTime.time_state == time_state_t::time_granted) {
         nTime.setAction(CMD_TIME_GRANT);
-    } else if (mTime.tState == DependencyInfo::time_state_t::time_requested) {
+    } else if (mTime.time_state == time_state_t::time_requested) {
         nTime.setAction(CMD_TIME_REQUEST);
         clearActionFlag(nTime, iteration_requested_flag);
-    } else if (mTime.tState == DependencyInfo::time_state_t::time_requested_iterative) {
+    } else if (mTime.time_state == time_state_t::time_requested_iterative) {
         nTime.setAction(CMD_TIME_REQUEST);
         setActionFlag(nTime, iteration_requested_flag);
     }
@@ -320,7 +387,7 @@ void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
                 if ((isBroker(dep)) && (!ignoreMinFed)) {
                     auto di = getDependencyInfo(dep);
                     if (di != nullptr) {
-                        if ((di->Tnext == msg.actionTime) || (di->fedID == lastMinFed)) {
+                        if ((di->next == msg.actionTime) || (di->fedID == main.minFed)) {
                             sendMessageFunction(generateTimeRequestIgnoreDependency(msg, dep));
                             continue;
                         }
@@ -328,7 +395,7 @@ void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
                 }
                 auto di = getDependencyInfo(dep);
                 if (di != nullptr) {
-                    if (di->Tnext > msg.actionTime) {
+                    if (di->next > msg.actionTime) {
                         continue;
                     }
                 }
