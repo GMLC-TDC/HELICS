@@ -18,4 +18,7 @@ Co-simulation is a powerful analysis technique that allows simulators of differe
 
 ```
 
-Last change: |today|
+Last change: 
+```eval_rst
+|today|
+```
