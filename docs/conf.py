@@ -177,6 +177,11 @@ html_sidebars = {
     ]
 }
 
+
+# Adding last updated timestamp at the bottom of every page
+html_last_updated_fmt = '%H:%M  %d %b %Y'
+
+
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
