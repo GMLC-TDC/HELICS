@@ -2,61 +2,21 @@
 
 
 
-
 ```eval_rst
 .. toctree::
     :maxdepth: 1
-
+    
+    fundamental_endpoints
+    fundamental_combo
 
 ```
 
-[description of what this tutorial module will cover -- different ways to connect messages, and different ways to disrupt message receipt.  why we want to do this different ways (in general), and what this affords us for the EV toy research question]
+In the [Base Example](./fundamental_default.md), we saw information passed between two federates using publications and subscriptions (pubs/subs). In addition to pubs/subs, where information is passed as *values* (physical parameters of the system), federates can also pass information between **endpoints**, where this information is now a *message*.
 
-* Endpoints
-	* Files
-	* Setup
-	* Results
-* Endpoints + Pub/Subs
- 	* Files
-	* Setup
-	* Results
-* Filters
-	* Files
-	* Setup
-	* Results
-
-	
-## Endpoints
-
-[why would we want to set up the co-sim with multi-source inputs? what does that allow us do answer for the EV toy?]
-
-### Files
-
-### Setup
-
-### Results
-
-## Endpoints + Pub/Subs
-
-### Files
-
-### Setup
-
-### Results
-
-## Filters
-
-### Files
-
-### Setup
-
-### Results
+This section on message and communication configuration will walk through how to set up two federates to pass messages using [endpoints](./fundamental_endpoints.md), and how to set up three federates which pass between them values and messages with a [combination](./fundamental_combo.md) of the two configurations.
 
 
-## [Questions and Help](../support.md)
 
-Do you have questions about HELICS or need help?  
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
-2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
-3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!
+
+
