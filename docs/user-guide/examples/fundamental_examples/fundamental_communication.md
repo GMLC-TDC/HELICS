@@ -2,14 +2,6 @@
 
 
 
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-    
-    fundamental_endpoints
-    fundamental_combo
-
-```
 
 In the [Base Example](./fundamental_default.md), we saw information passed between two federates using publications and subscriptions (pubs/subs). In addition to pubs/subs, where information is passed as *values* (physical parameters of the system), federates can also pass information between **endpoints**, where this information is now a *message*.
 
@@ -18,5 +10,12 @@ This section on message and communication configuration will walk through how to
 
 
 
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    
+    fundamental_endpoints
+    fundamental_combo
 
+```
 
