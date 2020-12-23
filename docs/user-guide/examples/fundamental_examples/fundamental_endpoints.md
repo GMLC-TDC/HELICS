@@ -1,3 +1,4 @@
+# Endpoint Federates
 
 ```eval_rst
 .. toctree::
