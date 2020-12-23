@@ -253,7 +253,7 @@ A command-line-like string that specifies options for the core as it connects to
 - `--broker_tag=`: For MPI cores only; identifies the MPI tag of the broker
 - `--localport=`: Port number to use when communicating with this core
 - `--autobroker`: When included the core will automatically generate a broker
-- `--key=`: Specifies a key to use when communicating with the broker. Only federates with this key specified will be able to talk to the broker with the same `key` value. This is used to prevent federations running on the same hardware from accidentally interfering with each other.
+- `--broker_key=`: Specifies a key to use when communicating with the broker. Only federates with this key specified will be able to talk to the broker with the same `key` value. This is used to prevent federations running on the same hardware from accidentally interfering with each other.
 
 In addition to these options, all options shown in the `broker_init_string` are also valid.
 

@@ -74,13 +74,13 @@ borker_config.json
 ```
 
 
-## Use of keys
+## Use of broker keys
 
-The previous techniques have used methods to create separate brokers and network connections to segregate the traffic for each simultaneously running co-simulation. Alternatively, the use of broker keys allows traffic from multiple co-simulations to flow through the same broker yet not interfere with each other. **NOTE:** _This key is not a cryptographic key, it is just a string to mark co-simulation traffic as belonging to a specific federation._
+The previous techniques have used methods to create separate brokers and network connections to segregate the traffic for each simultaneously running co-simulation.  For cases where there is a possibility of another co-simulation running in the same compute environment and having federates accidentally join your federation (such as in, perhaps, high-performance computing environments), the use of **broker keys** can prevent this from happening.  _This key is not a cryptographic key_, it is just a string to mark co-simulation traffic as belonging to a specific federation. It also doesn't solve the problem of federates and brokers using the same port (as the above example where `broker_port` was set). It is simply a way of preventing federates without the correct `broker_key` from joining the federation and thus prevent two federations from accidentally mixing.
 
 broker_server command-line launch:
 ```sh
-helics_broker --type=zmq --key=my_broker_key
+helics_broker --type=zmq --broker_key=my_broker_key
 ```
 
 Federate configuration:
@@ -89,7 +89,7 @@ Federate configuration:
   "name": "federate_name",
   "loglevel": 1,
   "coreType": "zmq",
-  "coreInitString": "--key=my_broker_key"
+  "coreInitString": "--broker_key=my_broker_key"
   ...
 ```
 
