@@ -1,13 +1,28 @@
 # Endpoint Federates
 
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-    
+The Federate Message + Communication Configuration Example extends the Base Example to demonstrate how to register federates which send messages from/to endpoints instead of values from/to pub/subs.
 
+This tutorial is organized as follows:
 
-```
+* [Computing Environment](#computing-environment)
+* [Example files](#example-files)  
+* [Federate Communication with Endpoints](#federate-communication-with-endpoints)
+	* [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
+	* [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
+	* [Co-simulation Execution](co-simulation-execution)
+* [Questions and Help](#questions-and-help)
 
+## Computing Environment
+
+## Example files
+
+## Federate Communication with Endpoints
+
+### When to use pub/subs vs endpoints
+
+### Translation from pub/sub to endpoints
+
+### Co-simulation execution
 
 ## [Questions and Help](../support.md)
 
