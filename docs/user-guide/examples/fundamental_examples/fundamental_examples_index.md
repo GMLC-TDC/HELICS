@@ -6,7 +6,7 @@ The Fundamental Examples teach three concepts to build on a default setup:
 
 ```eval_rst
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     
     fundamental_default
     fundamental_fedintegration
