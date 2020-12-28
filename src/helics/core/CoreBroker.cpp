@@ -1569,9 +1569,11 @@ void CoreBroker::addEndpoint(ActionMessage& m)
                 ActionMessage add(CMD_ADD_INTERDEPENDENCY,
                                   global_broker_id_local,
                                   higher_broker_id);
+                setActionFlag(add, child_flag);
                 transmit(parent_route_id, add);
 
                 timeCoord->addDependent(higher_broker_id);
+                timeCoord->setAsParent(higher_broker_id);
             }
         }
     } else {
@@ -1605,6 +1607,7 @@ void CoreBroker::addFilter(ActionMessage& m)
             if (timeCoord->addDependent(higher_broker_id)) {
                 hasTimeDependency = true;
                 ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
+                setActionFlag(add, child_flag);
                 transmit(parent_route_id, add);
             }
         }
@@ -3126,8 +3129,11 @@ void CoreBroker::checkDependencies()
 
         ActionMessage adddep(CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
+        setActionFlag(adddep, child_flag);
         routeMessage(adddep, higher_broker_id);
         adddep.source_id = higher_broker_id;
+        clearActionFlag(adddep, child_flag);
+        setActionFlag(adddep, parent_flag);
         routeMessage(adddep, fedid);
     }
 }

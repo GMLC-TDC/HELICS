@@ -615,7 +615,7 @@ iteration_time
 #endif
 
         unlock();
-        if ((retTime.grantedTime > nextTime) && (nextTime > lastTime)) {
+        if (retTime.grantedTime > nextTime && nextTime > lastTime && retTime.grantedTime<Time::maxVal()) {
             if (!ignore_time_mismatch_warnings) {
                 LOG_WARNING(
                     fmt::format("Time mismatch detected granted time >requested time {} vs {}",

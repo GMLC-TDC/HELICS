@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
+#include "json/json.h"
 #include <algorithm>
 #include <iostream>
 #include <set>
 #include <string>
 #include <vector>
-#include "json/json.h"
 
 namespace helics {
 void ForwardingTimeCoordinator::enteringExecMode()
@@ -28,22 +28,31 @@ void ForwardingTimeCoordinator::enteringExecMode()
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
     transmitTimingMessage(execreq);
+    bool fedOnly = true;
+    for (const auto& dep : dependencies) {
+        if (dep.parent) {
+            fedOnly = false;
+            break;
+        }
+        if (dep.child && dep.fedID.isBroker()) {
+            fedOnly = false;
+            break;
+        }
+    }
+    federatesOnly = fedOnly;
 }
-/*
+
 void ForwardingTimeCoordinator::disconnect()
 {
-if (sendMessageFunction) {
-        if (dependencies.empty())
-        {
+    if (sendMessageFunction) {
+        if (dependencies.empty()) {
             return;
         }
         ActionMessage bye(CMD_DISCONNECT);
         bye.source_id = source_id;
-        if (dependencies.size() == 1)
-        {
+        if (dependencies.size() == 1) {
             auto& dep = *dependencies.begin();
-            if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent)
-            {
+            if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                 bye.dest_id = dep.fedID;
                 if (bye.dest_id == source_id) {
                     processTimeMessage(bye);
@@ -52,28 +61,24 @@ if (sendMessageFunction) {
                 }
             }
 
-        }
-        else
-        {
+        } else {
             ActionMessage multi(CMD_MULTI_MESSAGE);
             for (auto dep : dependencies) {
-                if ((dep.dependency && dep.next < Time::maxVal())||dep.dependent) {
+                if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                     bye.dest_id = dep.fedID;
-                            if (dep.fedID == source_id) {
-                                processTimeMessage(bye);
-                            } else {
-                                appendMessage(multi, bye);
-                            }
-
+                    if (dep.fedID == source_id) {
+                        processTimeMessage(bye);
+                    } else {
+                        appendMessage(multi, bye);
+                    }
                 }
             }
             sendMessageFunction(multi);
         }
-
-
     }
 }
-*/
+
+/*
 void ForwardingTimeCoordinator::disconnect()
 {
     if (sendMessageFunction) {
@@ -110,15 +115,15 @@ void ForwardingTimeCoordinator::disconnect()
         }
     }
 }
-
+*/
 static inline bool isBroker(global_federate_id id)
 {
     return ((id.baseValue() == 1) || (id.baseValue() >= 0x7000'0000));
 }
 
 static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
-                                     bool restricted,
-                                     global_federate_id ignore = global_federate_id())
+                                         bool restricted,
+                                         global_federate_id ignore = global_federate_id())
 {
     DependencyInfo mTime(Time::maxVal());
     for (auto& dep : dependencies) {
@@ -137,6 +142,11 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
             if (dep.minDe < mTime.minminDe) {
                 mTime.minminDe = dep.minDe;
                 mTime.minFed = dep.fedID;
+                if (dep.minFed.isValid()) {
+                    mTime.minFedActual = dep.minFed;
+                } else {
+                    mTime.minFedActual = dep.fedID;
+                }
             } else if (dep.minDe == mTime.minminDe) {
                 mTime.minFed = global_federate_id();
             }
@@ -165,41 +175,22 @@ void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy);
 
-    bool update = (main.time_state != mTime.time_state);
-    main.time_state = mTime.time_state;
-
-    Time prev_next = main.next;
-    main.next = mTime.next;
-
-    if (mTime.minDe != main.minDe) {
-        update = true;
-        main.minDe = mTime.minDe;
-    }
-    if (mTime.minminDe != main.minminDe) {
-        main.minminDe = mTime.minminDe;
-        update = true;
-    }
-
+    bool update = main.update(mTime);
+    bool minUpdate = false;
     if (!restrictive_time_policy && main.minminDe < Time::maxVal()) {
         if (main.minminDe > main.next) {
             main.next = main.minminDe;
         }
     }
-    //    printf("%d UPDATE next=%f, minminDE=%f, Tdemin=%f\n", source_id,
-    //    static_cast<double>(time_next),
-    // static_cast<double>(minminDe), static_cast<double>(minDe));
-    if (prev_next != main.next) {
-        update = true;
-    }
 
-    if (mTime.minFed != main.minFed) {
-        main.minFed = mTime.minFed;
-        if (isBroker(mTime.minFed)) {
-            update = true;
-        }
+    if (main.minFed.isValid()) {
+        auto minTime = generateMinTimeSet(dependencies, restrictive_time_policy, main.minFed);
+        minUpdate = minExcl.update(minTime);
     }
     if (update) {
         sendTimeRequest();
+    } else if (minUpdate) {
+        //sendTimeRequest();
     }
 }
 
@@ -208,55 +199,60 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
     if (!sendMessageFunction) {
         return;
     }
+    ActionMessage upd(CMD_TIME_REQUEST);
+    upd.source_id = source_id;
+    //    upd.source_handle = lastMinFed;
+    upd.actionTime = main.next;
+    if (iterating) {
+        setActionFlag(upd, iteration_requested_flag);
+    }
     if (main.time_state == time_state_t::time_granted) {
-        ActionMessage upd(CMD_TIME_GRANT);
-        upd.source_id = source_id;
-        //    upd.source_handle = lastMinFed;
-        upd.actionTime = main.next;
-        if (iterating) {
-            setActionFlag(upd, iteration_requested_flag);
-        }
-        transmitTimingMessage(upd);
+         upd.setAction(CMD_TIME_GRANT);
     } else {
-        ActionMessage upd(CMD_TIME_REQUEST);
-        upd.source_id = source_id;
-        //    upd.source_handle = lastMinFed;
-        upd.actionTime = main.next;
+        
         upd.Te = main.minDe;
         upd.Tdemin = main.minminDe;
         upd.setExtraData(main.minFed.baseValue());
-        if (iterating) {
-            setActionFlag(upd, iteration_requested_flag);
-        }
-        transmitTimingMessage(upd);
-
-        //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
-        // static_cast<double>(time_exec), static_cast<double>(time_minDe));
     }
+    transmitTimingMessage(upd);
 }
-
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
 {
     base["type"] = "forwarding";
-    base["next"] = static_cast<double>(main.next);
-    base["minde"] = static_cast<double>(main.minDe);
-    base["minminde"] = static_cast<double>(main.minminDe);
-    base["minfed"] = main.minFed.baseValue();
-    base["minfedActual"] = main.minFedActual.baseValue();
+    Json::Value mainBlock;
+    mainBlock["next"] = static_cast<double>(main.next);
+    mainBlock["minde"] = static_cast<double>(main.minDe);
+    mainBlock["minminde"] = static_cast<double>(main.minminDe);
+    mainBlock["minfed"] = main.minFed.baseValue();
+    mainBlock["minfedActual"] = main.minFedActual.baseValue();
+    base["main"] = mainBlock;
+    Json::Value minBlock;
+    minBlock["next"] = static_cast<double>(minExcl.next);
+    minBlock["minde"] = static_cast<double>(minExcl.minDe);
+    minBlock["minminde"] = static_cast<double>(minExcl.minminDe);
+    minBlock["minfed"] = minExcl.minFed.baseValue();
+    minBlock["minfedActual"] = minExcl.minFedActual.baseValue();
+    base["excl"] = minBlock;
+
     base["dependencies"] = Json::arrayValue;
+    base["federatesonly"] = federatesOnly;
     for (auto dep : dependencies) {
-        Json::Value depblock;
-        depblock["id"] = dep.fedID.baseValue();
-        depblock["state"] = static_cast<int>(dep.time_state);
-        depblock["next"] = static_cast<double>(dep.next);
-        depblock["te"] = static_cast<double>(dep.Te);
-        depblock["minde"] = static_cast<double>(dep.minDe);
-        depblock["minfed"] = dep.minFed.baseValue();
-        base["dependencies"].append(depblock);
-    }
-    for (auto dep : dependents) {
-        base["dependents"].append(dep.baseValue());
+        if (dep.dependency) {
+            Json::Value depblock;
+            depblock["id"] = dep.fedID.baseValue();
+            depblock["state"] = static_cast<int>(dep.time_state);
+            depblock["next"] = static_cast<double>(dep.next);
+            depblock["te"] = static_cast<double>(dep.Te);
+            depblock["minde"] = static_cast<double>(dep.minDe);
+            depblock["minfed"] = dep.minFed.baseValue();
+            depblock["parent"] = dep.parent;
+            depblock["child"] = dep.child;
+            base["dependencies"].append(depblock);
+        }
+        if (dep.dependent) {
+            base["dependents"].append(dep.fedID.baseValue());
+        }
     }
 }
 
@@ -280,22 +276,23 @@ bool ForwardingTimeCoordinator::addDependency(global_federate_id fedID)
 
 bool ForwardingTimeCoordinator::addDependent(global_federate_id fedID)
 {
-    dependencies.addDependent(fedID);
+    return dependencies.addDependent(fedID);
+}
 
-    if (dependents.empty()) {
-        dependents.push_back(fedID);
-        return true;
+void ForwardingTimeCoordinator::setAsChild(global_federate_id fedID)
+{
+    auto* dep = dependencies.getDependencyInfo(fedID);
+    if (dep != nullptr) {
+        dep->child = true;
     }
-    auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
-    if (dep == dependents.end()) {
-        dependents.push_back(fedID);
-    } else {
-        if (*dep == fedID) {
-            return false;
-        }
-        dependents.insert(dep, fedID);
+}
+
+void ForwardingTimeCoordinator::setAsParent(global_federate_id fedID)
+{
+    auto* dep = dependencies.getDependencyInfo(fedID);
+    if (dep != nullptr) {
+        dep->parent = true;
     }
-    return true;
 }
 
 void ForwardingTimeCoordinator::removeDependency(global_federate_id fedID)
@@ -306,12 +303,6 @@ void ForwardingTimeCoordinator::removeDependency(global_federate_id fedID)
 void ForwardingTimeCoordinator::removeDependent(global_federate_id fedID)
 {
     dependencies.removeDependent(fedID);
-    auto dep = std::lower_bound(dependents.begin(), dependents.end(), fedID);
-    if (dep != dependents.end()) {
-        if (*dep == fedID) {
-            dependents.erase(dep);
-        }
-    }
 }
 
 const DependencyInfo* ForwardingTimeCoordinator::getDependencyInfo(global_federate_id ofed) const
@@ -323,7 +314,20 @@ std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies() con
 {
     std::vector<global_federate_id> deps;
     for (auto& dep : dependencies) {
-        deps.push_back(dep.fedID);
+        if (dep.dependency) {
+            deps.push_back(dep.fedID);
+        }
+    }
+    return deps;
+}
+
+std::vector<global_federate_id> ForwardingTimeCoordinator::getDependents() const
+{
+    std::vector<global_federate_id> deps;
+    for (auto& dep : dependencies) {
+        if (dep.dependent) {
+            deps.push_back(dep.fedID);
+        }
     }
     return deps;
 }
@@ -383,30 +387,31 @@ void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
 {
     if (sendMessageFunction) {
         if ((msg.action() == CMD_TIME_REQUEST) || (msg.action() == CMD_TIME_GRANT)) {
-            for (auto dep : dependents) {
-                if ((isBroker(dep)) && (!ignoreMinFed)) {
-                    auto di = getDependencyInfo(dep);
-                    if (di != nullptr) {
-                        if ((di->next == msg.actionTime) || (di->fedID == main.minFed)) {
-                            sendMessageFunction(generateTimeRequestIgnoreDependency(msg, dep));
+            for (auto dep : dependencies) {
+                if ((dep.child || dep.parent) && (!ignoreMinFed) && (!federatesOnly)) {
+                    if (dep.dependency) {
+                        if ((dep.next == msg.actionTime) || (dep.fedID == main.minFed)) {
+                            sendMessageFunction(
+                                generateTimeRequestIgnoreDependency(msg, dep.fedID));
                             continue;
                         }
                     }
                 }
-                auto di = getDependencyInfo(dep);
-                if (di != nullptr) {
-                    if (di->next > msg.actionTime) {
+                if (dep.dependency) {
+                    if (dep.next > msg.actionTime) {
                         continue;
                     }
                 }
 
-                msg.dest_id = dep;
+                msg.dest_id = dep.fedID;
                 sendMessageFunction(msg);
             }
         } else {
-            for (auto dep : dependents) {
-                msg.dest_id = dep;
-                sendMessageFunction(msg);
+            for (auto dep : dependencies) {
+                if (dep.dependent) {
+                    msg.dest_id = dep.fedID;
+                    sendMessageFunction(msg);
+                }
             }
         }
     }
@@ -453,6 +458,12 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage(const ActionMessa
             break;
         default:
             break;
+    }
+    if (checkActionFlag(cmd, child_flag)) {
+        setAsChild(cmd.source_id);
+    }
+    if (checkActionFlag(cmd, parent_flag)) {
+        setAsParent(cmd.source_id);
     }
 }
 

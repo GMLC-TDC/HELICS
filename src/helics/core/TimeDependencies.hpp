@@ -50,6 +50,8 @@ class DependencyInfo {
     explicit DependencyInfo(global_federate_id id): fedID(id) {}
 
     explicit DependencyInfo(Time start): next{start}, minDe{start}, minminDe{start} {};
+    /** check if there is an update to the current dependency info and assign*/
+    bool update(const DependencyInfo& update);
 
 };
 

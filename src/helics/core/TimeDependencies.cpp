@@ -57,7 +57,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = m.actionTime;
             dep.Te = dep.next;
             dep.minDe= dep.next;
-            dep.minFed = global_federate_id(m.getExtraData());
+            dep.minFed = global_federate_id{};
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -85,6 +85,38 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             return false;
     }
     return true;
+}
+
+bool DependencyInfo::update(const DependencyInfo& update)
+{
+    bool updated = (time_state != update.time_state);
+    time_state = update.time_state;
+
+    Time prev_next = next;
+    next = update.next;
+
+    if (update.minDe != minDe) {
+        updated = true;
+        minDe = update.minDe;
+    }
+    if (update.minminDe != minminDe) {
+        minminDe = update.minminDe;
+        updated = true;
+    }
+
+    if (prev_next != next) {
+        updated = true;
+    }
+
+    if (update.minFed != minFed) {
+        minFed = update.minFed;
+        updated = true;
+    }
+    if (update.minFedActual != minFedActual) {
+        minFedActual = update.minFedActual;
+        updated = true;
+    }
+    return updated;
 }
 
 // comparison helper lambda for comparing dependencies
@@ -158,7 +190,11 @@ void TimeDependencies::removeDependency(global_federate_id id)
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
     if (dep != dependencies.end()) {
         if (dep->fedID == id) {
-            dependencies.erase(dep);
+            dep->dependency = false;
+            if (!dep->dependent)
+            {
+                dependencies.erase(dep);
+            }
         }
     }
 }
@@ -194,6 +230,9 @@ void TimeDependencies::removeDependent(global_federate_id id)
     if (dep != dependencies.end()) {
         if (dep->fedID == id) {
             dep->dependent = false;
+            if (!dep->dependency) {
+                dependencies.erase(dep);
+            }
         }
     }
 }
@@ -203,8 +242,7 @@ void TimeDependencies::removeInterdependence(global_federate_id id)
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
     if (dep != dependencies.end()) {
         if (dep->fedID == id) {
-            dep->dependent = false;
-            dep->dependency = false;
+            dependencies.erase(dep);
         }
     }
 }

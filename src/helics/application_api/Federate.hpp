@@ -57,7 +57,8 @@ class HELICS_CXX_EXPORT Federate {
         pending_time = 7,  //!< state that the federate is pending a timeRequest
         pending_iterative_time =
             8,  //!< state that the federate is pending an iterative time request
-        pending_finalize = 9  //!< state that the federate is pending a finalize call
+        pending_finalize = 9,  //!< state that the federate is pending a finalize call
+        finished = 10  //!< the simulation has finished normally but everything is still connected
     };
 
   protected:

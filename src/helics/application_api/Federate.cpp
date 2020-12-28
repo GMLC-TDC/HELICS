@@ -300,7 +300,7 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
                     break;
                     // LCOV_EXCL_STOP
                 case iteration_result::halted:
-                    currentMode = modes::finalize;
+                    currentMode = modes::finished;
                     break;
             }
             break;
@@ -387,7 +387,7 @@ iteration_result Federate::enterExecutingModeComplete()
                         break;
                         // LCOV_EXCL_STOP
                     case iteration_result::halted:
-                        currentMode = modes::finalize;
+                        currentMode = modes::finished;
                         break;
                 }
 
@@ -467,6 +467,7 @@ void Federate::finalize()
             asyncCallInfo->lock()->timeRequestFuture.get();
             break;
         case modes::executing:
+        case modes::finished:
             break;
         case modes::pending_iterative_time:
             asyncCallInfo->lock()
@@ -605,26 +606,32 @@ void Federate::globalError(int errorcode, const std::string& message)
 
 Time Federate::requestTime(Time nextInternalTimeStep)
 {
-    if (currentMode == modes::executing) {
-        try {
-            auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
-            Time oldTime = currentTime;
-            currentTime = newTime;
-            updateTime(newTime, oldTime);
-            if (newTime == Time::maxVal()) {
-                currentMode = modes::finalize;
+    switch (currentMode)
+    {
+        case modes::executing:
+            try {
+                auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+                Time oldTime = currentTime;
+                currentTime = newTime;
+                updateTime(newTime, oldTime);
+                if (newTime == Time::maxVal()) {
+                    currentMode = modes::finished;
+                }
+                return newTime;
             }
-            return newTime;
-        }
-        catch (const FunctionExecutionFailure&) {
-            currentMode = modes::error;
-            throw;
-        }
-    } else if (currentMode == modes::finalize) {
-        return Time::maxVal();
-    } else {
-        throw(InvalidFunctionCall("cannot call request time in present state"));
+            catch (const FunctionExecutionFailure&) {
+                currentMode = modes::error;
+                throw;
+            }
+            break;
+        case modes::finalize:
+        case modes::finished:
+            return Time::maxVal();
+        default:
+            break;
     }
+
+    throw(InvalidFunctionCall("cannot call request time in present state"));
 }
 
 iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iteration_request iterate)
@@ -643,7 +650,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
             case iteration_result::halted:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
-                currentMode = modes::finalize;
+                currentMode = modes::finished;
                 break;
             case iteration_result::error:
                 // LCOV_EXCL_START
@@ -653,7 +660,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
         }
         return iterativeTime;
     }
-    if (currentMode == modes::finalize) {
+    if (currentMode == modes::finalize || currentMode==modes::finished) {
         return {Time::maxVal(), iteration_result::halted};
     }
     throw(InvalidFunctionCall("cannot call request time in present state"));
@@ -723,7 +730,7 @@ iteration_time Federate::requestTimeIterativeComplete()
             case iteration_result::halted:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
-                currentMode = modes::finalize;
+                currentMode = modes::finished;
                 break;
             case iteration_result::error:
                 // LCOV_EXCL_START

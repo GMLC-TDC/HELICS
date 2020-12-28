@@ -2233,6 +2233,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
             break;
         case global_time_debugging:
             base["state"] = brokerStateName(brokerState.load());
+            base["state"] = brokerStateName(brokerState.load());
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
@@ -3233,6 +3234,7 @@ void CommonCore::registerInterface(ActionMessage& command)
 
                         fed->addAction(add);
                         timeCoord->addDependent(fed->global_id);
+                        timeCoord->setAsChild(fed->global_id);
                     }
                 }
 
@@ -3242,9 +3244,12 @@ void CommonCore::registerInterface(ActionMessage& command)
                         ActionMessage add(CMD_ADD_INTERDEPENDENCY,
                                           global_broker_id_local,
                                           higher_broker_id);
+                        setActionFlag(add, child_flag);
+
                         transmit(getRoute(higher_broker_id), add);
 
                         timeCoord->addDependent(higher_broker_id);
+                        timeCoord->setAsParent(higher_broker_id);
                     }
                 }
                 break;
@@ -3262,8 +3267,10 @@ void CommonCore::registerInterface(ActionMessage& command)
                         ActionMessage add(CMD_ADD_INTERDEPENDENCY,
                                           global_broker_id_local,
                                           higher_broker_id);
+                        setActionFlag(add, child_flag);
                         transmit(getRoute(higher_broker_id), add);
                         timeCoord->addDependency(higher_broker_id);
+                        timeCoord->setAsParent(higher_broker_id);
                     }
                 }
                 break;
@@ -3780,25 +3787,35 @@ void CommonCore::checkDependencies()
     if (isobs) {
         ActionMessage adddep(CMD_ADD_DEPENDENT);
         adddep.source_id = fedid;
+        setActionFlag(adddep, child_flag);
         routeMessage(adddep, brkid);
         adddep.setAction(CMD_ADD_DEPENDENCY);
         adddep.source_id = brkid;
+        clearActionFlag(adddep, child_flag);
+        setActionFlag(adddep, parent_flag);
         routeMessage(adddep, fedid);
     } else if (issource) {
         ActionMessage adddep(CMD_ADD_DEPENDENCY);
         adddep.source_id = fedid;
+        setActionFlag(adddep, child_flag);
         routeMessage(adddep, brkid);
+        
         adddep.setAction(CMD_ADD_DEPENDENT);
+        clearActionFlag(adddep, child_flag);
+        setActionFlag(adddep, parent_flag);
         adddep.source_id = brkid;
         routeMessage(adddep, fedid);
     } else {
         ActionMessage adddep(CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
+        setActionFlag(adddep, child_flag);
         routeMessage(adddep, brkid);
         routeMessage(
             adddep,
             fedid);  // make sure the fed depends on itself in case the broker removes itself later
         adddep.source_id = brkid;
+        clearActionFlag(adddep, child_flag);
+        setActionFlag(adddep, parent_flag);
         routeMessage(adddep, fedid);
     }
 }

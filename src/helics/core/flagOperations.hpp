@@ -33,12 +33,21 @@ enum operation_flags : uint16_t {
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
+/// overload of extra_flag4 indicating a federate, core or broker is slow responding
 constexpr uint16_t slow_responding_flag =
-    extra_flag4;  // overload of extra_flag4 indicating a federate, core or broker is slow
-                  // responding
+    extra_flag4;  
 
+/// overload of extra_flag3 indicating an operation is canceled
 constexpr uint16_t cancel_flag =
-    extra_flag3;  // overload of extra_flag3 indicating an operation is canceled
+    extra_flag3;  
+
+/// overload of extra_flag3 indicating the message is from a parent object
+constexpr uint16_t parent_flag =
+    extra_flag3; 
+
+/// overload of extra_flag4 indicating a message is from a child object
+constexpr uint16_t child_flag =
+    extra_flag4;  
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

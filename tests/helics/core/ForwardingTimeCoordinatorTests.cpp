@@ -84,7 +84,7 @@ TEST(ftc_tests, dependent_tests)
     global_federate_id fed3(3);
     ftc.addDependent(fed2);
     ftc.addDependent(fed3);
-    auto& deps = ftc.getDependents();
+    auto deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);

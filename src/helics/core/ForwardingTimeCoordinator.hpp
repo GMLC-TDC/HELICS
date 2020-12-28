@@ -34,8 +34,6 @@ class ForwardingTimeCoordinator {
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<global_federate_id>
-        dependents;  //!< federates which temporally depend on this federate
 
     std::function<void(const ActionMessage&)>
         sendMessageFunction;  //!< callback used to send the messages
@@ -50,6 +48,8 @@ class ForwardingTimeCoordinator {
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
     bool restrictive_time_policy{
         false};  //!< flag indicating that a restrictive time policy should be used
+  private:
+    bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
     ForwardingTimeCoordinator() = default;
 
@@ -62,7 +62,7 @@ class ForwardingTimeCoordinator {
     /** get a list of actual dependencies*/
     std::vector<global_federate_id> getDependencies() const;
     /** get a reference to the dependents vector*/
-    const std::vector<global_federate_id>& getDependents() const { return dependents; }
+    std::vector<global_federate_id> getDependents() const;
 
     /** compute updates to time values
     and send an update if needed
@@ -78,7 +78,7 @@ class ForwardingTimeCoordinator {
     /** check whether a timeCoordinator has any dependencies or dependents*/
     bool empty() const
     {
-        return dependents.empty() && dependencies.empty();
+        return dependencies.empty();
     }
   private:
     /**send out the latest time request command*/
@@ -112,6 +112,9 @@ class ForwardingTimeCoordinator {
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
     void removeDependent(global_federate_id fedID);
+
+    void setAsChild(global_federate_id fedID);
+    void setAsParent(global_federate_id fedID);
 
     /** disconnect*/
     void disconnect();

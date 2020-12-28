@@ -42,7 +42,10 @@ class global_broker_id {
         return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift));
     }
     bool isBroker() const { return (gid >= global_broker_id_shift); }
-    bool isValid() const { return (gid != invalid_global_broker_id); }
+    bool isValid() const
+    {
+        return (gid != invalid_global_broker_id && gid != detail::invalid_interface_handle);
+    }
     base_type localIndex() const { return gid - global_broker_id_shift; }
 
   private:
@@ -100,7 +103,7 @@ class global_federate_id {
     /** return true if the broker_id is a valid broker id code*/
     bool isBroker() const { return (gid >= global_broker_id_shift); }
     /** return true if the broker_id is a valid broker id code*/
-    bool isValid() const { return (gid != invalid_global_fed_id); }
+    bool isValid() const { return (gid != invalid_global_fed_id && gid!=detail::invalid_interface_handle); }
     /** generate a local offset index
         @details the global_id is shifted by a certain amount*/
     constexpr base_type localIndex() const { return gid - global_federate_id_shift; }

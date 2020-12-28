@@ -54,6 +54,8 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
+   // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  //  auto res = broker->query("root", "global_time_debugging");
     mFed->requestTimeComplete();
 
     EXPECT_TRUE(!mFed->hasMessage(p2));

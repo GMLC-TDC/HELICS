@@ -71,8 +71,7 @@ class TimeCoordinator {
         dependency_federates;  //!< these are to maintain an accessible record of dependency
                                //!< federates
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<global_federate_id>
-        dependents;  //!< federates which temporally depend on this federate
+    
     std::vector<std::pair<Time, int32_t>>
         timeBlocks;  //!< blocks for a particular timeblocking link
     tcoptions info;  //!< basic time control information
