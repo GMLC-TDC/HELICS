@@ -191,8 +191,136 @@ Notice that we have only introduced an `offset` into the Battery config file, as
 
 #### Simulators
 
+The simulators in this co-simulation (`*.py`) must be edited from the Base Example to register endpoints (instead of pub/subs) and ensure that messages are sent and received.
+
+##### Battery
+
+First let's make changes to `Battery.py`. In the Registration Step, we need to register the endpoints and get the endpoint count:
+
+```
+    fed = h.helicsCreateMessageFederateFromConfig("BatteryConfig.json")
+    federate_name = h.helicsFederateGetName(fed)
+    logger.info(f'Created federate {federate_name}')
+    print(f'Created federate {federate_name}')
+
+    end_count = h.helicsFederateGetEndpointCount(fed)
+    logging.debug(f'\tNumber of endpoints: {end_count}')
+
+    # Diagnostics to confirm JSON config correctly added the required
+    #   endpoints
+    endid = {}
+    for i in range(0, end_count):
+        endid[i] = h.helicsFederateGetEndpointByIndex(fed, i)
+        end_name = h.helicsEndpointGetName(endid[i])
+        logger.debug(f'\tRegistered Endpoint ---> {end_name}')
+```
+
+After entering Execution Mode but before the Time Loop begins, we need to extract the offset value:
+
+```
+    update_offset = int(h.helicsFederateGetTimeProperty(
+                                fed,
+                                h.helics_property_time_offset))
+```
+
+And add that offset to `requested_time`:
+
+```
+        requested_time = (grantedtime+update_interval+update_offset)
+```
+
+The next largest difference with implementing communication between simulators with endpoints vs pub/subs comes from the lack of innate message dependency, as described above with the `dependency_graph`. (Which can be accessed for pub/subs with a [query](.../../advanced_topics/queries.md).) Best practice for handling message receipt is to check if a message is waiting to be retrieved for an endpoint. The following code replaces `charging_voltage = h.helicsInputGetDouble((subid[j]))` from the Base Example (we are looping over `end_count`, the number of endpoints for this federate):
+
+```
+            endpoint_name = h.helicsEndpointGetName(endid[j])
+            if h.helicsEndpointHasMessage(endid[j]):
+                msg = h.helicsEndpointGetMessage(endid[j])
+                charging_voltage = float(h.helicsMessageGetString(msg))
+```
+
+If we want to know who sent the message (which can be helpful for both debugging and simplifying code), we invoke:
+
+```
+                source = h.helicsMessageGetOriginalSource(msg)
+```
+
+An alternative to using `h.helicsMessageGetOriginalSource(msg)` is to set a default `destination` in the JSON config file. Use of both can help with debugging.
+
+The `Battery.py` simulator takes the `charging_voltage` from the `Charger.py` simulator and calculates the `charging_current` to send back. Sending messages to a default `destination` is then done with:
+
+```
+            h.helicsEndpointSendBytesTo(endid[j], "",str(charging_current))  
+```
+
+Where the `""` can also be replaced with a string for the desired destination -- we can check `""` against `source` to confirm the messages are going to their intended destinations.
+
+##### Charger
+
+As with the `Battery.py` simulator, we need to Register the Charger federate as a Message Federate and get the endpoint ids:
+
+```
+    fed = h.helicsCreateMessageFederateFromConfig("ChargerConfig.json")
+    federate_name = h.helicsFederateGetName(fed)
+    logger.info(f'Created federate {federate_name}')
+    print(f'Created federate {federate_name}')
+    end_count = h.helicsFederateGetEndpointCount(fed)
+    logging.debug(f'\tNumber of endpoints: {end_count}')
+
+    # Diagnostics to confirm JSON config correctly added the required
+    #   endpoints
+    endid = {}
+    for i in range(0, end_count):
+        endid[i] = h.helicsFederateGetEndpointByIndex(fed, i)
+        end_name = h.helicsEndpointGetName(endid[i])
+        logger.debug(f'\tRegistered Endpoint ---> {end_name}')
+```
+
+The next difference with the Base Example `Charger.py` simulator is in sending the initial voltage to Battery Federate:
+
+```
+    for j in range(0, end_count):
+        message = str(charging_voltage[j])
+        h.helicsEndpointSendBytesTo(endid[j], "", message.encode()) #
+```
+
+Notice that we are sending the message to the default `destination` with `""`. We cannot use `h.helicsMessageGetOriginalSource(msg)`, as no messages have been received by the Charger Federate yet.
+
+Within the Time Loop, we change the message receipt component in the same way as the `Battery.py` simulator, where `h.helicsInputGetDouble((subid[j]))` is replaced with:
+
+```
+            endpoint_name = h.helicsEndpointGetName(endid[j])
+            if h.helicsEndpointHasMessage(endid[j]):
+                msg = h.helicsEndpointGetMessage(endid[j])
+                charging_current[j] = float(h.helicsMessageGetString(msg))
+```
+
+There's one final difference. Which API do we call to send the message to the Battery Federate?
+
+<details><summary>ANSWER</summary>
+<p>
+
+```
+                # Send message of voltage to Battery federate
+                h.helicsEndpointSendBytesTo(endid[j], "",f'{charging_voltage[j]:4f}'.encode())  #
+```
+
+</p>
+</details>
 
 ### Co-simulation execution
+
+We run the co-simulation just as before in the Base Example -- the `runner.json` is exactly the same:
+
+```
+>helics run --path=fundamental_endpoints_runner.json
+```
+
+And we get these figures:
+
+![](../../../img/fundamental_endpoints_battery_SOCs.png)
+![](../../../img/fundamental_endpoints_charger_power.png)
+
+Armed now with the knowledge of endpoints and messages, how could you change the research question?
 
 ## [Questions and Help](../support.md)
 
