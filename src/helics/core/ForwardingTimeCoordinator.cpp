@@ -190,7 +190,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
     if (update) {
         sendTimeRequest();
     } else if (minUpdate) {
-        //sendTimeRequest();
+        sendTimeRequest();
     }
 }
 
