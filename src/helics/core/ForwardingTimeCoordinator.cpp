@@ -27,7 +27,7 @@ void ForwardingTimeCoordinator::enteringExecMode()
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
-    transmitTimingMessage(execreq);
+    transmitTimingMessages(execreq);
     bool fedOnly = true;
     for (const auto& dep : dependencies) {
         if (dep.parent) {
@@ -127,6 +127,10 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
 {
     DependencyInfo mTime(Time::maxVal());
     for (auto& dep : dependencies) {
+        if (dep.dependency == false)
+        {
+            continue;
+        }
         if (dep.fedID == ignore) {
             continue;
         }
@@ -188,33 +192,14 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         minUpdate = minExcl.update(minTime);
     }
     if (update) {
-        sendTimeRequest();
+        auto upd = generateTimeRequest(main, global_federate_id{});
+        transmitTimingMessages(upd);
     } else if (minUpdate) {
-        sendTimeRequest();
+        if (sendMessageFunction)
+        {
+            sendMessageFunction(generateTimeRequest(minExcl, main.minFed));
+        }
     }
-}
-
-void ForwardingTimeCoordinator::sendTimeRequest() const
-{
-    if (!sendMessageFunction) {
-        return;
-    }
-    ActionMessage upd(CMD_TIME_REQUEST);
-    upd.source_id = source_id;
-    //    upd.source_handle = lastMinFed;
-    upd.actionTime = main.next;
-    if (iterating) {
-        setActionFlag(upd, iteration_requested_flag);
-    }
-    if (main.time_state == time_state_t::time_granted) {
-         upd.setAction(CMD_TIME_GRANT);
-    } else {
-        
-        upd.Te = main.minDe;
-        upd.Tdemin = main.minminDe;
-        upd.setExtraData(main.minFed.baseValue());
-    }
-    transmitTimingMessage(upd);
 }
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
@@ -354,36 +339,35 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
 
     ActionMessage execgrant(CMD_EXEC_GRANT);
     execgrant.source_id = source_id;
-    transmitTimingMessage(execgrant);
+    transmitTimingMessages(execgrant);
 
     return ret;
 }
 
-ActionMessage
-    ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency(const ActionMessage& msg,
-                                                                   global_federate_id iFed) const
-{
-    auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy, iFed);
-    ActionMessage nTime(msg);
 
-    nTime.actionTime = mTime.next;
-    nTime.Tdemin = mTime.minminDe;
-    nTime.Te = mTime.minDe;
-    nTime.dest_id = iFed;
-    nTime.setExtraData(mTime.minFed.baseValue());
-    if (mTime.time_state == time_state_t::time_granted) {
+ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const
+{
+    ActionMessage nTime(CMD_TIME_REQUEST);
+    nTime.source_id = source_id;
+    nTime.dest_id = fed;
+    nTime.actionTime = dep.next;
+    
+    if (dep.time_state == time_state_t::time_granted) {
         nTime.setAction(CMD_TIME_GRANT);
-    } else if (mTime.time_state == time_state_t::time_requested) {
-        nTime.setAction(CMD_TIME_REQUEST);
-        clearActionFlag(nTime, iteration_requested_flag);
-    } else if (mTime.time_state == time_state_t::time_requested_iterative) {
-        nTime.setAction(CMD_TIME_REQUEST);
+    } else if (dep.time_state == time_state_t::time_requested) {
+        nTime.setExtraData(dep.minFed.baseValue());
+        nTime.Tdemin = dep.minminDe;
+        nTime.Te = dep.minDe;
+    } else if (dep.time_state == time_state_t::time_requested_iterative) {
+        nTime.setExtraData(dep.minFed.baseValue());
         setActionFlag(nTime, iteration_requested_flag);
+        nTime.Tdemin = dep.minminDe;
+        nTime.Te = dep.minDe;
     }
     return nTime;
 }
 
-void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
+void ForwardingTimeCoordinator::transmitTimingMessages(ActionMessage& msg) const
 {
     if (sendMessageFunction) {
         if ((msg.action() == CMD_TIME_REQUEST) || (msg.action() == CMD_TIME_GRANT)) {
@@ -391,8 +375,7 @@ void ForwardingTimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
                 if ((dep.child || dep.parent) && (!ignoreMinFed) && (!federatesOnly)) {
                     if (dep.dependency) {
                         if ((dep.next == msg.actionTime) || (dep.fedID == main.minFed)) {
-                            sendMessageFunction(
-                                generateTimeRequestIgnoreDependency(msg, dep.fedID));
+                            sendMessageFunction(generateTimeRequest(minExcl, dep.fedID));
                             continue;
                         }
                     }

@@ -81,14 +81,9 @@ class ForwardingTimeCoordinator {
         return dependencies.empty();
     }
   private:
-    /**send out the latest time request command*/
-    void sendTimeRequest() const;
-    void transmitTimingMessage(ActionMessage& msg) const;
-    /** generate a new timing request message by recalculating the times ignoring a particular
-     * brokers input
-     */
-    ActionMessage generateTimeRequestIgnoreDependency(const ActionMessage& msg,
-                                                      global_federate_id iFed) const;
+    void transmitTimingMessages(ActionMessage& msg) const;
+    /** generate a timeRequest message based on the dependency info data*/
+    ActionMessage generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const;
 
   public:
     /** process a message related to time

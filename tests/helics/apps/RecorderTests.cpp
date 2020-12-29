@@ -113,6 +113,7 @@ TEST(recorder_tests, recorder_test_message)
     mfed.enterExecutingMode();
 
     auto retTime = mfed.requestTime(1.0);
+
     e1.send("src1", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
     retTime = mfed.requestTime(2.0);

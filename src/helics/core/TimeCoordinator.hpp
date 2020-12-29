@@ -160,7 +160,7 @@ class TimeCoordinator {
 
     void sendTimeRequest() const;
     void updateTimeGrant();
-    void transmitTimingMessage(ActionMessage& msg) const;
+    void transmitTimingMessages(ActionMessage& msg) const;
 
     message_process_result processTimeBlockMessage(const ActionMessage& cmd);
 

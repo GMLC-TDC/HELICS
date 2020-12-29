@@ -51,7 +51,7 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
     if (iterating != iteration_request::no_iterations) {
         setIterationFlags(execreq, iterating);
     }
-    transmitTimingMessage(execreq);
+    transmitTimingMessages(execreq);
 }
 
 void TimeCoordinator::disconnect()
@@ -489,7 +489,7 @@ void TimeCoordinator::sendTimeRequest() const
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
-    transmitTimingMessage(upd);
+    transmitTimingMessages(upd);
     //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(time_exec), static_cast<double>(time_minDe));
 }
@@ -507,7 +507,7 @@ void TimeCoordinator::updateTimeGrant()
     if (iterating != iteration_request::no_iterations) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
-    transmitTimingMessage(treq);
+    transmitTimingMessages(treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
     // static_cast<double>(time_allow), static_cast<double>(time_next),
     // static_cast<double>(time_exec), static_cast<double>(time_minDe));
@@ -581,7 +581,7 @@ std::vector<global_federate_id> TimeCoordinator::getDependencies() const
     return *dependency_federates.lock_shared();
 }
 
-void TimeCoordinator::transmitTimingMessage(ActionMessage& msg) const
+void TimeCoordinator::transmitTimingMessages(ActionMessage& msg) const
 {
     for (auto dep : dependencies) {
         if (dep.dependent)
@@ -630,7 +630,7 @@ message_processing_result TimeCoordinator::checkExecEntry()
 
         ActionMessage execgrant(CMD_EXEC_GRANT);
         execgrant.source_id = source_id;
-        transmitTimingMessage(execgrant);
+        transmitTimingMessages(execgrant);
     } else if (ret == message_processing_result::iterating) {
         dependencies.resetIteratingExecRequests();
         hasInitUpdates = false;
@@ -639,7 +639,7 @@ message_processing_result TimeCoordinator::checkExecEntry()
         execgrant.source_id = source_id;
         execgrant.counter = iteration;
         setActionFlag(execgrant, iteration_requested_flag);
-        transmitTimingMessage(execgrant);
+        transmitTimingMessages(execgrant);
     }
     return ret;
 }
@@ -666,7 +666,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 ActionMessage treq(CMD_TIME_GRANT);
                 treq.source_id = source_id;
                 treq.actionTime = time_granted;
-                transmitTimingMessage(treq);
+                transmitTimingMessages(treq);
                 return message_process_result::processed;
             }
             return message_process_result::no_effect;
