@@ -570,9 +570,15 @@ iteration_time
         }
 #endif
         auto ret = processQueue();
-        time_granted = timeCoord->getGrantedTime();
-        allowed_send_time = timeCoord->allowedSendTime();
-        iterating = (ret == message_processing_result::iterating);
+        if (ret == message_processing_result::halted) {
+            time_granted = Time::maxVal();
+            allowed_send_time = Time::maxVal();
+            iterating = false;
+        } else {
+            time_granted = timeCoord->getGrantedTime();
+            allowed_send_time = timeCoord->allowedSendTime();
+            iterating = (ret == message_processing_result::iterating);
+        }
 
         iteration_time retTime = {time_granted, static_cast<iteration_result>(ret)};
         // now fill the event vector so external systems know what has been updated
@@ -634,8 +640,7 @@ iteration_time
     } else if (state == HELICS_ERROR) {
         ret = iteration_result::error;
     }
-    iteration_time retTime = {time_granted, ret};
-    return retTime;
+    return {time_granted, ret};
 }
 
 void FederateState::fillEventVectorUpTo(Time currentTime)
