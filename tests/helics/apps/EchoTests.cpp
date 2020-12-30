@@ -86,7 +86,7 @@ TEST(echo_tests, echo_test_delay_period)
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
-    EXPECT_TRUE(!ep1.hasMessage());
+    EXPECT_FALSE(ep1.hasMessage());
     auto ntime = mfed.requestTime(4.0);
     EXPECT_EQ(ntime, 2.3);
     EXPECT_TRUE(ep1.hasMessage());

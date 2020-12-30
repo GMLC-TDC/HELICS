@@ -624,7 +624,7 @@ iteration_time
         if (retTime.grantedTime > nextTime && nextTime > lastTime && retTime.grantedTime<Time::maxVal()) {
             if (!ignore_time_mismatch_warnings) {
                 LOG_WARNING(
-                    fmt::format("Time mismatch detected granted time >requested time {} vs {}",
+                    fmt::format("Time mismatch detected: granted time greater than requested time {} vs {}",
                                 static_cast<double>(retTime.grantedTime),
                                 static_cast<double>(nextTime)));
             }
@@ -632,7 +632,7 @@ iteration_time
         return retTime;
     }
     // this would not be good practice to get into this part of the function
-    // but the area must protect itself and should return something sensible
+    // but the area must protect itself against the possibility and should return something sensible
     std::lock_guard<FederateState> fedlock(*this);
     iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
     if (state == HELICS_FINISHED) {
@@ -827,7 +827,7 @@ message_processing_result FederateState::processQueue() noexcept
 
 message_processing_result FederateState::processActionMessage(ActionMessage& cmd)
 {
-    LOG_TRACE(fmt::format("processing cmd {}", prettyPrintString(cmd)));
+    LOG_TRACE(fmt::format("processing command {}", prettyPrintString(cmd)));
     switch (cmd.action()) {
         case CMD_IGNORE:
         default:

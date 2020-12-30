@@ -134,7 +134,7 @@ class MessageFederateManager {
     class EndpointData {
       public:
         gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
-        std::function<void(Endpoint&, Time)> callback;
+        atomic_guarded<std::function<void(Endpoint&, Time)>> callback;
     };
     shared_guarded<
         gmlc::containers::

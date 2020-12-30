@@ -190,10 +190,9 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             Endpoint& currentEpt = *fid;
             auto localEndpointIndex = fid->referenceIndex;
             (*eptDat)[localEndpointIndex]->messages.emplace(std::move(message));
-
-            if ((*eptDat)[localEndpointIndex]->callback) {
+            auto cb = (*eptDat)[localEndpointIndex]->callback.load();
+            if (cb) {
                 // need to be copied otherwise there is a potential race condition on lock removal
-                auto cb = (*eptDat)[localEndpointIndex]->callback;
                 eptDat.unlock();
                 epts.unlock();
                 cb(currentEpt, CurrentTime);
