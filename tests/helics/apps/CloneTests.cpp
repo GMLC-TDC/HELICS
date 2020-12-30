@@ -274,9 +274,11 @@ TEST(clone_tests, simple_clone_test_sub)
     p1.loadFile("subtest.json");
 
     p1.initialize();
-
+   
     EXPECT_EQ(p1.pointCount(), 3u);
     EXPECT_EQ(p1.publicationCount(), 2u);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    //this depends on some processing occurring
     EXPECT_EQ(p1.accessUnderlyingFederate().getInputCount(), 2);
     p1.finalize();
     ghc::filesystem::remove("subtest.json");
