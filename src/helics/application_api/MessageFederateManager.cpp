@@ -183,7 +183,6 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-
         auto fid = epts->find(endpoint_id);
         if (fid != epts->end()) {  // assign the data
 

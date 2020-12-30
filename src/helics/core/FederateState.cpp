@@ -203,7 +203,7 @@ uint64_t FederateState::getQueueSize(interface_handle id) const
 {
     const auto* epI = interfaceInformation.getEndpoint(id);
     if (epI != nullptr) {
-        return epI->queueSize(time_granted);
+        return epI->availableMessages();
     }
     return 0;
 }
@@ -212,7 +212,7 @@ uint64_t FederateState::getQueueSize() const
 {
     uint64_t cnt = 0;
     for (const auto& end_point : interfaceInformation.getEndpoints()) {
-        cnt += end_point->queueSize(time_granted);
+        cnt += end_point->availableMessages();
     }
     return cnt;
 }
@@ -621,12 +621,13 @@ iteration_time
 #endif
 
         unlock();
-        if (retTime.grantedTime > nextTime && nextTime > lastTime && retTime.grantedTime<Time::maxVal()) {
+        if (retTime.grantedTime > nextTime && nextTime > lastTime &&
+            retTime.grantedTime < Time::maxVal()) {
             if (!ignore_time_mismatch_warnings) {
-                LOG_WARNING(
-                    fmt::format("Time mismatch detected: granted time greater than requested time {} vs {}",
-                                static_cast<double>(retTime.grantedTime),
-                                static_cast<double>(nextTime)));
+                LOG_WARNING(fmt::format(
+                    "Time mismatch detected: granted time greater than requested time {} vs {}",
+                    static_cast<double>(retTime.grantedTime),
+                    static_cast<double>(nextTime)));
             }
         }
         return retTime;
@@ -646,10 +647,17 @@ iteration_time
 void FederateState::fillEventVectorUpTo(Time currentTime)
 {
     events.clear();
+    eventMessages.clear();
     for (const auto& ipt : interfaceInformation.getInputs()) {
         bool updated = ipt->updateTimeUpTo(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
+        }
+    }
+    for (const auto& ept : interfaceInformation.getEndpoints()) {
+        bool updated = ept->updateTimeUpTo(currentTime);
+        if (updated) {
+            eventMessages.push_back(ept->id.handle);
         }
     }
 }
@@ -657,10 +665,18 @@ void FederateState::fillEventVectorUpTo(Time currentTime)
 void FederateState::fillEventVectorInclusive(Time currentTime)
 {
     events.clear();
-    for (const auto& ipt : interfaceInformation.getInputs()) {
+    for (const auto& ipt : interfaceInformation.getInputs())
+    {
         bool updated = ipt->updateTimeInclusive(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
+        }
+    }
+    eventMessages.clear();
+    for (const auto& ept : interfaceInformation.getEndpoints()) {
+        bool updated = ept->updateTimeInclusive(currentTime);
+        if (updated) {
+            eventMessages.push_back(ept->id.handle);
         }
     }
 }
@@ -672,6 +688,13 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
         bool updated = ipt->updateTimeNextIteration(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
+        }
+    }
+    eventMessages.clear();
+    for (const auto& ept : interfaceInformation.getEndpoints()) {
+        bool updated = ept->updateTimeNextIteration(currentTime);
+        if (updated) {
+            eventMessages.push_back(ept->id.handle);
         }
     }
 }

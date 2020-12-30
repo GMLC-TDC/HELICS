@@ -110,6 +110,7 @@ class FederateState {
     std::map<global_federate_id, std::deque<ActionMessage>>
         delayQueues;  //!< queue for delaying processing of messages for a time
     std::vector<interface_handle> events;  //!< list of value events to process
+    std::vector<interface_handle> eventMessages;  //!< list of endpoints with messages to process
     std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;

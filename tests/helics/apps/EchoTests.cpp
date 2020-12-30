@@ -56,9 +56,9 @@ TEST(echo_tests, echo_test_delay)
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
-    EXPECT_TRUE(!ep1.hasMessage());
+    EXPECT_FALSE(ep1.hasMessage());
     auto ntime = mfed.requestTime(2.0);
-    EXPECT_EQ(ntime, helics::timeEpsilon + 1.2);
+    EXPECT_EQ(ntime, helics::Time::epsilon()+1.2);
     EXPECT_TRUE(ep1.hasMessage());
     auto m = ep1.getMessage();
     ASSERT_TRUE(m);
@@ -117,7 +117,7 @@ TEST(echo_tests, echo_test_multiendpoint)
     ep1.send("test2", "hello again");
     EXPECT_TRUE(!ep1.hasMessage());
     auto ntime = mfed.requestTime(2.0);
-    EXPECT_EQ(ntime, helics::timeEpsilon + 1.2);
+    EXPECT_EQ(ntime, helics::Time::epsilon()+1.2);
     EXPECT_TRUE(ep1.hasMessage());
     auto m = ep1.getMessage();
     ASSERT_TRUE(m);
