@@ -123,6 +123,8 @@ TEST(echo_tests, echo_test_multiendpoint)
     ASSERT_TRUE(m);
     EXPECT_EQ(m->data.to_string(), "hello world");
     EXPECT_EQ(m->source, "test");
+    m = ep1.getMessage();
+    EXPECT_FALSE(m);
 
     ntime = mfed.requestTime(3.0);
     EXPECT_EQ(ntime, 2.2);

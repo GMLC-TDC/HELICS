@@ -224,3 +224,15 @@ TEST(ftc_tests, timing_test1)
     EXPECT_EQ(lastMessage.Tdemin, 0.5);
     EXPECT_TRUE(lastMessage.action() == CMD_TIME_REQUEST);
 }
+
+
+TEST(ftc_tests, timing_test2)
+{
+    ForwardingTimeCoordinator ftc;
+    global_federate_id fed2(2);
+    global_federate_id fed3(3);
+    ftc.addDependency(fed2);
+    ftc.addDependency(fed3);
+    getFTCtoExecMode(ftc);
+
+}
