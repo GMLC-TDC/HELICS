@@ -4,7 +4,7 @@
 .. toctree::
    :maxdepth: 1
    
-   tools_using_helics 
+   Tools_using_HELICS 
    configuration_options_reference
    api-reference/index
 	
