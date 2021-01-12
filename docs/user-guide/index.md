@@ -11,8 +11,6 @@ Co-simulation is a powerful analysis technique that allows simulators of differe
     orientation
     installation/index
     cosim_tutorial
-    fundamental_topics/fundamental_topics_index
-    advanced_topics/advanced_topics_index
     configuration_options_reference
     examples/examples_index
     references
