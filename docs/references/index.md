@@ -2,6 +2,7 @@
 
 ```eval_rst
 .. toctree::
+   :hidden:
    :maxdepth: 1
    
    Tools_using_HELICS 
