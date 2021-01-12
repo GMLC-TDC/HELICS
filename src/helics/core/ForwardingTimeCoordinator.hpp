@@ -39,15 +39,18 @@ class ForwardingTimeCoordinator {
         sendMessageFunction;  //!< callback used to send the messages
 
   public:
+    /// the identifier for inserting into the source id field of any generated messages;
     global_federate_id source_id{
-        0};  //!< the identifier for inserting into the source id field of any generated messages;
+        0};
+    /// flag indicating that the coordinator is trying to enter the exec mode
     bool checkingExec{
-        false};  //!< flag indicating that the coordinator is trying to enter the exec mode
+        false};  
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
+    /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{
-        false};  //!< flag indicating that a restrictive time policy should be used
+        false};  
   private:
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
