@@ -5,15 +5,17 @@
 
     :maxdepth: 1
 
-    co-simulation_overview
     helics_terminology
-    helics_co-sim_sequence
+    simulator_integration
+    federates
+    timing
+    helics_cli
+    simulation
+    logging
 	
 
 ```
 
-
-- [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Terminology**](./helics_terminology) - Key terms and concepts to understand before running co-simulations with HELICS
 - [**HELICS Sequence of Components**](./helics_co-sim_sequence.md) - A notional walk-through of a simple transmission and distribution HELICS co-simulation to show the basic steps the software runs through
 	- [**(Design) Integrating a Simulator with HELICS**](./simulator_integration.md) - How to connect an existing simulator with HELICS
