@@ -26,6 +26,6 @@ Motivation: Energy systems and their associated information and communication te
 
    user-guide/index
    developer-guide/index
-   reference/index
+   references/index
    
 ```
