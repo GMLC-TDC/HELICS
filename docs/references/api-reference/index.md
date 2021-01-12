@@ -1,16 +1,6 @@
 # API Reference
 
-```eval_rst
-.. toctree::
-    :hidden:
-    :maxdepth: 2
 
-    co-simulation_overview
-    helics_key_concepts
-    helics_co-sim_sequence
-	
-
-```
 
 ## [C++ API (doxygen)](https://docs.helics.org/en/latest/doxygen/index.html)
 

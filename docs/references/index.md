@@ -6,7 +6,7 @@
     
 
     configuration_options_reference
-	 Tools_using_HELICS
+	 tools_using_helics
 	 api-reference/index
 	
 ```
