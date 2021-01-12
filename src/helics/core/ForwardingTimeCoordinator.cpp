@@ -127,24 +127,23 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
 {
     DependencyInfo mTime(Time::maxVal());
     for (auto& dep : dependencies) {
-        if (dep.dependency == false)
-        {
+        if (dep.dependency == false) {
             continue;
         }
+
         if (dep.fedID == ignore) {
-            if (dep.Te < mTime.minDe) {
-                mTime.minDe = dep.Te;
+            if (!isBroker(dep.fedID)) {
+                if (dep.Te < mTime.minDe) {
+                    mTime.minDe = dep.Te;
+                }
+                if (mTime.minDe < mTime.minminDe) {
+                    mTime.minminDe = mTime.minDe;
+                }
             }
+
             continue;
         }
-        if (dep.next < mTime.next) {
-            mTime.next = dep.next;
-            mTime.time_state = dep.time_state;
-        } else if (dep.next == mTime.next) {
-            if (dep.time_state == time_state_t::time_granted) {
-                mTime.time_state = dep.time_state;
-            }
-        }
+        
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minminDe) {
                 mTime.minminDe = dep.minDe;
@@ -163,9 +162,27 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
             mTime.minminDe = -1;
         }
 
+        if (dep.next < mTime.next) {
+            mTime.next = dep.next;
+            mTime.time_state = dep.time_state;
+        }
+        else if (dep.next == mTime.next) {
+            if (dep.time_state == time_state_t::time_granted) {
+                mTime.time_state = dep.time_state;
+            }
+        }
         if (dep.Te < mTime.minDe) {
             mTime.minDe = dep.Te;
+            if (mTime.minminDe < 0.0) {
+                mTime.minFed = dep.fedID;
+                if (dep.minFed.isValid()) {
+                    mTime.minFedActual = dep.minFed;
+                } else {
+                    mTime.minFedActual = dep.fedID;
+                }
+            }
         }
+        
     }
 
     mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
@@ -198,8 +215,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         auto upd = generateTimeRequest(main, global_federate_id{});
         transmitTimingMessages(upd);
     } else if (minUpdate) {
-        if (sendMessageFunction)
-        {
+        if (sendMessageFunction) {
             sendMessageFunction(generateTimeRequest(minExcl, main.minFed));
         }
     }
@@ -347,14 +363,14 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
     return ret;
 }
 
-
-ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const
+ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInfo& dep,
+                                                             global_federate_id fed) const
 {
     ActionMessage nTime(CMD_TIME_REQUEST);
     nTime.source_id = source_id;
     nTime.dest_id = fed;
     nTime.actionTime = dep.next;
-    
+
     if (dep.time_state == time_state_t::time_granted) {
         nTime.setAction(CMD_TIME_GRANT);
     } else if (dep.time_state == time_state_t::time_requested) {

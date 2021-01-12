@@ -741,9 +741,9 @@ TEST_F(filter_tests, reroute_separate)
        auto t1 = std::thread(act1);
        auto t2 = std::thread(act2);
        auto t3 = std::thread(act3);
-      // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+       //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-      // auto res = broker->query("root", "global_time_debugging");
+       //auto res = broker->query("root", "global_time_debugging");
        t1.join();
        t2.join();
        t3.join();
@@ -751,7 +751,7 @@ TEST_F(filter_tests, reroute_separate)
        EXPECT_EQ(p2.pendingMessages(), 0U);
        EXPECT_EQ(p3.pendingMessages(), 10U);
        EXPECT_EQ(cnt, 11);
-       auto res = broker->query("root", "global_time_debugging");
+       auto res2 = broker->query("root", "global_time_debugging");
        broker->waitForDisconnect();
    }
 
