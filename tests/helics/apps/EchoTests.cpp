@@ -114,6 +114,7 @@ TEST(echo_tests, echo_test_multiendpoint)
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ep1.send("test2", "hello again");
     EXPECT_TRUE(!ep1.hasMessage());
     auto ntime = mfed.requestTime(2.0);

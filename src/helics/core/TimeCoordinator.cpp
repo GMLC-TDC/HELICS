@@ -403,7 +403,7 @@ bool TimeCoordinator::updateTimeFactors()
     //    static_cast<double>(time_next),
     // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next) {
-        update = true;
+        update = true; 
     }
     if (minDe < Time::maxVal()) {
         minDe = generateAllowedTime(minDe) + info.outputDelay;
@@ -412,11 +412,8 @@ bool TimeCoordinator::updateTimeFactors()
         update = true;
         time_minDe = minDe;
     }
-    if (minNext < Time::maxVal()) {
-        time_allow = info.inputDelay + minNext;
-    } else {
-        time_allow = Time::maxVal();
-    }
+    time_allow = (minNext < Time::maxVal()) ? info.inputDelay + minNext : Time::maxVal();
+    
     updateNextExecutionTime();
     return update;
 }

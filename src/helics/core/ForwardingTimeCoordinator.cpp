@@ -132,6 +132,9 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
             continue;
         }
         if (dep.fedID == ignore) {
+            if (dep.Te < mTime.minDe) {
+                mTime.minDe = dep.Te;
+            }
             continue;
         }
         if (dep.next < mTime.next) {
