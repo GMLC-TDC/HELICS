@@ -55,9 +55,3 @@ Programmatically multibrokers can also be started using the BrokerApp and giving
 - Using TCPSS comms in the multibroker does not currently support outgoing connections like a full TCPSS broker would. This will likely be fixed in upcoming releases.
 - Configuration files must currently be in JSON, in a few limited cases TOML files may work, but configuration of multiple comms in a toml file will not work. This will also likely be fixed in upcoming releases.
 - General support for multibrokers is not provided in the webServer due to limitations on the configuration files. Some mechanism for this will be allowed in a future release.
-
-
-## Example
-
-
-A [full co-simulation example](./examples/advanced_examples/advanced_brokers_multibroker.md) showing how to implement a multi-protocol broker  [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/multi_broker) has been developed and is available for evaluation and running.

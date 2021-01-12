@@ -20,7 +20,7 @@ def make_federate(cmd):
 
     return runner
 
-    
+
 
 def main():
     samples = 1
@@ -50,7 +50,7 @@ def main():
             port += 1
 
         fed.close()
-        
+
 
 if __name__ == "__main__":
     main()

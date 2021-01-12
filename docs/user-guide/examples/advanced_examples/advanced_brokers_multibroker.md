@@ -28,8 +28,13 @@ This example shows how to configure a HELICS co-simulation to implement a broker
 	
 	
 
-
-## Where is the code?
+<a name="where-is-the-code">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+Where is the code?
+</span>
+</strong>
+</a>
 
 This example on [multibrokerscan be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/multi_broker). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
@@ -43,8 +48,13 @@ This example on [multibrokerscan be found here](https://github.com/GMLC-TDC/HELI
 
 
 
-
-## What is this co-simulation doing?
+<a name="what-is-this-co-simulation-doing">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+What is this Co-simulation doing?
+</span>
+</strong>
+</a>
 
 This example shows you how to configure a co-simulation to use more than one core type in the same federation. The example itself has the same functionality as the Advanced Default example as the only change is a structural to the federation and not the federate code itself.
 
@@ -52,17 +62,26 @@ This example shows you how to configure a co-simulation to use more than one cor
 
 
 
-
-## Differences compared to the Advanced Default example
+<a name="differences-compared-to-the-advanced-default-example">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Differences Compared to the Advanced Default example
+</span>
+</strong>
+</a>
 
 For this example, the [Advanced Default example](./advanced_default.md) has been split up so that each federate uses a different core type in a single federation.
 
 
 
 
-
-
-## HELICS differences
+<a name="helics-differences">
+<strong>
+<span style="color:black">
+HELICS Differences
+</span>
+</strong>
+</a>
 
 Typically, all federates in a federation use the same core type. There can be cases, though, where a multi-site co-simulation with a more complex networking environment or performance requirements dictate the need for some federates to utilize a difference core type than others. For example, the `IPC` core utilizes a Boost library function to allow two executables both using Boost to communicate between themselves when running on the same compute node; since this is in-memory communication rather than over the network stack, performance is expected to be higher. It could be that a particular federation has been optimized to take advantage of this but must also communicate with federates on a separate compute node via ZMQ. In this case, a so-called "multibroker" can be configured to allow for the federation to run.
 
@@ -72,9 +91,13 @@ In this example, we won't be doing anything like that but, for demonstration pur
 
 
 
-
-
-## HELICS components
+<a name="helics-components">
+<strong>
+<span style="color:black;text-decoration:underline;">
+HELICS components
+</span>
+</strong>
+</a>
 
 To configure a multibroker, the broker configuration line is slightly extended from a traditional federation. From the helics_cli runner configuration file `multi_broker_runner.json`
 
@@ -146,8 +169,13 @@ ControllerConfig.json
 
 
 
-
-## Execution and results
+<a name="execution-and-results">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Execution and Results
+</span>
+</strong>
+</a>
 
 Unlike the other advanced broker examples, this one can be run with a single helics_cli command:
 

@@ -26,9 +26,15 @@ This example shows how to configure a HELICS co-simulation to allow the use of m
 
 	
 	
+	
 
-
-## Where is the code?
+<a name="where-is-the-code">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+Where is the code?
+</span>
+</strong>
+</a>
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [broker hierarchies can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/hierarchies). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
@@ -42,8 +48,13 @@ The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples
 
 
 
-
-## What is this co-simulation doing?
+<a name="what-is-this-co-simulation-doing">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+What is this Co-simulation doing?
+</span>
+</strong>
+</a>
 
 This example shows you how to configure a co-simulation to take advantage of multiple brokers. Though we'll be running this example on a single computer, the application of broker hierarchies is more common when running a co-simulation across multiple computers.
 
@@ -51,7 +62,13 @@ This example shows you how to configure a co-simulation to take advantage of mul
 
 
 
-## Differences compared to the Advanced Default example
+<a name="differences-compared-to-the-advanced-default-example">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Differences Compared to the Advanced Default example
+</span>
+</strong>
+</a>
 
 For this example, the [Advanced Default example](./advanced_default.md) has been split up to utilize three brokers as shown below:
 
@@ -63,7 +80,13 @@ As will be shown, the use of multiple brokers will not affect the results of the
 
 
 
-## HELICS differences
+<a name="helics-differences">
+<strong>
+<span style="color:black">
+HELICS Differences
+</span>
+</strong>
+</a>
 
 Broker hierarchies are primarily used to help improve the performance of the co-simulation by allowing federates that interact strongly with each other to run on a single compute node, thereby allowing them to exchange information with each other quickly rather than over a relatively slow network connection to the rest of the federates on other compute nodes. This can be particularly helpful when the other compute nodes reside at off-site locations and the co-simulation communication is taking place between them over the public internet. 
 
@@ -73,9 +96,13 @@ Not all federations lend themselves to segregation like this; the example here d
 
 
 
-
-
-## HELICS Components
+<a name="helics-components">
+<strong>
+<span style="color:black;text-decoration:underline;">
+HELICS components
+</span>
+</strong>
+</a>
 
 When implementing across compute nodes, the configuration is simpler will be simpler than in this example because the need to segregate the federates and brokers is only a function of IP address where HELICS can use the default port number on each compute node. To get this example to run on a single computer, the hierarchy must be implemented through the use of specific port numbers for specific brokers.
 
@@ -111,9 +138,13 @@ Additionally, each federate has to define the broker to which it is attempting t
 ```
 
 
-
-
-## Execution and results
+<a name="execution-and-results">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Execution and Results
+</span>
+</strong>
+</a>
 
 Since this example requires three brokers and their respective federates to run simultaneously, `helic_cli` will be used to launch the three sets of brokers and federates, just like the in [simultaneous co-simulation example](./advanced_broker_simultaneous.md)
 
