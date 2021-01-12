@@ -173,7 +173,17 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
         }
         if (dep.Te < mTime.minDe) {
             mTime.minDe = dep.Te;
-            if (mTime.minminDe < 0.0) {
+        }
+        
+    }
+
+    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
+
+    if (mTime.minminDe < 0.0) {
+        for (auto& dep : dependencies)
+        {
+            if (mTime.minDe == dep.Te)
+            {
                 mTime.minFed = dep.fedID;
                 if (dep.minFed.isValid()) {
                     mTime.minFedActual = dep.minFed;
@@ -182,10 +192,7 @@ static DependencyInfo generateMinTimeSet(const TimeDependencies& dependencies,
                 }
             }
         }
-        
     }
-
-    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
 
     if (!restricted && mTime.minminDe < Time::maxVal()) {
         if (mTime.minminDe > mTime.next) {
