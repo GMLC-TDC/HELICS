@@ -1,15 +1,6 @@
 # Multi-Input
 
 
-
-
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-
-
-```
-
 ![placeholder](../../../img/user_guide_combinations_advanced.png)
 
 
@@ -19,7 +10,6 @@ This demonstrates the use of federation queries and performs dynamic configurati
 * [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
 	* [Differences Compared to the Fundamental Examples](#differences-compared-to-the-advanced-default-example)
 		* [HELICS Differences](#helics-differences)
-		* [Research Question Complexity Differences](#research-question-complexity-differences)
 	* [HELICS Components](#helics-components)
 * [Execution and Results](#execution-and-results)
 
@@ -28,7 +18,7 @@ This demonstrates the use of federation queries and performs dynamic configurati
 	
 	
 
-## Where is the code
+## Where is the code?
 
 This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
@@ -41,7 +31,7 @@ This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HEL
 
 
 
-## What is this co-simulation doing
+## What is this co-simulation doing?
 
 This example shows how to use inputs, allowing multiple publications to arrive at the same input handle (similar to a subscription, as you'll see) and a demonstration on one method of managing data conflicts that can arise.
 
@@ -49,7 +39,7 @@ This example shows how to use inputs, allowing multiple publications to arrive a
 
 
 
-## Difference compared to the Advanced Default example
+### Difference compared to the Advanced Default example
 
 This example deviates fairly significantly from the  [Advanced Default example](./advanced_default.md) in that it only has a Battery and Charger federate. The Charger federate was modeled with one charging terminal that branches out to the five Battery terminals. That is, from the Charger federates perspective, there is only one charging voltage and one charging current even though the federation is still constructed to charge five batteries. 
 
@@ -64,7 +54,7 @@ Additionally, since the protocol (to use the term loosely) in the Advanced Defau
 
 
 
-## HELICS differences
+#### HELICS differences
 
 With a single charger being used to charge five batteries, each battery still publishes it's charging current as before but only has one subscription, the single charging voltage. This shows up on the Battery federate configuration:
 
@@ -142,7 +132,7 @@ The Charger federate configuration is also altered, using an `input` rather than
 ```
 
 
-## HELICS Components
+### HELICS Components
 
 `Battery.py` and `Charger.py` have both been simplified such that only battery per charging terminal is charged over the duration of the simulation. When the battery reaches full SOC, it self-terminates charging.
 
@@ -155,9 +145,6 @@ Run the co-simulation:
 `$ helics run --path=./multi_input_runner.json`
 
 The primary result of interest is still the cumulative charging power.
-
-
-**TODO: make these links?**
 
 ![placeholder](../../../img/advanced_multi_input_power.png)
 

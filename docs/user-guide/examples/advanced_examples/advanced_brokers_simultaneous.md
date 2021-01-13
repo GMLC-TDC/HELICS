@@ -2,14 +2,6 @@
 
 
 
-
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-
-
-```
-
 ![placeholder](../../../img/user_guide_combinations_advanced.png)
 
 
@@ -38,7 +30,7 @@ The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples
 
 
 
-## What is the co-simulation doing?
+## What is this co-simulation doing?
 
 Using the exact same federates as in the [Advanced Default example](./advanced_default.md), the same co-simulation is run multiple times (simultaneously) with different random number generator seeds. The example both demonstrates how to run multiple HELICS co-simulations simultaneously on one computer without the messages between federates getting mixed up, but also shows a simple way to do sensitivity analysis. A better way is shown later in the [orchestration example.](./advanced_orchestration.md)
 
@@ -46,7 +38,7 @@ Using the exact same federates as in the [Advanced Default example](./advanced_d
 
 
 
-## Differences compared to the advanced default example
+### Differences compared to the advanced default example
 
 
 Two primary changes:
@@ -71,7 +63,7 @@ The values shown above are from [federation_1](https://github.com/GMLC-TDC/HELIC
 
 
 
-## HELICS differences
+#### HELICS differences
 
 With no extra configuration, it is only possible to run one HELICS co-simulation on a given computer. In the most popular HELICS cores (ZMQ being the most common, by far), messages are sent between federates using the networking stack. (There are other ways, though. For example, the IPC core uses the Boost library inter-process communication.). If you want to run multiple co-simulations on one compute need, an extra step needs to be taken to keep the messages from each federation separate from each other and non-interfering. Since we're using the network stack, this can be easily accomplished by assigning each broker a unique port to use. Looking at the federation launch config files, you can see this clearly expressed:
 
@@ -116,18 +108,12 @@ With no extra configuration, it is only possible to run one HELICS co-simulation
 
 
 
-# Research question complexity differences
+#### Research question complexity differences
 
-The Advanced Default example uses a random number generator to determine things like initial state-of-charge of the battery and charging power of the individual EV batteries. These factors have an impact on the charging duration for each EV battery and the peak charging power seen over the duration of the simulation. Since the later is _the_ key metric of the simulation experiment, there is strong motivation to vary the seed value for the random number generator to expand the range of results, effectively increasing the sample size. These co-simluations could each be run serially but assuming the computer in question has the horsepower, there's no reason not to run them in parallel.
+The Advanced Default example uses a random number generator to determine things like initial state-of-charge of the battery and charging power of the individual EV batteries. These factors have an impact on the charging duration for each EV battery and the peak charging power seen over the duration of the simulation. Since the later is _the_ key metric of the simulation experiment, there is strong motivation to vary the seed value for the random number generator to expand the range of results, effectively increasing the sample size. These co-simulations could each be run serially but assuming the computer in question has the horsepower, there's no reason not to run them in parallel.
 
 
-<a name="execution-and-results">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Execution and Results
-</span>
-</strong>
-</a>
+## Execution and Results
 
 To run the co-simulations simultaneously, all that is required is having `helics_cli` launch each individually. The trailing `&` in the shell commands below background the command and return another shell prompt to the user.
 

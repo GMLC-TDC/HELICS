@@ -1,15 +1,6 @@
 # Federation Queries
 
 
-
-
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-
-
-```
-
 ![placeholder](../../../img/user_guide_combinations_advanced.png)
 
 
@@ -19,22 +10,13 @@ This demonstrates the use of federation queries and performs dynamic configurati
 * [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
 	* [Differences Compared to the Fundamental Examples](#differences-compared-to-the-advanced-default-example)
 		* [HELICS Differences](#helics-differences)
-		* [Research Question Complexity Differences](#research-question-complexity-differences)
 	* [HELICS Components](#helics-components)
 * [Execution and Results](#execution-and-results)
 
 
 	
-	
-	
 
-<a name="where-is-the-code">
-<strong>
-<span style="font-size:larger;color:black;text-decoration:underline;">
-Where is the code?
-</span>
-</strong>
-</a>
+## Where is the code?
 
 This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
@@ -47,13 +29,7 @@ This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-E
 
 
 
-<a name="what-is-this-co-simulation-doing">
-<strong>
-<span style="font-size:larger;color:black;text-decoration:underline;">
-What is this Co-simulation doing?
-</span>
-</strong>
-</a>
+## What is this co-simulation doing?
 
 This example shows how to run queries on a federation and to use the output of the queries to configure a federate. Rather than a static configuration that is defined prior to runtime, this dynamic configuration can be useful for federations that change composition frequently.
 
@@ -61,26 +37,14 @@ This example shows how to run queries on a federation and to use the output of t
 
 
 
-<a name="differences-compared-to-the-advanced-default-example">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Differences Compared to the Advanced Default example
-</span>
-</strong>
-</a>
+### Difference compared to the Advanced Default example
 
 This example has the same federates interacting in the same ways as in the [Advanced Default example](./advanced_default.md). The only difference is the use of queries for dynamic configuration rather than static configuration.
 
 
 
 
-<a name="helics-differences">
-<strong>
-<span style="color:black">
-HELICS Differences
-</span>
-</strong>
-</a>
+#### HELICS Differences
 
 In most of the examples presented here, the configuration of the federation is defined prior to executing the co-simulation via the configuration JSONs. It is possible, though, with extra effort and careful design, to write the federate code such that they self-configure based on the other participants in the co-simulation. This example provides a simple demonstration of this by having the Battery federate query the federation and look for the values that the Charger federate is publishing and subscribing to them.
  
@@ -88,13 +52,7 @@ In most of the examples presented here, the configuration of the federation is d
 
 
 
-<a name="helics-components">
-<strong>
-<span style="color:black;text-decoration:underline;">
-HELICS components
-</span>
-</strong>
-</a>
+### HELICS components
 
 `Battery.py` contains all the changes from the [Advanced Default example](./advanced_default.md) that allow it to perform dynamic configuration. Specifically:
 
@@ -153,13 +111,7 @@ HELICS components
 
 
 
-<a name="execution-and-results">
-<strong>
-<span style="color:black;text-decoration:underline;">
-Execution and Results
-</span>
-</strong>
-</a>
+## Execution and Results
 
 Run the co-simulation:
 
@@ -168,7 +120,6 @@ Run the co-simulation:
 
 Since this is only a change to the configuration method of the federation, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-**TODO: make these links?**
 
 ![placeholder](../../../img/advanced_query_charging_power.png)
 
