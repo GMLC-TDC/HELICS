@@ -1,4 +1,4 @@
-# Co-simulation Tutorial
+# HELICS Tutorial
 
 ```eval_rst
 .. toctree::

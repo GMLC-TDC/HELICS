@@ -10,7 +10,7 @@
     federates
     timing
     helics_cli
-    simulation
+    web_interface
     logging
 	
 
@@ -28,8 +28,6 @@
 	- [**Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
 
 	- [**(Launch) Execution with `helics_cli`**](./helics_cli.md) - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
-	- [**Simulation**](./simulation.md)
-		- [**Connecting to a Running Simulation**](./webserver.md) - Getting live information from a running co-simulation through a webserver.
-		- [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
+	- [**Simulation Management**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 	- [**(Termination) Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
 
