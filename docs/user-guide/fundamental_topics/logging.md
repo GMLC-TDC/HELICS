@@ -1,5 +1,7 @@
 # Logging
 
+After all possible time grants have been exhausted, the federates signal to their core that they are leaving the federation. Once all the federates have left, the rest of the infrastructure disassembles itself and also terminates. Discussion of the termination step focuses on what to do after the co-simulation has finished, including how to use the log files to confirm the co-simulation executed properly.
+
 Logging in HELICS is normally handled through an independent thread. The thread prints message to the console and or to a file.
 
 ## Federate Logging

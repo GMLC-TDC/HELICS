@@ -1,6 +1,11 @@
 
 
-# Integration + Configuration
+# Integration of Federates
+
+
+As a co-simulation is, in some sense, a simulation of simulations, there are two levels of configuration required: the configuration of the individual federates as if they were running on their own (identifying models to be used, defining the start and stop time of the simulation, defining how the results of the simulation should be stored, etc...) and the configuration of how each federate will connect to and interact with the other federates in the co-simulation. One of the goals of a co-simulation platform like HELICS is to make the connecting easier and more efficient by providing a standardized method of configuration. To provide a better understanding of why certain types of information are required during configuration and the implications of making these choices, this section presents the components to a HELICS co-simulation in sequence of operation and includes examples of each component from the [Default Co-simulation Example](../examples/fundamental_examples/fundamental_default.md). 
+
+
 
 As a user, it will be up to you to understand the assumptions, modeling techniques, and dynamics of the simulators you are going to be tying together via HELICS. Using that knowledge you'll have to define the message topology (who is passing what information to whom) and the broker topology (which federates/cores are connected to which brokers). Message topology requires understanding the interactions of the system the simulators are trying to replicate and identifying the boundaries where they could exchange data. Broker topology is somewhat optional (you can run a co-simulation with just a single broker) but offers an increase in performance if it is possible to identify groups of federates that interact often with each other but rarely with the rest of the federation. In such cases, assigning that group of federates their own broker will remove the congestion their messages cause with the federation as a whole.
 
@@ -41,7 +46,10 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ![Common HELICS architecture](../../img/helics_architecture_1.png)
 
-## The Essential API Calls
+## Integration with JSON Configuration
+
+
+## Integration with API Calls
 
 With the answers to those clarifying questions in mind, let's look at how you might go about creating a HELICS federate, which is essentially the agent that enables your simulator to interface with the rest of the co-simulation. For the remainder of this section of the guide, we'll walk through the typical stages of co-simulation, providing examples of how these might be implemented using HELICS API calls. For the purposes of these examples, we will assume the use of a Python binding. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../doxygen/index.md) to get the details you need.
 
