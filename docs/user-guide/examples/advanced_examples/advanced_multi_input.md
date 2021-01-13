@@ -33,8 +33,7 @@ This demonstrates the use of federation queries and performs dynamic configurati
 This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
 
-**TODO: Update screen shot**
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 
 
 

@@ -39,8 +39,7 @@ Where is the code?
 This example on [multibrokerscan be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/multi_broker). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
 
-**TODO: Update screen shot**
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_multi_broker_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 
 
 

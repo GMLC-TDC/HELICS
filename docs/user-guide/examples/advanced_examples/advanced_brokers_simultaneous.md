@@ -30,8 +30,7 @@ This example shows how to configure a HELICS co-simulation so that multiple co-s
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [simultaneous co-simulations can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simulataneous). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
 
-**TODO: Update screen shot**
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_simultaneous_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 
 
 
