@@ -28,15 +28,16 @@ class ForwardingTimeCoordinator {
 
     // the variables for time coordination
       DependencyInfo main;
-      DependencyInfo minExcl;
-
+      DependencyInfo minNext;
+      DependencyInfo minEvent;
+      DependencyInfo minMinDe;
+      DependencyInfo minState;
     
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-
-    std::function<void(const ActionMessage&)>
-        sendMessageFunction;  //!< callback used to send the messages
+      /// callback used to send the messages
+    std::function<void(const ActionMessage&)> sendMessageFunction;  
 
   public:
     /// the identifier for inserting into the source id field of any generated messages;

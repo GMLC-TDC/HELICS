@@ -47,7 +47,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
                 dep.minDe= dep.Te;
             }
 
-            dep.minFed = global_federate_id(m.getExtraData());
+            dep.minFedMinDe = global_federate_id(m.getExtraData());
             break;
         case CMD_TIME_GRANT:
             dep.time_state = time_state_t::time_granted;
@@ -57,7 +57,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = m.actionTime;
             dep.Te = dep.next;
             dep.minDe= dep.next;
-            dep.minFed = global_federate_id{};
+            dep.minFedMinDe = global_federate_id{};
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -70,7 +70,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
             dep.minDe= Time::maxVal();
-            dep.minFed = global_federate_id{};
+            dep.minFedMinDe = global_federate_id{};
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -79,7 +79,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
             dep.minDe= Time::maxVal();
-            dep.minFed = global_federate_id{};
+            dep.minFedMinDe = global_federate_id{};
             break;
         default:
             return false;
@@ -108,12 +108,30 @@ bool DependencyInfo::update(const DependencyInfo& update)
         updated = true;
     }
 
-    if (update.minFed != minFed) {
-        minFed = update.minFed;
+    if (update.minFedMinDe != minFedMinDe) {
+        minFedMinDe = update.minFedMinDe;
         updated = true;
     }
-    if (update.minFedActual != minFedActual) {
-        minFedActual = update.minFedActual;
+    if (update.minFedActualMinDe != minFedActualMinDe) {
+        minFedActualMinDe = update.minFedActualMinDe;
+        updated = true;
+    }
+
+    if (update.minFedNext != minFedNext) {
+        minFedNext = update.minFedNext;
+        updated = true;
+    }
+    if (update.minFedActualNext != minFedActualNext) {
+        minFedActualNext = update.minFedActualNext;
+        updated = true;
+    }
+
+    if (update.minFedEvent != minFedEvent) {
+        minFedEvent = update.minFedEvent;
+        updated = true;
+    }
+    if (update.minFedActualEvent != minFedActualEvent) {
+        minFedActualEvent = update.minFedActualEvent;
         updated = true;
     }
     return updated;

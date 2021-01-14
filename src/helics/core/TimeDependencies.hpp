@@ -14,7 +14,7 @@ namespace helics {
 class ActionMessage;
 
     /**enumeration of possible states for a federate to be in regards to time request*/
-    enum class time_state_t : int16_t {
+    enum class time_state_t : uint8_t {
         initialized = 0,
         exec_requested_iterative = 1,
         exec_requested = 2,
@@ -29,8 +29,13 @@ class DependencyInfo {
   public:
    
     global_federate_id fedID{};  //!< identifier for the dependency
-    global_federate_id minFed{};  //!< identifier for the min dependency
-    global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
+    global_federate_id minFedNext{};  //!< identifier for the min dependency
+    global_federate_id minFedActualNext{};  //!< the actual forwarded minimum federate object
+    global_federate_id minFedEvent{};  //!< identifier for the min dependency
+    global_federate_id minFedActualEvent{};  //!< the actual forwarded minimum federate object
+    global_federate_id minFedMinDe{};  //!< identifier for the min dependency
+    global_federate_id minFedActualMinDe{};  //!< the actual forwarded minimum federate object
+    global_federate_id minState{};  //!< the actual forwarded minimum federate object
     time_state_t time_state{time_state_t::initialized};  //!< the current state of the dependency
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
@@ -38,6 +43,7 @@ class DependencyInfo {
     bool child{false}; //!< indicator that the dependency is a child object
     bool dependent{false}; //!< indicator the dependency is a dependent object
     bool dependency{false}; //!< indicator that the dependency is an actual dependency
+    bool forwarding{false}; //!< indicator that the dependency is a forwarding time coordinator
     // 1 byte gap here
     Time next{negEpsilon};  //!< next possible message or value
     Time Te{timeZero};  //!< the next currently scheduled event
@@ -47,9 +53,11 @@ class DependencyInfo {
     /** default constructor*/
     DependencyInfo() = default;
     /** construct from a federate id*/
-    explicit DependencyInfo(global_federate_id id): fedID(id) {}
+    explicit DependencyInfo(global_federate_id id): fedID(id), forwarding{id.isBroker()}
+    {
+    }
 
-    explicit DependencyInfo(Time start): next{start}, minDe{start}, minminDe{start} {};
+    explicit DependencyInfo(Time start): next{start},Te{start}, minDe{start}, minminDe{start} {};
     /** check if there is an update to the current dependency info and assign*/
     bool update(const DependencyInfo& update);
 
