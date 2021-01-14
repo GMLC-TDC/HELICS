@@ -12,7 +12,17 @@ Every federate (instance of a simulator) will require configuration of the way i
 
    **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). 
 
-In depth explanations for each of these components can be found on the [Federates](./federates.md) page.
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    
+    value_federates
+    message_federates
+    filters
+
+```
+
 
 ## Types of Federates
 
