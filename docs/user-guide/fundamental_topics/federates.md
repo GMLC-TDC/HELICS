@@ -1,6 +1,6 @@
 # Federates
 
-Every federate (instance of a simulator) will require configuration of the way it will communicate (send signals) to other federates in the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; bespoke simulators can be configured with the HELICS APIs in the code or via a JSON file. The essential information that HELICS configuration defines is:
+A "simulator" is the executable program. As soon as one particular instance of that simulator begins running in a co-simulation it is considered a "federate". Every federate (instance of a simulator) will require configuration of the way it will communicate (send signals) to other federates in the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; bespoke simulators can be configured with the HELICS APIs in the code or via a JSON file. The essential information that HELICS configuration defines is:
 
    **Federate name** - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
 
@@ -13,22 +13,20 @@ Every federate (instance of a simulator) will require configuration of the way i
    **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). 
 
 
-```eval_rst
-.. toctree::
-    :maxdepth: 1
-    
-    value_federates
-    message_federates
-    filters
-
-```
-
 
 ## Types of Federates
 
-A "federate", as previously introduced in the [HELICS Key Concepts section](./helics_key_concepts.md), is a specific instance of simulation executable. For example, a federation may contain a bunch of electric vehicles (EVs), each with their own charge controller implemented as a stand-alone federate (maybe the co-simulation designer is trying out a fancy new coordination algorithm); we'll call this code `EV_coordinator_v12.exe`. The code that does this charge coordination is generic in the sense that it can be used to charge any of these EVs; it works with all makes and models. But to run the co-simulation, each EV will have to have its own running instance of this code that controls the charging of a particular vehicle. If the co-simulation is testing this algorithm with five EVs, then there would be five federates each running their own version of `EV_coordinator_v12.exe` which presumably have unique information particular to each individual EV (battery size, maximum charging rate, etc).
+A "federate", as previously introduced in the [HELICS Key Concepts section](./helics_terminology.md), is a specific instance of a simulation executable. For example, a federation may contain a bunch of electric vehicles (EVs), each with their own charge controller implemented as a stand-alone federate.
 
-(And, to be clear, a "simulator" is the executable itself. A simulator can never be a part of a co-simulation; as soon as one particular instance of that simulator begins running in a co-simulation it is considered a "federate".)
+```
+In the examples, see the default example -- brief description of what it's trying to do.
+
+describe the example here, link to page, and use this to describe the concepts below
+```
+
+ (maybe the co-simulation designer is trying out a fancy new coordination algorithm); we'll call this code `EV_coordinator_v12.exe`. The code that does this charge coordination is generic in the sense that it can be used to charge any of these EVs; it works with all makes and models. But to run the co-simulation, each EV will have to have its own running instance of this code that controls the charging of a particular vehicle. If the co-simulation is testing this algorithm with five EVs, then there would be five federates each running their own version of `EV_coordinator_v12.exe` which presumably have unique information particular to each individual EV (battery size, maximum charging rate, etc).
+
+
 
 HELICS defines three specific types of federates defined by the nature of the messages they are passing to and from the federation:
 
@@ -52,6 +50,10 @@ HELICS defines three specific types of federates defined by the nature of the me
    Message federates interact with the federation through a conceptually different mechanism than a value federate. If message federates can be thought of as attaching to communication networks, the federate's "endpoints" are the specific interfaces to that communication network. By default, HELICS acts as the communication network, transferring signals between message federates from the endpoint on one to the endpoint on another.
 
 The following table may be useful in understanding the differences between the two methods by which federates can communicate:
+
+```
+fix the table below
+```
 
 ```eval_rst
 +--------------------------------------------------------------------+--------------------------------------------------------+

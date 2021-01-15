@@ -1,5 +1,22 @@
 # Timing
 
+#### Request the Next Time Step
+
+Now it is time for the federate to request the next time step and then - once granted - progress to that time step. If the uninterruptible flag has been set for the federate, than the requested time will always be what is returned. However, if the uninterruptible flag is not set, then the federate may receive a time earlier than it requests. This will happen if there have been updates to value publications to which it is subscribed or to endpoints which it has registered. 
+
+To request time, use the following API call:
+
+```python
+t = h.helicsFederateRequestTime (fed, time_requested)
+```
+For certain simulators, time_requested may be the last time (t) plus a native time step. For other simulators, time_requested may always be the final time step (end_time), and it will only be granted time when there are relevant updates provided by other federates in the cosimulation. 
+
+Like `helicsFederateEnterExecutingMode`, this method is a blocking call. Your federate will do nothing until the HELICS core has granted a time to it.
+
+Once granted a time, the federate is woken up and can begin execution for the next time step. Remember that the granted time may or may not be the requested time as the arrival of new inputs from the federation can cause the federate to be woken up prior to the requested time. More than likely, your federate will want to check what time has been granted and may choose different paths of execution based on whether this was the requested time or not.
+
+
+
 Once the initialization phase is complete (registration and integration of federates, configuration of signals), the co-simulation proper begins. Every federate will request a simulation time from its core. This time request indicates the point in simulated time at which the federate knows it will have to execute commands so it can simulate some portion of the model or behavior in the system. For example, there may be a federate simulating a building and based on the dynamics of the system, it knows the indoor temperature will not appreciably change over the next five minutes. 
 
 Based on the time requests and grants from all the connected federates, a core will determine the next time it can grant to a federate to guarantee none of the federates will be asked to simulate a point in time that occurs in the past. If the core is doing its job correctly, every federate will receive a time that is the same as or larger than the last time it was granted. HELICS does support a configuration and some other situations that allows a federate to break this rule, but this is a very special situation and would require all the federates to support this jumping back in time, or accept non-causality and some randomness in execution. 

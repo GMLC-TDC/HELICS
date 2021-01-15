@@ -16,6 +16,15 @@
 
 ```
 
+```
+what do we mean by 'fundamental topics' ?
+what are the learning objectives?
+by the end of this section, you should be able to...
+provide context with examples
+
+give narrative intro to topics introduced in this section
+```
+
 - [**HELICS Terminology**](./helics_terminology) - Key terms and concepts to understand before running co-simulations with HELICS
 - [**Federate Configuration**](./federates.md) - Discussion of the different types of federates in HELICS and how to configure them.
 	- [**Value Federates**](./value_federates.md)
