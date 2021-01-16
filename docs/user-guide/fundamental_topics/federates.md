@@ -16,12 +16,21 @@ A "simulator" is the executable program. As soon as one particular instance of t
 
 ## Types of Federates
 
-A "federate", as previously introduced in the [HELICS Key Concepts section](./helics_terminology.md), is a specific instance of a simulation executable. For example, a federation may contain a bunch of electric vehicles (EVs), each with their own charge controller implemented as a stand-alone federate.
+A "federate", as previously introduced in the [HELICS Terminology section](./helics_terminology.md), is a specific instance of a simulation executable. For example, a federation may contain a five electric vehicles (EVs) connected to charging ports in a dedicated EV charging garage. This co-simulation is the described in more detail in the [Fundamental Examples](../../examples/fundamental_examples/fundamental_examples.md). There are two federates in this co-simulation; one modeling the batteries on board the EVs, and one modeling the chargers of the batteries. 
+
+smaller computational executables can be standalone, 
+with big models, difficult to lump into one model
+if the federates are very similar -- parameter differences are small
+less complex vs 
+
+, each with their own charge controller implemented as a stand-alone federate.
 
 ```
 In the examples, see the default example -- brief description of what it's trying to do.
 
 describe the example here, link to page, and use this to describe the concepts below
+
+ask Trevor to clarify what I write
 ```
 
  (maybe the co-simulation designer is trying out a fancy new coordination algorithm); we'll call this code `EV_coordinator_v12.exe`. The code that does this charge coordination is generic in the sense that it can be used to charge any of these EVs; it works with all makes and models. But to run the co-simulation, each EV will have to have its own running instance of this code that controls the charging of a particular vehicle. If the co-simulation is testing this algorithm with five EVs, then there would be five federates each running their own version of `EV_coordinator_v12.exe` which presumably have unique information particular to each individual EV (battery size, maximum charging rate, etc).
