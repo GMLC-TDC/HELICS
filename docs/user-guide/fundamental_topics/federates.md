@@ -18,6 +18,8 @@ HELICS has three types of federates defined by the nature of the messages they a
 
    Message federates interact with the federation through a conceptually different mechanism than a value federate. If message federates can be thought of as attaching to communication networks, the federate's "endpoints" are the specific interfaces to that communication network. By default, HELICS acts as the communication network, transferring signals between message federates from the endpoint on one to the endpoint on another.
 
+3. **Combination federates** - Combination federates make use of both value signals and message signals for transferring data between federates. The [Combination Federation](../examples/fundamental_examples/fundamental_combo.md) in the Fundamental Examples learning track introduces a third federate to the [Base Example](../examples/fundamental_examples/fundamental_default.md) -- the combination federate passes values with the battery federate to monitor the physics of the battery charging, and it also passes messages with a controller federate to decide when to stop charging.
+
 The following table may be useful in understanding the differences between the two methods by which federates can communicate:
 
 
@@ -30,10 +32,6 @@ The following table may be useful in understanding the differences between the t
 | Status on Message Bus: |Current value always available|Removed when received |
 | Fidelity: |Can be configured with a default value |Can be rerouted and modified through filters |
 | Signal Contents: |Physical units  |Generic binary blobs  |
-
-
-3. **Combination federates** - Combination federates make use of both value signals and message signals for transferring data between federates. The [Combination Federation](../examples/fundamental_examples/fundamental_combo.md) in the Fundamental Examples learning track introduces a third federate to the [Base Example](../examples/fundamental_examples/fundamental_default.md) -- the combination federate passes values with the battery federate to monitor the physics of the battery charging, and it also passes messages with a controller federate to decide when to stop charging.
-
 
 The next three sections present more detail on value federates and message federates, and introduce filters as a method to model communication failure.
 
