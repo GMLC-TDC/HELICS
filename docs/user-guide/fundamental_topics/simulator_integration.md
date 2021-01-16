@@ -1,5 +1,15 @@
 
+A "simulator" is the executable program. As soon as one particular instance of that simulator begins running in a co-simulation it is considered a "federate". Every federate (instance of a simulator) will require configuration of the way it will communicate (send signals) to other federates in the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; bespoke simulators can be configured with the HELICS APIs in the code or via a JSON file. The essential information that HELICS configuration defines is:
 
+   **Federate name** - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
+
+   **Core type** - The core manages interfaces between the federation and the federate; there are several messaging technologies supported by HELICS. 
+
+   **Publications and Inputs** - Publication configuration contains a listing of source handle, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file. 
+
+   **Endpoints** - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate. 
+
+   **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). 
 
 
 # Integration of Federates
@@ -19,6 +29,11 @@ This section introduces the simplest broker topology for integrating federates i
 ```
 fix toc to be direct links
 ```
+
+```
+make link/reference to tools with HELICS support -- these will need to be configured with jsons
+```
+
 
 ```eval_rst
 .. toctree::
