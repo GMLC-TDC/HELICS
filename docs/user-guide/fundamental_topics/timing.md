@@ -1,5 +1,12 @@
 # Timing
 
+by default, the time inside helics has a resolution of 1ns. 
+
+What is the difference between helicsFederateRequestTime and helicsFederateRequestTimeIterative with the iterate parameter set to no_iteration? Would it make sense to use force_iteration while checking for convergence at a single time step and then use no_iteration when I want to move to the next time step? 
+
+the only difference in those calls would be that the return value includes an iteration_result enumeration value. Otherwise they make the same call. use the iteration in combination with the setMinimumChange functions then helics can determine the iteration if there is updated data. But that is not possible in all cases, in which case it is up to the individual application to decide on an iteration strategy
+There is also a max iterations flag as well
+
 #### Request the Next Time Step
 
 Now it is time for the federate to request the next time step and then - once granted - progress to that time step. If the uninterruptible flag has been set for the federate, than the requested time will always be what is returned. However, if the uninterruptible flag is not set, then the federate may receive a time earlier than it requests. This will happen if there have been updates to value publications to which it is subscribed or to endpoints which it has registered. 

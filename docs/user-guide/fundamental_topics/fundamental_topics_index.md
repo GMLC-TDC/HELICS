@@ -10,6 +10,7 @@
     simulator_integration
     timing
     helics_cli
+    stages
     web_interface
     logging
 	

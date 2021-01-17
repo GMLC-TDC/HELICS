@@ -56,6 +56,109 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Integration with JSON Configuration
 
+Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [federate configuration](../configuration_options_reference.md) guide.
+
+### General Configuration Parameter
+
+(xxxxxxx figure out what needs to be in here now that we have the Configuration Options Reference page)
+
+Though contained here in this section on value federates, the options below are applicable to both value and message federates. As value federates are the more common type, we've put them here.
+
+```json
+{
+    ...
+    "name":"generic_federate",
+    "coreType": "zmq"
+    ...
+}
+```
+
+- **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
+- **`coreType` [zmq]** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
+
+### Value Federate Interface Configuration
+
+```json
+{
+     "publications" : [
+          {
+               "key" : "IEEE_123_feeder_0/totalLoad",
+               "global" : true,
+               "type" : "complex",
+               "unit" : "VA",
+               "info" : "{
+                    \"object\" : \"network_node\",
+                    \"property\" : \"distribution_load\"
+               }"
+          }
+     ],
+     "subscriptions" : [
+          {
+               "required": true,
+               "key" : "TransmissionSim/transmission_voltage",
+               "type" : "complex",
+               "unit" : "V",
+               "info" : "{
+                    \"object\" : \"network_node\",
+                    \"property\" : \"positive_sequence_voltage\"
+                    }"
+          }
+     ]
+}
+```
+
+- **`publications` and/or `subscriptions`** - These are lists of the values being sent to and from the given federate.
+- **`key`** -
+  - `publications` - The string in this field is the unique identifier (at the federate level) for the value that will be published to the federation. If `global` is set (see below) it must be unique to the entire federation.
+  - `subscriptions` - This string identifies the federation-unique value that this federate wishes to receive. Unless `global` has been set to `true` in the publishings JSON configuration file, the name of the value is formatted as `<federate name>/<publication key>`. Both of these strings can be found in the publishing federate's JSON configuration file as the `name` and `key` strings, respectively. If `global` is `true` the string is just the `key` value.
+- **`global` [false]** - (publications only) `global` is used to indicate that the value in `key` will be used as a global name when other federates are subscribing to the message. This requires that the user ensure that the name is used only once across all federates. Setting `global` to `true` is handy for federations with a small number of federates and a small number of message exchanges as it allows the `key` string to be short and simple. For larger federations, it is likely to be easier to set the flag to `false` and accept the extra naming
+- **`required` [false]** -
+  - `publications` - At least one federate must subscribe to the publications.
+  - `subscriptions` - The message being subscribed to must be provided by some other publisher in the federation.
+- **`type`** - HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)).
+- **`units`** - HELICS is able to do some levels of unit conversion, currently only on double type publications but more may be added in the future. The units can be any sort of unit string, a wide assortment is supported and can be compound units such as m/s^2 and the conversion will convert as long as things are convertible. The unit match is also checked for other types and an error if mismatching units are detected. A warning is also generated if the units are not understood and not matching. The unit checking and conversion is only active if both the publication and subscription specify units.
+- **`info`** - The `info` field is entirely ignored by HELICS and is used as a mechanism to pass configuration information to the federate so that it can properly integrate into the federation. Thus, there is no standard content or format for this field; it is entirely up to the individual simulators to decide how the data in this field (if any) should be used. Often it is used by simulators to map the HELICS names into internal variable names as shown in the above example. In this case, the object `network_node` has a property called `positive_sequence_voltage` that will be updated with the value from the subscription `TransmissionSim/transmission_voltage`.
+
+## Message Federate Configuration in JSON
+
+Once the message topology considering endpoints has been determined, the definitions of these endpoints in the JSON file is straight-forward. Here's what it could look like for the voltage regulator example from above.
+
+```json
+{
+     ...
+     "endpoints" : [
+        {
+            "name" : "voltage_sensor",
+            "global" : true,
+            "destination" : "voltage_controller",
+            "info" : ""
+        },
+        {
+            "name" : "voltage_controller_1",
+            "global" : true,
+            "info" : ""
+        },
+        {
+            "name" : "voltage_controller_2",
+            "global" : true,
+            "destination" : "voltage_actuator",
+            "info" : ""
+        },
+        {
+            "name" : "voltage_actuator",
+            "global" : true,
+            "info" : ""
+        }
+     ...
+     ]
+}
+```
+
+- **`name`** - Analogous to `key` in value federates, this is the unique identifier of the endpoint in the federation and has the same interaction with `global` as the value federates do.
+- **`global`** - Just as in value federates, `global` allows for the identifier of the endpoint to be declared unique for the entire federation.
+- **`destination`** - For endpoints that send all outgoing messages to only a single endpoint, `destination` allows the endpoint to be specified in the JSON configuration. This allows for a more modular implementation of the federate since this parameter is externally defined rather than being hardcoded in the federate itself.
+- **`info`** - Just as in the value federate, the string in this field is ignored by HELICS and can be used by the federate for internal configuration purposes.
+
 
 ## Integration with API Calls
 
