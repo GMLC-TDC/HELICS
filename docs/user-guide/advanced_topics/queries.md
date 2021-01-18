@@ -1,6 +1,6 @@
 # Queries
 
-Queries are asynchronous means within a HELICS federation of asking for and receiving information from other federate components. Brokers, Federates, and Cores all have query functions. Federates are also able to define a callback for answering custom queries.
+Queries are an asynchronous means within a HELICS federation of asking for and receiving information from other federate components. A query provides the ability to evaluate the current state of a federation and typically addresses the configuration and architecture of the federation. Brokers, Federates, and Cores all have query functions. Federates are also able to define a callback for answering custom queries.
 
 The general function looks like this:
 
