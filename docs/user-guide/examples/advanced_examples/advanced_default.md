@@ -38,10 +38,10 @@ The files include:
 ## Co-simulation Setup
 
 ### Messages + Values
-As you may or may not have read in the User Guide (**TODO: link to appropriate section in User Guide**), one of the key differences between value exchange and the message exchange is that value exchange paths are defined once the federation has been initialized but message exchanges are dynamic and can travel from any endpoint to any endpoint throughout the co-simulation. The diagram below shows the three federates used in this example with the representative handles for both the value and message exchanges.
+As you may or may not have read in the [User Guide](../../fundamental_topics/message_federates.md), one of the key differences between value exchange and the message exchange is that value exchange paths are defined once the federation has been initialized but message exchanges are dynamic and can travel from any endpoint to any endpoint throughout the co-simulation. The diagram below shows the three federates used in this example with the representative handles for both the value and message exchanges.
 
 
-![](../../../img/advanced_default_battery_SOCs.png)
+![](../../../img/advanced_default_signal_topology.png)
 
 
 ### Co-simulation Execution and Results

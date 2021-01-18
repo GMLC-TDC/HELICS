@@ -60,7 +60,7 @@ As will be shown, the use of multiple brokers will not affect the results of the
 
 #### HELICS differences 
 
-Broker hierarchies are primarily used to help improve the performance of the co-simulation by allowing federates that interact strongly with each other to run on a single compute node, thereby allowing them to exchange information with each other quickly rather than over a relatively slow network connection to the rest of the federates on other compute nodes. This can be particularly helpful when the other compute nodes reside at off-site locations and the co-simulation communication is taking place between them over the public internet. 
+Broker hierarchies are primarily used to help improve the performance of the co-simulation by allowing federates that interact strongly with each other to run on a single compute node, thereby allowing them to exchange information with each other quickly rather than over a relatively slow network connection to the rest of the federates on other compute nodes.   This can be particularly helpful when the other compute nodes reside at off-site locations and the co-simulation communication is taking place between them over the public internet. (See the [User Guide section on broker hierarchies](../../advanced_topics/broker_hierarchies.md) for further details.) 
 
 Not all federations lend themselves to segregation like this; the example here doesn't really support such segregation as both the Battery and the Controller talk frequently with the Charger. 
 
