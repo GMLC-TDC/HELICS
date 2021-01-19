@@ -6,7 +6,7 @@ There are a number of classes of HELICS users:
 	- Start with [**Installation**](../installation/index.md)
 	- Read the [**Fundamental Topics**](./index.html#fundamental-topics)
 	- Try the [**Examples**](./index.html#examples)	
-- **Intermediate users** that have run co-simulations with HELICS using simulators in which somebody else has done the simulator integration with HELICS.
+- **Intermediate users (Modelers)** that have run co-simulations with HELICS using simulators in which somebody else has done the simulator integration with HELICS.
 	- Review [**Fundamental Topics**](./index.html#fundamental-topics) as needed 
 	- Look over the [**Advanced Topics**](./index.html#advanced-topics) to see which features of HELICS may be most useful for your analysis.
 		- [Multi-Source Inputs](./advanced_topics/multiSourceInputs.md) ([example](./examples/advanced_examples/advanced_multi_input.md))
@@ -15,7 +15,7 @@ There are a number of classes of HELICS users:
 		- [Queries](./advanced_topics/queries.md) ([example](./examples/advanced_examples/advanced_query.md))
 		- [Simultaneous Co-simulation](./advanced_topics/simultaneous_cosimulations.md) ([example](./examples/advanced_examples/advanced_brokers_simultaneous.md))
 		- [Multiple Co-simulation Orchestration](./advanced_topics/orchestration.md) ([example](./examples/advanced_examples/advanced_orchestration.md))
-- **Experienced users** that are incorporating a new simulator and need to know how to use specific features in the HELICS API
+- **Experienced users (Integrators)** that are incorporating a new simulator and need to know how to use specific features in the HELICS API
 	- Look in the [**Configurations Options Reference**](./index.html#configurations-options-reference) or jump straight to the API references
 		- [C++](https://docs.helics.org/en/latest/doxygen/index.html)
 		- C++98

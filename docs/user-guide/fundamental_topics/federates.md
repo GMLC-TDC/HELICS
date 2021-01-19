@@ -26,7 +26,7 @@ This co-simulation is described in more detail in the [Fundamental Examples](../
 
 Co-simulations are designed to answer a research question. The question addressed by the [Fundamental Examples](../examples/fundamental_examples/fundamental_examples.md) is: How much power is needed to serve five EVs in a dedicated charging garage?
 
-With this research question, we have identified that we want to model **batteries** and **chargers** and we want to moniter the power draw in **kW** over time. It's important to first identify the types of objects you want to model, as co-simulation in HELICS requires constructing federates based on the type of information they pass to other federates.
+With this research question, we have identified that we want to model **batteries** and **chargers** and we want to monitor the power draw in **kW** over time. It's important to first identify the types of objects you want to model, as co-simulation in HELICS requires constructing federates based on the type of information they pass to other federates.
 
 ## Types of Federates
 
@@ -53,7 +53,7 @@ Value federates have direct fixed connections through interfaces to other federa
 
 The most commonly used of these fixed interfaces are publications and subscriptions. In the [Fundamental Example](../examples/fundamental_examples/fundamental_examples.md), the battery federate and the charger federate have fixed pub/sub connections. In the figure below, publishing interfaces are in <span style="color:red;">red</span> and the subscription interfaces are in <span style="color:orange;">yellow</span>. The battery federate **publishes** the amps (current in the battery) from the publication interface named `EV_Battery/EV_current` and does not specify the intended recipient. The charger federate **subscribes** to the amps from the battery with the subscription interface named `EV_Battery/EV_current` -- the receiving interface only specifies the sender.
 
-![Fundamental Example Configuration](../../img/battery_sub.png)
+![](../../img/battery_sub.png)
 
 
 In all cases the configuration of the federate core declares the existence of the interface to use for communicating with other federates. The difference between publication/subscription and directed outputs/unnamed inputs is where the federate core knows the specific names of the interfaces on the receiving/sending federate core.
@@ -86,7 +86,7 @@ Endpoints are interfaces used to pass packetized data blocks (messages) to anoth
 
 In the figure below, Federate A and B are message federates with endpoints epA and epB. They do not have a fixed communication pathway; they have unique addresses (endpoints) to which messages can be sent. An endpoint can send data to any other endpoint in the system -- it just needs the "address" (endpoint handle).
 
-![Fundamental Example Configuration](../../img/ep_connection.png)
+![](../../img/ep_connection.png)
 
 Endpoints can have a type which is a user defined string. HELICS currently does not recognize any predefined types.  The data consists of raw binary data and optionally a send time. Messages are delivered first by time order, then federate id number, then handle id, then by order of arrival.
 
@@ -117,12 +117,12 @@ Filters have the following properties:
    
 The figure below is an example of a representation of the message topology of a generic co-simulation federation composed entirely of message federates. Source and destination filters have been implemented (indicated by the blue endpoints -- gray endpoints do not have filters), each showing a different built-in HELICS filter function.
 
-![Federate communication](../../img/messages_and_filters_example.png)
+![](../../img/messages_and_filters_example.png)
 
 - In this figure, Federate 4 has a single endpoint for sending and receiving messages. Both a source filter and a destination filter can be set up on a single endpoint, or multiple source filters can be used on the same endpoint.
 - The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by  0.5 seconds. Without establishing a separate destination endpoint devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
 - Because the filter on Federate 4 is a destination filter, the message it receives from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
-- The source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint. (**BUT IT'S SENDING A MESSAGE TO FEDERATE 1??**)
+- The source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
 - Individual filters can be targeted to act on multiple endpoints and act as both source and destination filters.
 
 
@@ -143,11 +143,13 @@ This feature offers the convenience of allowing a message federate to receive me
 
 ### Combination Federates
 
-3. **Combination federates** - Combination federates make use of both value signals and message signals for transferring data between federates. The [Combination Federation](../examples/fundamental_examples/fundamental_combo.md) in the Fundamental Examples learning track introduces a third federate to the [Base Example](../examples/fundamental_examples/fundamental_default.md) -- the combination federate passes values with the battery federate to monitor the physics of the battery charging, and it also passes messages with a controller federate to decide when to stop charging.
+**Combination federates** - Combination federates make use of both value signals and message signals for transferring data between federates. The [Combination Federation](../examples/fundamental_examples/fundamental_combo.md) in the Fundamental Examples learning track introduces a third federate to the [Base Example](../examples/fundamental_examples/fundamental_default.md) -- the combination federate passes values with the battery federate to monitor the physics of the battery charging, and it also passes messages with a controller federate to decide when to stop charging.
 
-(reference combination federation example or final example)
+```
+reference combination federation example or final example
+```
 
-![Combination Federate](../../img/fundamental_complete.png)
+![](../../img/fundamental_complete.png)
 
 
 The following table may be useful in understanding the differences between the two methods by which federates can communicate:

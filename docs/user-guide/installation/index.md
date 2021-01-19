@@ -12,16 +12,16 @@ The first step to using HELICS is to install it. Since there are several ways to
 ![](./images/install-decision-tree.png)
 
 
-## `pip install`
+## pip install
 [pip install helics](https://python.helics.org/)
 
 ## Download pre-compiled
 [Download the pre-compiled libraries and add them to your system path](./installing_the_pre_compiled_libraries.md)
 
-## `spack install`
+## spack install
 [spack install helics](./spack.md)
 
-## `nimble install`
+## nimble install
 [nimble install https://github.com/GMLC-TDC/helics.nim#head](https://github.com/GMLC-TDC/helics.nim)
 
 ## Build from source
