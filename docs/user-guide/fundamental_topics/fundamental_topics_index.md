@@ -8,7 +8,7 @@
     helics_terminology
     federates
     simulator_integration
-    timing
+    timing_configuration 
     helics_cli
     stages
     web_interface
