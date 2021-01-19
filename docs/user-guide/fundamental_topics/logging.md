@@ -4,17 +4,6 @@ After all possible time grants have been exhausted, the federates signal to thei
 
 Logging in HELICS is normally handled through an independent thread. The thread prints message to the console and or to a file.
 
-### Federate Finalization
-
-Once the federate has completed its contribution to the co-simulation, it needs to close out its connection to the federation. Typically a federate knows it has reached the end of the co-simulation when it is granted `maxTime`. To leave the federation cleanly (without causing errors for itself or others in the co-simulation) the following process needs to be followed:
-
-```python
-h.helicsFederateFinalize(fed)
-h.helicsFederateFree(fed)
-h.helicsCloseLibrary()
-```
-
-`helicsFederateFinalize()` signals to the core and brokers that this federate is leaving the co-simulation. This process will take an indeterminate amount of time and thus it is necessary to poll the connection status to the broker. Once that connection has closed, the memory of the federate (associated with HELICS) is freed up with `helicsFederateFree()` and the processes in the HELICS library are terminated with `helicsCloseLibrary()`. At this point, the federate can safely end execution completely.
 
 ## Federate Logging
 

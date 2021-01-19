@@ -1,8 +1,11 @@
-# HELICS Co-simulation Architectures
+# Co-simulation Architectures
 
 There are several co-simulation architectures that can be constructed where the relationships between the federates, cores, and brokers can vary.
 
 ## Simple Co-simulation
+
+Broker topology is somewhat optional for simple co-simulations, but offers an increase in performance if it is possible to identify groups of federates that interact often with each other but rarely with the rest of the federation. In such cases, assigning that group of federates their own broker will remove the congestion their messages cause with the federation as a whole. The Fundamental Topics and Examples are built with a single broker.
+
 
 The figure below shows the most common architecture for HELICS co-simulation. Each core has only one federate as an integrated executable, all executables reside on the same computer and are connected to the same broker. This architecture is particularly common for small federates and/or co-simulations under development. This is also the architecture for the [Fundamental Examples](../examples/fundamental_examples/fundamental_examples_index.md).
 
