@@ -11,7 +11,7 @@ This section on Federates covers:
 		* [Value Federate Interfaces](#value-federate-interfaces)
 	* [Message Federates](#message-federates)
 		* [Message Information](#message-information) 
-		* [Message Federate Interfaces](#interfaces-endpoints)
+		* [Message Federate Interfaces](#message-federate-interfaces)
 			* [Endpoints](#endpoints)
 			* [Filters](#filters)
 		* [Interactions Between Messages and Values](#interactions-between-messages-and-values)
@@ -26,7 +26,7 @@ This co-simulation is described in more detail in the [Fundamental Examples](../
 
 Co-simulations are designed to answer a research question. The question addressed by the [Fundamental Examples](../examples/fundamental_examples/fundamental_examples.md) is: How much power is needed to serve five EVs in a dedicated charging garage?
 
-With this research question, we have identified that we want to model **batteries** and **chargers** and we want to monitor the power draw in **kW** over time. It's important to first identify the types of objects you want to model, as co-simulation in HELICS requires constructing federates based on the type of information they pass to other federates.
+With this research question, we have identified that we want to model **batteries** and **chargers** and we want to moniter the power draw in **kW** over time. It's important to first identify the types of objects you want to model, as co-simulation in HELICS requires constructing federates based on the type of information they pass to other federates.
 
 ## Types of Federates
 
@@ -43,17 +43,27 @@ The information modeled by value federates is physical values in a system with a
 
 #### Value Federate Interfaces
 
-Value federates have direct fixed connections through interfaces to other federates. There are four interface types for value federates that allow the interactions between the federates to be flexibly defined. The difference between the four types revolve around whether the interface is for sending or receiving values and whether the sender/receiver is defined by the federate:
+Value federates have direct fixed connections through interfaces to other federates. There are three interface types for value federates that allow the interactions between the federates to be flexibly defined. The difference between the three types revolves around whether the interface is for sending or receiving values and whether the sender/receiver is defined by the federate:
 
-* Publications - Sending interface where the federate does not specify the intended recipient of the HELICS value
-* Directed Outputs - Sending interface where the federate specifies the recipient of HELICS value
-* Subscriptions (Named Inputs) - Receiving interface where the federate specifies the sender of HELICS value
-* Unnamed Inputs - Receiving interface where the federate does not specify the source federate of the HELICS value
+* Publications 
+	* Sending interface
+	* Handle named with `"key"` in configuration
+	* Recipient handle of value is not necessary, however it can be specified with `"targets"` in configuration
+* Subscriptions (Unnamed Inputs) 
+	* Receiving interface
+	* Not "named"
+	* Source handle of value is specified with `"key"` in configuration
+* Named Inputs 
+	* Receiving interface 
+	* Handle named with `"key"` in configuration
+	* Source handle of value is not necessary, however it can be specified with `"targets"` -- Named Inputs can receive values from multiple `"targets"`
 
 
-The most commonly used of these fixed interfaces are publications and subscriptions. In the [Fundamental Example](../examples/fundamental_examples/fundamental_examples.md), the battery federate and the charger federate have fixed pub/sub connections. In the figure below, publishing interfaces are in <span style="color:red;">red</span> and the subscription interfaces are in <span style="color:orange;">yellow</span>. The battery federate **publishes** the amps (current in the battery) from the publication interface named `EV_Battery/EV_current` and does not specify the intended recipient. The charger federate **subscribes** to the amps from the battery with the subscription interface named `EV_Battery/EV_current` -- the receiving interface only specifies the sender.
 
-![](../../img/battery_sub.png)
+
+The most commonly used of these fixed interfaces are publications and subscriptions. In the [Fundamental Example](../examples/fundamental_examples/fundamental_examples.md), the battery federate and the charger federate have fixed pub/sub connections. In the figure below, publishing interfaces are in <span style="color:red;">**red**</span> and the subscription interfaces are in <span style="color:orange;">**yellow**</span>. The battery federate **publishes** the amps (current in the battery) from the publication interface named `EV_Battery/EV_current` and does not specify the intended recipient. The charger federate **subscribes** to the amps from the battery with the subscription interface named `EV_Battery/EV_current` -- the receiving interface only specifies the sender.
+
+![Fundamental Example Configuration](../../img/battery_sub.png)
 
 
 In all cases the configuration of the federate core declares the existence of the interface to use for communicating with other federates. The difference between publication/subscription and directed outputs/unnamed inputs is where the federate core knows the specific names of the interfaces on the receiving/sending federate core.
@@ -76,7 +86,7 @@ Message federates send packets of data with unfixed connections for things such 
 Message federates are used when the HELICS signals being passed to and from the simulation are generic packets of information, often for control purposes. They are treated as data to be used by an algorithm, processor, or controller. If the inputs to the federate can be thought of as traveling over a communication network of some kind, it should be modeled as coming from/going to a message federate. For example, in the power system world, phasor measurement units ([PMUs](https://en.wikipedia.org/wiki/Phasor_measurement_unit)) have been installed throughout the power system and the measurements they make are collected through a communication system.
 
 
-#### Interfaces
+#### Message Federate Interfaces
 
 Message federates interact with the federation through two types of interfaces: endpoints and filters. Message federates can be thought of as attaching to communication networks, where the federate's **endpoints** are the specific interfaces to that communication network. By default, HELICS acts as the communication network, transferring messages between endpoint interfaces configured for message federates. Just as communications networks can be susceptible to failure, messages can be altered or delayed with **filter** interfaces. Filters are unique interfaces that must be configured, and they can only disrupt messages (never values).
 
@@ -86,14 +96,14 @@ Endpoints are interfaces used to pass packetized data blocks (messages) to anoth
 
 In the figure below, Federate A and B are message federates with endpoints epA and epB. They do not have a fixed communication pathway; they have unique addresses (endpoints) to which messages can be sent. An endpoint can send data to any other endpoint in the system -- it just needs the "address" (endpoint handle).
 
-![](../../img/ep_connection.png)
+![Fundamental Example Configuration](../../img/ep_connection.png)
 
 Endpoints can have a type which is a user defined string. HELICS currently does not recognize any predefined types.  The data consists of raw binary data and optionally a send time. Messages are delivered first by time order, then federate id number, then handle id, then by order of arrival.
 
 Unlike HELICS values which are persistent (meaning they are continuously available throughout the co-simulation), HELICS messages are only readable once when collected from an endpoint. Once that collection is made, the message only exists within the memory of the collecting message federate. If another message federate needs the information, a new message must be created and sent to the appropriate endpoint. 
 
 
-##### Filters: Controlling Federate Messages
+##### Native HELICS Filters
 
 Filters are interfaces that can be used to disrupt message packets similar to communications networks. Filters are associated with the HELICS core, which in turn manages a federate's endpoints. Typical filtering actions might be delaying the transmission of a message or randomly dropping a certain percentage of the received messages. Filters can also be defined to operate on messages being sent ("source filters") and/or messages being received ("destination filters"). 
 
@@ -117,12 +127,12 @@ Filters have the following properties:
    
 The figure below is an example of a representation of the message topology of a generic co-simulation federation composed entirely of message federates. Source and destination filters have been implemented (indicated by the blue endpoints -- gray endpoints do not have filters), each showing a different built-in HELICS filter function.
 
-![](../../img/messages_and_filters_example.png)
+![Federate communication](../../img/messages_and_filters_example.png)
 
 - In this figure, Federate 4 has a single endpoint for sending and receiving messages. Both a source filter and a destination filter can be set up on a single endpoint, or multiple source filters can be used on the same endpoint.
 - The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by  0.5 seconds. Without establishing a separate destination endpoint devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
 - Because the filter on Federate 4 is a destination filter, the message it receives from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
-- The source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
+- The source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint. 
 - Individual filters can be targeted to act on multiple endpoints and act as both source and destination filters.
 
 
@@ -143,13 +153,10 @@ This feature offers the convenience of allowing a message federate to receive me
 
 ### Combination Federates
 
-**Combination federates** - Combination federates make use of both value signals and message signals for transferring data between federates. The [Combination Federation](../examples/fundamental_examples/fundamental_combo.md) in the Fundamental Examples learning track introduces a third federate to the [Base Example](../examples/fundamental_examples/fundamental_default.md) -- the combination federate passes values with the battery federate to monitor the physics of the battery charging, and it also passes messages with a controller federate to decide when to stop charging.
+Combination federates make use of both value signals and message signals for transferring data between federates. The [Combination Federation](../examples/fundamental_examples/fundamental_combo.md) in the Fundamental Examples learning track introduces a third federate to the [Base Example](../examples/fundamental_examples/fundamental_default.md) -- the combination federate passes values with the battery federate to monitor the physics of the battery charging, and it also passes messages with a controller federate to decide when to stop charging.
 
-```
-reference combination federation example or final example
-```
 
-![](../../img/fundamental_complete.png)
+![Combination Federate](../../img/fundamental_complete.png)
 
 
 The following table may be useful in understanding the differences between the two methods by which federates can communicate:
@@ -157,10 +164,10 @@ The following table may be useful in understanding the differences between the t
 
 |  |Values  | Messages        |
 |:---|:-----------------------------------------|:-----------------|
-| Interface Type:  | Publication/Subscription |  Endpoint |
+| Interface Type:  | Publication/Subscription/Input |  Endpoint/Filter |
 | [Signal Route](../advanced_topics/queries.md): |Fixed, defined at initialization   |Determined at time of transmission   |
-| Publications: | 1 to n (broadcast)    |1 to 1 - defined sender and receiver        |
-| Inputs: | n to 1 (promiscuous)  |       None              |
+| Outgoing signal: | 1 to n (broadcast)    |1 to 1 - defined sender and receiver        |
+| Incoming signal: | n to 1 (promiscuous)  |       None              |
 | Status on Message Bus: |Current value always available|Removed when received |
 | Fidelity: |Default value |Rerouting/modification through filters |
 | Signal Contents: |Physical units  |Generic binary blobs  |
