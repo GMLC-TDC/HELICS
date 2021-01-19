@@ -46,8 +46,10 @@ constexpr uint16_t parent_flag =
     extra_flag3; 
 
 /// overload of extra_flag4 indicating a message is from a child object
-constexpr uint16_t child_flag =
-    extra_flag4;  
+constexpr uint16_t child_flag = extra_flag4;
+
+/// overload of nameless_interface_flag indicating that a federate should not count in any totals
+constexpr uint16_t non_counting_flag = nameless_interface_flag;
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

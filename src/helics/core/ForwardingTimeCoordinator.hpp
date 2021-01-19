@@ -27,16 +27,13 @@ class ForwardingTimeCoordinator {
   private:
 
     // the variables for time coordination
-      DependencyInfo main;
-      DependencyInfo minNext;
-      DependencyInfo minEvent;
-      DependencyInfo minMinDe;
-      DependencyInfo minState;
+      DependencyInfo upstream;
+      DependencyInfo downstream;
     
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-      /// callback used to send the messages
+    /// callback used to send the messages
     std::function<void(const ActionMessage&)> sendMessageFunction;  
 
   public:
@@ -51,7 +48,8 @@ class ForwardingTimeCoordinator {
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{
-        false};  
+        false};
+    bool noParent{false};//!< indicator that the coordinator does not have parents
   private:
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
@@ -85,7 +83,8 @@ class ForwardingTimeCoordinator {
         return dependencies.empty();
     }
   private:
-    void transmitTimingMessages(ActionMessage& msg) const;
+    void transmitTimingMessagesUpstream(ActionMessage& msg) const;
+    void transmitTimingMessagesDownstream(ActionMessage& msg) const;
     /** generate a timeRequest message based on the dependency info data*/
     ActionMessage generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const;
 
@@ -132,6 +131,6 @@ class ForwardingTimeCoordinator {
     /** check if there are any active Time dependencies*/
     bool hasActiveTimeDependencies() const;
     /** get the current next time*/
-    Time getNextTime() const { return main.next; }
+    Time getNextTime() const { return downstream.next; }
 };
 }  // namespace helics

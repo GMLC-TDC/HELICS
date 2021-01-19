@@ -54,6 +54,7 @@ class BasicFedInfo {
     route_id route;  //!< the routing information for data to be sent to the federate
     global_broker_id parent;  //!< the id of the parent broker/core
     connection_state state{connection_state::connected};
+    bool nonCounting{false};  //indicator the federate shouldn't count toward limits or total
     explicit BasicFedInfo(const std::string& fedname): name(fedname) {}
 };
 

@@ -47,7 +47,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
                 dep.minDe= dep.Te;
             }
 
-            dep.minFedMinDe = global_federate_id(m.getExtraData());
+            dep.minFed = global_federate_id(m.getExtraData());
             break;
         case CMD_TIME_GRANT:
             dep.time_state = time_state_t::time_granted;
@@ -57,7 +57,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = m.actionTime;
             dep.Te = dep.next;
             dep.minDe= dep.next;
-            dep.minFedMinDe = global_federate_id{};
+            dep.minFed = global_federate_id{};
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -70,7 +70,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
             dep.minDe= Time::maxVal();
-            dep.minFedMinDe = global_federate_id{};
+            dep.minFed = global_federate_id{};
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -79,7 +79,7 @@ static bool ProcessMessage(const ActionMessage& m, DependencyInfo &dep)
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
             dep.minDe= Time::maxVal();
-            dep.minFedMinDe = global_federate_id{};
+            dep.minFed = global_federate_id{};
             break;
         default:
             return false;
@@ -108,32 +108,15 @@ bool DependencyInfo::update(const DependencyInfo& update)
         updated = true;
     }
 
-    if (update.minFedMinDe != minFedMinDe) {
-        minFedMinDe = update.minFedMinDe;
+    if (update.minFed != minFed) {
+        minFed = update.minFed;
         updated = true;
     }
-    if (update.minFedActualMinDe != minFedActualMinDe) {
-        minFedActualMinDe = update.minFedActualMinDe;
-        updated = true;
-    }
-
-    if (update.minFedNext != minFedNext) {
-        minFedNext = update.minFedNext;
-        updated = true;
-    }
-    if (update.minFedActualNext != minFedActualNext) {
-        minFedActualNext = update.minFedActualNext;
+    if (update.minFedActual != minFedActual) {
+        minFedActual = update.minFedActual;
         updated = true;
     }
 
-    if (update.minFedEvent != minFedEvent) {
-        minFedEvent = update.minFedEvent;
-        updated = true;
-    }
-    if (update.minFedActualEvent != minFedActualEvent) {
-        minFedActualEvent = update.minFedActualEvent;
-        updated = true;
-    }
     return updated;
 }
 
@@ -362,4 +345,229 @@ void TimeDependencies::resetDependentEvents(helics::Time grantTime)
 }
 }
 
+static DependencyInfo generateMinTimeImplementation(const TimeDependencies& dependencies,
+    bool restricted,
+    global_federate_id self,
+    global_federate_id ignore,
+    ConnectionType disallowed)
+{
+
+}
+
+DependencyInfo generateMinTimeUpstream(const TimeDependencies& dependencies,
+    bool restricted,
+    global_federate_id self,
+    global_federate_id ignore)
+{
+    DependencyInfo mTime(Time::maxVal());
+    for (auto& dep : dependencies) {
+        if (dep.dependency == false) {
+            continue;
+        }
+        if (dep.connection == ConnectionType::parent) {
+            continue;
+        }
+        if (dep.minFedActual == self) {
+            continue;
+        }
+
+        if (dep.fedID == ignore) {
+            if (dep.fedID.isBroker()) {
+                if (dep.Te < mTime.minDe) {
+                    mTime.minDe = dep.Te;
+                }
+                if (mTime.minDe < mTime.minminDe) {
+                    mTime.minminDe = mTime.minDe;
+                }
+            }
+
+            continue;
+        }
+
+        if (dep.minDe >= dep.next) {
+            if (dep.minDe < mTime.minminDe) {
+                mTime.minminDe = dep.minDe;
+                mTime.minFed = dep.fedID;
+                if (dep.minFed.isValid()) {
+                    mTime.minFedActual = dep.minFed;
+                } else {
+                    mTime.minFed = dep.fedID;
+                }
+            } else if (dep.minDe == mTime.minminDe) {
+                mTime.minFedActual = global_federate_id();
+            }
+        } else {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            mTime.minminDe = -1;
+        }
+
+        if (dep.next < mTime.next) {
+            mTime.next = dep.next;
+            mTime.time_state = dep.time_state;
+
+        } else if (dep.next == mTime.next) {
+            if (dep.time_state == time_state_t::time_granted) {
+                mTime.time_state = dep.time_state;
+            }
+        }
+        if (dep.Te < mTime.minDe) {
+            mTime.minDe = dep.Te;
+        }
+    }
+
+    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
+
+    if (!restricted && mTime.minminDe < Time::maxVal()) {
+        if (mTime.minminDe > mTime.next) {
+            mTime.next = mTime.minminDe;
+        }
+    }
+
+    return mTime;
+}
+
+DependencyInfo generateMinTimeDownstream(const TimeDependencies& dependencies,
+    bool restricted,
+    global_federate_id self,
+    global_federate_id ignore)
+{
+    DependencyInfo mTime(Time::maxVal());
+    for (auto& dep : dependencies) {
+        if (dep.dependency == false) {
+            continue;
+        }
+        if (dep.connection == ConnectionType::parent) {
+            continue;
+        }
+        if (dep.minFedActual == self) {
+            continue;
+        }
+
+        if (dep.fedID == ignore) {
+            if (dep.fedID.isBroker()) {
+                if (dep.Te < mTime.minDe) {
+                    mTime.minDe = dep.Te;
+                }
+                if (mTime.minDe < mTime.minminDe) {
+                    mTime.minminDe = mTime.minDe;
+                }
+            }
+
+            continue;
+        }
+
+        if (dep.minDe >= dep.next) {
+            if (dep.minDe < mTime.minminDe) {
+                mTime.minminDe = dep.minDe;
+                mTime.minFed = dep.fedID;
+                if (dep.minFed.isValid()) {
+                    mTime.minFedActual = dep.minFed;
+                } else {
+                    mTime.minFed = dep.fedID;
+                }
+            } else if (dep.minDe == mTime.minminDe) {
+                mTime.minFedActual = global_federate_id();
+            }
+        } else {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            mTime.minminDe = -1;
+        }
+
+        if (dep.next < mTime.next) {
+            mTime.next = dep.next;
+            mTime.time_state = dep.time_state;
+
+        } else if (dep.next == mTime.next) {
+            if (dep.time_state == time_state_t::time_granted) {
+                mTime.time_state = dep.time_state;
+            }
+        }
+        if (dep.Te < mTime.minDe) {
+            mTime.minDe = dep.Te;
+        }
+    }
+
+    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
+
+    if (!restricted && mTime.minminDe < Time::maxVal()) {
+        if (mTime.minminDe > mTime.next) {
+            mTime.next = mTime.minminDe;
+        }
+    }
+
+    return mTime;
+}
+
+DependencyInfo generateMinTimeTotal(const TimeDependencies& dependencies,
+    bool restricted,
+    global_federate_id self,
+    global_federate_id ignore)
+{
+    DependencyInfo mTime(Time::maxVal());
+    for (auto& dep : dependencies) {
+        if (dep.dependency == false) {
+            continue;
+        }
+        
+        if (dep.minFedActual == self) {
+            continue;
+        }
+
+        if (dep.fedID == ignore) {
+            if (dep.fedID.isBroker()) {
+                if (dep.Te < mTime.minDe) {
+                    mTime.minDe = dep.Te;
+                }
+                if (mTime.minDe < mTime.minminDe) {
+                    mTime.minminDe = mTime.minDe;
+                }
+            }
+
+            continue;
+        }
+
+        if (dep.minDe >= dep.next) {
+            if (dep.minDe < mTime.minminDe) {
+                mTime.minminDe = dep.minDe;
+                mTime.minFed = dep.fedID;
+                if (dep.minFed.isValid()) {
+                    mTime.minFedActual = dep.minFed;
+                } else {
+                    mTime.minFed = dep.fedID;
+                }
+            } else if (dep.minDe == mTime.minminDe) {
+                mTime.minFedActual = global_federate_id();
+            }
+        } else {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            mTime.minminDe = -1;
+        }
+
+        if (dep.next < mTime.next) {
+            mTime.next = dep.next;
+            mTime.time_state = dep.time_state;
+
+        } else if (dep.next == mTime.next) {
+            if (dep.time_state == time_state_t::time_granted) {
+                mTime.time_state = dep.time_state;
+            }
+        }
+        if (dep.Te < mTime.minDe) {
+            mTime.minDe = dep.Te;
+        }
+    }
+
+    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
+
+    if (!restricted && mTime.minminDe < Time::maxVal()) {
+        if (mTime.minminDe > mTime.next) {
+            mTime.next = mTime.minminDe;
+        }
+    }
+
+    return mTime;
+}
 }  // namespace helics

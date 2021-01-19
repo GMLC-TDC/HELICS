@@ -51,6 +51,10 @@ mode
 */
 class TimeCoordinator {
   private:
+
+    /// the variables for time coordination
+    DependencyInfo upstream;
+    DependencyInfo total;
     // the variables for time coordination
     Time time_granted = Time::minVal();  //!< the most recent time granted
     Time time_requested = Time::maxVal();  //!< the most recent time requested
@@ -61,19 +65,21 @@ class TimeCoordinator {
     Time time_exec = Time::maxVal();  //!< the time of the next targeted execution
     Time time_message = Time::maxVal();  //!< the time of the earliest message event
     Time time_value = Time::maxVal();  //!< the time of the earliest value event
+    /** time to use as a basis for calculating the next grantable
+    time(usually time granted unless values are changing) */
     Time time_grantBase =
-        Time::minVal();  //!< time to use as a basis for calculating the next grantable
-    //!< time(usually time granted unless values are changing)
+        Time::minVal();  
     Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
+    /// these are to maintain an accessible record of dependent federates
     shared_guarded_m<std::vector<global_federate_id>>
-        dependent_federates;  //!< these are to maintain an accessible record of dependent federates
+        dependent_federates;
+    /// these are to maintain an accessible record of dependency federates
     shared_guarded_m<std::vector<global_federate_id>>
-        dependency_federates;  //!< these are to maintain an accessible record of dependency
-                               //!< federates
+        dependency_federates;  
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    
+    /// blocks for a particular timeblocking link
     std::vector<std::pair<Time, int32_t>>
-        timeBlocks;  //!< blocks for a particular timeblocking link
+        timeBlocks;  
     tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage&)>
         sendMessageFunction;  //!< callback used to send the messages

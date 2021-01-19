@@ -24,27 +24,29 @@ class ActionMessage;
         error = 7
     };
 
+     enum class ConnectionType : uint8_t {
+        independent = 0,
+        parent = 1,
+        child = 2,
+        none = 3
+    };
+
 /** data class containing information about inter-federate dependencies*/
 class DependencyInfo {
   public:
    
     global_federate_id fedID{};  //!< identifier for the dependency
-    global_federate_id minFedNext{};  //!< identifier for the min dependency
-    global_federate_id minFedActualNext{};  //!< the actual forwarded minimum federate object
-    global_federate_id minFedEvent{};  //!< identifier for the min dependency
-    global_federate_id minFedActualEvent{};  //!< the actual forwarded minimum federate object
-    global_federate_id minFedMinDe{};  //!< identifier for the min dependency
-    global_federate_id minFedActualMinDe{};  //!< the actual forwarded minimum federate object
-    global_federate_id minState{};  //!< the actual forwarded minimum federate object
-    time_state_t time_state{time_state_t::initialized};  //!< the current state of the dependency
+    global_federate_id minFed{};  //!< identifier for the min dependency
+    global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
+
+    time_state_t time_state{time_state_t::initialized};
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
-    bool parent{false}; //!< indicator that the dependency is a parent
-    bool child{false}; //!< indicator that the dependency is a child object
+    ConnectionType connection{ConnectionType::independent};
     bool dependent{false}; //!< indicator the dependency is a dependent object
     bool dependency{false}; //!< indicator that the dependency is an actual dependency
     bool forwarding{false}; //!< indicator that the dependency is a forwarding time coordinator
-    // 1 byte gap here
+    // 2 byte gap here
     Time next{negEpsilon};  //!< next possible message or value
     Time Te{timeZero};  //!< the next currently scheduled event
     Time minDe{timeZero};  //!< min dependency event time
@@ -131,4 +133,19 @@ class TimeDependencies {
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
 };
+
+DependencyInfo generateMinTimeUpstream(const TimeDependencies& dependencies,
+                                       bool restricted,
+                                       global_federate_id self,
+                                       global_federate_id ignore = global_federate_id());
+
+DependencyInfo generateMinTimeDownstream(const TimeDependencies& dependencies,
+                                     bool restricted,
+                                     global_federate_id self,
+                                     global_federate_id ignore = global_federate_id());
+
+DependencyInfo generateMinTimeTotal(const TimeDependencies& dependencies,
+                                     bool restricted,
+                                     global_federate_id self,
+                                     global_federate_id ignore = global_federate_id());
 }  // namespace helics

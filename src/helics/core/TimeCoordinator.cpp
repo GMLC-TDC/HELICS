@@ -265,14 +265,14 @@ void TimeCoordinator::generateConfig(Json::Value& base) const
 
 void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const {
     generateConfig(base);
-        base["granted"] = static_cast<double>(time_granted);
-        base["requested"] = static_cast<double>(time_requested);
+    base["granted"] = static_cast<double>(time_granted);
+    base["requested"] = static_cast<double>(time_requested);
     base["exec"] = static_cast<double>(time_exec);
     base["allow"] = static_cast<double>(time_allow);
     base["value"] = static_cast<double>(time_value);
     base["message"] = static_cast<double>(time_message);
     base["minde"] = static_cast<double>(time_minDe);
-        base["minminde"]=static_cast<double>(time_minminDe);
+    base["minminde"]=static_cast<double>(time_minminDe);
     base["dependencies"] = Json::arrayValue;
         for (auto dep : dependencies)
         {
@@ -284,6 +284,7 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const {
                 depblock["next"] = static_cast<double>(dep.next);
                 depblock["te"] = static_cast<double>(dep.Te);
                 depblock["minde"] = static_cast<double>(dep.minDe);
+                depblock["minfed"] = dep.minFed.baseValue();
                 base["dependencies"].append(depblock);
             }
             if (dep.dependent)
@@ -368,34 +369,11 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
 bool TimeCoordinator::updateTimeFactors()
 {
-    Time minNext = Time::maxVal();
-    Time minminDe = std::min(time_value, time_message);
-    Time minDe = minminDe;
-    for (auto& dep : dependencies) {
-        if (!dep.dependency)
-        {
-            continue;
-        }
-        if (dep.next < minNext) {
-            minNext = dep.next;
-        }
-        if (dep.minDe >= dep.next) {
-            if (dep.minDe < minminDe) {
-                minminDe = dep.minDe;
-            }
-        } else {
-            // this minimum dependent event time received was invalid and can't be trusted
-            // therefore it can't be used to determine a time grant
-            minminDe = -1;
-        }
-
-        if (dep.Te < minDe) {
-            minDe = dep.Te;
-        }
-    }
+    auto globalMin = generateMinTimeTotal(dependencies, false, global_federate_id{});
+    
 
     bool update = false;
-    time_minminDe = std::min(minDe, minminDe);
+    time_minminDe = std::min(globalMin.minDe, globalMin.minminDe);
     Time prev_next = time_next;
     updateNextPossibleEventTime();
 
@@ -405,14 +383,15 @@ bool TimeCoordinator::updateTimeFactors()
     if (prev_next != time_next) {
         update = true; 
     }
-    if (minDe < Time::maxVal()) {
-        minDe = generateAllowedTime(minDe) + info.outputDelay;
+    if (globalMin.minDe < Time::maxVal()) {
+        globalMin.minDe = generateAllowedTime(globalMin.minDe) + info.outputDelay;
     }
-    if (minDe != time_minDe) {
+    if (globalMin.minDe != time_minDe) {
         update = true;
-        time_minDe = minDe;
+        time_minDe = globalMin.minDe;
     }
-    time_allow = (minNext < Time::maxVal()) ? info.inputDelay + minNext : Time::maxVal();
+    time_allow =
+        (globalMin.next < Time::maxVal()) ? info.inputDelay + globalMin.next : Time::maxVal();
     
     updateNextExecutionTime();
     return update;
