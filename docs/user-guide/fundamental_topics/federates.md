@@ -13,7 +13,7 @@ This section on Federates covers:
 		* [Message Information](#message-information) 
 		* [Message Federate Interfaces](#message-federate-interfaces)
 			* [Endpoints](#endpoints)
-			* [Filters](#filters)
+			* [Native HELICS Filters](#native-helics-filters)
 		* [Interactions Between Messages and Values](#interactions-between-messages-and-values)
 	* [Combination Federates](#combination-federates)
 
