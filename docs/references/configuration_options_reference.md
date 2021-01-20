@@ -873,14 +873,6 @@ _Property's enumerated name:_ `helics_handle_option_buffer_data` [411]
 	
 
 
-### `alias` [null]
-_API:_
-xxxxxxx - Is this a user-facing option? The API is a part of the application API but doesn't start "helics..." making me wonder.
-
----
-	
-
-
 
 ### `ignore_units_mismatch | ignoreunitmismatch | ignoreUnitMismatch` [null]
 _API:_ 
@@ -913,6 +905,20 @@ _Property's enumerated name:_ `helics_handle_option_strict_type_checking` [414]
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.x
 
 
+---
+
+
+
+## Publication-only Options
+
+### `targets`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Publication.html#abb36f297be67589f7a73c4c1fc39240b) | 
+[C](https://docs.helics.org/en/latest/c-api-reference/index.html#publication) | 
+[Python](https://python.helics.org/api/capi-py/#helicsPublicationAddTarget) | 
+[Julia](https://julia.helics.org/latest/api/#Publication)
+Used to specify which inputs should receive the values from this output. This can be a list of output keys/names.
+
+
 
 
 
@@ -920,6 +926,17 @@ When an interface requests a target it tries to find a match in the federation. 
 
 ## Input-only Options
 Inputs can receive values from multiple sending handles and the means by which those multiple data points for a single handle are managed can be specified with several options. See the [User Guide entry](./user-guide/multiSourceInputs.md) for further details.
+
+
+
+### `targets`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a017ad953343ac7758fbf1f45ea54d1eb) | 
+[C](https://docs.helics.org/en/latest/c-api-reference/index.html#input) | 
+[Python](https://python.helics.org/api/capi-py/#helicsInputAddTarget) | 
+[Julia](https://julia.helics.org/latest/api/#Input)
+Inputs can specify which outputs (typically publications) they should be pulling from. This is similar to subscriptions but inputs can allow multiple outputs to feed to the same input. This can be a list of output keys/names.
+
+---
 
 
 ### `connections` []
@@ -1044,7 +1061,7 @@ The name of the endpoint as it will be known to the rest of the federation.
 ### `type` []
 _API:_ (none)
 
-xxxxxxx
+HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)). 
 
 ---
 	
