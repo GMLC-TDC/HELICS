@@ -111,17 +111,17 @@ If the federation needs to iterate in initialization mode prior to entering exec
 
 1. Calling the API requires that the federate declare its needs for iteration using an enumeration:
 
-`NO_ITERATION` -- don't iterate
+	`NO_ITERATION` -- don't iterate
 
-`FORCE_ITERATION` -- guaranteed iteration, stay in iteration mode
+	`FORCE_ITERATION` -- guaranteed iteration, stay in iteration mode
 
-`ITERATE_IF_NEEDED` -- If there is data available from other federates Helics will iterate, if no additional data is available it will move to execution mode and have granted time=0.
+	`ITERATE_IF_NEEDED` -- If there is data available from other federates Helics will iterate, if no additional data is available it will move to execution mode and have granted time=0.
 
 2. The API returns an enumeration indicating the federation's iteration state:
 
-`NEXT_STEP` - Iteration has completed and the federation should move to the next time step. In the case of exiting initialization, this will be the time between t=0 (which was just completed by the iteration process) and the next time grant.
+	`NEXT_STEP` - Iteration has completed and the federation should move to the next time step. In the case of exiting initialization, this will be the time between t=0 (which was just completed by the iteration process) and the next time grant.
 
-`ITERATING` - Federation has not ceased iterating and will iterate once again. During this time the federate will need to check all its inputs and subscriptions, recalculate its model, and produce new outputs for the rest of the federation.
+	`ITERATING` - Federation has not ceased iterating and will iterate once again. During this time the federate will need to check all its inputs and subscriptions, recalculate its model, and produce new outputs for the rest of the federation.
 
 To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federates internal evaluation of the stability of the solution to determine if it is requesting iteration to continue. The returned value of the API will determine whether the federate needs to resolve its model with new inputs from the of the federation or enter normal execution mode where it can enter execution mode.
 
