@@ -1,6 +1,9 @@
 # Co-simulation Stages
 
-Helics has several stages to the co-simulation. Creation, initialization, execution, and final state. The helicsFederateEnterExecutingMode is the transition between initialization and execution. In the init mode values can be exchanged prior to time beginning. Normally values published in init mode are available at time 0, but if the iteration is used they can be available inside the initialization mode. There are 3 available options for the iterate parameter.
+Helics has several stages to the co-simulation. Creation, initialization, execution, and final state. The helicsFederateEnterExecutingMode is the transition between initialization and execution. 
+
+
+<!-- In the init mode values can be exchanged prior to time beginning. Normally values published in init mode are available at time 0, but if the iteration is used they can be available inside the initialization mode. There are 3 available options for the iterate parameter.
 
 `no_iteration` -- don't iterate
 
@@ -8,11 +11,85 @@ Helics has several stages to the co-simulation. Creation, initialization, execut
 
 `iterate_if_needed` -- If there is data available from other federates Helics will iterate, if no additional data is available it will move to execution mode and have granted time=0.
 
-ou could manage the timing of the federation to use the `initialize` mode in HELICS. This would allow you to communicate initial conditions (`t=0`) information prior to the start of execution mode. It would also allow you to publish out the `t=1` information so that all federates would have access to it once they were granted `t=1`. Look into `helicsFederateEnterInitializingMode()`.
+ou could manage the timing of the federation to use the `initialize` mode in HELICS. This would allow you to communicate initial conditions (`t=0`) information prior to the start of execution mode. It would also allow you to publish out the `t=1` information so that all federates would have access to it once they were granted `t=1`. Look into `helicsFederateEnterInitializingMode()`. -->
 
 ## Creation
 
+For the purposes of these examples, we will assume the use of a Python binding. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../../references/api-reference/index.md) to get the details you need.
+
+To begin, at the top of your Python module ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to import the HELICS library, which will look something like this:
+
+```python
+import helics as h
+```
+
+
 ### Registration 
+
+As discussed in the previous section on [Federate Interface Configuration](./interface_configuration.md), configuration of federates can be done with either JSON config files or with the simulator's API. 
+
+#### Using a JSON Config File
+
+In HELICS there is a single API call that can be used to read in all of the necessary information for creating a federate from a JSON configuration file. The JSON configuration file, as discussed earlier in this guide, contains both the federate info as well as the metadata required to define the federate's publications, subscriptions and endpoints. The API calls for creating each type of federate are given below. 
+
+For a value federate:
+
+```python
+fed = h.helicsCreateValueFederateFromConfig('fed_config.json')
+```
+
+For a message federate:
+
+```python
+fed = h.helicsCreateMessageFederateFromConfig('fed_config.json')
+```
+
+For a combination federate:
+
+```python
+fed = h.helicsCreateCombinationFederateFromConfig('fed_config.json')
+```
+
+In all instances, this function returns the federate object `fed` and requires a path to the JSON configuration file as an input.
+
+#### Using PyHELICS API Calls
+
+Additionally, there are ways to create and configure the federate directly through HELICS API calls, which may be appropriate in some instances. First, you need to create the federate info object, which will later be used to create the federate:
+
+```python
+fed = h.helicsCreateFederateInfo()
+```
+
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+
+```python
+h.helicsFederateInfoSetFlagOption(fed, 6, True)
+```
+
+Once the federate info object has been created and the appropriate options have been set, the helics federate can be created by passing in a unique federate name and the federate info object into the appropriate HELICS API call. For creating a value federate, that would look like this:
+
+```python
+fed = h.helicsCreateValueFederate(federate_name, fi)
+```
+
+Once the federate is created, you now need to define all of its publications, subscriptions and endpoints. The first step is to create them by registering them with the federate with an API call that looks like this:
+
+```python
+pub = h.helicsFederateRegisterPublication(fed, key, data_type)
+```
+
+This call takes in the federate object, a string containing the publication key (which will be prepended with the federate name), and the data type of the publication. It returns the publication object. Once the publication, subscription and endpoints are registered, additional API calls can be used to set the info field in these objects and to set certain options. For example, to set the only transmit on change option for a specific publication, this API call would be used:
+
+```python
+pub = h.helicsPublicationSetOption(pub, 454, True)
+```
+
+Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntatically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revist the above example where the only_transmit_on_change on change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
+
+```python
+h.helicsFederateSetFlagOption(fed, 6, True)
+```
+
 
 ### Collecting the Interface Objects
 

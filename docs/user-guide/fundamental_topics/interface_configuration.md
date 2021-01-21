@@ -12,7 +12,7 @@ As soon as one particular instance of a simulator begins running in a co-simulat
 
    **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). 
    
-This section describes how to configure the federate interfaces using JSON files and API calls.
+This section describes how to configure the federate interfaces using JSON files and API calls. Extensive details on the options for configuring HELICS federates is available in the [Configurations Options Reference](../../references/configuration_options_reference.md). If the user has written the simulator, it may be preferrable to use the HELICS APIs to configure the federates, because the interface registrations can be made into a variable of the simulation. For non-open-source simulators, the JSON configuration files must be written before the federation is launched.
 
 * [JSON Configuration](#json-configuration)
 * [API Configuration](#api-configuration)
@@ -79,7 +79,7 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
 - **`coreType`** - There are a number of technologies or message buses that can be used to send HELICS messages among federates, detailed in [Core Types](../advanced_topics/CoreTypes.md). Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used, but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
 - **`period`** - The federate needs instruction for how to step forward in time in order to synchronize calculations. This is the simplest way to synchronize simulators to the same time step; this forces the federate to time step intervals of `n*period`. The default units are in seconds.  Timing configuration is explained in greater detail in the [Timing](./timing.md) page, with additional configuration options in the [Configuration Options Reference](../../references/configuration_options_reference.md#timing-options). 
 - **`uninterruptible`** - Setting `uninterruptible` to `false` allows the federate to be interrupted if there is a signal available for it to receive. This is a [timing](./timing.md) configuration option.
-- **`terminate_on_error`** - Setting `terminate_on_error` frees the federate from the broker if there is an error in execution, which simplifies debugging.
+- **`terminate_on_error`** - By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the cosimulation is no longer valid. Setting `terminate_on_error` frees the federate from the broker if there is an error in execution, which simplifies debugging. This will prevent your federate from hanging in the event that another federate fails.
 - **`endpoints`**
 	- `name` - The string in this field is the unique identifier/handle for the endpoint interface.
 	- `destination` - This option can be used to set a default destination for the messages sent from this endpoint. The default destination is allowed to be rerouted or changed during run time.
@@ -95,10 +95,20 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
 	- `required` - The message being subscribed to must be provided by some other publisher in the federation.
 	- `type` - Data type, such as integer, double, complex.
 	- `units` - Same as with `publications`.
+	- `global` - Applies to the `key`, same as with `publications`.
 
 ## API Configuration
 
-### Sample pyhelics API configuration 
+Configuring the federate interface with the API is done internal to a user-written simulator. The specific API used will depend on the language the simulator is written in. Native APIs for HELICS are available in [C++](https://docs.helics.org/en/latest/doxygen/index.html) and [C](../../references/C_API.md). MATLAB, Java, Julia, Nim, and Python all support the C API calls (ex: `helicsFederateEnterExecutionMode()`). Python and Julia also have Native APIs (see: [Python (PyHELICS)](https://python.helics.org/api/), [Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)) that wrap the C APIs to better support the conventions of their languages. The [API References](../../references/api-reference/index.md) page contains links to the APIs.
+
+The [Examples](../examples/examples_index.md) in this User Guide are written in Python -- the following federate interface configuration guidance will use the [PyHELICS](https://python.helics.org/api/) API, but can easily be adapted to other C-based HELICS APIs. 
+
+
+### Sample PyHELICS API configuration 
+
+The following example of a federate interface configuration with the PyHELICS API comes from the [Fundamental Final Example](../examples/fundamental_examples/fundamental_final.md). This co-simulation has exactly the same interface configuration as the Combination Federation above. The only difference is that the federate interfaces are configured with the PyHELICS API.
+
+In the `Charger.py` simulator, the following function calls the APIs to create a federate:
 
 ```
 def create_combo_federate(fedinitstring,name,period):
@@ -107,111 +117,79 @@ def create_combo_federate(fedinitstring,name,period):
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
     h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
     # "loglevel": 1,
-    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 11)
+    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 7)
     # "period": 60,
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_period, period)
     # "uninterruptible": false,
     h.helicsFederateInfoSetFlagOption(fedinfo, h.helics_flag_uninterruptible, False)
     # "terminate_on_error": true,
     h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_TERMINATE_ON_ERROR, True)
-    #h.helicsFederateInfoSetFlagOption(fedinfo, 72, True)
     # "name": "Charger",
     fed = h.helicsCreateCombinationFederate(name, fedinfo)
     return fed
 ```
 
+The interface configurations are finalized and registered in one step using the following APIs:
 
-### pyhelics API configuration explanation
+```
+    fedinitstring = " --federates=1"
+    name = "Charger"
+    period = 60
+    fed = create_combo_federate(fedinitstring,name,period)
+
+    num_EVs = 5
+    end_count = num_EVs
+    endid = {}
+    for i in range(0,end_count):
+        end_name = f'Charger/EV{i+1}.so'
+        endid[i] = h.helicsFederateRegisterGlobalEndpoint(fed, end_name, 'double')
+        dest_name = f'Controller/ep'
+        h.helicsEndpointSetDefaultDestination(endid[i], dest_name)
+
+    pub_count = num_EVs
+    pubid = {}
+    for i in range(0,pub_count):
+        pub_name = f'Charger/EV{i+1}_voltage'
+        pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
+                    fed, pub_name, 'double', 'V')
+
+    sub_count = num_EVs
+    subid = {}
+    for i in range(0,sub_count):
+        sub_name = f'Battery/EV{i+1}_current'
+        subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, 'A')
+
+```
 
 
-## Typical Federate Execution
-For the remainder of this section of the guide, we'll walk through the typical stages of co-simulation, providing examples of how these might be implemented using HELICS API calls. For the purposes of these examples, we will assume the use of a Python binding. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../../references/api-reference/index.md) to get the details you need.
+### PyHELICS API configuration explanation
 
-To begin, at the top of your Python module ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to import the HELICS library, which will look something like this:
+All the API calls reference the PyHELICS library with
 
-```python
+```
 import helics as h
 ```
 
-### Federate Information
+#### Federate Creation **`create_combo_federate()`**
 
-Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](./../configuration/FederateFlags.md). 
+- **`h.helicsCreateFederateInfo()`** - Sets the federate information variable (set to `fedinfo`) 
+-  **`h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")`** - Sets the core type for `fedinfo` to `zmq`
+- **`h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)`** - Sets the number of federates (`fedinitstring` has been passed as `" --federates=1"`)
+- **`h.helicsFederateInfoSetIntegerProperty()`** - Sets log level calling another API, `h.helics_property_int_log_level`
+- **`h.helicsFederateInfoSetTimeProperty()`** - Sets time information. This API must receive another API to distinguish which type of time property to set. The period is set with  `h.helics_property_time_period`, and `period` has been pass to this function
+- **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are setting is `h.helics_flag_uninterruptible` to `False`, to mirror the JSON configuration
+- **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are wetting is `h.HELICS_FLAG_TERMINATE_ON_ERROR` to `True`
+- **`fed = h.helicsCreateCombinationFederate(name, fedinfo)`** - Creates the combination federate with the name passed to this function (`Charger`) and the information set above for `fedinfo`
 
+#### Federate Interface Configuration and Registration
 
-
-### Create the HELICS Federate
-
-Now that you've decided what kind of federate you are going to use to instantiate your simulator within the federation, you'll need to actually create that federate in your code. There are two ways to do this: from a configuration file or programmatically, using a sequence of HELICS API calls. In most instances, using a configuration file is probably simpler and more modular. However, we will go through both options below as there may be times when creating the federate in your source code is necessary or more appropriate.
-
-#### Using a Config File
-
-In HELICS there is a single API call that can be used to read in all of the necessary information for creating a federate from a JSON configuration file. The JSON configuration file, as discussed earlier in this guide, contains both the federate info as well as the metadata required to define the federate's publications, subscriptions and endpoints. The API calls for creating each type of federate are given below. 
-
-For a value federate:
-
-```python
-fed = h.helicsCreateValueFederateFromConfig('fed_config.json')
-```
-
-For a message federate:
-
-```python
-fed = h.helicsCreateMessageFederateFromConfig('fed_config.json')
-```
-
-For a combination federate:
-
-```python
-fed = h.helicsCreateCombinationFederateFromConfig('fed_config.json')
-```
-
-In all instances, this function returns the federate object `fed` and requires a path to the JSON configuration file as an input.
-
-#### Using HELICS API Calls
-
-Additionally, there are ways to create and configure the federate directly through HELICS API calls, which may be appropriate in some instances. First, you need to create the federate info object, which will later be used to create the federate:
-
-```python
-fi = h.helicsCreateFederateInfo()
-```
-
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](./../configuration/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
-
-```python
-h.helicsFederateInfoSetFlagOption(fi, 6, True)
-```
-
-Once the federate info object has been created and the appropriate options have been set, the helics federate can be created by passing in a unique federate name and the federate info object into the appropriate HELICS API call. For creating a value federate, that would look like this:
-
-```python
-fed = h.helicsCreateValueFederate(federate_name, fi)
-```
-
-Once the federate is created, you now need to define all of its publications, subscriptions and endpoints. The first step is to create them by registering them with the federate with an API call that looks like this:
-
-```python
-pub = h.helicsFederateRegisterPublication(fed, key, data_type)
-```
-
-This call takes in the federate object, a string containing the publication key (which will be prepended with the federate name), and the data type of the publication. It returns the publication object. Once the publication, subscription and endpoints are registered, additional API calls can be used to set the info field in these objects and to set certain options. For example, to set the only transmit on change option for a specific publication, this API call would be used:
-
-```python
-pub = h.helicsPublicationSetOption(pub, 454, True)
-```
-
-Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntatically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revist the above example where the only_transmit_on_change on change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
-
-```python
-h.helicsFederateSetFlagOption(fi, 6, True)
-```
-
-### Error Handling
-
-By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the cosimulation is no longer valid. It is therefore generally a good idea to set the following flag in your simulator federate so that its execution will be terminated if an error occurs anywhere in the cosimulation.
-
-```python
-h.helicsFederateSetFlagOption(fed, helics_flag_terminate_on_error)
-```
-This will prevent your federate from hanging in the event that another federate fails.
+- **Endpoints**
+	- **`h.helicsFederateRegisterGlobalEndpoint(fed, end_name, 'double')`** - The `fed` has been created, `end_name` is set in a loop, and the endpoint is registered as global `double`. This API registers the id object for each endpoint, `endid[i]`
+	- **`h.helicsEndpointSetDefaultDestination(endid[i], dest_name)`** - As with the JSON configuration, a default destination is set with a destination name, `'Controller/ep'`, for each endpoint object 
+- **Publications**
+	- **`h.helicsFederateRegisterGlobalTypePublication(fed, pub_name, 'double', 'V')`** - The publication interfaces are registered for the `fed` by looping through `pub_name`. The interface is given a datatype of `double`, units of `V` for volts, and designated as global type
+- **Subscriptions**
+	- **`h.helicsFederateRegisterSubscription(fed, sub_name, 'A')`** - The subscription interfaces are registered for the `fed` by looping through `sub_name`. The interface is given units of `A` for amps. Alternatively, the PyHELICS API for Inputs can be used: `h.helicsFederateRegisterGlobalTypeInput(fed, sub_name, 'double','A')`
 
 
+Interface configuration, including federate creation and registration, is done prior to the co-simulation execution. The next section in this User Guide places federate interface configuration in the context of the co-simulation stages and discusses the four stages of the co-simulation.
