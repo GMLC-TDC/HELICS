@@ -8,7 +8,7 @@
     helics_terminology
     federates
     interface_configuration
-    timing
+    timing_configuration
     stages
     logging
     helics_cli
