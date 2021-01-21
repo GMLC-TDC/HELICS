@@ -3,48 +3,12 @@
 
 Logging in HELICS is normally handled through an independent thread. The thread prints message to the console and or to a file. This section discusses how to use the log files to confirm the co-simulation executed properly and to debug when it doesn't. 
 
-## Setting up the Simulator for Logging
-
-The [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md) incorporates simple logging for the two federate co-simulation. These federates, Battery and Charger, are user-written in Python with PyHELICS, so we have the luxury of setting up the simulator for logging.
-
-In the Battery simulator, we need to import `logging` and set up the logger:
-
-```
-import logging
+* [Log Levels](#log-levels)
+* [Setting up the Simulator for Logging](#setting-up-the-simulator-for-logging)
+* [Setting up the Federate for Logging](#setting-up-the-federate-for-logging)
+* [Setting up the Core/Broker for Logging](#setting-up-the-core-broker-for-logging)
 
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
-```
-
-Now we can use the `logger` to print different levels of detail about the co-simulation execution to log files. These files will be generated for each federate in the co-simulation and the broker with the naming convention "name assigned to federate/broker"`.log`.
-
-## Setting up the Federate for Logging
-
-Most of the time the log for a federate is the same as for its core. This is managed through a few properties in the [`HelicsFederateInfo` class](https://python.helics.org/api/capi-py/#HelicsFederateInfo) which can also be directly specified through the property functions.
-
-- `helics_property_int_log_level` - General logging level applicable to both file and console logs
-
-- `helics_property_int_file_log_level` Level to log to the file
-
-- `helics_property_int_console_log_level` Level to log to the console
-
-These properties can be set using the JSON configuration for each federate:
-
-```
-{
-  "name": "Battery",
-  "log_level": 1,
-  ...
-}
-```
-
-Or with the API interface functions for each federate:
-
-```python
-h.helicsFederateInfoSetIntegerProperty(fed,h.helics_property_int_log_level, 1)
-```
 
 ## Log Levels
 
@@ -93,6 +57,62 @@ commMessage||26516-enRPa-PzaBB-ZG190-lj14t:got new broker information
 which includes a name and internal id code for the federate followed by a time in parenthesis and the message. If it is a warning or error, there will be an indicator before the object name. Names for brokers or cores are often auto generated and look like `26516-enRPa-PzaBB-ZG190-lj14t` which is essentially a random string with a thread id in the front. In this case, the `commMessage` indicates it came from one of the communication modules.
 
 
+
+## Setting up the Simulator for Logging
+
+The [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md) incorporates simple logging for the two federate co-simulation. These federates, Battery and Charger, are user-written in Python with PyHELICS, so we have the luxury of setting up the simulator for logging.
+
+In the Battery simulator, we need to import `logging` and set up the logger:
+
+```
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
+```
+
+Now we can use the `logger` to print different levels of detail about the co-simulation execution to log files. These files will be generated for each federate in the co-simulation and the broker with the naming convention "name assigned to federate/broker"`.log`.
+
+
+A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file. 
+
+```
+logger.info('Only prints to log file if log_level = 2 or summary')
+logger.debug('Only prints to log file if log_level = 6 or data')
+logger.error('Only prints to log file if log_level = 0 or error')
+logger.warning('Only prints to log file if log_level = 1 or warning')
+
+```
+
+
+
+## Setting up the Federate for Logging
+
+Most of the time the log for a federate is the same as for its core. This is managed through a few properties in the [`HelicsFederateInfo` class](https://python.helics.org/api/capi-py/#HelicsFederateInfo) which can also be directly specified through the property functions.
+
+- `helics_property_int_log_level` - General logging level applicable to both file and console logs
+
+- `helics_property_int_file_log_level` Level to log to the file
+
+- `helics_property_int_console_log_level` Level to log to the console
+
+These properties can be set using the JSON configuration for each federate:
+
+```
+{
+  "name": "Battery",
+  "log_level": 1,
+  ...
+}
+```
+
+Or with the API interface functions for each federate:
+
+```python
+h.helicsFederateInfoSetIntegerProperty(fed,h.helics_property_int_log_level, 1)
+```
 
 
 
@@ -152,17 +172,7 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 - identifier a string with the name of the object generating the message (may be empty)
 - message the actual message to log
 
-## User Log Messages
 
-A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file. 
-
-```
-logger.info('Only prints to log file if log_level = 2 or summary')
-logger.debug('Only prints to log file if log_level = 6 or data')
-logger.error('Only prints to log file if log_level = 0 or error')
-logger.warning('Only prints to log file if log_level = 1 or warning')
-
-```
 
 
 
