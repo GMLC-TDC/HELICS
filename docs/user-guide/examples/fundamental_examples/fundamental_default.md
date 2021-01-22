@@ -11,72 +11,13 @@ The base example described here will go into detail about the necessary componen
 
 The Base Example tutorial is organized as follows:
 
-* [Computing Environment](#computing-environment)
+
 * [Example files](#example-files)  
 * [Default Setup](#default-setup)
 	* [Messages + Communication: pub sub](#messages-communication-pub-sub)
 	* [Simulator Integration: External JSON](#simulator-integration-external-json)
 	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics-cli)
 * [Questions and Help](#questions-and-help)
-
-
-## Computing Environment
-
-This example was successfully run on `Tue Nov 10 11:16:44 PST 2020` with the following computing environment.
-
-* 	Operating System
-
-```
-$ sw_vers
-ProductName:	Mac OS X
-ProductVersion:	10.14.6
-BuildVersion:	18G6032
-```
-*  python version
-
-```
-$ python
-Python 3.7.6 (default, Jan  8 2020, 13:42:34) 
-[Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
-Type "help", "copyright", "credits" or "license" for more information.
-```
-* python modules for this example
-
-```
-$ pip list | grep matplotlib
-matplotlib                    3.1.3    
-$ pip list | grep numpy
-numpy                         1.18.5 
-```
-If these modules are not installed, you can install them with
-
-```
-$ pip install matplotlib
-$ pip install numpy
-```
-* 	helics_broker version
-
-```
-$ helics_broker --version
-2.4.0 (2020-02-04)
-```
-* 	helics_cli version
-
-```
-$ helics --version
-0.4.1-HEAD-ef36755
-```
-*	pyhelics init file
-
-```
-$ python
-
->>> import helics as h
->>> h.__file__
-'/Users/[username]/Software/pyhelics/helics/__init__.py'
-```
-
-
 
 
 
@@ -94,7 +35,7 @@ The files include:
 
 ## Default Setup
 
-The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](link to helics cli md) (**NEEDS LINK**). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSONs and how to launch the co-simulation with `helics_cli`.
+The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](../../fundamental_topics/helics_cli.md). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSONs and how to launch the co-simulation with `helics_cli`.
 
 ### Messages + Communication: pub/sub
 
@@ -133,8 +74,8 @@ There are [extensive ways](../../configuration_options_reference.html) to config
 ```
 {
   "name": "Battery",
-  "loglevel": 1,
-  "coreType": "zmq",
+  "log_level": 1,
+  "core_type": "zmq",
   "period": 60,
   "uninterruptible": false,
   "terminate_on_error": true,
@@ -145,7 +86,7 @@ There are [extensive ways](../../configuration_options_reference.html) to config
 
 ```
 
-In this configuration, we have named the federate `Battery`, set the `loglevel` to 1 ([what do loglevels mean and which one do I want?](../configuration_options_reference.html#logging-options)), and set the `coreType` to `zmq` ([the most common](../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
+In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../configuration_options_reference.html#logging-options)), and set the `core_type` to `zmq` ([the most common](../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
 
 This federate is configured with pubs and subs, so it will need an option to indicate the publication and the subscription configurations (for brevity, only the first pub and sub are printed below):
 
@@ -179,8 +120,8 @@ fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 
 Recall that federate registration and configuration is typically done **before** entering execution mode.
 
-**outstanding allison question:**
-(can you create a new configuration after entering execution mode?)
+<!-- **outstanding allison question:**
+(can you create a new configuration after entering execution mode?) -->
 
 
 
@@ -195,7 +136,7 @@ At this point in setting up the Base Example co-simulation, we have:
 
 It's now time to launch the co-simulation with `helics_cli` ([install helics_cli here!](https://github.com/GMLC-TDC/helics-cli)). This is accomplished by creating a **runner** JSON file. `helics_cli` allows the user to launch multiple simulations in one command line, which otherwise would have required multiple terminals.
 
-The runner JSON for the Base Example is called `EVtoyrunner.json`:
+The runner JSON for the Base Example is called `fundamental_default_runner.json`:
 
 ```
 {
@@ -219,7 +160,7 @@ The runner JSON for the Base Example is called `EVtoyrunner.json`:
       "name": "Battery"
     }
   ],
-  "name": "EV_toy"
+  "name": "fundamental_default"
 }
 ``` 
 
@@ -232,7 +173,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 The final step is to launch our Base Example with `helics_cli` from the command line:
 
 ```
->helics run --path=EVtoyrunner.json
+>helics run --path=fundamental_default_runner.json
 ```
 
 If all goes well, this will reward us with two figures:
