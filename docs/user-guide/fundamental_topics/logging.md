@@ -1,7 +1,7 @@
 # Logging
 
 
-Logging in HELICS is normally handled through an independent thread. The thread prints message to the console and or to a file. This section discusses how to use the log files to confirm the co-simulation executed properly and to debug when it doesn't. 
+Logging in HELICS  provides a way to understand the operation of a federate and is normally handled through an independent thread. The thread prints message to the console and or to a file as events within a federate occur. This section discusses how to use the log files to confirm the co-simulation executed properly and to debug when it doesn't. 
 
 * [Log Levels](#log-levels)
 * [Setting up the Simulator for Logging](#setting-up-the-simulator-for-logging)
@@ -26,10 +26,10 @@ helics_log_level_data = 6,
 helics_log_level_trace = 7
 ```    
 
-- `helics_log_level_no_print` Don't print anything
-- `helics_log_level_error` Error and faults from within HELICS
-- `helics_log_level_warning` Warning messages of things that might be incorrect or unusual
-- `helics_log_level_summary` Summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
+- `helics_log_level_no_print` Don't log anything
+- `helics_log_level_error` Log error and faults from within HELICS
+- `helics_log_level_warning` Log warning messages of things that might be incorrect or unusual
+- `helics_log_level_summary` Log summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
 - `helics_log_level_connections` Log a message for each connection event (federate connection/disconnection)
 - `helics_log_level_interfaces` Log messages when interfaces, such as endpoints, publications, and filters are created
 - `helics_log_level_timing` Log messages related to timing information such as mode transition and time advancement
@@ -38,7 +38,7 @@ helics_log_level_trace = 7
 
 NOTE: these levels currently correspond to (-1 through 7) but this may change in future major version numbers to allow more fine grained control
 
-`timing`, `data` and `trace` log levels can generate a large number of messages and should primarily be used for debugging. `trace` will produce a very large number of messages most of which deal with internal communications and is primarily for debugging message timing in HELICS.
+`timing`, `data` and `trace` log levels can generate a large number of messages and should primarily be used for debugging. `trace` will produce a very large number of messages most of which deal with internal communications and is primarily for debugging timing in HELICS.
 
 
 

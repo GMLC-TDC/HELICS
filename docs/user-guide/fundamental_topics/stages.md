@@ -1,6 +1,6 @@
 # Co-simulation Stages
 
-Helics has several stages to the co-simulation. Creation, initialization, execution, and final state. The helicsFederateEnterExecutingMode is the transition between initialization and execution. 
+HELICS has several stages to the co-simulation. Creation, initialization, execution, and final state. A call to `helicsFederateEnterExecutingMode()` is the transition between initialization and execution. 
 
 * [Creation](#creation)
 	* [Registration](#registration)
@@ -71,11 +71,13 @@ Additionally, there are ways to create and configure the federate directly throu
 fed = h.helicsCreateFederateInfo()
 ```
 
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference) as appropriate. For example, to set the `only_transmit_on_change` flag to true, you would use the following API call:
 
 ```python
 h.helicsFederateInfoSetFlagOption(fed, 6, True)
 ```
+
+(The "6" there is the integer value for appropriate HELICS enumeration. The definition of the enumerations can be found in the [C++ API reference](https://docs.helics.org/en/latest/doxygen/helics__enums_8h.html) and also cross shown in the [Configurations Options Reference](../../eferences/configuration_options_reference.md).) 
 
 Once the federate info object has been created and the appropriate options have been set, the helics federate can be created by passing in a unique federate name and the federate info object into the appropriate HELICS API call. For creating a value federate, that would look like this:
 
@@ -134,14 +136,14 @@ If the federation needs to iterate in initialization mode prior to entering exec
 
 	`ITERATING` - Federation has not ceased iterating and will iterate once again. During this time the federate will need to check all its inputs and subscriptions, recalculate its model, and produce new outputs for the rest of the federation.
 
-To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federates internal evaluation of the stability of the solution to determine if it is requesting iteration to continue. The returned value of the API will determine whether the federate needs to resolve its model with new inputs from the of the federation or enter normal execution mode where it can enter execution mode.
+To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federate's internal evaluation of the stability of the solution to determine if needs to request another iteration. The returned value of the API will determine whether the federate needs to re-solve its model with new inputs from the of the federation or enter normal execution mode where it can enter execution mode.
 
 
 
 
 ## Execution
 
-Once the federate has been created, all subscriptions, publications and endpoints have been registered and, all the federate information has been appropriately set, it is time to enter executing mode. This can be done with the following API call:
+Once the federate has been created, all subscriptions, publications and endpoints have been registered and the federation initial state has been appropriately set, it is time to enter execution mode. This can be done with the following API call:
 
 ```python
 h.helicsFederateEnterExecutingMode(fed)
