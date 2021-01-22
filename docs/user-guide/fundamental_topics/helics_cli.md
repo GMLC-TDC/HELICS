@@ -1,8 +1,10 @@
 # helics_cli
 
+<!--
 ```
 have to use cli to use the web interface
 ```
+-->
 
 Execution of the HELICS co-simulation is done from the command line with `helics_cli`, or Command Line Interface. Each simulator must be executed individually in order to join the federation. `helics_cli` condenses these command line execution commands into one executable, called the runner file.
 
