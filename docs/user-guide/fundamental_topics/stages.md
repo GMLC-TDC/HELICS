@@ -2,6 +2,17 @@
 
 Helics has several stages to the co-simulation. Creation, initialization, execution, and final state. The helicsFederateEnterExecutingMode is the transition between initialization and execution. 
 
+* [Creation](#creation)
+	* [Registration](#registration)
+		* [Using a JSON Config File](#using-a-json-config-file)
+		* [Using PyHELICS API Calls](#using-pyhelics-api-calls)
+	* [Collecting the Interface Objects](#collecting-the-interface-objects)
+* [Initialization](#initialization)
+* [Execution](#execution)
+	* [Get Inputs](#get-inputs)
+	* [Internal Updates and Calculations](#internal-updates-and-calculations)
+	* [Publish Outputs](#publish-outputs)
+* [Final State](#final-state)
 
 <!-- In the init mode values can be exchanged prior to time beginning. Normally values published in init mode are available at time 0, but if the iteration is used they can be available inside the initialization mode. There are 3 available options for the iterate parameter.
 
@@ -147,7 +158,7 @@ while t < end_time:
 ```
 Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the cosimulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the cosimulation before requesting the next time step. 
 
-#### Get Inputs
+### Get Inputs
 
 The federate will first listen on each of its inputs (or subscriptions) and endpoints to see whether new information has been sent from the rest of the federation. The first code sample below shows how information can be retrieved from an input (or subscriptions) through HELICS API calls by passing in the subscription object. As can be seen, HELICS has built in type conversion ([where possible](https://www.youtube.com/watch?v=mZOAn-3aATY)) and regardless of how the sender of the data has formatted it, HELICS can present it as requested by the appropriate method call.
 
@@ -177,11 +188,11 @@ To get the source of each of the messages received at an endpoint, the following
 msg_source = h.helicsMessageGetOriginalSource(msg_obj)
 ```
 
-#### Internal Updates and Calculations
+### Internal Updates and Calculations
 
 At this point, your federate has received all of its input information from the other federates in the co-simulation and is now ready to run whatever updates or calculations it needs to for the current time step. 
 
-#### Publish Outputs
+### Publish Outputs
 
 Once the new inputs have been collected and all necessary calculations made, the federate can publish whatever information it needs to for the rest of the federation to use. The code sample below shows how these output values can be published out to the federation using HELICS API calls. As in when reading in new values, these output values can published as a variety of data types and HELICS can handle type conversion if one of the receivers of the value asks for it in a type different than published.
 
