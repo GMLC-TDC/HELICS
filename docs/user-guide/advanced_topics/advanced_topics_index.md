@@ -19,7 +19,7 @@
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the 
-Advanced Topics section assumes you, the reader, have a familiarity and experience with running HELICS co-simulations. If that's not the case, it's well worth your while to go review the Fundamental Topics and examples. In this section it will be assumed you know things like:
+Advanced Topics section assumes you, the reader, have a familiarity and experience with running HELICS co-simulations. If that's not the case, it's well worth your while to go review the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) and [corresponding examples](../examples/fundamental_examples/fundamental_examples_index.md). In this section it will be assumed you know things like:
 	- The difference between value and message passing in HELICS
 	- How to configure HELICS federate appropriately
 	- Familiarity with the common HELICS APIs (_e.g._ requesting time, getting subscribed values, publishing values)

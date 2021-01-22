@@ -19,6 +19,8 @@ helics_broker --type=zmq --port=20400 &
 
 Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker. These brokers operate independently of each other. The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.
 
+An example of configuring multiple federations to run on a single compute node using port numbers [has been written up over here](../examples/advanced_examples/advanced_brokers/simultaneous/simultaneous_cosimulation_example.md) (and the source code can be found in the [HELICS Examples repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simultaneous)).
+
 ## Use Broker server
 
 For the zmq, zmqss, tcp, and udp core types it is possible to use the broker server.

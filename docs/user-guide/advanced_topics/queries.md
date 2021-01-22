@@ -4,8 +4,14 @@ Queries are an asynchronous means within a HELICS federation of asking for and r
 
 The general function looks like this:
 
+**C++**
 ```cpp
 std::string query(const std::string& target, const std::string& queryStr)
+```
+
+**Python**
+```Python
+query_result = h.helicsCreateQuery(traget_string, query_string)
 ```
 
 ## Targets
@@ -265,4 +271,4 @@ A query must be freed after use `helicsQueryFree()`.
 
 
 ## Example
-A [full co-simulation example](./examples/advanced_examples/advanced_query.md) showing how queries can be used for dynamic configuration can be found in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query).
+A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query)).
