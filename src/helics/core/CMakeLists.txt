@@ -31,6 +31,7 @@ set(SRC_FILES
     coreTypeOperations.cpp
     helicsCLI11JsonConfig.cpp
     FilterFederate.cpp
+    TimeCoordinatorProcessing.cpp
 )
 
 set(PUBLIC_INCLUDE_FILES
@@ -79,6 +80,7 @@ set(INCLUDE_FILES
     fileConnections.hpp
     helicsCLI11JsonConfig.hpp
     FilterFederate.hpp
+    TimeCoordinatorProcessing.hpp
     ../helics_enums.h
 )
 

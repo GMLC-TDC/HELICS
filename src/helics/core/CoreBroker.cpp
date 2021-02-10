@@ -284,44 +284,54 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             _federates.insert(command.name, no_search, command.name);
             _federates.back().route = getRoute(command.source_id);
             _federates.back().parent = command.source_id;
-            if (checkActionFlag(command, non_counting_flag))
-            {
+            if (checkActionFlag(command, non_counting_flag)) {
                 _federates.back().nonCounting = true;
             }
-                if (!isRootc) {
-                    if (global_broker_id_local.isValid()) {
-                        command.source_id = global_broker_id_local;
-                        transmit(parent_route_id, command);
-                    } else {
-                        // delay the response if we are not fully registered yet
-                        delayTransmitQueue.push(command);
-                    }
-                } else {
-                    _federates.back().global_id = global_federate_id(
-                        static_cast<global_federate_id::base_type>(_federates.size()) - 1 +
-                        global_federate_id_shift);
-                    _federates.addSearchTermForIndex(_federates.back().global_id,
-                                                     static_cast<size_t>(
-                                                         _federates.back().global_id.baseValue()) -
-                                                         global_federate_id_shift);
-                    auto route_id = _federates.back().route;
-                    auto global_fedid = _federates.back().global_id;
-
-                    routing_table.emplace(global_fedid, route_id);
-                    // don't bother with the federate_table
-                    // transmit the response
-                    ActionMessage fedReply(CMD_FED_ACK);
-                    fedReply.source_id = global_broker_id_local;
-                    fedReply.dest_id = global_fedid;
-                    fedReply.name = command.name;
-                    transmit(route_id, fedReply);
-                    LOG_CONNECTIONS(global_broker_id_local,
-                                    getIdentifier(),
-                                    fmt::format("registering federate {}({}) on route {}",
-                                                command.name,
-                                                global_fedid.baseValue(),
-                                                route_id.baseValue()));
+            if (checkActionFlag(command, child_flag)) {
+                _federates.back().global_id = global_federate_id(command.getExtraData());
+                _federates.addSearchTermForIndex(_federates.back().global_id,
+                                                 _federates.size() - 1);
+            } else if (isRootc) {
+                _federates.back().global_id = global_federate_id(
+                    static_cast<global_federate_id::base_type>(_federates.size()) - 1 +
+                    global_federate_id_shift);
+                _federates.addSearchTermForIndex(_federates.back().global_id,
+                                                 static_cast<size_t>(
+                                                     _federates.back().global_id.baseValue()) -
+                                                     global_federate_id_shift);
                 }
+            if (!isRootc) {
+                if (global_broker_id_local.isValid()) {
+                    command.source_id = global_broker_id_local;
+                    transmit(parent_route_id, command);
+                } else {
+                    // delay the response if we are not fully registered yet
+                    delayTransmitQueue.push(command);
+                }
+            } else {
+                
+                auto route_id = _federates.back().route;
+                auto global_fedid = _federates.back().global_id;
+
+                routing_table.emplace(global_fedid, route_id);
+                // don't bother with the federate_table
+                // transmit the response
+                ActionMessage fedReply(CMD_FED_ACK);
+                fedReply.source_id = global_broker_id_local;
+                fedReply.dest_id = global_fedid;
+                fedReply.name = command.name;
+                if (checkActionFlag(command, child_flag))
+                {
+                    setActionFlag(fedReply, child_flag);
+                }
+                transmit(route_id, fedReply);
+                LOG_CONNECTIONS(global_broker_id_local,
+                                getIdentifier(),
+                                fmt::format("registering federate {}({}) on route {}",
+                                            command.name,
+                                            global_fedid.baseValue(),
+                                            route_id.baseValue()));
+            }
         } break;
         case CMD_REG_BROKER: {
             if (!connectionEstablished) {
@@ -484,9 +494,13 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_FED_ACK: {  // we can't be root if we got one of these
             auto fed = _federates.find(command.name);
             if (fed != _federates.end()) {
-                fed->global_id = command.dest_id;
+                
                 auto route = fed->route;
-                _federates.addSearchTerm(command.dest_id, fed->name);
+                if (!fed->global_id.isValid())
+                {
+                    fed->global_id = command.dest_id;
+                    _federates.addSearchTerm(command.dest_id, fed->name);
+                }
                 transmit(route, command);
                 routing_table.emplace(fed->global_id, route);
             } else {
@@ -3166,15 +3180,12 @@ bool CoreBroker::allInitReady() const
     if (static_cast<decltype(minBrokerCount)>(_brokers.size()) < minBrokerCount) {
         return false;
     }
-    bool initReady=(getAllConnectionState() >= connection_state::init_requested);
-    if (initReady)
-    {
+    bool initReady = (getAllConnectionState() >= connection_state::init_requested);
+    if (initReady) {
         // now do a more formal count of federates as there may be non-counting ones
         int cnt{0};
-        for (const auto &fed : _federates)
-        {
-            if (!fed.nonCounting)
-            {
+        for (const auto& fed : _federates) {
+            if (!fed.nonCounting) {
                 ++cnt;
             }
         }

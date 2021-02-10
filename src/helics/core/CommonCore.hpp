@@ -41,6 +41,7 @@ class FederateState;
 class BasicHandleInfo;
 class FilterCoordinator;
 class FilterInfo;
+class FilterFederate;
 class TimeoutMonitor;
 enum class handle_type : char;
 /** enumeration of possible operating conditions for a federate*/
@@ -278,8 +279,7 @@ class CommonCore: public Core, public BrokerBase {
     const BasicHandleInfo* getHandleInfo(interface_handle handle) const;
     /** get a localEndpoint from the name*/
     const BasicHandleInfo* getLocalEndpoint(const std::string& name) const;
-    /** get a filtering function object*/
-    FilterCoordinator* getFilterCoordinator(interface_handle handle);
+    
     /** check if all federates managed by the core are ready to enter initialization state*/
     bool allInitReady() const;
     /** check if all connections are disconnected (feds and time dependencies)*/
@@ -331,20 +331,6 @@ class CommonCore: public Core, public BrokerBase {
      * ActionMessage*/
     void routeMessage(ActionMessage&& cmd);
 
-    /** process any filter or route the message*/
-    void processMessageFilter(ActionMessage& cmd);
-    /** process a filter message return*/
-    void processFilterReturn(ActionMessage& cmd);
-    /** process a destination filter message return*/
-    void processDestFilterReturn(ActionMessage& command);
-    /** create a source filter */
-    FilterInfo* createFilter(global_broker_id dest,
-                             interface_handle handle,
-                             const std::string& key,
-                             const std::string& type_in,
-                             const std::string& type_out,
-                             bool cloning);
-
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** deal with a query response addressed to this core*/
@@ -383,40 +369,42 @@ class CommonCore: public Core, public BrokerBase {
         federates;  //!< threadsafe local federate information list for external functions
     gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
         loopFederates;  // federate pointers stored for the core loop
-    std::atomic<int32_t> messageCounter{
-        54};  //!< counter for the number of messages that have been sent, nothing
-    //!< magical about 54 just a number bigger than 1 to prevent
-    //!< confusion
-
+    
+    /** counter for the number of messages that have been sent, nothing magical about 54 just a
+     * number bigger than 1 to prevent confusion */
+    std::atomic<int32_t> messageCounter{54};  
     ordered_guarded<HandleManager> handles;  //!< local handle information;
     HandleManager loopHandles;  //!< copy of handles to use in the primary processing loop without
                                 //!< thread protection
-    std::map<int32_t, std::set<int32_t>>
-        ongoingFilterProcesses;  //!< sets of ongoing filtered messages
-    std::map<int32_t, std::set<int32_t>>
-        ongoingDestFilterProcesses;  //!< sets of ongoing destination filter processing
+    /// sets of ongoing time blocks from filtering
+    std::vector<std::pair<global_federate_id,int32_t>> timeBlocks;  
 
     std::map<int32_t, std::vector<ActionMessage>>
         delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
-    std::atomic<int> queryCounter{
-        1};  //!< counter for queries start at 1 so the default value isn't used
+
+    /// counter for queries start at 1 so the default value isn't used
+    std::atomic<int> queryCounter{1};
+    /// holder for active queries
     gmlc::concurrency::DelayedObjects<std::string>
-        activeQueries;  //!< holder for active queries
-                        /// holder for the query map builder information
+        activeQueries;  
+    /// holder for the query map builder information
     mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
-    std::map<interface_handle, std::unique_ptr<FilterCoordinator>>
-        filterCoord;  //!< map of all local filters
+
     // The interface_handle used is here is usually referencing an endpoint
     gmlc::containers::DualMappedPointerVector<FilterInfo,
                                               std::string,
                                               global_handle>
         filters;  //!< storage for all the filters
-
+    std::unique_ptr<FilterFederate> filterFed;
+    global_federate_id filterFedID;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<stx::any>, 4>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
+    void generateFilterFederate();
+    /** check if a given federate has a timeblock*/
+    bool hasTimeBlock(global_federate_id fedID);
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration();
     /** deliver a message to the appropriate location*/
@@ -442,10 +430,6 @@ class CommonCore: public Core, public BrokerBase {
     @param global_fedid the identifier for the federate
     @return parent_route if unknown, otherwise returns the route_id*/
     route_id getRoute(global_federate_id global_fedid) const;
-    /** process a message for potential additions to the filter ordering
-    @param command the message to process
-    */
-    void processFilterInfo(ActionMessage& command);
     /** function to check for a named interface*/
     void checkForNamedInterface(ActionMessage& command);
     /** function to remove a named target*/
@@ -461,10 +445,8 @@ class CommonCore: public Core, public BrokerBase {
     void removeTargetFromInterface(ActionMessage& command);
     /** function disconnect a single interface*/
     void disconnectInterface(ActionMessage& command);
-    /** organize filters
-    @details organize the filter and report and potential warnings and errors
-    */
-    void organizeFilterOperations();
+    /** manage any timeblock messages*/
+    void manageTimeBlocks(ActionMessage& command);
 
     /** generate a query response for a federate if possible
     @param fed a pointer to the federateState object to query

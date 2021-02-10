@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
+#include "timeCoordinatorProcessing.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
@@ -243,7 +244,7 @@ std::unique_ptr<Message> FederateState::receiveAny(interface_handle& id)
     if (earliest_time <= time_granted) {
         auto result = endpointI->getMessage(time_granted);
         id = (result) ? endpointI->id.handle : interface_handle{};
-        
+
         return result;
     }
     id = interface_handle();
@@ -663,8 +664,7 @@ void FederateState::fillEventVectorUpTo(Time currentTime)
 void FederateState::fillEventVectorInclusive(Time currentTime)
 {
     events.clear();
-    for (const auto& ipt : interfaceInformation.getInputs())
-    {
+    for (const auto& ipt : interfaceInformation.getInputs()) {
         bool updated = ipt->updateTimeInclusive(currentTime);
         if (updated) {
             events.push_back(ipt->id.handle);
@@ -1096,8 +1096,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             if (epi != nullptr) {
                 timeCoord->updateMessageTime(cmd.actionTime);
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-                if (cmd.actionTime < time_granted)
-                {
+                if (cmd.actionTime < time_granted) {
                     LOG_WARNING(
                         fmt::format("received message {} at time({}) earlier than granted time({})",
                                     prettyPrintString(cmd),
@@ -1666,13 +1665,12 @@ Time FederateState::nextMessageTime() const
     auto firstMessageTime = Time::maxVal();
     for (const auto& ep : interfaceInformation.getEndpoints()) {
         auto messageTime = ep->firstMessageTime();
-        if (messageTime < time_granted)
-        {
+        if (messageTime < time_granted) {
             messageTime = time_granted;
         }
-            if (messageTime < firstMessageTime) {
-                firstMessageTime = messageTime;
-            }
+        if (messageTime < firstMessageTime) {
+            firstMessageTime = messageTime;
+        }
     }
     return firstMessageTime;
 }

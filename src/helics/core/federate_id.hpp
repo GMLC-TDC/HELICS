@@ -58,7 +58,7 @@ namespace detail{
 }
 
 
-    /** class defining a local_federate_id
+ /** class defining a local_federate_id
  @details  the intent of this class is to limit the operations available on a federate identifier
  to those that are actually required and make sense, and make it as low impact as possible.
  it also acts to limit any mistakes of a local_federate_id
@@ -92,8 +92,9 @@ class interface_handle {
 std::ostream& operator<<(std::ostream& os, interface_handle handle);
 #endif
 
+/// this special handle can be used to directly send a message in a core
 constexpr interface_handle direct_send_handle{
-    -1'745'234};  //!< this special handle can be used to directly send a message in a core
+    -1'745'234};  
 
 }  // namespace helics
 
