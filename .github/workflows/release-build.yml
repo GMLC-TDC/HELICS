@@ -71,7 +71,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.client_payload.commit }}
-      if: github.event.action == 'published' || github.event.action == 'helics-release-build' || github.event_name == 'workflow_dispatch'
+      if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2
@@ -147,7 +147,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.client_payload.commit }}
-      if: github.event.action == 'published' || github.event.action == 'helics-release-build' || github.event_name == 'workflow_dispatch'
+      if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2
@@ -234,7 +234,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.client_payload.commit }}
-      if: github.event.action == 'published' || github.event.action == 'helics-release-build' || github.event_name == 'workflow_dispatch'
+      if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2

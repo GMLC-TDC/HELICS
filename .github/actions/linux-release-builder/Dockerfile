@@ -1,4 +1,4 @@
-FROM phusion/holy-build-box-64:latest
+FROM phusion/holy-build-box-64:2.1.0
 
 # Install a copy of git and the Boost headers
 # curl -L follows redirects and -k ignores SSL certificate warnings
