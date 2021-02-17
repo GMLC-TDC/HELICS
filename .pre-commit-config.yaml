@@ -38,6 +38,7 @@ repos:
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
       - id: shellcheck
+        additional_dependencies: []
       - id: shfmt
         args: [-w]
       - id: script-must-have-extension
