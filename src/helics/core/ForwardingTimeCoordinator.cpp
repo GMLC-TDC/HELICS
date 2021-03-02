@@ -122,10 +122,9 @@ void ForwardingTimeCoordinator::disconnect()
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id);
-    auto mTimeDownstream = generateMinTimeDownstream(dependencies, restrictive_time_policy, source_id);
-    if (noParent) {
-        mTimeDownstream = mTimeUpstream;
-    }
+    auto mTimeDownstream = (noParent) ?
+        mTimeUpstream:generateMinTimeDownstream(dependencies, restrictive_time_policy, source_id);
+    
     bool updateUpstream = upstream.update(mTimeUpstream);
     bool updateDownstream = downstream.update(mTimeDownstream);
 
@@ -153,20 +152,11 @@ void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) con
 {
     base["type"] = "forwarding";
     Json::Value upBlock;
-    upBlock["next"] = static_cast<double>(upstream.next);
-    upBlock["minde"] = static_cast<double>(upstream.minDe);
-    upBlock["minminde"] = static_cast<double>(upstream.minminDe);
-    upBlock["minfed"] = upstream.minFed.baseValue();
-    upBlock["state"] = static_cast<int32_t>(upstream.time_state);
-    upBlock["minfedActual"] = upstream.minFedActual.baseValue();
+    generateJsonOutputTimeData(upBlock, upstream);
+
     base["upstream"] = upBlock;
     Json::Value downBlock;
-    downBlock["next"] = static_cast<double>(downstream.next);
-    downBlock["minde"] = static_cast<double>(downstream.minDe);
-    downBlock["minminde"] = static_cast<double>(downstream.minminDe);
-    downBlock["minfed"] = downstream.minFed.baseValue();
-    downBlock["minfedActual"] = downstream.minFedActual.baseValue();
-    downBlock["state"] = static_cast<int32_t>(downstream.time_state);
+    generateJsonOutputTimeData(downBlock, downstream);
     base["downstream"] = downBlock;
 
     base["dependencies"] = Json::arrayValue;
@@ -174,13 +164,7 @@ void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) con
     for (auto dep : dependencies) {
         if (dep.dependency) {
             Json::Value depblock;
-            depblock["id"] = dep.fedID.baseValue();
-            depblock["state"] = static_cast<int>(dep.time_state);
-            depblock["next"] = static_cast<double>(dep.next);
-            depblock["te"] = static_cast<double>(dep.Te);
-            depblock["minde"] = static_cast<double>(dep.minDe);
-            depblock["minfed"] = dep.minFed.baseValue();
-            depblock["connection"] = static_cast<uint8_t>(dep.connection);
+            generateJsonOutputDependency(depblock, dep);
             base["dependencies"].append(depblock);
         }
         if (dep.dependent) {
@@ -268,6 +252,16 @@ std::vector<global_federate_id> ForwardingTimeCoordinator::getDependents() const
 bool ForwardingTimeCoordinator::hasActiveTimeDependencies() const
 {
     return dependencies.hasActiveTimeDependencies();
+}
+
+int ForwardingTimeCoordinator::dependencyCount() const
+{
+    return dependencies.activeDependencyCount();
+}
+/** get a count of the active dependencies*/
+global_federate_id ForwardingTimeCoordinator::getMinDependency() const
+{
+    return dependencies.getMinDependency();
 }
 
 message_processing_result ForwardingTimeCoordinator::checkExecEntry()

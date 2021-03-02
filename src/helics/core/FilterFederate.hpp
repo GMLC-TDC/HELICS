@@ -6,17 +6,20 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "../common/JsonBuilder.hpp"
+#include "Core.hpp"
 #include "FilterCoordinator.hpp"
 #include "FilterInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "global_federate_id.hpp"
-#include "gmlc/containers/DualMappedPointerVector.hpp"
-#include "Core.hpp"
+#include "gmlc/containers/MappedPointerVector.hpp"
+#include "gmlc/containers/AirLock.hpp"
+#include "helics/external/any.hpp"
+
 #include <functional>
 #include <map>
-#include <set>
 #include <memory>
-#include "../common/JsonBuilder.hpp"
+#include <set>
 
 namespace helics {
 class HandleManager;
@@ -28,36 +31,40 @@ class FilterFederate {
     global_federate_id mFedID;
     global_broker_id mCoreID;
     const std::string mName;
-    Core* mCore;
-    HandleManager* mHandles;
+    Core* mCore{nullptr};
+    TimeCoordinator mCoord;
+    HandleManager* mHandles{nullptr};
+    federate_state current_state{HELICS_CREATED};
     /// map of all local filters
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;
     // The interface_handle used is here is usually referencing an endpoint
-    /// storage for all the filters
-    gmlc::containers::DualMappedPointerVector<FilterInfo, std::string, global_handle> filters;
 
-    TimeCoordinator mCoord;
 
-    std::function<void(ActionMessage&)> mQueueMessage;
+    std::function<void(const ActionMessage&)> mQueueMessage;
     std::function<void(ActionMessage&&)> mQueueMessageMove;
-    std::function<void(ActionMessage&)> mSendMessage;
+    std::function<void(const ActionMessage&)> mSendMessage;
     std::function<void(ActionMessage&&)> mSendMessageMove;
 
     std::function<void(ActionMessage&)> mDeliverMessage;
 
     std::function<void(int, const std::string&, const std::string&)> mLogger;
+    std::function < gmlc::containers::AirLock<stx::any>&(int)> mGetAirLock;
+
     /// sets of ongoing filtered messages
-    std::map<int32_t, std::set<int32_t>>
-        ongoingFilterProcesses;
+    std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;
     /// sets of ongoing destination filter processing
-    std::map<int32_t, std::set<int32_t>>
-        ongoingDestFilterProcesses;
-    /** counter for the number of messages that have been sent, nothing magical about 54 just a number bigger than 1 to prevent confusion */
-    std::atomic<int32_t> messageCounter{
-        54};  
+    std::map<int32_t, std::set<int32_t>> ongoingDestFilterProcesses;
+    /** counter for the number of messages that have been sent, nothing magical about 54 just a
+     * number bigger than 1 to prevent confusion */
+    std::atomic<int32_t> messageCounter{54};
+    /// storage for all the filters
+    gmlc::containers::MappedPointerVector<FilterInfo, global_handle> filters;
+    bool hasTiming{false};
   public:
-    FilterFederate(global_federate_id fedID, const std::string &name, global_broker_id coreID, Core *core):
-        mFedID(fedID), mCoreID(coreID), mName(name),mCore(core){};
+    FilterFederate(global_federate_id fedID,
+                   std::string name,
+                   global_broker_id coreID,
+                   Core* core);
     /** process any filter or route the message*/
     void processMessageFilter(ActionMessage& cmd);
     /** process a filter message return*/
@@ -72,9 +79,9 @@ class FilterFederate {
                              const std::string& type_out,
                              bool cloning);
 
-    void setCallbacks(std::function<void(ActionMessage&)> queueMessage,
+    void setCallbacks(std::function<void(const ActionMessage&)> queueMessage,
                       std::function<void(ActionMessage&&)> queueMessageMove,
-                      std::function<void(ActionMessage&)> sendMessage,
+                      std::function<void(const ActionMessage&)> sendMessage,
                       std::function<void(ActionMessage&&)> sendMessageMove)
     {
         mQueueMessage = std::move(queueMessage);
@@ -92,24 +99,35 @@ class FilterFederate {
     {
         mDeliverMessage = std::move(deliverMessage);
     }
+
+    void setAirLockFunction(
+        std::function<gmlc::containers::AirLock<stx::any>&(int)> getAirLock)
+    {
+        mGetAirLock = std::move(getAirLock);
+    }
     void organizeFilterOperations();
 
     void handleMessage(ActionMessage& command);
 
     void processFilterInfo(ActionMessage& command);
 
-    ActionMessage& processMessage(ActionMessage& command, const BasicHandleInfo *handle);
+    ActionMessage& processMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
     void destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
     void addFilteredEndpoint(Json::Value& block, global_federate_id fed) const;
 
-    void setHandleManager(HandleManager* handles)
-    {
-        mHandles = handles;}
+    void setHandleManager(HandleManager* handles) { mHandles = handles; }
 
-      private:
+    std::string query(const std::string& queryStr) const;
+    /** check if the filter federate has active time dependencies other than parent*/
+    bool hasActiveTimeDependencies() const;
+  private:
+    void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/
     FilterCoordinator* getFilterCoordinator(interface_handle handle);
+
+    FilterInfo* getFilterInfo(global_handle id);
+    FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle);
 };
 }  // namespace helics

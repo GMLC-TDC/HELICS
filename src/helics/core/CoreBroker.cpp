@@ -1464,7 +1464,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
                 command.setDestination(ept->handle);
                 command.name.clear();
                 routeMessage(command);
-                command.setAction(CMD_ADD_ENDPOINT);
+                command.setAction(CMD_REMOVE_ENDPOINT);
                 command.swapSourceDest();
                 routeMessage(command);
 

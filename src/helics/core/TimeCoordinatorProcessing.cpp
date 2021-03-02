@@ -64,6 +64,7 @@ std::tuple<federate_state, message_processing_result, bool>
             FALLTHROUGH
             /* FALLTHROUGH */
         case CMD_EXEC_GRANT:
+            {
             bool processed = false;
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
@@ -81,6 +82,7 @@ std::tuple<federate_state, message_processing_result, bool>
             {
                 break;
             }
+            }
             FALLTHROUGH
             /* FALLTHROUGH */
         case CMD_EXEC_CHECK:  // just check the time for entry
@@ -90,7 +92,6 @@ std::tuple<federate_state, message_processing_result, bool>
             }
             if (!timeGranted_mode) {
                 auto grant = timeCoord->checkExecEntry();
-                bool returnable{false};
                 switch (grant) {
                     case message_processing_result::iterating:
                         newMode = true;
@@ -197,6 +198,11 @@ std::tuple<federate_state, message_processing_result, bool>
         
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
+            if (cmd.source_id == global_federate_id(131073) &&
+                cmd.dest_id == global_federate_id(1879048190) && cmd.actionTime == 1.0)
+            {
+                returnable = false;
+            }
             returnable = false;
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
@@ -270,7 +276,7 @@ std::tuple<federate_state, message_processing_result, bool>
                     break;
                 }
                 if (!timeGranted_mode) {
-                    auto proc = timeCoord->checkTimeGrant();
+                    proc = timeCoord->checkTimeGrant();
                     if (returnableResult(proc)) {
                         newMode = true;
                     }

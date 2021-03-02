@@ -397,6 +397,4 @@ class FederateState {
     void closeInterface(interface_handle handle, handle_type type);
 };
 
-/** convert the state into a human readable string*/
-const std::string& fedStateString(federate_state state);
 }  // namespace helics

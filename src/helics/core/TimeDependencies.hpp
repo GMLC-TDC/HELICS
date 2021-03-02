@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "basic_core_types.hpp"
-
+#include "json/forwards.h"
 #include <vector>
 
 namespace helics {
@@ -28,29 +28,41 @@ class ActionMessage;
         independent = 0,
         parent = 1,
         child = 2,
-        none = 3
+        self = 3,
+        none = 4,
     };
+     // helper class containing the basic timeData
+     class TimeData
+     {
+       public:
+         Time next{negEpsilon};  //!< next possible message or value
+         Time Te{timeZero};  //!< the next currently scheduled event
+         Time minDe{timeZero};  //!< min dependency event time
+         Time minminDe{timeZero};  // minimum min dependent event
+         global_federate_id minFed{};  //!< identifier for the min dependency
+         global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
+         time_state_t time_state{time_state_t::initialized};
+
+         TimeData() = default;
+         explicit TimeData(Time start):
+             next{start}, Te{start}, minDe{start}, minminDe{start} {};
+         /** check if there is an update to the current dependency info and assign*/
+         bool update(const TimeData& update);
+     };
 
 /** data class containing information about inter-federate dependencies*/
-class DependencyInfo {
+class DependencyInfo:public TimeData {
   public:
    
     global_federate_id fedID{};  //!< identifier for the dependency
-    global_federate_id minFed{};  //!< identifier for the min dependency
-    global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
 
-    time_state_t time_state{time_state_t::initialized};
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
     ConnectionType connection{ConnectionType::independent};
     bool dependent{false}; //!< indicator the dependency is a dependent object
     bool dependency{false}; //!< indicator that the dependency is an actual dependency
     bool forwarding{false}; //!< indicator that the dependency is a forwarding time coordinator
-    // 2 byte gap here
-    Time next{negEpsilon};  //!< next possible message or value
-    Time Te{timeZero};  //!< the next currently scheduled event
-    Time minDe{timeZero};  //!< min dependency event time
-    Time minminDe{timeZero}; // minimum min dependent event
+
     //Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
@@ -59,9 +71,8 @@ class DependencyInfo {
     {
     }
 
-    explicit DependencyInfo(Time start): next{start},Te{start}, minDe{start}, minminDe{start} {};
-    /** check if there is an update to the current dependency info and assign*/
-    bool update(const DependencyInfo& update);
+    explicit DependencyInfo(Time start): TimeData(start) {};
+    
 
 };
 
@@ -132,20 +143,32 @@ class TimeDependencies {
     void resetDependentEvents(Time grantTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
+    /** get a count of the active dependencies*/
+    int activeDependencyCount() const;
+    /** get a count of the active dependencies*/
+    global_federate_id getMinDependency() const;
+
+    void setDependencyVector(const std::vector<DependencyInfo> &deps) { dependencies = deps; }
 };
 
-DependencyInfo generateMinTimeUpstream(const TimeDependencies& dependencies,
+TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                        bool restricted,
                                        global_federate_id self,
                                        global_federate_id ignore = global_federate_id());
 
-DependencyInfo generateMinTimeDownstream(const TimeDependencies& dependencies,
+TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                      bool restricted,
                                      global_federate_id self,
                                      global_federate_id ignore = global_federate_id());
 
-DependencyInfo generateMinTimeTotal(const TimeDependencies& dependencies,
+TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                                      bool restricted,
                                      global_federate_id self,
                                      global_federate_id ignore = global_federate_id());
+
+void generateJsonOutputTimeData(Json::Value& output,
+                                 const TimeData& dep,
+                                 bool includeAggregates = true);
+
+void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep);
 }  // namespace helics

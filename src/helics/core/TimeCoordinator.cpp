@@ -273,18 +273,22 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const {
     base["message"] = static_cast<double>(time_message);
     base["minde"] = static_cast<double>(time_minDe);
     base["minminde"]=static_cast<double>(time_minminDe);
+
+    Json::Value upBlock;
+    generateJsonOutputTimeData(upBlock, upstream);
+   
+    base["upstream"] = upBlock;
+    Json::Value tblock;
+    generateJsonOutputTimeData(tblock, total);
+   
+    base["total"] = tblock;
     base["dependencies"] = Json::arrayValue;
         for (auto dep : dependencies)
         {
             if (dep.dependency)
             {
                 Json::Value depblock;
-                depblock["id"] = dep.fedID.baseValue();
-                depblock["state"] = static_cast<int>(dep.time_state);
-                depblock["next"] = static_cast<double>(dep.next);
-                depblock["te"] = static_cast<double>(dep.Te);
-                depblock["minde"] = static_cast<double>(dep.minDe);
-                depblock["minfed"] = dep.minFed.baseValue();
+                generateJsonOutputDependency(depblock, dep);
                 base["dependencies"].append(depblock);
             }
             if (dep.dependent)
@@ -295,9 +299,21 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const {
     }
 
 }
+
 bool TimeCoordinator::hasActiveTimeDependencies() const
 {
     return dependencies.hasActiveTimeDependencies();
+}
+
+int TimeCoordinator::dependencyCount() const
+{
+    return dependencies.activeDependencyCount();
+}
+
+/** get a count of the active dependencies*/
+global_federate_id TimeCoordinator::getMinDependency() const
+{
+    return dependencies.getMinDependency();
 }
 
 Time TimeCoordinator::getNextPossibleTime() const
@@ -369,11 +385,11 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
 bool TimeCoordinator::updateTimeFactors()
 {
-    auto globalMin = generateMinTimeTotal(dependencies, false, global_federate_id{});
-    
+    total = generateMinTimeTotal(dependencies, false, global_federate_id{});
+    upstream = generateMinTimeUpstream(dependencies, false, global_federate_id{});
 
     bool update = false;
-    time_minminDe = std::min(globalMin.minDe, globalMin.minminDe);
+    time_minminDe = std::min(total.minDe, total.minminDe);
     Time prev_next = time_next;
     updateNextPossibleEventTime();
 
@@ -383,15 +399,18 @@ bool TimeCoordinator::updateTimeFactors()
     if (prev_next != time_next) {
         update = true; 
     }
-    if (globalMin.minDe < Time::maxVal()) {
-        globalMin.minDe = generateAllowedTime(globalMin.minDe) + info.outputDelay;
+    if (total.minDe < Time::maxVal()) {
+        total.minDe = generateAllowedTime(total.minDe) + info.outputDelay;
     }
-    if (globalMin.minDe != time_minDe) {
+    if (upstream.minDe < Time::maxVal() && upstream.minDe>total.minDe) {
+        upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
+    }
+    if (total.minDe != time_minDe) {
         update = true;
-        time_minDe = globalMin.minDe;
+        time_minDe = total.minDe;
     }
     time_allow =
-        (globalMin.next < Time::maxVal()) ? info.inputDelay + globalMin.next : Time::maxVal();
+        (total.next < Time::maxVal()) ? info.inputDelay + total.next : Time::maxVal();
     
     updateNextExecutionTime();
     return update;
@@ -408,7 +427,7 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::halted;
         }
     }
-    if (time_block <= time_exec) {
+    if (time_block <= time_exec && time_block<Time::maxVal()) {
         return message_processing_result::continue_processing;
     }
     if ((iterating == iteration_request::no_iterations) ||
@@ -447,25 +466,59 @@ message_processing_result TimeCoordinator::checkTimeGrant()
     }
 
     // if we haven't returned we may need to update the time messages
-    if ((!dependencies.empty()) && (update)) {
+    if ((!dependencies.empty()) ) {
         sendTimeRequest();
     }
     return message_processing_result::continue_processing;
 }
 
-void TimeCoordinator::sendTimeRequest() const
+void TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd) const
 {
+    bool changed{false};
+    if (lastSend.next != upd.actionTime)
+    {
+        changed = true;
+    }
+    if (lastSend.minDe != upd.Tdemin) {
+        changed = true;
+    }
+    if (lastSend.Te != upd.Te) {
+        changed = true;
+    }
+    if (lastSend.minFed != global_federate_id(upd.getExtraData()))
+    {
+        changed = true;
+    }
+    if (changed) {
+        lastSend.next = upd.actionTime;
+        lastSend.minDe = upd.Tdemin;
+        lastSend.Te = upd.Te;
+        lastSend.minFed = global_federate_id(upd.getExtraData());
+        transmitTimingMessages(upd);
+    }
+}
+
+void TimeCoordinator::sendTimeRequest() const
+    {
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
-    upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
+    upd.Tdemin = upstream.minDe;
+    upd.setExtraData(upstream.minFed.baseValue());
+
+    if (upd.Tdemin < upd.actionTime)
+    {
+        upd.Tdemin = upd.actionTime;
+    }
 
     if (iterating != iteration_request::no_iterations) {
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
-    transmitTimingMessages(upd);
+    checkAndSendTimeRequest(upd);
+
+    
     //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
     // static_cast<double>(time_exec), static_cast<double>(time_minDe));
 }
@@ -510,6 +563,13 @@ bool TimeCoordinator::isDependency(global_federate_id ofed) const
 bool TimeCoordinator::addDependency(global_federate_id fedID)
 {
     if (dependencies.addDependency(fedID)) {
+        if (fedID == source_id) {
+            auto* dep = dependencies.getDependencyInfo(fedID);
+            if (dep != nullptr) {
+                dep->connection = ConnectionType::self;
+            }
+        }
+        
         dependency_federates.lock()->push_back(fedID);
         return true;
     }
@@ -523,6 +583,30 @@ bool TimeCoordinator::addDependent(global_federate_id fedID)
         return true;
     }
     return false;
+}
+
+
+void TimeCoordinator::setAsChild(global_federate_id fedID)
+{
+    if (fedID == source_id) {
+        return;
+    }
+    auto* dep = dependencies.getDependencyInfo(fedID);
+    if (dep != nullptr) {
+        dep->connection = ConnectionType::child;
+    }
+}
+
+void TimeCoordinator::setAsParent(global_federate_id fedID)
+{
+    if (fedID == source_id)
+    {
+        return;
+    }
+    auto* dep = dependencies.getDependencyInfo(fedID);
+    if (dep != nullptr) {
+        dep->connection = ConnectionType::parent;
+    }
 }
 
 void TimeCoordinator::removeDependency(global_federate_id fedID)
@@ -738,9 +822,10 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
 
 void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
 {
+    bool added{false};
     switch (cmd.action()) {
         case CMD_ADD_DEPENDENCY:
-            addDependency(cmd.source_id);
+            added=addDependency(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENCY:
             removeDependency(cmd.source_id);
@@ -752,7 +837,7 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
             removeDependent(cmd.source_id);
             break;
         case CMD_ADD_INTERDEPENDENCY:
-            addDependency(cmd.source_id);
+            added=addDependency(cmd.source_id);
             addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_INTERDEPENDENCY:
@@ -762,6 +847,16 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
         default:
             break;
     }
+    if (added)
+    {
+        if (checkActionFlag(cmd, child_flag)) {
+            setAsChild(cmd.source_id);
+        }
+        if (checkActionFlag(cmd, parent_flag)) {
+            setAsParent(cmd.source_id);
+        }
+    }
+   
 }
 
 /** set a timeProperty for a the coordinator*/

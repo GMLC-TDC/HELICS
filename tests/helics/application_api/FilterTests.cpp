@@ -63,7 +63,7 @@ TEST_P(filter_single_type_test, message_filter_registration)
     EXPECT_TRUE(ep1.getHandle().isValid());
 
     mFed->finalizeAsync();
-    // std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
     auto& f3 = fFed->registerCloningFilter();
     fFed->addSourceTarget(f3, "filter0/fout");
     f3.addDestinationTarget("port2");
@@ -275,10 +275,12 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 simulation
 */
 
-TEST_P(filter_all_type_test, message_dest_filter_function_t2)
+TEST_P(filter_all_type_test, message_source_filter_function)
 {
-    auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 2, broker, 0.5, "message");
+    //auto p = GetParam();
+    auto p = "zmq_2";
+    auto broker = AddBroker(p, 2);
+    AddFederates<helics::MessageFederate>(p, 2, broker, 0.5, "message");
 
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
@@ -302,9 +304,15 @@ TEST_P(filter_all_type_test, message_dest_filter_function_t2)
     mFed1->sendMessage(p1, "port2", data);
 
     mFed1->requestTimeAsync(1.0);
-    mFed2->requestTime(1.0);
-    mFed1->requestTimeComplete();
+    mFed2->requestTimeAsync(1.0);
+   // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+   // auto res1 = broker->query("root", "global_time_debugging");
+    //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+   //std::this_thread::yield();
+   // auto res2 = broker->query("root", "global_time_debugging");
 
+    mFed1->requestTimeComplete();
+    mFed2->requestTimeComplete();
     auto res = mFed2->hasMessage();
     EXPECT_TRUE(!res);
 
@@ -353,6 +361,8 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
+    //std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    //auto qres = fFed->query("root", "global_time_debugging");
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
@@ -361,6 +371,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
+    
     mFed->requestTimeComplete();
 
     auto res = mFed->hasMessage();
@@ -741,17 +752,19 @@ TEST_F(filter_tests, reroute_separate)
        auto t1 = std::thread(act1);
        auto t2 = std::thread(act2);
        auto t3 = std::thread(act3);
-       std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
-       auto res = broker->query("root", "global_time_debugging");
+       
        t1.join();
        t2.join();
+
+       //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+      // auto res = broker->query("root", "global_time_debugging");
        t3.join();
        filt->finalize();
        EXPECT_EQ(p2.pendingMessages(), 0U);
        EXPECT_EQ(p3.pendingMessages(), 10U);
        EXPECT_EQ(cnt, 11);
-       auto res2 = broker->query("root", "global_time_debugging");
+      // auto res2 = broker->query("root", "global_time_debugging");
        broker->waitForDisconnect();
    }
 
@@ -1175,7 +1188,7 @@ TEST_F(filter_test, message_clone_test)
 
     sFed->requestTimeAsync(1.0);
     dcFed->requestTimeAsync(1.0);
-    dFed->requestTime(1.0);
+    auto tm=dFed->requestTime(1.0);
     sFed->requestTimeComplete();
     dcFed->requestTimeComplete();
 

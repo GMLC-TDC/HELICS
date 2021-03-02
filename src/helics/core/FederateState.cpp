@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
-#include "timeCoordinatorProcessing.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
@@ -18,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
+#include "timeCoordinatorProcessing.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -461,22 +461,25 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
         if (ret == message_processing_result::next_step) {
             time_granted = timeZero;
             allowed_send_time = timeCoord->allowedSendTime();
+        } else if (ret == message_processing_result::iterating) {
+            time_granted = initializationTime;
+            allowed_send_time = initializationTime;
         }
-        switch (iterate) {
-            case iteration_request::force_iteration:
-                fillEventVectorNextIteration(time_granted);
-                break;
-            case iteration_request::iterate_if_needed:
-                if (ret == message_processing_result::next_step) {
-                    fillEventVectorUpTo(time_granted);
-                } else {
+            switch (iterate) {
+                case iteration_request::force_iteration:
                     fillEventVectorNextIteration(time_granted);
-                }
-                break;
-            case iteration_request::no_iterations:
-                fillEventVectorUpTo(time_granted);
-                break;
-        }
+                    break;
+                case iteration_request::iterate_if_needed:
+                    if (ret == message_processing_result::next_step) {
+                        fillEventVectorUpTo(time_granted);
+                    } else {
+                        fillEventVectorNextIteration(time_granted);
+                    }
+                    break;
+                case iteration_request::no_iterations:
+                    fillEventVectorUpTo(time_granted);
+                    break;
+            }
 
         unlock();
 #ifndef HELICS_DISABLE_ASIO
@@ -849,6 +852,91 @@ message_processing_result FederateState::processQueue() noexcept
 message_processing_result FederateState::processActionMessage(ActionMessage& cmd)
 {
     LOG_TRACE(fmt::format("processing command {}", prettyPrintString(cmd)));
+
+    if (cmd.action() == CMD_TIME_REQUEST) {
+        if ((cmd.source_id == global_id.load()) &&
+            checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
+            iteration_request iterate = iteration_request::no_iterations;
+            if (checkActionFlag(cmd, iteration_requested_flag)) {
+                iterate = (checkActionFlag(cmd, required_flag)) ?
+                    iteration_request::force_iteration :
+                    iteration_request::iterate_if_needed;
+            }
+            timeCoord->timeRequest(cmd.actionTime, iterate, nextValueTime(), nextMessageTime());
+            timeGranted_mode = false;
+            auto ret = processDelayQueue();
+            if (returnableResult(ret)) {
+                return ret;
+            }
+            cmd.setAction(CMD_TIME_CHECK);
+        }
+    }
+    auto proc_result = processCoordinatorMessage(
+        cmd, timeCoord.get(), getState(), timeGranted_mode, global_id.load());
+
+    timeGranted_mode = std::get<2>(proc_result);
+
+    if (getState() != std::get<0>(proc_result)) {
+        setState(std::get<0>(proc_result));
+        switch (std::get<0>(proc_result)) {
+            case HELICS_INITIALIZING:
+                LOG_TIMING("Granting Initialization");
+                if (checkInterfaces() != defs::errors::ok) {
+                    setState(HELICS_ERROR);
+                    return message_processing_result::error;
+                }
+                break;
+            case HELICS_EXECUTING:
+                timeCoord->updateTimeFactors();
+                LOG_TIMING("Granting Execution");
+                break;
+            case HELICS_FINISHED:
+                LOG_TIMING("Terminating");
+                break;
+            case HELICS_ERROR:
+                if (cmd.payload.empty()) {
+                    errorString = commandErrorString(cmd.messageID);
+                    if (errorString == "unknown") {
+                        errorString += " code:" + std::to_string(cmd.messageID);
+                    }
+                } else {
+                    errorString = cmd.payload;
+                }
+                errorCode = cmd.messageID;
+                LOG_ERROR(errorString);
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch (std::get<1>(proc_result)) {
+        case message_processing_result::continue_processing:
+            break;
+        case message_processing_result::reprocess_message:
+            if (cmd.dest_id != global_id.load()) {
+                routeMessage(cmd);
+                return message_processing_result::continue_processing;
+            }
+            return processActionMessage(cmd);
+        case message_processing_result::delay_message:
+            addFederateToDelay(global_federate_id(cmd.source_id));
+            return message_processing_result::delay_message;
+        default:
+            if (timeGranted_mode) {
+                time_granted = timeCoord->getGrantedTime();
+                allowed_send_time = timeCoord->allowedSendTime();
+                if (cmd.action() == CMD_FORCE_TIME_GRANT) {
+                    if (!ignore_time_mismatch_warnings) {
+                        LOG_WARNING(fmt::format("forced Granted Time={}", time_granted));
+                    }
+                } else {
+                    LOG_TIMING(fmt::format("Granted Time={}", time_granted));
+                }
+            }
+            return (std::get<1>(proc_result));
+    }
+
     switch (cmd.action()) {
         case CMD_IGNORE:
         default:
@@ -862,49 +950,10 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         }
 
         break;
-        case CMD_TIME_BLOCK:
-        case CMD_TIME_BARRIER:
-        case CMD_TIME_BARRIER_CLEAR:
-        case CMD_TIME_UNBLOCK: {
-            auto processed = timeCoord->processTimeMessage(cmd);
-            if (processed == message_process_result::processed) {
-                if (!timeGranted_mode) {
-                    if (state == HELICS_INITIALIZING) {
-                        cmd.setAction(CMD_EXEC_CHECK);
-                        return processActionMessage(cmd);
-                    }
-                    if (state == HELICS_EXECUTING) {
-                        cmd.setAction(CMD_TIME_CHECK);
-                        return processActionMessage(cmd);
-                    }
-                }
-            }
-            break;
-        }
-        case CMD_INIT_GRANT:
-            if (state == HELICS_CREATED) {
-                setState(HELICS_INITIALIZING);
-                LOG_TIMING("Granting Initialization");
-                timeGranted_mode = true;
-                int pcode = checkInterfaces();
-                if (pcode != defs::errors::ok) {
-                    setState(HELICS_ERROR);
-                    return message_processing_result::error;
-                }
-                return message_processing_result::next_step;
-            }
-            break;
+
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
                 checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
-                iteration_request iterate = iteration_request::no_iterations;
-                if (checkActionFlag(cmd, iteration_requested_flag)) {
-                    iterate = (checkActionFlag(cmd, required_flag)) ?
-                        iteration_request::force_iteration :
-                        iteration_request::iterate_if_needed;
-                }
-                timeCoord->enteringExecMode(iterate);
-                timeGranted_mode = false;
                 auto ret = processDelayQueue();
                 if (returnableResult(ret)) {
                     return ret;
@@ -912,62 +961,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 cmd.setAction(CMD_EXEC_CHECK);
                 return processActionMessage(cmd);
             }
-            FALLTHROUGH
-            /* FALLTHROUGH */
-        case CMD_EXEC_GRANT:
-            switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
-                    return message_processing_result::delay_message;
-                case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
-                default:
-                    break;
-            }
-            FALLTHROUGH
-            /* FALLTHROUGH */
-        case CMD_EXEC_CHECK:  // just check the time for entry
-        {
-            if (state != HELICS_INITIALIZING) {
-                break;
-            }
-            if (!timeGranted_mode) {
-                auto grant = timeCoord->checkExecEntry();
-                switch (grant) {
-                    case message_processing_result::iterating:
-                        timeGranted_mode = true;
-                        return grant;
-                    case message_processing_result::next_step:
-                        setState(HELICS_EXECUTING);
-                        LOG_TIMING("Granting Execution");
-                        timeGranted_mode = true;
-                        return grant;
-                    case message_processing_result::continue_processing:
-                        break;
-                    default:
-                        timeGranted_mode = true;
-                        return grant;
-                }
-            }
-        } break;
-        case CMD_TERMINATE_IMMEDIATELY:
-            setState(HELICS_FINISHED);
-            LOG_TIMING("Terminating");
-            return message_processing_result::halted;
-        case CMD_STOP:
-            setState(HELICS_FINISHED);
-            LOG_TIMING("Terminating");
-            timeCoord->disconnect();
-            return message_processing_result::halted;
-        case CMD_DISCONNECT_FED_ACK:
-            if ((cmd.dest_id == global_id.load()) && (cmd.source_id == parent_broker_id)) {
-                if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
-                    timeCoord->disconnect();
-                }
-                setState(HELICS_FINISHED);
-                return message_processing_result::halted;
-            }
             break;
+
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:
             if (cmd.source_id == global_id.load()) {
@@ -1001,96 +996,12 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 }
             }
             break;
-        case CMD_BROADCAST_DISCONNECT:
-        case CMD_DISCONNECT_BROKER:
-        case CMD_DISCONNECT_CORE:
-            switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
-                    return message_processing_result::delay_message;
-                case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
-                default:
-                    break;
-            }
-            if (state != HELICS_EXECUTING) {
-                break;
-            }
-            if (!timeGranted_mode) {
-                auto ret = timeCoord->checkTimeGrant();
-                if (returnableResult(ret)) {
-                    time_granted = timeCoord->getGrantedTime();
-                    allowed_send_time = timeCoord->allowedSendTime();
-                    timeGranted_mode = true;
-                    return ret;
-                }
-            }
-            break;
         case CMD_CLOSE_INTERFACE:
             if (cmd.source_id == global_id.load()) {
                 closeInterface(cmd.source_handle, static_cast<handle_type>(cmd.counter));
             }
             break;
-        case CMD_TIME_REQUEST:
-            if ((cmd.source_id == global_id.load()) &&
-                checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
-                iteration_request iterate = iteration_request::no_iterations;
-                if (checkActionFlag(cmd, iteration_requested_flag)) {
-                    iterate = (checkActionFlag(cmd, required_flag)) ?
-                        iteration_request::force_iteration :
-                        iteration_request::iterate_if_needed;
-                }
-                timeCoord->timeRequest(cmd.actionTime, iterate, nextValueTime(), nextMessageTime());
-                timeGranted_mode = false;
-                auto ret = processDelayQueue();
-                if (returnableResult(ret)) {
-                    return ret;
-                }
-                cmd.setAction(CMD_TIME_CHECK);
-                return processActionMessage(cmd);
-            }
-            FALLTHROUGH
-            /* FALLTHROUGH */
-        case CMD_TIME_GRANT:
-            switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
-                    return message_processing_result::delay_message;
-                case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
-                default:
-                    break;
-            }
-            FALLTHROUGH
-            /* FALLTHROUGH */
-        case CMD_TIME_CHECK: {
-            if (state != HELICS_EXECUTING) {
-                break;
-            }
-            if (!timeGranted_mode) {
-                auto ret = timeCoord->checkTimeGrant();
-                if (returnableResult(ret)) {
-                    time_granted = timeCoord->getGrantedTime();
-                    allowed_send_time = timeCoord->allowedSendTime();
-                    LOG_TIMING(fmt::format("Granted Time={}", time_granted));
-                    timeGranted_mode = true;
-                    return ret;
-                }
-            }
-        } break;
-        case CMD_FORCE_TIME_GRANT: {
-            if (cmd.actionTime < time_granted) {
-                break;
-            }
-            timeCoord->processTimeMessage(cmd);
-            time_granted = timeCoord->getGrantedTime();
-            allowed_send_time = timeCoord->allowedSendTime();
-            if (!ignore_time_mismatch_warnings) {
-                LOG_WARNING(fmt::format("forced Granted Time={}", time_granted));
-            }
-            timeGranted_mode = true;
-            return message_processing_result::next_step;
-        }
+
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr) {
@@ -1136,54 +1047,6 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             }
             LOG_WARNING(cmd.payload);
             break;
-        case CMD_ERROR:
-        case CMD_LOCAL_ERROR:
-        case CMD_GLOBAL_ERROR:
-            if (cmd.action() == CMD_GLOBAL_ERROR || cmd.source_id == global_id.load() ||
-                cmd.source_id == parent_broker_id || cmd.source_id == root_broker_id ||
-                cmd.dest_id != global_id) {
-                if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
-                    if (cmd.action() != CMD_GLOBAL_ERROR) {
-                        timeCoord->localError();
-                    }
-                    setState(HELICS_ERROR);
-                    if (cmd.payload.empty()) {
-                        errorString = commandErrorString(cmd.messageID);
-                        if (errorString == "unknown") {
-                            errorString += " code:" + std::to_string(cmd.messageID);
-                        }
-                    } else {
-                        errorString = cmd.payload;
-                    }
-                    errorCode = cmd.messageID;
-                    LOG_ERROR(errorString);
-                    return message_processing_result::error;
-                }
-            } else {
-                switch (timeCoord->processTimeMessage(cmd)) {
-                    case message_process_result::delay_processing:
-                        addFederateToDelay(global_federate_id(cmd.source_id));
-                        return message_processing_result::delay_message;
-                    case message_process_result::no_effect:
-                        return message_processing_result::continue_processing;
-                    default:
-                        break;
-                }
-                if (state != HELICS_EXECUTING) {
-                    break;
-                }
-                if (!timeGranted_mode) {
-                    auto ret = timeCoord->checkTimeGrant();
-                    if (returnableResult(ret)) {
-                        time_granted = timeCoord->getGrantedTime();
-                        allowed_send_time = timeCoord->allowedSendTime();
-                        timeGranted_mode = true;
-                        return ret;
-                    }
-                }
-            }
-            break;
-
         case CMD_ADD_PUBLISHER: {
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
@@ -1203,17 +1066,6 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 }
             }
         } break;
-        case CMD_ADD_DEPENDENCY:
-        case CMD_REMOVE_DEPENDENCY:
-        case CMD_ADD_DEPENDENT:
-        case CMD_REMOVE_DEPENDENT:
-        case CMD_ADD_INTERDEPENDENCY:
-        case CMD_REMOVE_INTERDEPENDENCY:
-            if (cmd.dest_id == global_id.load()) {
-                timeCoord->processDependencyUpdateMessage(cmd);
-            }
-
-            break;
         case CMD_REMOVE_NAMED_PUBLICATION: {
             auto* subI = interfaceInformation.getInput(cmd.source_handle);
             if (subI != nullptr) {

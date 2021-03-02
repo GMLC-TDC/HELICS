@@ -220,7 +220,7 @@ TEST(ftc_tests, timing_test1)
     EXPECT_TRUE(modified);
     ftc.updateTimeFactors();
     EXPECT_EQ(lastMessage.actionTime, 0.5);
-    EXPECT_EQ(lastMessage.Te, 1.0);
+    EXPECT_EQ(lastMessage.Te, 0.5);
     EXPECT_EQ(lastMessage.Tdemin, 0.5);
     EXPECT_TRUE(lastMessage.action() == CMD_TIME_REQUEST);
 }

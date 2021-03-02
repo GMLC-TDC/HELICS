@@ -53,8 +53,9 @@ class TimeCoordinator {
   private:
 
     /// the variables for time coordination
-    DependencyInfo upstream;
-    DependencyInfo total;
+    TimeData upstream;
+    TimeData total;
+    mutable TimeData lastSend;
     // the variables for time coordination
     Time time_granted = Time::minVal();  //!< the most recent time granted
     Time time_requested = Time::maxVal();  //!< the most recent time requested
@@ -164,6 +165,8 @@ class TimeCoordinator {
     Time getNextPossibleTime() const;
     Time generateAllowedTime(Time testTime) const;
 
+    void checkAndSendTimeRequest(ActionMessage& upd) const;
+
     void sendTimeRequest() const;
     void updateTimeGrant();
     void transmitTimingMessages(ActionMessage& msg) const;
@@ -199,6 +202,9 @@ class TimeCoordinator {
     @param fedID the identifier of the federate to remove*/
     void removeDependent(global_federate_id fedID);
 
+    void setAsChild(global_federate_id fedID);
+
+    void setAsParent(global_federate_id fedID);
     /** check if entry to the executing state can be granted*/
     message_processing_result checkExecEntry();
     /** request a time
@@ -230,5 +236,10 @@ class TimeCoordinator {
 
     /** generate debugging time information*/
     void generateDebuggingTimeInfo(Json::Value& base) const;
+
+    /** get a count of the active dependencies*/
+    int dependencyCount() const;
+    /** get a count of the active dependencies*/
+    global_federate_id getMinDependency() const;
 };
 }  // namespace helics

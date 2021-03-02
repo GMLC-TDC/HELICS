@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define HELICS_CORE_TYPES_HEADER
 
 #    include "../helics_enums.h"
+#    include <string>
+
 
 /** @file
 @details definitions of types an enumerations used in helics
@@ -27,6 +29,9 @@ enum federate_state {
     HELICS_FINISHED,  //!< the federation has finished its execution
     HELICS_UNKNOWN,  //!< unknown state
 };
+
+/** convert the state into a human readable string*/
+const std::string& fedStateString(federate_state state);
 
 /** the type of the cores that are available */
 enum class core_type : int {
@@ -103,8 +108,8 @@ constexpr auto ITERATE_IF_NEEDED =
                                                    //!< should iterate if
 //!< warranted
 
-// #TOBEDEPRECTATED The use of the the core-types header for the functions contained in
-// ../application_api/typeOperations.hpp is deprectaced and will be removed in HELICS 3.0 please use
+// #TOBEDEPRECTATED The use of the core-types header for the functions contained in
+// ../application_api/typeOperations.hpp is deprecated and will be removed in HELICS 3.0 please use
 // ../application_api/typeOperations.hpp directory for those functions.
 // This next section should be removed in HELICS 3.0 but is needed to prevent breaking changes
 #    if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY

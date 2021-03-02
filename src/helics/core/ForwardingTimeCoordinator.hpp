@@ -27,8 +27,8 @@ class ForwardingTimeCoordinator {
   private:
 
     // the variables for time coordination
-      DependencyInfo upstream;
-      DependencyInfo downstream;
+    DependencyInfo upstream;
+    DependencyInfo downstream;
     
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
@@ -132,5 +132,9 @@ class ForwardingTimeCoordinator {
     bool hasActiveTimeDependencies() const;
     /** get the current next time*/
     Time getNextTime() const { return downstream.next; }
+    /** get a count of the active dependencies*/
+    int dependencyCount() const;
+    /** get a count of the active dependencies*/
+    global_federate_id getMinDependency() const;
 };
 }  // namespace helics

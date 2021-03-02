@@ -533,7 +533,9 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
 
     EXPECT_EQ(mFed.getFilter(0).getInfo(),
               "this is an information string for use by the application");
+    auto cr = mFed.getCorePointer();
     mFed.disconnect();
+    cr->disconnect();
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
