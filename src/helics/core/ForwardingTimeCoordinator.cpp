@@ -124,13 +124,15 @@ void ForwardingTimeCoordinator::updateTimeFactors()
     auto mTimeUpstream = generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id);
     auto mTimeDownstream = (noParent) ?
         mTimeUpstream:generateMinTimeDownstream(dependencies, restrictive_time_policy, source_id);
-    
+
+
     bool updateUpstream = upstream.update(mTimeUpstream);
+
     bool updateDownstream = downstream.update(mTimeDownstream);
 
-    
-    if (!restrictive_time_policy && upstream.minminDe < Time::maxVal()) {
-        if (downstream.minminDe > downstream.next) {
+   
+    if (!restrictive_time_policy && upstream.minDe < Time::maxVal()) {
+        if (downstream.minDe > downstream.next) {
        //     downstream.next = downstream.minminDe;
         }
     }
@@ -175,10 +177,10 @@ void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) con
 
 std::string ForwardingTimeCoordinator::printTimeStatus() const
 {
-    return fmt::format(R"raw({{"time_next":{}, "minDe":{}, "minminDe":{}}})raw",
+    return fmt::format(R"raw({{"time_next":{}, "Te":{}, "minDe":{}}})raw",
                        static_cast<double>(downstream.next),
-                       static_cast<double>(downstream.minDe),
-                       static_cast<double>(downstream.minminDe));
+                       static_cast<double>(downstream.Te),
+                       static_cast<double>(downstream.minDe));
 }
 
 bool ForwardingTimeCoordinator::isDependency(global_federate_id ofed) const
@@ -277,7 +279,6 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
     downstream.next = timeZero;
     downstream.time_state = time_state_t::time_granted;
     downstream.minDe = timeZero;
-    downstream.minminDe = timeZero;
 
     ActionMessage execgrant(CMD_EXEC_GRANT);
     execgrant.source_id = source_id;
@@ -293,18 +294,18 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
     nTime.source_id = source_id;
     nTime.dest_id = fed;
     nTime.actionTime = dep.next;
-
+    
     if (dep.time_state == time_state_t::time_granted) {
         nTime.setAction(CMD_TIME_GRANT);
     } else if (dep.time_state == time_state_t::time_requested) {
         nTime.setExtraData(dep.minFed.baseValue());
-        nTime.Tdemin = dep.minminDe;
-        nTime.Te = dep.minDe;
+        nTime.Tdemin = std::min(dep.minDe, dep.Te);
+        nTime.Te = dep.Te;
     } else if (dep.time_state == time_state_t::time_requested_iterative) {
         nTime.setExtraData(dep.minFed.baseValue());
         setActionFlag(nTime, iteration_requested_flag);
-        nTime.Tdemin = dep.minminDe;
-        nTime.Te = dep.minDe;
+        nTime.Tdemin = std::min(dep.minDe, dep.Te);
+        nTime.Te = dep.Te;
     }
     return nTime;
 }
@@ -314,7 +315,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
 {
     if (sendMessageFunction) {
         for (auto dep : dependencies) {
-            if (dep.connection != ConnectionType::parent) {
+            if (dep.connection == ConnectionType::child) {
                 continue;
             }
             if (!dep.dependent)
@@ -332,7 +333,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
     if (sendMessageFunction) {
         if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
             for (auto dep : dependencies) {
-                if (dep.connection == ConnectionType::parent)
+                if (dep.connection != ConnectionType::child)
                 {
                     continue;
                 }
@@ -345,8 +346,14 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
                         continue;
                     }
                 }
-
                 msg.dest_id = dep.fedID;
+                /*if (msg.dest_id == global_federate_id(131074)) {
+                    if (msg.actionTime > timeZero) {
+                        printf("sending TR to 131074 for next=%f\n",
+                               static_cast<double>(msg.actionTime));
+                    }
+                }
+                */
                 sendMessageFunction(msg);
             }
         } else {

@@ -96,13 +96,14 @@ bool TimeData::update(const TimeData& update)
     Time prev_next = next;
     next = update.next;
 
+    if (update.Te != Te) {
+        updated = true;
+        Te = update.Te;
+    }
+
     if (update.minDe != minDe) {
         updated = true;
         minDe = update.minDe;
-    }
-    if (update.minminDe != minminDe) {
-        minminDe = update.minminDe;
-        updated = true;
     }
 
     if (prev_next != next) {
@@ -128,6 +129,7 @@ static const std::string& timeStateString(time_state_t state)
     static const std::string errorString{"error"};
     static const std::string execReq{"exec requested"};
     static const std::string timeReq{"time requested"};
+    static const std::string timeReqIterative{"time requested iterative"};
     static const std::string disconnected{"disconnected"};
     static const std::string other{"other"};
     switch (state)
@@ -142,6 +144,8 @@ static const std::string& timeStateString(time_state_t state)
             return execReq;
         case time_state_t::time_requested:
             return timeReq;
+        case time_state_t::time_requested_iterative:
+            return timeReqIterative;
         default:
             return other;
     }
@@ -156,7 +160,6 @@ void generateJsonOutputTimeData(Json::Value & output, const TimeData& dep, bool 
     output["state"] = timeStateString(dep.time_state);
     if (includeAggregates)
     {
-        output["minminde"] = static_cast<double>(dep.minminDe);
         output["minfedActual"] = dep.minFedActual.baseValue();
     }
     
@@ -440,30 +443,27 @@ static void generateMinTimeImplementation(TimeData& mTime,
             if (dep.Te < mTime.minDe) {
                 mTime.minDe = dep.Te;
             }
-            if (mTime.minDe < mTime.minminDe) {
-                mTime.minminDe = mTime.minDe;
-            }
         }
 
         return;
     }
     if (dep.connection != ConnectionType::self) {
     if (dep.minDe >= dep.next) {
-        if (dep.minDe < mTime.minminDe) {
-            mTime.minminDe = dep.minDe;
+        if (dep.minDe < mTime.minDe) {
+            mTime.minDe = dep.minDe;
             mTime.minFed = dep.fedID;
             if (dep.minFed.isValid()) {
                 mTime.minFedActual = dep.minFed;
             } else {
                 mTime.minFed = dep.fedID;
             }
-        } else if (dep.minDe == mTime.minminDe) {
+        } else if (dep.minDe == mTime.minDe) {
             mTime.minFedActual = global_federate_id();
         }
     } else {
         // this minimum dependent event time received was invalid and can't be trusted
         // therefore it can't be used to determine a time grant
-        mTime.minminDe = -1;
+        mTime.minDe = -1;
     }
     }
     if (dep.next < mTime.next) {
@@ -479,9 +479,6 @@ static void generateMinTimeImplementation(TimeData& mTime,
     {
         if (dep.Te < mTime.Te) {
             mTime.Te = dep.Te;
-        }
-        if (dep.minDe < mTime.minDe) {
-            mTime.minDe = dep.minDe;
         }
     }
     
@@ -508,11 +505,10 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
     }
-    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
-
+   
     if (!restricted ) {
-        if (mTime.minminDe > mTime.next) {
-            mTime.next = mTime.minminDe;
+        if (mTime.minDe > mTime.next) {
+            mTime.next = mTime.minDe;
         }
     }
 
@@ -529,7 +525,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         if (dep.dependency == false) {
             continue;
         }
-        if (dep.connection == ConnectionType::parent) {
+        if (dep.connection != ConnectionType::parent) {
             continue;
         }
         if (self.isValid() && dep.minFedActual == self) {
@@ -540,11 +536,10 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
     }
-    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
 
     if (!restricted ) {
-        if (mTime.minminDe > mTime.next) {
-            mTime.next = mTime.minminDe;
+        if (mTime.minDe > mTime.next) {
+            mTime.next = mTime.minDe;
         }
     }
 
@@ -571,11 +566,10 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
     }
-    mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
 
     if (!restricted ) {
-        if (mTime.minminDe > mTime.next) {
-            mTime.next = mTime.minminDe;
+        if (mTime.minDe > mTime.next) {
+            mTime.next = mTime.minDe;
         }
     }
 

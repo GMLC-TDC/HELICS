@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
+#include "helics/application_api/Endpoints.hpp"
 
 #include <future>
 
@@ -242,6 +243,67 @@ TEST_F(iteration_tests, time_iteration_test_2fed)
     EXPECT_EQ(val2, val);
 }
 
+TEST_F(iteration_tests, time_iteration_test_message)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    // register the publications
+    auto eptid = mFed1->registerGlobalEndpoint("ept");
+
+    mFed1->setProperty(helics_property_time_period, 1.0);
+    mFed1->setProperty(helics_property_time_delta, 1.0);
+    mFed1->enterExecutingMode();
+    eptid.send("ept", "message1");
+
+    auto comp = mFed1->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+
+    EXPECT_TRUE(comp.state == helics::iteration_result::iterating);
+    EXPECT_EQ(comp.grantedTime, helics::timeZero);
+    auto val = mFed1->getMessage(eptid);
+    EXPECT_EQ(val->to_string(), "message1");
+
+    comp = mFed1->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+
+    EXPECT_TRUE(comp.state == helics::iteration_result::next_step);
+    EXPECT_EQ(comp.grantedTime, 1.0);
+    EXPECT_FALSE(mFed1->hasMessage());
+}
+
+TEST_F(iteration_tests, time_iteration_test_2fed_message)
+{
+    SetupTest<helics::MessageFederate>("test", 2, 1.0);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    // register the publications
+    auto eptid1 = mFed1->registerGlobalEndpoint("ept1");
+
+    auto eptid2 = mFed2->registerGlobalEndpoint("ept2");
+
+    mFed1->setProperty(helics_property_time_period, 1);
+    mFed2->setProperty(helics_property_time_period, 1.0);
+
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+    eptid1.send("ept2","message1");
+
+    mFed1->requestTimeAsync(1.0);
+    auto comp = mFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+
+    EXPECT_TRUE(comp.state == helics::iteration_result::iterating);
+    EXPECT_EQ(comp.grantedTime, helics::timeZero);
+    auto message = mFed2->getMessage();
+    EXPECT_EQ(message->to_string(), "message1");
+
+    comp = mFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+
+    EXPECT_TRUE(comp.state == helics::iteration_result::next_step);
+    EXPECT_EQ(comp.grantedTime, 1.0);
+    EXPECT_FALSE(mFed2->hasMessage());
+    mFed1->requestTimeComplete();
+
+}
+
 TEST_F(iteration_tests, test2fed_withSubPub)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
@@ -283,7 +345,7 @@ TEST_F(iteration_tests, test2fed_withSubPub)
     EXPECT_EQ(val2, val);
 }
 
-TEST_F(iteration_tests, test_iteration_counter)
+TEST_F(iteration_tests, iteration_counter)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -312,6 +374,7 @@ TEST_F(iteration_tests, test_iteration_counter)
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
+    helics::iteration_time res;
     while (c1 <= 10) {
         EXPECT_EQ(sub1.getValue<int64_t>(), c1);
         EXPECT_EQ(sub2.getValue<int64_t>(), c2);
@@ -323,7 +386,18 @@ TEST_F(iteration_tests, test_iteration_counter)
         }
 
         vFed1->requestTimeIterativeAsync(1.0, helics::iteration_request::iterate_if_needed);
-        auto res = vFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+        if (c1 <= 10)
+        {
+            res = vFed2->requestTimeIterative(1.0, helics::iteration_request::iterate_if_needed);
+        }
+        else
+        {
+            vFed2->requestTimeIterativeAsync(1.0, helics::iteration_request::iterate_if_needed);
+            //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+            //auto td = vFed2->query("root", "global_time_debugging");
+            res = vFed2->requestTimeIterativeComplete();
+        }
         if (c1 <= 10) {
             EXPECT_TRUE(res.state == helics::iteration_result::iterating);
             EXPECT_EQ(res.grantedTime, 0.0);

@@ -155,8 +155,17 @@ void TimeCoordinator::timeRequest(Time nextTime,
         }
     }
     time_requested = nextTime;
-    time_value = (newValueTime > time_next) ? newValueTime : time_next;
-    time_message = (newMessageTime > time_next) ? newMessageTime : time_next;
+    if (iterating != iteration_request::no_iterations)
+    {
+        time_value = (newValueTime > time_granted) ? newValueTime : time_granted;
+        time_message = (newMessageTime > time_granted) ? newMessageTime : time_granted;
+    }
+    else
+    {
+        time_value = (newValueTime > time_next) ? newValueTime : time_next;
+        time_message = (newMessageTime > time_next) ? newMessageTime : time_next;
+    }
+    
     time_exec = std::min({time_value, time_message, time_requested});
     if (info.uninterruptible) {
         time_exec = time_requested;
@@ -282,6 +291,11 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const {
     generateJsonOutputTimeData(tblock, total);
    
     base["total"] = tblock;
+
+    Json::Value sent;
+    generateJsonOutputTimeData(sent, lastSend);
+
+    base["last_send"] = sent;
     base["dependencies"] = Json::arrayValue;
         for (auto dep : dependencies)
         {
@@ -389,7 +403,7 @@ bool TimeCoordinator::updateTimeFactors()
     upstream = generateMinTimeUpstream(dependencies, false, global_federate_id{});
 
     bool update = false;
-    time_minminDe = std::min(total.minDe, total.minminDe);
+    time_minminDe = total.minDe;
     Time prev_next = time_next;
     updateNextPossibleEventTime();
 
@@ -504,7 +518,7 @@ void TimeCoordinator::sendTimeRequest() const
     upd.source_id = source_id;
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
-    upd.Tdemin = upstream.minDe;
+    upd.Tdemin = std::min(upstream.minDe, upd.Te);
     upd.setExtraData(upstream.minFed.baseValue());
 
     if (upd.Tdemin < upd.actionTime)

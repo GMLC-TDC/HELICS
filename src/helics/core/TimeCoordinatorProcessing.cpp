@@ -198,8 +198,8 @@ std::tuple<federate_state, message_processing_result, bool>
         
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
-            if (cmd.source_id == global_federate_id(131073) &&
-                cmd.dest_id == global_federate_id(1879048190) && cmd.actionTime == 1.0)
+            if (cmd.source_id == global_federate_id(1879048194) &&
+                cmd.dest_id == global_federate_id(131074) && cmd.actionTime>timeZero)
             {
                 returnable = false;
             }

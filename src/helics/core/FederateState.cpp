@@ -274,6 +274,11 @@ void FederateState::routeMessage(const ActionMessage& msg)
 
 void FederateState::addAction(const ActionMessage& action)
 {
+    if (action.source_id == global_federate_id(1879048194) &&
+        action.dest_id == global_federate_id(131074) && action.actionTime > timeZero) {
+        queue.push(action);
+        return;
+    }
     if (action.action() != CMD_IGNORE) {
         queue.push(action);
     }
@@ -580,6 +585,7 @@ iteration_time
             time_granted = timeCoord->getGrantedTime();
             allowed_send_time = timeCoord->allowedSendTime();
             iterating = (ret == message_processing_result::iterating);
+            
         }
 
         iteration_time retTime = {time_granted, static_cast<iteration_result>(ret)};

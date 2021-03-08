@@ -1691,7 +1691,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
                 message.dest_handle = localP->getInterfaceHandle();
             }
 
-            timeCoord->processTimeMessage(message);
+            //timeCoord->processTimeMessage(message);
 
             auto* fed = getFederateCore(localP->getFederateId());
             if (fed != nullptr) {
@@ -2732,7 +2732,6 @@ void CommonCore::processCommand(ActionMessage&& command)
                 routeMessage(command);
             }
             break;
-        case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
             if (isLocal(command.source_id)) {
                 if (hasTimeBlock(command.source_id)) {
@@ -2740,13 +2739,16 @@ void CommonCore::processCommand(ActionMessage&& command)
                     break;
                 }
             }
-            if (command.source_id == global_broker_id_local) {
-                for (auto dep : timeCoord->getDependents()) {
-                    routeMessage(command, dep);
+            routeMessage(command);
+            break;
+        case CMD_TIME_REQUEST:
+            if (isLocal(command.source_id)) {
+                if (hasTimeBlock(command.source_id)) {
+                    delayedTimingMessages[command.source_id.baseValue()].push_back(command);
+                    break;
                 }
-            } else {
-                routeMessage(command);
             }
+            routeMessage(command);
             break;
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_FED:
