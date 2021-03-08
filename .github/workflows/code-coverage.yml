@@ -43,6 +43,7 @@ jobs:
     - name: Run tests
       working-directory: build
       run: |
+        export TEST_TYPE=${TEST_TYPE:-"Coverage"}
         source ../scripts/setup-helics-ci-options.sh
         export CTEST_OPTIONS="--output-on-failure"
         echo "Running CI tests with flags ${CI_TEST_FLAGS}"
