@@ -518,7 +518,7 @@ void TimeCoordinator::sendTimeRequest() const
     upd.source_id = source_id;
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
-    upd.Tdemin = std::min(upstream.minDe, upd.Te);
+    upd.Tdemin = std::min(upstream.Te, upd.Te);
     upd.setExtraData(upstream.minFed.baseValue());
 
     if (upd.Tdemin < upd.actionTime)

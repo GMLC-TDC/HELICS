@@ -989,6 +989,10 @@ TEST_F(filter_tests, reroute_separate)
        f5.addSourceTarget("send5");
 
        f1.setString("newdestination", "reroute");
+       f2.setString("newdestination", "reroute");
+       f3.setString("newdestination", "reroute");
+       f4.setString("newdestination", "reroute");
+       f5.setString("newdestination", "reroute");
 
        auto act1 = [&]() {
            send->enterExecutingMode();
