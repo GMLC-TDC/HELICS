@@ -27,7 +27,7 @@ FilterFederate::FilterFederate(global_federate_id fedID,
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
     mCoord.source_id = fedID;
-};
+}
 
 void FilterFederate::routeMessage(const ActionMessage& msg)
 {
@@ -572,7 +572,7 @@ FilterInfo* FilterFederate::createFilter(global_broker_id dest,
                                          bool cloning)
 {
     auto filt = std::make_unique<FilterInfo>(
-        (dest == parent_broker_id||dest==mCoreID) ? mFedID : dest, handle, key, type_in, type_out, false);
+        (dest == parent_broker_id||dest==mCoreID) ? global_broker_id(mFedID) : dest, handle, key, type_in, type_out, false);
 
     auto cid = filt->core_id;
     auto* retTarget = filt.get();

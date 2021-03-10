@@ -433,7 +433,7 @@ bool TimeCoordinator::updateTimeFactors()
 
 message_processing_result TimeCoordinator::checkTimeGrant()
 {
-    bool update = updateTimeFactors();
+    updateTimeFactors();
     if (time_exec == Time::maxVal()) {
         if (time_allow == Time::maxVal()) {
             time_granted = Time::maxVal();
