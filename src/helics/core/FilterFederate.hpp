@@ -65,6 +65,7 @@ class FilterFederate {
                    std::string name,
                    global_broker_id coreID,
                    Core* core);
+    ~FilterFederate();
     /** process any filter or route the message*/
     void processMessageFilter(ActionMessage& cmd);
     /** process a filter message return*/

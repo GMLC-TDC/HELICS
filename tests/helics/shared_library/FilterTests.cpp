@@ -26,7 +26,7 @@ class filter_tests: public FederateTestFixture, public ::testing::Test {
 
 /** test registration of filters*/
 
-TEST_P(filter_type_tests, registration)
+TEST_P(filter_simple_type_tests, registration)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "filter");

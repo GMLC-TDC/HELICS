@@ -29,6 +29,33 @@ FilterFederate::FilterFederate(global_federate_id fedID,
     mCoord.source_id = fedID;
 }
 
+FilterFederate::~FilterFederate()
+{
+
+    mHandles={nullptr};
+    current_state={HELICS_CREATED};
+    /// map of all local filters
+    filterCoord.clear();
+    // The interface_handle used is here is usually referencing an endpoint
+
+    mQueueMessage = nullptr;
+    mQueueMessageMove = nullptr;
+     mSendMessage = nullptr;
+    mSendMessageMove = nullptr;
+
+    mDeliverMessage = nullptr;
+
+    mLogger = nullptr;
+    mGetAirLock = nullptr;
+
+    /// sets of ongoing filtered messages
+    ongoingFilterProcesses.clear();
+    /// sets of ongoing destination filter processing
+    ongoingDestFilterProcesses.clear();
+
+    filters.clear();
+}
+
 void FilterFederate::routeMessage(const ActionMessage& msg)
 {
     if (mSendMessage) {

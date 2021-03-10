@@ -390,7 +390,8 @@ class CommonCore: public Core, public BrokerBase {
     /// holder for the query map builder information
     mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
 
-    std::unique_ptr<FilterFederate> filterFed;
+    FilterFederate* filterFed{nullptr};
+    std::atomic<std::thread::id> filterThread;
     std::atomic<global_federate_id> filterFedID;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<stx::any>, 4>

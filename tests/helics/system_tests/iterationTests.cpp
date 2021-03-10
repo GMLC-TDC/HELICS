@@ -393,9 +393,9 @@ TEST_F(iteration_tests, iteration_counter)
         else
         {
             vFed2->requestTimeIterativeAsync(1.0, helics::iteration_request::iterate_if_needed);
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+          //  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-            auto td = vFed2->query("root", "global_time_debugging");
+          //  auto td = vFed2->query("root", "global_time_debugging");
             res = vFed2->requestTimeIterativeComplete();
         }
         if (c1 <= 10) {

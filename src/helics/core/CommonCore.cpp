@@ -440,14 +440,11 @@ bool CommonCore::allDisconnected() const
     // all federates must have hit finished state
     auto afed = (minFederateState() == operation_state::disconnected);
     if ((hasTimeDependency) || (hasFilters)) {
-        if (afed)
-        {
-            if (!timeCoord->hasActiveTimeDependencies())
-            {
+        if (afed) {
+            if (!timeCoord->hasActiveTimeDependencies()) {
                 return true;
             }
-            if (timeCoord->dependencyCount() == 1 && timeCoord->getMinDependency() == filterFedID)
-            {
+            if (timeCoord->dependencyCount() == 1 && timeCoord->getMinDependency() == filterFedID) {
                 return !filterFed->hasActiveTimeDependencies();
             }
         }
@@ -1691,7 +1688,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
                 message.dest_handle = localP->getInterfaceHandle();
             }
 
-            //timeCoord->processTimeMessage(message);
+            // timeCoord->processTimeMessage(message);
 
             auto* fed = getFederateCore(localP->getFederateId());
             if (fed != nullptr) {
@@ -1911,7 +1908,7 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
     if (fed != nullptr) {
         base["name"] = fed->getIdentifier();
         base["id"] = fed->global_id.load().baseValue();
-        if (filterFed) {
+        if (filterFed != nullptr) {
             filterFed->addFilteredEndpoint(base, fed->global_id);
         }
     } else {
@@ -2026,7 +2023,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 builder.addComponent(ret, brkindex);
             }
         }
-        if (filterFed) {
+        if (filterFed != nullptr) {
             int brkindex = builder.generatePlaceHolder("federates", filterFedID.load().baseValue());
             std::string ret = filterFed->query(request);
             builder.addComponent(ret, brkindex);
@@ -2701,9 +2698,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
-            if (filterFed) {
-                auto* fed = filterFed.release();
-                (void)(fed);
+            if (filterThread.load() == std::this_thread::get_id()) {
+                if (filterFed != nullptr) {
+                    delete filterFed;
+                    filterFed = nullptr;
+                    filterThread.store(std::thread::id{});
+                }
             }
             activeQueries.fulfillAllPromises("#disconnected");
             break;
@@ -3030,7 +3030,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                 }
 
                 loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
-                if (filterFed && filterTiming) {
+                if (filterFed != nullptr && filterTiming) {
                     filterFed->handleMessage(command);
                 }
                 timeCoord->enteringExecMode();
@@ -3136,10 +3136,9 @@ void CommonCore::generateFilterFederate()
 {
     auto fid = filterFedID.load();
 
-    filterFed = std::make_unique<FilterFederate>(fid,
-                                                 getIdentifier() + "_filters",
-                                                 global_broker_id_local,
-                                                 this);
+    filterFed = new FilterFederate(fid, getIdentifier() + "_filters", global_broker_id_local, this);
+    filterThread.store(std::this_thread::get_id());
+    filterFedID.store(fid);
 
     filterFed->setCallbacks([this](const ActionMessage& m) { addActionMessage(m); },
                             [this](ActionMessage&& m) { addActionMessage(std::move(m)); },
@@ -3368,7 +3367,7 @@ void CommonCore::disconnectInterface(ActionMessage& command)
     }
     setActionFlag(*handleInfo, disconnected_flag);
     if (handleInfo->getFederateId() == filterFedID.load()) {
-        if (filterFed) {
+        if (filterFed != nullptr) {
             filterFed->handleMessage(command);
         }
     } else {
@@ -3633,7 +3632,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             }
             break;
         case UPDATE_FILTER_OPERATOR:
-            if (filterFed) {
+            if (filterFed != nullptr) {
                 filterFed->handleMessage(cmd);
             }
             break;
@@ -3774,11 +3773,8 @@ bool CommonCore::checkAndProcessDisconnect()
         dis.source_id = global_broker_id_local;
         transmit(parent_route_id, dis);
         return true;
-    }
-    else if (hasFilters)
-    {
-        if (!filterFed->hasActiveTimeDependencies())
-        {
+    } else if (hasFilters) {
+        if (!filterFed->hasActiveTimeDependencies()) {
             ActionMessage dis(CMD_DISCONNECT);
             dis.source_id = global_broker_id_local;
             transmit(parent_route_id, dis);
@@ -3817,7 +3813,7 @@ void CommonCore::sendDisconnect()
     if (hasTimeDependency) {
         timeCoord->disconnect();
     }
-    if (filterFed) {
+    if (filterFed != nullptr) {
         filterFed->handleMessage(bye);
     }
 }
