@@ -74,6 +74,8 @@ TEST_P(filter_type_tests, registration)
 
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_finalize);
+    helicsBrokerDestroy(broker);
+    helicsCloseLibrary();
 }
 
 /**

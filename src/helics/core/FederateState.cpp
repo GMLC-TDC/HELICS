@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
-#include "timeCoordinatorProcessing.hpp"
+#include "TimeCoordinatorProcessing.hpp"
 
 #include <algorithm>
 #include <chrono>

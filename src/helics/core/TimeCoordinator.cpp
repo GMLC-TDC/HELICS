@@ -399,8 +399,9 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
 bool TimeCoordinator::updateTimeFactors()
 {
-    total = generateMinTimeTotal(dependencies, false, global_federate_id{});
-    upstream = generateMinTimeUpstream(dependencies, false, global_federate_id{});
+    total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, global_federate_id{});
+    upstream =
+        generateMinTimeUpstream(dependencies, info.restrictive_time_policy, global_federate_id{});
 
     bool update = false;
     time_minminDe = total.minDe;
