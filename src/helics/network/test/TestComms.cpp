@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <utility>
+#include <queue>
 
 namespace helics {
 namespace testcore {

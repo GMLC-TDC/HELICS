@@ -70,7 +70,7 @@ class DependencyInfo:public TimeData {
     {
     }
 
-    explicit DependencyInfo(Time start): TimeData(start) {};
+    explicit DependencyInfo(Time start): TimeData(start) {}
     
 
 };

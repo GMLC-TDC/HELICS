@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "json/json.h"
 #include <algorithm>
+#include <string>
 #include <cassert>
 
 namespace helics {

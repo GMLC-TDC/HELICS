@@ -12,14 +12,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "global_federate_id.hpp"
-#include "gmlc/containers/MappedPointerVector.hpp"
 #include "gmlc/containers/AirLock.hpp"
+#include "gmlc/containers/MappedPointerVector.hpp"
 #include "helics/external/any.hpp"
 
 #include <functional>
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
+#include <vector>
+#include <utility>
 
 namespace helics {
 class HandleManager;
@@ -39,7 +42,6 @@ class FilterFederate {
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;
     // The interface_handle used is here is usually referencing an endpoint
 
-
     std::function<void(const ActionMessage&)> mQueueMessage;
     std::function<void(ActionMessage&&)> mQueueMessageMove;
     std::function<void(const ActionMessage&)> mSendMessage;
@@ -48,7 +50,7 @@ class FilterFederate {
     std::function<void(ActionMessage&)> mDeliverMessage;
 
     std::function<void(int, const std::string&, const std::string&)> mLogger;
-    std::function < gmlc::containers::AirLock<stx::any>&(int)> mGetAirLock;
+    std::function<gmlc::containers::AirLock<stx::any>&(int)> mGetAirLock;
 
     /// sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;
@@ -60,11 +62,9 @@ class FilterFederate {
     /// storage for all the filters
     gmlc::containers::MappedPointerVector<FilterInfo, global_handle> filters;
     bool hasTiming{false};
+
   public:
-    FilterFederate(global_federate_id fedID,
-                   std::string name,
-                   global_broker_id coreID,
-                   Core* core);
+    FilterFederate(global_federate_id fedID, std::string name, global_broker_id coreID, Core* core);
     ~FilterFederate();
     /** process any filter or route the message*/
     void processMessageFilter(ActionMessage& cmd);
@@ -101,8 +101,7 @@ class FilterFederate {
         mDeliverMessage = std::move(deliverMessage);
     }
 
-    void setAirLockFunction(
-        std::function<gmlc::containers::AirLock<stx::any>&(int)> getAirLock)
+    void setAirLockFunction(std::function<gmlc::containers::AirLock<stx::any>&(int)> getAirLock)
     {
         mGetAirLock = std::move(getAirLock);
     }
@@ -123,6 +122,7 @@ class FilterFederate {
     std::string query(const std::string& queryStr) const;
     /** check if the filter federate has active time dependencies other than parent*/
     bool hasActiveTimeDependencies() const;
+
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/

@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TimeCoordinator.hpp"
 #include "flagOperations.hpp"
+#include "TimeCoordinatorProcessing.hpp"
+
 #include <tuple>
 
 namespace helics {
