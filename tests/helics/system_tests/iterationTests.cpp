@@ -384,7 +384,7 @@ TEST_F(iteration_tests, iteration_counter)
             pub1.publish(c1);
             pub2.publish(c2);
         }
-
+        std::cout << "iteration " << c1 << std::endl;
         vFed1->requestTimeIterativeAsync(1.0, helics::iteration_request::iterate_if_needed);
         if (c1 <= 10)
         {
@@ -398,6 +398,7 @@ TEST_F(iteration_tests, iteration_counter)
           //  auto td = vFed2->query("root", "global_time_debugging");
             res = vFed2->requestTimeIterativeComplete();
         }
+        std::cout << "iteration granted " << c1 << std::endl;
         if (c1 <= 10) {
             EXPECT_TRUE(res.state == helics::iteration_result::iterating);
             EXPECT_EQ(res.grantedTime, 0.0);

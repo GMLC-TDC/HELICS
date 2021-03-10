@@ -74,14 +74,13 @@ TEST_P(filter_simple_type_tests, registration)
 
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_finalize);
-    helicsBrokerDestroy(broker);
-    helicsCloseLibrary();
+    
 }
 
 /**
 Test filter info fields
 */
-TEST_P(filter_type_tests, info_tests)
+TEST_P(filter_simple_type_tests, info_tests)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "filter");
@@ -160,7 +159,7 @@ TEST_F(filter_tests, core_filter_reg)
     helicsCloseLibrary();
 }
 
-TEST_P(filter_type_tests, message_filter_function)
+TEST_P(filter_simple_type_tests, message_filter_function)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
