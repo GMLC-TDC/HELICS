@@ -365,8 +365,8 @@ class CommonCore: public Core, public BrokerBase {
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to
                                                //!< initialization Mode was explicitly delayed
-    bool filterTiming{false}; //!< if there are filters needing a time connection
-     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
+    bool filterTiming{false};  //!< if there are filters needing a time connection
+    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
         federates;  //!< threadsafe local federate information list for external functions
     gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
         loopFederates;  // federate pointers stored for the core loop
@@ -391,7 +391,7 @@ class CommonCore: public Core, public BrokerBase {
     mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
 
     FilterFederate* filterFed{nullptr};
-    std::atomic<std::thread::id> filterThread;
+    std::atomic<std::thread::id> filterThread{std::thread::id{}};
     std::atomic<global_federate_id> filterFedID;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<stx::any>, 4>
