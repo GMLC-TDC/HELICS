@@ -504,11 +504,16 @@ void TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd) const
     {
         changed = true;
     }
+    if (lastSend.time_state != time_state_t::time_requested)
+    {
+        changed = true;
+    }
     if (changed) {
         lastSend.next = upd.actionTime;
         lastSend.minDe = upd.Tdemin;
         lastSend.Te = upd.Te;
         lastSend.minFed = global_federate_id(upd.getExtraData());
+        lastSend.time_state = time_state_t::time_requested;
         transmitTimingMessages(upd);
     }
 }
@@ -551,6 +556,10 @@ void TimeCoordinator::updateTimeGrant()
     if (iterating != iteration_request::no_iterations) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
+    lastSend.next = treq.actionTime;
+    lastSend.Te = treq.actionTime;
+    lastSend.minDe = treq.actionTime;
+    lastSend.time_state = time_state_t::time_granted;
     transmitTimingMessages(treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
     // static_cast<double>(time_allow), static_cast<double>(time_next),
@@ -741,6 +750,10 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 ActionMessage treq(CMD_TIME_GRANT);
                 treq.source_id = source_id;
                 treq.actionTime = time_granted;
+                lastSend.next = time_granted;
+                lastSend.Te = time_granted;
+                lastSend.minDe = time_granted;
+                lastSend.time_state = time_state_t::time_granted;
                 transmitTimingMessages(treq);
                 return message_process_result::processed;
             }

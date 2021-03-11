@@ -29,6 +29,7 @@ TEST(echo_tests, echo_test1)
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto retTime = mfed.requestTime(1.0);
     EXPECT_TRUE(ep1.hasMessage());
     EXPECT_LT(retTime, 1.0);
@@ -55,6 +56,7 @@ TEST(echo_tests, echo_test_delay)
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mfed.requestTime(1.0);
     EXPECT_FALSE(ep1.hasMessage());
     auto ntime = mfed.requestTime(2.0);
@@ -85,6 +87,7 @@ TEST(echo_tests, echo_test_delay_period)
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mfed.requestTime(1.0);
     EXPECT_FALSE(ep1.hasMessage());
     auto ntime = mfed.requestTime(4.0);
@@ -113,10 +116,12 @@ TEST(echo_tests, echo_test_multiendpoint)
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
     ep1.send("test", "hello world");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mfed.requestTime(1.0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ep1.send("test2", "hello again");
     EXPECT_TRUE(!ep1.hasMessage());
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto ntime = mfed.requestTime(2.0);
     EXPECT_EQ(ntime, helics::Time::epsilon()+1.2);
     EXPECT_TRUE(ep1.hasMessage());
@@ -150,9 +155,11 @@ TEST(echo_tests, echo_test_fileload)
     helics::Endpoint ep1(&mfed, "src");
     auto fut = std::async(std::launch::async, [&echo1]() { echo1.runTo(5.0); });
     mfed.enterExecutingMode();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     ep1.send("test", "hello world");
     mfed.requestTime(1.0);
     ep1.send("test2", "hello again");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_TRUE(!ep1.hasMessage());
     auto ntime = mfed.requestTime(2.0);
     EXPECT_EQ(ntime, helics::timeEpsilon + 1.2);

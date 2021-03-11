@@ -290,7 +290,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
 simulation
 */
-TEST_P(filter_type_tests, function_two_stage)
+TEST_P(filter_simple_type_tests, function_two_stage)
 {
     helics_broker broker = AddBroker(GetParam(), 3);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -375,7 +375,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 simulation
 */
 
-TEST_P(filter_type_tests, function2)
+TEST_P(filter_simple_type_tests, function2)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -448,7 +448,7 @@ TEST_P(filter_type_tests, function2)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
-TEST_P(filter_type_tests, message_filter_function3)
+TEST_P(filter_simple_type_tests, message_filter_function3)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
