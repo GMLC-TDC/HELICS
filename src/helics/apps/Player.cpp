@@ -426,7 +426,7 @@ namespace apps {
                         {
                             iterationIndex = std::stoi(str.substr(cloc + 1));
                         }
-                        catch (const std::exception &e)
+                        catch (const std::exception &)
                         {
                             iterationIndex = 0;
                         }
@@ -441,7 +441,7 @@ namespace apps {
                         try {
                             iterationIndex = std::stoi(str.substr(cloc + 1));
                         }
-                        catch (const std::exception& e) {
+                        catch (const std::exception& ) {
                             iterationIndex = 0;
                         }
                     }
