@@ -52,7 +52,13 @@ std::ostream& operator<<(std::ostream& os, local_federate_id fid);
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr local_federate_id local_core_id(-259);
 
-/** class defining a local_federate_id
+namespace detail{
+    /** constant numerical value for invalid handle identification*/
+    constexpr identififier_base_type invalid_interface_handle{-1'700'000'000};
+}
+
+
+ /** class defining a local_federate_id
  @details  the intent of this class is to limit the operations available on a federate identifier
  to those that are actually required and make sense, and make it as low impact as possible.
  it also acts to limit any mistakes of a local_federate_id
@@ -76,7 +82,7 @@ class interface_handle {
     bool isValid() const { return (hid != invalid_handle); }
 
   private:
-    static constexpr base_type invalid_handle{-1'700'000'000};
+    static constexpr base_type invalid_handle{detail::invalid_interface_handle};
     base_type hid{invalid_handle};  //!< the underlying index value
 };
 
@@ -86,8 +92,9 @@ class interface_handle {
 std::ostream& operator<<(std::ostream& os, interface_handle handle);
 #endif
 
+/// this special handle can be used to directly send a message in a core
 constexpr interface_handle direct_send_handle{
-    -1'745'234};  //!< this special handle can be used to directly send a message in a core
+    -1'745'234};  
 
 }  // namespace helics
 

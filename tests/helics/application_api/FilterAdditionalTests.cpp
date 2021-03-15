@@ -54,16 +54,25 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
+   // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    //auto res = broker->query("root", "global_time_debugging");
+    //std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    //std::this_thread::yield();
+    //auto res2 = broker->query("root", "global_time_debugging");
     mFed->requestTimeComplete();
 
     EXPECT_TRUE(!mFed->hasMessage(p2));
-    ASSERT_TRUE(mFed->hasMessage(p3));
+    EXPECT_TRUE(mFed->hasMessage(p3));
 
     auto m2 = mFed->getMessage(p3);
-    EXPECT_EQ(m2->source, "port1");
-    EXPECT_EQ(m2->original_dest, "port2");
-    EXPECT_EQ(m2->dest, "port3");
-    EXPECT_EQ(m2->data.size(), data.size());
+    if (m2)
+    {
+        EXPECT_EQ(m2->source, "port1");
+        EXPECT_EQ(m2->original_dest, "port2");
+        EXPECT_EQ(m2->dest, "port3");
+        EXPECT_EQ(m2->data.size(), data.size());
+    }
+   
 
     fFed->requestTimeAsync(2.0);
     mFed->requestTime(2.0);
@@ -125,8 +134,13 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
     EXPECT_TRUE(!mFed->hasMessage(p3));
 
     m2 = mFed->getMessage(p2);
-    EXPECT_EQ(m2->dest, "port2");
-    EXPECT_EQ(m2->data.size(), data.size());
+    EXPECT_TRUE(m2);
+    if (m2)
+    {
+        EXPECT_EQ(m2->dest, "port2");
+        EXPECT_EQ(m2->data.size(), data.size());
+    }
+    
     mFed->finalize();
     fFed->finalize();
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::finalize);
@@ -517,7 +531,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
     mFed->sendMessage(p1, "port2", data);
 
     double timestep = 0.0;  // 1 second
-    int max_iterations = 4;
+    int max_iterations = 6;
     int count = 0;
     double actual_delay = 100.0;
 

@@ -289,9 +289,10 @@ void ValueFederateManager::startupToInitializeStateTransition()
     inpHandle->apply([](auto& inp) { inp.loadSourceInformation(); });
 }
 
-void ValueFederateManager::initializeToExecuteStateTransition()
+void ValueFederateManager::initializeToExecuteStateTransition(iteration_result result)
 {
-    updateTime(0.0, 0.0);
+    Time ctime = result == iteration_result::next_step ? timeZero : initializationTime;
+    updateTime(ctime, initializationTime);
 }
 
 std::string ValueFederateManager::localQuery(const std::string& queryStr) const

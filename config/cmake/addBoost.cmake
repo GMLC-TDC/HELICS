@@ -15,6 +15,7 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
+		boost_1_75_0
         boost_1_74_0
         boost_1_73_0
         boost_1_72_0

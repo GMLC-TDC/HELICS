@@ -20,6 +20,8 @@ set(core_test_sources
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
     CoreConfigureTests.cpp
+    FilterFederateTests.cpp
+    TimeDependenciesTests.cpp
 )
 
 if(NOT HELICS_DISABLE_ASIO)

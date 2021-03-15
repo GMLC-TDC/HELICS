@@ -26,7 +26,7 @@ class filter_tests: public FederateTestFixture, public ::testing::Test {
 
 /** test registration of filters*/
 
-TEST_P(filter_type_tests, registration)
+TEST_P(filter_simple_type_tests, registration)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "filter");
@@ -74,12 +74,13 @@ TEST_P(filter_type_tests, registration)
 
     CE(helics_federate_state state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == helics_state_finalize);
+    
 }
 
 /**
 Test filter info fields
 */
-TEST_P(filter_type_tests, info_tests)
+TEST_P(filter_simple_type_tests, info_tests)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, helics_time_zero, "filter");
@@ -158,7 +159,7 @@ TEST_F(filter_tests, core_filter_reg)
     helicsCloseLibrary();
 }
 
-TEST_P(filter_type_tests, message_filter_function)
+TEST_P(filter_simple_type_tests, message_filter_function)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -289,7 +290,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
 simulation
 */
-TEST_P(filter_type_tests, function_two_stage)
+TEST_P(filter_simple_type_tests, function_two_stage)
 {
     helics_broker broker = AddBroker(GetParam(), 3);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -374,7 +375,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 simulation
 */
 
-TEST_P(filter_type_tests, function2)
+TEST_P(filter_simple_type_tests, function2)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -447,7 +448,7 @@ TEST_P(filter_type_tests, function2)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
-TEST_P(filter_type_tests, message_filter_function3)
+TEST_P(filter_simple_type_tests, message_filter_function3)
 {
     helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
