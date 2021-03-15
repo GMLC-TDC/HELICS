@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-    
 bool EndpointInfo::updateTimeUpTo(Time newTime)
 {
     int index{0};
@@ -22,17 +21,14 @@ bool EndpointInfo::updateTimeUpTo(Time newTime)
 
     auto cv = handle.begin();
     auto it_final = handle.end();
-    while (cv != it_final)
-    {
-        if ((*cv)->time >= newTime)
-        {
+    while (cv != it_final) {
+        if ((*cv)->time >= newTime) {
             break;
         }
         ++index;
         ++cv;
     }
-    if (index != mAvailableMessages.load())
-    {
+    if (index != mAvailableMessages.load()) {
         mAvailableMessages.store(index);
         return true;
     }
@@ -83,8 +79,7 @@ bool EndpointInfo::updateTimeInclusive(Time newTime)
 
 std::unique_ptr<Message> EndpointInfo::getMessage(Time maxTime)
 {
-    if (mAvailableMessages.load() > 0)
-    {
+    if (mAvailableMessages.load() > 0) {
         auto handle = message_queue.lock();
         if (handle->empty()) {
             return nullptr;
@@ -125,7 +120,6 @@ void EndpointInfo::clearQueue()
 {
     mAvailableMessages.store(0);
     message_queue.lock()->clear();
-    
 }
 
 int32_t EndpointInfo::availableMessages() const

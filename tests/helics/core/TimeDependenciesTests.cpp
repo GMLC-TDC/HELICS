@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-
 TEST(timeDep_tests, dependency_tests)
 {
     std::vector<DependencyInfo> deps;
@@ -26,7 +25,7 @@ TEST(timeDep_tests, dependency_tests)
     deps[0].Te = 2.0;
     deps[0].minDe = 2.0;
 
-     deps[1].connection = ConnectionType::child;
+    deps[1].connection = ConnectionType::child;
     deps[1].fedID = global_federate_id(1879048192);
     deps[1].time_state = time_state_t::time_requested;
     deps[1].dependent = true;
@@ -40,7 +39,4 @@ TEST(timeDep_tests, dependency_tests)
     depTest.setDependencyVector(deps);
     auto total = generateMinTimeTotal(depTest, false, global_federate_id(1), global_federate_id());
     EXPECT_EQ(total.next, 2.0);
-
-    
 }
-

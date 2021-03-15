@@ -531,7 +531,7 @@ TEST(tracer_tests, tracer_test_endpoint_clone)
     e2.send("d1", "this is a test message2");
     mfed2.requestTimeAsync(3.0);
     retTime = mfed.requestTime(3.0);
-    EXPECT_EQ(retTime, 3.0); 
+    EXPECT_EQ(retTime, 3.0);
     mfed2.requestTimeComplete();
     mfed.finalize();
     mfed2.finalize();
@@ -578,11 +578,11 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
 
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
     std::atomic<int> mcount{0};
-    auto cb = [&mguard, &lastTime,&mcount](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto cb = [&mguard, &lastTime, &mcount](helics::Time tm,
+                                            std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
         lastTime = static_cast<double>(tm);
-        if (tm == helics::Time::maxVal())
-        {
+        if (tm == helics::Time::maxVal()) {
             lastTime = helics::Time::minVal();
         }
         ++mcount;

@@ -5,15 +5,20 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "TimeCoordinatorProcessing.hpp"
+
 #include "TimeCoordinator.hpp"
 #include "flagOperations.hpp"
-#include "TimeCoordinatorProcessing.hpp"
 
 #include <tuple>
 
 namespace helics {
 std::tuple<federate_state, message_processing_result, bool>
-    processCoordinatorMessage(ActionMessage& cmd, TimeCoordinator *timeCoord, const federate_state state, const bool timeGranted_mode, const global_federate_id localID)
+    processCoordinatorMessage(ActionMessage& cmd,
+                              TimeCoordinator* timeCoord,
+                              const federate_state state,
+                              const bool timeGranted_mode,
+                              const global_federate_id localID)
 {
     federate_state newState{state};
     bool newMode{timeGranted_mode};
@@ -46,7 +51,7 @@ std::tuple<federate_state, message_processing_result, bool>
             if (state == HELICS_CREATED) {
                 newState = HELICS_INITIALIZING;
                 newMode = true;
-                proc=message_processing_result::next_step;
+                proc = message_processing_result::next_step;
             }
             break;
         case CMD_EXEC_REQUEST:
@@ -64,26 +69,24 @@ std::tuple<federate_state, message_processing_result, bool>
             }
             FALLTHROUGH
             /* FALLTHROUGH */
-        case CMD_EXEC_GRANT:
-            {
+        case CMD_EXEC_GRANT: {
             bool processed = false;
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
-                    proc= message_processing_result::delay_message;
+                    proc = message_processing_result::delay_message;
                     processed = true;
                     break;
                 case message_process_result::no_effect:
-                    proc= message_processing_result::continue_processing;
+                    proc = message_processing_result::continue_processing;
                     processed = true;
                     break;
                 default:
                     break;
             }
-            if (processed)
-            {
+            if (processed) {
                 break;
             }
-            }
+        }
             FALLTHROUGH
             /* FALLTHROUGH */
         case CMD_EXEC_CHECK:  // just check the time for entry
@@ -100,7 +103,7 @@ std::tuple<federate_state, message_processing_result, bool>
                         proc = grant;
                         break;
                     case message_processing_result::next_step:
-                        newState=HELICS_EXECUTING;
+                        newState = HELICS_EXECUTING;
                         newMode = true;
                         returnable = true;
                         proc = grant;
@@ -110,27 +113,27 @@ std::tuple<federate_state, message_processing_result, bool>
                     default:
                         newMode = true;
                         returnable = true;
-                        proc=grant;
+                        proc = grant;
                         break;
                 }
             }
         } break;
         case CMD_TERMINATE_IMMEDIATELY:
-            newState=HELICS_FINISHED;
-            proc=message_processing_result::halted;
+            newState = HELICS_FINISHED;
+            proc = message_processing_result::halted;
             break;
         case CMD_STOP:
-            newState=HELICS_FINISHED;
+            newState = HELICS_FINISHED;
             timeCoord->disconnect();
-            proc=message_processing_result::halted;
+            proc = message_processing_result::halted;
             break;
         case CMD_DISCONNECT_FED_ACK:
             if ((cmd.dest_id == localID) && (cmd.source_id == parent_broker_id)) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     timeCoord->disconnect();
                 }
-                newState=HELICS_FINISHED;
-                proc=message_processing_result::halted;
+                newState = HELICS_FINISHED;
+                proc = message_processing_result::halted;
             }
             break;
         case CMD_DISCONNECT_FED:
@@ -139,7 +142,7 @@ std::tuple<federate_state, message_processing_result, bool>
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     timeCoord->disconnect();
                     cmd.dest_id = parent_broker_id;
-                    newState=HELICS_TERMINATING;
+                    newState = HELICS_TERMINATING;
                     proc = message_processing_result::reprocess_message;
                 }
             } else {
@@ -147,11 +150,11 @@ std::tuple<federate_state, message_processing_result, bool>
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
                         returnable = true;
-                        proc=message_processing_result::delay_message;
+                        proc = message_processing_result::delay_message;
                         break;
                     case message_process_result::no_effect:
                         returnable = true;
-                        proc=message_processing_result::continue_processing;
+                        proc = message_processing_result::continue_processing;
                     default:
                         break;
                 }
@@ -173,17 +176,16 @@ std::tuple<federate_state, message_processing_result, bool>
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
                     returnable = true;
-                    proc=message_processing_result::delay_message;
+                    proc = message_processing_result::delay_message;
                     break;
                 case message_process_result::no_effect:
-                    proc=message_processing_result::continue_processing;
+                    proc = message_processing_result::continue_processing;
                     returnable = true;
                     break;
                 default:
                     break;
             }
-            if (returnable)
-            {
+            if (returnable) {
                 break;
             }
             if (state != HELICS_EXECUTING) {
@@ -196,13 +198,13 @@ std::tuple<federate_state, message_processing_result, bool>
                 }
             }
             break;
-        
+
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
             returnable = false;
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
-                    proc=message_processing_result::delay_message;
+                    proc = message_processing_result::delay_message;
                     returnable = true;
                     break;
                 case message_process_result::no_effect:
@@ -212,8 +214,7 @@ std::tuple<federate_state, message_processing_result, bool>
                 default:
                     break;
             }
-            if (returnable)
-            {
+            if (returnable) {
                 break;
             }
             FALLTHROUGH
@@ -228,17 +229,17 @@ std::tuple<federate_state, message_processing_result, bool>
                     newMode = true;
                 }
             }
-        break;
+            break;
         case CMD_FORCE_TIME_GRANT: {
             if (cmd.actionTime < timeCoord->getGrantedTime()) {
                 break;
             }
             timeCoord->processTimeMessage(cmd);
             newMode = true;
-            proc=message_processing_result::next_step;
+            proc = message_processing_result::next_step;
             break;
         }
-        
+
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -249,26 +250,25 @@ std::tuple<federate_state, message_processing_result, bool>
                     if (cmd.action() != CMD_GLOBAL_ERROR) {
                         timeCoord->localError();
                     }
-                    newState=HELICS_ERROR;
-                    proc=message_processing_result::error;
+                    newState = HELICS_ERROR;
+                    proc = message_processing_result::error;
                 }
             } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
                         returnable = true;
-                        proc=message_processing_result::delay_message;
+                        proc = message_processing_result::delay_message;
                         break;
                     case message_process_result::no_effect:
                         returnable = true;
-                        proc=message_processing_result::continue_processing;
+                        proc = message_processing_result::continue_processing;
                     default:
                         break;
                 }
                 if (state != HELICS_EXECUTING) {
                     break;
                 }
-                if (returnable)
-                {
+                if (returnable) {
                     break;
                 }
                 if (!timeGranted_mode) {
@@ -290,7 +290,6 @@ std::tuple<federate_state, message_processing_result, bool>
             }
 
             break;
-
     }
     return {newState, proc, newMode};
 }

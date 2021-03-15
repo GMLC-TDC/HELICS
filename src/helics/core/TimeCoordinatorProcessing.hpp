@@ -7,10 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "TimeCoordinator.hpp"
+
 #include <tuple>
 
-namespace helics
-{
+namespace helics {
 std::tuple<federate_state, message_processing_result, bool>
     processCoordinatorMessage(ActionMessage& cmd,
                               TimeCoordinator* timeCoord,

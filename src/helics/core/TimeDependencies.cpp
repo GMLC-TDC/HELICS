@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "json/json.h"
 #include <algorithm>
-#include <string>
 #include <cassert>
+#include <string>
 
 namespace helics {
 static bool ProcessMessage(const ActionMessage& m, DependencyInfo& dep)
@@ -133,8 +133,7 @@ static const std::string& timeStateString(time_state_t state)
     static const std::string timeReqIterative{"time requested iterative"};
     static const std::string disconnected{"disconnected"};
     static const std::string other{"other"};
-    switch (state)
-    {
+    switch (state) {
         case time_state_t::initialized:
             return init;
         case time_state_t::time_granted:
@@ -152,24 +151,22 @@ static const std::string& timeStateString(time_state_t state)
     }
 }
 
-void generateJsonOutputTimeData(Json::Value & output, const TimeData& dep, bool includeAggregates)
-    {
+void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool includeAggregates)
+{
     output["next"] = static_cast<double>(dep.next);
     output["te"] = static_cast<double>(dep.Te);
     output["minde"] = static_cast<double>(dep.minDe);
     output["minfed"] = dep.minFed.baseValue();
     output["state"] = timeStateString(dep.time_state);
-    if (includeAggregates)
-    {
+    if (includeAggregates) {
         output["minfedActual"] = dep.minFedActual.baseValue();
     }
-    
 }
 
 void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep)
 {
     output["id"] = dep.fedID.baseValue();
-    generateJsonOutputTimeData(output, dep,false);
+    generateJsonOutputTimeData(output, dep, false);
     switch (dep.connection) {
         case ConnectionType::child:
             output["connection"] = "child";
@@ -354,15 +351,13 @@ int TimeDependencies::activeDependencyCount() const
     });
 }
 /** get a count of the active dependencies*/
-global_federate_id TimeDependencies::getMinDependency() const {
+global_federate_id TimeDependencies::getMinDependency() const
+{
     global_federate_id minID;
     Time minTime(Time::maxVal());
-    for (auto dep : dependencies)
-    {
-        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal()))
-        {
-            if (dep.next < minTime)
-            {
+    for (auto dep : dependencies) {
+        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal())) {
+            if (dep.next < minTime) {
                 minTime = dep.next;
                 minID = dep.fedID;
             }
@@ -449,23 +444,23 @@ static void generateMinTimeImplementation(TimeData& mTime,
         return;
     }
     if (dep.connection != ConnectionType::self) {
-    if (dep.minDe >= dep.next) {
-        if (dep.minDe < mTime.minDe) {
-            mTime.minDe = dep.minDe;
-            mTime.minFed = dep.fedID;
-            if (dep.minFed.isValid()) {
-                mTime.minFedActual = dep.minFed;
-            } else {
+        if (dep.minDe >= dep.next) {
+            if (dep.minDe < mTime.minDe) {
+                mTime.minDe = dep.minDe;
                 mTime.minFed = dep.fedID;
+                if (dep.minFed.isValid()) {
+                    mTime.minFedActual = dep.minFed;
+                } else {
+                    mTime.minFed = dep.fedID;
+                }
+            } else if (dep.minDe == mTime.minDe) {
+                mTime.minFedActual = global_federate_id();
             }
-        } else if (dep.minDe == mTime.minDe) {
-            mTime.minFedActual = global_federate_id();
+        } else {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            mTime.minDe = -1;
         }
-    } else {
-        // this minimum dependent event time received was invalid and can't be trusted
-        // therefore it can't be used to determine a time grant
-        mTime.minDe = -1;
-    }
     }
     if (dep.next < mTime.next) {
         mTime.next = dep.next;
@@ -476,19 +471,17 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.time_state = dep.time_state;
         }
     }
-    if (dep.connection != ConnectionType::self)
-    {
+    if (dep.connection != ConnectionType::self) {
         if (dep.Te < mTime.Te) {
             mTime.Te = dep.Te;
         }
     }
-    
 }
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
-                                       bool restricted,
-                                       global_federate_id self,
-                                       global_federate_id ignore)
+                                 bool restricted,
+                                 global_federate_id self,
+                                 global_federate_id ignore)
 {
     TimeData mTime(Time::maxVal());
     for (auto& dep : dependencies) {
@@ -506,8 +499,8 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
     }
-   
-    if (!restricted ) {
+
+    if (!restricted) {
         if (mTime.minDe > mTime.next) {
             mTime.next = mTime.minDe;
         }
@@ -517,9 +510,9 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
 }
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
-                                         bool restricted,
-                                         global_federate_id self,
-                                         global_federate_id ignore)
+                                   bool restricted,
+                                   global_federate_id self,
+                                   global_federate_id ignore)
 {
     TimeData mTime(Time::maxVal());
     for (auto& dep : dependencies) {
@@ -532,13 +525,13 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep,ignore);
+        generateMinTimeImplementation(mTime, dep, ignore);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
     }
 
-    if (!restricted ) {
+    if (!restricted) {
         if (mTime.minDe > mTime.next) {
             mTime.next = mTime.minDe;
         }
@@ -548,9 +541,9 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
 }
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
-                                    bool restricted,
-                                    global_federate_id self,
-                                    global_federate_id ignore)
+                              bool restricted,
+                              global_federate_id self,
+                              global_federate_id ignore)
 {
     TimeData mTime(Time::maxVal());
     for (auto& dep : dependencies) {
@@ -568,7 +561,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
         mTime.minDe = mTime.Te;
     }
 
-    if (!restricted ) {
+    if (!restricted) {
         if (mTime.minDe > mTime.next) {
             mTime.next = mTime.minDe;
         }

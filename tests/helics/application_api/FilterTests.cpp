@@ -671,7 +671,7 @@ TEST_F(filter_tests, reroute_separate)
         send->finalize();
     };
     int cntb{0};
-    auto act2 = [&rec,&cntb]() {
+    auto act2 = [&rec, &cntb]() {
         rec->enterExecutingMode();
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {

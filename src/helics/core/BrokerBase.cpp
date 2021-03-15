@@ -480,10 +480,11 @@ void BrokerBase::setLogLevels(int32_t consoleLevel, int32_t fileLevel)
 
 void BrokerBase::addActionMessage(const ActionMessage& m)
 {
-   // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194)) {
-     ///   if (m.action() == CMD_TIME_REQUEST && m.actionTime>timeZero) {
-     //       printf("adding action message\n");
-      //  }
+    // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194))
+    // {
+    ///   if (m.action() == CMD_TIME_REQUEST && m.actionTime>timeZero) {
+    //       printf("adding action message\n");
+    //  }
     //}
     if (isPriorityCommand(m)) {
         actionQueue.pushPriority(m);
@@ -495,7 +496,8 @@ void BrokerBase::addActionMessage(const ActionMessage& m)
 
 void BrokerBase::addActionMessage(ActionMessage&& m)
 {
-    //if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194)) {
+    // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194))
+    // {
     //    if (m.action() == CMD_TIME_REQUEST && m.actionTime > timeZero) {
     //        printf("adding action message 2\n");
     //    }

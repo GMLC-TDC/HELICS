@@ -94,7 +94,7 @@ TEST(ftc_tests, dependent_tests)
     EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
-    
+
     ftc.removeDependent(fed2);
     deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 1U);
@@ -225,7 +225,6 @@ TEST(ftc_tests, timing_test1)
     EXPECT_TRUE(lastMessage.action() == CMD_TIME_REQUEST);
 }
 
-
 TEST(ftc_tests, timing_test2)
 {
     ForwardingTimeCoordinator ftc;
@@ -234,5 +233,4 @@ TEST(ftc_tests, timing_test2)
     ftc.addDependency(fed2);
     ftc.addDependency(fed3);
     getFTCtoExecMode(ftc);
-
 }

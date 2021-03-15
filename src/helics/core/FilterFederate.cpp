@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "BasicHandleInfo.hpp"
 #include "HandleManager.hpp"
+#include "TimeCoordinatorProcessing.hpp"
 #include "coreTypeOperations.hpp"
 #include "flagOperations.hpp"
-#include "helics_definitions.hpp"
-#include "TimeCoordinatorProcessing.hpp"
 #include "helicsVersion.hpp"
+#include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
 
 namespace helics {
@@ -31,16 +31,15 @@ FilterFederate::FilterFederate(global_federate_id fedID,
 
 FilterFederate::~FilterFederate()
 {
-
-    mHandles={nullptr};
-    current_state={HELICS_CREATED};
+    mHandles = {nullptr};
+    current_state = {HELICS_CREATED};
     /// map of all local filters
     filterCoord.clear();
     // The interface_handle used is here is usually referencing an endpoint
 
     mQueueMessage = nullptr;
     mQueueMessageMove = nullptr;
-     mSendMessage = nullptr;
+    mSendMessage = nullptr;
     mSendMessageMove = nullptr;
 
     mDeliverMessage = nullptr;
@@ -383,7 +382,7 @@ void FilterFederate::destinationProcessMessage(ActionMessage& command,
                     command.source_handle = handle->getInterfaceHandle();
                     command.dest_id = ffunc->destFilter->core_id;
                     command.dest_handle = ffunc->destFilter->handle;
-                    
+
                     mSendMessageMove(std::move(command));
                     return;
                 }
@@ -439,11 +438,9 @@ void FilterFederate::destinationProcessMessage(ActionMessage& command,
 
 void FilterFederate::handleMessage(ActionMessage& command)
 {
-    auto proc_result = processCoordinatorMessage(
-        command, &mCoord, current_state, false, mFedID);
+    auto proc_result = processCoordinatorMessage(command, &mCoord, current_state, false, mFedID);
 
-    if (std::get<2>(proc_result)&& current_state==HELICS_EXECUTING)
-    {
+    if (std::get<2>(proc_result) && current_state == HELICS_EXECUTING) {
         mCoord.disconnect();
         ActionMessage disconnect(CMD_DISCONNECT);
         disconnect.source_id = mFedID;
@@ -463,12 +460,14 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 }
                 break;
             case HELICS_EXECUTING:
-                mCoord.timeRequest(Time::maxVal(), iteration_request::no_iterations, Time::maxVal(), Time::maxVal());
+                mCoord.timeRequest(Time::maxVal(),
+                                   iteration_request::no_iterations,
+                                   Time::maxVal(),
+                                   Time::maxVal());
                 break;
             case HELICS_FINISHED:
                 break;
-            case HELICS_ERROR:
-            {
+            case HELICS_ERROR: {
                 std::string errorString;
                 if (command.payload.empty()) {
                     errorString = commandErrorString(command.messageID);
@@ -478,10 +477,8 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 } else {
                     errorString = command.payload;
                 }
-                if (mLogger)
-                    mLogger(helics_log_level_error,mName,errorString);
-                }
-                break;
+                if (mLogger) mLogger(helics_log_level_error, mName, errorString);
+            } break;
             default:
                 break;
         }
@@ -506,7 +503,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
             auto* filt = filters.find(command.getSource());
             if (filt != nullptr) {
                 ActionMessage rem(CMD_REMOVE_FILTER);
-                rem.source_handle=filt->handle;
+                rem.source_handle = filt->handle;
                 rem.source_id = filt->core_id;
                 for (auto& target : filt->sourceTargets) {
                     rem.setDestination(target);
@@ -523,8 +520,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 filt->destTargets.clear();
                 setActionFlag(*filt, disconnected_flag);
             }
-            }
-            break;
+        } break;
         case CMD_REMOVE_FILTER: {
             auto* filterC = getFilterCoordinator(command.dest_handle);
             if (filterC == nullptr) {
@@ -571,19 +567,15 @@ void FilterFederate::handleMessage(ActionMessage& command)
             }
         } break;
         case CMD_CORE_CONFIGURE:
-            if (command.messageID == UPDATE_FILTER_OPERATOR)
-            {
-                auto* filtI =
-                    getFilterInfo(mFedID, command.source_handle);
-                if (filtI != nullptr)
-                {
+            if (command.messageID == UPDATE_FILTER_OPERATOR) {
+                auto* filtI = getFilterInfo(mFedID, command.source_handle);
+                if (filtI != nullptr) {
                     auto op = mGetAirLock(command.counter).try_unload();
                     if (op) {
                         auto M = stx::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
                         filtI->filterOp = std::move(M);
                     }
                 }
-                
             }
             break;
         default:
@@ -598,24 +590,30 @@ FilterInfo* FilterFederate::createFilter(global_broker_id dest,
                                          const std::string& type_out,
                                          bool cloning)
 {
-    auto filt = std::make_unique<FilterInfo>(
-        (dest == parent_broker_id||dest==mCoreID) ? global_broker_id(mFedID) : dest, handle, key, type_in, type_out, false);
+    auto filt = std::make_unique<FilterInfo>((dest == parent_broker_id || dest == mCoreID) ?
+                                                 global_broker_id(mFedID) :
+                                                 dest,
+                                             handle,
+                                             key,
+                                             type_in,
+                                             type_out,
+                                             false);
 
     auto cid = filt->core_id;
     auto* retTarget = filt.get();
-    //auto actualKey = key;
+    // auto actualKey = key;
     retTarget->cloning = cloning;
-   // if (actualKey.empty()) {
-       // actualKey = "sFilter_";
-       // actualKey.append(std::to_string(handle.baseValue()));
-   // }
+    // if (actualKey.empty()) {
+    // actualKey = "sFilter_";
+    // actualKey.append(std::to_string(handle.baseValue()));
+    // }
 
-    //if (filt->core_id == mFedID) {
-        filters.insert({cid, handle}, std::move(filt));
+    // if (filt->core_id == mFedID) {
+    filters.insert({cid, handle}, std::move(filt));
     //} else {
-       // actualKey.push_back('_');
-      //  actualKey.append(std::to_string(cid.baseValue()));
-   //    filters.insert({cid, handle}, std::move(filt));
+    // actualKey.push_back('_');
+    //  actualKey.append(std::to_string(cid.baseValue()));
+    //    filters.insert({cid, handle}, std::move(filt));
     //}
 
     return retTarget;
@@ -636,16 +634,15 @@ FilterCoordinator* FilterFederate::getFilterCoordinator(interface_handle handle)
 
 FilterInfo* FilterFederate::getFilterInfo(global_handle id)
 {
-        return filters.find(id);
+    return filters.find(id);
 }
 
 FilterInfo* FilterFederate::getFilterInfo(global_federate_id fed, interface_handle handle)
 {
-    if (fed == parent_broker_id || fed == mCoreID)
-    {
+    if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;
     }
-        return filters.find(global_handle{fed, handle});
+    return filters.find(global_handle{fed, handle});
 }
 
 void FilterFederate::processFilterInfo(ActionMessage& command)
@@ -864,7 +861,6 @@ void FilterFederate::addFilteredEndpoint(Json::Value& block, global_federate_id 
     }
 }
 
-
 std::string FilterFederate::query(const std::string& queryStr) const
 {
     if (queryStr == "exists") {
@@ -881,11 +877,10 @@ std::string FilterFederate::query(const std::string& queryStr) const
     }
 
     if (queryStr == "publications" || queryStr == "inputs" || queryStr == "filtered_endpoints" ||
-        queryStr == "endpoints" || queryStr == "subscriptions")
-        {
+        queryStr == "endpoints" || queryStr == "subscriptions") {
         return "[]";
     }
-    
+
     if (queryStr == "interfaces") {
         return "[]";
     }
@@ -989,7 +984,7 @@ std::string FilterFederate::query(const std::string& queryStr) const
         }
         return generateJsonString(base);
     }
-    
+
     return "#invalid";
 }
 
