@@ -30,9 +30,9 @@ void ForwardingTimeCoordinator::enteringExecMode()
     transmitTimingMessagesUpstream(execreq);
     transmitTimingMessagesDownstream(execreq);
     bool fedOnly = true;
-   noParent = true;
+    noParent = true;
     for (const auto& dep : dependencies) {
-        if (dep.connection==ConnectionType::parent) {
+        if (dep.connection == ConnectionType::parent) {
             fedOnly = false;
             noParent = false;
             break;
@@ -123,21 +123,18 @@ void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id);
     auto mTimeDownstream = (noParent) ?
-        mTimeUpstream:generateMinTimeDownstream(dependencies, restrictive_time_policy, source_id);
-
+        mTimeUpstream :
+        generateMinTimeDownstream(dependencies, restrictive_time_policy, source_id);
 
     bool updateUpstream = upstream.update(mTimeUpstream);
 
     bool updateDownstream = downstream.update(mTimeDownstream);
 
-   
     if (!restrictive_time_policy && upstream.minDe < Time::maxVal()) {
         if (downstream.minDe > downstream.next) {
-       //     downstream.next = downstream.minminDe;
+            //     downstream.next = downstream.minminDe;
         }
     }
-
-    
 
     if (updateUpstream) {
         auto upd = generateTimeRequest(upstream, global_federate_id{});
@@ -147,7 +144,6 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         auto upd = generateTimeRequest(downstream, global_federate_id{});
         transmitTimingMessagesDownstream(upd);
     }
-
 }
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
@@ -294,7 +290,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
     nTime.source_id = source_id;
     nTime.dest_id = fed;
     nTime.actionTime = dep.next;
-    
+
     if (dep.time_state == time_state_t::time_granted) {
         nTime.setAction(CMD_TIME_GRANT);
     } else if (dep.time_state == time_state_t::time_requested) {
@@ -310,7 +306,6 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
     return nTime;
 }
 
-
 void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) const
 {
     if (sendMessageFunction) {
@@ -318,8 +313,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
             if (dep.connection == ConnectionType::child) {
                 continue;
             }
-            if (!dep.dependent)
-            {
+            if (!dep.dependent) {
                 continue;
             }
             msg.dest_id = dep.fedID;
@@ -333,14 +327,13 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
     if (sendMessageFunction) {
         if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
             for (auto dep : dependencies) {
-                if (dep.connection != ConnectionType::child)
-                {
+                if (dep.connection != ConnectionType::child) {
                     continue;
                 }
                 if (!dep.dependent) {
                     continue;
                 }
-                
+
                 if (dep.dependency) {
                     if (dep.next > msg.actionTime) {
                         continue;

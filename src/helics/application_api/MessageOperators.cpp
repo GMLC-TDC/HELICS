@@ -63,8 +63,7 @@ void MessageDestOperator::setDestFunction(
 std::unique_ptr<Message> MessageDestOperator::process(std::unique_ptr<Message> message)
 {
     if (DestUpdateFunction) {
-        if (message->original_dest.empty())
-        {
+        if (message->original_dest.empty()) {
             message->original_dest = message->dest;
         }
         message->dest = DestUpdateFunction(message->source, message->dest);

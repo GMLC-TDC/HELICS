@@ -7,72 +7,66 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "basic_core_types.hpp"
+
 #include "json/forwards.h"
 #include <vector>
 
 namespace helics {
 class ActionMessage;
 
-    /**enumeration of possible states for a federate to be in regards to time request*/
-    enum class time_state_t : uint8_t {
-        initialized = 0,
-        exec_requested_iterative = 1,
-        exec_requested = 2,
-        time_granted = 3,
-        time_requested_iterative = 4,
-        time_requested = 5,
-        error = 7
-    };
+/**enumeration of possible states for a federate to be in regards to time request*/
+enum class time_state_t : uint8_t {
+    initialized = 0,
+    exec_requested_iterative = 1,
+    exec_requested = 2,
+    time_granted = 3,
+    time_requested_iterative = 4,
+    time_requested = 5,
+    error = 7
+};
 
-     enum class ConnectionType : uint8_t {
-        independent = 0,
-        parent = 1,
-        child = 2,
-        self = 3,
-        none = 4,
-    };
-     // helper class containing the basic timeData
-     class TimeData
-     {
-       public:
-         Time next{negEpsilon};  //!< next possible message or value
-         Time Te{timeZero};  //!< the next currently scheduled event
-         Time minDe{timeZero};  //!< min dependency event time
-         global_federate_id minFed{};  //!< identifier for the min dependency
-         global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
-         time_state_t time_state{time_state_t::initialized};
+enum class ConnectionType : uint8_t {
+    independent = 0,
+    parent = 1,
+    child = 2,
+    self = 3,
+    none = 4,
+};
+// helper class containing the basic timeData
+class TimeData {
+  public:
+    Time next{negEpsilon};  //!< next possible message or value
+    Time Te{timeZero};  //!< the next currently scheduled event
+    Time minDe{timeZero};  //!< min dependency event time
+    global_federate_id minFed{};  //!< identifier for the min dependency
+    global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
+    time_state_t time_state{time_state_t::initialized};
 
-         TimeData() = default;
-         explicit TimeData(Time start):
-             next{start}, Te{start}, minDe{start} {};
-         /** check if there is an update to the current dependency info and assign*/
-         bool update(const TimeData& update);
-     };
+    TimeData() = default;
+    explicit TimeData(Time start): next{start}, Te{start}, minDe{start} {};
+    /** check if there is an update to the current dependency info and assign*/
+    bool update(const TimeData& update);
+};
 
 /** data class containing information about inter-federate dependencies*/
-class DependencyInfo:public TimeData {
+class DependencyInfo: public TimeData {
   public:
-   
     global_federate_id fedID{};  //!< identifier for the dependency
 
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
     ConnectionType connection{ConnectionType::independent};
-    bool dependent{false}; //!< indicator the dependency is a dependent object
-    bool dependency{false}; //!< indicator that the dependency is an actual dependency
-    bool forwarding{false}; //!< indicator that the dependency is a forwarding time coordinator
+    bool dependent{false};  //!< indicator the dependency is a dependent object
+    bool dependency{false};  //!< indicator that the dependency is an actual dependency
+    bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
 
-    //Time forwardEvent{Time::maxVal()};  //!< a predicted event
+    // Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
     /** construct from a federate id*/
-    explicit DependencyInfo(global_federate_id id): fedID(id), forwarding{id.isBroker()}
-    {
-    }
+    explicit DependencyInfo(global_federate_id id): fedID(id), forwarding{id.isBroker()} {}
 
     explicit DependencyInfo(Time start): TimeData(start) {}
-    
-
 };
 
 /** class for managing a set of dependencies*/
@@ -147,27 +141,27 @@ class TimeDependencies {
     /** get a count of the active dependencies*/
     global_federate_id getMinDependency() const;
 
-    void setDependencyVector(const std::vector<DependencyInfo> &deps) { dependencies = deps; }
+    void setDependencyVector(const std::vector<DependencyInfo>& deps) { dependencies = deps; }
 };
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
-                                       bool restricted,
-                                       global_federate_id self,
-                                       global_federate_id ignore = global_federate_id());
+                                 bool restricted,
+                                 global_federate_id self,
+                                 global_federate_id ignore = global_federate_id());
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
-                                     bool restricted,
-                                     global_federate_id self,
-                                     global_federate_id ignore = global_federate_id());
+                                   bool restricted,
+                                   global_federate_id self,
+                                   global_federate_id ignore = global_federate_id());
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
-                                     bool restricted,
-                                     global_federate_id self,
-                                     global_federate_id ignore = global_federate_id());
+                              bool restricted,
+                              global_federate_id self,
+                              global_federate_id ignore = global_federate_id());
 
 void generateJsonOutputTimeData(Json::Value& output,
-                                 const TimeData& dep,
-                                 bool includeAggregates = true);
+                                const TimeData& dep,
+                                bool includeAggregates = true);
 
 void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep);
 }  // namespace helics

@@ -12,10 +12,10 @@ namespace helics {
 /** a shift in the global federate id numbers to allow discrimination between local ids and global
    ones this value allows 131072 federates to be available in each core 1,878,917,120 allowable
    federates in the system and 268,435,455 brokers allowed  if we need more than that this, HELICS
-   as a program has been phenomenally successful beyond all wildest imaginations and we can probably afford to
-   change these to 64 bit numbers to accommodate.  Of the available federates there is 1 federate
-   number that can be defined per core for various purposes.  These are the upper number of federate id's
-   so 268,435,455 reserved federate id's.  An ID of 1 is reserved for the root broker
+   as a program has been phenomenally successful beyond all wildest imaginations and we can probably
+   afford to change these to 64 bit numbers to accommodate.  Of the available federates there is 1
+   federate number that can be defined per core for various purposes.  These are the upper number of
+   federate id's so 268,435,455 reserved federate id's.  An ID of 1 is reserved for the root broker
    */
 constexpr identififier_base_type global_federate_id_shift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
@@ -43,7 +43,7 @@ class global_broker_id {
     {
         return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift));
     }
-    bool isBroker() const { return (gid >= global_broker_id_shift || gid==1); }
+    bool isBroker() const { return (gid >= global_broker_id_shift || gid == 1); }
     bool isValid() const
     {
         return (gid != invalid_global_broker_id && gid != detail::invalid_interface_handle);
@@ -103,9 +103,12 @@ class global_federate_id {
         return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift));
     }
     /** return true if the broker_id is a valid broker id code*/
-    bool isBroker() const { return (gid >= global_broker_id_shift||gid==1); }
+    bool isBroker() const { return (gid >= global_broker_id_shift || gid == 1); }
     /** return true if the broker_id is a valid broker id code*/
-    bool isValid() const { return (gid != invalid_global_fed_id && gid!=detail::invalid_interface_handle); }
+    bool isValid() const
+    {
+        return (gid != invalid_global_fed_id && gid != detail::invalid_interface_handle);
+    }
     /** generate a local offset index
         @details the global_id is shifted by a certain amount*/
     constexpr base_type localIndex() const { return gid - global_federate_id_shift; }

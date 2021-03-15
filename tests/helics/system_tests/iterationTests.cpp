@@ -398,7 +398,7 @@ TEST_F(iteration_tests, iteration_counter)
         EXPECT_EQ(sub2.getValue<int64_t>(), c2);
         ++c1;
         ++c2;
-        
+
         if (c1 <= 10) {
             pub1.publish(c1);
             pub2.publish(c2);
@@ -415,7 +415,6 @@ TEST_F(iteration_tests, iteration_counter)
             res = vFed2->requestTimeIterativeComplete();
         }
 
-        
         if (c1 <= 10) {
             EXPECT_TRUE(res.state == helics::iteration_result::iterating);
             EXPECT_EQ(res.grantedTime, 0.0);

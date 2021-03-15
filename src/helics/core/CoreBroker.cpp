@@ -299,7 +299,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                                                  static_cast<size_t>(
                                                      _federates.back().global_id.baseValue()) -
                                                      global_federate_id_shift);
-                }
+            }
             if (!isRootc) {
                 if (global_broker_id_local.isValid()) {
                     command.source_id = global_broker_id_local;
@@ -309,7 +309,6 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     delayTransmitQueue.push(command);
                 }
             } else {
-                
                 auto route_id = _federates.back().route;
                 auto global_fedid = _federates.back().global_id;
 
@@ -320,8 +319,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 fedReply.source_id = global_broker_id_local;
                 fedReply.dest_id = global_fedid;
                 fedReply.name = command.name;
-                if (checkActionFlag(command, child_flag))
-                {
+                if (checkActionFlag(command, child_flag)) {
                     setActionFlag(fedReply, child_flag);
                 }
                 transmit(route_id, fedReply);
@@ -494,10 +492,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_FED_ACK: {  // we can't be root if we got one of these
             auto fed = _federates.find(command.name);
             if (fed != _federates.end()) {
-                
                 auto route = fed->route;
-                if (!fed->global_id.isValid())
-                {
+                if (!fed->global_id.isValid()) {
                     fed->global_id = command.dest_id;
                     _federates.addSearchTerm(command.dest_id, fed->name);
                 }

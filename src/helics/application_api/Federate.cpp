@@ -606,8 +606,7 @@ void Federate::globalError(int errorcode, const std::string& message)
 
 Time Federate::requestTime(Time nextInternalTimeStep)
 {
-    switch (currentMode)
-    {
+    switch (currentMode) {
         case modes::executing:
             try {
                 auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
@@ -660,7 +659,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
         }
         return iterativeTime;
     }
-    if (currentMode == modes::finalize || currentMode==modes::finished) {
+    if (currentMode == modes::finalize || currentMode == modes::finished) {
         return {Time::maxVal(), iteration_result::halted};
     }
     throw(InvalidFunctionCall("cannot call request time in present state"));

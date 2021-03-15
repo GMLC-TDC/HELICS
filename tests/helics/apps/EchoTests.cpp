@@ -60,7 +60,7 @@ TEST(echo_tests, echo_test_delay)
     mfed.requestTime(1.0);
     EXPECT_FALSE(ep1.hasMessage());
     auto ntime = mfed.requestTime(2.0);
-    EXPECT_EQ(ntime, helics::Time::epsilon()+1.2);
+    EXPECT_EQ(ntime, helics::Time::epsilon() + 1.2);
     EXPECT_TRUE(ep1.hasMessage());
     auto m = ep1.getMessage();
     ASSERT_TRUE(m);
@@ -123,7 +123,7 @@ TEST(echo_tests, echo_test_multiendpoint)
     EXPECT_TRUE(!ep1.hasMessage());
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto ntime = mfed.requestTime(2.0);
-    EXPECT_EQ(ntime, helics::Time::epsilon()+1.2);
+    EXPECT_EQ(ntime, helics::Time::epsilon() + 1.2);
     EXPECT_TRUE(ep1.hasMessage());
     auto m = ep1.getMessage();
     ASSERT_TRUE(m);

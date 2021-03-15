@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
-#include "json/forwards.h"
 
+#include "json/forwards.h"
 #include <atomic>
 #include <functional>
 #include <string>
@@ -25,31 +25,27 @@ mode
 */
 class ForwardingTimeCoordinator {
   private:
-
     // the variables for time coordination
     DependencyInfo upstream;
     DependencyInfo downstream;
-    
+
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     /// callback used to send the messages
-    std::function<void(const ActionMessage&)> sendMessageFunction;  
+    std::function<void(const ActionMessage&)> sendMessageFunction;
 
   public:
     /// the identifier for inserting into the source id field of any generated messages;
-    global_federate_id source_id{
-        0};
+    global_federate_id source_id{0};
     /// flag indicating that the coordinator is trying to enter the exec mode
-    bool checkingExec{
-        false};  
+    bool checkingExec{false};
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
     /// flag indicating that a restrictive time policy should be used
-    bool restrictive_time_policy{
-        false};
-    bool noParent{false};//!< indicator that the coordinator does not have parents
+    bool restrictive_time_policy{false};
+    bool noParent{false};  //!< indicator that the coordinator does not have parents
   private:
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
@@ -78,10 +74,8 @@ class ForwardingTimeCoordinator {
     /** check whether a federate is a dependency*/
     bool isDependency(global_federate_id ofed) const;
     /** check whether a timeCoordinator has any dependencies or dependents*/
-    bool empty() const
-    {
-        return dependencies.empty();
-    }
+    bool empty() const { return dependencies.empty(); }
+
   private:
     void transmitTimingMessagesUpstream(ActionMessage& msg) const;
     void transmitTimingMessagesDownstream(ActionMessage& msg) const;

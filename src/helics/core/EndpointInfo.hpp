@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "basic_core_types.hpp"
 
+#include <atomic>
 #include <deque>
 #include <memory>
 #include <string>
-#include <atomic>
 
 namespace helics {
 /** data class containing the information about an endpoint*/
@@ -30,7 +30,7 @@ class EndpointInfo {
   private:
     shared_guarded<std::deque<std::unique_ptr<Message>>>
         message_queue;  //!< storage for the messages
-    std::atomic<int32_t> mAvailableMessages{0}; //!<indicator of how many message are available
+    std::atomic<int32_t> mAvailableMessages{0};  //!< indicator of how many message are available
 
   public:
     bool hasFilter = false;  //!< indicator that the message has a filter

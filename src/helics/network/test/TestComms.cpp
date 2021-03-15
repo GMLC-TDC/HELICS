@@ -16,9 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <map>
 #include <memory>
+#include <queue>
 #include <string>
 #include <utility>
-#include <queue>
 
 namespace helics {
 namespace testcore {
@@ -53,7 +53,7 @@ namespace testcore {
         using std::chrono::milliseconds;
         bool bufferData{false};
         int32_t allowedSend{0};
-        std::queue<std::pair<route_id,ActionMessage>> buffer;
+        std::queue<std::pair<route_id, ActionMessage>> buffer;
         // make sure the link to the localTargetAddress is in place
         if (name != localTargetAddress) {
             if (!brokerName.empty()) {
@@ -152,19 +152,16 @@ namespace testcore {
         while (!haltLoop) {
             route_id rid;
             ActionMessage cmd;
-            if (!buffer.empty() && (!bufferData || allowedSend > 0))
-            {
-                auto & pr = buffer.front();
+            if (!buffer.empty() && (!bufferData || allowedSend > 0)) {
+                auto& pr = buffer.front();
                 rid = pr.first;
                 cmd = std::move(pr.second);
                 buffer.pop();
                 --allowedSend;
-            }
-            else
-            {
+            } else {
                 std::tie(rid, cmd) = txQueue.pop();
             }
-            
+
             bool processed = false;
             if (isProtocolCommand(cmd)) {
                 if (rid == control_route) {
@@ -225,15 +222,11 @@ namespace testcore {
             if (processed) {
                 continue;
             }
-            if (bufferData)
-            {
-                if (allowedSend == 0)
-                {
-                    buffer.emplace(rid,std::move(cmd));
+            if (bufferData) {
+                if (allowedSend == 0) {
+                    buffer.emplace(rid, std::move(cmd));
                     continue;
-                }
-                else
-                {
+                } else {
                     --allowedSend;
                 }
             }

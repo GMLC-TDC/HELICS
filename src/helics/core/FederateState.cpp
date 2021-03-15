@@ -13,11 +13,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeCoordinator.hpp"
+#include "TimeCoordinatorProcessing.hpp"
 #include "TimeDependencies.hpp"
 #include "helics/helics-config.h"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
-#include "TimeCoordinatorProcessing.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -470,21 +470,21 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
             time_granted = initializationTime;
             allowed_send_time = initializationTime;
         }
-            switch (iterate) {
-                case iteration_request::force_iteration:
-                    fillEventVectorNextIteration(time_granted);
-                    break;
-                case iteration_request::iterate_if_needed:
-                    if (ret == message_processing_result::next_step) {
-                        fillEventVectorUpTo(time_granted);
-                    } else {
-                        fillEventVectorNextIteration(time_granted);
-                    }
-                    break;
-                case iteration_request::no_iterations:
+        switch (iterate) {
+            case iteration_request::force_iteration:
+                fillEventVectorNextIteration(time_granted);
+                break;
+            case iteration_request::iterate_if_needed:
+                if (ret == message_processing_result::next_step) {
                     fillEventVectorUpTo(time_granted);
-                    break;
-            }
+                } else {
+                    fillEventVectorNextIteration(time_granted);
+                }
+                break;
+            case iteration_request::no_iterations:
+                fillEventVectorUpTo(time_granted);
+                break;
+        }
 
         unlock();
 #ifndef HELICS_DISABLE_ASIO
@@ -585,7 +585,6 @@ iteration_time
             time_granted = timeCoord->getGrantedTime();
             allowed_send_time = timeCoord->allowedSendTime();
             iterating = (ret == message_processing_result::iterating);
-            
         }
 
         iteration_time retTime = {time_granted, static_cast<iteration_result>(ret)};

@@ -87,8 +87,8 @@ class BrokerBase {
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     // time coordinator for managing filters
-    //std::unique_ptr<TimeCoordinator> filterTimeCoord;
-    //global_federate_id filterFedID;
+    // std::unique_ptr<TimeCoordinator> filterTimeCoord;
+    // global_federate_id filterFedID;
     /** enumeration of the possible core states*/
     enum class broker_state_t : int16_t {
         created = -6,  //!< the broker has been created

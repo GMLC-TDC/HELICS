@@ -422,12 +422,10 @@ namespace apps {
                         ptime = loadJsonTime(str, units);
                     } else {
                         ptime = loadJsonTime(str.substr(0, cloc - 1), units);
-                        try
-                        {
+                        try {
                             iterationIndex = std::stoi(str.substr(cloc + 1));
                         }
-                        catch (const std::exception &)
-                        {
+                        catch (const std::exception&) {
                             iterationIndex = 0;
                         }
                     }
@@ -441,7 +439,7 @@ namespace apps {
                         try {
                             iterationIndex = std::stoi(str.substr(cloc + 1));
                         }
-                        catch (const std::exception& ) {
+                        catch (const std::exception&) {
                             iterationIndex = 0;
                         }
                     }
