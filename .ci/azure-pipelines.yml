@@ -17,6 +17,10 @@ jobs:
     pool:
       vmImage: $(imageName)
 
+    env:
+      BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
+      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download
+
     steps:
       # -----------------------
       # Install dependencies
@@ -24,6 +28,27 @@ jobs:
       - bash: choco install swig --yes --limit-output
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
         displayName: Install swig
+      - name: Restore Boost cache
+        uses: actions/cache@v2
+        id: cache-boost
+        with:
+          path: ${{env.BOOST_ROOT}}
+          key: boost
+
+      - name: Install Boost
+        if: steps.cache-boost.outputs.cache-hit != 'true'
+        run: |
+          if [ "$OS" == "Windows_NT" ]; then
+            # fix up paths to be forward slashes consistently
+            BOOST_ROOT=$(echo $BOOST_ROOT | sed 's/\\/\//g')
+          fi
+          mkdir -p $BOOST_ROOT
+          curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 $BOOST_URL
+          7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
+          7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
+          cd $BOOST_ROOT && cp -r boost_*/* .
+          rm -rf boost_*/* download.tar.bz2 download.tar
+        shell: bash
 
       - task: UsePythonVersion@0
         inputs:
@@ -38,7 +63,7 @@ jobs:
       # Configure HELICS
       # -----------------------
       - bash: |
-          echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT_1_72_0"
+          echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT"
       - task: CMake@1
         inputs:
           cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
