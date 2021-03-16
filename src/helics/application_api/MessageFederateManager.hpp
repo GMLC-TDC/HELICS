@@ -79,7 +79,7 @@ class MessageFederateManager {
     /** transition from Startup To the Initialize State*/
     void startupToInitializeStateTransition();
     /** transition from initialize to execution State*/
-    void initializeToExecuteStateTransition();
+    void initializeToExecuteStateTransition(iteration_result result);
     /** generate results for a local query */
     std::string localQuery(const std::string& queryStr) const;
 
@@ -114,7 +114,7 @@ class MessageFederateManager {
     class EndpointData {
       public:
         gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
-        std::function<void(Endpoint&, Time)> callback;
+        atomic_guarded<std::function<void(Endpoint&, Time)>> callback;
     };
     shared_guarded<
         gmlc::containers::

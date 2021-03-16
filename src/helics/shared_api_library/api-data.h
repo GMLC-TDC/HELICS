@@ -138,6 +138,7 @@ typedef enum {
     HELICS_STATE_PENDING_TIME, /*!< state that the federate is pending a timeRequest */
     HELICS_STATE_PENDING_ITERATIVE_TIME, /*!< state that the federate is pending an iterative time request */
     HELICS_STATE_PENDING_FINALIZE /*!< state that the federate is pending a finalize request */
+    helics_state_finished /*!< state that the federate is finished simulating but still connected */
 } HelicsFederateState;
 
 /**

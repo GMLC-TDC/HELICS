@@ -331,6 +331,11 @@ across different compilers*/
 #define PROTOCOL_PING 10
 #define PROTOCOL_PONG 11
 #define CLOSE_RECEIVER 23425215
+/// some definitions for test core debugging
+#define PAUSE_TRANSMITTER 453623
+#define ALLOW_MESSAGES 453624
+#define UNPAUSE_TRANSMITTER 453625
+// routing information
 #define NEW_ROUTE 233
 #define REMOVE_ROUTE 244
 #define CONNECTION_INFORMATION 299

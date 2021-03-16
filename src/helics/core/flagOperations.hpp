@@ -33,12 +33,20 @@ enum operation_flags : uint16_t {
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
-constexpr uint16_t slow_responding_flag =
-    extra_flag4;  // overload of extra_flag4 indicating a federate, core or broker is slow
-                  // responding
+/// overload of extra_flag4 indicating a federate, core or broker is slow responding
+constexpr uint16_t slow_responding_flag = extra_flag4;
 
-constexpr uint16_t cancel_flag =
-    extra_flag3;  //!< overload of extra_flag3 indicating an operation is canceled
+/// overload of extra_flag3 indicating an operation is canceled
+constexpr uint16_t cancel_flag = extra_flag3;
+
+/// overload of extra_flag3 indicating the message is from a parent object
+constexpr uint16_t parent_flag = extra_flag3;
+
+/// overload of extra_flag4 indicating a message is from a child object
+constexpr uint16_t child_flag = extra_flag4;
+
+/// overload of nameless_interface_flag indicating that a federate should not count in any totals
+constexpr uint16_t non_counting_flag = nameless_interface_flag;
 
 constexpr uint16_t targetted_flag =
     extra_flag2;  //!< overload of extra_flag2 indicating an endpoint is targeted

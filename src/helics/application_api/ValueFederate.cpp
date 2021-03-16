@@ -473,9 +473,9 @@ void ValueFederate::startupToInitializeStateTransition()
 {
     vfManager->startupToInitializeStateTransition();
 }
-void ValueFederate::initializeToExecuteStateTransition()
+void ValueFederate::initializeToExecuteStateTransition(iteration_result result)
 {
-    vfManager->initializeToExecuteStateTransition();
+    vfManager->initializeToExecuteStateTransition(result);
 }
 
 std::string ValueFederate::localQuery(const std::string& queryStr) const

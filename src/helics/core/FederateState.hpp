@@ -112,6 +112,7 @@ class FederateState {
     std::map<GlobalFederateId, std::deque<ActionMessage>>
         delayQueues;  //!< queue for delaying processing of messages for a time
     std::vector<InterfaceHandle> events;  //!< list of value events to process
+    std::vector<interface_handle> eventMessages;  //!< list of endpoints with messages to process
     std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
@@ -317,15 +318,19 @@ class FederateState {
     IterationResult enterInitializingMode();
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
-    returns either converged or nonconverged depending on whether an iteration is needed
+    @param sendRequest generates the local actionMessage inside the function leaving to false
+    assumes the caller generated the message returns either converged or nonconverged depending on
+    whether an iteration is needed
     */
-    IterationResult enterExecutingMode(IterationRequest iterate);
+    iteration_result enterExecutingMode(iteration_request iterate, bool sendRequest = false);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param iterate the type of iteration requested
+    @param sendRequest generates the local actionMessage inside the function leaving to false
+    assumes the caller generated the message
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time requestTime(Time nextTime, IterationRequest iterate);
+    iteration_time requestTime(Time nextTime, iteration_request iterate, bool sendRequest = false);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */
@@ -405,6 +410,4 @@ class FederateState {
     std::pair<std::string, std::string> waitCommand();
 };
 
-/** convert the state into a human readable string*/
-const std::string& fedStateString(FederateStates state);
 }  // namespace helics

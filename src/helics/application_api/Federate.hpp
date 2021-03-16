@@ -68,7 +68,9 @@ class HELICS_CXX_EXPORT Federate {
         /** state that the federate is pending an iterative time request */
         PENDING_ITERATIVE_TIME = 8,
         /** state that the federate is pending a finalize call */
-        PENDING_FINALIZE = 9
+        PENDING_FINALIZE = 9,
+/** the simulation has finished normally but everything is still connected */
+       FINISHED = 10
     };
 
   protected:
@@ -498,7 +500,7 @@ received
     virtual void startupToInitializeStateTransition();
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
-    virtual void initializeToExecuteStateTransition();
+    virtual void initializeToExecuteStateTransition(iteration_result iterate);
     /** function to handle any disconnect operations*/
     virtual void disconnectTransition();
     /** function to generate results for a local Query

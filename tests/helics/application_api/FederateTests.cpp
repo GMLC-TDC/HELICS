@@ -93,7 +93,7 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
     EXPECT_TRUE(!cptr->isConnected());
     res = Fed->requestTime(4.0);
     EXPECT_EQ(res, helics::Time::maxVal());
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::finished);
 }
 
 #ifdef ENABLE_ZMQ_CORE

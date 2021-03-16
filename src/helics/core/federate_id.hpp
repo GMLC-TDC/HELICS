@@ -52,6 +52,11 @@ std::ostream& operator<<(std::ostream& os, LocalFederateId fid);
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr LocalFederateId gLocalCoreId(-259);
 
+namespace detail {
+    /** constant numerical value for invalid handle identification*/
+    constexpr identififier_base_type invalid_interface_handle{-1'700'000'000};
+}  // namespace detail
+
 /** class defining a LocalFederateId
  @details  the intent of this class is to limit the operations available on a federate identifier
  to those that are actually required and make sense, and make it as low impact as possible.
@@ -76,7 +81,7 @@ class InterfaceHandle {
     bool isValid() const { return (hid != invalid_handle); }
 
   private:
-    static constexpr BaseType invalid_handle{-1'700'000'000};
+    static constexpr base_type invalid_handle{detail::invalid_interface_handle};
     BaseType hid{invalid_handle};  //!< the underlying index value
 };
 

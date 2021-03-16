@@ -117,9 +117,10 @@ TEST(clone_tests, simple_clone_test_message)
     auto& ept = mfed.registerGlobalEndpoint("ept1", "etype");
     auto& ept2 = mfed.registerGlobalEndpoint("ept3");
     mfed.registerEndpoint("e3");
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(4); });
     mfed.enterExecutingMode();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     auto retTime = mfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
     ept.sendTo("message", "ept3");
@@ -277,6 +278,8 @@ TEST(clone_tests, simple_clone_test_sub)
 
     EXPECT_EQ(p1.pointCount(), 3u);
     EXPECT_EQ(p1.publicationCount(), 2u);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // this depends on some processing occurring
     EXPECT_EQ(p1.accessUnderlyingFederate().getInputCount(), 2);
     p1.finalize();
     ghc::filesystem::remove("subtest.json");
