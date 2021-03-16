@@ -113,6 +113,7 @@ TEST(recorder_tests, recorder_test_message)
     mfed.enterExecutingMode();
 
     auto retTime = mfed.requestTime(1.0);
+
     e1.send("src1", "this is a test message");
     EXPECT_EQ(retTime, 1.0);
     retTime = mfed.requestTime(2.0);
@@ -663,7 +664,10 @@ TEST(recorder_tests, recorder_test_saveFile3)
 
     helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
 
-    auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
+    auto fut = std::async(std::launch::async, [&rec1]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        rec1.runTo(5.0);
+    });
     mfed2.enterExecutingModeAsync();
     mfed.enterExecutingMode();
     mfed2.enterExecutingModeComplete();

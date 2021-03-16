@@ -32,6 +32,10 @@ namespace testcore {
         /** user function in the test comms to force the communication to stop immediately for
          * testing purposes*/
         void haltComms();
+        /** pause the comms*/
+        void pauseComms(bool paused = true);
+        /** allow a specific number of messages to proceed*/
+        void allowMessages(int messageCount);
         /** return a dummy port number*/
         int getPort() const { return -1; }
 
