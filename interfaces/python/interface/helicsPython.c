@@ -20075,6 +20075,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_state_pending_time",SWIG_From_int((int)(helics_state_pending_time)));
   SWIG_Python_SetConstant(d, "helics_state_pending_iterative_time",SWIG_From_int((int)(helics_state_pending_iterative_time)));
   SWIG_Python_SetConstant(d, "helics_state_pending_finalize",SWIG_From_int((int)(helics_state_pending_finalize)));
+  SWIG_Python_SetConstant(d, "helics_state_finished",SWIG_From_int((int)(helics_state_finished)));
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else

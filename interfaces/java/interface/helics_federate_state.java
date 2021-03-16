@@ -52,6 +52,10 @@ public final class helics_federate_state {
    *  state that the federate is pending a finalize request 
    */
   public final static helics_federate_state helics_state_pending_finalize = new helics_federate_state("helics_state_pending_finalize");
+  /**
+   *  state that the federate is finished simulating but still connected 
+   */
+  public final static helics_federate_state helics_state_finished = new helics_federate_state("helics_state_finished");
 
   public final int swigValue() {
     return swigValue;
@@ -87,7 +91,7 @@ public final class helics_federate_state {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_federate_state[] swigValues = { helics_state_startup, helics_state_initialization, helics_state_execution, helics_state_finalize, helics_state_error, helics_state_pending_init, helics_state_pending_exec, helics_state_pending_time, helics_state_pending_iterative_time, helics_state_pending_finalize };
+  private static helics_federate_state[] swigValues = { helics_state_startup, helics_state_initialization, helics_state_execution, helics_state_finalize, helics_state_error, helics_state_pending_init, helics_state_pending_exec, helics_state_pending_time, helics_state_pending_iterative_time, helics_state_pending_finalize, helics_state_finished };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

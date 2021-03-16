@@ -14845,6 +14845,7 @@ SWIGINTERN const char* SwigConstantName(int con_id) {
   case 128: return "helics_state_pending_time";
   case 129: return "helics_state_pending_iterative_time";
   case 130: return "helics_state_pending_finalize";
+  case 131: return "helics_state_finished";
   default: return 0;
   }
 }
@@ -15006,6 +15007,7 @@ SWIGINTERN int swigConstant(int SWIGUNUSEDPARM(resc), mxArray *resv[], int argc,
   case 128: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_time",SWIG_From_int(static_cast< int >(helics_state_pending_time)));; break;
   case 129: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_iterative_time",SWIG_From_int(static_cast< int >(helics_state_pending_iterative_time)));; break;
   case 130: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_finalize",SWIG_From_int(static_cast< int >(helics_state_pending_finalize)));; break;
+  case 131: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_finished",SWIG_From_int(static_cast< int >(helics_state_finished)));; break;
   default:
     SWIG_Error(SWIG_RuntimeError, "No such constant.");
     return 1;
