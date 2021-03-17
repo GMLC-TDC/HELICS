@@ -384,7 +384,7 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(helics_endpoint end);
 /**
  * Set the data in the info field for a filter.
  *
- * @param end The endpoint to query.
+ * @param endpoint The endpoint to query.
  * @param info The string to set.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
@@ -395,7 +395,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* i
 /**
  * Set a handle option on an endpoint.
  *
- * @param end The endpoint to modify.
+ * @param endpoint The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @param value The value to set the option to.
  * @forcpponly
@@ -407,7 +407,7 @@ HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option,
 /**
  * Set a handle option on an endpoint.
  *
- * @param end The endpoint to modify.
+ * @param endpoint The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @return the value of the option, for boolean options will be 0 or 1
  */
