@@ -25,7 +25,6 @@ jobs:
       # Install dependencies
       # -----------------------
       - task: Cache@2
-        id: cache-boost
         inputs:
           path: $(BOOST_ROOT)
           key: boost
