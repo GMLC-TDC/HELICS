@@ -56,8 +56,9 @@ jobs:
       # Configure HELICS
       # -----------------------
       - bash: |
-          echo "$BOOST_ROOT"
+          echo "BOOST_ROOT=$BOOST_ROOT"
           env
+        displayName: Show environment info
       - task: CMake@1
         inputs:
           cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
