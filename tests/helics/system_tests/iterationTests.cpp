@@ -385,8 +385,8 @@ TEST_F(iteration_tests, iteration_counter)
                 return;
             }
             if (nc1 == cb) {
-                auto res = vFed1->query("root", "global_time_debugging");
-                std::cout << res << std::endl;
+                auto qres = vFed1->query("root", "global_time_debugging");
+                std::cout << qres << std::endl;
                 return;
             }
             cb = nc1;
