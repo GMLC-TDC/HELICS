@@ -396,6 +396,8 @@ helics_state_pending_iterative_time = _helics.helics_state_pending_iterative_tim
 r""" state that the federate is pending an iterative time request"""
 helics_state_pending_finalize = _helics.helics_state_pending_finalize
 r""" state that the federate is pending a finalize request"""
+helics_state_finished = _helics.helics_state_finished
+r""" state that the federate is finished simulating but still connected"""
 class helics_complex(object):
     r""" structure defining a basic complex type"""
 
