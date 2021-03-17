@@ -39,7 +39,7 @@ jobs:
           cp -r boost_*/* "$BOOST_ROOT"
         condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
         displayName: Install Boost
-        
+
       - bash: choco install swig --yes --limit-output
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
         displayName: Install swig
