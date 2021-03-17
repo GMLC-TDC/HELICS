@@ -17,7 +17,7 @@ jobs:
     pool:
       vmImage: $(imageName)
     variables:
-      BOOST_ROOT: ${{Pipeline.Workspace}}/ci-libs/boost
+      BOOST_ROOT: ${{Agent.BuildDirectory}}/ci-libs/boost
       BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download
 
     steps:
