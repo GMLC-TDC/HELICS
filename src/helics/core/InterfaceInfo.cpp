@@ -197,15 +197,27 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
     return true;
 }
 
-// NOLINTNEXTLINE
-bool InterfaceInfo::setEndpointProperty(interface_handle /*id*/,
-                                        int32_t /*option*/,
-                                        int32_t /*value*/)
+bool InterfaceInfo::setEndpointProperty(interface_handle id,
+                                        int32_t option,
+                                        int32_t value)
 {
-    // there will likely be some future properties
-    // auto ept = getEndpoint (id);
-    // currently no properties on endpoints
-    return false;
+    auto* ept = getEndpoint(id);
+    if (ept == nullptr) {
+        return false;
+    }
+    bool bvalue = (value != 0);
+    switch (option) {
+        case defs::options::connection_required:
+            ept->required = bvalue;
+            break;
+        case defs::options::connection_optional:
+            ept->required = !bvalue;
+            break;
+        default:
+            return false;
+            break;
+    }
+    return true;
 }
 
 int32_t InterfaceInfo::getInputProperty(interface_handle id, int32_t option) const
@@ -284,12 +296,24 @@ int32_t InterfaceInfo::getPublicationProperty(interface_handle id, int32_t optio
     return flagval ? 1 : 0;
 }
 
-// NOLINTNEXTLINE
-int32_t InterfaceInfo::getEndpointProperty(interface_handle /*id*/, int32_t /*option*/) const
+int32_t InterfaceInfo::getEndpointProperty(interface_handle id, int32_t option) const
 {
-    // auto ept = getEndpoint (id);
-    // currently no properties on endpoints
-    return 0;
+    const auto* ept = getEndpoint(id);
+    if (ept == nullptr) {
+        return 0;
+    }
+    bool flagval = false;
+    switch (option) {
+        case defs::options::connection_required:
+            flagval = ept->required;
+            break;
+        case defs::options::connection_optional:
+            flagval = !ept->required;
+            break;
+        default:
+            break;
+    }
+    return flagval ? 1 : 0;
 }
 
 std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues()

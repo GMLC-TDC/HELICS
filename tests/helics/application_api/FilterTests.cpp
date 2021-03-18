@@ -931,10 +931,12 @@ TEST_F(filter_tests, reroute_separate2_5message)
     EXPECT_EQ(p3.pendingMessages(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
+    int index = 0;
     for (auto& mc : mcount) {
         totalMessageCount += mc;
-        EXPECT_TRUE(mc == 5 || mc == 0)
-            << "incorrect # of messages in interval (" << mc << ") instead of 5";
+        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval ["
+                                        << index<<"], (" << mc << ") messages instead of 5 ";
+            ++index;
     }
     EXPECT_EQ(totalMessageCount, 50);
     // auto res2 = broker->query("root", "global_time_debugging");
@@ -1053,10 +1055,12 @@ TEST_F(filter_tests, reroute_separate2_5message_b)
     EXPECT_EQ(p3.pendingMessages(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
+    int index{0};
     for (auto& mc : mcount) {
         totalMessageCount += mc;
-        EXPECT_TRUE(mc == 5 || mc == 0)
-            << "incorrect # of messages in interval (" << mc << ") instead of 5";
+        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval [" << index
+                                        << "], (" << mc << ") messages instead of 5 ";
+        ++index;
     }
     EXPECT_EQ(totalMessageCount, 50);
     // auto res2 = broker->query("root", "global_time_debugging");
@@ -1426,7 +1430,7 @@ TEST_F(filter_test, message_clone_test)
 
     sFed->requestTimeAsync(1.0);
     dcFed->requestTimeAsync(1.0);
-    auto tm = dFed->requestTime(1.0);
+    dFed->requestTime(1.0);
     sFed->requestTimeComplete();
     dcFed->requestTimeComplete();
 
