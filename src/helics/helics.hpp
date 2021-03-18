@@ -11,6 +11,6 @@ Header file for inclusion of the entire CPP shared library
 #pragma once
 
 #include "application_api.hpp"
-     #include "core/helicsVersion.hpp"
+#include "core/helicsVersion.hpp"
 #include "core/helics_definitions.hpp"
 #include "helics_enums.h"
