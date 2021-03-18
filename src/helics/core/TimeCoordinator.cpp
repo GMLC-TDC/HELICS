@@ -350,11 +350,18 @@ Time TimeCoordinator::generateAllowedTime(Time testTime) const
         if (testTime == Time::maxVal()) {
             return testTime;
         }
-        if (testTime - time_grantBase > info.period) {
-            auto blk = std::ceil((testTime - time_grantBase) / info.period);
-            testTime = time_grantBase + blk * info.period;
+        auto timeBase = time_grantBase;
+        if (time_grantBase < info.offset) {
+            timeBase = info.offset;
+            if (testTime <= info.offset) {
+                return info.offset;
+            }
+        }
+        if (testTime - timeBase > info.period) {
+            auto blk = std::ceil((testTime - timeBase) / info.period);
+            testTime = timeBase + blk * info.period;
         } else {
-            testTime = time_grantBase + info.period;
+            testTime = timeBase + info.period;
         }
     }
     return testTime;

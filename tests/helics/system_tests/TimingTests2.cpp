@@ -321,7 +321,45 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed3->finalize();
 }
 
-// Tests out the restrictive time policy
+TEST_F(timing_tests2, offset_timing)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed1->setFlagOption(helics::defs::ignore_time_mismatch_warnings);
+    vFed2->setFlagOption(helics::defs::ignore_time_mismatch_warnings);
+    vFed1->setProperty(helics::defs::period, 60.0);
+    vFed2->setProperty(helics::defs::period, 60.0);
+    vFed1->setProperty(helics::defs::offset, 10.0);
+
+    auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
+
+    auto& sub2 = vFed2->registerSubscription("pub1");
+    sub2.setDefault(2.6);
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    // this works since there are no reverse dependencies
+    auto tm1 = vFed1->requestTime(70.0);
+    EXPECT_EQ(tm1, 70.0);
+    pub1->publish(3.5);
+    tm1 = vFed1->requestTime(120.0);
+    EXPECT_EQ(tm1, 130.0);
+
+    auto tm2 = vFed2->requestTime(60.0);
+    EXPECT_EQ(tm2, 60.0);
+    tm2 = vFed2->requestTime(70.0);
+    EXPECT_EQ(tm2, 120.0);
+    double val2 = sub2.getValue<double>();
+    EXPECT_DOUBLE_EQ(val2, 3.5);  // shouldn't have gotten the update
+
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+// Tests out the time barrier
 TEST_F(timing_tests2, time_barrier1)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
