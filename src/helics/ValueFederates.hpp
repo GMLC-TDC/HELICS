@@ -9,6 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "application_api/CoreApp.hpp"
 #include "application_api/Inputs.hpp"
 #include "application_api/Publications.hpp"
-#include "application_api/Subscriptions.hpp"
+    #include "application_api/Subscriptions.hpp"
 #include "application_api/ValueFederate.hpp"
 #include "core/helics_definitions.hpp"
