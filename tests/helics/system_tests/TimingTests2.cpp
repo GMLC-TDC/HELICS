@@ -342,7 +342,7 @@ TEST_F(timing_tests2, offset_timing)
     vFed1->enterExecutingModeComplete();
 
     // this works since there are no reverse dependencies
-    auto tm1=vFed1->requestTime(70.0);
+    auto tm1 = vFed1->requestTime(70.0);
     EXPECT_EQ(tm1, 70.0);
     pub1->publish(3.5);
     tm1 = vFed1->requestTime(120.0);

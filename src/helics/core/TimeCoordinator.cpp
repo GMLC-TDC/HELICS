@@ -351,11 +351,9 @@ Time TimeCoordinator::generateAllowedTime(Time testTime) const
             return testTime;
         }
         auto timeBase = time_grantBase;
-        if (time_grantBase<info.offset)
-        {
+        if (time_grantBase < info.offset) {
             timeBase = info.offset;
-            if (testTime <= info.offset)
-            {
+            if (testTime <= info.offset) {
                 return info.offset;
             }
         }
