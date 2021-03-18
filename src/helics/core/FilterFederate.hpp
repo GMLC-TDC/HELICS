@@ -34,7 +34,7 @@ class FilterFederate {
     global_federate_id mFedID;
     global_broker_id mCoreID;
     const std::string mName;
-    //Core* mCore{nullptr};
+    // Core* mCore{nullptr};
     TimeCoordinator mCoord;
     HandleManager* mHandles{nullptr};
     federate_state current_state{HELICS_CREATED};
@@ -61,7 +61,7 @@ class FilterFederate {
     std::atomic<int32_t> messageCounter{54};
     /// storage for all the filters
     gmlc::containers::MappedPointerVector<FilterInfo, global_handle> filters;
-    //bool hasTiming{false};
+    // bool hasTiming{false};
 
   public:
     FilterFederate(global_federate_id fedID, std::string name, global_broker_id coreID, Core* core);

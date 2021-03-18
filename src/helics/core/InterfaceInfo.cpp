@@ -197,9 +197,7 @@ bool InterfaceInfo::setPublicationProperty(interface_handle id, int32_t option, 
     return true;
 }
 
-bool InterfaceInfo::setEndpointProperty(interface_handle id,
-                                        int32_t option,
-                                        int32_t value)
+bool InterfaceInfo::setEndpointProperty(interface_handle id, int32_t option, int32_t value)
 {
     auto* ept = getEndpoint(id);
     if (ept == nullptr) {
