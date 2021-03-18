@@ -405,3 +405,111 @@ TEST_F(timing_tests2, time_barrier_update)
     vFed1->finalize();
     vFed2->finalize();
 }
+
+
+TEST_F(timing_tests2, time_barrier_clear)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    brokers[0]->setTimeBarrier(0.0);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingModeAsync();
+    
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    brokers[0]->setTimeBarrier(2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    vFed1->enterExecutingModeComplete();
+    vFed2->enterExecutingModeComplete();
+    vFed1->requestTimeAsync(1.0);
+    vFed2->requestTimeAsync(1.0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+
+    brokers[0]->setTimeBarrier(3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    auto tm = vFed1->requestTimeComplete();
+    EXPECT_EQ(tm, 1.0);
+    tm = vFed2->requestTimeComplete();
+    EXPECT_EQ(tm, 1.0);
+
+    vFed1->requestTimeAsync(3.0);
+    auto rtime = vFed2->requestTime(1.89);
+    EXPECT_EQ(rtime, 1.89);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    brokers[0]->clearTimeBarrier();
+    rtime = vFed1->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+
+TEST_F(timing_tests2, time_barrier_clear2)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    /** establish dependencies between the federates*/
+    vFed1->registerGlobalPublication<double>("pub1");
+    vFed2->registerGlobalPublication<double>("pub2");
+    vFed1->registerSubscription("pub2");
+    vFed2->registerSubscription("pub1");
+
+    brokers[0]->setTimeBarrier(0.0);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingModeAsync();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    brokers[0]->setTimeBarrier(2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    vFed1->enterExecutingModeComplete();
+    vFed2->enterExecutingModeComplete();
+    vFed1->requestTimeAsync(1.0);
+    vFed2->requestTimeAsync(1.0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+
+    brokers[0]->setTimeBarrier(3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    auto tm = vFed1->requestTimeComplete();
+    EXPECT_EQ(tm, 1.0);
+    tm = vFed2->requestTimeComplete();
+    EXPECT_EQ(tm, 1.0);
+
+    vFed1->requestTimeAsync(3.0);
+    auto rtime = vFed2->requestTime(1.89);
+    EXPECT_EQ(rtime, 1.89);
+    vFed2->requestTimeAsync(3.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    brokers[0]->clearTimeBarrier();
+    rtime = vFed1->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+    rtime = vFed2->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+
+    vFed1->finalize();
+    vFed2->finalize();
+}
