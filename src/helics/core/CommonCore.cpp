@@ -2221,7 +2221,6 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
-    base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(CMD_QUERY);
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
