@@ -2,11 +2,11 @@ trigger:
   branches:
     exclude:
     - pre-commit/*
-  pr:
-    - main
-    - master
-    - develop
-    - helics3
+pr:
+  - main
+  - master
+  - develop
+  - helics3
     
 jobs:
   - job: Windows
