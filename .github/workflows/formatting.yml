@@ -3,11 +3,13 @@ on:
   push:
     branches:
       - develop
+      - main
       - master
       - helics3
   pull_request:
     branches:
       - develop
+      - main
       - master
       - helics3
 
