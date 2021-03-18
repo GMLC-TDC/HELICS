@@ -1087,11 +1087,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         ActionMessage warn(required_flag_set ? CMD_ERROR : CMD_WARNING);
                         warn.source_id = global_broker_id_local;
                         warn.dest_id = command.source_id;
-                        warn.payload = fmt::format("{} is not a known endpoint, message from {} dropped",
-                                                   command.getString(targetStringLoc), command.getString(sourceStringLoc));
+                        warn.payload =
+                            fmt::format("{} is not a known endpoint, message from {} dropped",
+                                        command.getString(targetStringLoc),
+                                        command.getString(sourceStringLoc));
                         transmit(getRoute(warn.dest_id), warn);
                     }
-                    
+
                 } else {
                     transmit(route, command);
                 }

@@ -934,9 +934,9 @@ TEST_F(filter_tests, reroute_separate2_5message)
     int index = 0;
     for (auto& mc : mcount) {
         totalMessageCount += mc;
-        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval ["
-                                        << index<<"], (" << mc << ") messages instead of 5 ";
-            ++index;
+        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval [" << index
+                                        << "], (" << mc << ") messages instead of 5 ";
+        ++index;
     }
     EXPECT_EQ(totalMessageCount, 50);
     // auto res2 = broker->query("root", "global_time_debugging");
