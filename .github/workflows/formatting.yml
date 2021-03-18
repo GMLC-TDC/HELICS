@@ -37,7 +37,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        COMMIT_MSG: "Automated formatting of repo files"
+        COMMIT_MSG: "Automated formatting of repo files [skip ci]"
         PR_TITLE: "Automated formatting of repo files [skip ci]"
         PR_BODY: "Automated formatting of repo files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
         GIT_NAME: "github-actions[bot]"
