@@ -3,11 +3,13 @@ on:
   push:
     branches:
       - develop
+      - main
       - master
       - helics3
   pull_request:
     branches:
       - develop
+      - main
       - master
       - helics3
 
@@ -35,9 +37,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        COMMIT_MSG: "Automated formatting of repo files"
+        COMMIT_MSG: "Automated formatting of repo files [skip ci]"
         PR_TITLE: "Automated formatting of repo files"
         PR_BODY: "Automated formatting of repo files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        # Git Email/Name for commits should be HELICS-bot (not GitHub Actions); this way, when the PR is merged the default new commit name uses the PR title (avoiding [skip ci] in the new commit message)
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "pre-commit/"
