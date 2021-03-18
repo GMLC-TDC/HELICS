@@ -1,13 +1,13 @@
 trigger:
   branches:
     exclude:
-    - pre-commit/*
+      - pre-commit/*
   pr:
     - main
     - master
     - develop
     - helics3
-    
+
 jobs:
   - job: Windows
     strategy:
