@@ -155,8 +155,11 @@ jobs:
 workflows:
   version: 2
   helics_test:
+    filters:
+      branches:
+        ignore: /pre-commit\/.*/
     jobs:
-      - helicsMSan
+    - helicsMSan
       - helicsASan
       - helicsInstall1
       - helicsInstall2
