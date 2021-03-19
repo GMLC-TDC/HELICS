@@ -38,6 +38,10 @@ trigger:
       - master
       - develop
       - helics3
+  event:
+    include:
+      - push
+      - pull_request
 
 ---
 kind: pipeline
@@ -80,3 +84,7 @@ trigger:
       - master
       - develop
       - helics3
+  event:
+    include:
+      - push
+      - pull_request
