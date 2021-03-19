@@ -34,11 +34,11 @@ steps:
 trigger:
   ref:
     include:
-    - refs/heads/main
-    - refs/heads/master
-    - refs/heads/develop
-    - refs/heads/helics3
-    - refs/pull/**
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/develop
+      - refs/heads/helics3
+      - refs/pull/**
 
 ---
 kind: pipeline
@@ -77,8 +77,8 @@ steps:
 trigger:
   ref:
     include:
-    - refs/heads/main
-    - refs/heads/master
-    - refs/heads/develop
-    - refs/heads/helics3
-    - refs/pull/**
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/develop
+      - refs/heads/helics3
+      - refs/pull/**
