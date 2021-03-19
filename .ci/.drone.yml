@@ -33,10 +33,10 @@ steps:
 
 trigger:
   branch:
-  - main
-  - master
-  - develop
-  - helics3
+    - main
+    - master
+    - develop
+    - helics3
 
 ---
 kind: pipeline
@@ -74,7 +74,7 @@ steps:
 
 trigger:
   branch:
-  - main
-  - master
-  - develop
-  - helics3
+    - main
+    - master
+    - develop
+    - helics3
