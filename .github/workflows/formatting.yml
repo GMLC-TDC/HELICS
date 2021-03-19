@@ -38,8 +38,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         COMMIT_MSG: "Automated formatting of repo files"
-        PR_TITLE: "Automated formatting of repo files"
-        PR_BODY: "Automated formatting of repo files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}. [skip ci]"
+        PR_TITLE: "Automated formatting of repo files [skip ci]"
+        PR_BODY: "Automated formatting of repo files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
         GIT_NAME: "github-actions[bot]"
         GIT_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
         BRANCH_PREFIX: "pre-commit/"
