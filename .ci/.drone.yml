@@ -31,6 +31,13 @@ steps:
       - cmake --build .
       - ctest -L Continuous --output-on-failure
 
+trigger:
+  branch:
+  - main
+  - master
+  - develop
+  - helics3
+
 ---
 kind: pipeline
 name: arm64
@@ -64,3 +71,10 @@ steps:
       - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
       - cmake --build .
       - ctest -L Continuous --output-on-failure
+
+trigger:
+  branch:
+  - main
+  - master
+  - develop
+  - helics3
