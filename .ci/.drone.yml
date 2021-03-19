@@ -32,9 +32,13 @@ steps:
       - ctest -L Continuous --output-on-failure
 
 trigger:
-  branch:
-    exclude:
-      - pre-commit/**
+  ref:
+    include:
+    - refs/heads/main
+    - refs/heads/master
+    - refs/heads/develop
+    - refs/heads/helics3
+    - refs/pull/**
 
 ---
 kind: pipeline
@@ -71,6 +75,10 @@ steps:
       - ctest -L Continuous --output-on-failure
 
 trigger:
-  branch:
-    exclude:
-      - pre-commit/**
+  ref:
+    include:
+    - refs/heads/main
+    - refs/heads/master
+    - refs/heads/develop
+    - refs/heads/helics3
+    - refs/pull/**
