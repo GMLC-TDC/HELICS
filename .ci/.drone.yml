@@ -33,14 +33,10 @@ steps:
 
 trigger:
   branch:
-    include:
-    - main
-    - master
-    - develop
-    - helics3
-    - refs/heads/**
-    exclude:
-    - pre-commit/**
+  - main
+  - master
+  - develop
+  - helics3
 
 ---
 kind: pipeline
@@ -78,11 +74,7 @@ steps:
 
 trigger:
   branch:
-    include:
-    - main
-    - master
-    - develop
-    - helics3
-    - refs/heads/**
-    exclude:
-    - pre-commit/**
+  - main
+  - master
+  - develop
+  - helics3
