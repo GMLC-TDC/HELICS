@@ -2,7 +2,7 @@ freebsd_instance:
   image_family: freebsd-12-1
 
 task:
-  only_if: $CIRRUS_BRANCH == 'pull/.*' || $CIRRUS_BRANCH == 'master' || $CIRRUS_BRANCH == 'main' || $CIRRUS_BRANCH == 'develop' || $CIRRUS_BRANCH == 'helics3'
+  skip: $CIRRUS_BRANCH == 'pre-commit/.*'
   install_script: |
     pkg install -y cmake libzmq4 ninja git
   build_script: |
