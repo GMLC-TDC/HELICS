@@ -33,15 +33,8 @@ steps:
 
 trigger:
   branch:
-    include:
-      - main
-      - master
-      - develop
-      - helics3
-  event:
-    include:
-      - push
-      - pull_request
+    exclude:
+      - pre-commit/**
 
 ---
 kind: pipeline
@@ -79,12 +72,5 @@ steps:
 
 trigger:
   branch:
-    include:
-      - main
-      - master
-      - develop
-      - helics3
-  event:
-    include:
-      - push
-      - pull_request
+    exclude:
+      - pre-commit/**
