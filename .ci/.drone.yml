@@ -31,6 +31,16 @@ steps:
       - cmake --build .
       - ctest -L Continuous --output-on-failure
 
+trigger:
+  ref:
+    include:
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/develop
+      - refs/heads/helics3
+      - "refs/pull/**"
+      - "refs/tags/**"
+
 ---
 kind: pipeline
 name: arm64
@@ -64,3 +74,13 @@ steps:
       - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
       - cmake --build .
       - ctest -L Continuous --output-on-failure
+
+trigger:
+  ref:
+    include:
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/develop
+      - refs/heads/helics3
+      - "refs/pull/**"
+      - "refs/tags/**"
