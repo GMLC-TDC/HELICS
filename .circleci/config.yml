@@ -159,11 +159,11 @@ workflows:
       branches:
         ignore: /pre-commit\/.*/
     jobs:
-    - helicsMSan
-      - helicsASan
-      - helicsInstall1
-      - helicsInstall2
-      - helicsgccTSan
+      - helicsMSan
+        - helicsASan
+        - helicsInstall1
+        - helicsInstall2
+        - helicsgccTSan
 
   nightly:
     triggers:
