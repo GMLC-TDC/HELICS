@@ -38,8 +38,8 @@ trigger:
       - refs/heads/master
       - refs/heads/develop
       - refs/heads/helics3
-      - "refs/pull/**"
-      - "refs/tags/**"
+      - 'refs/pull/**'
+      - 'refs/tags/**'
 
 ---
 kind: pipeline
@@ -82,5 +82,5 @@ trigger:
       - refs/heads/master
       - refs/heads/develop
       - refs/heads/helics3
-      - "refs/pull/**"
-      - "refs/tags/**"
+      - 'refs/pull/**'
+      - 'refs/tags/**'
