@@ -872,7 +872,7 @@ TEST_F(mfed_tests, missing_endpoint)
 
     auto mm = mlog.lock();
     EXPECT_EQ(mm->size(), 1U);
-    if (mm->size() > 0) {
+    if (!mm->empty()) {
         EXPECT_EQ(mm->front().first, helics_log_level_warning);
         EXPECT_THAT(mm->front().second, HasSubstr("ep92"));
         EXPECT_THAT(mm->front().second, HasSubstr("ep1"));
@@ -894,7 +894,7 @@ TEST_F(mfed_tests, missing_endpoint)
     }
     mm = mlog.lock();
     EXPECT_EQ(mm->size(), 2U);
-    if (mm->size() > 0) {
+    if (!mm->empty()) {
         EXPECT_EQ(mm->back().first, helics_log_level_error);
         EXPECT_THAT(mm->back().second, HasSubstr("ep92"));
         EXPECT_THAT(mm->back().second, HasSubstr("ep3"));

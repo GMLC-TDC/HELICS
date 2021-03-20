@@ -378,7 +378,7 @@ TEST_F(iteration_tests, iteration_counter)
     helics::iteration_time res;
     std::thread deadlock([&] {
         int64_t cb{0};
-        while (1) {
+        while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(2));
             auto nc1 = cc.load();
             if (nc1 > 10) {
