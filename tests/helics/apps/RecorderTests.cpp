@@ -52,7 +52,7 @@ TEST(recorder_tests, simple_recorder_test)
     fut.get();
     rec1.finalize();
     auto cnt = rec1.pointCount();
-    EXPECT_EQ(cnt, 2u);
+    EXPECT_EQ(cnt, 2U);
 }
 
 TEST(recorder_tests, simple_recorder_test2)
@@ -121,7 +121,7 @@ TEST(recorder_tests, recorder_test_message)
 
     mfed.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto m = rec1.getMessage(0);
     EXPECT_EQ(m->data.to_string(), "this is a test message");
@@ -167,7 +167,7 @@ TEST_P(recorder_file_tests, test_files)
     vfed.finalize();
     fut.get();
     rec1.finalize();
-    EXPECT_EQ(rec1.pointCount(), 4u);
+    EXPECT_EQ(rec1.pointCount(), 4U);
     auto v1 = rec1.getValue(0);
     EXPECT_EQ(v1.first, "pub1");
     EXPECT_EQ(v1.second, std::to_string(3.4));
@@ -240,8 +240,8 @@ TEST_P(recorder_message_file_tests, test_message_files)
     cfed.finalize();
     fut.get();
     rec1.finalize();
-    EXPECT_EQ(rec1.pointCount(), 4u);
-    EXPECT_EQ(rec1.messageCount(), 2u);
+    EXPECT_EQ(rec1.pointCount(), 4U);
+    EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto v1 = rec1.getValue(0);
     EXPECT_EQ(v1.first, "pub1");
@@ -316,8 +316,8 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
     cfed.finalize();
     fut.get();
     rec1.finalize();
-    EXPECT_EQ(rec1.pointCount(), 4u);
-    EXPECT_EQ(rec1.messageCount(), 2u);
+    EXPECT_EQ(rec1.pointCount(), 4U);
+    EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto v1 = rec1.getValue(0);
     EXPECT_EQ(v1.first, "pub1");
@@ -385,11 +385,13 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_GE(rec1.messageCount(), 2u);
+    EXPECT_GE(rec1.messageCount(), 2U);
 
     auto m = rec1.getMessage(0);
-    ASSERT_TRUE(m);
+    EXPECT_TRUE(m);
+    if (m) {
     EXPECT_EQ(m->data.to_string(), "this is a test message");
+}
 }
 
 TEST(recorder_tests, recorder_test_srcendpoint_clone)
@@ -432,7 +434,7 @@ TEST(recorder_tests, recorder_test_srcendpoint_clone)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_GE(rec1.messageCount(), 2u);
+    EXPECT_GE(rec1.messageCount(), 2U);
 
     auto m = rec1.getMessage(0);
     EXPECT_EQ(m->data.to_string(), "this is a test message");
@@ -478,7 +480,7 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto m = rec1.getMessage(0);
     EXPECT_EQ(m->data.to_string(), "this is a test message");
@@ -525,7 +527,7 @@ TEST_P(recorder_clone_file_tests, simple_clone_test_file)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_GE(rec1.messageCount(), 2u);
+    EXPECT_GE(rec1.messageCount(), 2U);
 
     auto m = rec1.getMessage(0);
     EXPECT_TRUE(m);
@@ -586,7 +588,7 @@ TEST(recorder_tests, recorder_test_saveFile1)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto filename = ghc::filesystem::temp_directory_path() / "savefile.txt";
     rec1.saveFile(filename.string());
@@ -693,8 +695,8 @@ TEST(recorder_tests, recorder_test_saveFile3)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 3u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 3U);
 
     auto filename = ghc::filesystem::temp_directory_path() / "savefile.txt";
     rec1.saveFile(filename.string());
