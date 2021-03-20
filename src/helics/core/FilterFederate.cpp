@@ -65,11 +65,10 @@ void FilterFederate::routeMessage(const ActionMessage& msg)
 /** process any filter or route the message*/
 void FilterFederate::processMessageFilter(ActionMessage& cmd)
 {
-    if (cmd.dest_id == parent_broker_id) {
+    if (cmd.dest_id != mFedID) {
         mSendMessage(cmd);
-    } else if (cmd.dest_id == mFedID) {
+    } else {
         // deal with local source filters
-
         auto* FiltI = getFilterInfo(cmd.getDest());
         if (FiltI != nullptr) {
             if ((!checkActionFlag(*FiltI, disconnected_flag)) && (FiltI->filterOp)) {
@@ -157,8 +156,6 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                 return m;
                 */
         }
-    } else {
-        mSendMessage(cmd);
     }
 }
 /** process a filter message return*/
@@ -480,7 +477,9 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 } else {
                     errorString = command.payload;
                 }
-                if (mLogger) mLogger(helics_log_level_error, mName, errorString);
+                if (mLogger) {
+                    mLogger(helics_log_level_error, mName, errorString);
+                }
             } break;
             default:
                 break;
@@ -497,7 +496,6 @@ void FilterFederate::handleMessage(ActionMessage& command)
             }
             return handleMessage(command);
         case message_processing_result::delay_message:
-            return;
         default:
             return;
     }

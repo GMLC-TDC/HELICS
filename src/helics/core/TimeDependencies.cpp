@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-static bool ProcessMessage(const ActionMessage& m, DependencyInfo& dep)
+static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
 {
     switch (m.action()) {
         case CMD_EXEC_REQUEST:
@@ -323,11 +323,11 @@ bool TimeDependencies::updateTime(const ActionMessage& m)
 {
     auto dependency_id = (m.action() != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
 
-    auto depInfo = getDependencyInfo(global_federate_id(dependency_id));
+    auto* depInfo = getDependencyInfo(global_federate_id(dependency_id));
     if (depInfo == nullptr || !depInfo->dependency) {
         return false;
     }
-    return ProcessMessage(m, *depInfo);
+    return processMessage(m, *depInfo);
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry(bool iterating) const
@@ -383,7 +383,7 @@ void TimeDependencies::resetIteratingExecRequests()
 bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const
 {
     if (iterating) {
-        for (auto& dep : dependencies) {
+        for (const auto& dep : dependencies) {
             if (!dep.dependency) {
                 continue;
             }
@@ -395,7 +395,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
             }
         }
     } else {
-        for (auto& dep : dependencies) {
+        for (const auto& dep : dependencies) {
             if (!dep.dependency) {
                 continue;
             }
@@ -491,7 +491,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  global_federate_id ignore)
 {
     TimeData mTime(Time::maxVal());
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
         }
@@ -522,8 +522,8 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    global_federate_id ignore)
 {
     TimeData mTime(Time::maxVal());
-    for (auto& dep : dependencies) {
-        if (dep.dependency == false) {
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
             continue;
         }
         if (dep.connection != ConnectionType::parent) {
@@ -553,7 +553,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               global_federate_id ignore)
 {
     TimeData mTime(Time::maxVal());
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
         }
