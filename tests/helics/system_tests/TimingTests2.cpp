@@ -406,7 +406,6 @@ TEST_F(timing_tests2, time_barrier_update)
     vFed2->finalize();
 }
 
-
 TEST_F(timing_tests2, time_barrier_clear)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
@@ -416,7 +415,6 @@ TEST_F(timing_tests2, time_barrier_clear)
     brokers[0]->setTimeBarrier(0.0);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
-    
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
@@ -455,7 +453,6 @@ TEST_F(timing_tests2, time_barrier_clear)
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(timing_tests2, time_barrier_clear2)
 {

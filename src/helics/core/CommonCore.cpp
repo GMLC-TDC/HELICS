@@ -2008,7 +2008,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
-    if (loopFederates.size() > 0 || filterFed!=nullptr) {
+    if (loopFederates.size() > 0 || filterFed != nullptr) {
         base["federates"] = Json::arrayValue;
         for (const auto& fed : loopFederates) {
             int brkindex =
@@ -2754,7 +2754,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                     if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
                         command.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, command);
-                        if (minFederateState() != operation_state::disconnected || filterFed!=nullptr) {
+                        if (minFederateState() != operation_state::disconnected ||
+                            filterFed != nullptr) {
                             command.setAction(CMD_DISCONNECT_FED_ACK);
                             command.dest_id = command.source_id;
                             command.source_id = parent_broker_id;
@@ -3101,7 +3102,7 @@ void CommonCore::registerInterface(ActionMessage& command)
                 break;
             case CMD_REG_FILTER:
 
-                if (filterFed==nullptr) {
+                if (filterFed == nullptr) {
                     generateFilterFederate();
                 }
                 filterFed->createFilter(filterFedID.load(),
@@ -3378,7 +3379,7 @@ void CommonCore::disconnectInterface(ActionMessage& command)
 void CommonCore::addTargetToInterface(ActionMessage& command)
 {
     if (command.action() == CMD_ADD_FILTER) {
-        if (filterFed==nullptr) {
+        if (filterFed == nullptr) {
             generateFilterFederate();
         }
         filterFed->processFilterInfo(command);
@@ -3684,7 +3685,7 @@ bool CommonCore::hasTimeBlock(global_federate_id fedID)
 {
     for (auto& tb : timeBlocks) {
         if (fedID == tb.first) {
-            return (tb.second!=0);
+            return (tb.second != 0);
         }
     }
     return false;

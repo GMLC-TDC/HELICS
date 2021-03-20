@@ -305,10 +305,9 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
             base["dependents"].append(dep.fedID.baseValue());
         }
     }
-    //now add any time blocks that may be present
+    // now add any time blocks that may be present
     base["blocks"] = Json::arrayValue;
-    for (const auto &blk : timeBlocks)
-    {
+    for (const auto& blk : timeBlocks) {
         Json::Value timeblock;
         timeblock["time"] = static_cast<double>(blk.first);
         timeblock["id"] = blk.second;
@@ -541,8 +540,7 @@ void TimeCoordinator::sendTimeRequest() const
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
-    if (checkAndSendTimeRequest(upd, upstream.minFed))
-    {
+    if (checkAndSendTimeRequest(upd, upstream.minFed)) {
         upd.dest_id = upstream.minFed;
         upd.setExtraData(global_federate_id{}.baseValue());
         upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
@@ -673,13 +671,12 @@ std::vector<global_federate_id> TimeCoordinator::getDependencies() const
     return *dependency_federates.lock_shared();
 }
 
-bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg,global_federate_id skipFed) const
+bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, global_federate_id skipFed) const
 {
     bool skipped{false};
     for (auto dep : dependencies) {
         if (dep.dependent) {
-            if (dep.fedID == skipFed)
-            {
+            if (dep.fedID == skipFed) {
                 skipped = true;
                 continue;
             }

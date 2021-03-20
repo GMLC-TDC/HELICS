@@ -296,8 +296,7 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
 ActionMessage& FilterFederate::processMessage(ActionMessage& command, const BasicHandleInfo* handle)
 {
     auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
-    if (filtFunc == nullptr)
-    {
+    if (filtFunc == nullptr) {
         return command;
     }
     if (filtFunc->hasSourceFilters) {
