@@ -106,6 +106,10 @@ bool TimeData::update(const TimeData& update)
         updated = true;
         minDe = update.minDe;
     }
+    if (update.TeAlt != TeAlt) {
+        updated = true;
+        TeAlt = update.TeAlt;
+    }
 
     if (prev_next != next) {
         updated = true;
@@ -159,6 +163,7 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["minfed"] = dep.minFed.baseValue();
     output["state"] = timeStateString(dep.time_state);
     if (includeAggregates) {
+        output["minde_alt"] = static_cast<double>(dep.minDe);
         output["minfedActual"] = dep.minFedActual.baseValue();
     }
 }
@@ -447,14 +452,6 @@ static void generateMinTimeImplementation(TimeData& mTime,
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
-                mTime.minFed = dep.fedID;
-                if (dep.minFed.isValid()) {
-                    mTime.minFedActual = dep.minFed;
-                } else {
-                    mTime.minFed = dep.fedID;
-                }
-            } else if (dep.minDe == mTime.minDe) {
-                mTime.minFedActual = global_federate_id();
             }
         } else {
             // this minimum dependent event time received was invalid and can't be trusted
@@ -473,7 +470,17 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
     if (dep.connection != ConnectionType::self) {
         if (dep.Te < mTime.Te) {
+            mTime.TeAlt = mTime.Te;
             mTime.Te = dep.Te;
+            mTime.minFed = dep.fedID;
+            if (dep.minFed.isValid()) {
+                mTime.minFedActual = dep.minFed;
+            } else {
+                mTime.minFed = dep.fedID;
+            }
+        } else if (dep.Te == mTime.Te) {
+            mTime.minFed = global_federate_id{};
+            mTime.TeAlt = mTime.Te;
         }
     }
 }
