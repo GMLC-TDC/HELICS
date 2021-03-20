@@ -389,7 +389,12 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
     EXPECT_GE(rec1.messageCount(), 2u);
 
     auto m = rec1.getMessage(0);
-    EXPECT_EQ(m->data.to_string(), "this is a test message");
+    EXPECT_TRUE(m);
+    if (m)
+    {
+        EXPECT_EQ(m->data.to_string(), "this is a test message");
+    }
+    
 }
 
 TEST(recorder_tests, recorder_test_srcendpoint_clone)

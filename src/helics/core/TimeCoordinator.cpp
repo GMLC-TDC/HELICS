@@ -545,7 +545,7 @@ void TimeCoordinator::sendTimeRequest() const
     {
         upd.dest_id = upstream.minFed;
         upd.setExtraData(global_federate_id{}.baseValue());
-        upd.Tdemin = upstream.minDeAlt;
+        upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
         sendMessageFunction(upd);
     }
 

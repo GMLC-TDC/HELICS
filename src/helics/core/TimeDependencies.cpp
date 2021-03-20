@@ -106,10 +106,9 @@ bool TimeData::update(const TimeData& update)
         updated = true;
         minDe = update.minDe;
     }
-    if (update.minDeAlt != minDeAlt)
-    {
+    if (update.TeAlt != TeAlt) {
         updated = true;
-        minDeAlt = update.minDeAlt;
+        TeAlt = update.TeAlt;
     }
 
     if (prev_next != next) {
@@ -452,17 +451,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
     if (dep.connection != ConnectionType::self) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
-                mTime.minDeAlt = mTime.minDe;
                 mTime.minDe = dep.minDe;
-                mTime.minFed = dep.fedID;
-                if (dep.minFed.isValid()) {
-                    mTime.minFedActual = dep.minFed;
-                } else {
-                    mTime.minFed = dep.fedID;
-                }
-            } else if (dep.minDe == mTime.minDe) {
-                mTime.minFedActual = global_federate_id();
-                mTime.minDeAlt = mTime.minDe;
             }
         } else {
             // this minimum dependent event time received was invalid and can't be trusted
@@ -481,7 +470,17 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
     if (dep.connection != ConnectionType::self) {
         if (dep.Te < mTime.Te) {
+            mTime.TeAlt = mTime.Te;
             mTime.Te = dep.Te;
+            mTime.minFed = dep.fedID;
+            if (dep.minFed.isValid()) {
+                mTime.minFedActual = dep.minFed;
+            } else {
+                mTime.minFed = dep.fedID;
+            }
+        } else if (dep.Te == mTime.Te) {
+            mTime.minFed = global_federate_id{};
+            mTime.TeAlt = mTime.Te;
         }
     }
 }

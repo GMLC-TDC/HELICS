@@ -38,13 +38,13 @@ class TimeData {
     Time next{negEpsilon};  //!< next possible message or value
     Time Te{timeZero};  //!< the next currently scheduled event
     Time minDe{timeZero};  //!< min dependency event time
-    Time minDeAlt{timeZero};  //!< the second min dependency event time
+    Time TeAlt{timeZero};  //!< the second min event
     global_federate_id minFed{};  //!< identifier for the min dependency
     global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
     time_state_t time_state{time_state_t::initialized};
 
     TimeData() = default;
-    explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, minDeAlt{start} {};
+    explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, TeAlt{start} {};
     /** check if there is an update to the current dependency info and assign*/
     bool update(const TimeData& update);
 };
