@@ -19,6 +19,7 @@ tar xfvj "download.tar.bz2"
 mkdir -p "$BOOST_ROOT"
 cp -r boost_*/* "$BOOST_ROOT"
 export BOOST_ROOT
+cd -
 
 # Build
 mkdir build && cd build || exit
