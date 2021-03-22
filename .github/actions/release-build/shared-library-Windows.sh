@@ -15,7 +15,7 @@ BOOST_ROOT="/c/boost"
 BOOST_URL="https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download"
 cd $(mktemp -d)
 curl --location --output "download.tar.bz2" "$BOOST_URL"
-tar xfvj "download.tar.bz2"
+tar xfj "download.tar.bz2"
 mkdir -p "$BOOST_ROOT"
 cp -r boost_*/* "$BOOST_ROOT"
 export BOOST_ROOT
