@@ -7,7 +7,7 @@
 echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
 choco install -y swig
 
-# Fix cpack command (interferes with chocolatey)
+# Find cpack command (interferes with chocolatey)
 cpack_dir="$(command -v cmake)"
 cpack_dir="${cpack_dir%/cmake}"
 
