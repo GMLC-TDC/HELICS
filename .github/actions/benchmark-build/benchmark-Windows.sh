@@ -13,7 +13,7 @@ cpack_dir="${cpack_dir%/cmake}"
 BOOST_ROOT="/c/boost"
 BOOST_URL="https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download"
 (
-    cd $(mktemp -d) || exit
+    cd "$(mktemp -d)" || exit
     curl --location --output "download.tar.bz2" "$BOOST_URL"
     tar xfj "download.tar.bz2"
     mkdir -p "$BOOST_ROOT"
