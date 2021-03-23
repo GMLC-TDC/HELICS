@@ -1713,14 +1713,15 @@ std::string FederateState::processQueryActual(const std::string& query) const
 std::string FederateState::processQuery(const std::string& query, bool synchronous) const
 {
     std::string qstring;
-    if (!synchronous && (query == "publications" || query == "inputs" || query == "endpoints" ||
-        query == "global_state")) {  // these never need to be locked
+    if (!synchronous &&
+        (query == "publications" || query == "inputs" || query == "endpoints" ||
+         query == "global_state")) {  // these never need to be locked
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
             "publications;inputs;endpoints;interfaces;subscriptions;current_state;global_state;dependencies;timeconfig;config;dependents;current_time";
     } else {  // the rest might to prevent a race condition
-       if (try_lock()) {
+        if (try_lock()) {
             qstring = processQueryActual(query);
             unlock();
         } else {

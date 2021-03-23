@@ -218,7 +218,9 @@ class CommonCore: public Core, public BrokerBase {
 
     virtual void setLogFile(const std::string& lfile) override final;
 
-    virtual std::string query(const std::string& target, const std::string& queryStr, query_synch_mode mode) override;
+    virtual std::string query(const std::string& target,
+                              const std::string& queryStr,
+                              query_synch_mode mode) override;
     virtual void
         setQueryCallback(local_federate_id federateID,
                          std::function<std::string(const std::string&)> queryFunction) override;
@@ -363,7 +365,7 @@ class CommonCore: public Core, public BrokerBase {
                               bool reset,
                               bool synchronous) const;
     /** generate results for core queries*/
-    std::string coreQuery(const std::string& queryStr,bool synchronous) const;
+    std::string coreQuery(const std::string& queryStr, bool synchronous) const;
 
     /** generate results for some core queries that do not depend on the main processing loop
      * running*/
@@ -464,7 +466,9 @@ class CommonCore: public Core, public BrokerBase {
     @return "#wait" if the lock cannot be granted immediately and no result can be obtained
     otherwise an answer to the query
     */
-    std::string federateQuery(const FederateState* fed, const std::string& queryStr, bool synchronous) const;
+    std::string federateQuery(const FederateState* fed,
+                              const std::string& queryStr,
+                              bool synchronous) const;
 
     /** send an error code and message to all the federates*/
     void sendErrorToFederates(int error_code, const std::string& message);

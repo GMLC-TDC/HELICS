@@ -91,7 +91,7 @@ bool waitForInit(helics::Federate* fed,
                  const std::string& fedName,
                  std::chrono::milliseconds timeout)
 {
-    auto res = fed->query(fedName, "isinit",helics_query_mode_ordered);
+    auto res = fed->query(fedName, "isinit", helics_query_mode_ordered);
     std::chrono::milliseconds waitTime{0};
     const std::chrono::milliseconds delta{400};
     while (res != "true") {
