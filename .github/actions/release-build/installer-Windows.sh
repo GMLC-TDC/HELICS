@@ -5,12 +5,11 @@
 
 echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
 choco install -y swig
-COMMON_SCRIPTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../common/Windows" && pwd )"
+COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
 # shellcheck source=../common/Windows/find-cpack.sh
 source "${COMMON_SCRIPTS}/find-cpack.sh"
 # shellcheck source=../common/Windows/install-boost.sh
 source "${COMMON_SCRIPTS}/install-boost.sh"
-
 
 # Build
 mkdir build && cd build || exit

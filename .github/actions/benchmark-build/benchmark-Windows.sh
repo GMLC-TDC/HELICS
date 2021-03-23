@@ -4,8 +4,7 @@
 # 2. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
 echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
-
-COMMON_SCRIPTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../common/Windows" && pwd )"
+COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
 # shellcheck source=../common/Windows/find-cpack.sh
 source "${COMMON_SCRIPTS}/find-cpack.sh"
 # shellcheck source=../common/Windows/install-boost.sh
