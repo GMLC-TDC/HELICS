@@ -5,22 +5,9 @@
 
 echo "Building shared library with ${BUILD_GEN} for ${BUILD_ARCH}"
 choco install -y swig
-
-# Find cpack command (interferes with chocolatey)
-cpack_dir="$(command -v cmake)"
-cpack_dir="${cpack_dir%/cmake}"
-
-# Install Boost
-BOOST_ROOT="/c/boost"
-BOOST_URL="https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download"
-(
-    cd "$(mktemp -d)" || exit
-    curl --location --output "download.tar.bz2" "$BOOST_URL"
-    tar xfj "download.tar.bz2"
-    mkdir -p "$BOOST_ROOT"
-    cp -r boost_*/* "$BOOST_ROOT"
-) || exit
-export BOOST_ROOT
+COMMON_SCRIPTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../common/Windows" && pwd )"
+source ${COMMON_SCRIPTS/find-cpack.sh
+source ${COMMON_SCRIPTS}/install-boost.sh
 
 # Build
 mkdir build && cd build || exit
