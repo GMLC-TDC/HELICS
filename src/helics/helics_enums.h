@@ -310,7 +310,7 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { helics_query_mode_fast = 0, helics_query_mode_ordered = 1 } query_synch_mode;
+typedef enum { helics_query_mode_fast = 0, helics_query_mode_ordered = 1 } helics_query_mode;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

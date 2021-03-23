@@ -1123,7 +1123,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_INTERFACE_CONFIGURE:
             setInterfaceProperty(cmd);
             break;
-        case CMD_QUERY_SYNCHRONOUS:
+        case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             std::string repStr;
             ActionMessage queryResp(CMD_QUERY_REPLY);
@@ -1710,10 +1710,10 @@ std::string FederateState::processQueryActual(const std::string& query) const
     return "#invalid";
 }
 
-std::string FederateState::processQuery(const std::string& query, bool synchronous) const
+std::string FederateState::processQuery(const std::string& query, bool force_ordering) const
 {
     std::string qstring;
-    if (!synchronous &&
+    if (!force_ordering &&
         (query == "publications" || query == "inputs" || query == "endpoints" ||
          query == "global_state")) {  // these never need to be locked
         qstring = processQueryActual(query);

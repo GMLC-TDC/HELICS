@@ -220,7 +220,7 @@ class CommonCore: public Core, public BrokerBase {
 
     virtual std::string query(const std::string& target,
                               const std::string& queryStr,
-                              query_synch_mode mode) override;
+                              helics_query_mode mode) override;
     virtual void
         setQueryCallback(local_federate_id federateID,
                          std::function<std::string(const std::string&)> queryFunction) override;
@@ -358,14 +358,14 @@ class CommonCore: public Core, public BrokerBase {
     @param request the query to build the map for
     @param index the key of the request
     @param reset whether the builder should reset or use an existing (true to not use existing)
-    @param synchronous true if the request should use the synchronous pathways
+    @param force_ordering true if the request should use the force_ordering pathways
     */
     void initializeMapBuilder(const std::string& request,
                               std::uint16_t index,
                               bool reset,
-                              bool synchronous) const;
+                              bool force_ordering) const;
     /** generate results for core queries*/
-    std::string coreQuery(const std::string& queryStr, bool synchronous) const;
+    std::string coreQuery(const std::string& queryStr, bool force_ordering) const;
 
     /** generate results for some core queries that do not depend on the main processing loop
      * running*/
@@ -468,7 +468,7 @@ class CommonCore: public Core, public BrokerBase {
     */
     std::string federateQuery(const FederateState* fed,
                               const std::string& queryStr,
-                              bool synchronous) const;
+                              bool force_ordering) const;
 
     /** send an error code and message to all the federates*/
     void sendErrorToFederates(int error_code, const std::string& message);
