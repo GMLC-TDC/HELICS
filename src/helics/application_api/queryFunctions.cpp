@@ -91,7 +91,7 @@ bool waitForInit(helics::Federate* fed,
                  const std::string& fedName,
                  std::chrono::milliseconds timeout)
 {
-    auto res = fed->query(fedName, "isinit");
+    auto res = fed->query(fedName, "isinit",helics_query_mode_ordered);
     std::chrono::milliseconds waitTime{0};
     const std::chrono::milliseconds delta{400};
     while (res != "true") {
@@ -99,7 +99,7 @@ bool waitForInit(helics::Federate* fed,
             return false;
         }
         std::this_thread::sleep_for(delta);
-        res = fed->query(fedName, "isinit");
+        res = fed->query(fedName, "isinit", helics_query_mode_ordered);
         waitTime += delta;
         if (waitTime >= timeout) {
             return false;
@@ -128,7 +128,7 @@ bool waitForFed(helics::Federate* fed,
 
 std::string queryFederateSubscriptions(helics::Federate* fed, const std::string& fedName)
 {
-    auto res = fed->query(fedName, "subscriptions");
+    auto res = fed->query(fedName, "subscriptions", helics_query_mode_ordered);
     if (res.size() > 2 && res != "#invalid") {
         res = fed->query("gid_to_name", res);
     }

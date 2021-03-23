@@ -95,7 +95,7 @@ class Broker {
       @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
-    virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
+    virtual std::string query(const std::string& target, const std::string& queryStr, query_synch_mode mode=helics_query_mode_fast) = 0;
 
     /** set a federation global value
     @details this overwrites any previous value for this name
