@@ -5,7 +5,7 @@
 
 echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
 
-COMMON_SCRIPTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../common/Windows" && pwd )"
+COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
 source "${COMMON_SCRIPTS}/find-cpack.sh"
 source "${COMMON_SCRIPTS}/install-boost.sh"
 
