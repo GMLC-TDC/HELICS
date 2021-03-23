@@ -854,9 +854,9 @@ const char* helicsQueryExecute(helics_query query, helics_federate fed, helics_e
         return invalidStringConst;
     }
     if (queryObj->target.empty()) {
-        queryObj->response = fedObj->query(queryObj->query);
+        queryObj->response = fedObj->query(queryObj->query, queryObj->mode);
     } else {
-        queryObj->response = fedObj->query(queryObj->target, queryObj->query);
+        queryObj->response = fedObj->query(queryObj->target, queryObj->query, queryObj->mode);
     }
 
     return queryObj->response.c_str();
@@ -873,7 +873,7 @@ const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_
         return invalidStringConst;
     }
     try {
-        queryObj->response = coreObj->query(queryObj->target, queryObj->query);
+        queryObj->response = coreObj->query(queryObj->target, queryObj->query, queryObj->mode);
         return queryObj->response.c_str();
     }
     // LCOV_EXCL_START
@@ -896,7 +896,7 @@ const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, h
         return invalidStringConst;
     }
     try {
-        queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
+        queryObj->response = brokerObj->query(queryObj->target, queryObj->query, queryObj->mode);
         return queryObj->response.c_str();
     }
     // LCOV_EXCL_START
