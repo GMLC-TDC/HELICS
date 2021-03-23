@@ -208,9 +208,9 @@ const std::string& CoreApp::getAddress() const
 }
 
 /** make a query at the core*/
-std::string CoreApp::query(const std::string& target, const std::string& queryStr)
+std::string CoreApp::query(const std::string& target, const std::string& queryStr, query_synch_mode mode)
 {
-    return (core) ? core->query(target, queryStr) : std::string("#error");
+    return (core) ? core->query(target, queryStr, mode) : std::string("#error");
 }
 
 void CoreApp::setGlobal(const std::string& valueName, const std::string& value)
