@@ -1105,7 +1105,7 @@ std::string Federate::query(const std::string& queryStr, query_synch_mode mode)
     }
     if (res.empty()) {
         if (coreObject) {
-            res = coreObject->query(getName(), queryStr,mode);
+            res = coreObject->query(getName(), queryStr, mode);
         } else {
             res = "#disconnected";
         }
@@ -1121,7 +1121,7 @@ std::string
         res = query(queryStr);
     } else {
         if (coreObject) {
-            res = coreObject->query(target, queryStr,mode);
+            res = coreObject->query(target, queryStr, mode);
         } else {
             res = "#disconnected";
         }
@@ -1129,10 +1129,12 @@ std::string
     return res;
 }
 
-query_id_t Federate::queryAsync(const std::string& target, const std::string& queryStr, query_synch_mode mode)
+query_id_t Federate::queryAsync(const std::string& target,
+                                const std::string& queryStr,
+                                query_synch_mode mode)
 {
-    auto queryFut = std::async(std::launch::async, [this, target, queryStr,mode]() {
-        return coreObject->query(target, queryStr,mode);
+    auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
+        return coreObject->query(target, queryStr, mode);
     });
     auto asyncInfo = asyncCallInfo->lock();
     int cnt = asyncInfo->queryCounter++;
@@ -1143,7 +1145,8 @@ query_id_t Federate::queryAsync(const std::string& target, const std::string& qu
 
 query_id_t Federate::queryAsync(const std::string& queryStr, query_synch_mode mode)
 {
-    auto queryFut = std::async(std::launch::async, [this, queryStr,mode]() { return query(queryStr,mode); });
+    auto queryFut =
+        std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });
     auto asyncInfo = asyncCallInfo->lock();
     int cnt = asyncInfo->queryCounter++;
 
