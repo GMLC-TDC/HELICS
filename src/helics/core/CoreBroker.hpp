@@ -285,7 +285,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void setLogFile(const std::string& lfile) override final;
     virtual std::string query(const std::string& target,
                               const std::string& queryStr,
-                              query_synch_mode mode = helics_query_mode_fast) override final;
+                              helics_query_mode mode = helics_query_mode_fast) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& publication, const std::string& input) override final;
@@ -332,7 +332,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** generate an answer to a local query*/
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer(const std::string& request, bool synchronous);
+    std::string generateQueryAnswer(const std::string& request, bool force_ordering);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;
     /** locate the route to take to a particular federate*/
@@ -355,7 +355,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void initializeMapBuilder(const std::string& request,
                               std::uint16_t index,
                               bool reset,
-                              bool synchronous);
+                              bool force_ordering);
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);

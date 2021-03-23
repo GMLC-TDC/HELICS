@@ -979,6 +979,15 @@ void helicsQuerySetQueryString(helics_query query, const char* queryString, heli
     queryObj->query = AS_STRING(queryString);
 }
 
+void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err)
+{
+    auto* queryObj = getQueryObj(query, err);
+    if (queryObj == nullptr) {
+        return;
+    }
+    queryObj->mode = (mode == 0) ? helics_query_mode_fast : helics_query_mode_ordered;
+}
+
 void helicsQueryFree(helics_query query)
 {
     auto* queryObj = getQueryObj(query, nullptr);

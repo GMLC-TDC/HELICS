@@ -33,11 +33,11 @@ across different compilers*/
             -254,  //!< priority commands usually do not have an ack this is an ack that
         //!< doesn't do anything
         cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
-        cmd_query_synchronous =
+        cmd_query_ordered =
             937,  //!< send a query along the synchronous paths instead of priority channels
         cmd_set_global = -cmd_info_basis - 55,  //!< set a global value
         cmd_broker_query = -37,  //!< send a query to a core
-        cmd_broker_query_synchronous = 939,  //!< send a query to a core
+        cmd_broker_query_ordered = 939,  //!< send a query to a core
         cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
         cmd_reg_broker =
             -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
@@ -315,9 +315,9 @@ across different compilers*/
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
 
 #define CMD_QUERY action_message_def::action_t::cmd_query
-#define CMD_QUERY_SYNCHRONOUS action_message_def::action_t::cmd_query_synchronous
+#define CMD_QUERY_ORDERED action_message_def::action_t::cmd_query_ordered
 #define CMD_BROKER_QUERY action_message_def::action_t::cmd_broker_query
-#define CMD_BROKER_QUERY_SYNCHRONOUS action_message_def::action_t::cmd_broker_query_synchronous
+#define CMD_BROKER_QUERY_ORDERED action_message_def::action_t::cmd_broker_query_ordered
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
 #define CMD_SET_GLOBAL action_message_def::action_t::cmd_set_global
 

@@ -99,7 +99,7 @@ class Broker {
     */
     virtual std::string query(const std::string& target,
                               const std::string& queryStr,
-                              query_synch_mode mode = helics_query_mode_fast) = 0;
+                              helics_query_mode mode = helics_query_mode_fast) = 0;
 
     /** set a federation global value
     @details this overwrites any previous value for this name

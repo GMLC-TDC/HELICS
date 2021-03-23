@@ -1921,7 +1921,7 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
 
 std::string CommonCore::federateQuery(const FederateState* fed,
                                       const std::string& queryStr,
-                                      bool synchronous) const
+                                      bool force_ordering) const
 {
     if (fed == nullptr) {
         if (queryStr == "exists") {
@@ -1939,12 +1939,12 @@ std::string CommonCore::federateQuery(const FederateState* fed,
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
     if (queryStr == "state") {
-        if (!synchronous) {
+        if (!force_ordering) {
             return fedStateString(fed->getState());
         }
     }
     if (queryStr == "filtered_endpoints") {
-        if (!synchronous) {
+        if (!force_ordering) {
             return filteredEndpointQuery(fed);
         }
     }
@@ -1952,7 +1952,7 @@ std::string CommonCore::federateQuery(const FederateState* fed,
         return std::string("[exists;isinit;state;version;queries;filtered_endpoints;") +
             fed->processQuery(queryStr) + "]";
     }
-    return fed->processQuery(queryStr, synchronous);
+    return fed->processQuery(queryStr, force_ordering);
 }
 
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
@@ -1999,7 +1999,7 @@ void CommonCore::loadBasicJsonInfo(
 void CommonCore::initializeMapBuilder(const std::string& request,
                                       std::uint16_t index,
                                       bool reset,
-                                      bool synchronous) const
+                                      bool force_ordering) const
 {
     if (!isValidIndex(index, mapBuilders)) {
         mapBuilders.resize(index + 1);
@@ -2011,7 +2011,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
-    ActionMessage queryReq(synchronous ? CMD_QUERY_SYNCHRONOUS : CMD_QUERY);
+    ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
@@ -2020,7 +2020,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
         for (const auto& fed : loopFederates) {
             int brkindex =
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
-            std::string ret = federateQuery(fed.fed, request, synchronous);
+            std::string ret = federateQuery(fed.fed, request, force_ordering);
             if (ret == "#wait") {
                 queryReq.messageID = brkindex;
                 queryReq.dest_id = fed.fed->global_id;
@@ -2070,7 +2070,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     }
 }
 
-std::string CommonCore::coreQuery(const std::string& queryStr, bool synchronous) const
+std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
 {
     auto res = quickCoreQueries(queryStr);
     if (!res.empty()) {
@@ -2167,7 +2167,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool synchronous)
             }
         }
 
-        initializeMapBuilder(queryStr, index, mi->second.second, synchronous);
+        initializeMapBuilder(queryStr, index, mi->second.second, force_ordering);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
             if (!mi->second.second) {
                 auto center = generateMapObjectCounter();
@@ -2208,7 +2208,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool synchronous)
 }
 
 std::string
-    CommonCore::query(const std::string& target, const std::string& queryStr, query_synch_mode mode)
+    CommonCore::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -2219,7 +2219,7 @@ std::string
         }
         return "#disconnected";
     }
-    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_SYNCHRONOUS);
+    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = direct_core_id;
     querycmd.dest_id = parent_broker_id;
     querycmd.payload = queryStr;
@@ -2236,7 +2236,7 @@ std::string
             return getAddress();
         }
         querycmd.setAction(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
-                                                            CMD_BROKER_QUERY_SYNCHRONOUS);
+                                                            CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
     if (querycmd.dest_id != direct_core_id) {
@@ -2699,8 +2699,8 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_TIME_UNBLOCK:
             manageTimeBlocks(command);
             break;
-        case CMD_BROKER_QUERY_SYNCHRONOUS:
-        case CMD_QUERY_SYNCHRONOUS:
+        case CMD_BROKER_QUERY_ORDERED:
+        case CMD_QUERY_ORDERED:
             processQueryCommand(command);
             break;
         case CMD_DISCONNECT_CHECK:
@@ -3571,10 +3571,10 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_BROKER_QUERY:
-        case CMD_BROKER_QUERY_SYNCHRONOUS:
+        case CMD_BROKER_QUERY_ORDERED:
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
                 std::string repStr =
-                    coreQuery(cmd.payload, cmd.action() == CMD_BROKER_QUERY_SYNCHRONOUS);
+                    coreQuery(cmd.payload, cmd.action() == CMD_BROKER_QUERY_ORDERED);
                 if (repStr != "#wait") {
                     if (cmd.source_id == direct_core_id) {
                         // TODO(PT) make setDelayedValue have a move method
@@ -3602,16 +3602,16 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             }
             break;
         case CMD_QUERY:
-        case CMD_QUERY_SYNCHRONOUS: {
-            bool synch = (cmd.action() == CMD_QUERY_SYNCHRONOUS);
+        case CMD_QUERY_ORDERED: {
+            bool force_ordered = (cmd.action() == CMD_QUERY_ORDERED);
             if (cmd.dest_id == parent_broker_id) {
                 const auto& target = cmd.getString(targetStringLoc);
                 if (target == "root" || target == "federation") {
-                    cmd.setAction(synch ? CMD_BROKER_QUERY_SYNCHRONOUS : CMD_BROKER_QUERY);
+                    cmd.setAction(force_ordered ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
                     cmd.dest_id = root_broker_id;
                     cmd.clearStringData();
                 } else if (target == "parent" || target == "broker") {
-                    cmd.setAction(synch ? CMD_BROKER_QUERY_SYNCHRONOUS : CMD_BROKER_QUERY);
+                    cmd.setAction(force_ordered ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
                     cmd.dest_id = higher_broker_id;
                     cmd.clearStringData();
                 }
@@ -3634,10 +3634,10 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 const std::string& target = cmd.getString(targetStringLoc);
                 if (target == getIdentifier()) {
                     queryResp.source_id = global_broker_id_local;
-                    repStr = coreQuery(cmd.payload, synch);
+                    repStr = coreQuery(cmd.payload, force_ordered);
                 } else {
                     auto* fedptr = getFederateCore(target);
-                    repStr = federateQuery(fedptr, cmd.payload, synch);
+                    repStr = federateQuery(fedptr, cmd.payload, force_ordered);
                     if (repStr == "#wait") {
                         if (fedptr != nullptr) {
                             cmd.dest_id = fedptr->global_id;

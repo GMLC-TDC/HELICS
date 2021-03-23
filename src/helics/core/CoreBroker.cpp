@@ -1149,8 +1149,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_BROKER_CONFIGURE:
             processBrokerConfigureCommands(command);
             break;
-        case CMD_BROKER_QUERY_SYNCHRONOUS:
-        case CMD_QUERY_SYNCHRONOUS:
+        case CMD_BROKER_QUERY_ORDERED:
+        case CMD_QUERY_ORDERED:
             processQueryCommand(command);
             break;
         default:
@@ -2413,12 +2413,12 @@ void CoreBroker::setLogFile(const std::string& lfile)
 
 // public query function
 std::string
-    CoreBroker::query(const std::string& target, const std::string& queryStr, query_synch_mode mode)
+    CoreBroker::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
 {
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
         ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_SYNCHRONOUS);
+                                                                CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -2434,7 +2434,7 @@ std::string
             return "#na";
         }
         ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_SYNCHRONOUS);
+                                                                CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
@@ -2446,7 +2446,7 @@ std::string
     }
     if ((target == "root") || (target == "rootbroker")) {
         ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_SYNCHRONOUS);
+                                                                CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -2459,7 +2459,7 @@ std::string
         return ret;
     }
 
-    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_SYNCHRONOUS);
+    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = gid;
     auto index = ++queryCounter;
     querycmd.messageID = index;
@@ -2505,7 +2505,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time_debugging", {global_time_debugging, true}},
 };
 
-std::string CoreBroker::generateQueryAnswer(const std::string& request, bool synchronous)
+std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
     if (request == "isinit") {
         return (brokerState >= broker_state_t::operating) ? std::string("true") :
@@ -2626,7 +2626,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool syn
             }
         }
 
-        initializeMapBuilder(request, index, mi->second.second, synchronous);
+        initializeMapBuilder(request, index, mi->second.second, force_ordering);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
             if (!mi->second.second) {
                 auto center = generateMapObjectCounter();
@@ -2727,7 +2727,7 @@ std::string CoreBroker::getNameList(std::string gidString) const
 void CoreBroker::initializeMapBuilder(const std::string& request,
                                       std::uint16_t index,
                                       bool reset,
-                                      bool synchronous)
+                                      bool force_ordering)
 {
     if (!isValidIndex(index, mapBuilders)) {
         mapBuilders.resize(index + 1);
@@ -2745,7 +2745,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
         base["parent"] = higher_broker_id.baseValue();
     }
     base["brokers"] = Json::arrayValue;
-    ActionMessage queryReq(synchronous ? CMD_BROKER_QUERY_SYNCHRONOUS : CMD_BROKER_QUERY);
+    ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
@@ -2843,8 +2843,8 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     queryRep.dest_id = m.source_id;
     queryRep.messageID = m.messageID;
     queryRep.payload = generateQueryAnswer(m.payload,
-                                           m.action() == CMD_QUERY_SYNCHRONOUS ||
-                                               m.action() == CMD_BROKER_QUERY_SYNCHRONOUS);
+                                           m.action() == CMD_QUERY_ORDERED ||
+                                               m.action() == CMD_BROKER_QUERY_ORDERED);
     queryRep.counter = m.counter;
     if (queryRep.payload == "#wait") {
         std::get<1>(mapBuilders[mapIndex.at(m.payload).first]).push_back(queryRep);
@@ -2902,7 +2902,7 @@ void CoreBroker::processQueryCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_BROKER_QUERY:
-        case CMD_BROKER_QUERY_SYNCHRONOUS:
+        case CMD_BROKER_QUERY_ORDERED:
             if (!connectionEstablished) {
                 earlyMessages.push_back(std::move(cmd));
                 break;
@@ -2915,7 +2915,7 @@ void CoreBroker::processQueryCommand(ActionMessage& cmd)
             }
             break;
         case CMD_QUERY:
-        case CMD_QUERY_SYNCHRONOUS:
+        case CMD_QUERY_ORDERED:
             processQuery(cmd);
             break;
         case CMD_QUERY_REPLY:
