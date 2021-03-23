@@ -4,12 +4,18 @@
 # 2. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
 
 echo "Building shared library with ${BUILD_GEN} for ${BUILD_ARCH}"
+
+# Install SWIG
 choco install -y swig
+
+# Install Boost
 COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
-# shellcheck source=../common/Windows/find-cpack.sh
-source "${COMMON_SCRIPTS}/find-cpack.sh"
 # shellcheck source=../common/Windows/install-boost.sh
 source "${COMMON_SCRIPTS}/install-boost.sh"
+
+# Find cpack command (chocolatey has a command with the same name)
+cpack_dir="$(command -v cmake)"
+cpack_dir="${cpack_dir%/cmake}"
 
 # Build
 mkdir build && cd build || exit

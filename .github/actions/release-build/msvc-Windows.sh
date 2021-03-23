@@ -5,12 +5,18 @@
 # 3. moving the generated installer with a rename to add msvcYYYY to the file name
 
 echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
+
+# Install SWIG
 choco install -y swig
+
+# Install Boost
 COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
-# shellcheck source=../common/Windows/find-cpack.sh
-source "${COMMON_SCRIPTS}/find-cpack.sh"
 # shellcheck source=../common/Windows/install-boost.sh
 source "${COMMON_SCRIPTS}/install-boost.sh"
+
+# Find cpack command (chocolatey has a command with the same name)
+cpack_dir="$(command -v cmake)"
+cpack_dir="${cpack_dir%/cmake}"
 
 # Build
 mkdir build && cd build || exit
