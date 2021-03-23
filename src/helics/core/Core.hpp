@@ -718,7 +718,7 @@ class Core {
     target can also be "global" to query a global value stored in the broker
     @param target the specific target of the query
     @param queryStr the actual query
-    @param mode
+    @param mode the synchronization mode for the query
     @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */

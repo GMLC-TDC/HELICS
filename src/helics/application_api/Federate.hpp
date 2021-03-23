@@ -324,7 +324,7 @@ class HELICS_CXX_EXPORT Federate {
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate if the local federate does not recognize the query it
     sends it on to the federation
-    @param mode asynchronous(default) means the query goes on priority channels, synchronous is
+    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered (synchronous) is
     slower but has more ordering guarantees
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
