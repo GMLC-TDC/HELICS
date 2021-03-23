@@ -11,5 +11,3 @@ BOOST_URL="https://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
     cp -r boost_*/* "$BOOST_ROOT"
 ) || exit
 export BOOST_ROOT
-
-
