@@ -376,7 +376,7 @@ class FederateState {
     @param synchronous true if the query should be processed in a synchronous way
     @return the resulting string from the query or "#wait" if the federate is not available to
     answer immediately*/
-    std::string processQuery(const std::string& query, bool synchronous=false) const;
+    std::string processQuery(const std::string& query, bool synchronous = false) const;
     /** check if a value should be published or not and if needed archive it as a changed value for
     future change detection
     @param pub_id the handle of the publication

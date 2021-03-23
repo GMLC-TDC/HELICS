@@ -917,7 +917,7 @@ TEST_F(query, concurrent_callback)
 
     vFed1->enterExecutingModeAsync();
     auto core = vFed1->getCorePointer();
-    auto res = core->query(vFed1->getName(), "abc",helics_query_mode_fast);
+    auto res = core->query(vFed1->getName(), "abc", helics_query_mode_fast);
     EXPECT_EQ(res, "AAAA");
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();

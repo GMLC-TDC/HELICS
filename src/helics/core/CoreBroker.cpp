@@ -579,7 +579,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_SET_GLOBAL:
             processQueryCommand(command);
             break;
-        
+
         default:
             // must not have been a priority command
             break;

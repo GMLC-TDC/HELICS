@@ -29,10 +29,12 @@ across different compilers*/
         cmd_route_ack = -16,  //!< acknowledge reply to a route registration
         cmd_register_route = -15,  //!< instructions to create a direct route to another federate
         cmd_reg_fed = -105,  //!< register a federate
-        cmd_priority_ack = -254,  //!< priority commands usually do not have an ack this is an ack that
+        cmd_priority_ack =
+            -254,  //!< priority commands usually do not have an ack this is an ack that
         //!< doesn't do anything
         cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
-        cmd_query_synchronous = 937, //!< send a query along the synchronous paths instead of priority channels
+        cmd_query_synchronous =
+            937,  //!< send a query along the synchronous paths instead of priority channels
         cmd_set_global = -cmd_info_basis - 55,  //!< set a global value
         cmd_broker_query = -37,  //!< send a query to a core
         cmd_broker_query_synchronous = 939,  //!< send a query to a core

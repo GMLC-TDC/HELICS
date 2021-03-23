@@ -182,7 +182,8 @@ namespace apps {
     {
         auto res = waitForInit(fed.get(), captureFederate);
         if (res) {
-            auto pubs = vectorizeQueryResult(fed->query(captureFederate, "publications",helics_query_mode_ordered));
+            auto pubs = vectorizeQueryResult(
+                fed->query(captureFederate, "publications", helics_query_mode_ordered));
             for (auto& pub : pubs) {
                 if (pub.empty()) {
                     continue;

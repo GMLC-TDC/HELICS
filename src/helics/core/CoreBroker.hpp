@@ -352,7 +352,10 @@ class CoreBroker: public Broker, public BrokerBase {
 
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing one of the data Maps*/
-    void initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset, bool synchronous);
+    void initializeMapBuilder(const std::string& request,
+                              std::uint16_t index,
+                              bool reset,
+                              bool synchronous);
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);
