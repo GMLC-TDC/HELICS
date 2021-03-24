@@ -341,8 +341,8 @@ class HELICS_CXX_EXPORT Federate {
     specific name of a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
-    @param mode asynchronous(default) means the query goes on priority channels, synchronous is
-    slower but has more ordering guarantees
+    @param mode fast (asynchronous; default) means the query goes on priority channels,
+    ordered(synchronous) is slower but has more ordering guarantees
     @return a query_id_t to use for returning the result
     */
     query_id_t queryAsync(const std::string& target,
