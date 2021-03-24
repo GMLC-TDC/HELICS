@@ -2207,8 +2207,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     return "#invalid";
 }
 
-std::string
-    CommonCore::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
+std::string CommonCore::query(const std::string& target,
+                              const std::string& queryStr,
+                              helics_query_mode mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {

@@ -108,8 +108,8 @@ class HELICS_CXX_EXPORT CoreApp {
     @param target the target of the query "federation", "parent", "core","broker" or a specific
     named object
     @param queryStr the query to make
-    @param mode defaults to fast (asynchronous) meaning the query goes into priority channels, ordered
-    (synchronous) means slower queries but has more ordering guarantees
+    @param mode defaults to fast (asynchronous) meaning the query goes into priority channels,
+    ordered (synchronous) means slower queries but has more ordering guarantees
     @return a string containing the query results
     */
     std::string query(const std::string& target,
