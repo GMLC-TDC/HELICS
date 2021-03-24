@@ -67,7 +67,7 @@ TEST_F(query_tests, exists)
     res = core1.query(brk->getIdentifier(), "exists");
     EXPECT_EQ(res, "true");
 
-    res = core1.query(mFed1->getName(), "exists",helics_query_mode_ordered);
+    res = core1.query(mFed1->getName(), "exists", helics_query_mode_ordered);
     EXPECT_EQ(res, "true");
 
     res = core1.query(mFed2->getName(), "exists");

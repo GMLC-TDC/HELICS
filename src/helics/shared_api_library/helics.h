@@ -1524,7 +1524,6 @@ HELICS_EXPORT void helicsQuerySetTarget(helics_query query, const char* target, 
  */
 HELICS_EXPORT void helicsQuerySetQueryString(helics_query query, const char* queryString, helics_error* err);
 
-
 /**
  * Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence
  *
