@@ -465,14 +465,21 @@ class Federate {
     specific name of a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
+    @param mode the ordering mode to use for the query (fast-priority channels, ordered for normal
+    channels ordered with all other messages)
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& target, const std::string& queryStr) const
+    std::string query(const std::string& target,
+                      const std::string& queryStr,
+                      helics_query_mode mode = helics_query_mode_fast) const
     {
         // returns helics_query
         helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        if (mode != helics_query_mode_fast) {
+            helicsQuerySetOrdering(q, mode, HELICS_IGNORE_ERROR);
+        }
         std::string result(helicsQueryExecute(q, fed, hThrowOnError()));
         helicsQueryFree(q);
         return result;
@@ -485,14 +492,20 @@ class Federate {
 
     @param queryStr a string with the query, see other documentation for specific properties to
     query, can be defined by the federate
+    @param mode the ordering mode to use for the query (fast-priority channels, ordered for normal
+    channels ordered with all other messages)
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& queryStr) const
+    std::string query(const std::string& queryStr,
+                      helics_query_mode mode = helics_query_mode_fast) const
     {
         // returns helics_query
         helics_query q = helicsCreateQuery(HELICS_NULL_POINTER, queryStr.c_str());
+        if (mode != helics_query_mode_fast) {
+            helicsQuerySetOrdering(q, mode, HELICS_IGNORE_ERROR);
+        }
         std::string result(helicsQueryExecute(q, fed, hThrowOnError()));
         helicsQueryFree(q);
         return result;
