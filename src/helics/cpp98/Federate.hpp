@@ -465,7 +465,7 @@ class Federate {
     specific name of a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
-    @param mode the ordering mode to use for the query (fast-priority channels, ordered for normal
+    @param mode the ordering mode to use for the query (fast for priority channels, ordered for normal
     channels ordered with all other messages)
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
@@ -492,7 +492,7 @@ class Federate {
 
     @param queryStr a string with the query, see other documentation for specific properties to
     query, can be defined by the federate
-    @param mode the ordering mode to use for the query (fast-priority channels, ordered for normal
+    @param mode the ordering mode to use for the query (fast for priority channels, ordered for normal
     channels ordered with all other messages)
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
