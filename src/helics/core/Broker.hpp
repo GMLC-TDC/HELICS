@@ -92,8 +92,8 @@ class Broker {
     query is a broken
     @param target the specific target of the query
     @param queryStr the actual query
-    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered (synchronous) is
-    slower but has more ordering guarantees
+    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered
+    (synchronous) is slower but has more ordering guarantees
       @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
