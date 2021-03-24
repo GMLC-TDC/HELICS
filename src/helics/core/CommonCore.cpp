@@ -1919,7 +1919,9 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
     return generateJsonString(base);
 }
 
-std::string CommonCore::federateQuery(const FederateState* fed, const std::string& queryStr) const
+std::string CommonCore::federateQuery(const FederateState* fed,
+                                      const std::string& queryStr,
+                                      bool force_ordering) const
 {
     if (fed == nullptr) {
         if (queryStr == "exists") {
@@ -1937,16 +1939,20 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
     if (queryStr == "state") {
-        return fedStateString(fed->getState());
+        if (!force_ordering) {
+            return fedStateString(fed->getState());
+        }
     }
     if (queryStr == "filtered_endpoints") {
-        return filteredEndpointQuery(fed);
+        if (!force_ordering) {
+            return filteredEndpointQuery(fed);
+        }
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string("[exists;isinit;state;version;queries;filtered_endpoints;") +
             fed->processQuery(queryStr) + "]";
     }
-    return fed->processQuery(queryStr);
+    return fed->processQuery(queryStr, force_ordering);
 }
 
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
@@ -1992,7 +1998,8 @@ void CommonCore::loadBasicJsonInfo(
 
 void CommonCore::initializeMapBuilder(const std::string& request,
                                       std::uint16_t index,
-                                      bool reset) const
+                                      bool reset,
+                                      bool force_ordering) const
 {
     if (!isValidIndex(index, mapBuilders)) {
         mapBuilders.resize(index + 1);
@@ -2004,7 +2011,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
-    ActionMessage queryReq(CMD_QUERY);
+    ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
@@ -2013,7 +2020,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
         for (const auto& fed : loopFederates) {
             int brkindex =
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
-            std::string ret = federateQuery(fed.fed, request);
+            std::string ret = federateQuery(fed.fed, request, force_ordering);
             if (ret == "#wait") {
                 queryReq.messageID = brkindex;
                 queryReq.dest_id = fed.fed->global_id;
@@ -2063,7 +2070,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     }
 }
 
-std::string CommonCore::coreQuery(const std::string& queryStr) const
+std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
 {
     auto res = quickCoreQueries(queryStr);
     if (!res.empty()) {
@@ -2160,7 +2167,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
             }
         }
 
-        initializeMapBuilder(queryStr, index, mi->second.second);
+        initializeMapBuilder(queryStr, index, mi->second.second, force_ordering);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
             if (!mi->second.second) {
                 auto center = generateMapObjectCounter();
@@ -2200,7 +2207,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     return "#invalid";
 }
 
-std::string CommonCore::query(const std::string& target, const std::string& queryStr)
+std::string CommonCore::query(const std::string& target,
+                              const std::string& queryStr,
+                              helics_query_mode mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -2211,7 +2220,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         }
         return "#disconnected";
     }
-    ActionMessage querycmd(CMD_QUERY);
+    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = direct_core_id;
     querycmd.dest_id = parent_broker_id;
     querycmd.payload = queryStr;
@@ -2227,7 +2236,8 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         if (queryStr == "address") {
             return getAddress();
         }
-        querycmd.setAction(CMD_BROKER_QUERY);
+        querycmd.setAction(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
+                                                            CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
     if (querycmd.dest_id != direct_core_id) {
@@ -2235,7 +2245,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         auto* fed =
             (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
         if (fed != nullptr) {
-            std::string ret = federateQuery(fed, queryStr);
+            std::string ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
             if (ret != "#wait") {
                 return ret;
             }
@@ -2256,7 +2266,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
                     }
                     case std::future_status::timeout: {  // federate query may need to wait or can
                                                          // get the result now
-                        ret = federateQuery(fed, queryStr);
+                        ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
                         if (ret != "#wait") {
                             activeQueries.finishedWithValue(index);
                             return ret;
@@ -2407,91 +2417,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             checkAndProcessDisconnect();
             break;
         case CMD_BROKER_QUERY:
-            if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {
-                std::string repStr = coreQuery(command.payload);
-                if (repStr != "#wait") {
-                    if (command.source_id == direct_core_id) {
-                        // TODO(PT) make setDelayedValue have a move method
-                        activeQueries.setDelayedValue(command.messageID, repStr);
-                    } else {
-                        ActionMessage queryResp(CMD_QUERY_REPLY);
-                        queryResp.dest_id = command.source_id;
-                        queryResp.source_id = global_broker_id_local;
-                        queryResp.messageID = command.messageID;
-                        queryResp.payload = std::move(repStr);
-                        queryResp.counter = command.counter;
-                        transmit(getRoute(queryResp.dest_id), queryResp);
-                    }
-                } else {
-                    ActionMessage queryResp(CMD_QUERY_REPLY);
-                    queryResp.dest_id = command.source_id;
-                    queryResp.source_id = global_broker_id_local;
-                    queryResp.messageID = command.messageID;
-                    queryResp.counter = command.counter;
-                    std::get<1>(mapBuilders[mapIndex.at(command.payload).first])
-                        .push_back(queryResp);
-                }
-
-            } else {
-                routeMessage(std::move(command));
-            }
-            break;
-        case CMD_QUERY: {
-            if (command.dest_id == parent_broker_id) {
-                const auto& target = command.getString(targetStringLoc);
-                if (target == "root" || target == "federation") {
-                    command.setAction(CMD_BROKER_QUERY);
-                    command.dest_id = root_broker_id;
-                    command.clearStringData();
-                } else if (target == "parent" || target == "broker") {
-                    command.setAction(CMD_BROKER_QUERY);
-                    command.dest_id = higher_broker_id;
-                    command.clearStringData();
-                }
-                if (global_broker_id_local != parent_broker_id) {
-                    // forward on to Broker
-                    command.source_id = global_broker_id_local;
-                    transmit(parent_route_id, std::move(command));
-                } else {
-                    // this will get processed when this core is assigned a global id
-                    command.source_id = direct_core_id;
-                    delayTransmitQueue.push(std::move(command));
-                }
-            } else {
-                std::string repStr;
-                ActionMessage queryResp(CMD_QUERY_REPLY);
-                queryResp.dest_id = command.source_id;
-                queryResp.source_id = command.dest_id;
-                queryResp.messageID = command.messageID;
-                queryResp.counter = command.counter;
-                const std::string& target = command.getString(targetStringLoc);
-                if (target == getIdentifier()) {
-                    queryResp.source_id = global_broker_id_local;
-                    repStr = coreQuery(command.payload);
-                } else {
-                    auto* fedptr = getFederateCore(target);
-                    repStr = federateQuery(fedptr, command.payload);
-                    if (repStr == "#wait") {
-                        if (fedptr != nullptr) {
-                            command.dest_id = fedptr->global_id;
-                            fedptr->addAction(std::move(command));
-                            break;
-                        }
-                        repStr = "#error";
-                    }
-                }
-
-                queryResp.payload = std::move(repStr);
-                transmit(getRoute(queryResp.dest_id), queryResp);
-            }
-
-        } break;
+        case CMD_QUERY:
         case CMD_QUERY_REPLY:
-            if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {
-                processQueryResponse(command);
-            } else {
-                transmit(getRoute(command.dest_id), command);
-            }
+            processQueryCommand(command);
             break;
         case CMD_PRIORITY_ACK:
         case CMD_ROUTE_ACK:
@@ -2771,6 +2699,10 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_TIME_BLOCK:
         case CMD_TIME_UNBLOCK:
             manageTimeBlocks(command);
+            break;
+        case CMD_BROKER_QUERY_ORDERED:
+        case CMD_QUERY_ORDERED:
+            processQueryCommand(command);
             break;
         case CMD_DISCONNECT_CHECK:
             checkAndProcessDisconnect();
@@ -3632,6 +3564,101 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             LOG_WARNING(global_broker_id_local,
                         identifier,
                         "unrecognized configure option passed to core ");
+            break;
+    }
+}
+
+void CommonCore::processQueryCommand(ActionMessage& cmd)
+{
+    switch (cmd.action()) {
+        case CMD_BROKER_QUERY:
+        case CMD_BROKER_QUERY_ORDERED:
+            if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
+                std::string repStr =
+                    coreQuery(cmd.payload, cmd.action() == CMD_BROKER_QUERY_ORDERED);
+                if (repStr != "#wait") {
+                    if (cmd.source_id == direct_core_id) {
+                        // TODO(PT) make setDelayedValue have a move method
+                        activeQueries.setDelayedValue(cmd.messageID, repStr);
+                    } else {
+                        ActionMessage queryResp(CMD_QUERY_REPLY);
+                        queryResp.dest_id = cmd.source_id;
+                        queryResp.source_id = global_broker_id_local;
+                        queryResp.messageID = cmd.messageID;
+                        queryResp.payload = std::move(repStr);
+                        queryResp.counter = cmd.counter;
+                        transmit(getRoute(queryResp.dest_id), queryResp);
+                    }
+                } else {
+                    ActionMessage queryResp(CMD_QUERY_REPLY);
+                    queryResp.dest_id = cmd.source_id;
+                    queryResp.source_id = global_broker_id_local;
+                    queryResp.messageID = cmd.messageID;
+                    queryResp.counter = cmd.counter;
+                    std::get<1>(mapBuilders[mapIndex.at(cmd.payload).first]).push_back(queryResp);
+                }
+
+            } else {
+                routeMessage(std::move(cmd));
+            }
+            break;
+        case CMD_QUERY:
+        case CMD_QUERY_ORDERED: {
+            bool force_ordered = (cmd.action() == CMD_QUERY_ORDERED);
+            if (cmd.dest_id == parent_broker_id) {
+                const auto& target = cmd.getString(targetStringLoc);
+                if (target == "root" || target == "federation") {
+                    cmd.setAction(force_ordered ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
+                    cmd.dest_id = root_broker_id;
+                    cmd.clearStringData();
+                } else if (target == "parent" || target == "broker") {
+                    cmd.setAction(force_ordered ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
+                    cmd.dest_id = higher_broker_id;
+                    cmd.clearStringData();
+                }
+                if (global_broker_id_local != parent_broker_id) {
+                    // forward on to Broker
+                    cmd.source_id = global_broker_id_local;
+                    transmit(parent_route_id, std::move(cmd));
+                } else {
+                    // this will get processed when this core is assigned a global id
+                    cmd.source_id = direct_core_id;
+                    delayTransmitQueue.push(std::move(cmd));
+                }
+            } else {
+                std::string repStr;
+                ActionMessage queryResp(CMD_QUERY_REPLY);
+                queryResp.dest_id = cmd.source_id;
+                queryResp.source_id = cmd.dest_id;
+                queryResp.messageID = cmd.messageID;
+                queryResp.counter = cmd.counter;
+                const std::string& target = cmd.getString(targetStringLoc);
+                if (target == getIdentifier()) {
+                    queryResp.source_id = global_broker_id_local;
+                    repStr = coreQuery(cmd.payload, force_ordered);
+                } else {
+                    auto* fedptr = getFederateCore(target);
+                    repStr = federateQuery(fedptr, cmd.payload, force_ordered);
+                    if (repStr == "#wait") {
+                        if (fedptr != nullptr) {
+                            cmd.dest_id = fedptr->global_id;
+                            fedptr->addAction(std::move(cmd));
+                            break;
+                        }
+                        repStr = "#error";
+                    }
+                }
+
+                queryResp.payload = std::move(repStr);
+                transmit(getRoute(queryResp.dest_id), queryResp);
+            }
+        } break;
+        case CMD_QUERY_REPLY:
+            if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
+                processQueryResponse(cmd);
+            } else {
+                transmit(getRoute(cmd.dest_id), cmd);
+            }
             break;
     }
 }
