@@ -3436,7 +3436,8 @@ def helicsEndpointSetInfo(endpoint: "helics_endpoint", info: "char const *") -> 
     r"""
     Set the data in the info field for a filter.
 
-    :param end: The endpoint to query.
+    :type endpoint: void
+    :param endpoint: The endpoint to query.
     :type info: string
     :param info: The string to set.
     """
@@ -3446,7 +3447,8 @@ def helicsEndpointSetOption(endpoint: "helics_endpoint", option: "int", value: "
     r"""
     Set a handle option on an endpoint.
 
-    :param end: The endpoint to modify.
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :type value: int
@@ -3458,7 +3460,8 @@ def helicsEndpointGetOption(endpoint: "helics_endpoint", option: "int") -> "int"
     r"""
     Set a handle option on an endpoint.
 
-    :param end: The endpoint to modify.
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :rtype: int
