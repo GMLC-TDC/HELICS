@@ -2853,7 +2853,7 @@ public class helics {
   /**
    * Set the data in the info field for a filter.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to query.<br>
    * @param info The string to set.
    */
   public static void helicsEndpointSetInfo(SWIGTYPE_p_void endpoint, String info) {
@@ -2863,7 +2863,7 @@ public class helics {
   /**
    * Set a handle option on an endpoint.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to modify.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
    * @param value The value to set the option to.
    */
@@ -2874,7 +2874,7 @@ public class helics {
   /**
    * Set a handle option on an endpoint.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to modify.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
    * @return the value of the option, for boolean options will be 0 or 1
    */
