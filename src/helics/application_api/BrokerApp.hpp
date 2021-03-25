@@ -107,9 +107,13 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param target the target of the query "federation", "parent", "broker", or a specific named
     object
     @param queryStr the query to make
+    @param mode the ordering mode to use (fast for asynchronous priority channels, and ordered for
+    slower but well ordered queries)
     @return a string containing the query results
     */
-    std::string query(const std::string& target, const std::string& queryStr);
+    std::string query(const std::string& target,
+                      const std::string& queryStr,
+                      helics_query_mode mode = helics_query_mode_fast);
     /** set a federation global value
      @details this overwrites any previous value for this name
      globals can be queried with a target of "global" and queryStr of the value to Query

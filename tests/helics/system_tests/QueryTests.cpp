@@ -42,7 +42,7 @@ TEST_P(query_type, publication_queries)
     vFed1->enterInitializingModeComplete();
 
     auto core = vFed1->getCorePointer();
-    auto res = core->query("fed0", "publications");
+    auto res = core->query("fed0", "publications", helics_query_mode_fast);
     EXPECT_EQ(res, "[pub1;fed0/pub2]");
     auto rvec = helics::vectorizeQueryResult(res);
 
@@ -65,7 +65,7 @@ TEST_P(query_type, broker_queries)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "federates");
+    auto res = core->query("root", "federates", helics_query_mode_fast);
     std::string str("[");
     str.append(vFed1->getName());
     str.push_back(';');
@@ -117,7 +117,7 @@ TEST_F(query, federate_map)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "federate_map");
+    auto res = core->query("root", "federate_map", helics_query_mode_fast);
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -139,7 +139,7 @@ TEST_F(query, federate_map2)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "federate_map");
+    auto res = core->query("root", "federate_map", helics_query_mode_fast);
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -161,7 +161,7 @@ TEST_F(query, federate_map3)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "federate_map");
+    auto res = core->query("root", "federate_map", helics_query_mode_fast);
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -188,7 +188,7 @@ TEST_F(query, dependency_graph)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "dependency_graph");
+    auto res = core->query("root", "dependency_graph", helics_query_mode_fast);
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
@@ -211,12 +211,12 @@ TEST_F(query, dependency_graph_reset)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     vFed1->registerGlobalPublication<double>("test1");
     auto core = vFed1->getCorePointer();
-    auto res1 = core->query("root", "dependency_graph");
+    auto res1 = core->query("root", "dependency_graph", helics_query_mode_fast);
     vFed2->registerSubscription("test1");
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
-    auto res2 = core->query("root", "dependency_graph");
+    auto res2 = core->query("root", "dependency_graph", helics_query_mode_fast);
     EXPECT_NE(res1, res2);
     vFed1->finalize();
     vFed2->finalize();
@@ -234,7 +234,7 @@ TEST_F(query, global_time)
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
-    auto res = core->query("root", "global_time");
+    auto res = core->query("root", "global_time", helics_query_mode_fast);
 
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0U);
@@ -249,7 +249,7 @@ TEST_F(query, global_time)
     vFed1->requestTime(1.0);
     vFed2->requestTimeComplete();
 
-    res = core->query("root", "global_time");
+    res = core->query("root", "global_time", helics_query_mode_fast);
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0U);
@@ -389,7 +389,7 @@ TEST_F(query, exists)
     res = brk->query("unknown_fed", "exists");
     EXPECT_EQ(res, "false");
 
-    res = mFed1->getCorePointer()->query("unknown_fed", "exists");
+    res = mFed1->getCorePointer()->query("unknown_fed", "exists", helics_query_mode_fast);
 
     mFed1->finalize();
     mFed2->finalize();
@@ -406,7 +406,7 @@ TEST_F(query, current_state)
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
-    auto res = core->query("root", "current_state");
+    auto res = core->query("root", "current_state", helics_query_mode_fast);
 
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 2U);
@@ -416,7 +416,7 @@ TEST_F(query, current_state)
     vFed1->localError(-3, "test error");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    res = core->query("root", "current_state");
+    res = core->query("root", "current_state", helics_query_mode_fast);
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 2U);
@@ -428,7 +428,7 @@ TEST_F(query, current_state)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    res = core->query("root", "current_state");
+    res = core->query("root", "current_state", helics_query_mode_fast);
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["federates"].size(), 2U);
@@ -451,7 +451,7 @@ TEST_F(query, global_state)
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
-    auto res = core->query("root", "global_state");
+    auto res = core->query("root", "global_state", helics_query_mode_fast);
 
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
@@ -461,7 +461,7 @@ TEST_F(query, global_state)
     vFed1->localError(-3, "test error");
 
     EXPECT_THROW(vFed1->requestTime(2.0), helics::HelicsException);
-    res = core->query("root", "global_state");
+    res = core->query("root", "global_state", helics_query_mode_fast);
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
@@ -476,7 +476,7 @@ TEST_F(query, global_state)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    res = core->query("root", "global_state");
+    res = core->query("root", "global_state", helics_query_mode_fast);
 
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
@@ -533,7 +533,40 @@ TEST_F(query, data_flow_graph)
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "data_flow_graph");
+    auto res = core->query("root", "data_flow_graph", helics_query_mode_fast);
+    auto val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 1U);
+    EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
+    EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
+    auto v2 = val["cores"][0]["federates"][1];
+    auto v1 = val["cores"][0]["federates"][0];
+    EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
+    EXPECT_EQ(v2["publications"].size(), 1U);
+    EXPECT_EQ(v1["inputs"].size(), 1U);
+    EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
+    EXPECT_EQ(v2["publications"][0]["key"], "pub1");
+    EXPECT_EQ(v1["inputs"][0]["sources"].size(), 1U);
+    EXPECT_EQ(v2["publications"][0]["targets"].size(), 1U);
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
+TEST_F(query, data_flow_graph_ordered)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed1->registerGlobalInput<double>("ipt1");
+    auto& p1 = vFed2->registerGlobalPublication<double>("pub1");
+    p1.addTarget("ipt1");
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query("root", "data_flow_graph", helics_query_mode_ordered);
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
@@ -568,7 +601,7 @@ TEST_F(query, data_flow_graph_concurrent)
 
     vFed1->enterExecutingModeAsync();
     auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "data_flow_graph");
+    auto res = core->query("root", "data_flow_graph", helics_query_mode_fast);
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
@@ -884,11 +917,11 @@ TEST_F(query, concurrent_callback)
 
     vFed1->enterExecutingModeAsync();
     auto core = vFed1->getCorePointer();
-    auto res = core->query(vFed1->getName(), "abc");
+    auto res = core->query(vFed1->getName(), "abc", helics_query_mode_fast);
     EXPECT_EQ(res, "AAAA");
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-    res = core->query(vFed1->getName(), "bca");
+    res = core->query(vFed1->getName(), "bca", helics_query_mode_fast);
     EXPECT_EQ(res, "BBBB");
     core = nullptr;
     vFed1->finalize();
