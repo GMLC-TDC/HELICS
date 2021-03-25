@@ -1516,6 +1516,16 @@ public class helics {
   }
 
   /**
+   * Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence<br>
+   * <br>
+   * @param query The query object to change the order for.<br>
+   * @param mode 0 for fast, 1 for ordered
+   */
+  public static void helicsQuerySetOrdering(SWIGTYPE_p_void query, SWIGTYPE_p_int32_t mode) {
+    helicsJNI.helicsQuerySetOrdering(SWIGTYPE_p_void.getCPtr(query), SWIGTYPE_p_int32_t.getCPtr(mode));
+  }
+
+  /**
    * Free the memory associated with a query object.
    */
   public static void helicsQueryFree(SWIGTYPE_p_void query) {

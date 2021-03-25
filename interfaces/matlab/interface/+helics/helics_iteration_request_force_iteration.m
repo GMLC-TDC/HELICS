@@ -1,7 +1,7 @@
 function v = helics_iteration_request_force_iteration()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 115);
+    vInitialized = helicsMEX(0, 117);
   end
   v = vInitialized;
 end
