@@ -3985,8 +3985,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
         return m;
     }
     if (checkActionFlag(*handle, has_source_filter_flag)) {
-        if (filterFed)
-        {
+        if (filterFed) {
             return filterFed->processMessage(m, handle);
         }
     }
