@@ -24,7 +24,7 @@ enum operation_flags : uint16_t {
     optional_flag = 8,  //!< flag indicating that a connection is optional and may not be matched
     clone_flag =
         9,  //!< flag indicating the filter is a clone filter or the data needs to be cloned
-    extra_flag2 = 8,  //!< extra flag
+    extra_flag2 = 10,  //!< extra flag
     destination_processing_flag =
         11,  //!< flag indicating the message is for destination processing
     disconnected_flag = 12,  //!< flag indicating that a broker/federate is disconnected

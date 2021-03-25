@@ -39,7 +39,7 @@ TEST_F(query_tests, exists)
 
     auto core1 = helicscpp::Core(mFed1->getCore());
 
-    res = mFed1->query(core1.getIdentifier(), "exists");
+    res = mFed1->query(core1.getIdentifier(), "exists", helics_query_mode_ordered);
     EXPECT_EQ(res, "true");
 
     res = mFed1->query(helicscpp::Core(mFed2->getCore()).getIdentifier(), "exists");
@@ -52,7 +52,7 @@ TEST_F(query_tests, exists)
     res = brk->query(mFed1->getName(), "exists");
     EXPECT_EQ(res, "true");
 
-    res = brk->query(mFed2->getName(), "exists");
+    res = brk->query(mFed2->getName(), "exists", helics_query_mode_ordered);
     EXPECT_EQ(res, "true");
 
     res = brk->query("root", "exists");
@@ -67,7 +67,7 @@ TEST_F(query_tests, exists)
     res = core1.query(brk->getIdentifier(), "exists");
     EXPECT_EQ(res, "true");
 
-    res = core1.query(mFed1->getName(), "exists");
+    res = core1.query(mFed1->getName(), "exists", helics_query_mode_ordered);
     EXPECT_EQ(res, "true");
 
     res = core1.query(mFed2->getName(), "exists");
@@ -76,7 +76,7 @@ TEST_F(query_tests, exists)
     res = core1.query("root", "exists");
     EXPECT_EQ(res, "true");
 
-    res = core1.query(core1.getIdentifier(), "exists");
+    res = core1.query(core1.getIdentifier(), "exists", helics_query_mode_ordered);
     EXPECT_EQ(res, "true");
 
     res = core1.query(helicscpp::Core(mFed2->getCore()).getIdentifier(), "exists");
