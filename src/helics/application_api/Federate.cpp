@@ -1083,7 +1083,7 @@ std::string Federate::localQuery(const std::string& /*queryStr*/) const
 {
     return std::string{};
 }
-std::string Federate::query(const std::string& queryStr)
+std::string Federate::query(const std::string& queryStr, helics_query_mode mode)
 {
     std::string res;
     if (queryStr == "name") {
@@ -1101,7 +1101,7 @@ std::string Federate::query(const std::string& queryStr)
     }
     if (res.empty()) {
         if (coreObject) {
-            res = coreObject->query(getName(), queryStr);
+            res = coreObject->query(getName(), queryStr, mode);
         } else {
             res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
@@ -1109,14 +1109,15 @@ std::string Federate::query(const std::string& queryStr)
     return res;
 }
 
-std::string Federate::query(const std::string& target, const std::string& queryStr)
+std::string
+    Federate::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
 {
     std::string res;
     if ((target.empty()) || (target == "federate") || (target == getName())) {
         res = query(queryStr);
     } else {
         if (coreObject) {
-            res = coreObject->query(target, queryStr);
+            res = coreObject->query(target, queryStr, mode);
         } else {
             res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
@@ -1124,10 +1125,12 @@ std::string Federate::query(const std::string& target, const std::string& queryS
     return res;
 }
 
-query_id_t Federate::queryAsync(const std::string& target, const std::string& queryStr)
+query_id_t Federate::queryAsync(const std::string& target,
+                                const std::string& queryStr,
+                                helics_query_mode mode)
 {
-    auto queryFut = std::async(std::launch::async, [this, target, queryStr]() {
-        return coreObject->query(target, queryStr);
+    auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
+        return coreObject->query(target, queryStr, mode);
     });
     auto asyncInfo = asyncCallInfo->lock();
     int cnt = asyncInfo->queryCounter++;
@@ -1136,9 +1139,10 @@ query_id_t Federate::queryAsync(const std::string& target, const std::string& qu
     return query_id_t(cnt);
 }
 
-query_id_t Federate::queryAsync(const std::string& queryStr)
+query_id_t Federate::queryAsync(const std::string& queryStr, helics_query_mode mode)
 {
-    auto queryFut = std::async(std::launch::async, [this, queryStr]() { return query(queryStr); });
+    auto queryFut =
+        std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });
     auto asyncInfo = asyncCallInfo->lock();
     int cnt = asyncInfo->queryCounter++;
 

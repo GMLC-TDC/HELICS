@@ -232,7 +232,9 @@ class CommonCore: public Core, public BrokerBase {
 
     virtual void setLogFile(const std::string& lfile) override final;
 
-    virtual std::string query(const std::string& target, const std::string& queryStr) override;
+    virtual std::string query(const std::string& target,
+                              const std::string& queryStr,
+                              helics_query_mode mode) override;
     virtual void
         setQueryCallback(LocalFederateId federateID,
                          std::function<std::string(std::string_view)> queryFunction) override;
@@ -362,6 +364,8 @@ class CommonCore: public Core, public BrokerBase {
     void processCommandsForCore(const ActionMessage& cmd);
     /** process configure commands for the core*/
     void processCoreConfigureCommands(ActionMessage& cmd);
+    /** handle the processing for a query command*/
+    void processQueryCommand(ActionMessage& cmd);
     /** check if a newly registered subscription has a local publication
     if it does return true*/
     bool checkForLocalPublication(ActionMessage& cmd);
@@ -371,10 +375,18 @@ class CommonCore: public Core, public BrokerBase {
     void loadBasicJsonInfo(
         Json::Value& base,
         const std::function<void(Json::Value& fedval, const FedInfo& fed)>& fedLoader) const;
-    /** generate a mapbuilder for the federates*/
-    void initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset) const;
+    /** generate a mapbuilder for the federates
+    @param request the query to build the map for
+    @param index the key of the request
+    @param reset whether the builder should reset or use an existing (true to not use existing)
+    @param force_ordering true if the request should use the force_ordering pathways
+    */
+    void initializeMapBuilder(const std::string& request,
+                              std::uint16_t index,
+                              bool reset,
+                              bool force_ordering) const;
     /** generate results for core queries*/
-    std::string coreQuery(const std::string& queryStr) const;
+    std::string coreQuery(const std::string& queryStr, bool force_ordering) const;
 
     /** generate results for some core queries that do not depend on the main processing loop
      * running*/
@@ -480,7 +492,9 @@ class CommonCore: public Core, public BrokerBase {
     @return "#wait" if the lock cannot be granted immediately and no result can be obtained
     otherwise an answer to the query
     */
-    std::string federateQuery(const FederateState* fed, const std::string& queryStr) const;
+    std::string federateQuery(const FederateState* fed,
+                              const std::string& queryStr,
+                              bool force_ordering) const;
 
     /** send an error code and message to all the federates*/
     void sendErrorToFederates(int error_code, std::string_view message);

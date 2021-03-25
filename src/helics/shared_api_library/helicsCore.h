@@ -1594,6 +1594,18 @@ HELICS_EXPORT void helicsQuerySetTarget(HelicsQuery query, const char* target, H
 HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, HelicsError* err);
 
 /**
+ * Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence
+ *
+ * @param query The query object to change the order for.
+ * @param mode 0 for fast, 1 for ordered
+ *
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err);
+
+/**
  * Free the memory associated with a query object.
  */
 HELICS_EXPORT void helicsQueryFree(HelicsQuery query);

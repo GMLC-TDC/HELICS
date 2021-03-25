@@ -379,9 +379,10 @@ class FederateState {
     }
     /** generate the result of a query string
     @param query a query string
+    @param force_ordering true if the query should be processed in a force_ordering way
     @return the resulting string from the query or "#wait" if the federate is not available to
     answer immediately*/
-    std::string processQuery(const std::string& query) const;
+    std::string processQuery(const std::string& query, bool force_ordering = false) const;
     /** check if a value should be published or not and if needed archive it as a changed value for
     future change detection
     @param pub_id the handle of the publication

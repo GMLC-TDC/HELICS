@@ -1147,6 +1147,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_INTERFACE_CONFIGURE:
             setInterfaceProperty(cmd);
             break;
+        case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             std::string repStr;
             ActionMessage queryResp(CMD_QUERY_REPLY);
@@ -1792,11 +1793,12 @@ std::string FederateState::processQueryActual(std::string_view query) const
     return generateJsonErrorResponse(400, "unrecognized Federate query");
 }
 
-std::string FederateState::processQuery(const std::string& query) const
+std::string FederateState::processQuery(const std::string& query, bool force_ordering) const
 {
     std::string qstring;
-    if (query == "publications" || query == "inputs" || query == "endpoints" ||
-        query == "global_state") {  // these never need to be locked
+    if (!force_ordering &&
+        (query == "publications" || query == "inputs" || query == "endpoints" ||
+         query == "global_state")) {  // these never need to be locked
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =

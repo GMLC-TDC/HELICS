@@ -284,7 +284,8 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void setLoggingLevel(int logLevel) override final;
     virtual void setLogFile(const std::string& lfile) override final;
     virtual std::string query(const std::string& target,
-                              const std::string& queryStr) override final;
+                              const std::string& queryStr,
+                              helics_query_mode mode = helics_query_mode_fast) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr) override final;
@@ -323,6 +324,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void checkForNamedInterface(ActionMessage& command);
     /** remove a named target from an interface*/
     void removeNamedTarget(ActionMessage& command);
+    /** handle the processing for a query command*/
+    void processQueryCommand(ActionMessage& cmd);
     /** answer a query or route the message the appropriate location*/
     void processQuery(ActionMessage& m);
     /** answer a query or route the message the appropriate location*/
@@ -330,11 +333,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** generate an answer to a local query*/
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer(std::string_view request);
-    /** process a command instruction message*/
-    void processCommandInstruction(ActionMessage& m);
-    /** process a command instruction targeted at this broker*/
-    void processLocalCommandInstruction(ActionMessage& m);
+    std::string generateQueryAnswer(const std::string& request, bool force_ordering);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;
     /** locate the route to take to a particular federate*/
@@ -354,7 +353,10 @@ class CoreBroker: public Broker, public BrokerBase {
 
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing one of the data Maps*/
-    void initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset);
+    void initializeMapBuilder(const std::string& request,
+                              std::uint16_t index,
+                              bool reset,
+                              bool force_ordering);
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);
