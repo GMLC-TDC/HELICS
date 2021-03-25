@@ -197,15 +197,25 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
     return true;
 }
 
-// NOLINTNEXTLINE
-bool InterfaceInfo::setEndpointProperty(InterfaceHandle /*id*/,
-                                        int32_t /*option*/,
-                                        int32_t /*value*/)
+bool InterfaceInfo::setEndpointProperty(interface_handle id, int32_t option, int32_t value)
 {
-    // there will likely be some future properties
-    // auto ept = getEndpoint (id);
-    // currently no properties on endpoints
+    auto* ept = getEndpoint(id);
+    if (ept == nullptr) {
     return false;
+}
+    bool bvalue = (value != 0);
+    switch (option) {
+        case defs::options::connection_required:
+            ept->required = bvalue;
+            break;
+        case defs::options::connection_optional:
+            ept->required = !bvalue;
+            break;
+        default:
+            return false;
+            break;
+    }
+    return true;
 }
 
 int32_t InterfaceInfo::getInputProperty(InterfaceHandle id, int32_t option) const
@@ -284,12 +294,24 @@ int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option
     return flagval ? 1 : 0;
 }
 
-// NOLINTNEXTLINE
-int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle /*id*/, int32_t /*option*/) const
+int32_t InterfaceInfo::getEndpointProperty(interface_handle id, int32_t option) const
 {
-    // auto ept = getEndpoint (id);
-    // currently no properties on endpoints
+    const auto* ept = getEndpoint(id);
+    if (ept == nullptr) {
     return 0;
+}
+    bool flagval = false;
+    switch (option) {
+        case defs::options::connection_required:
+            flagval = ept->required;
+            break;
+        case defs::options::connection_optional:
+            flagval = !ept->required;
+            break;
+        default:
+            break;
+    }
+    return flagval ? 1 : 0;
 }
 
 std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues()

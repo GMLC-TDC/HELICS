@@ -1698,7 +1698,7 @@ void CommonCore::sendTo(InterfaceHandle sourceHandle,
     m.messageID = ++messageCounter;
     m.source_handle = sourceHandle;
     m.source_id = hndl->getFederateId();
-
+    m.flags = hndl->flags;
     m.payload.assign(data, length);
     m.setStringData(destination, hndl->key, hndl->key);
     m.actionTime = fed->nextAllowedSendTime();
@@ -1728,6 +1728,9 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
     m.messageID = ++messageCounter;
     m.source_handle = sourceHandle;
     m.source_id = hndl->getFederateId();
+    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
+    m.actionTime = std::max(time, minTime);
+    m.flags = hndl->flags;
 
     m.payload.assign(data, length);
     m.setStringData(destination, hndl->key, hndl->key);

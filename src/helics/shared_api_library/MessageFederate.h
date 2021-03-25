@@ -413,7 +413,7 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
 /**
  * Set the data in the info field for a filter.
  *
- * @param end The endpoint to query.
+ * @param endpoint The endpoint to query.
  * @param info The string to set.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.

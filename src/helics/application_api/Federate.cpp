@@ -1373,7 +1373,7 @@ void Interface::setOption(int32_t option, int32_t value)
         cr->setHandleOption(handle, option, value);
     } else {
         throw(InvalidFunctionCall(
-            "set Option cannot be called on uninitialized interface or after close/disconnect"));
+            "setInterfaceOption cannot be called on uninitialized federate or after finalize call"));
     }
 }
 

@@ -178,7 +178,6 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     void setDefaultDestination(std::string_view target);
     /** get the target destination for the endpoint TODO(PT):: make this work*/
     const std::string& getDefaultDestination() const;
-
     virtual const std::string& getDisplayName() const override { return getName(); }
 
   private:

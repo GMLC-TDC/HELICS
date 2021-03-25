@@ -53,6 +53,7 @@ class EndpointInfo {
 
   public:
     bool hasFilter{false};  //!< indicator that the message has a filter
+    bool required{false};
     bool targettedEndpoint{false};  //!< indicator that the endpoint is a targeted endpoint only
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage(Time maxTime);
