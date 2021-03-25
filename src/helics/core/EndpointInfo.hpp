@@ -33,7 +33,8 @@ class EndpointInfo {
     std::atomic<int32_t> mAvailableMessages{0};  //!< indicator of how many message are available
 
   public:
-    bool hasFilter = false;  //!< indicator that the message has a filter
+    bool hasFilter{false};  //!< indicator that the message has a filter
+    bool required{false};
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage(Time maxTime);
     /** get the number of messages in the queue up to the specified time*/

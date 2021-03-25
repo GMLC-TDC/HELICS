@@ -21,9 +21,9 @@ namespace helics {
 FilterFederate::FilterFederate(global_federate_id fedID,
                                std::string name,
                                global_broker_id coreID,
-                               Core* core):
+                               Core* /*core*/):
     mFedID(fedID),
-    mCoreID(coreID), mName(std::move(name)), mCore(core),
+    mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
     mCoord.source_id = fedID;

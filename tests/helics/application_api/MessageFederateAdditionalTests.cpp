@@ -10,12 +10,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/core/flagOperations.hpp"
 #include "testFixtures.hpp"
 
 #include <future>
+#include <gmlc/libguarded/guarded.hpp>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
+
 /** these test cases test out the message federates
  */
 
@@ -718,13 +722,86 @@ TEST_F(mfed_tests, message_warnings_ignore)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(warnings.load(), 1);
-    mess1.flags |= (1 << 8);  // this is a the optional flag
+    setActionFlag(mess1, optional_flag);
     // it should cause the unknown destination to be ignored
     mFed1->sendMessage(ep1, mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(3.0);
     EXPECT_EQ(warnings.load(), 1);
 
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, message_error)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> errors{0};
+
+    mFed1->setLoggingCallback(
+        [&errors](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_error) {
+                ++errors;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    helics::Message mess1;
+    mess1.data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    mess1.dest = "unknown";
+
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(errors.load(), 0);
+    setActionFlag(mess1, required_flag);
+    // it should cause the unknown destination to be ignored
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    int err_count{0};
+    try {
+        mFed1->requestTime(3.0);
+    }
+    catch (...) {
+        ++err_count;
+    }
+    EXPECT_EQ(errors.load(), 1);
+    EXPECT_GT(err_count, 0);
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, default_endpoint_required)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    mFed1->setFlagOption(helics_handle_option_connection_required, true);
+    std::atomic<int> errors{0};
+
+    mFed1->setLoggingCallback(
+        [&errors](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_error) {
+                ++errors;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    mFed1->enterExecutingMode();
+
+    ep1.send("unknown", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    int err_count{0};
+    try {
+        mFed1->requestTime(1.0);
+    }
+    catch (...) {
+        ++err_count;
+    }
+    EXPECT_EQ(errors.load(), 1);
+    EXPECT_GT(err_count, 0);
     mFed1->finalize();
 }
 
@@ -763,46 +840,65 @@ TEST_F(mfed_tests, message_init_iteration)
     mFed1->finalize();
 }
 
-TEST_F(mfed_tests, message_init_time0)
+TEST_F(mfed_tests, missing_endpoint)
 {
+    using ::testing::HasSubstr;
     SetupTest<helics::MessageFederate>("test", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
     auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+    auto& ep2 = mFed1->registerGlobalEndpoint("ep2");
+    auto& ep3 = mFed1->registerGlobalEndpoint("ep3");
+    ep2.setOption(helics_handle_option_connection_optional);
+    ep3.setOption(helics_handle_option_connection_required);
 
-    auto& ep2 = mFed2->registerGlobalEndpoint("ep2");
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    mFed1->setLoggingCallback(
+        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+            mlog.lock()->emplace_back(level, message);
+        });
 
     const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
-    mFed1->enterInitializingModeAsync();
-    mFed2->enterInitializingMode();
-    mFed1->enterInitializingModeComplete();
-
-    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
-    mFed2->sendMessage(ep2, "ep1", message1.c_str(), 26);
     mFed1->enterExecutingModeAsync();
 
     mFed2->enterExecutingMode();
 
     mFed1->enterExecutingModeComplete();
-    EXPECT_TRUE(ep2.hasMessage());
-    auto m1 = ep2.getMessage();
-    if (m1) {
-        EXPECT_EQ(m1->data.size(), 26U);
+
+    mFed1->sendMessage(ep1, "ep92", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(1.0);
+
+    auto mm = mlog.lock();
+    EXPECT_EQ(mm->size(), 1U);
+    if (!mm->empty()) {
+        EXPECT_EQ(mm->front().first, helics_log_level_warning);
+        EXPECT_THAT(mm->front().second, HasSubstr("ep92"));
+        EXPECT_THAT(mm->front().second, HasSubstr("ep1"));
     }
-
-    auto res = ep1.hasMessage();
-    EXPECT_TRUE(res);
-    if (!res) {
-        ep1.hasMessage();
+    mm.unlock();
+    mFed1->sendMessage(ep2, "ep92", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    // no warning from this one
+    mm = mlog.lock();
+    EXPECT_EQ(mm->size(), 1U);
+    mm.unlock();
+    mFed1->sendMessage(ep3, "ep92", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    try {
+        mFed1->requestTime(3.0);
     }
-
-    auto m2 = ep1.getMessage();
-    if (m2) {
-        EXPECT_EQ(m2->data.size(), 26U);
+    catch (...) {
     }
-
-    mFed2->finalize();
-
+    mm = mlog.lock();
+    EXPECT_EQ(mm->size(), 2U);
+    if (!mm->empty()) {
+        EXPECT_EQ(mm->back().first, helics_log_level_error);
+        EXPECT_THAT(mm->back().second, HasSubstr("ep92"));
+        EXPECT_THAT(mm->back().second, HasSubstr("ep3"));
+    }
+    mm.unlock();
     mFed1->finalize();
 }

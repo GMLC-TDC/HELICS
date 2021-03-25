@@ -1092,6 +1092,7 @@ TEST(valuefederate, indexed_targets)
     Fed1->finalize();
 }
 
+#ifdef ENABLE_ZMQ_CORE
 /** test out register interfaces after configuration make sure that doesn't cause issues*/
 TEST(valuefederate, file_and_config)
 {
@@ -1134,6 +1135,7 @@ TEST(valuefederate, file_and_config)
     Fed2->finalize();
     broker->disconnect();
 }
+#endif
 
 TEST(valuefederate, duplicate_targets)
 {

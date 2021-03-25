@@ -1320,7 +1320,7 @@ void Federate::setInterfaceOption(interface_handle handle, int32_t option, int32
         coreObject->setHandleOption(handle, option, option_value);
     } else {
         throw(InvalidFunctionCall(
-            "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+            "setInterfaceOption cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
