@@ -250,6 +250,7 @@ void TimeCoordinator::generateConfig(Json::Value& base) const
     base["uninterruptible"] = info.uninterruptible;
     base["wait_for_current_time_updates"] = info.wait_for_current_time_updates;
     base["restrictive_time_policy"] = info.restrictive_time_policy;
+    base["event_triggered"] = info.event_triggered;
     base["max_iterations"] = info.maxIterations;
 
     if (info.period > timeZero) {
@@ -428,6 +429,12 @@ bool TimeCoordinator::updateTimeFactors()
     if (upstream.minDe < Time::maxVal() && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
+    if (info.event_triggered)
+    {
+        if (upstream.Te < Time::maxVal()) {
+            upstream.Te = generateAllowedTime(upstream.minDe);
+        }
+    }
     if (total.minDe != time_minDe) {
         update = true;
         time_minDe = total.minDe;
@@ -528,7 +535,11 @@ void TimeCoordinator::sendTimeRequest() const
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
+    
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
+    if (info.event_triggered) {
+        upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
+    }
     upd.Tdemin = std::min(upstream.Te, upd.Te);
     upd.setExtraData(upstream.minFed.baseValue());
 
@@ -945,6 +956,9 @@ void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
         case defs::flags::restrictive_time_policy:
             info.restrictive_time_policy = value;
             break;
+        case defs::flags::event_triggered:
+            info.event_triggered = value;
+            break;
         default:
             break;
     }
@@ -992,6 +1006,8 @@ bool TimeCoordinator::getOptionFlag(int optionFlag) const
             return info.wait_for_current_time_updates;
         case defs::flags::restrictive_time_policy:
             return info.restrictive_time_policy;
+        case defs::flags::event_triggered:
+            return info.event_triggered;
         default:
             throw(std::invalid_argument("flag not recognized"));
     }
