@@ -362,6 +362,8 @@ r"""
     a customizable filter type that can perform different actions on a message based on
           firewall like rules
     """
+helics_query_mode_fast = _helics.helics_query_mode_fast
+helics_query_mode_ordered = _helics.helics_query_mode_ordered
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
 helics_iteration_request_force_iteration = _helics.helics_iteration_request_force_iteration
@@ -1991,6 +1993,18 @@ def helicsQuerySetQueryString(query: "helics_query", queryString: "char const *"
     :param queryString: the new queryString
     """
     return _helics.helicsQuerySetQueryString(query, queryString)
+
+def helicsQuerySetOrdering(query: "helics_query", mode: "int32_t") -> "void":
+    r"""
+    Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence
+
+    :type query: void
+    :param query: The query object to change the order for.
+    :type mode: int32_t
+    :param mode: 0 for fast, 1 for ordered
+
+    """
+    return _helics.helicsQuerySetOrdering(query, mode)
 
 def helicsQueryFree(query: "helics_query") -> "void":
     r"""Free the memory associated with a query object."""
