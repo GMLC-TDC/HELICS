@@ -8,33 +8,33 @@ Most of the time the log for a federate is the same as for its core. This is man
 
 - `HELICS_PROPERTY_INT_LOG_LEVEL` General logging level applicable to both file and console logs
 
-- `HELICS_PROPERTY_INT_file_log_level` Level to log to the file
+- `HELICS_PROPERTY_INT_FILE_LOG_LEVEL` Level to log to the file
 
-- `HELICS_PROPERTY_INT_console_log_level` Level to log to the console
+- `HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL` Level to log to the console
 
 These properties can be set using the API interface functions
 
 ```c
-helicsFederateInfoSetIntegerProperty(fi,HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_data,&err);
+helicsFederateInfoSetIntegerProperty(fi,HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_DATA,&err);
 ```
 
 ```python
-h.helicsFederateInfoSetIntegerProperty(fi,h.HELICS_PROPERTY_INT_LOG_LEVEL, h.HELICS_LOG_LEVEL_data)
+h.helicsFederateInfoSetIntegerProperty(fi,h.HELICS_PROPERTY_INT_LOG_LEVEL, h.HELICS_LOG_LEVEL_DATA)
 ```
 
 NOTE: logging level properties set in a federateInfo will apply to a core as well if it is the first federate registered in the core. After registration log level properties must be set separately for the core and federate.
 
 There are several levels used inside HELICS for logging
 
-- `HELICS_LOG_LEVEL_no_print` Don't print anything
+- `HELICS_LOG_LEVEL_NO_PRINT` Don't print anything
 - `HELICS_LOG_LEVEL_ERROR` Error and faults from within HELICS
-- `HELICS_LOG_LEVEL_warning` Warning messages of things that might be incorrect or unusual
-- `HELICS_LOG_LEVEL_summary` Summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
-- `HELICS_LOG_LEVEL_connections` Log a message for each connection event (federate connection/disconnection)
-- `HELICS_LOG_LEVEL_interfaces` Log messages when interfaces, such as endpoints, publications, and filters are created
-- `HELICS_LOG_LEVEL_timing` Log messages related to timing information such as mode transition and time advancement
-- `HELICS_LOG_LEVEL_data` Log messages related to data passage and information being sent or received
-- `HELICS_LOG_LEVEL_trace` Log all internal message being sent
+- `HELICS_LOG_LEVEL_WARNING` Warning messages of things that might be incorrect or unusual
+- `HELICS_LOG_LEVEL_SUMMARY` Summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
+- `HELICS_LOG_LEVEL_CONNECTIONS` Log a message for each connection event (federate connection/disconnection)
+- `HELICS_LOG_LEVEL_INTERFACES` Log messages when interfaces, such as endpoints, publications, and filters are created
+- `HELICS_LOG_LEVEL_TIMING` Log messages related to timing information such as mode transition and time advancement
+- `HELICS_LOG_LEVEL_DATA` Log messages related to data passage and information being sent or received
+- `HELICS_LOG_LEVEL_TRACE` Log all internal message being sent
 
 NOTE: these levels currently correspond to (-1 through 7) but this may change in future major version numbers to allow more fine grained control
 
@@ -98,6 +98,7 @@ when specifying log levels through the command line or through config files it i
 - "data" : timing + data transfer logging
 - "trace" : all internal messages
 
+ALL CAPS and the Enum value name will also work for converting the string
 ```json
 {
   //example json configuration file for a value federate all arguments are optional

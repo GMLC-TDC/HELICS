@@ -218,7 +218,7 @@ _API:_ `helicsFederateInfoSetCoreTypeFromString`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)
 | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetCoreTypeFromString)
-| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreType-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_CoreType}})
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreType-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.HelicsCoreType}})
 
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). See the [User Guide page on core types](./user-guide/CoreTypes.md) for more details.
 
@@ -361,15 +361,15 @@ _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_LEVEL` [271]
 
 _Valid values:_
 
-- -1 - no logging - `HELICS_LOG_LEVEL_no_print`
+- -1 - no logging - `HELICS_LOG_LEVEL_NO_PRINT`
 - 0 - error - `HELICS_LOG_LEVEL_ERROR`
-- 1 - warning - `HELICS_LOG_LEVEL_warning`
-- 2 - summary - `HELICS_LOG_LEVEL_summary`
-- 3 - connections - `HELICS_LOG_LEVEL_connections`
-- 4 - interfaces - `HELICS_LOG_LEVEL_interfaces`
-- 5 - timing - `HELICS_LOG_LEVEL_timing`
-- 6 - data - `HELICS_LOG_LEVEL_data`
-- 7 - trace - `HELICS_LOG_LEVEL_trace`
+- 1 - warning - `HELICS_LOG_LEVEL_WARNING`
+- 2 - summary - `HELICS_LOG_LEVEL_SUMMARY`
+- 3 - connections - `HELICS_LOG_LEVEL_CONNECTIONS`
+- 4 - interfaces - `HELICS_LOG_LEVEL_INTERFACES`
+- 5 - timing - `HELICS_LOG_LEVEL_TIMING`
+- 6 - data - `HELICS_LOG_LEVEL_DATA`
+- 7 - trace - `HELICS_LOG_LEVEL_TRACE`
 
 Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid levels and their corresponding enumerations are shown below.
 

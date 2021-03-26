@@ -47,7 +47,7 @@ static const std::string emptyStr;
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
             if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                            \
-                logMessage(HHELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                          \
+                logMessage(HELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                          \
             }                                                                                      \
         } while (false)
 
@@ -1320,10 +1320,10 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
                 auto* ipt = interfaceInformation.getInput(cmd.dest_handle);
                 if (ipt != nullptr) {
                     LOG_WARNING(
-                        fmt::format("property {} not used on INPUT {}", cmd.messageID, ipt->key));
+                        fmt::format("property {} not used on input {}", cmd.messageID, ipt->key));
                 } else {
                     LOG_WARNING(
-                        fmt::format("property {} not used on due to unknown INPUT", cmd.messageID));
+                        fmt::format("property {} not used on due to unknown input", cmd.messageID));
                 }
             }
             break;
@@ -1337,11 +1337,11 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             if (!used) {
                 auto* pub = interfaceInformation.getPublication(cmd.dest_handle);
                 if (pub != nullptr) {
-                    LOG_WARNING(fmt::format("property {} not used on PUBLICATION {}",
+                    LOG_WARNING(fmt::format("property {} not used on publication {}",
                                             cmd.messageID,
                                             pub->key));
                 } else {
-                    LOG_WARNING(fmt::format("property {} not used on due to unknown PUBLICATION",
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown publication",
                                             cmd.messageID));
                 }
             }
@@ -1355,11 +1355,11 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             if (!used) {
                 auto* ept = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (ept != nullptr) {
-                    LOG_WARNING(fmt::format("property {} not used on ENDPOINT {}",
+                    LOG_WARNING(fmt::format("property {} not used on endpoint {}",
                                             cmd.messageID,
                                             ept->key));
                 } else {
-                    LOG_WARNING(fmt::format("property {} not used on due to unknown ENDPOINT",
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown endpoint",
                                             cmd.messageID));
                 }
             }

@@ -396,7 +396,7 @@ namespace tcp {
                     } else {
                         if (!isDisconnectCommand(cmd)) {
                             logWarning(std::string(
-                                           "(tcpss) UNKNOWN message destination message dropped ") +
+                                           "(tcpss) unknown message destination message dropped ") +
                                        prettyPrintString(cmd));
                         }
                     }

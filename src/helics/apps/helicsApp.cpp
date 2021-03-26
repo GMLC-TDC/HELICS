@@ -115,7 +115,7 @@ namespace apps {
                       "specify otherwise unspecified endpoints and publications as local( "
                       "i.e.the keys will be prepended with the player name)");
         app->add_option("--stop", stopTime, "The time to stop the app");
-        app->add_option("--INPUT,INPUT", masterFileName, "The primary INPUT file")
+        app->add_option("--input,input", masterFileName, "The primary input file")
             ->check(CLI::ExistingFile);
         app->allow_extras()->validate_positionals();
         return app;

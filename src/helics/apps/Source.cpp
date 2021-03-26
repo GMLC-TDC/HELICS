@@ -329,7 +329,7 @@ namespace apps {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(key + " was not recognized as a valid PUBLICATION"));
+            throw(InvalidParameter(key + " was not recognized as a valid publication"));
         }
         auto findGen = generatorLookup.find(generator);
         if (findGen != generatorLookup.end()) {
@@ -345,7 +345,7 @@ namespace apps {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(key + " was not recognized as a valid PUBLICATION"));
+            throw(InvalidParameter(key + " was not recognized as a valid publication"));
         }
         sources[fnd->second].generatorIndex = genIndex;
     }
