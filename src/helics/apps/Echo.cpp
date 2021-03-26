@@ -22,15 +22,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace apps {
-    Echo::Echo(std::vector<std::string> args): App("echo", std::move(args)) { processArgs(); }
+    Echo::Echo(std::vector<std::string> args): App("echo", std::move(args)) {
+        processArgs();
+    }
 
-    Echo::Echo(int argc, char* argv[]): App("echo", argc, argv) { processArgs(); }
+    Echo::Echo(int argc, char* argv[]): App("echo", argc, argv) {
+        processArgs();
+    }
 
     void Echo::processArgs()
     {
         helicsCLI11App app("Options specific to the Echo App");
         app.add_option("--delay", delayTime, "the delay with which the echo app will echo message");
         if (!deactivated) {
+            fed->setFlagOption(helics_flag_event_triggered);
             app.parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -41,19 +46,25 @@ namespace apps {
         }
     }
 
-    Echo::Echo(const std::string& name, const FederateInfo& fi): App(name, fi) {}
+    Echo::Echo(const std::string& name, const FederateInfo& fi): App(name, fi)
+    {
+        fed->setFlagOption(helics_flag_event_triggered);
+    }
 
     Echo::Echo(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi):
         App(name, core, fi)
     {
+        fed->setFlagOption(helics_flag_event_triggered);
     }
 
     Echo::Echo(const std::string& name, CoreApp& core, const FederateInfo& fi): App(name, core, fi)
     {
+        fed->setFlagOption(helics_flag_event_triggered);
     }
 
     Echo::Echo(const std::string& name, const std::string& jsonString): App(name, jsonString)
     {
+        fed->setFlagOption(helics_flag_event_triggered);
         Echo::loadJsonFile(jsonString);
     }
 

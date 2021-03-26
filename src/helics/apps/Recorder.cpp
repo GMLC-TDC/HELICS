@@ -51,7 +51,10 @@ namespace apps {
         processArgs();
     }
 
-    Recorder::Recorder(int argc, char* argv[]): App("recorder", argc, argv) { processArgs(); }
+    Recorder::Recorder(int argc, char* argv[]): App("recorder", argc, argv)
+    {
+        processArgs();
+    }
 
     void Recorder::processArgs()
     {
