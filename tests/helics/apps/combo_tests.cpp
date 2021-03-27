@@ -68,7 +68,7 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
-     mfed2.requestTimeAsync(4.0);
+    mfed2.requestTimeAsync(4.0);
     retTime = mfed.requestTime(4.0);
     EXPECT_EQ(retTime, 4.0);
     mfed2.requestTimeComplete();
@@ -230,7 +230,6 @@ static void useFileBinary(const std::string& corename, const std::string& file)
 TEST(combo_tests, save_load_file_binary)
 {
     auto tpath = ghc::filesystem::temp_directory_path();
-
 
     auto filename1 = ghc::filesystem::temp_directory_path() / "savefile_binary.txt";
     auto filename2 = ghc::filesystem::temp_directory_path() / "savefile_binary.json";

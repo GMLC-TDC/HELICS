@@ -429,8 +429,7 @@ bool TimeCoordinator::updateTimeFactors()
     if (upstream.minDe < Time::maxVal() && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
-    if (info.event_triggered)
-    {
+    if (info.event_triggered) {
         if (upstream.Te < Time::maxVal()) {
             upstream.Te = generateAllowedTime(upstream.minDe);
         }
@@ -535,7 +534,7 @@ void TimeCoordinator::sendTimeRequest() const
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
-    
+
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);

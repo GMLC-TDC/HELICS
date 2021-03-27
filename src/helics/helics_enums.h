@@ -115,7 +115,8 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     helics_flag_strict_config_checking = 75,
-    /** specify that the federate is event triggered-meaning (all/most) events are triggered by incoming events*/
+    /** specify that the federate is event triggered-meaning (all/most) events are triggered by
+       incoming events*/
     helics_flag_event_triggered = 81
 } helics_federate_flags;
 
