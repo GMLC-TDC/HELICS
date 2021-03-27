@@ -76,8 +76,8 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 3u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 3U);
 
     rec1.saveFile(f1.string());
 
@@ -99,10 +99,10 @@ static void useFile(const std::string& corename, const std::string& file)
     play1.loadFile(file);
 
     play1.initialize();
-    EXPECT_EQ(play1.pointCount(), 3u);
-    EXPECT_EQ(play1.publicationCount(), 1u);
-    EXPECT_EQ(play1.messageCount(), 2u);
-    EXPECT_EQ(play1.endpointCount(), 2u);
+    EXPECT_EQ(play1.pointCount(), 3U);
+    EXPECT_EQ(play1.publicationCount(), 1U);
+    EXPECT_EQ(play1.messageCount(), 2U);
+    EXPECT_EQ(play1.endpointCount(), 2U);
 
     play1.finalize();
     ghc::filesystem::remove(file);
@@ -175,8 +175,8 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 3u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 3U);
 
     rec1.saveFile(f1.string());
 
@@ -199,10 +199,10 @@ static void useFileBinary(const std::string& corename, const std::string& file)
     play1.loadFile(file);
 
     play1.initialize();
-    EXPECT_EQ(play1.pointCount(), 3u);
-    EXPECT_EQ(play1.publicationCount(), 1u);
-    EXPECT_EQ(play1.messageCount(), 2u);
-    EXPECT_EQ(play1.endpointCount(), 2u);
+    EXPECT_EQ(play1.pointCount(), 3U);
+    EXPECT_EQ(play1.publicationCount(), 1U);
+    EXPECT_EQ(play1.messageCount(), 2U);
+    EXPECT_EQ(play1.endpointCount(), 2U);
 
     auto& b1 = play1.getMessage(0);
     helics::data_block n5(256);
@@ -270,10 +270,10 @@ TEST(combo_tests, check_combination_file_load)
             fed.getPublication(1).publish(1);
         }
     }
-    EXPECT_EQ(fed.pendingMessages(), 3u);
+    EXPECT_EQ(fed.pendingMessages(), 3U);
     fed.finalize();
     fut_play.get();
     fut_rec.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 2u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 2U);
 }
