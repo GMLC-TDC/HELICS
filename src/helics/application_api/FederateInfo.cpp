@@ -153,7 +153,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"dumplog", helics_flag_dumplog},
     {"event_triggered", helics_flag_event_triggered},
     {"eventtriggered", helics_flag_event_triggered},
-    {"EventTriggered", helics_flag_event_triggered},
+    {"eventTriggered", helics_flag_event_triggered},
     {"terminate_on_error", helics_flag_terminate_on_error},
     {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
