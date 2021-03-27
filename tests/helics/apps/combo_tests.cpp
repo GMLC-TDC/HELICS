@@ -172,6 +172,12 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
+    mfed2.requestTimeAsync(3.0);
+    retTime = mfed.requestTime(3.0);
+    EXPECT_EQ(retTime, 3.0);
+
+    mfed2.requestTimeComplete();
+
     mfed.finalize();
     mfed2.finalize();
     fut.get();
