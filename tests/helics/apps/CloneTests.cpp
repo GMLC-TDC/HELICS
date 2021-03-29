@@ -14,10 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "helics/external/filesystem.hpp"
 #endif
 
+#include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Clone.hpp"
 #include "helics/apps/Player.hpp"
-#include "helics/application_api/Filters.hpp"
 
 #include <cstdio>
 #include <future>
