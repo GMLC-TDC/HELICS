@@ -2247,39 +2247,37 @@ std::string CommonCore::query(const std::string& target,
             (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
         if (fed != nullptr) {
             querycmd.dest_id = fed->global_id;
-            if (mode != helics_query_mode_ordered)
-            {
-
-            std::string ret = federateQuery(fed, queryStr, false);
-            if (ret != "#wait") {
-                return ret;
-            }
-
-            auto queryResult = activeQueries.getFuture(querycmd.messageID);
-            fed->addAction(std::move(querycmd));
-            std::future_status status = std::future_status::timeout;
-            while (status == std::future_status::timeout) {
-                status = queryResult.wait_for(std::chrono::milliseconds(50));
-                switch (status) {
-                    case std::future_status::ready:
-                    case std::future_status::deferred: {
-                        auto qres = queryResult.get();
-                        activeQueries.finishedWithValue(index);
-                        return qres;
-                    }
-                    case std::future_status::timeout: {  // federate query may need to wait or can
-                                                         // get the result now
-                        ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
-                        if (ret != "#wait") {
-                            activeQueries.finishedWithValue(index);
-                            return ret;
-                        }
-                    } break;
-                    default:
-                        status = std::future_status::ready;  // LCOV_EXCL_LINE
+            if (mode != helics_query_mode_ordered) {
+                std::string ret = federateQuery(fed, queryStr, false);
+                if (ret != "#wait") {
+                    return ret;
                 }
-            }
-            return "#error";  // LCOV_EXCL_LINE
+
+                auto queryResult = activeQueries.getFuture(querycmd.messageID);
+                fed->addAction(std::move(querycmd));
+                std::future_status status = std::future_status::timeout;
+                while (status == std::future_status::timeout) {
+                    status = queryResult.wait_for(std::chrono::milliseconds(50));
+                    switch (status) {
+                        case std::future_status::ready:
+                        case std::future_status::deferred: {
+                            auto qres = queryResult.get();
+                            activeQueries.finishedWithValue(index);
+                            return qres;
+                        }
+                        case std::future_status::timeout: {  // federate query may need to wait or
+                                                             // can get the result now
+                            ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+                            if (ret != "#wait") {
+                                activeQueries.finishedWithValue(index);
+                                return ret;
+                            }
+                        } break;
+                        default:
+                            status = std::future_status::ready;  // LCOV_EXCL_LINE
+                    }
+                }
+                return "#error";  // LCOV_EXCL_LINE
             }
         }
     }
