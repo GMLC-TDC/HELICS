@@ -63,7 +63,6 @@ enum class core_type : int {
 
 /** enumeration of the possible message processing results*/
 enum class message_processing_result : signed char {
-
     continue_processing = -2,  //!< the current loop should continue
     delay_message = -1,  //!< delay the current message and continue processing
     next_step = 0,  //!< indicator that the iterations have completed
