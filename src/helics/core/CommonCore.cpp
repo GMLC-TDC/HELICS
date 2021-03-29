@@ -2246,12 +2246,14 @@ std::string CommonCore::query(const std::string& target,
         auto* fed =
             (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
         if (fed != nullptr) {
-            std::string ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+            querycmd.dest_id = fed->global_id;
+            if (mode != helics_query_mode_ordered)
+            {
+
+            std::string ret = federateQuery(fed, queryStr, false);
             if (ret != "#wait") {
                 return ret;
             }
-
-            querycmd.dest_id = fed->global_id;
 
             auto queryResult = activeQueries.getFuture(querycmd.messageID);
             fed->addAction(std::move(querycmd));
@@ -2278,6 +2280,7 @@ std::string CommonCore::query(const std::string& target,
                 }
             }
             return "#error";  // LCOV_EXCL_LINE
+            }
         }
     }
 
