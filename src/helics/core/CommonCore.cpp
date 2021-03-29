@@ -2246,38 +2246,39 @@ std::string CommonCore::query(const std::string& target,
         auto* fed =
             (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
         if (fed != nullptr) {
-            std::string ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
-            if (ret != "#wait") {
-                return ret;
-            }
-
             querycmd.dest_id = fed->global_id;
-
-            auto queryResult = activeQueries.getFuture(querycmd.messageID);
-            fed->addAction(std::move(querycmd));
-            std::future_status status = std::future_status::timeout;
-            while (status == std::future_status::timeout) {
-                status = queryResult.wait_for(std::chrono::milliseconds(50));
-                switch (status) {
-                    case std::future_status::ready:
-                    case std::future_status::deferred: {
-                        auto qres = queryResult.get();
-                        activeQueries.finishedWithValue(index);
-                        return qres;
-                    }
-                    case std::future_status::timeout: {  // federate query may need to wait or can
-                                                         // get the result now
-                        ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
-                        if (ret != "#wait") {
-                            activeQueries.finishedWithValue(index);
-                            return ret;
-                        }
-                    } break;
-                    default:
-                        status = std::future_status::ready;  // LCOV_EXCL_LINE
+            if (mode != helics_query_mode_ordered) {
+                std::string ret = federateQuery(fed, queryStr, false);
+                if (ret != "#wait") {
+                    return ret;
                 }
+
+                auto queryResult = activeQueries.getFuture(querycmd.messageID);
+                fed->addAction(std::move(querycmd));
+                std::future_status status = std::future_status::timeout;
+                while (status == std::future_status::timeout) {
+                    status = queryResult.wait_for(std::chrono::milliseconds(50));
+                    switch (status) {
+                        case std::future_status::ready:
+                        case std::future_status::deferred: {
+                            auto qres = queryResult.get();
+                            activeQueries.finishedWithValue(index);
+                            return qres;
+                        }
+                        case std::future_status::timeout: {  // federate query may need to wait or
+                                                             // can get the result now
+                            ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+                            if (ret != "#wait") {
+                                activeQueries.finishedWithValue(index);
+                                return ret;
+                            }
+                        } break;
+                        default:
+                            status = std::future_status::ready;  // LCOV_EXCL_LINE
+                    }
+                }
+                return "#error";  // LCOV_EXCL_LINE
             }
-            return "#error";  // LCOV_EXCL_LINE
         }
     }
 
@@ -3651,7 +3652,15 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 }
 
                 queryResp.payload = std::move(repStr);
-                transmit(getRoute(queryResp.dest_id), queryResp);
+                if (queryResp.dest_id == direct_core_id)
+                {
+                    processQueryResponse(queryResp);
+                }
+                else
+                {
+                    transmit(getRoute(queryResp.dest_id), queryResp);
+                }
+                
             }
         } break;
         case CMD_QUERY_REPLY:
@@ -3985,7 +3994,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
         return m;
     }
     if (checkActionFlag(*handle, has_source_filter_flag)) {
-        if (filterFed) {
+        if (filterFed!=nullptr) {
             return filterFed->processMessage(m, handle);
         }
     }
