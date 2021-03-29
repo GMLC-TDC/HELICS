@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Clone.hpp"
 #include "helics/apps/Player.hpp"
+#include "helics/application_api/Filters.hpp"
 
 #include <cstdio>
 #include <future>
@@ -189,7 +190,10 @@ TEST(clone_tests, simple_clone_test_combo)
     mfed.finalize();
     fut.get();
     auto epts = c1.accessUnderlyingFederate().getEndpointCount();
-    EXPECT_EQ(epts, 3);
+    EXPECT_EQ(epts, 1);
+    auto filts = c1.accessUnderlyingFederate().getFilterCount();
+    EXPECT_EQ(filts, 1);
+
     auto ipts = c1.accessUnderlyingFederate().getInputCount();
     EXPECT_EQ(ipts, 2);
     c1.finalize();
