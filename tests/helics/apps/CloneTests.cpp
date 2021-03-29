@@ -193,7 +193,6 @@ TEST(clone_tests, simple_clone_test_combo)
     auto ipts = c1.accessUnderlyingFederate().getInputCount();
     EXPECT_EQ(ipts, 2);
     c1.finalize();
-    
 
     auto cnt = c1.messageCount();
     EXPECT_EQ(cnt, 2U);
