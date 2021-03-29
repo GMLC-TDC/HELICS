@@ -261,7 +261,7 @@ namespace apps {
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
-            std::cerr << "PUBLICATION already exists\n";
+            std::cerr << "publication already exists\n";
             return;
         }
         SourceObject newObj(Publication(useLocal ? interface_visibility::local :

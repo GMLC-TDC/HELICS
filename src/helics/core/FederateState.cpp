@@ -1814,7 +1814,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["parent"] = parent_->getGlobalId().baseValue();
         base["state"] = fedStateString(state.load());
         base["publications"] = publicationCount();
-        base["INPUT"] = inputCount();
+        base["input"] = inputCount();
         base["endpoints"] = endpointCount();
         base["granted_time"] = static_cast<double>(grantedTime());
         return generateJsonString(base);

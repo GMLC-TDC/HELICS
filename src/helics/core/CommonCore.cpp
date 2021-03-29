@@ -2135,10 +2135,10 @@ void CommonCore::setFilterOperator(InterfaceHandle filter, std::shared_ptr<Filte
     static std::shared_ptr<FilterOperator> nullFilt = std::make_shared<NullFilterOperator>();
     const auto* hndl = getHandleInfo(filter);
     if (hndl == nullptr) {
-        throw(InvalidIdentifier("FILTER is not a valid handle"));
+        throw(InvalidIdentifier("filter is not a valid handle"));
     }
     if ((hndl->handleType != InterfaceType::FILTER)) {
-        throw(InvalidIdentifier("FILTER identifier does not point a FILTER"));
+        throw(InvalidIdentifier("filter identifier does not point a filter"));
     }
     ActionMessage filtOpUpdate(CMD_CORE_CONFIGURE);
     filtOpUpdate.messageID = UPDATE_FILTER_OPERATOR;
@@ -3891,7 +3891,7 @@ void CommonCore::processFilterInfo(ActionMessage& command)
                     err.setSource(command.getDest());
                     err.messageID = defs::Errors::REGISTRATION_FAILURE;
                     err.payload =
-                        "Endpoint " + endhandle->key + " already has a destination FILTER";
+                        "Endpoint " + endhandle->key + " already has a destination filter";
                     routeMessage(std::move(err));
                     return;
                 }

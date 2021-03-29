@@ -373,12 +373,12 @@ TEST(evil_core_test, helicsCoreAddSourceFilterToEndpoint)
     auto evil_core = reinterpret_cast<HelicsCore>(rdata);
     auto err = helicsErrorInitialize();
     err.errorCode = 45;
-    helicsCoreAddSourceFilterToEndpoint(nullptr, "FILTER", "ept", &err);
+    helicsCoreAddSourceFilterToEndpoint(nullptr, "filter", "ept", &err);
     EXPECT_EQ(err.errorCode, 45);
     helicsErrorClear(&err);
     // auto res2=helicsCoreAddSourceFilterToEndpoint(HelicsCore core, const char* filter, const
     // char* endpoint, nullptr);
-    helicsCoreAddSourceFilterToEndpoint(evil_core, "FILTER", "ept", &err);
+    helicsCoreAddSourceFilterToEndpoint(evil_core, "filter", "ept", &err);
     EXPECT_NE(err.errorCode, 0);
 }
 
@@ -390,12 +390,12 @@ TEST(evil_core_test, helicsCoreAddDestinationFilterToEndpoint)
     auto evil_core = reinterpret_cast<HelicsCore>(rdata);
     auto err = helicsErrorInitialize();
     err.errorCode = 45;
-    helicsCoreAddDestinationFilterToEndpoint(nullptr, "FILTER", "ept", &err);
+    helicsCoreAddDestinationFilterToEndpoint(nullptr, "filter", "ept", &err);
     EXPECT_EQ(err.errorCode, 45);
     helicsErrorClear(&err);
     // auto res2=helicsCoreAddDestinationFilterToEndpoint(HelicsCore core, const char* filter,
     // const char* endpoint, nullptr);
-    helicsCoreAddDestinationFilterToEndpoint(evil_core, "FILTER", "ept", &err);
+    helicsCoreAddDestinationFilterToEndpoint(evil_core, "filter", "ept", &err);
     EXPECT_NE(err.errorCode, 0);
 }
 
@@ -651,12 +651,12 @@ TEST(evil_broker_test, helicsBrokerAddSourceFilterToEndpoint)
     auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
     auto err = helicsErrorInitialize();
     err.errorCode = 45;
-    helicsBrokerAddSourceFilterToEndpoint(nullptr, "FILTER", "ept", &err);
+    helicsBrokerAddSourceFilterToEndpoint(nullptr, "filter", "ept", &err);
     EXPECT_EQ(err.errorCode, 45);
     helicsErrorClear(&err);
     // auto res2=helicsBrokerAddSourceFilterToEndpoint(HelicsCore core, const char* filter, const
     // char* endpoint, nullptr);
-    helicsBrokerAddSourceFilterToEndpoint(evil_broker, "FILTER", "ept", &err);
+    helicsBrokerAddSourceFilterToEndpoint(evil_broker, "filter", "ept", &err);
     EXPECT_NE(err.errorCode, 0);
 }
 
@@ -668,12 +668,12 @@ TEST(evil_broker_test, helicsBrokerAddDestinationFilterToEndpoint)
     auto evil_broker = reinterpret_cast<HelicsBroker>(rdata);
     auto err = helicsErrorInitialize();
     err.errorCode = 45;
-    helicsBrokerAddDestinationFilterToEndpoint(nullptr, "FILTER", "ept", &err);
+    helicsBrokerAddDestinationFilterToEndpoint(nullptr, "filter", "ept", &err);
     EXPECT_EQ(err.errorCode, 45);
     helicsErrorClear(&err);
     // auto res2=helicsBrokerAddDestinationFilterToEndpoint(HelicsCore core, const char* filter,
     // const char* endpoint, nullptr);
-    helicsBrokerAddDestinationFilterToEndpoint(evil_broker, "FILTER", "ept", &err);
+    helicsBrokerAddDestinationFilterToEndpoint(evil_broker, "filter", "ept", &err);
     EXPECT_NE(err.errorCode, 0);
 }
 

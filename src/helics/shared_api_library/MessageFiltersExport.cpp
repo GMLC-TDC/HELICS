@@ -264,7 +264,7 @@ static helics::CloningFilter* getCloningFilter(HelicsFilter filt, HelicsError* e
         return nullptr;
     }
     if (!fObj->cloning) {
-        static constexpr char nonCloningFilterString[] = "FILTER must be a cloning FILTER";
+        static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
         assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCloningFilterString);
         return nullptr;
     }
@@ -482,7 +482,7 @@ void helicsFilterSetCustomCallback(HelicsFilter filt,
     }
 
     if (!fObj->custom) {
-        static constexpr char nonCustomFilterString[] = "FILTER must be a custom FILTER to specify callback";
+        static constexpr char nonCustomFilterString[] = "filter must be a custom FILTER to specify callback";
         assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCustomFilterString);
         return;
     }

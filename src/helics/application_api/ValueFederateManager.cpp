@@ -106,7 +106,7 @@ void ValueFederateManager::addAlias(const Input& inp, const std::string& shortcu
         inpHandle->addSearchTerm(shortcutName, inp.handle);
         targetIDs.lock()->emplace(shortcutName, inp.handle);
     } else {
-        throw(InvalidIdentifier("INPUT is invalid"));
+        throw(InvalidIdentifier("input is invalid"));
     }
 }
 
@@ -116,7 +116,7 @@ void ValueFederateManager::addAlias(const Publication& pub, const std::string& s
         auto pubHandle = publications.lock();
         pubHandle->addSearchTerm(shortcutName, pub.handle);
     } else {
-        throw(InvalidIdentifier("PUBLICATION is invalid"));
+        throw(InvalidIdentifier("publication is invalid"));
     }
 }
 

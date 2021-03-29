@@ -52,8 +52,12 @@ int main(int argc, char** argv)
     helics::CombinationFederate fedB2("fedB_2", crB2, fi);
     std::chrono::seconds timeout(30);
     if (argc >= 2) {
-        auto res = atoi(argv[1]);
-        timeout = std::chrono::seconds(res);
+        char* eptr{nullptr};
+        auto res = std::strtol(argv[1],&eptr,0);
+        if (eptr - argv[1]>0) {
+            timeout = std::chrono::seconds(res);
+        }
+        printf("value for timeout is not recognized(%s)\n", argv[1]);
     }
     fedA1.enterExecutingModeAsync();
     fedA2.enterExecutingMode();

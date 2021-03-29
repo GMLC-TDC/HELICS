@@ -30,7 +30,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -79,7 +79,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1_close_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -141,7 +141,7 @@ endpoint only if condition matches.
 TEST_P(filter_type_tests, message_reroute_filter_condition)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -199,7 +199,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object2_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
 
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -263,7 +263,7 @@ probability of 0.75.
 TEST_P(filter_type_tests, message_random_drop_object_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -320,7 +320,7 @@ probability of 0.9.
 TEST_P(filter_type_tests, message_random_drop_object1_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -378,7 +378,7 @@ probability of 0.75.
 TEST_P(filter_type_tests, message_random_drop_dest_object_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -436,7 +436,7 @@ probability of 0.9.
 TEST_P(filter_type_tests, message_random_drop_dest_object1_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -492,7 +492,7 @@ binomial distribution.
 TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
@@ -549,7 +549,7 @@ Test filter info fields
 TEST_P(filter_type_tests, test_filter_info_field_ci_skip)
 {
     auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "FILTER");
+    AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);

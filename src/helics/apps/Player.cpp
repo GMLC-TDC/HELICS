@@ -724,7 +724,7 @@ namespace apps {
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
-            std::cerr << "PUBLICATION already exists\n";
+            std::cerr << "publication already exists\n";
         }
         if (!useLocal) {
             publications.emplace_back(GLOBAL, fed.get(), key, type, pubUnits);
