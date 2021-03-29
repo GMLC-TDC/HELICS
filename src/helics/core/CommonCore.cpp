@@ -3652,15 +3652,11 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 }
 
                 queryResp.payload = std::move(repStr);
-                if (queryResp.dest_id == direct_core_id)
-                {
+                if (queryResp.dest_id == direct_core_id) {
                     processQueryResponse(queryResp);
-                }
-                else
-                {
+                } else {
                     transmit(getRoute(queryResp.dest_id), queryResp);
                 }
-                
             }
         } break;
         case CMD_QUERY_REPLY:
@@ -3994,7 +3990,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
         return m;
     }
     if (checkActionFlag(*handle, has_source_filter_flag)) {
-        if (filterFed!=nullptr) {
+        if (filterFed != nullptr) {
             return filterFed->processMessage(m, handle);
         }
     }
