@@ -277,7 +277,7 @@ simulation
 
 TEST_P(filter_single_type_test, message_source_filter_function)
 {
-     auto p = GetParam();
+    auto p = GetParam();
     auto broker = AddBroker(p, 2);
     AddFederates<helics::MessageFederate>(p, 2, broker, 0.5, "message");
 
