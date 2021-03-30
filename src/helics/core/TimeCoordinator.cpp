@@ -190,17 +190,13 @@ bool TimeCoordinator::updateNextExecutionTime()
             time_exec = (iterating == iteration_request::no_iterations) ? getNextPossibleTime() :
                                                                           time_granted;
         }
-        if (time_granted < Time::maxVal())
-        {
+        if (time_granted < Time::maxVal()) {
             if ((time_exec - time_granted) > timeZero) {
                 time_exec = generateAllowedTime(time_exec);
             }
-        }
-        else
-        {
+        } else {
             time_exec = generateAllowedTime(time_exec);
         }
-        
     }
 
     return (time_exec != cexec);
@@ -358,8 +354,7 @@ Time TimeCoordinator::getNextPossibleTime() const
         }
         return retTime;
     }
-    if (time_grantBase >= Time::maxVal() - std::max(info.timeDelta, info.period))
-    {
+    if (time_grantBase >= Time::maxVal() - std::max(info.timeDelta, info.period)) {
         return Time::maxVal();
     }
     return generateAllowedTime(time_grantBase + std::max(info.timeDelta, info.period));
