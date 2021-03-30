@@ -1166,6 +1166,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_BROKER_QUERY_ORDERED:
         case CMD_QUERY_ORDERED:
+        case CMD_QUERY_REPLY_ORDERED:
             processQueryCommand(command);
             break;
         default:
@@ -2908,13 +2909,13 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
 
 void CoreBroker::processLocalQuery(const ActionMessage& m)
 {
-    ActionMessage queryRep(CMD_QUERY_REPLY);
+    bool force_ordered =
+        (m.action() == CMD_QUERY_ORDERED || m.action() == CMD_BROKER_QUERY_ORDERED);
+    ActionMessage queryRep(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
     queryRep.source_id = global_broker_id_local;
     queryRep.dest_id = m.source_id;
     queryRep.messageID = m.messageID;
-    queryRep.payload = generateQueryAnswer(m.payload,
-                                           m.action() == CMD_QUERY_ORDERED ||
-                                               m.action() == CMD_BROKER_QUERY_ORDERED);
+    queryRep.payload = generateQueryAnswer(m.payload, force_ordered);
     queryRep.counter = m.counter;
     if (queryRep.payload.to_string() == "#wait") {
         std::get<1>(mapBuilders[mapIndex.at(std::string(m.payload.to_string())).first])
@@ -2992,6 +2993,7 @@ void CoreBroker::processQueryCommand(ActionMessage& cmd)
             processQuery(cmd);
             break;
         case CMD_QUERY_REPLY:
+        case CMD_QUERY_REPLY_ORDERED:
             if (cmd.dest_id == global_broker_id_local) {
                 processQueryResponse(cmd);
             } else {
@@ -3016,12 +3018,14 @@ void CoreBroker::processQueryCommand(ActionMessage& cmd)
 
 void CoreBroker::processQuery(ActionMessage& m)
 {
+    bool force_ordered =
+        (m.action() == CMD_QUERY_ORDERED || m.action() == CMD_BROKER_QUERY_ORDERED);
     const auto& target = m.getString(targetStringLoc);
     if ((target == getIdentifier() || target == "broker") ||
         (isRootc && (target == "root" || target == "federation"))) {
         processLocalQuery(m);
     } else if (isRootc && target == "gid_to_name") {
-        ActionMessage queryResp(CMD_QUERY_REPLY);
+        ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
@@ -3032,7 +3036,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
     } else if ((isRootc) && (target == "global" || target == "global_value")) {
-        ActionMessage queryResp(CMD_QUERY_REPLY);
+        ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
@@ -3087,7 +3091,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             if (response.empty()) {
                 response = generateJsonErrorResponse(404, "query not valid");
             }
-            ActionMessage queryResp(CMD_QUERY_REPLY);
+            ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
             queryResp.source_id = global_broker_id_local;
             queryResp.messageID = m.messageID;

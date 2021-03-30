@@ -40,6 +40,7 @@ across different compilers*/
         cmd_interface_query = -39,  //!< send a query to a core
         cmd_broker_query_ordered = 939,  //!< send a query to a core
         cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
+        cmd_query_reply_ordered = 942,  //!< response to a query on normal paths
         cmd_reg_broker =
             -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
         cmd_broker_location = cmd_info_basis - 57,  //!< command to define a new broker location
@@ -326,6 +327,7 @@ across different compilers*/
 #define CMD_BROKER_QUERY_ORDERED action_message_def::action_t::cmd_broker_query_ordered
 #define CMD_INTERFACE_QUERY action_message_def::action_t::cmd_interface_query
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
+#define CMD_QUERY_REPLY_ORDERED action_message_def::action_t::cmd_query_reply_ordered
 #define CMD_SET_GLOBAL action_message_def::action_t::cmd_set_global
 
 #define CMD_SEND_COMMAND action_message_def::action_t::cmd_send_command

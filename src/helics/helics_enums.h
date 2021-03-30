@@ -126,7 +126,9 @@ typedef enum {
    invalid values */
     HELICS_FLAG_STRICT_CONFIG_CHECKING = 75
 } HelicsFederateFlags;
-
+    /** specify that the federate is event triggered-meaning (all/most) events are triggered by
+       incoming events*/
+    helics_flag_event_triggered = 81
 /** enumeration of additional core flags*/
 typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/

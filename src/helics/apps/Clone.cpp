@@ -181,6 +181,7 @@ namespace apps {
     void Clone::generateInterfaces()
     {
         auto res = waitForInit(fed.get(), captureFederate);
+        std::this_thread::yield();
         if (res) {
             auto pubs = vectorizeQueryResult(
                 fed->query(captureFederate, "publications", helics_query_mode_ordered));

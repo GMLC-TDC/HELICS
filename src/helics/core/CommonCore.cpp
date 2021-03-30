@@ -2491,12 +2491,12 @@ std::string CommonCore::query(const std::string& target,
         auto* fed =
             (target != "federate") ? getFederate(target) : getFederateAt(LocalFederateId(0));
         if (fed != nullptr) {
-            std::string ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+            querycmd.dest_id = fed->global_id;
+            if (mode != helics_query_mode_ordered) {
+                std::string ret = federateQuery(fed, queryStr, false);
             if (ret != "#wait") {
                 return ret;
             }
-
-            querycmd.dest_id = fed->global_id;
 
             auto queryResult = activeQueries.getFuture(querycmd.messageID);
             fed->addAction(std::move(querycmd));
@@ -2510,8 +2510,8 @@ std::string CommonCore::query(const std::string& target,
                         activeQueries.finishedWithValue(index);
                         return qres;
                     }
-                    case std::future_status::timeout: {  // federate query may need to wait or can
-                                                         // get the result now
+                        case std::future_status::timeout: {  // federate query may need to wait or
+                                                             // can get the result now
                         ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
                         if (ret != "#wait") {
                             activeQueries.finishedWithValue(index);
@@ -2524,6 +2524,7 @@ std::string CommonCore::query(const std::string& target,
             }
             return generateJsonErrorResponse(500, "Unexpected Error #13");  // LCOV_EXCL_LINE
         }
+    }
     }
 
     auto queryResult = activeQueries.getFuture(querycmd.messageID);
@@ -2997,6 +2998,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
         case CMD_BROKER_QUERY_ORDERED:
         case CMD_QUERY_ORDERED:
+        case CMD_QUERY_REPLY_ORDERED:
             processQueryCommand(command);
             break;
         case CMD_DISCONNECT_CHECK:
@@ -3888,18 +3890,22 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
 
 void CommonCore::processQueryCommand(ActionMessage& cmd)
 {
+    bool force_ordered{false};
     switch (cmd.action()) {
-        case CMD_BROKER_QUERY:
         case CMD_BROKER_QUERY_ORDERED:
+            force_ordered = true;
+            // FALLTHROUGH
+        case CMD_BROKER_QUERY:
+
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
-                std::string repStr =
-                    coreQuery(cmd.payload, cmd.action() == CMD_BROKER_QUERY_ORDERED);
+                std::string repStr = coreQuery(cmd.payload, force_ordered);
                 if (repStr != "#wait") {
                     if (cmd.source_id == direct_core_id) {
                         // TODO(PT) make setDelayedValue have a move method
                         activeQueries.setDelayedValue(cmd.messageID, repStr);
                     } else {
-                        ActionMessage queryResp(CMD_QUERY_REPLY);
+                        ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED :
+                                                                CMD_QUERY_REPLY);
                         queryResp.dest_id = cmd.source_id;
                         queryResp.source_id = global_broker_id_local;
                         queryResp.messageID = cmd.messageID;
@@ -3908,7 +3914,8 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                         transmit(getRoute(queryResp.dest_id), queryResp);
                     }
                 } else {
-                    ActionMessage queryResp(CMD_QUERY_REPLY);
+                    ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED :
+                                                            CMD_QUERY_REPLY);
                     queryResp.dest_id = cmd.source_id;
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
@@ -3920,9 +3927,10 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 routeMessage(std::move(cmd));
             }
             break;
+        case CMD_QUERY_ORDERED:
+            force_ordered = true;
+            // FALLTHROUGH
         case CMD_QUERY:
-        case CMD_QUERY_ORDERED: {
-            bool force_ordered = (cmd.action() == CMD_QUERY_ORDERED);
             if (cmd.dest_id == parent_broker_id) {
                 const auto& target = cmd.getString(targetStringLoc);
                 if (target == "root" || target == "federation") {
@@ -3945,7 +3953,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 }
             } else {
                 std::string repStr;
-                ActionMessage queryResp(CMD_QUERY_REPLY);
+                ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
                 queryResp.dest_id = cmd.source_id;
                 queryResp.source_id = cmd.dest_id;
                 queryResp.messageID = cmd.messageID;
@@ -3968,10 +3976,15 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 }
 
                 queryResp.payload = std::move(repStr);
+                if (queryResp.dest_id == direct_core_id) {
+                    processQueryResponse(queryResp);
+                } else {
                 transmit(getRoute(queryResp.dest_id), queryResp);
             }
-        } break;
+            }
+            break;
         case CMD_QUERY_REPLY:
+        case CMD_QUERY_REPLY_ORDERED:
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
                 processQueryResponse(cmd);
             } else {
@@ -4303,7 +4316,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
     }
     clearActionFlag(m, filter_processing_required_flag);
     if (checkActionFlag(*handle, has_source_filter_flag)) {
-        if (filterFed) {
+        if (filterFed != nullptr) {
         return filterFed->processMessage(m, handle);
         }
     }

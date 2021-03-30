@@ -41,7 +41,9 @@ class tcoptions {
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
     bool restrictive_time_policy = false;
-    // 1 byte gap
+    /** have the shown event time match dependency events for use with federates
+    that trigger on events but don't have internal generated events*/
+    bool event_triggered = false;
     int maxIterations = 50;
 };
 

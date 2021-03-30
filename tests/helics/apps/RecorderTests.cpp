@@ -692,6 +692,12 @@ TEST(recorder_tests, recorder_test_saveFile3)
     mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
+    mfed2.requestTimeAsync(4.0);
+    retTime = mfed.requestTime(4.0);
+    EXPECT_EQ(retTime, 4.0);
+
+    mfed2.requestTimeComplete();
+
     mfed.finalize();
     mfed2.finalize();
     fut.get();
