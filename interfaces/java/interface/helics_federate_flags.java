@@ -75,6 +75,11 @@ public final class helics_federate_flags {
    *    invalid values 
    */
   public final static helics_federate_flags helics_flag_strict_config_checking = new helics_federate_flags("helics_flag_strict_config_checking", helicsJNI.helics_flag_strict_config_checking_get());
+  /**
+   *  specify that the federate is event triggered-meaning (all/most) events are triggered by<br>
+   *        incoming events
+   */
+  public final static helics_federate_flags helics_flag_event_triggered = new helics_federate_flags("helics_flag_event_triggered", helicsJNI.helics_flag_event_triggered_get());
 
   public final int swigValue() {
     return swigValue;
@@ -110,7 +115,7 @@ public final class helics_federate_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_restrictive_time_policy, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_ignore_time_mismatch_warnings, helics_flag_strict_config_checking };
+  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_restrictive_time_policy, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_ignore_time_mismatch_warnings, helics_flag_strict_config_checking, helics_flag_event_triggered };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
