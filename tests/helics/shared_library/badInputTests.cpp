@@ -592,7 +592,7 @@ TEST_F(function_tests, initError2)
     helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 1.0, nullptr);
 
     // unknown publication
-    auto pub3 = helicsFederateGetPublication(vFed1, "UNKNOWN", &err);
+    auto pub3 = helicsFederateGetPublication(vFed1, "unknown", &err);
     EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(pub3, nullptr);
@@ -607,7 +607,7 @@ TEST_F(function_tests, initError2)
     helicsErrorClear(&err);
 
     // unknown input
-    auto inp4 = helicsFederateGetInput(vFed1, "UNKNOWN", &err);
+    auto inp4 = helicsFederateGetInput(vFed1, "unknown", &err);
     EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(inp4, nullptr);
@@ -634,7 +634,7 @@ TEST_F(function_tests, initError3)
 
     helicsInputAddTarget(subid, "pub1", nullptr);
 
-    auto inp3 = helicsFederateGetSubscription(vFed1, "UNKNOWN", &err);
+    auto inp3 = helicsFederateGetSubscription(vFed1, "unknown", &err);
     EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(inp3, nullptr);
@@ -1057,7 +1057,7 @@ TEST_F(function_tests, filter_tests2)
     EXPECT_EQ(filt2, nullptr);
     helicsErrorClear(&err);
 
-    auto f3 = helicsFederateGetFilter(mFed1, "UNKNOWN", &err);
+    auto f3 = helicsFederateGetFilter(mFed1, "unknown", &err);
     EXPECT_NE(err.errorCode, 0);
     EXPECT_EQ(f3, nullptr);
 
@@ -1097,7 +1097,7 @@ TEST_F(function_tests, filter_tests4)
     EXPECT_NE(err.errorCode, 0);
     EXPECT_EQ(filt2, nullptr);
     helicsErrorClear(&err);
-    helicsFilterSetString(filt1, "UNKNOWN", "string", &err);
+    helicsFilterSetString(filt1, "unknown", "string", &err);
     EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
 
@@ -1111,7 +1111,7 @@ TEST_F(function_tests, filter_tests4)
     helicsFilterRemoveTarget(filt1, "ept1", &err);
     EXPECT_EQ(err.errorCode, 0);
 
-    helicsFilterSet(filt1, "UNKNOWN", 10.0, &err);
+    helicsFilterSet(filt1, "unknown", 10.0, &err);
     EXPECT_NE(err.errorCode, 0);
     helicsErrorClear(&err);
     helicsFederateFinalize(mFed1, nullptr);

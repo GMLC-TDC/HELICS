@@ -303,7 +303,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `HELICS_FLAG_terminate_on_error` [72]
+_Property's enumerated name:_ `HELICS_FLAG_TERMINATE_ON_ERROR` [72]
 
 If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions.
 

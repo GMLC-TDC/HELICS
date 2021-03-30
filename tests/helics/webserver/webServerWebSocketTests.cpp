@@ -329,7 +329,7 @@ TEST_F(webTest, createBrokerUUID)
 {
     Json::Value v1;
     v1["command"] = "create";
-    v1["CoreType"] = "ZMQ";
+    v1["core_type"] = "ZMQ";
     v1["num_feds"] = 3;
     auto result = sendText(generateJsonString(v1));
     auto val = loadJson(result);
@@ -383,7 +383,7 @@ TEST_F(webTest, timeBlock)
     Json::Value create;
     create["broker"] = "brk_timerws";
     create["command"] = "create";
-    create["CoreType"] = "ZMQ";
+    create["core_type"] = "ZMQ";
     create["num_feds"] = 1;
     sendText(generateJsonString(create));
     auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timerws");

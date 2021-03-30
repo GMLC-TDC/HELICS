@@ -569,7 +569,7 @@ TEST_F(mfed_tests, send_message1)
 
 TEST(messageFederate, constructor1)
 {
-    helics::MessageFederate mf1("fed1", "--CoreType=test --autobroker --corename=mfc");
+    helics::MessageFederate mf1("fed1", "--coretype=test --autobroker --corename=mfc");
     // try out loading a file
     EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")),
                  helics::HelicsException);
@@ -616,7 +616,7 @@ TEST(messageFederate, constructor2)
 
 TEST(messageFederate, constructor3)
 {
-    helics::CoreApp cr("--CoreType=test --name=cb2 --autobroker");
+    helics::CoreApp cr("--coretype=test --name=cb2 --autobroker");
 
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
@@ -650,7 +650,7 @@ TEST(messageFederate, constructor4)
 
 TEST(messageFederate, constructor5)
 {
-    helics::MessageFederate mf1("--CoreType=test --autobroker --corename=mfc5 --name=fedmd");
+    helics::MessageFederate mf1("--coretype=test --autobroker --corename=mfc5 --name=fedmd");
     // try out loading a file
 
     EXPECT_EQ(mf1.getName(), "fedmd");

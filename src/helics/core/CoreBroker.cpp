@@ -1541,7 +1541,7 @@ void CoreBroker::addInput(ActionMessage& m)
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate INPUT names ({})", m.name());
+        eret.payload = fmt::format("Duplicate input names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
@@ -1604,7 +1604,7 @@ void CoreBroker::addFilter(ActionMessage& m)
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate FILTER names ({})", m.name());
+        eret.payload = fmt::format("Duplicate filter names ({})", m.name());
         propagateError(std::move(eret));
         return;
     }
@@ -1940,32 +1940,32 @@ void CoreBroker::executeInitializationOperations()
                     switch (type) {
                         case 'p':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required PUBLICATION target {}",
+                                fmt::format("Unable to connect to required publication target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         case 'i':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required INPUT target {}",
+                                fmt::format("Unable to connect to required input target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         case 'f':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required FILTER target {}",
+                                fmt::format("Unable to connect to required filter target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         case 'e':
                             eMiss.payload =
-                                fmt::format("Unable to connect to required ENDPOINT target {}",
+                                fmt::format("Unable to connect to required endpoint target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
                         default:
                             // LCOV_EXCL_START
                             eMiss.payload =
-                                fmt::format("Unable to connect to required UNKNOWN target {}",
+                                fmt::format("Unable to connect to required unknown target {}",
                                             target);
                             LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
                             break;
@@ -1990,21 +1990,21 @@ void CoreBroker::executeInitializationOperations()
                 switch (type) {
                     case 'p':
                         wMiss.payload =
-                            fmt::format("Unable to connect to PUBLICATION target {}", target);
+                            fmt::format("Unable to connect to publication target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     case 'i':
-                        wMiss.payload = fmt::format("Unable to connect to INPUT target {}", target);
+                        wMiss.payload = fmt::format("Unable to connect to input target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     case 'f':
                         wMiss.payload =
-                            fmt::format("Unable to connect to FILTER target {}", target);
+                            fmt::format("Unable to connect to filter target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     case 'e':
                         wMiss.payload =
-                            fmt::format("Unable to connect to ENDPOINT target {}", target);
+                            fmt::format("Unable to connect to endpoint target {}", target);
                         LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
                         break;
                     default:

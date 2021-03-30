@@ -697,7 +697,7 @@ const char* actionMessageType(action_message_def::action_t action)
 
 // set of strings to translate error codes to something sensible
 static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
-    {connection_error_code, "connection error_result"},
+    {connection_error_code, "connection error result"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
     {duplicate_federate_name_error_code, "duplicate federate name detected"},

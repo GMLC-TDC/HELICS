@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 
-static constexpr char invalidFilterString[] = "The given FILTER object is not valid";
+static constexpr char invalidFilterString[] = "The given filter object is not valid";
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int filterValidationIdentifier = 0xEC26'0127;
@@ -482,7 +482,7 @@ void helicsFilterSetCustomCallback(HelicsFilter filt,
     }
 
     if (!fObj->custom) {
-        static constexpr char nonCustomFilterString[] = "filter must be a custom FILTER to specify callback";
+        static constexpr char nonCustomFilterString[] = "filter must be a custom filter to specify callback";
         assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCustomFilterString);
         return;
     }

@@ -33,7 +33,7 @@ typedef void* HelicsPublication;
 /**
  * opaque object representing an endpoint
  */
-// typedef void* HelicsEndpoint;
+// typedef void* helics_endpoint;
 typedef void* HelicsEndpoint;
 
 /**
@@ -62,7 +62,7 @@ typedef void* HelicsFederate;
 /**
  * opaque object representing a filter info object structure
  */
-// typedef void* HelicsFederateInfo;
+// typedef void* helics_federate_info;
 typedef void* HelicsFederateInfo;
 
 /**
@@ -80,7 +80,7 @@ typedef void* HelicsQueryBuffer;
 /**
  * opaque object representing a message
  */
-// typedef void* HelicsMessage;
+// typedef void* helics_message;
 typedef void* HelicsMessage;
 
 /**
@@ -161,7 +161,7 @@ typedef struct HelicsError {
     const char* message; /*!< a message associated with the error*/
 } HelicsError;
 
-// typedef HelicsError helics_error;
+// typedef helics_error HelicsError;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

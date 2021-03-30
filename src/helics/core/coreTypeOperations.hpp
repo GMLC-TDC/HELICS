@@ -20,8 +20,8 @@ namespace core {
 
     /** generate a core type value from a std::string
 @param type a string describing the desired core type
-@return a value of the helics_CoreType enumeration
-helics::CoreType::unrecognized if the type is not valid
+@return a value of the helics::CoreType enumeration
+helics::CoreType::UNRECOGNIZED if the type is not valid
 */
     CoreType coreTypeFromString(std::string type) noexcept;
 
