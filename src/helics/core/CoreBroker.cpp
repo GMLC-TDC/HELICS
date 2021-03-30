@@ -2846,13 +2846,12 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
 void CoreBroker::processLocalQuery(const ActionMessage& m)
 {
     bool force_ordered =
-       (m.action() == CMD_QUERY_ORDERED || m.action() == CMD_BROKER_QUERY_ORDERED);
-    ActionMessage queryRep(force_ordered?CMD_QUERY_REPLY_ORDERED:CMD_QUERY_REPLY);
+        (m.action() == CMD_QUERY_ORDERED || m.action() == CMD_BROKER_QUERY_ORDERED);
+    ActionMessage queryRep(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
     queryRep.source_id = global_broker_id_local;
     queryRep.dest_id = m.source_id;
     queryRep.messageID = m.messageID;
-    queryRep.payload = generateQueryAnswer(m.payload,
-                                           force_ordered);
+    queryRep.payload = generateQueryAnswer(m.payload, force_ordered);
     queryRep.counter = m.counter;
     if (queryRep.payload == "#wait") {
         std::get<1>(mapBuilders[mapIndex.at(m.payload).first]).push_back(queryRep);
@@ -2959,7 +2958,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         (isRootc && (target == "root" || target == "federation"))) {
         processLocalQuery(m);
     } else if (isRootc && target == "gid_to_name") {
-        ActionMessage queryResp(force_ordered?CMD_QUERY_REPLY_ORDERED:CMD_QUERY_REPLY);
+        ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
