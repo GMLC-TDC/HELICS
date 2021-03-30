@@ -50,7 +50,7 @@ TEST(BrokerAppTests, constructor2)
 
 TEST(BrokerAppTests, constructor3)
 {
-    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--CoreType"});
+    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--coretype"});
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -80,7 +80,7 @@ TEST(BrokerAppTests, constructor4)
 
 TEST(BrokerAppTests, constructor5)
 {
-    std::vector<std::string> args{"constructor4", "--name", "brk5", "--CoreType", "test"};
+    std::vector<std::string> args{"constructor4", "--name", "brk5", "--coretype", "test"};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -194,7 +194,7 @@ TEST(BrokerAppTests, null)
 
 TEST(BrokerAppTests, help)
 {
-    helics::BrokerApp app("--CoreType=test --help");
+    helics::BrokerApp app("--coretype=test --help");
     EXPECT_FALSE(app.isOpenToNewFederates());
     EXPECT_FALSE(app.isConnected());
     EXPECT_FALSE(app.connect());
@@ -207,7 +207,7 @@ TEST(BrokerAppTests, help)
 
 TEST(BrokerAppTests, file_logging_p2)
 {
-    helics::BrokerApp app("--name=loggerBrk1 --CoreType=test");
+    helics::BrokerApp app("--name=loggerBrk1 --coretype=test");
     app.setLoggingLevel(5);
     const std::string lfilename = "logfile3.txt";
     app.setLogFile("logfile3.txt");

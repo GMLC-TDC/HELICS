@@ -628,7 +628,7 @@ namespace apps {
             "capture_group", "Options related to capturing publications, endpoints, or federates");
         capture_group
             ->add_option(
-                "--tag,--PUBLICATION,--pub",
+                "--tag,--publication,--pub",
                 "tags(publications) to record, this argument may be specified any number of times")
             ->each([this](const std::string& tag) {
                 auto taglist = splitlineQuotes(tag);

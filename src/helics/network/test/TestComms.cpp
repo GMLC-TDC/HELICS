@@ -217,7 +217,7 @@ namespace testcore {
                         tbroker->addActionMessage(std::move(cmd));
                     } else {
                         if (!isDisconnectCommand(cmd)) {
-                            logWarning(std::string("UNKNOWN route, message dropped ") +
+                            logWarning(std::string("unknown route, message dropped ") +
                                        prettyPrintString(cmd));
                         }
                     }

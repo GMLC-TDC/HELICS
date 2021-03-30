@@ -20,7 +20,7 @@ HELICS_CXX_EXPORT std::string to_string(CoreType type);
 
 /** generate a core type value from a std::string
 @param type a string describing the desired core type
-@return a value of the helics_CoreType enumeration
+@return a value of the helics::CoreType enumeration
 helics::CoreType::unrecognized if the type is not valid
 */
 HELICS_CXX_EXPORT CoreType coreTypeFromString(std::string type) noexcept;

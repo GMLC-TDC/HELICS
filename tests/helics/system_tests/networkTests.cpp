@@ -128,7 +128,7 @@ TEST_F(network_tests, test_otherport)
     auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fi("--CoreType=ZMQ --broker=tcp://127.0.0.1:33200");
+    helics::FederateInfo fi("--coretype=ZMQ --broker=tcp://127.0.0.1:33200");
     helics::ValueFederate fed1("fed1", fi);
 
     fed1.enterExecutingMode();
@@ -145,7 +145,7 @@ TEST_F(network_tests, test_otherport2)
     auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fi("--CoreType=ZMQ --broker=tcp://127.0.0.1:20200");
+    helics::FederateInfo fi("--coretype=ZMQ --broker=tcp://127.0.0.1:20200");
     helics::ValueFederate fed1("fed1", fi);
 
     fed1.enterExecutingMode();
@@ -162,7 +162,7 @@ TEST_F(network_tests, test_otherport_fail)
     auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
-    helics::FederateInfo fi("--CoreType=ZMQ --broker=tcp://127.0.0.1:33198 --timeout=100ms");
+    helics::FederateInfo fi("--coretype=ZMQ --broker=tcp://127.0.0.1:33198 --timeout=100ms");
     EXPECT_THROW(helics::ValueFederate fed1("fed1", fi), helics::RegistrationFailure);
 
     if (broker->isConnected()) {

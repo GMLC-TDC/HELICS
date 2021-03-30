@@ -88,7 +88,7 @@ namespace apps {
                    defType = helics::getTypeFromString(res[0]);
                    return (defType != helics::DataType::HELICS_CUSTOM);
                },
-               "type of the PUBLICATION data type to use",
+               "type of the publication data type to use",
                false)
             ->take_last()
             ->ignore_underscore();
@@ -105,7 +105,7 @@ namespace apps {
                        return false;
                    }
                },
-               "the default units on the timestamps used in file based INPUT",
+               "the default units on the timestamps used in file based input",
                false)
             ->take_last()
             ->ignore_underscore();
@@ -305,7 +305,7 @@ namespace apps {
                         messages[mIndex].mess.data = decode(std::move(blk[5]));
                         break;
                     default:
-                        std::cerr << "UNKNOWN message format line " << lcount << '\n';
+                        std::cerr << "unknown message format line " << lcount << '\n';
                         break;
                 }
                 ++mIndex;
@@ -328,7 +328,7 @@ namespace apps {
                         points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                     } else {
                         std::cerr
-                            << "lines without PUBLICATION name but follow one with a PUBLICATION line "
+                            << "lines without publication name but follow one with a publication line "
                             << lcount << '\n';
                     }
                     points[pIndex].value = blk[1];
@@ -378,7 +378,7 @@ namespace apps {
                     points[pIndex].value = blk[3];
                     ++pIndex;
                 } else {
-                    std::cerr << "UNKNOWN publish format line " << lcount << '\n';
+                    std::cerr << "unknown publish format line " << lcount << '\n';
                 }
             }
         }

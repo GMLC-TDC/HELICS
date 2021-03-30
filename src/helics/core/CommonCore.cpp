@@ -1326,7 +1326,7 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
         throw(InvalidIdentifier("Handle not valid (setValue)"));
     }
     if (handleInfo->handleType != InterfaceType::PUBLICATION) {
-        throw(InvalidIdentifier("handle does not point to a PUBLICATION or control output"));
+        throw(InvalidIdentifier("handle does not point to a publication or control output"));
     }
     if (checkActionFlag(*handleInfo, disconnected_flag)) {
         return;
@@ -1393,7 +1393,7 @@ const std::shared_ptr<const SmallBuffer>& CommonCore::getValue(InterfaceHandle h
     }
 
     if (handleInfo->handleType != InterfaceType::INPUT) {
-        throw(InvalidIdentifier("Handle does not identify an INPUT"));
+        throw(InvalidIdentifier("Handle does not identify an input"));
     }
     auto& fed = *getFederateAt(handleInfo->local_fed_id);
     std::lock_guard<FederateState> lk(fed);
@@ -1409,7 +1409,7 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
     }
 
     if (handleInfo->handleType != InterfaceType::INPUT) {
-        throw(InvalidIdentifier("Handle does not identify an INPUT"));
+        throw(InvalidIdentifier("Handle does not identify an input"));
     }
     auto& fed = *getFederateAt(handleInfo->local_fed_id);
     std::lock_guard<FederateState> lk(fed);
@@ -1507,7 +1507,7 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
                 auto* res = hand.getFilter(filterName);
                 return (res != nullptr);
             })) {
-            throw(RegistrationFailure("there already exists a FILTER with this name"));
+            throw(RegistrationFailure("there already exists a filter with this name"));
         }
     }
     if (!waitCoreRegistration()) {
@@ -1543,7 +1543,7 @@ InterfaceHandle CommonCore::registerCloningFilter(const std::string& filterName,
                 auto* res = hand.getFilter(filterName);
                 return (res != nullptr);
             })) {
-            throw(RegistrationFailure("there already exists a FILTER with this name"));
+            throw(RegistrationFailure("there already exists a filter with this name"));
         }
     }
     if (!waitCoreRegistration()) {

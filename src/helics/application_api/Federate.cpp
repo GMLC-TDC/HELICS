@@ -720,7 +720,7 @@ iteration_time Federate::requestTimeIterativeComplete()
         return iterativeTime;
     }
     throw(InvalidFunctionCall(
-        "cannot call complete requestTimeIterative without first calling requestTimeIterativeAsync function"));
+        "cannot call requestTimeIterativeComplete without first calling requestTimeIterativeAsync function"));
 }
 
 void Federate::updateTime(Time /*newTime*/, Time /*oldTime*/)

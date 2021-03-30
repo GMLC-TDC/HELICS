@@ -53,7 +53,7 @@ for how to setup support in your preferred editor or IDE.
 
 6. Variable names:
    local variable names should be `camelCase`
-   member variable names should be `mPamelCase`
+   member variable names should be `mPascalCase`
    static const members should be `CAPITAL_SNAKE_CASE`
    function input names should be `camelCase`
    index variables can be `camelCase` or `ii,jj,kk,mm, nn` or similar if appropriate

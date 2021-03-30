@@ -29,7 +29,7 @@ static const bool amb = helics::allowMultiBroker();
 
 TEST(MultiBroker, constructor1)
 {
-    helics::BrokerApp App(helics::CoreType::MULTI, "brk1", "--CoreType test");
+    helics::BrokerApp App(helics::CoreType::MULTI, "brk1", "--coretype test");
 
     // Brokers connect automatically
     EXPECT_TRUE(App.isConnected());
@@ -41,7 +41,7 @@ TEST(MultiBroker, constructor1)
 
 TEST(MultiBroker, connect1)
 {
-    helics::BrokerApp b(helics::CoreType::MULTI, "brk2", "--CoreType test");
+    helics::BrokerApp b(helics::CoreType::MULTI, "brk2", "--coretype test");
     EXPECT_TRUE(b.connect());
     helics::CoreApp c1(helics::CoreType::TEST, "--brokername=brk2 --name=core1b");
     EXPECT_TRUE(c1.connect());

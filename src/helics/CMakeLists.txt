@@ -55,7 +55,7 @@ file(COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h
 )
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set_target_properties(helics_application_api helics_common HelicsCore PROPERTIES FOLDER helics)
+    set_target_properties(helics_application_api helics_common helics_core PROPERTIES FOLDER helics)
 endif()
 
 if(HELICS_BUILD_APP_LIBRARY)

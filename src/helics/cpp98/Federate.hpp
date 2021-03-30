@@ -99,7 +99,7 @@ class FederateInfo {
     {
         helicsFederateInfoSetCoreTypeFromString(fi, coretype.c_str(), hThrowOnError());
     }
-    /** set the core type from an integer \ref helics_CoreType
+    /** set the core type from an integer \ref HelicsCoreTypes
     @param coretype an integer code with the federate type
     */
     void setCoreType(int coretype)
