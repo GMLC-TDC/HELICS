@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "helics/external/filesystem.hpp"
 #endif
 
+#include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Clone.hpp"
 #include "helics/apps/Player.hpp"
@@ -48,7 +49,7 @@ TEST(clone_tests, simple_clone_test_pub)
     fut.get();
     c1.finalize();
     auto cnt = c1.pointCount();
-    EXPECT_EQ(cnt, 2u);
+    EXPECT_EQ(cnt, 2U);
 }
 
 TEST(clone_tests, simple_clone_test_pub2)
@@ -82,7 +83,7 @@ TEST(clone_tests, simple_clone_test_pub2)
     fut.get();
     c1.finalize();
     auto cnt = c1.pointCount();
-    EXPECT_EQ(cnt, 3u);
+    EXPECT_EQ(cnt, 3U);
     auto icnt = c1.accessUnderlyingFederate().getInputCount();
     EXPECT_EQ(icnt, 2);
     c1.saveFile("pubtest2.json");
@@ -98,8 +99,8 @@ TEST(clone_tests, simple_clone_test_pub2)
 
     p1.initialize();
 
-    EXPECT_EQ(p1.pointCount(), 3u);
-    EXPECT_EQ(p1.publicationCount(), 2u);
+    EXPECT_EQ(p1.pointCount(), 3U);
+    EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
     ghc::filesystem::remove("pubtest2.json");
 }
@@ -136,7 +137,7 @@ TEST(clone_tests, simple_clone_test_message)
     fut.get();
     c1.finalize();
     auto cnt = c1.messageCount();
-    EXPECT_EQ(cnt, 2u);
+    EXPECT_EQ(cnt, 2U);
     c1.saveFile("eptsave.json");
     // now test the files
     auto fi2 = helics::loadFederateInfo("eptsave.json");
@@ -148,8 +149,8 @@ TEST(clone_tests, simple_clone_test_message)
 
     p1.initialize();
 
-    EXPECT_EQ(p1.messageCount(), 2u);
-    EXPECT_EQ(p1.endpointCount(), 3u);
+    EXPECT_EQ(p1.messageCount(), 2U);
+    EXPECT_EQ(p1.endpointCount(), 3U);
     p1.finalize();
     ghc::filesystem::remove("eptsave.json");
 }
@@ -172,7 +173,7 @@ TEST(clone_tests, simple_clone_test_combo)
 
     auto& pub2 = mfed.registerPublication("pub2", "double", "m");
 
-    auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(4); });
+    auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(6); });
     mfed.enterExecutingMode();
     auto retTime = mfed.requestTime(1);
     EXPECT_EQ(retTime, 1.0);
@@ -188,12 +189,20 @@ TEST(clone_tests, simple_clone_test_combo)
 
     mfed.finalize();
     fut.get();
+    auto epts = c1.accessUnderlyingFederate().getEndpointCount();
+    EXPECT_EQ(epts, 1);
+    auto filts = c1.accessUnderlyingFederate().getFilterCount();
+    EXPECT_EQ(filts, 1);
+
+    auto ipts = c1.accessUnderlyingFederate().getInputCount();
+    EXPECT_EQ(ipts, 2);
     c1.finalize();
+
     auto cnt = c1.messageCount();
-    EXPECT_EQ(cnt, 2u);
+    EXPECT_EQ(cnt, 2U);
 
     cnt = c1.pointCount();
-    EXPECT_EQ(cnt, 3u);
+    EXPECT_EQ(cnt, 3U);
 
     c1.saveFile("combsave.json");
 
@@ -206,10 +215,10 @@ TEST(clone_tests, simple_clone_test_combo)
 
     p1.initialize();
 
-    EXPECT_EQ(p1.messageCount(), 2u);
-    EXPECT_EQ(p1.endpointCount(), 3u);
-    EXPECT_EQ(p1.pointCount(), 3u);
-    EXPECT_EQ(p1.publicationCount(), 2u);
+    EXPECT_EQ(p1.messageCount(), 2U);
+    EXPECT_EQ(p1.endpointCount(), 3U);
+    EXPECT_EQ(p1.pointCount(), 3U);
+    EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
     ghc::filesystem::remove("combsave.json");
 }
@@ -237,7 +246,7 @@ TEST(clone_tests, simple_clone_test_sub)
 
     vfed.registerSubscription("block2/pub");
 
-    auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(4); });
+    auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(6); });
     vfed2.enterExecutingModeAsync();
     vfed.enterExecutingMode();
     vfed2.enterExecutingModeComplete();
@@ -258,7 +267,7 @@ TEST(clone_tests, simple_clone_test_sub)
     fut.get();
 
     auto cnt = c1.pointCount();
-    EXPECT_EQ(cnt, 3u);
+    EXPECT_EQ(cnt, 3U);
     auto icnt = c1.accessUnderlyingFederate().getInputCount();
     EXPECT_EQ(icnt, 2);
     c1.finalize();
@@ -276,8 +285,8 @@ TEST(clone_tests, simple_clone_test_sub)
 
     p1.initialize();
 
-    EXPECT_EQ(p1.pointCount(), 3u);
-    EXPECT_EQ(p1.publicationCount(), 2u);
+    EXPECT_EQ(p1.pointCount(), 3U);
+    EXPECT_EQ(p1.publicationCount(), 2U);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     // this depends on some processing occurring
     EXPECT_EQ(p1.accessUnderlyingFederate().getInputCount(), 2);

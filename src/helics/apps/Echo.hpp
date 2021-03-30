@@ -87,7 +87,7 @@ consistent answers if used from multiple threads unless protected.
 
       private:
         /** load information from a JSON file*/
-        virtual void loadJsonFile(const std::string& filename) override;
+        virtual void loadJsonFile(const std::string& jsonFile) override;
         /** echo an actual message from an endpoint*/
         void echoMessage(const Endpoint& ept, Time currentTime);
 

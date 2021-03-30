@@ -27,6 +27,7 @@ FilterFederate::FilterFederate(global_federate_id fedID,
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
     mCoord.source_id = fedID;
+    mCoord.setOptionFlag(helics::defs::flags::event_triggered, true);
 }
 
 FilterFederate::~FilterFederate()
