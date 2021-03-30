@@ -30,7 +30,7 @@ constexpr const char* tstr[] = {"default",
                                 "undef",
                                 "undef",
                                 "http",
-                                "UNKNOWN"};
+                                "unknown"};
 
 constexpr const char* tcodeStr(int tcode)
 {

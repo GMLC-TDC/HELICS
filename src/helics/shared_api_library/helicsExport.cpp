@@ -73,12 +73,12 @@ HelicsBool helicsIsCoreTypeAvailable(const char* type)
 //    HELICS_OK = 0, /*!< the function executed successfully */
 //    HELICS_ERROR_INVALID_OBJECT, /*!< indicator that the object used was not a valid object */
 //    HELICS_ERROR_INVALID_ARGUMENT, /*!< the parameter passed was invalid and unable to be used*/
-//    helics_discard, /*!< the input was discarded and not used for some reason */
-//    helics_terminated, /*!< the federate has terminated and the call cannot be completed*/
-//    helics_warning, /*!< the function issued a warning of some kind */
-//    helics_invalid_state_transition, /*!< error issued when an invalid state transition occurred */
-//    helics_invalid_function_call, /*!< the call made was invalid in the present state of the calling object*/
-//    HelicsError /*!< the function produced an error */
+//    HELICS_DISCARD, /*!< the input was discarded and not used for some reason */
+//    HELICS_TERMINATED, /*!< the federate has terminated and the call cannot be completed*/
+//    HELICS_WARNING, /*!< the function issued a warning of some kind */
+//    HELICS_INVALID_STATE_TRANSITION, /*!< error issued when an invalid state transition occurred */
+//    HELICS_INVALID_FUNCTION_CALL, /*!< the call made was invalid in the present state of the calling object*/
+//    HELICS_ERROR /*!< the function produced an error */
 //} void;
 
 /** this function is based on the lippencott function template

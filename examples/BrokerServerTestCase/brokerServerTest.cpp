@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 int main(int argc, char** argv)
 {
@@ -57,7 +58,7 @@ int main(int argc, char** argv)
         if (eptr - argv[1]>0) {
             timeout = std::chrono::seconds(res);
         }
-        printf("value for timeout is not recognized(%s)\n", argv[1]);
+        std::cout << "value for timeout is not recognized(" << argv[1] << ")" << std::endl;
     }
     fedA1.enterExecutingModeAsync();
     fedA2.enterExecutingMode();
