@@ -1126,7 +1126,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             std::string repStr;
-            ActionMessage queryResp(CMD_QUERY_REPLY);
+            ActionMessage queryResp(cmd.action() == CMD_QUERY ? CMD_QUERY_REPLY :
+                                                                CMD_QUERY_REPLY_ORDERED);
             queryResp.dest_id = cmd.source_id;
             queryResp.source_id = cmd.dest_id;
             queryResp.messageID = cmd.messageID;
