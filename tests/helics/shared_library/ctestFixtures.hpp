@@ -15,40 +15,40 @@ SPDX-License-Identifier: BSD-3-Clause
 #define CE(command)                                                                                \
     helicsErrorClear(&err);                                                                        \
     command;                                                                                       \
-    EXPECT_TRUE(err.error_code == helics_ok) << err.message
+    EXPECT_TRUE(err.errorCode == HELICS_OK) << err.message
 
 #define HELICS_SIZE_MAX 512
 
-typedef helics_federate (*FedCreator)(const char*, helics_federate_info, helics_error*);
+typedef HelicsFederate (*FedCreator)(const char*, HelicsFederateInfo, HelicsError*);
 
 struct FederateTestFixture {
     FederateTestFixture();
     ~FederateTestFixture();
 
-    helics_broker AddBroker(const std::string& core_type_name, int count);
-    helics_broker AddBroker(const std::string& core_type_name,
-                            const std::string& initialization_string);
+    HelicsBroker AddBroker(const std::string& CoreType_name, int count);
+    HelicsBroker AddBroker(const std::string& CoreType_name,
+                           const std::string& initialization_string);
 
     void SetupTest(FedCreator ctor,
-                   const std::string& core_type_name,
+                   const std::string& CoreType_name,
                    int count,
-                   helics_time time_delta = helics_time_zero,
+                   HelicsTime timeDelta = HELICS_TIME_ZERO,
                    const std::string& name_prefix = "fed");
 
     void AddFederates(FedCreator ctor,
-                      std::string core_type_name,
+                      std::string CoreType_name,
                       int count,
-                      helics_broker broker,
-                      helics_time time_delta = helics_time_zero,
+                      HelicsBroker broker,
+                      HelicsTime time_delta = HELICS_TIME_ZERO,
                       const std::string& name_prefix = "fed");
 
-    helics_federate GetFederateAt(int index);
+    HelicsFederate GetFederateAt(int index);
 
-    std::vector<helics_broker> brokers;
-    std::vector<helics_federate> federates;
+    std::vector<HelicsBroker> brokers;
+    std::vector<HelicsFederate> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
-    helics_error err;
+    HelicsError err;
 
     std::string ctype;
 

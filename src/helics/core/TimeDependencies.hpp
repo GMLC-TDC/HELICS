@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "basic_core_types.hpp"
+#include "basic_CoreTypes.hpp"
 
 #include <vector>
 

@@ -242,7 +242,7 @@ void MessageFederate::subscribe(const Endpoint& ept, std::string_view key)
 
 bool MessageFederate::hasMessage() const
 {
-    if (currentMode >= modes::initializing) {
+    if (currentMode >= Modes::INITIALIZING) {
         return mfManager->hasMessage();
     }
     return false;
@@ -250,7 +250,7 @@ bool MessageFederate::hasMessage() const
 
 bool MessageFederate::hasMessage(const Endpoint& ept) const
 {
-    if (currentMode >= modes::initializing) {
+    if (currentMode >= Modes::INITIALIZING) {
         return mfManager->hasMessage(ept);
     }
     return false;
@@ -258,7 +258,7 @@ bool MessageFederate::hasMessage(const Endpoint& ept) const
 
 uint64_t MessageFederate::pendingMessagesCount(const Endpoint& ept) const
 {
-    if (currentMode >= modes::initializing) {
+    if (currentMode >= Modes::INITIALIZING) {
         return mfManager->pendingMessagesCount(ept);
     }
     return 0;
@@ -266,7 +266,7 @@ uint64_t MessageFederate::pendingMessagesCount(const Endpoint& ept) const
 
 uint64_t MessageFederate::pendingMessagesCount() const
 {
-    if (currentMode >= modes::initializing) {
+    if (currentMode >= Modes::INITIALIZING) {
         return mfManager->pendingMessagesCount();
     }
     return 0;
@@ -274,7 +274,7 @@ uint64_t MessageFederate::pendingMessagesCount() const
 
 std::unique_ptr<Message> MessageFederate::getMessage()
 {
-    if (currentMode >= modes::initializing) {
+    if (currentMode >= Modes::INITIALIZING) {
         return mfManager->getMessage();
     }
     return nullptr;
@@ -282,7 +282,7 @@ std::unique_ptr<Message> MessageFederate::getMessage()
 
 std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
 {
-    if (currentMode >= modes::initializing) {
+    if (currentMode >= Modes::INITIALIZING) {
         return mfManager->getMessage(ept);
     }
     return nullptr;

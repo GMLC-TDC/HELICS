@@ -12,7 +12,7 @@ namespace helics {
 namespace testcore {
     class TestComms;
     /** implementation for the core that can only communicate in process*/
-    using TestCore = NetworkCore<TestComms, interface_type::inproc>;
+    using TestCore = NetworkCore<TestComms, InterfaceTypes::INPROC>;
 
 }  // namespace testcore
 }  // namespace helics

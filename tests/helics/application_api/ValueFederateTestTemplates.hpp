@@ -18,21 +18,21 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 template<class X>
-void runFederateTest(const std::string& core_type_str,
+void runFederateTest(const std::string& CoreType_str,
                      const X& defaultValue,
                      const X& testValue1,
                      const X& testValue2)
 {
     FederateTestFixture fixture;
 
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
+    fixture.SetupTest<helics::ValueFederate>(CoreType_str, 1);
     auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
     auto& pubid = vFed->registerGlobalPublication<X>("pub1");
 
     auto& subid = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     subid.setDefault(defaultValue);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -62,19 +62,19 @@ void runFederateTest(const std::string& core_type_str,
     EXPECT_EQ(val, testValue2);
 
     vFed->finalize();
-    EXPECT_TRUE(vFed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     helics::cleanupHelicsLibrary();
 }
 
 template<class X>
-void runFederateTestObj(const std::string& core_type_str,
+void runFederateTestObj(const std::string& CoreType_str,
                         const X& defaultValue,
                         const X& testValue1,
                         const X& testValue2)
 {
     FederateTestFixture fixture;
 
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
+    fixture.SetupTest<helics::ValueFederate>(CoreType_str, 1);
     auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
@@ -82,7 +82,7 @@ void runFederateTestObj(const std::string& core_type_str,
 
     auto& subid = vFed->registerSubscription("pub1");
 
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     subid.setDefault(defaultValue);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -114,21 +114,21 @@ void runFederateTestObj(const std::string& core_type_str,
 }
 
 template<class X>
-void runFederateTestv2(const std::string& core_type_str,
+void runFederateTestv2(const std::string& CoreType_str,
                        const X& defaultValue,
                        const X& testValue1,
                        const X& testValue2)
 {
     FederateTestFixture fixture;
 
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
+    fixture.SetupTest<helics::ValueFederate>(CoreType_str, 1);
     auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
 
     // register the publications
     auto& pubid = vFed->registerGlobalPublication<X>("pub1");
 
     auto& subid = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     subid.setDefault(defaultValue);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -161,14 +161,14 @@ void runFederateTestv2(const std::string& core_type_str,
 }
 
 template<class X>
-void runDualFederateTest(const std::string& core_type_str,
+void runDualFederateTest(const std::string& CoreType_str,
                          const X& defaultValue,
                          const X& testValue1,
                          const X& testValue2)
 {
     FederateTestFixture fixture;
 
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 2);
+    fixture.SetupTest<helics::ValueFederate>(CoreType_str, 2);
     auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
     auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
 
@@ -176,8 +176,8 @@ void runDualFederateTest(const std::string& core_type_str,
     auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
     auto& subid = fedB->registerSubscription("pub1");
-    fedA->setProperty(helics_property_time_delta, 1.0);
-    fedB->setProperty(helics_property_time_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     subid.setDefault(defaultValue);
 
@@ -225,14 +225,14 @@ void runDualFederateTest(const std::string& core_type_str,
 }
 
 template<class X>
-void runDualFederateTestv2(const std::string& core_type_str,
+void runDualFederateTestv2(const std::string& CoreType_str,
                            X& defaultValue,
                            const X& testValue1,
                            const X& testValue2)
 {
     FederateTestFixture fixture;
 
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 2);
+    fixture.SetupTest<helics::ValueFederate>(CoreType_str, 2);
     auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
     auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
 
@@ -240,8 +240,8 @@ void runDualFederateTestv2(const std::string& core_type_str,
     auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
     auto& subid = fedB->registerSubscription("pub1");
-    fedA->setProperty(helics_property_time_delta, 1.0);
-    fedB->setProperty(helics_property_time_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     subid.setDefault(defaultValue);
     auto f1finish = std::async(std::launch::async, [&]() { fedA->enterExecutingMode(); });
@@ -282,14 +282,14 @@ void runDualFederateTestv2(const std::string& core_type_str,
 }
 
 template<class X>
-void runDualFederateTestObj(const std::string& core_type_str,
+void runDualFederateTestObj(const std::string& CoreType_str,
                             const X& defaultValue,
                             const X& testValue1,
                             const X& testValue2)
 {
     FederateTestFixture fixture;
     using namespace helics;
-    fixture.SetupTest<ValueFederate>(core_type_str, 2);
+    fixture.SetupTest<ValueFederate>(CoreType_str, 2);
     auto fedA = fixture.GetFederateAs<ValueFederate>(0);
     auto fedB = fixture.GetFederateAs<ValueFederate>(1);
 
@@ -297,8 +297,8 @@ void runDualFederateTestObj(const std::string& core_type_str,
     auto& pubid = fedA->registerGlobalPublication<X>("pub1");
 
     auto subid = fedB->registerSubscription("pub1");
-    fedA->setProperty(helics_property_time_delta, 1.0);
-    fedB->setProperty(helics_property_time_delta, 1.0);
+    fedA->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    fedB->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     subid.setDefault(defaultValue);
 

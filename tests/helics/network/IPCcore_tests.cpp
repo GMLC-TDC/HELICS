@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreBroker.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/core/core-types.hpp"
+#include "helics/core/CoreTypes.hpp"
 #include "helics/network/ipc/IpcComms.h"
 #include "helics/network/ipc/IpcCore.h"
 #include "helics/network/ipc/IpcQueueHelper.h"
@@ -223,7 +223,7 @@ TEST(IPCCore, ipcComm_transmit_add_route)
 TEST(IPCCore, ipccore_initialization)
 {
     std::string initializationString = "--broker_address=testBroker --name=core1";
-    auto core = helics::CoreFactory::create(helics::core_type::INTERPROCESS, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::INTERPROCESS, initializationString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -252,9 +252,9 @@ TEST(IPCCore, ipcCore_core_broker_default)
     std::string initializationString = "-f 1";
 
     auto broker =
-        helics::BrokerFactory::create(helics::core_type::INTERPROCESS, initializationString);
+        helics::BrokerFactory::create(helics::CoreType::INTERPROCESS, initializationString);
 
-    auto core = helics::CoreFactory::create(helics::core_type::IPC, initializationString);
+    auto core = helics::CoreFactory::create(helics::CoreType::IPC, initializationString);
     bool connected = broker->isConnected();
     EXPECT_TRUE(connected);
     connected = core->connect();
@@ -271,8 +271,8 @@ TEST(IPCCore, ipcCore_core_broker_default)
 TEST(IPCCore, commFactory)
 {
     auto comm = helics::CommFactory::create("ipc");
-    auto comm2 = helics::CommFactory::create(helics::core_type::IPC);
-    auto comm3 = helics::CommFactory::create(helics::core_type::INTERPROCESS);
+    auto comm2 = helics::CommFactory::create(helics::CoreType::IPC);
+    auto comm3 = helics::CommFactory::create(helics::CoreType::INTERPROCESS);
 
     EXPECT_TRUE(dynamic_cast<helics::ipc::IpcComms*>(comm.get()) != nullptr);
     EXPECT_TRUE(dynamic_cast<helics::ipc::IpcComms*>(comm2.get()) != nullptr);

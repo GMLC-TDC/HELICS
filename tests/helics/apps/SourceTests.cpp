@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(source_tests, simple_source_test)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "score-source";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1("player1", fi);
@@ -28,7 +28,7 @@ TEST(source_tests, simple_source_test)
     }
     gen->set("ramp", 0.3);
     gen->set("level", 1.0);
-    src1.addPublication("pub1", helics::data_type::helics_double, 1.0);
+    src1.addPublication("pub1", helics::DataType::HELICS_DOUBLE, 1.0);
     src1.setStartTime("pub1", 1.0);
     helics::ValueFederate vfed("block1", fi);
     auto& sub1 = vfed.registerSubscription("pub1");
@@ -67,8 +67,8 @@ TEST(source_tests, simple_source_test)
 
 TEST(source_tests, simple_source_test2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.coreType = helics::CoreType::TEST;
     fi.coreName = "score-simple";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1("player1", fi);
@@ -85,11 +85,11 @@ TEST(source_tests, simple_source_test2)
     }
     gen->set("ramp", 0.3);
     gen->set("level", 1.0);
-    src1.addPublication("pub1", "ramp", helics::data_type::helics_double, 1.0);
+    src1.addPublication("pub1", "ramp", helics::DataType::HELICS_DOUBLE, 1.0);
     src1.setStartTime("pub1", 1.0);
     gen2->set("ramp", 0.6);
     gen2->set("level", 2.0);
-    src1.addPublication("pub2", "ramp2", helics::data_type::helics_double, 2.0);
+    src1.addPublication("pub2", "ramp2", helics::DataType::HELICS_DOUBLE, 2.0);
     src1.setStartTime("pub2", 3.0);
     helics::ValueFederate vfed("block1", fi);
     auto& sub1 = vfed.registerSubscription("pub1");
@@ -135,8 +135,8 @@ TEST(source_tests, simple_source_test2)
 
 TEST(source_tests, sine_source_test)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.coreType = helics::CoreType::TEST;
     fi.coreName = "score-sine";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1("player1", fi);
@@ -148,7 +148,7 @@ TEST(source_tests, sine_source_test)
         gen->set("freq", 0.5);
         gen->set("amplitude", 1.0);
     }
-    src1.addPublication("pub1", helics::data_type::helics_double, 0.5);
+    src1.addPublication("pub1", helics::DataType::HELICS_DOUBLE, 0.5);
     src1.setStartTime("pub1", 1.0);
     helics::ValueFederate vfed("block1", fi);
     auto& sub1 = vfed.registerSubscription("pub1");
@@ -193,7 +193,7 @@ TEST(source_tests, sine_source_test)
 
 TEST(source_tests, simple_source_test_file)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "scorep";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1("source1", fi);
@@ -236,7 +236,7 @@ TEST(source_tests, simple_source_test_file)
 
 TEST(source_tests, simple_source_test2_file)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "score2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1("player1", fi);
@@ -286,7 +286,7 @@ TEST(source_tests, simple_source_test2_file)
 
 TEST(source_tests, sine_source_test_file)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
 
     fi.coreName = "score1";
     fi.coreInitString = "-f 2 --autobroker";

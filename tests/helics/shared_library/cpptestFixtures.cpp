@@ -25,22 +25,20 @@ static bool hasIndexCode(const std::string& type_name)
     return false;
 }
 
-static auto StartBrokerImp(const std::string& core_type_name, std::string initialization_string)
+static auto StartBrokerImp(const std::string& CoreType_name, std::string initialization_string)
 {
-    if (core_type_name.compare(0, 3, "tcp") == 0) {
+    if (CoreType_name.compare(0, 3, "tcp") == 0) {
         initialization_string += " --reuse_address";
-    } else if (core_type_name.compare(0, 3, "ipc") == 0) {
+    } else if (CoreType_name.compare(0, 3, "ipc") == 0) {
         // this is to use the name instead of the "_ipc_broker" as the queue name
         // since we are linking it directly anyway
         initialization_string += " --client";
     }
-    if (hasIndexCode(core_type_name)) {
-        std::string new_type(core_type_name.begin(), core_type_name.end() - 2);
+    if (hasIndexCode(CoreType_name)) {
+        std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
         return std::make_shared<helicscpp::Broker>(new_type, std::string(), initialization_string);
     }
-    return std::make_shared<helicscpp::Broker>(core_type_name,
-                                               std::string(),
-                                               initialization_string);
+    return std::make_shared<helicscpp::Broker>(CoreType_name, std::string(), initialization_string);
 }
 
 bool FederateTestFixture_cpp::hasIndexCode(const std::string& type_name)
@@ -80,20 +78,20 @@ FederateTestFixture_cpp::~FederateTestFixture_cpp()
 }
 
 std::shared_ptr<helicscpp::Broker>
-    FederateTestFixture_cpp::AddBroker(const std::string& core_type_name, int count)
+    FederateTestFixture_cpp::AddBroker(const std::string& CoreType_name, int count)
 {
-    return AddBroker(core_type_name, std::string("-f") + std::to_string(count));
+    return AddBroker(CoreType_name, std::string("-f") + std::to_string(count));
 }
 
 std::shared_ptr<helicscpp::Broker>
-    FederateTestFixture_cpp::AddBroker(const std::string& core_type_name,
+    FederateTestFixture_cpp::AddBroker(const std::string& CoreType_name,
                                        const std::string& initialization_string)
 {
     std::shared_ptr<helicscpp::Broker> broker;
     if (extraBrokerArgs.empty()) {
-        broker = StartBrokerImp(core_type_name, initialization_string);
+        broker = StartBrokerImp(CoreType_name, initialization_string);
     } else {
-        broker = StartBrokerImp(core_type_name, initialization_string + " " + extraBrokerArgs);
+        broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
     }
     if (broker) {
         brokers.push_back(broker);

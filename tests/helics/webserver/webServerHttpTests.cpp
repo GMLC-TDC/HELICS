@@ -136,7 +136,7 @@ class httpTest: public ::testing::Test {
         return res.body();
     }
 
-    static std::shared_ptr<helics::Broker> addBroker(helics::core_type ctype,
+    static std::shared_ptr<helics::Broker> addBroker(helics::CoreType ctype,
                                                      const std::string& init)
     {
         auto brk = helics::BrokerFactory::create(ctype, init);
@@ -146,7 +146,7 @@ class httpTest: public ::testing::Test {
         return brk;
     }
 
-    static std::shared_ptr<helics::Core> addCore(helics::core_type ctype, const std::string& init)
+    static std::shared_ptr<helics::Core> addCore(helics::CoreType ctype, const std::string& init)
     {
         auto cr = helics::CoreFactory::create(ctype, init);
         if (cr) {
@@ -202,7 +202,7 @@ TEST_F(httpTest, test1)
 
 TEST_F(httpTest, single)
 {
-    addBroker(helics::core_type::ZMQ, "--name=brk1");
+    addBroker(helics::CoreType::ZMQ, "--name=brk1");
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
@@ -213,7 +213,7 @@ TEST_F(httpTest, single)
 
 TEST_F(httpTest, pair)
 {
-    addBroker(helics::core_type::TEST, "--name=brk2");
+    addBroker(helics::CoreType::TEST, "--name=brk2");
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
@@ -265,7 +265,7 @@ TEST_F(httpTest, not_found)
 
 TEST_F(httpTest, core)
 {
-    auto cr = addCore(helics::core_type::TEST, "--name=cr1 -f2");
+    auto cr = addCore(helics::CoreType::TEST, "--name=cr1 -f2");
     EXPECT_TRUE(cr->connect());
 
     auto result = sendGet("brk2");
@@ -430,7 +430,7 @@ TEST_F(httpTest, deleteJson)
 TEST_F(httpTest, timeBlock)
 {
     sendCommand(http::verb::post, "brk_timer", "type=ZMQ");
-    auto cr = addCore(helics::core_type::ZMQ, "--name=c_timer -f1 --broker=brk_timer");
+    auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timer");
     EXPECT_TRUE(cr->connect());
 
     helics::ValueFederate vFed("fed1", cr);

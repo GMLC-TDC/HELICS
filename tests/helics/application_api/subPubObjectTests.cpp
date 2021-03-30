@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <future>
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST(subscriptionObject, tests)
 {
@@ -28,7 +28,7 @@ TEST(subscriptionObject, tests)
     // register the publications
     auto& pubObj = vFed->registerGlobalPublication<std::string>("pub1");
     auto& subObj = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     pubObj.publish("string1");
@@ -66,7 +66,7 @@ void runPubSubTypeTests(const TX& valtx, const RX& valrx)
     auto& pubObj = vFed->registerGlobalPublication<TX>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     pubObj.publish(valtx);
@@ -91,7 +91,7 @@ void runPubSubThroughTypeTests(const TX& valtx, const RX& valrx)
     auto& pubObj = vFed->registerGlobalPublication<IX>("pub1");
 
     auto& subObj = vFed->registerSubscription("pub1");
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     pubObj.publish(valtx);
@@ -289,7 +289,7 @@ TEST(subscriptionObject, ChangeDetection_tests)
     auto& subObj1 = vFed->registerSubscription("pub1");
     auto& subObj2 = vFed->registerSubscription("pub1");
     subObj2.setMinimumChange(0.1);
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     pubObj.publish(23.7);
@@ -331,7 +331,7 @@ TEST(subscriptionObject, Size_tests)
 
     auto& subObj = vFed->registerSubscription("pub1");
 
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     std::string str("this is a string test");
@@ -360,7 +360,7 @@ TEST(subscriptionObject, VectorSize_tests)
 
     auto& subObj = vFed->registerSubscription("pub1");
 
-    vFed->setProperty(helics_property_time_delta, 1.0);
+    vFed->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed->enterExecutingMode();
     // publish string1 at time=0.0;
     std::vector<double> tvec{5, 7, 234.23, 99.1, 1e7, 0.0};
@@ -384,7 +384,7 @@ TEST(subscriptionObject, Defaults_test)
     fi.coreInitString = "--autobroker";
 
     auto vFed = std::make_shared<helics::ValueFederate>("test1", fi);
-    vFed->setFlagOption(helics_handle_option_connection_optional);
+    vFed->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
     // register the publications
     auto& subObj1 = vFed->registerSubscription("pub1");
     auto& subObj2 = vFed->registerSubscription("pub2");

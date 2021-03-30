@@ -239,7 +239,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             iData->lastUpdate = CurrentTime;
 
             bool updated = false;
-            if (fid->getMultiInputMode() == multi_input_handling_method::no_op) {
+            if (fid->getMultiInputMode() == MultiInputHandlingMethod::NO_OP) {
                 const auto& data = coreObject->getValue(handle);
                 iData->lastData = data;
                 iData->hasUpdate = true;
@@ -327,12 +327,12 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
             if (inp.isUpdated()) {
                 auto inpTemp = inp;
                 auto iType = inpTemp.getHelicsType();
-                if (iType == data_type::helics_any || iType == data_type::helics_unknown) {
+                if (iType == DataType::HELICS_ANY || iType == DataType::HELICS_UNKNOWN) {
                     iType = inp.getHelicsInjectionType();
                 }
-                if (iType == data_type::helics_double) {
+                if (iType == DataType::HELICS_DOUBLE) {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<double>());
-                } else if (iType == data_type::helics_vector) {
+                } else if (iType == DataType::HELICS_VECTOR) {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::vector<double>>());
                 } else {
                     JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::string>());
@@ -346,12 +346,12 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
             auto inpTemp = inp;
             inpTemp.checkUpdate(true);
             auto iType = inpTemp.getHelicsType();
-            if (iType == data_type::helics_any || iType == data_type::helics_unknown) {
+            if (iType == DataType::HELICS_ANY || iType == DataType::HELICS_UNKNOWN) {
                 iType = inp.getHelicsInjectionType();
             }
-            if (iType == data_type::helics_double) {
+            if (iType == DataType::HELICS_DOUBLE) {
                 JB.addElement(inp.getDisplayName(), inpTemp.getValue<double>());
-            } else if (iType == data_type::helics_vector) {
+            } else if (iType == DataType::HELICS_VECTOR) {
                 JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::vector<double>>());
             } else {
                 JB.addElement(inp.getDisplayName(), inpTemp.getValue<std::string>());

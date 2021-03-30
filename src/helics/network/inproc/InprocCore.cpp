@@ -10,5 +10,5 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InprocComms.h"
 
 namespace helics {
-template class NetworkCore<inproc::InprocComms, interface_type::inproc>;
+template class NetworkCore<inproc::InprocComms, InterfaceTypes::INPROC>;
 }  // namespace helics

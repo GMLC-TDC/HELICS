@@ -46,11 +46,11 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, initialize)
 
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 #ifdef ENABLE_ZMQ_CORE
@@ -71,7 +71,7 @@ TEST_P(valuefed_add_ztype_tests, publication_registration)
     auto pubid3 = vFed1->registerPublication("pub3", "double", "V");
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     const auto& sv = pubid.getKey();
     const auto& sv2 = pubid2.getKey();
@@ -88,7 +88,7 @@ TEST_P(valuefed_add_ztype_tests, publication_registration)
     EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 INSTANTIATE_TEST_SUITE_P(vfed_add_tests, valuefed_add_ztype_tests, ::testing::ValuesIn(ztypes));
@@ -101,13 +101,13 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     helics::Publication pubid(vFed1.get(), "pub1", helics::helicsType<std::string>());
-    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2", helics::data_type::helics_int);
+    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2", helics::DataType::HELICS_INT);
 
     vFed1->setSeparator('-');
     helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(), "V");
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     const auto& sv = pubid.getKey();
     const auto& sv2 = pubid2.getKey();
@@ -124,7 +124,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
@@ -132,14 +132,14 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
     auto& subid = vFed1->registerSubscription("sub1", "V");
     auto& subid2 = vFed1->registerSubscription("sub2");
 
     auto& subid3 = vFed1->registerSubscription("sub3", "V");
     vFed1->enterExecutingMode();
 
-    // EXPECT_TRUE (vFed->getCurrentMode () == helics::Federate::modes::executing);
+    // EXPECT_TRUE (vFed->getCurrentMode () == helics::Federate::Modes::EXECUTING);
 
     auto& sv = vFed1->getTarget(subid);
     auto& sv2 = vFed1->getTarget(subid2);
@@ -159,7 +159,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
 
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     helics::cleanupHelicsLibrary();
 }
 
@@ -167,7 +167,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
     // register the publications
     auto pubid = vFed1->registerPublication<std::string>("pub1");
     auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
@@ -182,7 +182,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
     // enter execution
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     // check subscriptions
     auto sv = vFed1->getTarget(subid);
     auto sv2 = vFed1->getTarget(subid2);
@@ -206,7 +206,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
     EXPECT_EQ(pubid3.getUnits(), "V");
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     helics::cleanupHelicsLibrary();
 }
 
@@ -214,7 +214,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
     // register the publications
     auto& pubid = vFed1->registerPublication<std::string>("pub1");
     auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
@@ -229,7 +229,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
     // enter execution
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     // check subscriptions
     EXPECT_EQ(subid.getTarget(), "pub2");
     EXPECT_EQ(subid2.getKey(), "sub2");
@@ -256,7 +256,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
     EXPECT_EQ(pubid3.getExtractionUnits(), "V");
     vFed1->finalize();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     helics::cleanupHelicsLibrary();
 }
 
@@ -269,7 +269,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
     auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto subid = vFed1->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");
@@ -456,8 +456,8 @@ TEST_P(valuefed_add_type_tests_ci_skip, async_calls)
     auto pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 
     auto subid = vFed2->registerSubscription("pub1");
-    vFed1->setProperty(helics_property_time_delta, 1.0);
-    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     vFed1->enterExecutingModeAsync();
     EXPECT_TRUE(!vFed1->isAsyncOperationCompleted());
@@ -514,7 +514,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, info_field)
     pubid2.setInfo(std::string("test2"));
     vFed1->enterExecutingMode();
 
-    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     auto info1 = pubid1.getInfo();
     auto info2 = pubid2.getInfo();
@@ -529,7 +529,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, info_pubs_subs)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
+    vFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
     auto pubid1 = vFed1->registerIndexedPublication<double>("pub1", 0);
     pubid1.setInfo(std::string("pub_test1"));
 
@@ -562,7 +562,7 @@ TEST_F(valuefed_add_tests_ci_skip, test_move_calls)
 {
     helics::ValueFederate vFed;
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreInitString = "-f 3 --autobroker";
     vFed = helics::ValueFederate("test1", fi);
     EXPECT_EQ(vFed.getName(), "test1");
@@ -665,7 +665,7 @@ TEST(valuefed_json_tests, json_publish)
 {
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.separator = '/';
     fi.coreName = "json_test2";
     fi.coreInitString = "--autobroker";
@@ -707,7 +707,7 @@ TEST(valuefed_json_tests, test_json_register_publish)
 {
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.separator = '/';
     fi.coreName = "core_pub_json";
     fi.coreInitString = "--autobroker";
@@ -739,7 +739,7 @@ TEST(valuefed_json_tests, test_json_register_publish)
 
 TEST(valuefed_json_tests, test_json_register_publish_error)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.separator = '/';
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed("test2", fi);
@@ -769,18 +769,18 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
 
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_add_single_type_tests_ci_skip,
-                         ::testing::ValuesIn(core_types_single));
+                         ::testing::ValuesIn(CoreTypes_single));
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_add_type_tests_ci_skip,
-                         ::testing::ValuesIn(core_types));
+                         ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(valuefed_tests,
                          valuefed_add_all_type_tests_ci_skip,
-                         ::testing::ValuesIn(core_types_all));
+                         ::testing::ValuesIn(CoreTypes_all));
 
 TEST(valuefederate, coreApp)
 {
-    helics::CoreApp capp(helics::core_type::TEST, "corename", "-f 1 --autobroker");
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::CoreApp capp(helics::CoreType::TEST, "corename", "-f 1 --autobroker");
+    helics::FederateInfo fi(helics::CoreType::TEST);
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", capp, fi);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
 
@@ -789,7 +789,7 @@ TEST(valuefederate, coreApp)
 
 TEST(valuefederate, core_ptr)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_ptr";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -824,7 +824,7 @@ TEST(valuefederate, from_file_bad3)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_bad_toml";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -842,7 +842,7 @@ TEST(valuefederate, pubAlias)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_alias";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -862,7 +862,7 @@ TEST(valuefederate, pubAlias)
 
 TEST(valuefederate, regJsonFailures)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_pjson";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -877,7 +877,7 @@ TEST(valuefederate, regJsonFailures)
 
 TEST(valuefederate, getInputs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_ipt";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -908,7 +908,7 @@ TEST(valuefederate, getInputs)
 
 TEST(valuefederate, indexed_inputs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_indexipt";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -938,7 +938,7 @@ TEST(valuefederate, indexed_inputs)
 
 TEST(valuefederate, indexed_pubs)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_indexpub";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -992,7 +992,7 @@ TEST(valuefederate, indexed_pubs)
 
 TEST(valuefederate, update_query)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_upd_query";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -1053,7 +1053,7 @@ TEST(valuefederate, update_query)
 
 TEST(valuefederate, indexed_targets)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_ind_target";
     fi.coreInitString = "-f 1 --autobroker";
 

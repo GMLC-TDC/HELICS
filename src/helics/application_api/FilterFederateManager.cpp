@@ -57,12 +57,12 @@ CloningFilter& FilterFederateManager::registerCloningFilter(const std::string& n
     throw(RegistrationFailure("Unable to register Filter"));
 }
 
-Filter& FilterFederateManager::registerFilter(filter_types type, const std::string& name)
+Filter& FilterFederateManager::registerFilter(FilterTypes type, const std::string& name)
 {
     return make_filter(type, fed, name);
 }
 
-CloningFilter& FilterFederateManager::registerCloningFilter(filter_types type,
+CloningFilter& FilterFederateManager::registerCloningFilter(FilterTypes type,
                                                             const std::string& name)
 {
     return make_cloning_filter(type, fed, std::string(), name);

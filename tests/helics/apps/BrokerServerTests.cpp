@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, core_type>> {
+class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, CoreType>> {
 };
 
 TEST_P(BrokerServerTests, startup_tests)
@@ -85,7 +85,7 @@ TEST_P(BrokerServerTests, execution_tests)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto fed2 = ValueFederate("fed2", fi);
     auto& sub = fed2.registerSubscription("key1");
-    sub.setOption(helics_handle_option_connection_required);
+    sub.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed1.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed2.enterExecutingMode());
     fed1.enterExecutingModeComplete();
@@ -113,7 +113,7 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto fed2 = ValueFederate("fed2", fi);
     auto& sub2 = fed2.registerSubscription("key1");
-    sub2.setOption(helics_handle_option_connection_required);
+    sub2.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed1.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed2.enterExecutingMode());
     fed1.enterExecutingModeComplete();
@@ -126,7 +126,7 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto fed4 = ValueFederate("fed4", fi);
     auto& sub4 = fed4.registerSubscription("key1");
-    sub4.setOption(helics_handle_option_connection_required);
+    sub4.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     fed3.enterExecutingModeAsync();
     EXPECT_NO_THROW(fed4.enterExecutingMode());
     fed3.enterExecutingModeComplete();
@@ -152,9 +152,9 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     cleanupHelicsLibrary();
 }
 
-const std::vector<std::pair<const char*, core_type>> tvals{{"--zmq", core_type::ZMQ},
-                                                           {"--zmqss", core_type::ZMQ_SS},
-                                                           {"--tcp", core_type::TCP},
-                                                           {"--udp", core_type::UDP}};
+const std::vector<std::pair<const char*, CoreType>> tvals{{"--zmq", CoreType::ZMQ},
+                                                          {"--zmqss", CoreType::ZMQ_SS},
+                                                          {"--tcp", CoreType::TCP},
+                                                          {"--udp", CoreType::UDP}};
 
 INSTANTIATE_TEST_SUITE_P(broker_server_tests, BrokerServerTests, ::testing::ValuesIn(tvals));

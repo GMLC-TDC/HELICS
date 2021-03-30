@@ -39,37 +39,37 @@ class MessageTimer {
 
 #include "../common/fmt_format.h"
 static const std::string emptyStr;
-#define LOG_ERROR(message) logMessage(helics_log_level_error, emptyStr, message)
-#define LOG_WARNING(message) logMessage(helics_log_level_warning, emptyStr, message)
+#define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, emptyStr, message)
+#define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, emptyStr, message)
 
 #ifdef HELICS_ENABLE_LOGGING
 
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
-            if (logLevel >= helics_log_level_summary) {                                            \
-                logMessage(Hhelics_log_level_summary, emptyStr, message);                          \
+            if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                            \
+                logMessage(HELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                          \
             }                                                                                      \
         } while (false)
 
 #    define LOG_INTERFACES(message)                                                                \
         do {                                                                                       \
-            if (logLevel >= helics_log_level_interfaces) {                                         \
-                logMessage(helics_log_level_interfaces, emptyStr, message);                        \
+            if (logLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                         \
+                logMessage(HELICS_LOG_LEVEL_INTERFACES, emptyStr, message);                        \
             }                                                                                      \
         } while (false)
 
 #    ifdef HELICS_ENABLE_DEBUG_LOGGING
 #        define LOG_TIMING(message)                                                                \
             do {                                                                                   \
-                if (logLevel >= helics_log_level_timing) {                                         \
-                    logMessage(helics_log_level_timing, emptyStr, message);                        \
+                if (logLevel >= HELICS_LOG_LEVEL_TIMING) {                                         \
+                    logMessage(HELICS_LOG_LEVEL_TIMING, emptyStr, message);                        \
                 }                                                                                  \
             } while (false)
 
 #        define LOG_DATA(message)                                                                  \
             do {                                                                                   \
-                if (logLevel >= helics_log_level_data) {                                           \
-                    logMessage(helics_log_level_data, emptyStr, message);                          \
+                if (logLevel >= HELICS_LOG_LEVEL_DATA) {                                           \
+                    logMessage(HELICS_LOG_LEVEL_DATA, emptyStr, message);                          \
                 }                                                                                  \
             } while (false)
 #    else
@@ -80,8 +80,8 @@ static const std::string emptyStr;
 #    ifdef HELICS_ENABLE_TRACE_LOGGING
 #        define LOG_TRACE(message)                                                                 \
             do {                                                                                   \
-                if (logLevel >= helics_log_level_trace) {                                          \
-                    logMessage(helics_log_level_trace, emptyStr, message);                         \
+                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {                                          \
+                    logMessage(HELICS_LOG_LEVEL_TRACE, emptyStr, message);                         \
                 }                                                                                  \
             } while (false)
 #    else
@@ -117,7 +117,7 @@ FederateState::FederateState(const std::string& fedName, const CoreFederateInfo&
 FederateState::~FederateState() = default;
 
 // define the allowable state transitions for a federate
-void FederateState::setState(federate_state newState)
+void FederateState::setState(FederateStates newState)
 {
     if (state == newState) {
         return;
@@ -163,7 +163,7 @@ void FederateState::reInit()
     delayQueues.clear();
     // TODO(PT): this needs to reset a bunch of stuff as well as check a few things
 }
-federate_state FederateState::getState() const
+FederateStates FederateState::getState() const
 {
     return state.load();
 }
@@ -289,7 +289,7 @@ void FederateState::addAction(ActionMessage&& action)
     }
 }
 
-void FederateState::createInterface(handle_type htype,
+void FederateState::createInterface(InterfaceType htype,
                                     InterfaceHandle handle,
                                     const std::string& key,
                                     const std::string& type,
@@ -298,43 +298,43 @@ void FederateState::createInterface(handle_type htype,
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
-        case handle_type::publication: {
+        case InterfaceType::PUBLICATION: {
             interfaceInformation.createPublication(handle, key, type, units);
             if (checkActionFlag(getInterfaceFlags(), required_flag)) {
                 interfaceInformation.setPublicationProperty(handle,
-                                                            defs::options::connection_required,
+                                                            defs::Options::CONNECTION_REQUIRED,
                                                             1);
             }
             if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
                 interfaceInformation.setPublicationProperty(handle,
-                                                            defs::options::connection_optional,
+                                                            defs::Options::CONNECTION_OPTIONAL,
                                                             1);
             }
         } break;
-        case handle_type::input: {
+        case InterfaceType::INPUT: {
             interfaceInformation.createInput(handle, key, type, units);
             if (strict_input_type_checking) {
                 interfaceInformation.setInputProperty(handle,
-                                                      defs::options::strict_type_checking,
+                                                      defs::Options::STRICT_TYPE_CHECKING,
                                                       1);
             }
             if (ignore_unit_mismatch) {
                 interfaceInformation.setInputProperty(handle,
-                                                      defs::options::ignore_unit_mismatch,
+                                                      defs::Options::IGNORE_UNIT_MISMATCH,
                                                       1);
             }
             if (checkActionFlag(getInterfaceFlags(), required_flag)) {
                 interfaceInformation.setInputProperty(handle,
-                                                      defs::options::connection_required,
+                                                      defs::Options::CONNECTION_REQUIRED,
                                                       1);
             }
             if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
                 interfaceInformation.setInputProperty(handle,
-                                                      defs::options::connection_optional,
+                                                      defs::Options::CONNECTION_OPTIONAL,
                                                       1);
             }
         } break;
-        case handle_type::endpoint: {
+        case InterfaceType::ENDPOINT: {
             interfaceInformation.createEndpoint(handle, key, type);
         }
         default:
@@ -342,10 +342,10 @@ void FederateState::createInterface(handle_type htype,
     }
 }
 
-void FederateState::closeInterface(InterfaceHandle handle, handle_type type)
+void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
 {
     switch (type) {
-        case handle_type::publication: {
+        case InterfaceType::PUBLICATION: {
             auto* pub = interfaceInformation.getPublication(handle);
             if (pub != nullptr) {
                 ActionMessage rem(CMD_REMOVE_PUBLICATION);
@@ -358,13 +358,13 @@ void FederateState::closeInterface(InterfaceHandle handle, handle_type type)
                 pub->subscribers.clear();
             }
         } break;
-        case handle_type::endpoint: {
+        case InterfaceType::ENDPOINT: {
             auto* ept = interfaceInformation.getEndpoint(handle);
             if (ept != nullptr) {
                 ept->clearQueue();
             }
         } break;
-        case handle_type::input: {
+        case InterfaceType::INPUT: {
             auto* ipt = interfaceInformation.getInput(handle);
             if (ipt != nullptr) {
                 ActionMessage rem(CMD_REMOVE_SUBSCRIBER);
@@ -389,66 +389,66 @@ std::optional<ActionMessage>
     return {};
 }
 
-iteration_result FederateState::waitSetup()
+IterationResult FederateState::waitSetup()
 {
     if (try_lock()) {  // only enter this loop once per federate
         auto ret = processQueue();
         unlock();
-        return static_cast<iteration_result>(ret);
+        return static_cast<IterationResult>(ret);
     }
 
     std::lock_guard<FederateState> fedlock(*this);
-    iteration_result ret;
+    IterationResult ret;
     switch (getState()) {
         case HELICS_CREATED: {  // we are still in the created state
             return waitSetup();
         }
         case HELICS_ERROR:
-            ret = iteration_result::error;
+            ret = IterationResult::ERROR_RESULT;
             break;
         case HELICS_FINISHED:
-            ret = iteration_result::halted;
+            ret = IterationResult::HALTED;
             break;
         default:
-            ret = iteration_result::next_step;
+            ret = IterationResult::NEXT_STEP;
             break;
     }
 
     return ret;
 }
 
-iteration_result FederateState::enterInitializingMode()
+IterationResult FederateState::enterInitializingMode()
 {
     if (try_lock()) {  // only enter this loop once per federate
         auto ret = processQueue();
         unlock();
-        if (ret == message_processing_result::next_step) {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
             time_granted = initialTime;
             allowed_send_time = initialTime;
         }
-        return static_cast<iteration_result>(ret);
+        return static_cast<IterationResult>(ret);
     }
 
     std::lock_guard<FederateState> fedlock(*this);
-    iteration_result ret;
+    IterationResult ret;
     switch (getState()) {
         case HELICS_ERROR:
-            ret = iteration_result::error;
+            ret = IterationResult::ERROR_RESULT;
             break;
         case HELICS_FINISHED:
-            ret = iteration_result::halted;
+            ret = IterationResult::HALTED;
             break;
         case HELICS_CREATED: {
             return enterInitializingMode();
         }
         default:  // everything >= HELICS_INITIALIZING
-            ret = iteration_result::next_step;
+            ret = IterationResult::NEXT_STEP;
             break;
     }
     return ret;
 }
 
-iteration_result FederateState::enterExecutingMode(iteration_request iterate)
+IterationResult FederateState::enterExecutingMode(IterationRequest iterate)
 {
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
@@ -459,29 +459,29 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate)
         addAction(exec);
 
         auto ret = processQueue();
-        if (ret == message_processing_result::next_step) {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
             time_granted = timeZero;
             allowed_send_time = timeCoord->allowedSendTime();
         }
         switch (iterate) {
-            case iteration_request::force_iteration:
+            case IterationRequest::FORCE_ITERATION:
                 fillEventVectorNextIteration(time_granted);
                 break;
-            case iteration_request::iterate_if_needed:
-                if (ret == message_processing_result::next_step) {
+            case IterationRequest::ITERATE_IF_NEEDED:
+                if (ret == MessageProcessingResult::NEXT_STEP) {
                     fillEventVectorUpTo(time_granted);
                 } else {
                     fillEventVectorNextIteration(time_granted);
                 }
                 break;
-            case iteration_request::no_iterations:
+            case IterationRequest::NO_ITERATIONS:
                 fillEventVectorUpTo(time_granted);
                 break;
         }
 
         unlock();
 #ifndef HELICS_DISABLE_ASIO
-        if ((realtime) && (ret == message_processing_result::next_step)) {
+        if ((realtime) && (ret == MessageProcessingResult::NEXT_STEP)) {
             if (!mTimer) {
                 mTimer = std::make_shared<MessageTimer>(
                     [this](ActionMessage&& mess) { return this->addAction(std::move(mess)); });
@@ -489,26 +489,26 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate)
             start_clock_time = std::chrono::steady_clock::now();
         }
 #endif
-        return static_cast<iteration_result>(ret);
+        return static_cast<IterationResult>(ret);
     }
     // the following code is for situation which this has been called multiple times, which really
     // shouldn't be done but it isn't really an error so we need to deal with it.
     std::lock_guard<FederateState> plock(*this);
-    iteration_result ret;
+    IterationResult ret;
     switch (getState()) {
         case HELICS_ERROR:
-            ret = iteration_result::error;
+            ret = IterationResult::ERROR_RESULT;
             break;
         case HELICS_FINISHED:
-            ret = iteration_result::halted;
+            ret = IterationResult::HALTED;
             break;
         case HELICS_CREATED:
         case HELICS_INITIALIZING:
         default:
-            ret = iteration_result::iterating;
+            ret = IterationResult::ITERATING;
             break;
         case HELICS_EXECUTING:
-            ret = iteration_result::next_step;
+            ret = IterationResult::NEXT_STEP;
             break;
     }
     return ret;
@@ -534,7 +534,7 @@ std::vector<std::pair<GlobalHandle, std::string_view>>
     }
     return {};
 }
-iteration_time FederateState::requestTime(Time nextTime, iteration_request iterate)
+iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterate)
 {
     if (try_lock()) {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime();
@@ -577,22 +577,22 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
         auto ret = processQueue();
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
-        iterating = (ret == message_processing_result::iterating);
+        iterating = (ret == MessageProcessingResult::ITERATING);
 
-        iteration_time retTime = {time_granted, static_cast<iteration_result>(ret)};
+        iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
         // now fill the event vector so external systems know what has been updated
         switch (iterate) {
-            case iteration_request::force_iteration:
+            case IterationRequest::FORCE_ITERATION:
                 fillEventVectorNextIteration(time_granted);
                 break;
-            case iteration_request::iterate_if_needed:
+            case IterationRequest::ITERATE_IF_NEEDED:
                 if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorNextIteration(time_granted);
                 } else {
                     fillEventVectorUpTo(time_granted);
                 }
                 break;
-            case iteration_request::no_iterations:
+            case IterationRequest::NO_ITERATIONS:
                 if (time_granted < nextTime || wait_for_current_time) {
                     fillEventVectorInclusive(time_granted);
                 } else {
@@ -606,7 +606,7 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
             if (rt_lag < Time::maxVal()) {
                 mTimer->cancelTimer(realTimeTimerIndex);
             }
-            if (ret == message_processing_result::next_step) {
+            if (ret == MessageProcessingResult::NEXT_STEP) {
                 auto current_clock_time = std::chrono::steady_clock::now();
                 auto timegap = current_clock_time - start_clock_time;
                 if (time_granted - Time(timegap) > rt_lead) {
@@ -633,11 +633,11 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
     // this would not be good practice to get into this part of the function
     // but the area must protect itself and should return something sensible
     std::lock_guard<FederateState> fedlock(*this);
-    iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
+    IterationResult ret = iterating ? IterationResult::ITERATING : IterationResult::NEXT_STEP;
     if (state == HELICS_FINISHED) {
-        ret = iteration_result::halted;
+        ret = IterationResult::HALTED;
     } else if (state == HELICS_ERROR) {
-        ret = iteration_result::error;
+        ret = IterationResult::ERROR_RESULT;
     }
     iteration_time retTime = {time_granted, ret};
     return retTime;
@@ -676,29 +676,29 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
     }
 }
 
-iteration_result FederateState::genericUnspecifiedQueueProcess()
+IterationResult FederateState::genericUnspecifiedQueueProcess()
 {
     if (try_lock()) {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue();
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
         unlock();
-        return static_cast<iteration_result>(ret);
+        return static_cast<IterationResult>(ret);
     }
 
     std::lock_guard<FederateState> fedlock(*this);
-    return iteration_result::next_step;
+    return IterationResult::NEXT_STEP;
 }
 
 void FederateState::finalize()
 {
-    if ((state == federate_state::HELICS_FINISHED) || (state == federate_state::HELICS_ERROR)) {
+    if ((state == FederateStates::HELICS_FINISHED) || (state == FederateStates::HELICS_ERROR)) {
         return;
     }
-    iteration_result ret = iteration_result::next_step;
-    while (ret != iteration_result::halted) {
+    IterationResult ret = IterationResult::NEXT_STEP;
+    while (ret != IterationResult::HALTED) {
         ret = genericUnspecifiedQueueProcess();
-        if (ret == iteration_result::error) {
+        if (ret == IterationResult::ERROR_RESULT) {
             break;
         }
     }
@@ -711,25 +711,25 @@ const std::vector<InterfaceHandle>& FederateState::getEvents() const
     return events;
 }
 
-message_processing_result FederateState::processDelayQueue() noexcept
+MessageProcessingResult FederateState::processDelayQueue() noexcept
 {
     delayedFederates.clear();
-    auto ret_code = message_processing_result::continue_processing;
+    auto ret_code = MessageProcessingResult::CONTINUE_PROCESSING;
     if (!delayQueues.empty()) {
         for (auto& dQ : delayQueues) {
             auto& tempQueue = dQ.second;
-            ret_code = message_processing_result::continue_processing;
+            ret_code = MessageProcessingResult::CONTINUE_PROCESSING;
             // we specifically want to stop the loop on a delay_message return
-            while ((ret_code == message_processing_result::continue_processing) &&
+            while ((ret_code == MessageProcessingResult::CONTINUE_PROCESSING) &&
                    (!tempQueue.empty())) {
                 auto& cmd = tempQueue.front();
                 if (messageShouldBeDelayed(cmd)) {
-                    ret_code = message_processing_result::delay_message;
+                    ret_code = MessageProcessingResult::DELAY_MESSAGE;
                     continue;
                 }
 
                 ret_code = processActionMessage(cmd);
-                if (ret_code == message_processing_result::delay_message) {
+                if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
                     continue;
                 }
                 tempQueue.pop_front();
@@ -776,10 +776,10 @@ bool FederateState::messageShouldBeDelayed(const ActionMessage& cmd) const
     }
 }
 
-message_processing_result FederateState::processQueue() noexcept
+MessageProcessingResult FederateState::processQueue() noexcept
 {
     if (state == HELICS_FINISHED) {
-        return message_processing_result::halted;
+        return MessageProcessingResult::HALTED;
     }
     auto initError = (state == HELICS_ERROR);
     bool error_cmd{false};
@@ -794,14 +794,14 @@ message_processing_result FederateState::processQueue() noexcept
         }
         //    messLog.push_back(cmd);
         ret_code = processActionMessage(cmd);
-        if (ret_code == message_processing_result::delay_message) {
+        if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
             delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);
         }
-        if (ret_code == message_processing_result::error && cmd.action() == CMD_GLOBAL_ERROR) {
+        if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd.action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
         }
     }
-    if (ret_code == message_processing_result::error && state == HELICS_ERROR) {
+    if (ret_code == MessageProcessingResult::ERROR_RESULT && state == HELICS_ERROR) {
         if (!initError && !error_cmd) {
             if (parent_ != nullptr) {
                 ActionMessage gError(CMD_LOCAL_ERROR);
@@ -820,12 +820,12 @@ message_processing_result FederateState::processQueue() noexcept
         }
     }
     if (initError) {
-        ret_code = message_processing_result::error;
+        ret_code = MessageProcessingResult::ERROR_RESULT;
     }
     return ret_code;
 }
 
-message_processing_result FederateState::processActionMessage(ActionMessage& cmd)
+MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
 {
     LOG_TRACE(fmt::format("processing cmd {}", prettyPrintString(cmd)));
     switch (cmd.action()) {
@@ -866,21 +866,21 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 LOG_TIMING("Granting Initialization");
                 timeGranted_mode = true;
                 int pcode = checkInterfaces();
-                if (pcode != defs::errors::ok) {
+                if (pcode != defs::Errors::OK) {
                     setState(HELICS_ERROR);
-                    return message_processing_result::error;
+                    return MessageProcessingResult::ERROR_RESULT;
                 }
-                return message_processing_result::next_step;
+                return MessageProcessingResult::NEXT_STEP;
             }
             break;
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
                 (cmd.dest_id == parent_broker_id)) {  // this sets up a time request
-                iteration_request iterate = iteration_request::no_iterations;
+                IterationRequest iterate = IterationRequest::NO_ITERATIONS;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?
-                        iteration_request::force_iteration :
-                        iteration_request::iterate_if_needed;
+                        IterationRequest::FORCE_ITERATION :
+                        IterationRequest::ITERATE_IF_NEEDED;
                 }
                 timeCoord->enteringExecMode(iterate);
                 timeGranted_mode = false;
@@ -896,9 +896,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
                     addFederateToDelay(GlobalFederateId(cmd.source_id));
-                    return message_processing_result::delay_message;
+                    return MessageProcessingResult::DELAY_MESSAGE;
                 case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
+                    return MessageProcessingResult::CONTINUE_PROCESSING;
                 default:
                     break;
             }
@@ -911,15 +911,15 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             if (!timeGranted_mode) {
                 auto grant = timeCoord->checkExecEntry();
                 switch (grant) {
-                    case message_processing_result::iterating:
+                    case MessageProcessingResult::ITERATING:
                         timeGranted_mode = true;
                         return grant;
-                    case message_processing_result::next_step:
+                    case MessageProcessingResult::NEXT_STEP:
                         setState(HELICS_EXECUTING);
                         LOG_TIMING("Granting Execution");
                         timeGranted_mode = true;
                         return grant;
-                    case message_processing_result::continue_processing:
+                    case MessageProcessingResult::CONTINUE_PROCESSING:
                         break;
                     default:
                         timeGranted_mode = true;
@@ -930,19 +930,19 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_TERMINATE_IMMEDIATELY:
             setState(HELICS_FINISHED);
             LOG_TIMING("Terminating");
-            return message_processing_result::halted;
+            return MessageProcessingResult::HALTED;
         case CMD_STOP:
             setState(HELICS_FINISHED);
             LOG_TIMING("Terminating");
             timeCoord->disconnect();
-            return message_processing_result::halted;
+            return MessageProcessingResult::HALTED;
         case CMD_DISCONNECT_FED_ACK:
             if ((cmd.dest_id == global_id.load()) && (cmd.source_id == parent_broker_id)) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     timeCoord->disconnect();
                 }
                 setState(HELICS_FINISHED);
-                return message_processing_result::halted;
+                return MessageProcessingResult::HALTED;
             }
             break;
         case CMD_DISCONNECT_FED:
@@ -958,9 +958,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
                         addFederateToDelay(GlobalFederateId(cmd.source_id));
-                        return message_processing_result::delay_message;
+                        return MessageProcessingResult::DELAY_MESSAGE;
                     case message_process_result::no_effect:
-                        return message_processing_result::continue_processing;
+                        return MessageProcessingResult::CONTINUE_PROCESSING;
                     default:
                         break;
                 }
@@ -984,9 +984,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
                     addFederateToDelay(GlobalFederateId(cmd.source_id));
-                    return message_processing_result::delay_message;
+                    return MessageProcessingResult::DELAY_MESSAGE;
                 case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
+                    return MessageProcessingResult::CONTINUE_PROCESSING;
                 default:
                     break;
             }
@@ -1005,17 +1005,17 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             break;
         case CMD_CLOSE_INTERFACE:
             if (cmd.source_id == global_id.load()) {
-                closeInterface(cmd.source_handle, static_cast<handle_type>(cmd.counter));
+                closeInterface(cmd.source_handle, static_cast<InterfaceType>(cmd.counter));
             }
             break;
         case CMD_TIME_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
                 (cmd.dest_id == parent_broker_id)) {  // this sets up a time request
-                iteration_request iterate = iteration_request::no_iterations;
+                IterationRequest iterate = IterationRequest::NO_ITERATIONS;
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     iterate = (checkActionFlag(cmd, required_flag)) ?
-                        iteration_request::force_iteration :
-                        iteration_request::iterate_if_needed;
+                        IterationRequest::FORCE_ITERATION :
+                        IterationRequest::ITERATE_IF_NEEDED;
                 }
                 timeCoord->timeRequest(cmd.actionTime, iterate, nextValueTime(), nextMessageTime());
                 timeGranted_mode = false;
@@ -1031,9 +1031,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
                     addFederateToDelay(GlobalFederateId(cmd.source_id));
-                    return message_processing_result::delay_message;
+                    return MessageProcessingResult::DELAY_MESSAGE;
                 case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
+                    return MessageProcessingResult::CONTINUE_PROCESSING;
                 default:
                     break;
             }
@@ -1064,7 +1064,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 LOG_WARNING(fmt::format("forced Granted Time={}", time_granted));
             }
             timeGranted_mode = true;
-            return message_processing_result::next_step;
+            return MessageProcessingResult::NEXT_STEP;
         }
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
@@ -1089,7 +1089,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                         timeCoord->updateValueTime(cmd.actionTime);
                         LOG_TRACE(timeCoord->printTimeStatus());
                     }
-                    LOG_DATA(fmt::format("receive publication {} from {}",
+                    LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
                                          prettyPrintString(cmd),
                                          subI->getSourceName(src)));
                 }
@@ -1126,15 +1126,15 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                     }
                     errorCode = cmd.messageID;
                     LOG_ERROR(errorString);
-                    return message_processing_result::error;
+                    return MessageProcessingResult::ERROR_RESULT;
                 }
             } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
                         addFederateToDelay(GlobalFederateId(cmd.source_id));
-                        return message_processing_result::delay_message;
+                        return MessageProcessingResult::DELAY_MESSAGE;
                     case message_process_result::no_effect:
-                        return message_processing_result::continue_processing;
+                        return MessageProcessingResult::CONTINUE_PROCESSING;
                     default:
                         break;
                 }
@@ -1227,12 +1227,12 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 if (checkActionFlag(cmd, error_flag)) {
                     setState(HELICS_ERROR);
                     errorString = commandErrorString(cmd.messageID);
-                    return message_processing_result::error;
+                    return MessageProcessingResult::ERROR_RESULT;
                 }
                 global_id = cmd.dest_id;
                 interfaceInformation.setGlobalId(cmd.dest_id);
                 timeCoord->source_id = global_id;
-                return message_processing_result::next_step;
+                return MessageProcessingResult::NEXT_STEP;
             }
             break;
         case CMD_FED_CONFIGURE_TIME:
@@ -1259,7 +1259,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
             routeMessage(queryResp);
         } break;
     }
-    return message_processing_result::continue_processing;
+    return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
 void FederateState::setProperties(const ActionMessage& cmd)
@@ -1337,11 +1337,11 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             if (!used) {
                 auto* pub = interfaceInformation.getPublication(cmd.dest_handle);
                 if (pub != nullptr) {
-                    LOG_WARNING(fmt::format("property {} not used on Publication {}",
+                    LOG_WARNING(fmt::format("property {} not used on publication {}",
                                             cmd.messageID,
                                             pub->key));
                 } else {
-                    LOG_WARNING(fmt::format("property {} not used on due to unknown Publication",
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown publication",
                                             cmd.messageID));
                 }
             }
@@ -1355,11 +1355,11 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             if (!used) {
                 auto* ept = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (ept != nullptr) {
-                    LOG_WARNING(fmt::format("property {} not used on Endpoint {}",
+                    LOG_WARNING(fmt::format("property {} not used on endpoint {}",
                                             cmd.messageID,
                                             ept->key));
                 } else {
-                    LOG_WARNING(fmt::format("property {} not used on due to unknown Endpoint",
+                    LOG_WARNING(fmt::format("property {} not used on due to unknown endpoint",
                                             cmd.messageID));
                 }
             }
@@ -1372,13 +1372,13 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
 void FederateState::setProperty(int timeProperty, Time propertyVal)
 {
     switch (timeProperty) {
-        case defs::properties::rt_lag:
+        case defs::Properties::RT_LAG:
             rt_lag = propertyVal;
             break;
-        case defs::properties::rt_lead:
+        case defs::Properties::RT_LEAD:
             rt_lead = propertyVal;
             break;
-        case defs::properties::rt_tolerance:
+        case defs::Properties::RT_TOLERANCE:
             rt_lag = propertyVal;
             rt_lead = propertyVal;
             break;
@@ -1392,18 +1392,18 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
 void FederateState::setProperty(int intProperty, int propertyVal)
 {
     switch (intProperty) {
-        case defs::properties::log_level:
-        case defs::properties::file_log_level:
-        case defs::properties::console_log_level:
+        case defs::Properties::LOG_LEVEL:
+        case defs::Properties::FILE_LOG_LEVEL:
+        case defs::Properties::CONSOLE_LOG_LEVEL:
             logLevel = propertyVal;
             break;
-        case defs::properties::rt_lag:
+        case defs::Properties::RT_LAG:
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             break;
-        case defs::properties::rt_lead:
+        case defs::Properties::RT_LEAD:
             rt_lead = helics::Time(static_cast<double>(propertyVal));
             break;
-        case defs::properties::rt_tolerance:
+        case defs::Properties::RT_TOLERANCE:
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             rt_lead = rt_lag;
             break;
@@ -1416,28 +1416,28 @@ void FederateState::setProperty(int intProperty, int propertyVal)
 void FederateState::setOptionFlag(int optionFlag, bool value)
 {
     switch (optionFlag) {
-        case defs::flags::only_transmit_on_change:
-        case defs::options::handle_only_transmit_on_change:
+        case defs::Flags::ONLY_TRANSMIT_ON_CHANGE:
+        case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
             only_transmit_on_change = value;
             break;
-        case defs::flags::only_update_on_change:
-        case defs::options::handle_only_update_on_change:
+        case defs::Flags::ONLY_UPDATE_ON_CHANGE:
+        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
             interfaceInformation.setChangeUpdateFlag(value);
             break;
-        case defs::flags::strict_input_type_checking:
+        case defs::Flags::STRICT_INPUT_TYPE_CHECKING:
             strict_input_type_checking = value;
             break;
-        case defs::flags::ignore_input_unit_mismatch:
+        case defs::Flags::IGNORE_INPUT_UNIT_MISMATCH:
             ignore_unit_mismatch = value;
             break;
-        case defs::flags::slow_responding:
-        case defs::flags::debugging:
+        case defs::Flags::SLOW_RESPONDING:
+        case defs::Flags::DEBUGGING:
             slow_responding = value;
             break;
-        case defs::flags::terminate_on_error:
+        case defs::Flags::TERMINATE_ON_ERROR:
             terminate_on_error = value;
             break;
-        case defs::flags::realtime:
+        case defs::Flags::REALTIME:
             if (value) {
                 if (state < HELICS_EXECUTING) {
                     realtime = true;
@@ -1447,7 +1447,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             }
 
             break;
-        case defs::flags::source_only:
+        case defs::Flags::SOURCE_ONLY:
             if (state == HELICS_CREATED) {
                 source_only = value;
                 if (value) {
@@ -1455,7 +1455,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
                 }
             }
             break;
-        case defs::flags::observer:
+        case defs::Flags::OBSERVER:
             if (state == HELICS_CREATED) {
                 observer = value;
                 if (value) {
@@ -1463,24 +1463,24 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
                 }
             }
             break;
-        case defs::flags::ignore_time_mismatch_warnings:
+        case defs::Flags::IGNORE_TIME_MISMATCH_WARNINGS:
             ignore_time_mismatch_warnings = value;
             break;
-        case defs::flags::wait_for_current_time_update:
+        case defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE:
             // this flag is needed in both locations
             wait_for_current_time = value;
             timeCoord->setOptionFlag(optionFlag, value);
             break;
-        case defs::options::buffer_data:
+        case defs::Options::BUFFER_DATA:
             break;
-        case defs::flags::connections_required:
+        case defs::Flags::CONNECTIONS_REQUIRED:
             if (value) {
                 interfaceFlags |= make_flags(required_flag);
             } else {
                 interfaceFlags &= ~(make_flags(required_flag));
             }
             break;
-        case defs::flags::connections_optional:
+        case defs::Flags::CONNECTIONS_OPTIONAL:
             if (value) {
                 interfaceFlags |= make_flags(optional_flag);
             } else {
@@ -1497,10 +1497,10 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
 Time FederateState::getTimeProperty(int timeProperty) const
 {
     switch (timeProperty) {
-        case defs::properties::rt_lag:
-        case defs::properties::rt_tolerance:
+        case defs::Properties::RT_LAG:
+        case defs::Properties::RT_TOLERANCE:
             return rt_lag;
-        case defs::properties::rt_lead:
+        case defs::Properties::RT_LEAD:
             return rt_lead;
         default:
             return timeCoord->getTimeProperty(timeProperty);
@@ -1511,32 +1511,32 @@ Time FederateState::getTimeProperty(int timeProperty) const
 bool FederateState::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {
-        case defs::flags::only_transmit_on_change:
-        case defs::options::handle_only_transmit_on_change:
+        case defs::Flags::ONLY_TRANSMIT_ON_CHANGE:
+        case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
             return only_transmit_on_change;
-        case defs::flags::only_update_on_change:
-        case defs::options::handle_only_update_on_change:
+        case defs::Flags::ONLY_UPDATE_ON_CHANGE:
+        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
             return interfaceInformation.getChangeUpdateFlag();
-        case defs::flags::realtime:
+        case defs::Flags::REALTIME:
             return realtime;
-        case defs::flags::observer:
+        case defs::Flags::OBSERVER:
             return observer;
-        case defs::flags::source_only:
+        case defs::Flags::SOURCE_ONLY:
             return source_only;
-        case defs::flags::slow_responding:
-        case defs::flags::debugging:
+        case defs::Flags::SLOW_RESPONDING:
+        case defs::Flags::DEBUGGING:
             return slow_responding;
-        case defs::flags::terminate_on_error:
+        case defs::Flags::TERMINATE_ON_ERROR:
             return terminate_on_error;
-        case defs::flags::connections_required:
+        case defs::Flags::CONNECTIONS_REQUIRED:
             return ((interfaceFlags.load() & make_flags(required_flag)) != 0);
-        case defs::flags::connections_optional:
+        case defs::Flags::CONNECTIONS_OPTIONAL:
             return ((interfaceFlags.load() & make_flags(optional_flag)) != 0);
-        case defs::flags::strict_input_type_checking:
+        case defs::Flags::STRICT_INPUT_TYPE_CHECKING:
             return strict_input_type_checking;
-        case defs::flags::ignore_input_unit_mismatch:
+        case defs::Flags::IGNORE_INPUT_UNIT_MISMATCH:
             return ignore_unit_mismatch;
-        case defs::flags::ignore_time_mismatch_warnings:
+        case defs::Flags::IGNORE_TIME_MISMATCH_WARNINGS:
             return ignore_time_mismatch_warnings;
         default:
             return timeCoord->getOptionFlag(optionFlag);
@@ -1562,9 +1562,9 @@ int32_t FederateState::getHandleOption(InterfaceHandle handle, char iType, int32
 int FederateState::getIntegerProperty(int intProperty) const
 {
     switch (intProperty) {
-        case defs::properties::log_level:
-        case defs::properties::file_log_level:
-        case defs::properties::console_log_level:
+        case defs::Properties::LOG_LEVEL:
+        case defs::Properties::FILE_LOG_LEVEL:
+        case defs::Properties::CONSOLE_LOG_LEVEL:
             return logLevel;
         default:
             return timeCoord->getIntegerProperty(intProperty);
@@ -1616,7 +1616,7 @@ int FederateState::checkInterfaces()
     errorString = issues.front().second;
     for (auto& issue : issues) {
         switch (issue.first) {
-            case defs::errors::connection_failure:
+            case defs::Errors::CONNECTION_FAILURE:
                 LOG_ERROR(fmt::format("Connection Error: {}", issue.second));
                 break;
             default:
@@ -1675,7 +1675,7 @@ void FederateState::logMessage(int level,
     }
 }
 
-const std::string& fedStateString(federate_state state)
+const std::string& fedStateString(FederateStates state)
 {
     static const std::string c1{"created"};
     static const std::string estate{"error"};
@@ -1686,19 +1686,19 @@ const std::string& fedStateString(federate_state state)
     static const std::string unk{"unknown"};
 
     switch (state) {
-        case federate_state::HELICS_CREATED:
+        case FederateStates::HELICS_CREATED:
             return c1;
-        case federate_state::HELICS_INITIALIZING:
+        case FederateStates::HELICS_INITIALIZING:
             return init;
-        case federate_state::HELICS_EXECUTING:
+        case FederateStates::HELICS_EXECUTING:
             return exec;
-        case federate_state::HELICS_TERMINATING:
+        case FederateStates::HELICS_TERMINATING:
             return term;
-        case federate_state::HELICS_FINISHED:
+        case FederateStates::HELICS_FINISHED:
             return dis;
-        case federate_state::HELICS_ERROR:
+        case FederateStates::HELICS_ERROR:
             return estate;
-        case federate_state::HELICS_UNKNOWN:
+        case FederateStates::HELICS_UNKNOWN:
         default:
             return unk;
     }

@@ -697,7 +697,7 @@ const char* actionMessageType(action_message_def::action_t action)
 
 // set of strings to translate error codes to something sensible
 static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
-    {connection_error_code, "connection error"},
+    {connection_error_code, "connection error result"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
     {duplicate_federate_name_error_code, "duplicate federate name detected"},
@@ -811,17 +811,17 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
     return (-1);
 }
 
-void setIterationFlags(ActionMessage& command, iteration_request iterate)
+void setIterationFlags(ActionMessage& command, IterationRequest iterate)
 {
     switch (iterate) {
-        case iteration_request::force_iteration:
+        case IterationRequest::FORCE_ITERATION:
             setActionFlag(command, iteration_requested_flag);
             setActionFlag(command, required_flag);
             break;
-        case iteration_request::iterate_if_needed:
+        case IterationRequest::ITERATE_IF_NEEDED:
             setActionFlag(command, iteration_requested_flag);
             break;
-        case iteration_request::no_iterations:
+        case IterationRequest::NO_ITERATIONS:
             break;
     }
 }

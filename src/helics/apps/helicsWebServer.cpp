@@ -327,10 +327,10 @@ std::pair<return_val, std::string>
             }
             if (fields.find("type") != fields.end()) {
                 type = fields.at("type");
-            } else if (fields.find("core_type") != fields.end()) {
-                type = fields.at("core_type");
+            } else if (fields.find("CoreType") != fields.end()) {
+                type = fields.at("CoreType");
             }
-            helics::core_type ctype{helics::core_type::DEFAULT};
+            helics::CoreType ctype{helics::CoreType::DEFAULT};
             if (!type.empty()) {
                 ctype = helics::core::coreTypeFromString(type);
                 if (!helics::core::isCoreTypeAvailable(ctype)) {

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "basic_core_types.hpp"
+#include "basic_CoreTypes.hpp"
 #include "flagOperations.hpp"
 
 #include <string>
@@ -32,7 +32,7 @@ class BasicHandleInfo {
     /** construct from the data*/
     BasicHandleInfo(GlobalFederateId federate_id,
                     InterfaceHandle handle_id,
-                    handle_type type_of_handle,
+                    InterfaceType type_of_handle,
                     const std::string& key_name,
                     const std::string& type_name,
                     const std::string& unit_name):
@@ -48,7 +48,7 @@ class BasicHandleInfo {
 
     const GlobalHandle handle{};  //!< the global federate id for the creator of the handle
     LocalFederateId local_fed_id{};  //!< the local federate id of the handle
-    const handle_type handleType{handle_type::unknown};  //!< the type of the handle
+    const InterfaceType handleType{InterfaceType::UNKNOWN};  //!< the type of the handle
     bool used{false};  //!< indicator that the handle is being used to link with another federate
     uint16_t flags{
         0};  //!< flags corresponding to the flags used in ActionMessages +some extra ones

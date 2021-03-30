@@ -47,289 +47,307 @@ extern "C" {
 /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
 typedef enum {
     /** a default core type that will default to something available*/
-    helics_core_type_default = 0,
-    helics_core_type_zmq = 1, /*!< use the Zero MQ networking protocol */
-    helics_core_type_mpi = 2, /*!< use MPI for operation on a parallel cluster */
-    helics_core_type_test = 3, /*!< use the Test core if all federates are in the same process */
+    HELICS_CORE_TYPE_DEFAULT = 0,
+    /** use the Zero MQ networking protocol */
+    HELICS_CORE_TYPE_ZMQ = 1,
+    /** use MPI for operation on a parallel cluster */
+    HELICS_CORE_TYPE_MPI = 2,
+    /** use the Test core if all federates are in the same process */
+    HELICS_CORE_TYPE_TEST = 3,
     /** interprocess uses memory mapped files to transfer data (for use when all federates are
         on the same machine */
-    helics_core_type_interprocess = 4,
+    HELICS_CORE_TYPE_INTERPROCESS = 4,
     /** interprocess uses memory mapped files to transfer data (for use when all federates are
-        on the same machine ipc is the same as /ref helics_core_type_interprocess*/
-    helics_core_type_ipc = 5,
-    helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
-    helics_core_type_udp = 7, /*!< use UDP packets to send the data */
+        on the same machine ipc is the same as /ref HELICS_CORE_TYPE_interprocess*/
+    HELICS_CORE_TYPE_IPC = 5,
+    /** use a generic TCP protocol message stream to send messages */
+    HELICS_CORE_TYPE_TCP = 6,
+    /** use UDP packets to send the data */
+    HELICS_CORE_TYPE_UDP = 7,
     /** single socket version of ZMQ core usually for high fed count on the same system*/
-    helics_core_type_zmq_test = 10,
-    helics_core_type_nng = 9, /*!< for using the nanomsg communications */
-    /*!< a single socket version of the TCP core for more easily handling firewalls*/
-    helics_core_type_tcp_ss = 11,
-    helics_core_type_http = 12, /*!< a core type using http for communication*/
-    helics_core_type_websocket = 14, /*!< a core using websockets for communication*/
-    helics_core_type_inproc = 18, /*!< an in process core type for handling communications in shared
+    HELICS_CORE_TYPE_ZMQ_SS = 10,
+    /** for using the nanomsg communications */
+    HELICS_CORE_TYPE_NNG = 9,
+    /** a single socket version of the TCP core for more easily handling firewalls*/
+    HELICS_CORE_TYPE_TCP_SS = 11,
+    /** a core type using http for communication*/
+    HELICS_CORE_TYPE_HTTP = 12,
+    /** a core using websockets for communication*/
+    HELICS_CORE_TYPE_WEBSOCKET = 14,
+    /** an in process core type for handling communications in shared
                                      memory it is pretty similar to the test core but stripped from
                                      the "test" components*/
-    helics_core_type_null = 66 /*!< an explicit core type that is recognized but explicitly doesn't
+    HELICS_CORE_TYPE_INPROC = 18,
+    /** an explicit core type that is recognized but explicitly doesn't
                                   exist, for testing and a few other assorted reasons*/
-} helics_core_type;
+    HELICS_CORE_TYPE_NULL = 66
+} HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
 typedef enum {
     /** a sequence of characters*/
-    helics_data_type_string = 0,
+    HELICS_DATA_TYPE_STRING = 0,
     /** a double precision floating point number*/
-    helics_data_type_double = 1,
+    HELICS_DATA_TYPE_DOUBLE = 1,
     /** a 64 bit integer*/
-    helics_data_type_int = 2,
+    HELICS_DATA_TYPE_INT = 2,
     /** a pair of doubles representing a complex number*/
-    helics_data_type_complex = 3,
+    HELICS_DATA_TYPE_COMPLEX = 3,
     /** an array of doubles*/
-    helics_data_type_vector = 4,
+    HELICS_DATA_TYPE_VECTOR = 4,
     /** a complex vector object*/
-    helics_data_type_complex_vector = 5,
+    HELICS_DATA_TYPE_COMPLEX_VECTOR = 5,
     /** a named point consisting of a string and a double*/
-    helics_data_type_named_point = 6,
+    HELICS_DATA_TYPE_NAMED_POINT = 6,
     /** a boolean data type*/
-    helics_data_type_boolean = 7,
+    HELICS_DATA_TYPE_BOOLEAN = 7,
     /** time data type*/
-    helics_data_type_time = 8,
+    HELICS_DATA_TYPE_TIME = 8,
     /** raw data type*/
-    helics_data_type_raw = 25,
+    HELICS_DATA_TYPE_RAW = 25,
     /** the data type can change*/
-    helics_data_type_multi = 33,
+    HELICS_DATA_TYPE_MULTI = 33,
     /** open type that can be anything*/
-    helics_data_type_any = 25262
-} helics_data_type;
+    HELICS_DATA_TYPE_ANY = 25262
+} HelicsDataTypes;
 
 /** single character data type  this is intentionally the same as string*/
-#define helics_data_type_char helics_data_type_string
+#define HELICS_DATA_TYPE_CHAR HELICS_DATA_TYPE_STRING
 
 /** enumeration of possible federate flags*/
 typedef enum {
     /** flag indicating that a federate is observe only*/
-    helics_flag_observer = 0,
+    HELICS_FLAG_OBSERVER = 0,
     /** flag indicating that a federate can only return requested times*/
-    helics_flag_uninterruptible = 1,
+    HELICS_FLAG_UNINTERRUPTIBLE = 1,
     /** flag indicating that a federate can be interrupted*/
-    helics_flag_interruptible = 2,
+    HELICS_FLAG_INTERRUPTIBLE = 2,
     /** flag indicating that a federate/interface is a signal generator only*/
-    helics_flag_source_only = 4,
+    HELICS_FLAG_SOURCE_ONLY = 4,
     /** flag indicating a federate/interface should only transmit values if they have changed(binary
            equivalence)*/
-    helics_flag_only_transmit_on_change = 6,
+    HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE = 6,
     /** flag indicating a federate/interface should only trigger an update if a value has changed
      * (binary equivalence)*/
-    helics_flag_only_update_on_change = 8,
+    HELICS_FLAG_ONLY_UPDATE_ON_CHANGE = 8,
     /** flag indicating a federate should only grant time if all other federates have already passed
      * the requested time*/
-    helics_flag_wait_for_current_time_update = 10,
+    HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE = 10,
     /** flag indicating a federate should operate on a restrictive time policy, which disallows some
        2nd order time evaluation and can be useful for certain types of dependency cycles
         and update patterns, but generally shouldn't be used as it can lead to some very slow update
        conditions*/
-    helics_flag_restrictive_time_policy = 11,
+    HELICS_FLAG_RESTRICTIVE_TIME_POLICY = 11,
     /** flag indicating that a federate has rollback capability*/
-    helics_flag_rollback = 12,
+    HELICS_FLAG_ROLLBACK = 12,
     /** flag indicating that a federate performs forward computation and does internal rollback*/
-    helics_flag_forward_compute = 14,
+    HELICS_FLAG_FORWARD_COMPUTE = 14,
     /** flag indicating that a federate needs to run in real time*/
-    helics_flag_realtime = 16,
+    HELICS_FLAG_REALTIME = 16,
     /** flag indicating that the federate will only interact on a single thread*/
-    helics_flag_single_thread_federate = 27,
+    HELICS_FLAG_SINGLE_THREAD_FEDERATE = 27,
     /** used to not display warnings on mismatched requested times*/
-    helics_flag_ignore_time_mismatch_warnings = 67,
+    HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS = 67,
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
-    helics_flag_strict_config_checking = 75
-} helics_federate_flags;
+    HELICS_FLAG_STRICT_CONFIG_CHECKING = 75
+} HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
 typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
-    helics_flag_delay_init_entry = 45,
+    HELICS_FLAG_DELAY_INIT_ENTRY = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-    helics_flag_enable_init_entry = 47
-} helics_core_flags;
+    HELICS_FLAG_ENABLE_INIT_ENTRY = 47
+} HelicsCoreFlags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */
 typedef enum {
     /** flag specifying that a federate, core, or broker may be slow to respond to pings
         If the federate goes offline there is no good way to detect it so use with caution
         */
-    helics_flag_slow_responding = 29,
+    HELICS_FLAG_SLOW_RESPONDING = 29,
     /** flag specifying the federate/core/broker is operating in a user debug mode so deadlock
     timers and timeout are disabled this flag is a combination of slow_responding and disabling of
     some timeouts*/
-    helics_flag_debugging = 31,
+    HELICS_FLAG_DEBUGGING = 31,
     /** specify that a federate error should terminate the federation*/
-    helics_flag_terminate_on_error = 72,
+    HELICS_FLAG_TERMINATE_ON_ERROR = 72,
     /** specify that the log files should be flushed on every log message*/
-    helics_flag_force_logging_flush = 88,
+    HELICS_FLAG_FORCE_LOGGING_FLUSH = 88,
     /** specify that a full log should be dumped into a file*/
-    helics_flag_dumplog = 89
-} helics_flags;
+    HELICS_FLAG_DUMPLOG = 89
+} HelicsFlags;
 
 /** log level definitions
  */
 typedef enum {
     /** don't print anything except a few catastrophic errors*/
-    helics_log_level_no_print = -1,
+    HELICS_LOG_LEVEL_NO_PRINT = -1,
     /** only print error level indicators*/
-    helics_log_level_error = 0,
+    HELICS_LOG_LEVEL_ERROR = 0,
     /** only print warnings and errors*/
-    helics_log_level_warning = 1,
+    HELICS_LOG_LEVEL_WARNING = 1,
     /** warning errors and summary level information*/
-    helics_log_level_summary = 2,
+    HELICS_LOG_LEVEL_SUMMARY = 2,
     /** summary+ notices about federate and broker connections +messages about network
        connections*/
-    helics_log_level_connections = 3,
+    HELICS_LOG_LEVEL_CONNECTIONS = 3,
     /** connections+ interface definitions*/
-    helics_log_level_interfaces = 4,
+    HELICS_LOG_LEVEL_INTERFACES = 4,
     /** interfaces + timing message*/
-    helics_log_level_timing = 5,
+    HELICS_LOG_LEVEL_TIMING = 5,
     /** timing+ data transfer notices*/
-    helics_log_level_data = 6,
+    HELICS_LOG_LEVEL_DATA = 6,
     /** all internal messages*/
-    helics_log_level_trace = 7
-} helics_log_levels;
+    HELICS_LOG_LEVEL_TRACE = 7
+} HelicsLogLevels;
 
 /** enumeration of return values from the C interface functions
  */
 typedef enum {
-    helics_error_fatal = -404, /*!< global fatal error for federation */
-    helics_error_external_type = -203, /*!< an unknown non-helics error was produced */
-    helics_error_other = -101, /*!< the function produced a helics error of some other type */
+    /** global fatal error for federation */
+    HELICS_ERROR_FATAL = -404,
+    /** an unknown non-helics error was produced */
+    HELICS_ERROR_EXTERNAL_TYPE = -203,
+    /** the function produced a helics error of some other type */
+    HELICS_ERROR_OTHER = -101,
     /** insufficient space is available to store requested data */
-    helics_error_insufficient_space = -18,
-    helics_error_execution_failure = -14, /*!< the function execution has failed */
+    HELICS_ERROR_INSUFFICIENT_SPACE = -18,
+    HELICS_ERROR_EXECUTION_FAILURE = -14, /*!< the function execution has failed */
     /** the call made was invalid in the present state of the calling object */
-    helics_error_invalid_function_call = -10,
+    HELICS_ERROR_INVALID_FUNCTION_CALL = -10,
     /** error issued when an invalid state transition occurred */
-    helics_error_invalid_state_transition = -9,
-    helics_warning = -8, /*!< the function issued a warning of some kind */
+    HELICS_ERROR_INVALID_STATE_TRANSITION = -9,
+    /** the function issued a warning of some kind */
+    HELICS_WARNING = -8,
     /** the federate has terminated unexpectedly and the call cannot be completed */
-    helics_error_system_failure = -6,
-    helics_error_discard = -5, /*!< the input was discarded and not used for some reason */
+    HELICS_ERROR_SYSTEM_FAILURE = -6,
+    /** the input was discarded and not used for some reason */
+    HELICS_ERROR_DISCARD = -5,
     /** the parameter passed was invalid and unable to be used */
-    helics_error_invalid_argument = -4,
-    helics_error_invalid_object = -3, /*!< indicator that the object used was not a valid object */
-    helics_error_connection_failure = -2, /*!< the operation to connect has failed */
-    helics_error_registration_failure = -1, /*!< registration has failed */
-    helics_ok = 0 /*!< the function executed successfully */
-} helics_error_types;
+    HELICS_ERROR_INVALID_ARGUMENT = -4,
+    /** indicator that the object used was not a valid object */
+    HELICS_ERROR_INVALID_OBJECT = -3,
+    /** the operation to connect has failed */
+    HELICS_ERROR_CONNECTION_FAILURE = -2,
+    /** registration has failed */
+    HELICS_ERROR_REGISTRATION_FAILURE = -1,
+    /** the function executed successfully */
+    HELICS_OK = 0
+} HelicsErrorTypes;
 
 /** enumeration of properties that apply to federates*/
 typedef enum {
     /** the property controlling the minimum time delta for a federate*/
-    helics_property_time_delta = 137,
+    HELICS_PROPERTY_TIME_DELTA = 137,
     /** the property controlling the period for a federate*/
-    helics_property_time_period = 140,
+    HELICS_PROPERTY_TIME_PERIOD = 140,
     /** the property controlling time offset for the period of federate*/
-    helics_property_time_offset = 141,
+    HELICS_PROPERTY_TIME_OFFSET = 141,
     /** the property controlling real time lag for a federate the max time a federate can lag
        real time*/
-    helics_property_time_rt_lag = 143,
+    HELICS_PROPERTY_TIME_RT_LAG = 143,
     /** the property controlling real time lead for a federate the max time a federate can be
        ahead of real time*/
-    helics_property_time_rt_lead = 144,
+    HELICS_PROPERTY_TIME_RT_LEAD = 144,
     /** the property controlling real time tolerance for a federate sets both rt_lag and
        rt_lead*/
-    helics_property_time_rt_tolerance = 145,
+    HELICS_PROPERTY_TIME_RT_TOLERANCE = 145,
     /** the property controlling input delay for a federate*/
-    helics_property_time_input_delay = 148,
+    HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
     /** the property controlling output delay for a federate*/
-    helics_property_time_output_delay = 150,
+    HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
     /** integer property controlling the maximum number of iterations in a federate*/
-    helics_property_int_max_iterations = 259,
+    HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
     /** integer property controlling the log level in a federate see \ref helics_log_levels*/
-    helics_property_int_log_level = 271,
+    HELICS_PROPERTY_INT_LOG_LEVEL = 271,
     /** integer property controlling the log level for file logging in a federate see \ref
        helics_log_levels*/
-    helics_property_int_file_log_level = 272,
+    HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
     /** integer property controlling the log level for file logging in a federate see \ref
        helics_log_levels*/
-    helics_property_int_console_log_level = 274
-} helics_properties;
+    HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274
+} HelicsProperties;
 
 /** enumeration of the multi_input operations*/
 typedef enum {
     /** time and priority order the inputs from the core library*/
-    helics_multi_input_no_op = 0,
+    HELICS_MULTI_INPUT_NO_OP = 0,
     /** vectorize the inputs either double vector or string vector*/
-    helics_multi_input_vectorize_operation = 1,
+    HELICS_MULTI_INPUT_VECTORIZE_OPERATION = 1,
     /** all inputs are assumed to be boolean and all must be true to return true*/
-    helics_multi_input_and_operation = 2,
+    HELICS_MULTI_INPUT_AND_OPERATION = 2,
     /** all inputs are assumed to be boolean and at least one must be true to return true*/
-    helics_multi_input_or_operation = 3,
+    HELICS_MULTI_INPUT_OR_OPERATION = 3,
     /** sum all the inputs*/
-    helics_multi_input_sum_operation = 4,
+    HELICS_MULTI_INPUT_SUM_OPERATION = 4,
     /** do a difference operation on the inputs, first-sum(rest)
     for double input, vector diff for vector input*/
-    helics_multi_input_diff_operation = 5,
+    HELICS_MULTI_INPUT_DIFF_OPERATION = 5,
     /** find the max of the inputs*/
-    helics_multi_input_max_operation = 6,
+    HELICS_MULTI_INPUT_MAX_OPERATION = 6,
     /** find the min of the inputs*/
-    helics_multi_input_min_operation = 7,
+    HELICS_MULTI_INPUT_MIN_OPERATION = 7,
     /** take the average of the inputs*/
-    helics_multi_input_average_operation = 8
-
-} helics_multi_input_mode;
+    HELICS_MULTI_INPUT_AVERAGE_OPERATION = 8
+} HelicsMultiInputModes;
 
 /** enumeration of options that apply to handles*/
 typedef enum {
     /** specify that a connection is required for an interface and will generate an error if not
        available*/
-    helics_handle_option_connection_required = 397,
+    HELICS_HANDLE_OPTION_CONNECTION_REQUIRED = 397,
     /** specify that a connection is NOT required for an interface and will only be made if
        available no warning will be issues if not available*/
-    helics_handle_option_connection_optional = 402,
+    HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL = 402,
     /** specify that only a single connection is allowed for an interface*/
-    helics_handle_option_single_connection_only = 407,
+    HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY = 407,
     /** specify that multiple connections are allowed for an interface*/
-    helics_handle_option_multiple_connections_allowed = 409,
+    HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED = 409,
     /** specify that the last data should be buffered and sent on subscriptions after init*/
-    helics_handle_option_buffer_data = 411,
+    HELICS_HANDLE_OPTION_BUFFER_DATA = 411,
     /** specify that the types should be checked strictly for pub/sub and filters*/
-    helics_handle_option_strict_type_checking = 414,
+    HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING = 414,
     /** specify that the mismatching units should be ignored*/
-    helics_handle_option_ignore_unit_mismatch = 447,
+    HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH = 447,
     /** specify that an interface will only transmit on change(only applicable to
        publications)*/
-    helics_handle_option_only_transmit_on_change = 452,
+    HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE = 452,
     /** specify that an interface will only update if the value has actually changed*/
-    helics_handle_option_only_update_on_change = 454,
+    HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE = 454,
     /** specify that an interface does not participate in determining time interrupts*/
-    helics_handle_option_ignore_interrupts = 475,
+    HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS = 475,
     /** specify the multi-input processing method for inputs*/
-    helics_handle_option_multi_input_handling_method = 507,
+    HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD = 507,
     /** specify the source index with the highest priority*/
-    helics_handle_option_input_priority_location = 510,
+    HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION = 510,
     /** specify that the priority list should be cleared or question if it is cleared*/
-    helics_handle_option_clear_priority_list = 512,
+    HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST = 512,
     /** specify the required number of connections or get the actual number of connections*/
-    helics_handle_option_connections = 522
-} helics_handle_options;
+    HELICS_HANDLE_OPTION_CONNECTIONS = 522
+} HelicsHandleOptions;
 
 /** enumeration of the predefined filter types*/
 typedef enum {
     /** a custom filter type that executes a user defined callback*/
-    helics_filter_type_custom = 0,
+    HELICS_FILTER_TYPE_CUSTOM = 0,
     /** a filter type that executes a fixed delay on a message*/
-    helics_filter_type_delay = 1,
+    HELICS_FILTER_TYPE_DELAY = 1,
     /** a filter type that executes a random delay on the messages*/
-    helics_filter_type_random_delay = 2,
+    HELICS_FILTER_TYPE_RANDOM_DELAY = 2,
     /** a filter type that randomly drops messages*/
-    helics_filter_type_random_drop = 3,
+    HELICS_FILTER_TYPE_RANDOM_DROP = 3,
     /** a filter type that reroutes a message to a different destination than originally
        specified*/
-    helics_filter_type_reroute = 4,
+    HELICS_FILTER_TYPE_REROUTE = 4,
     /** a filter type that duplicates a message and sends the copy to a different destination*/
-    helics_filter_type_clone = 5,
+    HELICS_FILTER_TYPE_CLONE = 5,
     /** a customizable filter type that can perform different actions on a message based on
        firewall like rules*/
-    helics_filter_type_firewall = 6
+    HELICS_FILTER_TYPE_FIREWALL = 6
 
-} helics_filter_type;
+} HelicsFilterTypes;
 
 /**
  * @file
@@ -339,12 +357,12 @@ typedef enum {
 /**
  * opaque object representing an input
  */
-typedef void* helics_input;
+typedef void* HelicsInput;
 typedef void* HelicsInput;
 /**
  * opaque object representing a publication
  */
-typedef void* helics_publication;
+typedef void* HelicsPublication;
 typedef void* HelicsPublication;
 /**
  * opaque object representing an endpoint
@@ -355,24 +373,24 @@ typedef void* HelicsEndpoint;
 /**
  * opaque object representing a filter
  */
-typedef void* helics_filter;
+typedef void* HelicsFilter;
 typedef void* HelicsFilter;
 
 /**
  * opaque object representing a core
  */
-typedef void* helics_core;
+typedef void* HelicsCore;
 typedef void* HelicsCore;
 
 /**
  * opaque object representing a broker
  */
-typedef void* helics_broker;
+typedef void* HelicsBroker;
 typedef void* HelicsBroker;
 /**
  * opaque object representing a federate
  */
-typedef void* helics_federate;
+typedef void* HelicsFederate;
 typedef void* HelicsFederate;
 
 /**
@@ -384,13 +402,14 @@ typedef void* HelicsFederateInfo;
 /**
  * opaque object representing a query
  */
-typedef void* helics_query;
+typedef void* HelicsQuery;
 typedef void* HelicsQuery;
 
 /**
  * opaque object representing a string buffer for a query
  */
 typedef void* helics_query_buffer;
+typedef void* HelicsQueryBuffer;
 
 /**
  * opaque object representing a message
@@ -401,59 +420,59 @@ typedef void* HelicsMessage;
 /**
  * time definition used in the C interface to helics
  */
-typedef double helics_time;
+typedef double HelicsTime;
 typedef double HelicsTime;
 
-const HelicsTime helics_time_zero = 0.0; /*!< definition of time zero-the beginning of simulation */
-const HelicsTime helics_time_epsilon = 1.0e-9; /*!< definition of the minimum time resolution */
-const HelicsTime helics_time_invalid = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const HelicsTime helics_time_maxtime = 9223372036.854774; /*!< definition of time signifying the federate has
+const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
+const HelicsTime HELICS_TIME_EPSILON = 1.0e-9; /*!< definition of the minimum time resolution */
+const HelicsTime HELICS_TIME_INVALID = -1.785e39; /*!< definition of an invalid time that has no meaning */
+const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774; /*!< definition of time signifying the federate has
                                                              terminated or to run until the end of the simulation*/
 
 /**
  * defining a boolean type for use in the helics interface
  */
-typedef int helics_bool;
+typedef int HelicsBool;
 typedef int HelicsBool;
 
-const helics_bool helics_true = 1; /*!< indicator used for a true response */
-const helics_bool helics_false = 0; /*!< indicator used for a false response */
+const HelicsBool HELICS_TRUE = 1; /*!< indicator used for a true response */
+const HelicsBool HELICS_FALSE = 0; /*!< indicator used for a false response */
 
 /**
  * enumeration of the different iteration results
  */
 typedef enum {
-    helics_iteration_request_no_iteration, /*!< no iteration is requested */
-    helics_iteration_request_force_iteration, /*!< force iteration return when able */
-    helics_iteration_request_iterate_if_needed /*!< only return an iteration if necessary */
-} helics_iteration_request;
+    HELICS_ITERATION_REQUEST_NO_ITERATION, /*!< no iteration is requested */
+    HELICS_ITERATION_REQUEST_FORCE_ITERATION, /*!< force iteration return when able */
+    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED /*!< only return an iteration if necessary */
+} HelicsIterationRequest;
 
 /**
  * enumeration of possible return values from an iterative time request
  */
 typedef enum {
-    helics_iteration_result_next_step, /*!< the iterations have progressed to the next time */
-    helics_iteration_result_error, /*!< there was an error */
-    helics_iteration_result_halted, /*!< the federation has halted */
-    helics_iteration_result_iterating /*!< the federate is iterating at current time */
-} helics_iteration_result;
+    HELICS_ITERATION_RESULT_NEXT_STEP, /*!< the iterations have progressed to the next time */
+    HELICS_ITERATION_RESULT_ERROR, /*!< there was an error */
+    HELICS_ITERATION_RESULT_HALTED, /*!< the federation has halted */
+    HELICS_ITERATION_RESULT_ITERATING /*!< the federate is iterating at current time */
+} HelicsIterationResult;
 
 /**
  * enumeration of possible federate states
  */
 typedef enum {
-    helics_state_startup = 0, /*!< when created the federate is in startup state */
-    helics_state_initialization, /*!< entered after the enterInitializingMode call has returned */
-    helics_state_execution, /*!< entered after the enterExectuationState call has returned */
-    helics_state_finalize, /*!< the federate has finished executing normally final values may be retrieved */
-    helics_state_error, /*!< error state no core communication is possible but values can be retrieved */
+    HELICS_STATE_STARTUP = 0, /*!< when created the federate is in startup state */
+    HELICS_STATE_INITIALIZATION, /*!< entered after the enterInitializingMode call has returned */
+    HELICS_STATE_EXECUTION, /*!< entered after the enterExectuationState call has returned */
+    HELICS_STATE_FINALIZE, /*!< the federate has finished executing normally final values may be retrieved */
+    HELICS_STATE_ERROR, /*!< error state no core communication is possible but values can be retrieved */
     /* the following states are for asynchronous operations */
-    helics_state_pending_init, /*!< indicator that the federate is pending entry to initialization state */
-    helics_state_pending_exec, /*!< state pending EnterExecution State */
-    helics_state_pending_time, /*!< state that the federate is pending a timeRequest */
-    helics_state_pending_iterative_time, /*!< state that the federate is pending an iterative time request */
-    helics_state_pending_finalize /*!< state that the federate is pending a finalize request */
-} helics_federate_state;
+    HELICS_STATE_PENDING_INIT, /*!< indicator that the federate is pending entry to initialization state */
+    HELICS_STATE_PENDING_EXEC, /*!< state pending EnterExecution State */
+    HELICS_STATE_PENDING_TIME, /*!< state that the federate is pending a timeRequest */
+    HELICS_STATE_PENDING_ITERATIVE_TIME, /*!< state that the federate is pending an iterative time request */
+    HELICS_STATE_PENDING_FINALIZE /*!< state that the federate is pending a finalize request */
+} HelicsFederateState;
 
 /**
  *  structure defining a basic complex type
@@ -471,12 +490,12 @@ typedef HelicsComplex helics_complex;
  * if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string,
  * otherwise it will be an empty string
  */
-typedef struct helics_error {
-    int32_t error_code; /*!< an error code associated with the error*/
+typedef struct HelicsError {
+    int32_t errorCode; /*!< an error code associated with the error*/
     const char* message; /*!< a message associated with the error*/
-} helics_error;
+} HelicsError;
 
-typedef helics_error HelicsError;
+typedef HelicsError HelicsError;
 
 /**
  * @file
@@ -505,12 +524,12 @@ HELICS_EXPORT const char* helicsGetCompilerVersion(void);
 /**
  * Return an initialized error object.
  */
-HELICS_EXPORT helics_error helicsErrorInitialize(void);
+HELICS_EXPORT HelicsError helicsErrorInitialize(void);
 
 /**
  * Clear an error object.
  */
-HELICS_EXPORT void helicsErrorClear(helics_error* err);
+HELICS_EXPORT void helicsErrorClear(HelicsError* err);
 
 /**
  * Returns true if core/broker type specified is available in current compilation.
@@ -519,7 +538,7 @@ HELICS_EXPORT void helicsErrorClear(helics_error* err);
  *
  * @details Options include "zmq", "udp", "ipc", "interprocess", "tcp", "default", "mpi".
  */
-HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable(const char* type);
+HELICS_EXPORT HelicsBool helicsIsCoreTypeAvailable(const char* type);
 
 /**
  * Create a core object.
@@ -532,12 +551,12 @@ HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable(const char* type);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A helics_core object.
+ * @return A HelicsCore object.
  * @forcpponly
  * If the core is invalid, err will contain the corresponding error message and the returned object will be NULL.
  * @endforcpponly
  */
-HELICS_EXPORT helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err);
+HELICS_EXPORT HelicsCore helicsCreateCore(const char* type, const char* name, const char* initString, HelicsError* err);
 
 /**
  * Create a core object by passing command line arguments.
@@ -553,31 +572,30 @@ HELICS_EXPORT helics_core helicsCreateCore(const char* type, const char* name, c
  *                    if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A helics_core object.
+ * @return A HelicsCore object.
  */
-HELICS_EXPORT helics_core
-    helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, helics_error* err);
+HELICS_EXPORT HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Create a new reference to an existing core.
  *
  * @details This will create a new broker object that references the existing broker. The new broker object must be freed as well.
  *
- * @param core An existing helics_core.
+ * @param core An existing HelicsCore.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
  * @return A new reference to the same broker.
  */
-HELICS_EXPORT helics_core helicsCoreClone(helics_core core, helics_error* err);
+HELICS_EXPORT HelicsCore helicsCoreClone(HelicsCore core, HelicsError* err);
 
 /**
  * Check if a core object is a valid object.
  *
- * @param core The helics_core object to test.
+ * @param core The HelicsCore object to test.
  */
-HELICS_EXPORT helics_bool helicsCoreIsValid(helics_core core);
+HELICS_EXPORT HelicsBool helicsCoreIsValid(HelicsCore core);
 
 /**
  * Create a broker object.
@@ -591,12 +609,12 @@ HELICS_EXPORT helics_bool helicsCoreIsValid(helics_core core);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A helics_broker object.
+ * @return A HelicsBroker object.
  * @forcpponly
  * It will be NULL if there was an error indicated in the err object.
  * @endforcpponly
  */
-HELICS_EXPORT helics_broker helicsCreateBroker(const char* type, const char* name, const char* initString, helics_error* err);
+HELICS_EXPORT HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* initString, HelicsError* err);
 
 /**
  * Create a core object by passing command line arguments.
@@ -611,40 +629,40 @@ HELICS_EXPORT helics_broker helicsCreateBroker(const char* type, const char* nam
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A helics_core object.
+ * @return A HelicsCore object.
  */
-HELICS_EXPORT helics_broker
-    helicsCreateBrokerFromArgs(const char* type, const char* name, int argc, const char* const* argv, helics_error* err);
+HELICS_EXPORT HelicsBroker
+    helicsCreateBrokerFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Create a new reference to an existing broker.
  *
  * @details This will create a new broker object that references the existing broker it must be freed as well.
  *
- * @param broker An existing helics_broker.
+ * @param broker An existing HelicsBroker.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
  * @return A new reference to the same broker.
  */
-HELICS_EXPORT helics_broker helicsBrokerClone(helics_broker broker, helics_error* err);
+HELICS_EXPORT HelicsBroker helicsBrokerClone(HelicsBroker broker, HelicsError* err);
 
 /**
  * Check if a broker object is a valid object.
  *
- * @param broker The helics_broker object to test.
+ * @param broker The HelicsBroker object to test.
  */
-HELICS_EXPORT helics_bool helicsBrokerIsValid(helics_broker broker);
+HELICS_EXPORT HelicsBool helicsBrokerIsValid(HelicsBroker broker);
 
 /**
  * Check if a broker is connected.
  *
  * @details A connected broker implies it is attached to cores or cores could reach out to communicate.
  *
- * @return helics_false if not connected.
+ * @return HELICS_FALSE if not connected.
  */
-HELICS_EXPORT helics_bool helicsBrokerIsConnected(helics_broker broker);
+HELICS_EXPORT HelicsBool helicsBrokerIsConnected(HelicsBroker broker);
 
 /**
  * Link a named publication and named input using a broker.
@@ -653,10 +671,10 @@ HELICS_EXPORT helics_bool helicsBrokerIsConnected(helics_broker broker);
  * @param source The name of the publication (cannot be NULL).
  * @param target The name of the target to send the publication data (cannot be NULL).
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerDataLink(helics_broker broker, const char* source, const char* target, helics_error* err);
+HELICS_EXPORT void helicsBrokerDataLink(HelicsBroker broker, const char* source, const char* target, HelicsError* err);
 
 /**
  * Link a named filter to a source endpoint.
@@ -665,10 +683,10 @@ HELICS_EXPORT void helicsBrokerDataLink(helics_broker broker, const char* source
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data from (cannot be NULL).
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err);
+HELICS_EXPORT void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err);
 
 /**
  * Link a named filter to a destination endpoint.
@@ -677,11 +695,11 @@ HELICS_EXPORT void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, c
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data going to (cannot be NULL).
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsBrokerAddDestinationFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err);
+    helicsBrokerAddDestinationFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err);
 
 /**
  * Load a file containing connection information.
@@ -689,10 +707,10 @@ HELICS_EXPORT void
  * @param broker The broker to generate the connections from.
  * @param file A JSON or TOML file containing connection information.
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerMakeConnections(helics_broker broker, const char* file, helics_error* err);
+HELICS_EXPORT void helicsBrokerMakeConnections(HelicsBroker broker, const char* file, HelicsError* err);
 
 /**
  * Wait for the core to disconnect.
@@ -703,9 +721,9 @@ HELICS_EXPORT void helicsBrokerMakeConnections(helics_broker broker, const char*
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_true if the disconnect was successful, helics_false if there was a timeout.
+ * @return HELICS_TRUE if the disconnect was successful, HELICS_FALSE if there was a timeout.
  */
-HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect(helics_core core, int msToWait, helics_error* err);
+HELICS_EXPORT HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWait, HelicsError* err);
 
 /**
  * Wait for the broker to disconnect.
@@ -716,18 +734,18 @@ HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect(helics_core core, int msTo
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_true if the disconnect was successful, helics_false if there was a timeout.
+ * @return HELICS_TRUE if the disconnect was successful, HELICS_FALSE if there was a timeout.
  */
-HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, helics_error* err);
+HELICS_EXPORT HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int msToWait, HelicsError* err);
 
 /**
  * Check if a core is connected.
  *
  * @details A connected core implies it is attached to federates or federates could be attached to it
  *
- * @return helics_false if not connected, helics_true if it is connected.
+ * @return HELICS_FALSE if not connected, HELICS_TRUE if it is connected.
  */
-HELICS_EXPORT helics_bool helicsCoreIsConnected(helics_core core);
+HELICS_EXPORT HelicsBool helicsCoreIsConnected(HelicsCore core);
 
 /**
  * Link a named publication and named input using a core.
@@ -736,10 +754,10 @@ HELICS_EXPORT helics_bool helicsCoreIsConnected(helics_core core);
  * @param source The name of the publication (cannot be NULL).
  * @param target The name of the target to send the publication data (cannot be NULL).
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreDataLink(helics_core core, const char* source, const char* target, helics_error* err);
+HELICS_EXPORT void helicsCoreDataLink(HelicsCore core, const char* source, const char* target, HelicsError* err);
 
 /**
  * Link a named filter to a source endpoint.
@@ -748,10 +766,10 @@ HELICS_EXPORT void helicsCoreDataLink(helics_core core, const char* source, cons
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data from (cannot be NULL).
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreAddSourceFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, helics_error* err);
+HELICS_EXPORT void helicsCoreAddSourceFilterToEndpoint(HelicsCore core, const char* filter, const char* endpoint, HelicsError* err);
 
 /**
  * Link a named filter to a destination endpoint.
@@ -760,10 +778,10 @@ HELICS_EXPORT void helicsCoreAddSourceFilterToEndpoint(helics_core core, const c
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data going to (cannot be NULL).
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, helics_error* err);
+HELICS_EXPORT void helicsCoreAddDestinationFilterToEndpoint(HelicsCore core, const char* filter, const char* endpoint, HelicsError* err);
 
 /**
  * Load a file containing connection information.
@@ -771,10 +789,10 @@ HELICS_EXPORT void helicsCoreAddDestinationFilterToEndpoint(helics_core core, co
  * @param core The core to generate the connections from.
  * @param file A JSON or TOML file containing connection information.
  * @forcpponly
- * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
+ * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreMakeConnections(helics_core core, const char* file, helics_error* err);
+HELICS_EXPORT void helicsCoreMakeConnections(HelicsCore core, const char* file, HelicsError* err);
 
 /**
  * Get an identifier for the broker.
@@ -783,7 +801,7 @@ HELICS_EXPORT void helicsCoreMakeConnections(helics_core core, const char* file,
  *
  * @return A string containing the identifier for the broker.
  */
-HELICS_EXPORT const char* helicsBrokerGetIdentifier(helics_broker broker);
+HELICS_EXPORT const char* helicsBrokerGetIdentifier(HelicsBroker broker);
 
 /**
  * Get an identifier for the core.
@@ -792,7 +810,7 @@ HELICS_EXPORT const char* helicsBrokerGetIdentifier(helics_broker broker);
  *
  * @return A string with the identifier of the core.
  */
-HELICS_EXPORT const char* helicsCoreGetIdentifier(helics_core core);
+HELICS_EXPORT const char* helicsCoreGetIdentifier(HelicsCore core);
 
 /**
  * Get the network address associated with a broker.
@@ -801,7 +819,7 @@ HELICS_EXPORT const char* helicsCoreGetIdentifier(helics_core core);
  *
  * @return A string with the network address of the broker.
  */
-HELICS_EXPORT const char* helicsBrokerGetAddress(helics_broker broker);
+HELICS_EXPORT const char* helicsBrokerGetAddress(HelicsBroker broker);
 
 /**
  * Get the network address associated with a core.
@@ -810,7 +828,7 @@ HELICS_EXPORT const char* helicsBrokerGetAddress(helics_broker broker);
  *
  * @return A string with the network address of the broker.
  */
-HELICS_EXPORT const char* helicsCoreGetAddress(helics_core core);
+HELICS_EXPORT const char* helicsCoreGetAddress(HelicsCore core);
 
 /**
  * Set the core to ready for init.
@@ -823,7 +841,7 @@ HELICS_EXPORT const char* helicsCoreGetAddress(helics_core core);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreSetReadyToInit(helics_core core, helics_error* err);
+HELICS_EXPORT void helicsCoreSetReadyToInit(HelicsCore core, HelicsError* err);
 
 /**
  * Connect a core to the federate based on current configuration.
@@ -833,9 +851,9 @@ HELICS_EXPORT void helicsCoreSetReadyToInit(helics_core core, helics_error* err)
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_false if not connected, helics_true if it is connected.
+ * @return HELICS_FALSE if not connected, HELICS_TRUE if it is connected.
  */
-HELICS_EXPORT helics_bool helicsCoreConnect(helics_core core, helics_error* err);
+HELICS_EXPORT HelicsBool helicsCoreConnect(HelicsCore core, HelicsError* err);
 
 /**
  * Disconnect a core from the federation.
@@ -845,7 +863,7 @@ HELICS_EXPORT helics_bool helicsCoreConnect(helics_core core, helics_error* err)
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreDisconnect(helics_core core, helics_error* err);
+HELICS_EXPORT void helicsCoreDisconnect(HelicsCore core, HelicsError* err);
 
 /**
  * Get an existing federate object from a core by name.
@@ -858,9 +876,9 @@ HELICS_EXPORT void helicsCoreDisconnect(helics_core core, helics_error* err);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return NULL if no fed is available by that name otherwise a helics_federate with that name.
+ * @return NULL if no fed is available by that name otherwise a HelicsFederate with that name.
  */
-HELICS_EXPORT helics_federate helicsGetFederateByName(const char* fedName, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err);
 
 /**
  * Disconnect a broker.
@@ -870,32 +888,32 @@ HELICS_EXPORT helics_federate helicsGetFederateByName(const char* fedName, helic
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerDisconnect(helics_broker broker, helics_error* err);
+HELICS_EXPORT void helicsBrokerDisconnect(HelicsBroker broker, HelicsError* err);
 
 /**
  * Disconnect and free a federate.
  */
-HELICS_EXPORT void helicsFederateDestroy(helics_federate fed);
+HELICS_EXPORT void helicsFederateDestroy(HelicsFederate fed);
 
 /**
  * Disconnect and free a broker.
  */
-HELICS_EXPORT void helicsBrokerDestroy(helics_broker broker);
+HELICS_EXPORT void helicsBrokerDestroy(HelicsBroker broker);
 
 /**
  * Disconnect and free a core.
  */
-HELICS_EXPORT void helicsCoreDestroy(helics_core core);
+HELICS_EXPORT void helicsCoreDestroy(HelicsCore core);
 
 /**
  * Release the memory associated with a core.
  */
-HELICS_EXPORT void helicsCoreFree(helics_core core);
+HELICS_EXPORT void helicsCoreFree(HelicsCore core);
 
 /**
  * Release the memory associated with a broker.
  */
-HELICS_EXPORT void helicsBrokerFree(helics_broker broker);
+HELICS_EXPORT void helicsBrokerFree(HelicsBroker broker);
 
 /*
  * Creation and destruction of Federates.
@@ -904,7 +922,7 @@ HELICS_EXPORT void helicsBrokerFree(helics_broker broker);
 /**
  * Create a value federate from a federate info object.
  *
- * @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument.
+ * @details HelicsFederate objects can be used in all functions that take a HelicsFederate or HelicsFederate object as an argument.
  *
  * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name.
  * @param fi The federate info object that contains details on the federate.
@@ -914,12 +932,12 @@ HELICS_EXPORT void helicsBrokerFree(helics_broker broker);
  *
  * @return An opaque value federate object.
  */
-HELICS_EXPORT helics_federate helicsCreateValueFederate(const char* fedName, helics_federate_info fi, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, helics_federate_info fi, HelicsError* err);
 
 /**
  * Create a value federate from a JSON file, JSON string, or TOML file.
  *
- * @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument.
+ * @details HelicsFederate objects can be used in all functions that take a HelicsFederate or HelicsFederate object as an argument.
  *
  * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
  * @forcpponly
@@ -928,12 +946,12 @@ HELICS_EXPORT helics_federate helicsCreateValueFederate(const char* fedName, hel
  *
  * @return An opaque value federate object.
  */
-HELICS_EXPORT helics_federate helicsCreateValueFederateFromConfig(const char* configFile, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsCreateValueFederateFromConfig(const char* configFile, HelicsError* err);
 
 /**
  * Create a message federate from a federate info object.
  *
- * @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
+ * @details helics_message_federate objects can be used in all functions that take a helics_message_federate or HelicsFederate object as an
  * argument.
  *
  * @param fedName The name of the federate to create.
@@ -944,12 +962,12 @@ HELICS_EXPORT helics_federate helicsCreateValueFederateFromConfig(const char* co
  *
  * @return An opaque message federate object.
  */
-HELICS_EXPORT helics_federate helicsCreateMessageFederate(const char* fedName, helics_federate_info fi, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, helics_federate_info fi, HelicsError* err);
 
 /**
  * Create a message federate from a JSON file or JSON string or TOML file.
  *
- * @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
+ * @details helics_message_federate objects can be used in all functions that take a helics_message_federate or HelicsFederate object as an
  * argument.
  *
  * @param configFile A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.
@@ -959,13 +977,13 @@ HELICS_EXPORT helics_federate helicsCreateMessageFederate(const char* fedName, h
  *
  * @return An opaque message federate object.
  */
-HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig(const char* configFile, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, HelicsError* err);
 
 /**
  * Create a combination federate from a federate info object.
  *
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
- *                      that take a helics_federate, helics_message_federate or helics_federate object as an argument
+ *                      that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
  * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
  * @param fi The federate info object that contains details on the federate.
@@ -975,13 +993,13 @@ HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig(const char* 
  *
  * @return An opaque value federate object nullptr if the object creation failed.
  */
-HELICS_EXPORT helics_federate helicsCreateCombinationFederate(const char* fedName, helics_federate_info fi, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName, helics_federate_info fi, HelicsError* err);
 
 /**
  * Create a combination federate from a JSON file or JSON string or TOML file.
  *
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
- *          that take a helics_federate, helics_message_federate or helics_federate object as an argument
+ *          that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
  * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
  * @forcpponly
@@ -990,21 +1008,21 @@ HELICS_EXPORT helics_federate helicsCreateCombinationFederate(const char* fedNam
  *
  * @return An opaque combination federate object.
  */
-HELICS_EXPORT helics_federate helicsCreateCombinationFederateFromConfig(const char* configFile, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err);
 
 /**
  * Create a new reference to an existing federate.
  *
- * @details This will create a new helics_federate object that references the existing federate. The new object must be freed as well.
+ * @details This will create a new HelicsFederate object that references the existing federate. The new object must be freed as well.
  *
- * @param fed An existing helics_federate.
+ * @param fed An existing HelicsFederate.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
  * @return A new reference to the same federate.
  */
-HELICS_EXPORT helics_federate helicsFederateClone(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
 
 /**
  * Create a federate info object for specifying federate information when constructing a federate.
@@ -1023,7 +1041,7 @@ HELICS_EXPORT helics_federate_info helicsCreateFederateInfo(void);
  *
  *  @return A helics_federate_info object which is a reference to the created object.
  */
-HELICS_EXPORT helics_federate_info helicsFederateInfoClone(helics_federate_info fi, helics_error* err);
+HELICS_EXPORT helics_federate_info helicsFederateInfoClone(helics_federate_info fi, HelicsError* err);
 
 /**
  * Load federate info from command line arguments.
@@ -1035,7 +1053,7 @@ HELICS_EXPORT helics_federate_info helicsFederateInfoClone(helics_federate_info 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromArgs(helics_federate_info fi, int argc, const char* const* argv, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromArgs(helics_federate_info fi, int argc, const char* const* argv, HelicsError* err);
 
 /**
  * Delete the memory associated with a federate info object.
@@ -1045,9 +1063,9 @@ HELICS_EXPORT void helicsFederateInfoFree(helics_federate_info fi);
 /**
  * Check if a federate_object is valid.
  *
- * @return helics_true if the federate is a valid active federate, helics_false otherwise
+ * @return HELICS_TRUE if the federate is a valid active federate, HELICS_FALSE otherwise
  */
-HELICS_EXPORT helics_bool helicsFederateIsValid(helics_federate fed);
+HELICS_EXPORT HelicsBool helicsFederateIsValid(HelicsFederate fed);
 
 /**
  * Set the name of the core to link to for a federate.
@@ -1058,7 +1076,7 @@ HELICS_EXPORT helics_bool helicsFederateIsValid(helics_federate fed);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename, HelicsError* err);
 
 /**
  * Set the initialization string for the core usually in the form of command line arguments.
@@ -1069,7 +1087,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreName(helics_federate_info fi, const 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* coreInit, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* coreInit, HelicsError* err);
 
 /**
  * Set the initialization string that a core will pass to a generated broker usually in the form of command line arguments.
@@ -1080,19 +1098,19 @@ HELICS_EXPORT void helicsFederateInfoSetCoreInitString(helics_federate_info fi, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* brokerInit, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* brokerInit, HelicsError* err);
 
 /**
  * Set the core type by integer code.
  *
  * @details Valid values available by definitions in api-data.h.
  * @param fi The federate info object to alter.
- * @param coretype An numerical code for a core type see /ref helics_core_type.
+ * @param coretype An numerical code for a core type see /ref helics_CoreType.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, int coretype, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, int coretype, HelicsError* err);
 
 /**
  * Set the core type from a string.
@@ -1103,7 +1121,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreType(helics_federate_info fi, int co
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char* coretype, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char* coretype, HelicsError* err);
 
 /**
  * Set the name or connection information for a broker.
@@ -1115,7 +1133,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(helics_federate_info 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, HelicsError* err);
 
 /**
  * Set the key for a broker connection.
@@ -1127,7 +1145,7 @@ HELICS_EXPORT void helicsFederateInfoSetBroker(helics_federate_info fi, const ch
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerkey, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerkey, HelicsError* err);
 
 /**
  * Set the port to use for the broker.
@@ -1140,7 +1158,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int brokerPort, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int brokerPort, HelicsError* err);
 
 /**
  * Set the local port to use.
@@ -1152,7 +1170,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetLocalPort(helics_federate_info fi, const char* localPort, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetLocalPort(helics_federate_info fi, const char* localPort, HelicsError* err);
 
 /**
  * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
@@ -1195,12 +1213,12 @@ HELICS_EXPORT int helicsGetOptionValue(const char* val);
  * @details Valid flags are available /ref helics_federate_flags.
  * @param fi The federate info object to alter.
  * @param flag A numerical index for a flag.
- * @param value The desired value of the flag helics_true or helics_false.
+ * @param value The desired value of the flag HELICS_TRUE or HELICS_FALSE.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, helics_bool value, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, HelicsBool value, HelicsError* err);
 
 /**
  * Set the separator character in the info structure.
@@ -1213,7 +1231,7 @@ HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char separator, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char separator, HelicsError* err);
 
 /**
  * Set the output delay for a federate.
@@ -1225,8 +1243,7 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void
-    helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, helics_time propertyValue, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
 // TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
@@ -1241,7 +1258,7 @@ HELICS_EXPORT void
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int intProperty, int propertyValue, helics_error* err);
+HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int intProperty, int propertyValue, HelicsError* err);
 
 /**
  * Load interfaces from a file.
@@ -1252,7 +1269,7 @@ HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi,
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const char* file, helics_error* err);
+HELICS_EXPORT void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, HelicsError* err);
 
 /**
  * Generate a global error from a federate.
@@ -1263,7 +1280,7 @@ HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const c
  * @param error_code The integer code for the error.
  * @param error_string A string describing the error.
  */
-HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int error_code, const char* error_string);
 
 /**
  * Generate a local error in a federate.
@@ -1274,27 +1291,27 @@ HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code
  * @param error_code The integer code for the error.
  * @param error_string A string describing the error.
  */
-HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateLocalError(HelicsFederate fed, int error_code, const char* error_string);
 
 /**
  * Finalize the federate. This function halts all communication in the federate and disconnects it from the core.
  */
-HELICS_EXPORT void helicsFederateFinalize(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateFinalize(HelicsFederate fed, HelicsError* err);
 
 /**
  * Finalize the federate in an async call.
  */
-HELICS_EXPORT void helicsFederateFinalizeAsync(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
  * Complete the asynchronous finalize call.
  */
-HELICS_EXPORT void helicsFederateFinalizeComplete(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Release the memory associated with a federate.
  */
-HELICS_EXPORT void helicsFederateFree(helics_federate fed);
+HELICS_EXPORT void helicsFederateFree(HelicsFederate fed);
 
 /**
  * Call when done using the helics library.
@@ -1317,7 +1334,7 @@ HELICS_EXPORT void helicsCloseLibrary(void);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterInitializingMode(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err);
 
 /**
  * Non blocking alternative to \ref helicsFederateEnterInitializingMode.
@@ -1329,7 +1346,7 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(helics_federate fed, heli
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
  * Check if the current Asynchronous operation has completed.
@@ -1339,9 +1356,9 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(helics_federate fed,
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return helics_false if not completed, helics_true if completed.
+ * @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
  */
-HELICS_EXPORT helics_bool helicsFederateIsAsyncOperationCompleted(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
 
 /**
  * Finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
@@ -1351,7 +1368,7 @@ HELICS_EXPORT helics_bool helicsFederateIsAsyncOperationCompleted(helics_federat
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request that the federate enter the Execution mode.
@@ -1364,7 +1381,7 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(helics_federate f
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterExecutingMode(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request that the federate enter the Execution mode.
@@ -1377,7 +1394,7 @@ HELICS_EXPORT void helicsFederateEnterExecutingMode(helics_federate fed, helics_
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
  * Complete the call to /ref helicsFederateEnterExecutingModeAsync.
@@ -1387,7 +1404,7 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(helics_federate fed, he
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request an iterative time.
@@ -1403,9 +1420,9 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(helics_federate fed,
  *
  * @return An iteration structure with field containing the time and iteration status.
  */
-HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterative(helics_federate fed,
-                                                                                helics_iteration_request iterate,
-                                                                                helics_error* err);
+HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterative(HelicsFederate fed,
+                                                                              HelicsIterationRequest iterate,
+                                                                              HelicsError* err);
 
 /**
  * Request an iterative entry to the execution mode.
@@ -1419,7 +1436,7 @@ HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterative(
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(helics_federate fed, helics_iteration_request iterate, helics_error* err);
+HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate fed, HelicsIterationRequest iterate, HelicsError* err);
 
 /**
  * Complete the asynchronous iterative call into ExecutionMode.
@@ -1431,7 +1448,7 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(helics_federat
  *
  * @return An iteration object containing the iteration time and iteration_status.
  */
-HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterativeComplete(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Get the current state of a federate.
@@ -1441,9 +1458,9 @@ HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterativeC
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return State the resulting state if void return helics_ok.
+ * @return State the resulting state if void return HELICS_OK.
  */
-HELICS_EXPORT helics_federate_state helicsFederateGetState(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err);
 
 /**
  * Get the core object associated with a federate.
@@ -1455,7 +1472,7 @@ HELICS_EXPORT helics_federate_state helicsFederateGetState(helics_federate fed, 
  *
  * @return A core object, nullptr if invalid.
  */
-HELICS_EXPORT helics_core helicsFederateGetCore(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsCore helicsFederateGetCore(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request the next time for federate execution.
@@ -1466,9 +1483,9 @@ HELICS_EXPORT helics_core helicsFederateGetCore(helics_federate fed, helics_erro
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid.
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid.
  */
-HELICS_EXPORT helics_time helicsFederateRequestTime(helics_federate fed, helics_time requestTime, helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateRequestTime(HelicsFederate fed, HelicsTime requestTime, HelicsError* err);
 
 /**
  * Request the next time for federate execution.
@@ -1479,9 +1496,9 @@ HELICS_EXPORT helics_time helicsFederateRequestTime(helics_federate fed, helics_
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
-HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, helics_time timeDelta, helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateRequestTimeAdvance(HelicsFederate fed, HelicsTime timeDelta, HelicsError* err);
 
 /**
  * Request the next time step for federate execution.
@@ -1494,9 +1511,9 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
-HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request an iterative time.
@@ -1514,16 +1531,16 @@ HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, hel
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result.
+ * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated along with the appropriate iteration result.
  * @beginPythonOnly
  * This function also returns the iteration specification of the result.
  * @endPythonOnly
  */
-HELICS_EXPORT helics_time helicsFederateRequestTimeIterative(helics_federate fed,
-                                                             helics_time requestTime,
-                                                             helics_iteration_request iterate,
-                                                             helics_iteration_result* outIteration,
-                                                             helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
+                                                            HelicsTime requestTime,
+                                                            HelicsIterationRequest iterate,
+                                                            HelicsIterationResult* outIteration,
+                                                            HelicsError* err);
 
 /**
  * Request the next time for federate execution in an asynchronous call.
@@ -1536,7 +1553,7 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeIterative(helics_federate fed
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateRequestTimeAsync(helics_federate fed, helics_time requestTime, helics_error* err);
+HELICS_EXPORT void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsError* err);
 
 /**
  * Complete an asynchronous requestTime call.
@@ -1546,9 +1563,9 @@ HELICS_EXPORT void helicsFederateRequestTimeAsync(helics_federate fed, helics_ti
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated.
+ * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  */
-HELICS_EXPORT helics_time helicsFederateRequestTimeComplete(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request an iterative time through an asynchronous call.
@@ -1563,10 +1580,8 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeComplete(helics_federate fed,
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(helics_federate fed,
-                                                           helics_time requestTime,
-                                                           helics_iteration_request iterate,
-                                                           helics_error* err);
+HELICS_EXPORT void
+    helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err);
 
 /**
  * Complete an iterative time request asynchronous call.
@@ -1577,14 +1592,14 @@ HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(helics_federate fed,
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The granted time, will return helics_time_maxtime if the simulation has terminated.
+ * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  * @beginPythonOnly
  * This function also returns the iteration specification of the result.
  * @endPythonOnly
  */
-HELICS_EXPORT helics_time helicsFederateRequestTimeIterativeComplete(helics_federate fed,
-                                                                     helics_iteration_result* outIterate,
-                                                                     helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed,
+                                                                    HelicsIterationResult* outIterate,
+                                                                    HelicsError* err);
 
 /**
  * Get the name of the federate.
@@ -1593,7 +1608,7 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeIterativeComplete(helics_fede
  *
  * @return A pointer to a string with the name.
  */
-HELICS_EXPORT const char* helicsFederateGetName(helics_federate fed);
+HELICS_EXPORT const char* helicsFederateGetName(HelicsFederate fed);
 
 /**
  * Set a time based property for a federate.
@@ -1605,7 +1620,7 @@ HELICS_EXPORT const char* helicsFederateGetName(helics_federate fed);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetTimeProperty(helics_federate fed, int timeProperty, helics_time time, helics_error* err);
+HELICS_EXPORT void helicsFederateSetTimeProperty(HelicsFederate fed, int timeProperty, HelicsTime time, HelicsError* err);
 
 /**
  * Set a flag for the federate.
@@ -1617,7 +1632,7 @@ HELICS_EXPORT void helicsFederateSetTimeProperty(helics_federate fed, int timePr
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetFlagOption(helics_federate fed, int flag, helics_bool flagValue, helics_error* err);
+HELICS_EXPORT void helicsFederateSetFlagOption(HelicsFederate fed, int flag, HelicsBool flagValue, HelicsError* err);
 
 /**
  * Set the separator character in a federate.
@@ -1631,7 +1646,7 @@ HELICS_EXPORT void helicsFederateSetFlagOption(helics_federate fed, int flag, he
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetSeparator(helics_federate fed, char separator, helics_error* err);
+HELICS_EXPORT void helicsFederateSetSeparator(HelicsFederate fed, char separator, HelicsError* err);
 
 /**
  * Set an integer based property of a federate.
@@ -1643,7 +1658,7 @@ HELICS_EXPORT void helicsFederateSetSeparator(helics_federate fed, char separato
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetIntegerProperty(helics_federate fed, int intProperty, int propertyVal, helics_error* err);
+HELICS_EXPORT void helicsFederateSetIntegerProperty(HelicsFederate fed, int intProperty, int propertyVal, HelicsError* err);
 
 /**
  * Get the current value of a time based property in a federate.
@@ -1654,7 +1669,7 @@ HELICS_EXPORT void helicsFederateSetIntegerProperty(helics_federate fed, int int
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT helics_time helicsFederateGetTimeProperty(helics_federate fed, int timeProperty, helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int timeProperty, HelicsError* err);
 
 /**
  * Get a flag value for a federate.
@@ -1667,7 +1682,7 @@ HELICS_EXPORT helics_time helicsFederateGetTimeProperty(helics_federate fed, int
  *
  * @return The value of the flag.
  */
-HELICS_EXPORT helics_bool helicsFederateGetFlagOption(helics_federate fed, int flag, helics_error* err);
+HELICS_EXPORT HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int flag, HelicsError* err);
 
 /**
  * Get the current value of an integer property (such as a logging level).
@@ -1680,7 +1695,7 @@ HELICS_EXPORT helics_bool helicsFederateGetFlagOption(helics_federate fed, int f
  *
  * @return The value of the property.
  */
-HELICS_EXPORT int helicsFederateGetIntegerProperty(helics_federate fed, int intProperty, helics_error* err);
+HELICS_EXPORT int helicsFederateGetIntegerProperty(HelicsFederate fed, int intProperty, HelicsError* err);
 
 /**
  * Get the current time of the federate.
@@ -1692,7 +1707,7 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(helics_federate fed, int intP
  *
  * @return The current time of the federate.
  */
-HELICS_EXPORT helics_time helicsFederateGetCurrentTime(helics_federate fed, helics_error* err);
+HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
 
 /**
  * Set a federation global value through a federate.
@@ -1705,7 +1720,7 @@ HELICS_EXPORT helics_time helicsFederateGetCurrentTime(helics_federate fed, heli
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, helics_error* err);
+HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
 /**
  * Add a time dependency for a federate. The federate will depend on the given named federate for time synchronization.
@@ -1716,7 +1731,7 @@ HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valu
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
+HELICS_EXPORT void helicsFederateAddDependency(HelicsFederate fed, const char* fedName, HelicsError* err);
 
 /**
  * Set the logging file for a federate (actually on the core associated with a federate).
@@ -1727,7 +1742,7 @@ HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* 
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_error* err);
+HELICS_EXPORT void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsError* err);
 
 /**
  * Log an error message through a federate.
@@ -1738,7 +1753,7 @@ HELICS_EXPORT void helicsFederateSetLogFile(helics_federate fed, const char* log
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateLogErrorMessage(helics_federate fed, const char* logmessage, helics_error* err);
+HELICS_EXPORT void helicsFederateLogErrorMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
 /**
  * Log a warning message through a federate.
@@ -1749,7 +1764,7 @@ HELICS_EXPORT void helicsFederateLogErrorMessage(helics_federate fed, const char
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateLogWarningMessage(helics_federate fed, const char* logmessage, helics_error* err);
+HELICS_EXPORT void helicsFederateLogWarningMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
 /**
  * Log an info message through a federate.
@@ -1760,7 +1775,7 @@ HELICS_EXPORT void helicsFederateLogWarningMessage(helics_federate fed, const ch
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateLogInfoMessage(helics_federate fed, const char* logmessage, helics_error* err);
+HELICS_EXPORT void helicsFederateLogInfoMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
 /**
  * Log a debug message through a federate.
@@ -1771,7 +1786,7 @@ HELICS_EXPORT void helicsFederateLogInfoMessage(helics_federate fed, const char*
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char* logmessage, helics_error* err);
+HELICS_EXPORT void helicsFederateLogDebugMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
 /**
  * Log a message through a federate.
@@ -1783,7 +1798,7 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateLogLevelMessage(helics_federate fed, int loglevel, const char* logmessage, helics_error* err);
+HELICS_EXPORT void helicsFederateLogLevelMessage(HelicsFederate fed, int loglevel, const char* logmessage, HelicsError* err);
 
 /**
  * Send a command to another helics object through a federate.
@@ -1795,7 +1810,7 @@ HELICS_EXPORT void helicsFederateLogLevelMessage(helics_federate fed, int loglev
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederateSendCommand(helics_federate fed, const char* target, const char* command, helics_error* err);
+HELICS_EXPORT void helicsFederateSendCommand(HelicsFederate fed, const char* target, const char* command, HelicsError* err);
 
 /**
  * Get a command sent to the federate.
@@ -1807,7 +1822,7 @@ HELICS_EXPORT void helicsFederateSendCommand(helics_federate fed, const char* ta
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
-HELICS_EXPORT const char* helicsFederateGetCommand(helics_federate fed, helics_error* err);
+HELICS_EXPORT const char* helicsFederateGetCommand(HelicsFederate fed, HelicsError* err);
 
 /**
  * Get the source of the most recently retrieved command sent to the federate.
@@ -1819,7 +1834,7 @@ HELICS_EXPORT const char* helicsFederateGetCommand(helics_federate fed, helics_e
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
-HELICS_EXPORT const char* helicsFederateGetCommandSource(helics_federate fed, helics_error* err);
+HELICS_EXPORT const char* helicsFederateGetCommandSource(HelicsFederate fed, HelicsError* err);
 
 /**
  * Get a command sent to the federate. Blocks until a command is received.
@@ -1833,7 +1848,7 @@ HELICS_EXPORT const char* helicsFederateGetCommandSource(helics_federate fed, he
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
-HELICS_EXPORT const char* helicsFederateWaitCommand(helics_federate fed, helics_error* err);
+HELICS_EXPORT const char* helicsFederateWaitCommand(HelicsFederate fed, HelicsError* err);
 /**
  * Set a global value in a core.
  *
@@ -1846,7 +1861,7 @@ HELICS_EXPORT const char* helicsFederateWaitCommand(helics_federate fed, helics_
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreSetGlobal(helics_core core, const char* valueName, const char* value, helics_error* err);
+HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err);
 
 /**
  * Set a federation global value.
@@ -1860,7 +1875,7 @@ HELICS_EXPORT void helicsCoreSetGlobal(helics_core core, const char* valueName, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const char* value, helics_error* err);
+HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
 /**
  * Send a command to another helics object though a core.
@@ -1872,7 +1887,7 @@ HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* value
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreSendCommand(helics_core core, const char* target, const char* command, helics_error* err);
+HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 
 /**
  * Send a command to another helics object through a broker.
@@ -1884,7 +1899,7 @@ HELICS_EXPORT void helicsCoreSendCommand(helics_core core, const char* target, c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerSendCommand(helics_broker broker, const char* target, const char* command, helics_error* err);
+HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
 
 /**
  * Set the log file on a core.
@@ -1895,7 +1910,7 @@ HELICS_EXPORT void helicsBrokerSendCommand(helics_broker broker, const char* tar
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreSetLogFile(helics_core core, const char* logFileName, helics_error* err);
+HELICS_EXPORT void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err);
 
 /**
  * Set the log file on a broker.
@@ -1906,7 +1921,7 @@ HELICS_EXPORT void helicsCoreSetLogFile(helics_core core, const char* logFileNam
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerSetLogFile(helics_broker broker, const char* logFileName, helics_error* err);
+HELICS_EXPORT void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err);
 
 /**
  * Set a broker time barrier.
@@ -1917,14 +1932,14 @@ HELICS_EXPORT void helicsBrokerSetLogFile(helics_broker broker, const char* logF
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time barrierTime, helics_error* err);
+HELICS_EXPORT void helicsBrokerSetTimeBarrier(HelicsBroker broker, HelicsTime barrierTime, HelicsError* err);
 
 /**
  * Clear any time barrier on a broker.
  *
  * @param broker The broker to clear the barriers on.
  */
-HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
+HELICS_EXPORT void helicsBrokerClearTimeBarrier(HelicsBroker broker);
 
 /**
  * Create a query object.
@@ -1934,7 +1949,7 @@ HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
  * @param target The name of the target to query.
  * @param query The query to make of the target.
  */
-HELICS_EXPORT helics_query helicsCreateQuery(const char* target, const char* query);
+HELICS_EXPORT HelicsQuery helicsCreateQuery(const char* target, const char* query);
 
 /**
  * Execute a query.
@@ -1953,7 +1968,7 @@ HELICS_EXPORT helics_query helicsCreateQuery(const char* target, const char* que
  * invalid.
  * @endforcpponly
  */
-HELICS_EXPORT const char* helicsQueryExecute(helics_query query, helics_federate fed, helics_error* err);
+HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 
 /**
  * Execute a query directly on a core.
@@ -1972,7 +1987,7 @@ HELICS_EXPORT const char* helicsQueryExecute(helics_query query, helics_federate
  * invalid.
  * @endforcpponly
  */
-HELICS_EXPORT const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_error* err);
+HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);
 
 /**
  * Execute a query directly on a broker.
@@ -1991,7 +2006,7 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(helics_query query, helics_core
  * invalid
  * @endforcpponly
  */
-HELICS_EXPORT const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err);
+HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err);
 
 /**
  * Execute a query in a non-blocking call.
@@ -2002,7 +2017,7 @@ HELICS_EXPORT const char* helicsQueryBrokerExecute(helics_query query, helics_br
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsQueryExecuteAsync(helics_query query, helics_federate fed, helics_error* err);
+HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 
 /**
  * Complete the return from a query called with /ref helicsExecuteQueryAsync.
@@ -2020,7 +2035,7 @@ HELICS_EXPORT void helicsQueryExecuteAsync(helics_query query, helics_federate f
  *         The return will be nullptr if query is an invalid object
  * @endforcpponly
  */
-HELICS_EXPORT const char* helicsQueryExecuteComplete(helics_query query, helics_error* err);
+HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 
 /**
  * Check if an asynchronously executed query has completed.
@@ -2029,10 +2044,10 @@ HELICS_EXPORT const char* helicsQueryExecuteComplete(helics_query query, helics_
  *
  * @param query The query object to check if completed.
  *
- * @return Will return helics_true if an asynchronous query has completed or a regular query call was made with a result,
+ * @return Will return HELICS_TRUE if an asynchronous query has completed or a regular query call was made with a result,
  *         and false if an asynchronous query has not completed or is invalid
  */
-HELICS_EXPORT helics_bool helicsQueryIsCompleted(helics_query query);
+HELICS_EXPORT HelicsBool helicsQueryIsCompleted(HelicsQuery query);
 
 /**
  * Update the target of a query.
@@ -2044,7 +2059,7 @@ HELICS_EXPORT helics_bool helicsQueryIsCompleted(helics_query query);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsQuerySetTarget(helics_query query, const char* target, helics_error* err);
+HELICS_EXPORT void helicsQuerySetTarget(HelicsQuery query, const char* target, HelicsError* err);
 
 /**
  * Update the queryString of a query.
@@ -2055,12 +2070,12 @@ HELICS_EXPORT void helicsQuerySetTarget(helics_query query, const char* target, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsQuerySetQueryString(helics_query query, const char* queryString, helics_error* err);
+HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, HelicsError* err);
 
 /**
  * Free the memory associated with a query object.
  */
-HELICS_EXPORT void helicsQueryFree(helics_query query);
+HELICS_EXPORT void helicsQueryFree(HelicsQuery query);
 
 /**
  * Function to do some housekeeping work.
@@ -2089,7 +2104,7 @@ HELICS_EXPORT void helicsCleanupLibrary(void);
  *
  * @return An object containing the subscription.
  */
-HELICS_EXPORT helics_input helicsFederateRegisterSubscription(helics_federate fed, const char* key, const char* units, helics_error* err);
+HELICS_EXPORT HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err);
 
 /**
  * Register a publication with a known type.
@@ -2099,7 +2114,7 @@ HELICS_EXPORT helics_input helicsFederateRegisterSubscription(helics_federate fe
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication the global publication key will be prepended with the federate name.
- * @param type A code identifying the type of the input see /ref helics_data_type for available options.
+ * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the subscription (may be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2107,8 +2122,8 @@ HELICS_EXPORT helics_input helicsFederateRegisterSubscription(helics_federate fe
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication
-    helicsFederateRegisterPublication(helics_federate fed, const char* key, helics_data_type type, const char* units, helics_error* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
  * Register a publication with a defined type.
@@ -2126,8 +2141,8 @@ HELICS_EXPORT helics_publication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication
-    helicsFederateRegisterTypePublication(helics_federate fed, const char* key, const char* type, const char* units, helics_error* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**
  * Register a global named publication with an arbitrary type.
@@ -2137,7 +2152,7 @@ HELICS_EXPORT helics_publication
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
- * @param type A code identifying the type of the input see /ref helics_data_type for available options.
+ * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the subscription (may be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2145,11 +2160,8 @@ HELICS_EXPORT helics_publication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(helics_federate fed,
-                                                                         const char* key,
-                                                                         helics_data_type type,
-                                                                         const char* units,
-                                                                         helics_error* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
  * Register a global publication with a defined type.
@@ -2167,11 +2179,8 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication(helics_
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(helics_federate fed,
-                                                                             const char* key,
-                                                                             const char* type,
-                                                                             const char* units,
-                                                                             helics_error* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**
  * Register a named input.
@@ -2181,7 +2190,7 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(hel
  *
  * @param fed The federate object in which to create an input.
  * @param key The identifier for the publication the global input key will be prepended with the federate name.
- * @param type A code identifying the type of the input see /ref helics_data_type for available options.
+ * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the input (may be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2189,8 +2198,8 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication(hel
  *
  * @return An object containing the input.
  */
-HELICS_EXPORT helics_input
-    helicsFederateRegisterInput(helics_federate fed, const char* key, helics_data_type type, const char* units, helics_error* err);
+HELICS_EXPORT HelicsInput
+    helicsFederateRegisterInput(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
  * Register an input with a defined type.
@@ -2208,8 +2217,8 @@ HELICS_EXPORT helics_input
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_input
-    helicsFederateRegisterTypeInput(helics_federate fed, const char* key, const char* type, const char* units, helics_error* err);
+HELICS_EXPORT HelicsInput
+    helicsFederateRegisterTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**
  * Register a global named input.
@@ -2219,7 +2228,7 @@ HELICS_EXPORT helics_input
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
- * @param type A code identifying the type of the input see /ref helics_data_type for available options.
+ * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the subscription maybe NULL.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2227,8 +2236,8 @@ HELICS_EXPORT helics_input
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication
-    helicsFederateRegisterGlobalInput(helics_federate fed, const char* key, helics_data_type type, const char* units, helics_error* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalInput(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
  * Register a global publication with an arbitrary type.
@@ -2246,8 +2255,8 @@ HELICS_EXPORT helics_publication
  *
  * @return An object containing the publication.
  */
-HELICS_EXPORT helics_publication
-    helicsFederateRegisterGlobalTypeInput(helics_federate fed, const char* key, const char* type, const char* units, helics_error* err);
+HELICS_EXPORT HelicsPublication
+    helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
 
 /**
  * Get a publication object from a key.
@@ -2258,10 +2267,10 @@ HELICS_EXPORT helics_publication
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_publication object, the object will not be valid and err will contain an error code if no publication with the
+ * @return A HelicsPublication object, the object will not be valid and err will contain an error code if no publication with the
  * specified key exists.
  */
-HELICS_EXPORT helics_publication helicsFederateGetPublication(helics_federate fed, const char* key, helics_error* err);
+HELICS_EXPORT HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* key, HelicsError* err);
 
 /**
  * Get a publication by its index, typically already created via registerInterfaces file or something of that nature.
@@ -2272,9 +2281,9 @@ HELICS_EXPORT helics_publication helicsFederateGetPublication(helics_federate fe
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_publication.
+ * @return A HelicsPublication.
  */
-HELICS_EXPORT helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int index, helics_error* err);
+HELICS_EXPORT HelicsPublication helicsFederateGetPublicationByIndex(HelicsFederate fed, int index, HelicsError* err);
 
 /**
  * Get an input object from a key.
@@ -2285,10 +2294,10 @@ HELICS_EXPORT helics_publication helicsFederateGetPublicationByIndex(helics_fede
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_input object, the object will not be valid and err will contain an error code if no input with the specified
+ * @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
  * key exists.
  */
-HELICS_EXPORT helics_input helicsFederateGetInput(helics_federate fed, const char* key, helics_error* err);
+HELICS_EXPORT HelicsInput helicsFederateGetInput(HelicsFederate fed, const char* key, HelicsError* err);
 
 /**
  * Get an input by its index, typically already created via registerInterfaces file or something of that nature.
@@ -2299,9 +2308,9 @@ HELICS_EXPORT helics_input helicsFederateGetInput(helics_federate fed, const cha
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_input, which will be NULL if an invalid index.
+ * @return A HelicsInput, which will be NULL if an invalid index.
  */
-HELICS_EXPORT helics_input helicsFederateGetInputByIndex(helics_federate fed, int index, helics_error* err);
+HELICS_EXPORT HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsError* err);
 
 /**
  * Get an input object from a subscription target.
@@ -2312,17 +2321,17 @@ HELICS_EXPORT helics_input helicsFederateGetInputByIndex(helics_federate fed, in
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_input object, the object will not be valid and err will contain an error code if no input with the specified
+ * @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
  * key exists.
  */
-HELICS_EXPORT helics_input helicsFederateGetSubscription(helics_federate fed, const char* key, helics_error* err);
+HELICS_EXPORT HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, HelicsError* err);
 
 /**
  * Clear all the update flags from a federates inputs.
  *
  * @param fed The value federate object for which to clear update flags.
  */
-HELICS_EXPORT void helicsFederateClearUpdates(helics_federate fed);
+HELICS_EXPORT void helicsFederateClearUpdates(HelicsFederate fed);
 
 /**
  * Register the publications via JSON publication string.
@@ -2335,7 +2344,7 @@ HELICS_EXPORT void helicsFederateClearUpdates(helics_federate fed);
  *
  * @details This would be the same JSON that would be used to publish data.
  */
-HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON(helics_federate fed, const char* json, helics_error* err);
+HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON(HelicsFederate fed, const char* json, HelicsError* err);
 
 /**
  * Publish data contained in a JSON file or string.
@@ -2346,7 +2355,7 @@ HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON(helics_federate fed
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* json, helics_error* err);
+HELICS_EXPORT void helicsFederatePublishJSON(HelicsFederate fed, const char* json, HelicsError* err);
 
 /**
  * \defgroup publications Publication functions
@@ -2361,9 +2370,9 @@ HELICS_EXPORT void helicsFederatePublishJSON(helics_federate fed, const char* js
  *
  * @param pub The publication to check.
  *
- * @return helics_true if the publication is a valid publication.
+ * @return HELICS_TRUE if the publication is a valid publication.
  */
-HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
+HELICS_EXPORT HelicsBool helicsPublicationIsValid(HelicsPublication pub);
 
 /**
  * Publish raw data from a char * and length.
@@ -2375,7 +2384,7 @@ HELICS_EXPORT helics_bool helicsPublicationIsValid(helics_publication pub);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishBytes(helics_publication pub, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishBytes(HelicsPublication pub, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Publish a string.
@@ -2386,7 +2395,7 @@ HELICS_EXPORT void helicsPublicationPublishBytes(helics_publication pub, const v
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishString(helics_publication pub, const char* str, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* str, HelicsError* err);
 
 /**
  * Publish an integer value.
@@ -2397,7 +2406,7 @@ HELICS_EXPORT void helicsPublicationPublishString(helics_publication pub, const 
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishInteger(helics_publication pub, int64_t val, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishInteger(HelicsPublication pub, int64_t val, HelicsError* err);
 
 /**
  * Publish a Boolean Value.
@@ -2408,7 +2417,7 @@ HELICS_EXPORT void helicsPublicationPublishInteger(helics_publication pub, int64
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishBoolean(helics_publication pub, helics_bool val, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishBoolean(HelicsPublication pub, HelicsBool val, HelicsError* err);
 
 /**
  * Publish a double floating point value.
@@ -2419,7 +2428,7 @@ HELICS_EXPORT void helicsPublicationPublishBoolean(helics_publication pub, helic
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishDouble(helics_publication pub, double val, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishDouble(HelicsPublication pub, double val, HelicsError* err);
 
 /**
  * Publish a time value.
@@ -2430,7 +2439,7 @@ HELICS_EXPORT void helicsPublicationPublishDouble(helics_publication pub, double
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishTime(helics_publication pub, helics_time val, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishTime(HelicsPublication pub, HelicsTime val, HelicsError* err);
 
 /**
  * Publish a single character.
@@ -2441,7 +2450,7 @@ HELICS_EXPORT void helicsPublicationPublishTime(helics_publication pub, helics_t
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishChar(helics_publication pub, char val, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishChar(HelicsPublication pub, char val, HelicsError* err);
 
 /**
  * Publish a complex value (or pair of values).
@@ -2453,7 +2462,7 @@ HELICS_EXPORT void helicsPublicationPublishChar(helics_publication pub, char val
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishComplex(helics_publication pub, double real, double imag, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishComplex(HelicsPublication pub, double real, double imag, HelicsError* err);
 
 /**
  * Publish a vector of doubles.
@@ -2465,7 +2474,7 @@ HELICS_EXPORT void helicsPublicationPublishComplex(helics_publication pub, doubl
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishVector(helics_publication pub, const double* vectorInput, int vectorLength, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
  * Publish a named point.
@@ -2477,7 +2486,7 @@ HELICS_EXPORT void helicsPublicationPublishVector(helics_publication pub, const 
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationPublishNamedPoint(helics_publication pub, const char* str, double val, helics_error* err);
+HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err);
 
 /**
  * Add a named input to the list of targets a publication publishes to.
@@ -2488,16 +2497,16 @@ HELICS_EXPORT void helicsPublicationPublishNamedPoint(helics_publication pub, co
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationAddTarget(helics_publication pub, const char* target, helics_error* err);
+HELICS_EXPORT void helicsPublicationAddTarget(HelicsPublication pub, const char* target, HelicsError* err);
 
 /**
  * Check if an input is valid.
  *
  * @param ipt The input to check.
  *
- * @return helics_true if the Input object represents a valid input.
+ * @return HELICS_TRUE if the Input object represents a valid input.
  */
-HELICS_EXPORT helics_bool helicsInputIsValid(helics_input ipt);
+HELICS_EXPORT HelicsBool helicsInputIsValid(HelicsInput ipt);
 
 /**
  * Add a publication to the list of data that an input subscribes to.
@@ -2508,7 +2517,7 @@ HELICS_EXPORT helics_bool helicsInputIsValid(helics_input ipt);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputAddTarget(helics_input ipt, const char* target, helics_error* err);
+HELICS_EXPORT void helicsInputAddTarget(HelicsInput ipt, const char* target, HelicsError* err);
 
 /**@}*/
 
@@ -2524,7 +2533,7 @@ HELICS_EXPORT void helicsInputAddTarget(helics_input ipt, const char* target, he
  *
  * @return The size of the raw data/string in bytes.
  */
-HELICS_EXPORT int helicsInputGetByteCount(helics_input ipt);
+HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
 
 /**
  * Get the raw data for the latest value of a subscription.
@@ -2541,14 +2550,14 @@ HELICS_EXPORT int helicsInputGetByteCount(helics_input ipt);
  * @return  raw Bytes of the value, the value is uninterpreted raw bytes.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetBytes(helics_input ipt, void* data, int maxDataLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
 
 /**
  * Get the size of a value for subscription assuming return as a string.
  *
  * @return The size of the string.
  */
-HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
+HELICS_EXPORT int helicsInputGetStringSize(HelicsInput ipt);
 
 /**
  * Get a string value from a subscription.
@@ -2565,7 +2574,7 @@ HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
  * @return A string data
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetString(helics_input ipt, char* outputString, int maxStringLength, int* actualLength, helics_error* err);
+HELICS_EXPORT void helicsInputGetString(HelicsInput ipt, char* outputString, int maxStringLength, int* actualLength, HelicsError* err);
 
 /**
  * Get an integer value from a subscription.
@@ -2577,7 +2586,7 @@ HELICS_EXPORT void helicsInputGetString(helics_input ipt, char* outputString, in
  *
  * @return An int64_t value with the current value of the input.
  */
-HELICS_EXPORT int64_t helicsInputGetInteger(helics_input ipt, helics_error* err);
+HELICS_EXPORT int64_t helicsInputGetInteger(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a boolean value from a subscription.
@@ -2589,7 +2598,7 @@ HELICS_EXPORT int64_t helicsInputGetInteger(helics_input ipt, helics_error* err)
  *
  * @return A boolean value of current input value.
  */
-HELICS_EXPORT helics_bool helicsInputGetBoolean(helics_input ipt, helics_error* err);
+HELICS_EXPORT HelicsBool helicsInputGetBoolean(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a double value from a subscription.
@@ -2601,7 +2610,7 @@ HELICS_EXPORT helics_bool helicsInputGetBoolean(helics_input ipt, helics_error* 
  *
  * @return The double value of the input.
  */
-HELICS_EXPORT double helicsInputGetDouble(helics_input ipt, helics_error* err);
+HELICS_EXPORT double helicsInputGetDouble(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a time value from a subscription.
@@ -2613,7 +2622,7 @@ HELICS_EXPORT double helicsInputGetDouble(helics_input ipt, helics_error* err);
  *
  * @return The resulting time value.
  */
-HELICS_EXPORT helics_time helicsInputGetTime(helics_input ipt, helics_error* err);
+HELICS_EXPORT HelicsTime helicsInputGetTime(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a single character value from an input.
@@ -2628,7 +2637,7 @@ HELICS_EXPORT helics_time helicsInputGetTime(helics_input ipt, helics_error* err
  *         NAK (negative acknowledgment) symbol returned on error
  * @endforcpponly
  */
-HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
+HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a complex object from an input object.
@@ -2641,7 +2650,7 @@ HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
  *
  * @return A HelicsComplex structure with the value.
  */
-HELICS_EXPORT helics_complex helicsInputGetComplexObject(helics_input ipt, helics_error* err);
+HELICS_EXPORT helics_complex helicsInputGetComplexObject(HelicsInput ipt, HelicsError* err);
 
 /**
  * Get a pair of double forming a complex number from a subscriptions.
@@ -2658,14 +2667,14 @@ HELICS_EXPORT helics_complex helicsInputGetComplexObject(helics_input ipt, helic
  * @return a pair of floating point values that represent the real and imag values
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetComplex(helics_input ipt, double* real, double* imag, helics_error* err);
+HELICS_EXPORT void helicsInputGetComplex(HelicsInput ipt, double* real, double* imag, HelicsError* err);
 
 /**
  * Get the size of a value for subscription assuming return as an array of doubles.
  *
  * @return The number of doubles in a returned vector.
  */
-HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
+HELICS_EXPORT int helicsInputGetVectorSize(HelicsInput ipt);
 
 /**
  * Get a vector from a subscription.
@@ -2682,7 +2691,7 @@ HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
  * @return a list of floating point values
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int maxLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
 
 /**
  * Get a named point from a subscription.
@@ -2701,7 +2710,7 @@ HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int max
  * @endPythonOnly
  */
 HELICS_EXPORT void
-    helicsInputGetNamedPoint(helics_input ipt, char* outputString, int maxStringLength, int* actualLength, double* val, helics_error* err);
+    helicsInputGetNamedPoint(HelicsInput ipt, char* outputString, int maxStringLength, int* actualLength, double* val, HelicsError* err);
 
 /**@}*/
 
@@ -2721,7 +2730,7 @@ HELICS_EXPORT void
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultBytes(helics_input ipt, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Set the default as a string.
@@ -2732,7 +2741,7 @@ HELICS_EXPORT void helicsInputSetDefaultBytes(helics_input ipt, const void* data
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultString(helics_input ipt, const char* str, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str, HelicsError* err);
 
 /**
  * Set the default as an integer.
@@ -2743,7 +2752,7 @@ HELICS_EXPORT void helicsInputSetDefaultString(helics_input ipt, const char* str
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultInteger(helics_input ipt, int64_t val, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultInteger(HelicsInput ipt, int64_t val, HelicsError* err);
 
 /**
  * Set the default as a boolean.
@@ -2754,7 +2763,7 @@ HELICS_EXPORT void helicsInputSetDefaultInteger(helics_input ipt, int64_t val, h
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultBoolean(helics_input ipt, helics_bool val, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultBoolean(HelicsInput ipt, HelicsBool val, HelicsError* err);
 
 /**
  * Set the default as a time.
@@ -2765,7 +2774,7 @@ HELICS_EXPORT void helicsInputSetDefaultBoolean(helics_input ipt, helics_bool va
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultTime(helics_input ipt, helics_time val, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultTime(HelicsInput ipt, HelicsTime val, HelicsError* err);
 
 /**
  * Set the default as a char.
@@ -2776,7 +2785,7 @@ HELICS_EXPORT void helicsInputSetDefaultTime(helics_input ipt, helics_time val, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultChar(helics_input ipt, char val, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultChar(HelicsInput ipt, char val, HelicsError* err);
 
 /**
  * Set the default as a double.
@@ -2787,7 +2796,7 @@ HELICS_EXPORT void helicsInputSetDefaultChar(helics_input ipt, char val, helics_
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultDouble(helics_input ipt, double val, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultDouble(HelicsInput ipt, double val, HelicsError* err);
 
 /**
  * Set the default as a complex number.
@@ -2799,7 +2808,7 @@ HELICS_EXPORT void helicsInputSetDefaultDouble(helics_input ipt, double val, hel
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultComplex(helics_input ipt, double real, double imag, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, double imag, HelicsError* err);
 
 /**
  * Set the default as a vector of doubles.
@@ -2811,7 +2820,7 @@ HELICS_EXPORT void helicsInputSetDefaultComplex(helics_input ipt, double real, d
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultVector(helics_input ipt, const double* vectorInput, int vectorLength, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
  * Set the default as a NamedPoint.
@@ -2823,7 +2832,7 @@ HELICS_EXPORT void helicsInputSetDefaultVector(helics_input ipt, const double* v
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetDefaultNamedPoint(helics_input ipt, const char* str, double val, helics_error* err);
+HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
 
 /**@}*/
 
@@ -2837,9 +2846,9 @@ HELICS_EXPORT void helicsInputSetDefaultNamedPoint(helics_input ipt, const char*
  *
  * @param ipt The input to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetType(helics_input ipt);
+HELICS_EXPORT const char* helicsInputGetType(HelicsInput ipt);
 
 /**
  * Get the type the publisher to an input is sending.
@@ -2848,32 +2857,32 @@ HELICS_EXPORT const char* helicsInputGetType(helics_input ipt);
  *
  * @return A const char * with the type name.
  */
-HELICS_EXPORT const char* helicsInputGetPublicationType(helics_input ipt);
+HELICS_EXPORT const char* helicsInputGetPublicationType(HelicsInput ipt);
 
 /**
  * Get the type of a publication.
  *
  * @param pub The publication to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsPublicationGetType(helics_publication pub);
+HELICS_EXPORT const char* helicsPublicationGetType(HelicsPublication pub);
 
 /**
  * Get the key of an input.
  *
  * @param ipt The input to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetKey(helics_input ipt);
+HELICS_EXPORT const char* helicsInputGetKey(HelicsInput ipt);
 
 /**
  * Get the key of a subscription.
  *
  * @return A const char with the subscription key.
  */
-HELICS_EXPORT const char* helicsSubscriptionGetKey(helics_input ipt);
+HELICS_EXPORT const char* helicsSubscriptionGetKey(HelicsInput ipt);
 
 /**
  * Get the key of a publication.
@@ -2882,27 +2891,27 @@ HELICS_EXPORT const char* helicsSubscriptionGetKey(helics_input ipt);
  *
  * @param pub The publication to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsPublicationGetKey(helics_publication pub);
+HELICS_EXPORT const char* helicsPublicationGetKey(HelicsPublication pub);
 
 /**
  * Get the units of an input.
  *
  * @param ipt The input to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetUnits(helics_input ipt);
+HELICS_EXPORT const char* helicsInputGetUnits(HelicsInput ipt);
 
 /**
  * Get the units of the publication that an input is linked to.
  *
  * @param ipt The input to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetInjectionUnits(helics_input ipt);
+HELICS_EXPORT const char* helicsInputGetInjectionUnits(HelicsInput ipt);
 
 /**
  * Get the units of an input.
@@ -2911,18 +2920,18 @@ HELICS_EXPORT const char* helicsInputGetInjectionUnits(helics_input ipt);
  *
  * @param ipt The input to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetExtractionUnits(helics_input ipt);
+HELICS_EXPORT const char* helicsInputGetExtractionUnits(HelicsInput ipt);
 
 /**
  * Get the units of a publication.
  *
  * @param pub The publication to query.
  *
- * @return A void enumeration, helics_ok if everything worked.
+ * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsPublicationGetUnits(helics_publication pub);
+HELICS_EXPORT const char* helicsPublicationGetUnits(HelicsPublication pub);
 
 /**
  * Get the data in the info field of an input.
@@ -2931,7 +2940,7 @@ HELICS_EXPORT const char* helicsPublicationGetUnits(helics_publication pub);
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT const char* helicsInputGetInfo(helics_input inp);
+HELICS_EXPORT const char* helicsInputGetInfo(HelicsInput inp);
 
 /**
  * Set the data in the info field for an input.
@@ -2942,7 +2951,7 @@ HELICS_EXPORT const char* helicsInputGetInfo(helics_input inp);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetInfo(helics_input inp, const char* info, helics_error* err);
+HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err);
 
 /**
  * Get the data in the info field of an publication.
@@ -2951,7 +2960,7 @@ HELICS_EXPORT void helicsInputSetInfo(helics_input inp, const char* info, helics
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT const char* helicsPublicationGetInfo(helics_publication pub);
+HELICS_EXPORT const char* helicsPublicationGetInfo(HelicsPublication pub);
 
 /**
  * Set the data in the info field for a publication.
@@ -2962,7 +2971,7 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(helics_publication pub);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_error* err);
+HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
 
 /**
  * Get the current value of an input handle option
@@ -2972,7 +2981,7 @@ HELICS_EXPORT void helicsPublicationSetInfo(helics_publication pub, const char* 
  *
  * @return An integer value with the current value of the given option.
  */
-HELICS_EXPORT int helicsInputGetOption(helics_input inp, int option);
+HELICS_EXPORT int helicsInputGetOption(HelicsInput inp, int option);
 
 /**
  * Set an option on an input
@@ -2984,7 +2993,7 @@ HELICS_EXPORT int helicsInputGetOption(helics_input inp, int option);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, int value, helics_error* err);
+HELICS_EXPORT void helicsInputSetOption(HelicsInput inp, int option, int value, HelicsError* err);
 
 /**
  * Get the value of an option for a publication
@@ -2994,7 +3003,7 @@ HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, int value,
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT int helicsPublicationGetOption(helics_publication pub, int option);
+HELICS_EXPORT int helicsPublicationGetOption(HelicsPublication pub, int option);
 
 /**
  * Set the value of an option for a publication
@@ -3006,7 +3015,7 @@ HELICS_EXPORT int helicsPublicationGetOption(helics_publication pub, int option)
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option, int val, helics_error* err);
+HELICS_EXPORT void helicsPublicationSetOption(HelicsPublication pub, int option, int val, HelicsError* err);
 
 /**
  * Set the minimum change detection tolerance.
@@ -3017,7 +3026,7 @@ HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsPublicationSetMinimumChange(helics_publication pub, double tolerance, helics_error* err);
+HELICS_EXPORT void helicsPublicationSetMinimumChange(HelicsPublication pub, double tolerance, HelicsError* err);
 
 /**
  * Set the minimum change detection tolerance.
@@ -3028,40 +3037,40 @@ HELICS_EXPORT void helicsPublicationSetMinimumChange(helics_publication pub, dou
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsInputSetMinimumChange(helics_input inp, double tolerance, helics_error* err);
+HELICS_EXPORT void helicsInputSetMinimumChange(HelicsInput inp, double tolerance, HelicsError* err);
 
 /**@}*/
 
 /**
  * Check if a particular subscription was updated.
  *
- * @return helics_true if it has been updated since the last value retrieval.
+ * @return HELICS_TRUE if it has been updated since the last value retrieval.
  */
-HELICS_EXPORT helics_bool helicsInputIsUpdated(helics_input ipt);
+HELICS_EXPORT HelicsBool helicsInputIsUpdated(HelicsInput ipt);
 
 /**
  * Get the last time a subscription was updated.
  */
-HELICS_EXPORT helics_time helicsInputLastUpdateTime(helics_input ipt);
+HELICS_EXPORT HelicsTime helicsInputLastUpdateTime(HelicsInput ipt);
 
 /**
  * Clear the updated flag from an input.
  */
-HELICS_EXPORT void helicsInputClearUpdate(helics_input ipt);
+HELICS_EXPORT void helicsInputClearUpdate(HelicsInput ipt);
 
 /**
  * Get the number of publications in a federate.
  *
  * @return (-1) if fed was not a valid federate otherwise returns the number of publications.
  */
-HELICS_EXPORT int helicsFederateGetPublicationCount(helics_federate fed);
+HELICS_EXPORT int helicsFederateGetPublicationCount(HelicsFederate fed);
 
 /**
  * Get the number of subscriptions in a federate.
  *
  * @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions.
  */
-HELICS_EXPORT int helicsFederateGetInputCount(helics_federate fed);
+HELICS_EXPORT int helicsFederateGetInputCount(HelicsFederate fed);
 
 /* MessageFederate Calls*/
 
@@ -3084,7 +3093,7 @@ HELICS_EXPORT int helicsFederateGetInputCount(helics_federate fed);
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
+HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
 /**
  * Create an endpoint.
@@ -3104,10 +3113,10 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed,
+HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed,
                                                                    const char* name,
                                                                    const char* type,
-                                                                   helics_error* err);
+                                                                   HelicsError* err);
 
 /**
  * Create a targeted endpoint.  Targeted endpoints have specific destinations predefined and do not allow sending messages to other
@@ -3129,10 +3138,10 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federa
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(helics_federate fed,
+HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
                                                                      const char* name,
                                                                      const char* type,
-                                                                     helics_error* err);
+                                                                     HelicsError* err);
 
 /**
  * Create a global targeted endpoint, Targeted endpoints have specific destinations predefined and do not allow sending messages to other
@@ -3153,10 +3162,10 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterTargetedEndpoint(helics_fede
  *         nullptr on failure.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(helics_federate fed,
+HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
                                                                            const char* name,
                                                                            const char* type,
-                                                                           helics_error* err);
+                                                                           HelicsError* err);
 
 /**
  * Get an endpoint object from a name.
@@ -3172,7 +3181,7 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalTargetedEndpoint(helic
  *         The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name, helics_error* err);
+HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, HelicsError* err);
 
 /**
  * Get an endpoint by its index, typically already created via registerInterfaces file or something of that nature.
@@ -3188,16 +3197,16 @@ HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(helics_federate fed, con
  *         It will be NULL if given an invalid index.
  * @endforcpponly
  */
-HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index, helics_error* err);
+HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, HelicsError* err);
 
 /**
  * Check if an endpoint is valid.
  *
  * @param endpoint The endpoint object to check.
  *
- * @return helics_true if the Endpoint object represents a valid endpoint.
+ * @return HELICS_TRUE if the Endpoint object represents a valid endpoint.
  */
-HELICS_EXPORT helics_bool helicsEndpointIsValid(helics_endpoint endpoint);
+HELICS_EXPORT HelicsBool helicsEndpointIsValid(helics_endpoint endpoint);
 
 /**
  * Set the default destination for an endpoint if no other endpoint is given.
@@ -3208,7 +3217,7 @@ HELICS_EXPORT helics_bool helicsEndpointIsValid(helics_endpoint endpoint);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dst, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dst, HelicsError* err);
 
 /**
  * Get the default destination for an endpoint.
@@ -3229,7 +3238,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendBytes(helics_endpoint endpoint, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsEndpointSendBytes(helics_endpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Send a message to the specified destination.
@@ -3250,7 +3259,7 @@ HELICS_EXPORT void helicsEndpointSendBytes(helics_endpoint endpoint, const void*
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsEndpointSendBytesTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dst, helics_error* err);
+    helicsEndpointSendBytesTo(helics_endpoint endpoint, const void* data, int inputDataLength, const char* dst, HelicsError* err);
 
 /**
  * Send a message to the specified destination at a specific time.
@@ -3277,8 +3286,8 @@ HELICS_EXPORT void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
                                                const void* data,
                                                int inputDataLength,
                                                const char* dst,
-                                               helics_time time,
-                                               helics_error* err);
+                                               HelicsTime time,
+                                               HelicsError* err);
 
 /**
  * Send a message at a specific time to the targeted destinations
@@ -3296,7 +3305,7 @@ HELICS_EXPORT void helicsEndpointSendBytesToAt(helics_endpoint endpoint,
  */
 
 HELICS_EXPORT void
-    helicsEndpointSendBytesAt(helics_endpoint endpoint, const void* data, int inputDataLength, helics_time time, helics_error* err);
+    helicsEndpointSendBytesAt(helics_endpoint endpoint, const void* data, int inputDataLength, HelicsTime time, HelicsError* err);
 
 /**
  * Send a message object from a specific endpoint.
@@ -3307,7 +3316,7 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message message, helics_error* err);
+HELICS_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message message, HelicsError* err);
 
 /**
  * Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
@@ -3319,7 +3328,7 @@ HELICS_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_me
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(helics_endpoint endpoint, helics_message message, helics_error* err);
+HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(helics_endpoint endpoint, helics_message message, HelicsError* err);
 
 /**
  * Subscribe an endpoint to a publication.
@@ -3330,32 +3339,32 @@ HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(helics_endpoint endpoint, h
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, helics_error* err);
+HELICS_EXPORT void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, HelicsError* err);
 
 /**
  * Check if the federate has any outstanding messages.
  *
  * @param fed The federate to check.
  *
- * @return helics_true if the federate has a message waiting, helics_false otherwise.
+ * @return HELICS_TRUE if the federate has a message waiting, HELICS_FALSE otherwise.
  */
-HELICS_EXPORT helics_bool helicsFederateHasMessage(helics_federate fed);
+HELICS_EXPORT HelicsBool helicsFederateHasMessage(HelicsFederate fed);
 
 /**
  * Check if a given endpoint has any unread messages.
  *
  * @param endpoint The endpoint to check.
  *
- * @return helics_true if the endpoint has a message, helics_false otherwise.
+ * @return HELICS_TRUE if the endpoint has a message, HELICS_FALSE otherwise.
  */
-HELICS_EXPORT helics_bool helicsEndpointHasMessage(helics_endpoint endpoint);
+HELICS_EXPORT HelicsBool helicsEndpointHasMessage(helics_endpoint endpoint);
 
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  *
  * @param fed The federate to get the number of waiting messages from.
  */
-HELICS_EXPORT int helicsFederatePendingMessagesCount(helics_federate fed);
+HELICS_EXPORT int helicsFederatePendingMessagesCount(HelicsFederate fed);
 
 /**
  * Returns the number of pending receives for all endpoints of a particular federate.
@@ -3385,7 +3394,7 @@ HELICS_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
  *
  * @return A new helics_message.
  */
-HELICS_EXPORT helics_message helicsEndpointCreateMessage(helics_endpoint endpoint, helics_error* err);
+HELICS_EXPORT helics_message helicsEndpointCreateMessage(helics_endpoint endpoint, HelicsError* err);
 
 /**
  * Receive a communication message for any endpoint in the federate.
@@ -3396,7 +3405,7 @@ HELICS_EXPORT helics_message helicsEndpointCreateMessage(helics_endpoint endpoin
  *
  * @return A helics_message which references the data in the message.
  */
-HELICS_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
+HELICS_EXPORT helics_message helicsFederateGetMessage(HelicsFederate fed);
 
 /**
  * Create a new empty message object.
@@ -3410,7 +3419,7 @@ HELICS_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
  *
  * @return A helics_message containing the message data.
  */
-HELICS_EXPORT helics_message helicsFederateCreateMessage(helics_federate fed, helics_error* err);
+HELICS_EXPORT helics_message helicsFederateCreateMessage(HelicsFederate fed, HelicsError* err);
 
 /**
  * Clear all stored messages from a federate.
@@ -3419,7 +3428,7 @@ HELICS_EXPORT helics_message helicsFederateCreateMessage(helics_federate fed, he
  *
  * @param fed The federate to clear the message for.
  */
-HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
+HELICS_EXPORT void helicsFederateClearMessages(HelicsFederate fed);
 
 /**
  * Get the type specified for an endpoint.
@@ -3446,7 +3455,7 @@ HELICS_EXPORT const char* helicsEndpointGetName(helics_endpoint endpoint);
  *
  * @return (-1) if fed was not a valid federate, otherwise returns the number of endpoints.
  */
-HELICS_EXPORT int helicsFederateGetEndpointCount(helics_federate fed);
+HELICS_EXPORT int helicsFederateGetEndpointCount(HelicsFederate fed);
 
 /**
  * Get the data in the info field of a filter.
@@ -3466,7 +3475,7 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(helics_endpoint end);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* info, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* info, HelicsError* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -3478,7 +3487,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint endpoint, const char* i
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option, int value, helics_error* err);
+HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint endpoint, int option, int value, HelicsError* err);
 
 /**
  * Set a handle option on an endpoint.
@@ -3498,7 +3507,7 @@ HELICS_EXPORT int helicsEndpointGetOption(helics_endpoint endpoint, int option);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
+HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
 /**
  * add a destination target to an endpoint,  Specifying an endpoint to send undirected messages to
@@ -3509,7 +3518,7 @@ HELICS_EXPORT void helicsEndpointAddSourceTarget(helics_endpoint endpoint, const
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
+HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
 /**
  * remove an endpoint from being targeted
@@ -3520,7 +3529,7 @@ HELICS_EXPORT void helicsEndpointAddDestinationTarget(helics_endpoint endpoint, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const char* targetEndpoint, helics_error* err);
+HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
 /**
  * add a source Filter to an endpoint
@@ -3531,7 +3540,7 @@ HELICS_EXPORT void helicsEndpointRemoveTarget(helics_endpoint endpoint, const ch
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddSourceFilter(helics_endpoint endpoint, const char* filterName, helics_error* err);
+HELICS_EXPORT void helicsEndpointAddSourceFilter(helics_endpoint endpoint, const char* filterName, HelicsError* err);
 
 /**
  * add a destination filter to an endpoint
@@ -3542,7 +3551,7 @@ HELICS_EXPORT void helicsEndpointAddSourceFilter(helics_endpoint endpoint, const
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsEndpointAddDestinationFilter(helics_endpoint endpoint, const char* filterName, helics_error* err);
+HELICS_EXPORT void helicsEndpointAddDestinationFilter(helics_endpoint endpoint, const char* filterName, HelicsError* err);
 
 /**
  * \defgroup Message operation functions
@@ -3593,7 +3602,7 @@ HELICS_EXPORT const char* helicsMessageGetOriginalDestination(helics_message mes
  *
  * @return The time associated with a message.
  */
-HELICS_EXPORT helics_time helicsMessageGetTime(helics_message message);
+HELICS_EXPORT HelicsTime helicsMessageGetTime(helics_message message);
 
 /**
  * Get the payload of a message as a string.
@@ -3621,7 +3630,7 @@ HELICS_EXPORT int helicsMessageGetMessageID(helics_message message);
  *
  * @return The flags associated with a message.
  */
-HELICS_EXPORT helics_bool helicsMessageGetFlagOption(helics_message message, int flag);
+HELICS_EXPORT HelicsBool helicsMessageGetFlagOption(helics_message message, int flag);
 
 /**
  * Get the size of the data payload in bytes.
@@ -3647,7 +3656,7 @@ HELICS_EXPORT int helicsMessageGetByteCount(helics_message message);
  * @return Raw string data.
  * @endPythonOnly
  */
-HELICS_EXPORT void helicsMessageGetBytes(helics_message message, void* data, int maxMessageLength, int* actualSize, helics_error* err);
+HELICS_EXPORT void helicsMessageGetBytes(helics_message message, void* data, int maxMessageLength, int* actualSize, HelicsError* err);
 
 /**
  * Get a pointer to the raw data of a message.
@@ -3663,9 +3672,9 @@ HELICS_EXPORT void* helicsMessageGetBytesPointer(helics_message message);
  *
  * @param message The message object in question.
  *
- * @return helics_true if the message contains a payload.
+ * @return HELICS_TRUE if the message contains a payload.
  */
-HELICS_EXPORT helics_bool helicsMessageIsValid(helics_message message);
+HELICS_EXPORT HelicsBool helicsMessageIsValid(helics_message message);
 
 /**
  * Set the source of a message.
@@ -3676,7 +3685,7 @@ HELICS_EXPORT helics_bool helicsMessageIsValid(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetSource(helics_message message, const char* src, helics_error* err);
+HELICS_EXPORT void helicsMessageSetSource(helics_message message, const char* src, HelicsError* err);
 
 /**
  * Set the destination of a message.
@@ -3687,7 +3696,7 @@ HELICS_EXPORT void helicsMessageSetSource(helics_message message, const char* sr
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetDestination(helics_message message, const char* dst, helics_error* err);
+HELICS_EXPORT void helicsMessageSetDestination(helics_message message, const char* dst, HelicsError* err);
 
 /**
  * Set the original source of a message.
@@ -3698,7 +3707,7 @@ HELICS_EXPORT void helicsMessageSetDestination(helics_message message, const cha
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetOriginalSource(helics_message message, const char* src, helics_error* err);
+HELICS_EXPORT void helicsMessageSetOriginalSource(helics_message message, const char* src, HelicsError* err);
 
 /**
  * Set the original destination of a message.
@@ -3709,7 +3718,7 @@ HELICS_EXPORT void helicsMessageSetOriginalSource(helics_message message, const 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message message, const char* dst, helics_error* err);
+HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message message, const char* dst, HelicsError* err);
 
 /**
  * Set the delivery time for a message.
@@ -3720,7 +3729,7 @@ HELICS_EXPORT void helicsMessageSetOriginalDestination(helics_message message, c
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetTime(helics_message message, helics_time time, helics_error* err);
+HELICS_EXPORT void helicsMessageSetTime(helics_message message, HelicsTime time, HelicsError* err);
 
 /**
  * Resize the data buffer for a message.
@@ -3734,7 +3743,7 @@ HELICS_EXPORT void helicsMessageSetTime(helics_message message, helics_time time
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageResize(helics_message message, int newSize, helics_error* err);
+HELICS_EXPORT void helicsMessageResize(helics_message message, int newSize, HelicsError* err);
 
 /**
  * Reserve space in a buffer but don't actually resize.
@@ -3747,7 +3756,7 @@ HELICS_EXPORT void helicsMessageResize(helics_message message, int newSize, heli
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageReserve(helics_message message, int reserveSize, helics_error* err);
+HELICS_EXPORT void helicsMessageReserve(helics_message message, int reserveSize, HelicsError* err);
 
 /**
  * Set the message ID for the message.
@@ -3760,7 +3769,7 @@ HELICS_EXPORT void helicsMessageReserve(helics_message message, int reserveSize,
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetMessageID(helics_message message, int32_t messageID, helics_error* err);
+HELICS_EXPORT void helicsMessageSetMessageID(helics_message message, int32_t messageID, HelicsError* err);
 
 /**
  * Clear the flags of a message.
@@ -3779,7 +3788,7 @@ HELICS_EXPORT void helicsMessageClearFlags(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetFlagOption(helics_message message, int flag, helics_bool flagValue, helics_error* err);
+HELICS_EXPORT void helicsMessageSetFlagOption(helics_message message, int flag, HelicsBool flagValue, HelicsError* err);
 
 /**
  * Set the data payload of a message as a string.
@@ -3790,7 +3799,7 @@ HELICS_EXPORT void helicsMessageSetFlagOption(helics_message message, int flag, 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetString(helics_message message, const char* str, helics_error* err);
+HELICS_EXPORT void helicsMessageSetString(helics_message message, const char* str, HelicsError* err);
 
 /**
  * Set the data payload of a message as raw data.
@@ -3802,7 +3811,7 @@ HELICS_EXPORT void helicsMessageSetString(helics_message message, const char* st
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageSetData(helics_message message, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsMessageSetData(helics_message message, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Append data to the payload.
@@ -3814,7 +3823,7 @@ HELICS_EXPORT void helicsMessageSetData(helics_message message, const void* data
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageAppendData(helics_message message, const void* data, int inputDataLength, helics_error* err);
+HELICS_EXPORT void helicsMessageAppendData(helics_message message, const void* data, int inputDataLength, HelicsError* err);
 
 /**
  * Copy a message object.
@@ -3825,7 +3834,7 @@ HELICS_EXPORT void helicsMessageAppendData(helics_message message, const void* d
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageCopy(helics_message src_message, helics_message dst_message, helics_error* err);
+HELICS_EXPORT void helicsMessageCopy(helics_message src_message, helics_message dst_message, HelicsError* err);
 
 /**
  * Clone a message object.
@@ -3835,7 +3844,7 @@ HELICS_EXPORT void helicsMessageCopy(helics_message src_message, helics_message 
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT helics_message helicsMessageClone(helics_message message, helics_error* err);
+HELICS_EXPORT helics_message helicsMessageClone(helics_message message, HelicsError* err);
 
 /**
  * Free a message object from memory
@@ -3854,7 +3863,7 @@ HELICS_EXPORT void helicsMessageFree(helics_message message);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsMessageClear(helics_message message, helics_error* err);
+HELICS_EXPORT void helicsMessageClear(helics_message message, HelicsError* err);
 
 /**@}*/
 
@@ -3865,15 +3874,15 @@ HELICS_EXPORT void helicsMessageClear(helics_message message, helics_error* err)
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
  *
  * @param fed The federate to register through.
- * @param type The type of filter to create /ref helics_filter_type.
+ * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter object.
+ * @return A HelicsFilter object.
  */
-HELICS_EXPORT helics_filter helicsFederateRegisterFilter(helics_federate fed, helics_filter_type type, const char* name, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, HelicsFilterTypes type, const char* name, HelicsError* err);
 /**
  * Create a global source filter through a federate.
  *
@@ -3881,18 +3890,18 @@ HELICS_EXPORT helics_filter helicsFederateRegisterFilter(helics_federate fed, he
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
  *
  * @param fed The federate to register through.
- * @param type The type of filter to create /ref helics_filter_type.
+ * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter object.
+ * @return A HelicsFilter object.
  */
-HELICS_EXPORT helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed,
-                                                               helics_filter_type type,
-                                                               const char* name,
-                                                               helics_error* err);
+HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed,
+                                                              HelicsFilterTypes type,
+                                                              const char* name,
+                                                              HelicsError* err);
 
 /**
  * Create a cloning Filter on the specified federate.
@@ -3906,9 +3915,9 @@ HELICS_EXPORT helics_filter helicsFederateRegisterGlobalFilter(helics_federate f
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter object.
+ * @return A HelicsFilter object.
  */
-HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const char* name, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsFederateRegisterCloningFilter(HelicsFederate fed, const char* name, HelicsError* err);
 
 /**
  * Create a global cloning Filter on the specified federate.
@@ -3922,9 +3931,9 @@ HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter(helics_federate 
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter object.
+ * @return A HelicsFilter object.
  */
-HELICS_EXPORT helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char* name, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalCloningFilter(HelicsFederate fed, const char* name, HelicsError* err);
 
 /**
  * Create a source Filter on the specified core.
@@ -3933,15 +3942,15 @@ HELICS_EXPORT helics_filter helicsFederateRegisterGlobalCloningFilter(helics_fed
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
  *
  * @param core The core to register through.
- * @param type The type of filter to create /ref helics_filter_type.
+ * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter object.
+ * @return A HelicsFilter object.
  */
-HELICS_EXPORT helics_filter helicsCoreRegisterFilter(helics_core core, helics_filter_type type, const char* name, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsCoreRegisterFilter(HelicsCore core, HelicsFilterTypes type, const char* name, HelicsError* err);
 
 /**
  * Create a cloning Filter on the specified core.
@@ -3955,9 +3964,9 @@ HELICS_EXPORT helics_filter helicsCoreRegisterFilter(helics_core core, helics_fi
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter object.
+ * @return A HelicsFilter object.
  */
-HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter(helics_core core, const char* name, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsCoreRegisterCloningFilter(HelicsCore core, const char* name, HelicsError* err);
 
 /**
  * Get the number of filters registered through a federate.
@@ -3966,7 +3975,7 @@ HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter(helics_core core, co
  *
  * @return A count of the number of filters registered through a federate.
  */
-HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
+HELICS_EXPORT int helicsFederateGetFilterCount(HelicsFederate fed);
 
 /**
  * Get a filter by its name, typically already created via registerInterfaces file or something of that nature.
@@ -3977,10 +3986,10 @@ HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name
+ * @return A HelicsFilter object, the object will not be valid and err will contain an error code if no filter with the specified name
  * exists.
  */
-HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const char* name, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsFederateGetFilter(HelicsFederate fed, const char* name, HelicsError* err);
 /**
  * Get a filter by its index, typically already created via registerInterfaces file or something of that nature.
  *
@@ -3990,18 +3999,18 @@ HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const c
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter, which will be NULL if an invalid index is given.
+ * @return A HelicsFilter, which will be NULL if an invalid index is given.
  */
-HELICS_EXPORT helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, helics_error* err);
+HELICS_EXPORT HelicsFilter helicsFederateGetFilterByIndex(HelicsFederate fed, int index, HelicsError* err);
 
 /**
  * Check if a filter is valid.
  *
  * @param filt The filter object to check.
  *
- * @return helics_true if the Filter object represents a valid filter.
+ * @return HELICS_TRUE if the Filter object represents a valid filter.
  */
-HELICS_EXPORT helics_bool helicsFilterIsValid(helics_filter filt);
+HELICS_EXPORT HelicsBool helicsFilterIsValid(HelicsFilter filt);
 
 /**
  * Get the name of the filter and store in the given string.
@@ -4010,7 +4019,7 @@ HELICS_EXPORT helics_bool helicsFilterIsValid(helics_filter filt);
  *
  * @return A string with the name of the filter.
  */
-HELICS_EXPORT const char* helicsFilterGetName(helics_filter filt);
+HELICS_EXPORT const char* helicsFilterGetName(HelicsFilter filt);
 
 /**
  * Set a property on a filter.
@@ -4022,7 +4031,7 @@ HELICS_EXPORT const char* helicsFilterGetName(helics_filter filt);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterSet(helics_filter filt, const char* prop, double val, helics_error* err);
+HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double val, HelicsError* err);
 
 /**
  * Set a string property on a filter.
@@ -4034,7 +4043,7 @@ HELICS_EXPORT void helicsFilterSet(helics_filter filt, const char* prop, double 
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterSetString(helics_filter filt, const char* prop, const char* val, helics_error* err);
+HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
 
 /**
  * Add a destination target to a filter.
@@ -4046,7 +4055,7 @@ HELICS_EXPORT void helicsFilterSetString(helics_filter filt, const char* prop, c
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterAddDestinationTarget(helics_filter filt, const char* dst, helics_error* err);
+HELICS_EXPORT void helicsFilterAddDestinationTarget(HelicsFilter filt, const char* dst, HelicsError* err);
 
 /**
  * Add a source target to a filter.
@@ -4059,7 +4068,7 @@ HELICS_EXPORT void helicsFilterAddDestinationTarget(helics_filter filt, const ch
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterAddSourceTarget(helics_filter filt, const char* source, helics_error* err);
+HELICS_EXPORT void helicsFilterAddSourceTarget(HelicsFilter filt, const char* source, HelicsError* err);
 
 /**
  * \defgroup Clone filter functions
@@ -4078,7 +4087,7 @@ HELICS_EXPORT void helicsFilterAddSourceTarget(helics_filter filt, const char* s
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterAddDeliveryEndpoint(helics_filter filt, const char* deliveryEndpoint, helics_error* err);
+HELICS_EXPORT void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);
 
 /**
  * Remove a destination target from a filter.
@@ -4090,7 +4099,7 @@ HELICS_EXPORT void helicsFilterAddDeliveryEndpoint(helics_filter filt, const cha
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterRemoveTarget(helics_filter filt, const char* target, helics_error* err);
+HELICS_EXPORT void helicsFilterRemoveTarget(HelicsFilter filt, const char* target, HelicsError* err);
 
 /**
  * Remove a delivery destination from a cloning filter.
@@ -4101,7 +4110,7 @@ HELICS_EXPORT void helicsFilterRemoveTarget(helics_filter filt, const char* targ
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* deliveryEndpoint, helics_error* err);
+HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);
 
 /**
  * Get the data in the info field of a filter.
@@ -4110,7 +4119,7 @@ HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const 
  *
  * @return A string with the info field string.
  */
-HELICS_EXPORT const char* helicsFilterGetInfo(helics_filter filt);
+HELICS_EXPORT const char* helicsFilterGetInfo(HelicsFilter filt);
 /**
  * Set the data in the info field for a filter.
  *
@@ -4120,7 +4129,7 @@ HELICS_EXPORT const char* helicsFilterGetInfo(helics_filter filt);
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err);
+HELICS_EXPORT void helicsFilterSetInfo(HelicsFilter filt, const char* info, HelicsError* err);
 
 /**
  * Set the data in the info field for a filter.
@@ -4133,7 +4142,7 @@ HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char* info, hel
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, int value, helics_error* err);
+HELICS_EXPORT void helicsFilterSetOption(HelicsFilter filt, int option, int value, HelicsError* err);
 
 /**
  * Get a handle option for the filter.
@@ -4141,7 +4150,7 @@ HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, int val
  * @param filt The given filter to query.
  * @param option The option to query /ref helics_handle_options.
  */
-HELICS_EXPORT int helicsFilterGetOption(helics_filter filt, int option);
+HELICS_EXPORT int helicsFilterGetOption(HelicsFilter filt, int option);
 
 /**
  * @}
@@ -4162,10 +4171,10 @@ HELICS_EXPORT int helicsFilterGetOption(helics_filter filt, int option);
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerSetLoggingCallback(helics_broker broker,
+HELICS_EXPORT void helicsBrokerSetLoggingCallback(HelicsBroker broker,
                                                   void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
                                                   void* userdata,
-                                                  helics_error* err);
+                                                  HelicsError* err);
 
 /**
  * Set the logging callback for a core.
@@ -4181,10 +4190,10 @@ HELICS_EXPORT void helicsBrokerSetLoggingCallback(helics_broker broker,
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreSetLoggingCallback(helics_core core,
+HELICS_EXPORT void helicsCoreSetLoggingCallback(HelicsCore core,
                                                 void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
                                                 void* userdata,
-                                                helics_error* err);
+                                                HelicsError* err);
 
 /**
  * Set the logging callback for a federate.
@@ -4202,10 +4211,10 @@ HELICS_EXPORT void helicsCoreSetLoggingCallback(helics_core core,
  * @endforcpponly
  */
 HELICS_EXPORT void
-    helicsFederateSetLoggingCallback(helics_federate fed,
+    helicsFederateSetLoggingCallback(HelicsFederate fed,
                                      void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
                                      void* userdata,
-                                     helics_error* err);
+                                     HelicsError* err);
 
 /**
  * Set a general callback for a custom filter.
@@ -4221,10 +4230,10 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsFilterSetCustomCallback(helics_filter filter,
+HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
                                                  void (*filtCall)(helics_message message, void* userData),
                                                  void* userdata,
-                                                 helics_error* err);
+                                                 HelicsError* err);
 
 /**
  * Set callback for queries executed against a federate.
@@ -4244,10 +4253,10 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(helics_filter filter,
  */
 
 HELICS_EXPORT void
-    helicsFederateSetQueryCallback(helics_federate fed,
+    helicsFederateSetQueryCallback(HelicsFederate fed,
                                    void (*queryAnswer)(const char* query, int querySize, helics_query_buffer buffer, void* userdata),
                                    void* userdata,
-                                   helics_error* err);
+                                   HelicsError* err);
 
 /**
  * Set the data for a query callback.
@@ -4262,7 +4271,7 @@ HELICS_EXPORT void
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsQueryBufferFill(helics_query_buffer buffer, const char* str, int strSize, helics_error* err);
+HELICS_EXPORT void helicsQueryBufferFill(helics_query_buffer buffer, const char* str, int strSize, HelicsError* err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

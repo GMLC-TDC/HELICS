@@ -20,20 +20,20 @@ constexpr const char* defBrokerInterface[] = {"127.0.0.1",
                                               ""};
 constexpr const char* defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "", ""};
 
-template<class COMMS, interface_type baseline>
+template<class COMMS, InterfaceTypes baseline>
 NetworkCore<COMMS, baseline>::NetworkCore() noexcept
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
+    netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_DEACTIVATED;
 }
 
-template<class COMMS, interface_type baseline>
+template<class COMMS, InterfaceTypes baseline>
 NetworkCore<COMMS, baseline>::NetworkCore(const std::string& coreName):
     CommsBroker<COMMS, CommonCore>(coreName)
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
+    netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_DEACTIVATED;
 }
 
-template<class COMMS, interface_type baseline>
+template<class COMMS, InterfaceTypes baseline>
 std::shared_ptr<helicsCLI11App> NetworkCore<COMMS, baseline>::generateCLI()
 {
     auto app = CommonCore::generateCLI();
@@ -43,7 +43,7 @@ std::shared_ptr<helicsCLI11App> NetworkCore<COMMS, baseline>::generateCLI()
     return app;
 }
 
-template<class COMMS, interface_type baseline>
+template<class COMMS, InterfaceTypes baseline>
 bool NetworkCore<COMMS, baseline>::brokerConnect()
 {
     std::lock_guard<std::mutex> lock(dataMutex);
@@ -64,7 +64,7 @@ bool NetworkCore<COMMS, baseline>::brokerConnect()
     return res;
 }
 
-template<class COMMS, interface_type baseline>
+template<class COMMS, InterfaceTypes baseline>
 std::string NetworkCore<COMMS, baseline>::generateLocalAddressString() const
 {
     std::string add;
@@ -73,9 +73,9 @@ std::string NetworkCore<COMMS, baseline>::generateLocalAddressString() const
     } else {
         std::lock_guard<std::mutex> lock(dataMutex);
         switch (baseline) {
-            case interface_type::tcp:
-            case interface_type::ip:
-            case interface_type::udp:
+            case InterfaceTypes::TCP:
+            case InterfaceTypes::IP:
+            case InterfaceTypes::UDP:
                 if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*')) {
                     add = makePortAddress(
                         netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
@@ -84,8 +84,8 @@ std::string NetworkCore<COMMS, baseline>::generateLocalAddressString() const
                     add = makePortAddress(netInfo.localInterface, netInfo.portNumber);
                 }
                 break;
-            case interface_type::inproc:
-            case interface_type::ipc:
+            case InterfaceTypes::INPROC:
+            case InterfaceTypes::IPC:
             default:
                 if (!netInfo.localInterface.empty()) {
                     add = netInfo.localInterface;

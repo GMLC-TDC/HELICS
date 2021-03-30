@@ -14,7 +14,7 @@ namespace zeromq {
     class ZmqCommsSS;
 
     /** implementation for the core that uses zmq messages to communicate*/
-    class ZmqCore final: public NetworkCore<ZmqComms, interface_type::tcp> {
+    class ZmqCore final: public NetworkCore<ZmqComms, InterfaceTypes::TCP> {
       public:
         /** default constructor*/
         ZmqCore() noexcept;
@@ -26,7 +26,7 @@ namespace zeromq {
     };
 
     /** implementation for the core that uses zmq messages to communicate*/
-    class ZmqCoreSS final: public NetworkCore<ZmqCommsSS, interface_type::tcp> {
+    class ZmqCoreSS final: public NetworkCore<ZmqCommsSS, InterfaceTypes::TCP> {
       public:
         /** default constructor*/
         ZmqCoreSS() noexcept;

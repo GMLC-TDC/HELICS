@@ -19,8 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
-#include "helics-time.hpp"
 #include "helics/helics-config.h"
+#include "helicsTime.hpp"
 
 #include "json/forwards.h"
 #include <any>
@@ -43,7 +43,7 @@ class BasicHandleInfo;
 class FilterCoordinator;
 class FilterInfo;
 class TimeoutMonitor;
-enum class handle_type : char;
+enum class InterfaceType : char;
 /** enumeration of possible operating conditions for a federate*/
 enum class operation_state : std::uint8_t { operating = 0, error = 5, disconnected = 10 };
 
@@ -92,9 +92,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual void finalize(LocalFederateId federateID) override final;
     virtual void enterInitializingMode(LocalFederateId federateID) override final;
     virtual void setCoreReadyToInit() override final;
-    virtual iteration_result
+    virtual IterationResult
         enterExecutingMode(LocalFederateId federateID,
-                           iteration_request iterate = NO_ITERATION) override final;
+                           IterationRequest iterate = NO_ITERATION) override final;
     virtual LocalFederateId registerFederate(const std::string& name,
                                              const CoreFederateInfo& info) override final;
     virtual const std::string& getFederateName(LocalFederateId federateID) const override final;
@@ -103,7 +103,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual Time timeRequest(LocalFederateId federateID, Time next) override final;
     virtual iteration_time requestTimeIterative(LocalFederateId federateID,
                                                 Time next,
-                                                iteration_request iterate) override final;
+                                                IterationRequest iterate) override final;
     virtual Time getCurrentTime(LocalFederateId federateID) const override final;
     virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override final;
     virtual void
@@ -145,10 +145,10 @@ class CommonCore: public Core, public BrokerBase {
                               std::string_view targetToRemove) override final;
     virtual void addDestinationTarget(InterfaceHandle handle,
                                       std::string_view dest,
-                                      handle_type hint) override final;
+                                      InterfaceType hint) override final;
     virtual void addSourceTarget(InterfaceHandle handle,
                                  std::string_view name,
-                                 handle_type hint) override final;
+                                 InterfaceType hint) override final;
     virtual const std::string& getDestinationTargets(InterfaceHandle handle) const override final;
 
     virtual const std::string& getSourceTargets(InterfaceHandle handle) const override final;
@@ -455,7 +455,7 @@ class CommonCore: public Core, public BrokerBase {
     */
     const BasicHandleInfo& createBasicHandle(GlobalFederateId global_federateId,
                                              LocalFederateId local_federateId,
-                                             handle_type HandleType,
+                                             InterfaceType HandleType,
                                              const std::string& key,
                                              const std::string& type,
                                              const std::string& units,

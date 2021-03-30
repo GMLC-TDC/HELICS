@@ -23,121 +23,122 @@ extern "C" {
 /**
  * opaque object representing an input
  */
-typedef void* helics_input;
 typedef void* HelicsInput;
+// typedef void* helics_input;
 /**
  * opaque object representing a publication
  */
-typedef void* helics_publication;
 typedef void* HelicsPublication;
+// typedef void* helics_publication;
 /**
  * opaque object representing an endpoint
  */
-typedef void* helics_endpoint;
+// typedef void* helics_endpoint;
 typedef void* HelicsEndpoint;
 
 /**
  * opaque object representing a filter
  */
-typedef void* helics_filter;
+// typedef void* helics_filter;
 typedef void* HelicsFilter;
 
 /**
  * opaque object representing a core
  */
-typedef void* helics_core;
+// typedef void* helics_core;
 typedef void* HelicsCore;
 
 /**
  * opaque object representing a broker
  */
-typedef void* helics_broker;
+// typedef void* helics_broker;
 typedef void* HelicsBroker;
 /**
  * opaque object representing a federate
  */
-typedef void* helics_federate;
+// typedef void* helics_federate;
 typedef void* HelicsFederate;
 
 /**
  * opaque object representing a filter info object structure
  */
-typedef void* helics_federate_info;
+// typedef void* helics_federate_info;
 typedef void* HelicsFederateInfo;
 
 /**
  * opaque object representing a query
  */
-typedef void* helics_query;
+// typedef void* helics_query;
 typedef void* HelicsQuery;
 
 /**
  * opaque object representing a string buffer for a query
  */
-typedef void* helics_query_buffer;
+// typedef void* helics_query_buffer;
+typedef void* HelicsQueryBuffer;
 
 /**
  * opaque object representing a message
  */
-typedef void* helics_message;
+// typedef void* helics_message;
 typedef void* HelicsMessage;
 
 /**
  * time definition used in the C interface to helics
  */
-typedef double helics_time;
+// typedef double helics_time;
 typedef double HelicsTime;
 
-const HelicsTime helics_time_zero = 0.0; /*!< definition of time zero-the beginning of simulation */
-const HelicsTime helics_time_epsilon = 1.0e-9; /*!< definition of the minimum time resolution */
-const HelicsTime helics_time_invalid = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const HelicsTime helics_time_maxtime = 9223372036.854774; /*!< definition of time signifying the federate has
+const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
+const HelicsTime HELICS_TIME_EPSILON = 1.0e-9; /*!< definition of the minimum time resolution */
+const HelicsTime HELICS_TIME_INVALID = -1.785e39; /*!< definition of an invalid time that has no meaning */
+const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774; /*!< definition of time signifying the federate has
                                                              terminated or to run until the end of the simulation*/
 
 /**
  * defining a boolean type for use in the helics interface
  */
-typedef int helics_bool;
+// typedef int helics_bool;
 typedef int HelicsBool;
 
-const helics_bool helics_true = 1; /*!< indicator used for a true response */
-const helics_bool helics_false = 0; /*!< indicator used for a false response */
+const HelicsBool HELICS_TRUE = 1; /*!< indicator used for a true response */
+const HelicsBool HELICS_FALSE = 0; /*!< indicator used for a false response */
 
 /**
  * enumeration of the different iteration results
  */
 typedef enum {
-    helics_iteration_request_no_iteration, /*!< no iteration is requested */
-    helics_iteration_request_force_iteration, /*!< force iteration return when able */
-    helics_iteration_request_iterate_if_needed /*!< only return an iteration if necessary */
-} helics_iteration_request;
+    HELICS_ITERATION_REQUEST_NO_ITERATION, /*!< no iteration is requested */
+    HELICS_ITERATION_REQUEST_FORCE_ITERATION, /*!< force iteration return when able */
+    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED /*!< only return an iteration if necessary */
+} HelicsIterationRequest;
 
 /**
  * enumeration of possible return values from an iterative time request
  */
 typedef enum {
-    helics_iteration_result_next_step, /*!< the iterations have progressed to the next time */
-    helics_iteration_result_error, /*!< there was an error */
-    helics_iteration_result_halted, /*!< the federation has halted */
-    helics_iteration_result_iterating /*!< the federate is iterating at current time */
-} helics_iteration_result;
+    HELICS_ITERATION_RESULT_NEXT_STEP, /*!< the iterations have progressed to the next time */
+    HELICS_ITERATION_RESULT_ERROR, /*!< there was an error */
+    HELICS_ITERATION_RESULT_HALTED, /*!< the federation has halted */
+    HELICS_ITERATION_RESULT_ITERATING /*!< the federate is iterating at current time */
+} HelicsIterationResult;
 
 /**
  * enumeration of possible federate states
  */
 typedef enum {
-    helics_state_startup = 0, /*!< when created the federate is in startup state */
-    helics_state_initialization, /*!< entered after the enterInitializingMode call has returned */
-    helics_state_execution, /*!< entered after the enterExectuationState call has returned */
-    helics_state_finalize, /*!< the federate has finished executing normally final values may be retrieved */
-    helics_state_error, /*!< error state no core communication is possible but values can be retrieved */
+    HELICS_STATE_STARTUP = 0, /*!< when created the federate is in startup state */
+    HELICS_STATE_INITIALIZATION, /*!< entered after the enterInitializingMode call has returned */
+    HELICS_STATE_EXECUTION, /*!< entered after the enterExectuationState call has returned */
+    HELICS_STATE_FINALIZE, /*!< the federate has finished executing normally final values may be retrieved */
+    HELICS_STATE_ERROR, /*!< error state no core communication is possible but values can be retrieved */
     /* the following states are for asynchronous operations */
-    helics_state_pending_init, /*!< indicator that the federate is pending entry to initialization state */
-    helics_state_pending_exec, /*!< state pending EnterExecution State */
-    helics_state_pending_time, /*!< state that the federate is pending a timeRequest */
-    helics_state_pending_iterative_time, /*!< state that the federate is pending an iterative time request */
-    helics_state_pending_finalize /*!< state that the federate is pending a finalize request */
-} helics_federate_state;
+    HELICS_STATE_PENDING_INIT, /*!< indicator that the federate is pending entry to initialization state */
+    HELICS_STATE_PENDING_EXEC, /*!< state pending EnterExecution State */
+    HELICS_STATE_PENDING_TIME, /*!< state that the federate is pending a timeRequest */
+    HELICS_STATE_PENDING_ITERATIVE_TIME, /*!< state that the federate is pending an iterative time request */
+    HELICS_STATE_PENDING_FINALIZE /*!< state that the federate is pending a finalize request */
+} HelicsFederateState;
 
 /**
  *  structure defining a basic complex type
@@ -147,7 +148,7 @@ typedef struct HelicsComplex {
     double imag;
 } HelicsComplex;
 
-typedef HelicsComplex helics_complex;
+// typedef HelicsComplex helics_complex;
 
 /**
  * helics error object
@@ -155,12 +156,12 @@ typedef HelicsComplex helics_complex;
  * if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string,
  * otherwise it will be an empty string
  */
-typedef struct helics_error {
-    int32_t error_code; /*!< an error code associated with the error*/
+typedef struct HelicsError {
+    int32_t errorCode; /*!< an error code associated with the error*/
     const char* message; /*!< a message associated with the error*/
-} helics_error;
+} HelicsError;
 
-typedef helics_error HelicsError;
+// typedef helics_error HelicsError;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

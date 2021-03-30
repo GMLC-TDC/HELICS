@@ -18,8 +18,8 @@ end
 %! try
 %!    helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 %!    helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-%!   helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
-%!    helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
+%!   helicsFederateInfoSetTimeProperty(fedInfo,HELICS_PROPERTY_TIME_DELTA, 0.01);
+%!    helicsFederateInfoSetIntegerProperty(fedInfo,HELICS_PROPERTY_INT_LOG_LEVEL,1);
 %! catch e
 %!     disp(e.message)
 %!     disp(e.stack(1))

@@ -22,21 +22,21 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helicscpp {
 /** enumeration of the available types of publications and inputs*/
 enum PubSubTypes {
-    STRING_TYPE = helics_data_type_string,
-    DOUBLE_TYPE = helics_data_type_double,
-    INT_TYPE = helics_data_type_int,
-    COMPLEX_TYPE = helics_data_type_complex,
-    VECTOR_TYPE = helics_data_type_vector,
-    TIME_TYPE = helics_data_type_time,
-    BOOLEAN_TYPE = helics_data_type_boolean,
-    RAW_TYPE = helics_data_type_raw
+    STRING_TYPE = HELICS_DATA_TYPE_STRING,
+    DOUBLE_TYPE = HELICS_DATA_TYPE_DOUBLE,
+    INT_TYPE = HELICS_DATA_TYPE_INT,
+    COMPLEX_TYPE = HELICS_DATA_TYPE_COMPLEX,
+    VECTOR_TYPE = HELICS_DATA_TYPE_VECTOR,
+    TIME_TYPE = HELICS_DATA_TYPE_TIME,
+    BOOLEAN_TYPE = HELICS_DATA_TYPE_BOOLEAN,
+    RAW_TYPE = HELICS_DATA_TYPE_RAW
 };
 
 /** Class defining a ValueFederate object which interacts with publication and Inputs*/
 class ValueFederate: public virtual Federate {
   private:
-    std::vector<helics_input> ipts;
-    std::vector<helics_publication> pubs;
+    std::vector<HelicsInput> ipts;
+    std::vector<HelicsPublication> pubs;
 
   public:
     friend class helicscpp::FederateInfo;
@@ -49,7 +49,7 @@ class ValueFederate: public virtual Federate {
     {
         fed = helicsCreateValueFederate(fedName.c_str(), fi.getInfo(), hThrowOnError());
         if (fed == NULL) {
-            throw(HelicsException(helics_error_registration_failure, "Fed==NULL"));
+            throw(HelicsException(HELICS_ERROR_REGISTRATION_FAILURE, "Fed==NULL"));
         }
     }
     /**constructor taking a string with the required information
@@ -60,7 +60,7 @@ class ValueFederate: public virtual Federate {
     {
         fed = helicsCreateValueFederateFromConfig(configString.c_str(), hThrowOnError());
         if (fed == NULL) {
-            throw(HelicsException(helics_error_registration_failure, "Fed==NULL"));
+            throw(HelicsException(HELICS_ERROR_REGISTRATION_FAILURE, "Fed==NULL"));
         }
     }
     /** copy constructor*/
@@ -72,7 +72,7 @@ class ValueFederate: public virtual Federate {
         ipts = fedObj.ipts;
         pubs = fedObj.pubs;
         if (fed == NULL) {
-            throw(HelicsException(helics_error_registration_failure, "Fed==NULL move constructor"));
+            throw(HelicsException(HELICS_ERROR_REGISTRATION_FAILURE, "Fed==NULL move constructor"));
         }
         return *this;
     }
@@ -110,7 +110,7 @@ class ValueFederate: public virtual Federate {
                                     const std::string& type,
                                     const std::string& units = "")
     {
-        helics_publication pub = helicsFederateRegisterTypePublication(
+        HelicsPublication pub = helicsFederateRegisterTypePublication(
             fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
@@ -124,10 +124,10 @@ class ValueFederate: public virtual Federate {
     @return an identifier for use with this publication
     */
     Publication registerPublication(const std::string& name,
-                                    helics_data_type type,
+                                    HelicsDataTypes type,
                                     const std::string& units = "")
     {
-        helics_publication pub = helicsFederateRegisterPublication(
+        HelicsPublication pub = helicsFederateRegisterPublication(
             fed, name.c_str(), type, units.c_str(), hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
@@ -144,7 +144,7 @@ class ValueFederate: public virtual Federate {
                                           const std::string& type,
                                           const std::string& units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalTypePublication(
+        HelicsPublication pub = helicsFederateRegisterGlobalTypePublication(
             fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
@@ -158,10 +158,10 @@ class ValueFederate: public virtual Federate {
     @return a publication object for use as an identifier
     */
     Publication registerGlobalPublication(const std::string& key,
-                                          helics_data_type type,
+                                          HelicsDataTypes type,
                                           const std::string& units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalPublication(
+        HelicsPublication pub = helicsFederateRegisterGlobalPublication(
             fed, key.c_str(), type, units.c_str(), hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
@@ -178,7 +178,7 @@ class ValueFederate: public virtual Federate {
     */
     Publication registerIndexedPublication(const std::string& key,
                                            int index1,
-                                           helics_data_type type,
+                                           HelicsDataTypes type,
                                            const std::string& units = "")
     {
         std::string indexed_name = key + '_' + toStr(index1);
@@ -198,7 +198,7 @@ class ValueFederate: public virtual Federate {
     Publication registerIndexedPublication(const std::string& key,
                                            int index1,
                                            int index2,
-                                           helics_data_type type,
+                                           HelicsDataTypes type,
                                            const std::string& units = std::string())
     {
         std::string indexed_name = key + '_' + toStr(index1) + '_' + toStr(index2);
@@ -216,7 +216,7 @@ class ValueFederate: public virtual Federate {
     */
     Publication registerPublicationIndexed(const std::string& key,
                                            int index1,
-                                           helics_data_type type,
+                                           HelicsDataTypes type,
                                            const std::string& units = "")
     {
         return registerIndexedPublication(key, index1, type, units);
@@ -235,7 +235,7 @@ class ValueFederate: public virtual Federate {
     Publication registerPublicationIndexed(const std::string& key,
                                            int index1,
                                            int index2,
-                                           helics_data_type type,
+                                           HelicsDataTypes type,
                                            const std::string& units = std::string())
     {
         return registerIndexedPublication(key, index1, index2, type, units);
@@ -264,7 +264,7 @@ class ValueFederate: public virtual Federate {
     /** Methods to register subscriptions **/
     Input registerSubscription(const std::string& name, const std::string& units = std::string())
     {
-        helics_input sub =
+        HelicsInput sub =
             helicsFederateRegisterSubscription(fed, name.c_str(), units.c_str(), hThrowOnError());
         ipts.push_back(sub);
         return Input(sub);
@@ -339,7 +339,7 @@ class ValueFederate: public virtual Federate {
                         const std::string& type,
                         const std::string& units = "")
     {
-        helics_input ipt = helicsFederateRegisterTypeInput(
+        HelicsInput ipt = helicsFederateRegisterTypeInput(
             fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
         ipts.push_back(ipt);
         return Input(ipt);
@@ -353,9 +353,9 @@ class ValueFederate: public virtual Federate {
     @return an identifier for use with this input
     */
     Input
-        registerInput(const std::string& name, helics_data_type type, const std::string& units = "")
+        registerInput(const std::string& name, HelicsDataTypes type, const std::string& units = "")
     {
-        helics_input ipt = helicsFederateRegisterPublication(
+        HelicsInput ipt = helicsFederateRegisterPublication(
             fed, name.c_str(), type, units.c_str(), hThrowOnError());
         pubs.push_back(ipt);
         return Input(ipt);
@@ -372,7 +372,7 @@ class ValueFederate: public virtual Federate {
                               const std::string& type,
                               const std::string& units = "")
     {
-        helics_input ipt = helicsFederateRegisterGlobalTypeInput(
+        HelicsInput ipt = helicsFederateRegisterGlobalTypeInput(
             fed, name.c_str(), type.c_str(), units.c_str(), hThrowOnError());
         ipts.push_back(ipt);
         return Input(ipt);
@@ -386,10 +386,10 @@ class ValueFederate: public virtual Federate {
     @return an input object for use as an identifier
     */
     Input registerGlobalInput(const std::string& key,
-                              helics_data_type type,
+                              HelicsDataTypes type,
                               const std::string& units = "")
     {
-        helics_input inp = helicsFederateRegisterGlobalInput(
+        HelicsInput inp = helicsFederateRegisterGlobalInput(
             fed, key.c_str(), type, units.c_str(), hThrowOnError());
         ipts.push_back(inp);
         return Input(inp);
@@ -406,7 +406,7 @@ class ValueFederate: public virtual Federate {
     */
     Input registerIndexedInput(const std::string& key,
                                int index1,
-                               helics_data_type type,
+                               HelicsDataTypes type,
                                const std::string& units = "")
     {
         std::string indexed_name = key + '_' + toStr(index1);
@@ -426,7 +426,7 @@ class ValueFederate: public virtual Federate {
     Input registerIndexedInput(const std::string& key,
                                int index1,
                                int index2,
-                               helics_data_type type,
+                               HelicsDataTypes type,
                                const std::string& units = std::string())
     {
         std::string indexed_name = key + '_' + toStr(index1) + '_' + toStr(index2);
@@ -449,7 +449,7 @@ class ValueFederate: public virtual Federate {
     int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
     // TODO(PT): use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
-    std::vector<helics_input> queryUpdates() { return std::vector<helics_input>(); }
+    std::vector<HelicsInput> queryUpdates() { return std::vector<HelicsInput>(); }
 
     /** clear all the update flags from all federate inputs*/
     void clearUpdates() { helicsFederateClearUpdates(fed); }

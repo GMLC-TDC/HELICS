@@ -29,7 +29,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
     double delta{-1.0};  //!< the minimum change to publish
   protected:
-    data_type pubType{data_type::helics_any};  //!< the type of publication
+    DataType pubType{DataType::HELICS_ANY};  //!< the type of publication
     bool changeDetectionEnabled{false};  //!< the change detection is enabled
     bool disableAssign{false};  //!< disable assignment for the object
   private:
@@ -121,7 +121,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
   */
     Publication(ValueFederate* valueFed,
                 const std::string& key,
-                data_type type,
+                DataType type,
                 const std::string& units = std::string()):
         Publication(valueFed, key, typeNameStringRef(type), units)
     {
@@ -135,7 +135,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     template<class FedPtr>
     Publication(FedPtr& valueFed,
                 const std::string& key,
-                data_type type,
+                DataType type,
                 const std::string& units = std::string()):
         Publication(valueFed, key, typeNameStringRef(type), units)
     {
@@ -150,7 +150,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     Publication(interface_visibility locality,
                 ValueFederate* valueFed,
                 const std::string& key,
-                data_type type,
+                DataType type,
                 const std::string& units = std::string()):
         Publication(locality, valueFed, key, typeNameStringRef(type), units)
     {
@@ -167,7 +167,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     Publication(interface_visibility locality,
                 FedPtr& valueFed,
                 const std::string& key,
-                data_type type,
+                DataType type,
                 const std::string& units = std::string()):
         Publication(locality, valueFed, key, typeNameStringRef(type), units)
     {

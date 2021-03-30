@@ -38,14 +38,14 @@ int main(int argc, char* argv[])  // NOLINT
         cmdLine
             .add_subcommand(
                 "term",
-                "helics_broker term <broker args...> will start a broker and open a terminal control window "
+                "helics-broker term <broker args...> will start a broker and open a terminal control window "
                 "for the broker run help in a terminal for more commands\n")
             ->prefix_command();
     term->callback([&runterminal]() { runterminal = true; });
     cmdLine.add_flag(
         "--autorestart",
         autorestart,
-        "helics_broker --autorestart <broker args ...> will start a continually regenerating broker "
+        "helics-broker --autorestart <broker args ...> will start a continually regenerating broker "
         "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
     cmdLine.add_flag("--http",
                      http_webserver,
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])  // NOLINT
                      "start an websocket webserver that can respond to queries on the broker");
     cmdLine
         .footer(
-            "helics_broker <broker args ..> starts a broker with the given args and waits for it to "
+            "helics-broker <broker args ..> starts a broker with the given args and waits for it to "
             "complete\n")
         ->footer([]() {
             helics::BrokerApp app{"-?"};

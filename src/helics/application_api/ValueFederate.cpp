@@ -371,7 +371,7 @@ data_view ValueFederate::getBytes(const Input& inp)
 
 void ValueFederate::publishBytes(const Publication& pub, data_view block)  // NOLINT
 {
-    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
+    if ((currentMode == Modes::EXECUTING) || (currentMode == Modes::INITIALIZING)) {
         vfManager->publish(pub, block);
     } else {
         throw(InvalidFunctionCall(

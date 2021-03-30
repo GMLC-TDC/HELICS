@@ -102,11 +102,11 @@ std::shared_ptr<helicsCLI11App>
             "--client{0},--server{1}",
             [this](int64_t val) {
                 switch (server_mode) {
-                    case server_mode_options::unspecified:
-                    case server_mode_options::server_default_active:
-                    case server_mode_options::server_default_deactivated:
-                        server_mode = (val > 0) ? server_mode_options::server_active :
-                                                  server_mode_options::server_deactivated;
+                    case ServerModeOptions::UNSPECIFIED:
+                    case ServerModeOptions::SERVER_DEFAULT_ACTIVE:
+                    case ServerModeOptions::SERVER_DEFAULT_DEACTIVATED:
+                        server_mode = (val > 0) ? ServerModeOptions::SERVER_ACTIVE :
+                                                  ServerModeOptions::SERVER_DEACTIVATED;
                         break;
                     default:
                         break;
@@ -156,19 +156,19 @@ std::shared_ptr<helicsCLI11App>
 void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddress)
 {
     switch (allowedType) {
-        case interface_type::tcp:
+        case InterfaceTypes::TCP:
             if ((brokerAddress == "tcp://*") || (brokerAddress == "*") ||
                 (brokerAddress == "tcp")) {  // the broker address can't use a wild card
                 brokerAddress = localAddress;
             }
             break;
-        case interface_type::udp:
+        case InterfaceTypes::UDP:
             if ((brokerAddress == "udp://*") || (brokerAddress == "*") ||
                 (brokerAddress == "udp")) {  // the broker address can't use a wild card
                 brokerAddress = localAddress;
             }
             break;
-        case interface_type::ip:
+        case InterfaceTypes::IP:
             if ((brokerAddress == "udp://*") ||
                 (brokerAddress == "udp")) {  // the broker address can't use a wild card
                 if (localAddress.compare(3, 3, "://") == 0) {
@@ -187,8 +187,8 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
                 brokerAddress = localAddress;
             }
             break;
-        case interface_type::ipc:
-        case interface_type::inproc:
+        case InterfaceTypes::IPC:
+        case InterfaceTypes::INPROC:
             if ((brokerAddress.empty()) && (!localAddress.empty())) {
                 brokerAddress = localAddress;
             }
@@ -252,39 +252,39 @@ void removeProtocol(std::string& networkAddress)
     }
 }
 
-std::string addProtocol(const std::string& networkAddress, interface_type interfaceT)
+std::string addProtocol(const std::string& networkAddress, InterfaceTypes interfaceT)
 {
     if (networkAddress.find("://") == std::string::npos) {
         switch (interfaceT) {
-            case interface_type::ip:
-            case interface_type::tcp:
+            case InterfaceTypes::IP:
+            case InterfaceTypes::TCP:
                 return std::string("tcp://") + networkAddress;
-            case interface_type::ipc:
+            case InterfaceTypes::IPC:
                 return std::string("ipc://") + networkAddress;
-            case interface_type::udp:
+            case InterfaceTypes::UDP:
                 return std::string("udp://") + networkAddress;
-            case interface_type::inproc:
+            case InterfaceTypes::INPROC:
                 return std::string("inproc://") + networkAddress;
         }
     }
     return networkAddress;
 }
 
-void insertProtocol(std::string& networkAddress, interface_type interfaceT)
+void insertProtocol(std::string& networkAddress, InterfaceTypes interfaceT)
 {
     if (networkAddress.find("://") == std::string::npos) {
         switch (interfaceT) {
-            case interface_type::ip:
-            case interface_type::tcp:
+            case InterfaceTypes::IP:
+            case InterfaceTypes::TCP:
                 networkAddress.insert(0, "tcp://");
                 break;
-            case interface_type::ipc:
+            case InterfaceTypes::IPC:
                 networkAddress.insert(0, "ipc://");
                 break;
-            case interface_type::udp:
+            case InterfaceTypes::UDP:
                 networkAddress.insert(0, "udp://");
                 break;
-            case interface_type::inproc:
+            case InterfaceTypes::INPROC:
                 networkAddress.insert(0, "inproc://");
                 break;
         }
@@ -561,32 +561,32 @@ std::string getLocalExternalAddress(const std::string& server)
     return getLocalExternalAddressV4(server);
 }
 
-std::string generateMatchingInterfaceAddress(const std::string& server, interface_networks network)
+std::string generateMatchingInterfaceAddress(const std::string& server, InterfaceNetworks network)
 {
     std::string newInterface;
     switch (network) {
-        case interface_networks::local:
+        case InterfaceNetworks::LOCAL:
             if (server.empty()) {
                 newInterface = "tcp://127.0.0.1";
             } else {
                 newInterface = getLocalExternalAddress(server);
             }
             break;
-        case interface_networks::ipv4:
+        case InterfaceNetworks::IPV4:
             if (server.empty()) {
                 newInterface = "tcp://*";
             } else {
                 newInterface = getLocalExternalAddressV4(server);
             }
             break;
-        case interface_networks::ipv6:
+        case InterfaceNetworks::IPV6:
             if (server.empty()) {
                 newInterface = "tcp://*";
             } else {
                 newInterface = getLocalExternalAddressV6(server);
             }
             break;
-        case interface_networks::all:
+        case InterfaceNetworks::ALL:
             if (server.empty()) {
                 newInterface = "tcp://*";
             } else {

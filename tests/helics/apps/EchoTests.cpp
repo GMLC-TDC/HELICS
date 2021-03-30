@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 // this test will test basic echo functionality
 TEST(echo_tests, echo_test1)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
 
     fi.coreName = "ecore1";
     fi.coreInitString = "-f 2 --autobroker";
@@ -42,7 +42,7 @@ TEST(echo_tests, echo_test1)
 
 TEST(echo_tests, echo_test_delay)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
 
     fi.coreName = "ecore2";
     fi.coreInitString = "-f 2 --autobroker";
@@ -70,13 +70,13 @@ TEST(echo_tests, echo_test_delay)
 
 TEST(echo_tests, echo_test_delay_period)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
 
     fi.coreName = "ecore3";
     fi.coreInitString = "-f 2 --autobroker";
-    fi.setProperty(helics_property_time_period, 1.1);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.1);
     helics::apps::Echo echo1("echo1", fi);
-    fi.setProperty(helics_property_time_period, 0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 0);
 
     echo1.addEndpoint("test");
     echo1.setEchoDelay(1.2);
@@ -100,7 +100,7 @@ TEST(echo_tests, echo_test_delay_period)
 
 TEST(echo_tests, echo_test_multiendpoint)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
 
     fi.coreName = "ecore4";
     fi.coreInitString = "-f 2 --autobroker";
@@ -137,7 +137,7 @@ TEST(echo_tests, echo_test_multiendpoint)
 
 TEST(echo_tests, echo_test_fileload)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ecore4-file";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Echo echo1("echo1", fi);

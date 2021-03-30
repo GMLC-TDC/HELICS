@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 
-using helics::core_type;
+using helics::CoreType;
 
 static void BMfilter_singleCore(benchmark::State& state)
 {
@@ -31,7 +31,7 @@ static void BMfilter_singleCore(benchmark::State& state)
 
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
-        auto wcore = helics::CoreFactory::create(core_type::INPROC,
+        auto wcore = helics::CoreFactory::create(CoreType::INPROC,
                                                  std::string("--autobroker --federates=") +
                                                      std::to_string(feds + 1));
         EchoMessageHub hub;
@@ -41,7 +41,7 @@ static void BMfilter_singleCore(benchmark::State& state)
             std::string bmInit = "--index=" + std::to_string(ii);
             leafs[ii].initialize(wcore->getIdentifier(), bmInit);
         }
-        auto filt1 = make_filter(helics::filter_types::delay, wcore.get());
+        auto filt1 = make_filter(helics::FilterTypes::DELAY, wcore.get());
         // either add a source filter on Echo or a destination Filter on Echo
         // this filter does nothing other than make the message route through a filter
         if (state.range(1) == 1) {
@@ -77,7 +77,7 @@ BENCHMARK(BMfilter_singleCore)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BMfilter_multiCore(benchmark::State& state, core_type cType)
+static void BMfilter_multiCore(benchmark::State& state, CoreType cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -89,7 +89,7 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
             helics::BrokerFactory::create(cType,
                                           "brokerb",
                                           std::string("--federates=") + std::to_string(feds + 1));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel(HELICS_LOG_LEVEL_NO_PRINT);
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
 
@@ -107,7 +107,7 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
             leafs[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         filtcore->connect();
-        auto filt1 = make_filter(helics::filter_types::delay, filtcore.get());
+        auto filt1 = make_filter(helics::FilterTypes::DELAY, filtcore.get());
         // either add a source filter on Echo or a destination Filter on Echo
         // this filter does nothing other than make the message route through a filter
         if (state.range(1) == 1) {
@@ -142,14 +142,14 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
 
 static constexpr int64_t maxscale{1 << (5 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 // Register the inproc core benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMfilter_multiCore, inprocCore, CoreType::INPROC)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale * 2}, {1, 2}})
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMfilter_multiCore, zmqCore, CoreType::ZMQ)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -157,7 +157,7 @@ BENCHMARK_CAPTURE(BMfilter_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMfilter_multiCore, zmqssCore, CoreType::ZMQ_SS)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -168,7 +168,7 @@ BENCHMARK_CAPTURE(BMfilter_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMfilter_multiCore, ipcCore, CoreType::IPC)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -179,7 +179,7 @@ BENCHMARK_CAPTURE(BMfilter_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMfilter_multiCore, tcpCore, CoreType::TCP)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -187,7 +187,7 @@ BENCHMARK_CAPTURE(BMfilter_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMfilter_multiCore, tcpssCore, CoreType::TCP_SS)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -198,7 +198,7 @@ BENCHMARK_CAPTURE(BMfilter_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BMfilter_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMfilter_multiCore, udpCore, CoreType::UDP)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)

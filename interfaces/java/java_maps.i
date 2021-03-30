@@ -69,14 +69,14 @@
 
 %typemap(javain) (int argc, char **argv) "$javainput"
 
-%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+%typemap(in, numinputs=0) HelicsError * (HelicsError etemp) {
     etemp=helicsErrorInitialize();
     $1=&etemp;
 }
 
-%typemap(freearg) helics_error *
+%typemap(freearg) HelicsError *
 {
-    if ($1->error_code!=helics_ok)
+    if ($1->errorCode!=HELICS_OK)
     {
         jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
         (*jenv)->ThrowNew(jenv, clazz, $1->message);

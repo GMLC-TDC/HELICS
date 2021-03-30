@@ -40,7 +40,7 @@ namespace apps {
         helicsCLI11App app("Options specific to the Source App");
         app.add_option("--default_period", defaultPeriod, "the default period publications");
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_source_only);
+            fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
             app.parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -52,7 +52,7 @@ namespace apps {
     }
     Source::Source(const std::string& appName, const FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Source::Source(const std::string& appName,
@@ -60,19 +60,19 @@ namespace apps {
                    const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Source::Source(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
     Source::Source(const std::string& name, const std::string& configString):
         App(name, configString)
     {
-        fed->setFlagOption(helics_flag_source_only);
+        fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
 
         Source::loadJsonFile(configString);
     }
@@ -180,7 +180,7 @@ namespace apps {
     void Source::initialize()
     {
         auto md = fed->getCurrentMode();
-        if (md != Federate::modes::startup) {
+        if (md != Federate::Modes::STARTUP) {
             return;
         }
 
@@ -219,12 +219,12 @@ namespace apps {
     void Source::runTo(Time stopTime_input)
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             initialize();
         }
         Time nextRequestTime = Time::maxVal();
         Time currentTime;
-        if (md != Federate::modes::executing) {
+        if (md != Federate::Modes::EXECUTING) {
             // send stuff before timeZero
 
             runSourceLoop(timeZero - timeEpsilon);
@@ -255,7 +255,7 @@ namespace apps {
 
     void Source::addPublication(const std::string& key,
                                 const std::string& generator,
-                                data_type type,
+                                DataType type,
                                 Time period,
                                 const std::string& units)
     {

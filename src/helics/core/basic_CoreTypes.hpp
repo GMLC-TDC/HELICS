@@ -6,6 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "CoreTypes.hpp"
 #include "core-data.hpp"
-#include "core-types.hpp"
 #include "global_federate_id.hpp"

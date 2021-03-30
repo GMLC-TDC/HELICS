@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../core/CoreFederateInfo.hpp"
-#include "../core/core-types.hpp"
+#include "../core/CoreTypes.hpp"
 #include "helics_cxx_export.h"
 
 #include <memory>
@@ -25,7 +25,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
         false};  //!< specify that the core should generate a broker if not found otherwise
     bool debugging{false};  //!< specify that the core/federate should operate in a user debugging
                             //!< mode which will turn off some timeouts
-    core_type coreType{core_type::DEFAULT};  //!< the type of the core
+    CoreType coreType{CoreType::DEFAULT};  //!< the type of the core
     int brokerPort{-1};  //!< broker port information
 
     std::string defName;  //!< a default name to use for a federate
@@ -41,7 +41,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     FederateInfo() = default;
     /** construct from a type
     @param cType the type of core to use for the federate*/
-    explicit FederateInfo(core_type cType): coreType(cType) {}
+    explicit FederateInfo(CoreType cType): coreType(cType) {}
     /** load a federateInfo object from command line arguments in a string
     @details calls /ref loadInfoFromArgs in the constructor
     @param args a string containing the command line arguments

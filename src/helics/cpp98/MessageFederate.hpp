@@ -51,7 +51,7 @@ class MessageFederate: public virtual Federate {
     */
     Endpoint registerEndpoint(const std::string& name, const std::string& type = std::string())
     {
-        helics_endpoint ep =
+        HelicsEndpoint ep =
             helicsFederateRegisterEndpoint(fed, name.c_str(), type.c_str(), hThrowOnError());
         local_endpoints.push_back(ep);
         return Endpoint(ep);
@@ -65,7 +65,7 @@ class MessageFederate: public virtual Federate {
     Endpoint registerGlobalEndpoint(const std::string& name,
                                     const std::string& type = std::string())
     {
-        helics_endpoint ep =
+        HelicsEndpoint ep =
             helicsFederateRegisterGlobalEndpoint(fed, name.c_str(), type.c_str(), hThrowOnError());
         local_endpoints.push_back(ep);
         return Endpoint(ep);
@@ -105,7 +105,7 @@ class MessageFederate: public virtual Federate {
     int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 
   private:
-    std::vector<helics_endpoint> local_endpoints;
+    std::vector<HelicsEndpoint> local_endpoints;
 };
 // this code needs the definition of federate before it can de defined
 inline Message::Message(const Federate& fed):
@@ -115,7 +115,7 @@ inline Message::Message(const Federate& fed):
 
 inline Message& Message::newMessageObject(const Federate& fed)
 {
-    helics_message newmo = helicsFederateCreateMessage(fed.getObject(), hThrowOnError());
+    HelicsMessage newmo = helicsFederateCreateMessage(fed.getObject(), hThrowOnError());
     if (mo != HELICS_NULL_POINTER) {
         helicsMessageFree(mo);
     }

@@ -121,37 +121,37 @@ bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t
     }
     bool bvalue = (value != 0);
     switch (option) {
-        case defs::options::ignore_interrupts:
+        case defs::Options::IGNORE_INTERRUPTS:
             ipt->not_interruptible = bvalue;
             break;
-        case defs::options::handle_only_update_on_change:
+        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
             ipt->only_update_on_change = bvalue;
             break;
-        case defs::options::connection_required:
+        case defs::Options::CONNECTION_REQUIRED:
             ipt->required = bvalue;
             break;
-        case defs::options::connection_optional:
+        case defs::Options::CONNECTION_OPTIONAL:
             ipt->required = !bvalue;
             break;
-        case defs::options::single_connection_only:
+        case defs::Options::SINGLE_CONNECTION_ONLY:
             ipt->required_connnections = bvalue ? 1 : 0;
             break;
-        case defs::options::multiple_connections_allowed:
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             ipt->required_connnections = bvalue ? 0 : 1;
             break;
-        case defs::options::strict_type_checking:
+        case defs::Options::STRICT_TYPE_CHECKING:
             ipt->strict_type_matching = bvalue;
             break;
-        case defs::options::ignore_unit_mismatch:
+        case defs::Options::IGNORE_UNIT_MISMATCH:
             ipt->ignore_unit_mismatch = bvalue;
             break;
-        case defs::options::connections:
+        case defs::Options::CONNECTIONS:
             ipt->required_connnections = value;
             break;
-        case defs::options::input_priority_location:
+        case defs::Options::INPUT_PRIORITY_LOCATION:
             ipt->priority_sources.push_back(value);
             break;
-        case defs::options::clear_priority_list:
+        case defs::Options::CLEAR_PRIORITY_LIST:
             ipt->priority_sources.clear();
             break;
         default:
@@ -169,25 +169,25 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
     }
     bool bvalue = (value != 0);
     switch (option) {
-        case defs::options::handle_only_transmit_on_change:
+        case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
             pub->only_update_on_change = bvalue;
             break;
-        case defs::options::connection_required:
+        case defs::Options::CONNECTION_REQUIRED:
             pub->required = bvalue;
             break;
-        case defs::options::connection_optional:
+        case defs::Options::CONNECTION_OPTIONAL:
             pub->required = !bvalue;
             break;
-        case defs::options::single_connection_only:
+        case defs::Options::SINGLE_CONNECTION_ONLY:
             pub->required_connections = bvalue ? 1 : 0;
             break;
-        case defs::options::multiple_connections_allowed:
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             pub->required_connections = !bvalue ? 0 : 1;
             break;
-        case defs::options::buffer_data:
+        case defs::Options::BUFFER_DATA:
             pub->buffer_data = bvalue;
             break;
-        case defs::options::connections:
+        case defs::Options::CONNECTIONS:
             pub->required_connections = value;
             break;
         default:
@@ -216,32 +216,32 @@ int32_t InterfaceInfo::getInputProperty(InterfaceHandle id, int32_t option) cons
     }
     bool flagval = false;
     switch (option) {
-        case defs::options::ignore_interrupts:
+        case defs::Options::IGNORE_INTERRUPTS:
             flagval = ipt->not_interruptible;
             break;
-        case defs::options::handle_only_update_on_change:
+        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
             flagval = ipt->only_update_on_change;
             break;
-        case defs::options::connection_required:
+        case defs::Options::CONNECTION_REQUIRED:
             flagval = ipt->required;
             break;
-        case defs::options::connection_optional:
+        case defs::Options::CONNECTION_OPTIONAL:
             flagval = !ipt->required;
             break;
-        case defs::options::single_connection_only:
+        case defs::Options::SINGLE_CONNECTION_ONLY:
             flagval = (ipt->required_connnections == 1);
             break;
-        case defs::options::multiple_connections_allowed:
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             flagval = (ipt->required_connnections != 1);
             break;
-        case defs::options::strict_type_checking:
+        case defs::Options::STRICT_TYPE_CHECKING:
             flagval = ipt->strict_type_matching;
             break;
-        case defs::options::connections:
+        case defs::Options::CONNECTIONS:
             return static_cast<int32_t>(ipt->input_sources.size());
-        case defs::options::input_priority_location:
+        case defs::Options::INPUT_PRIORITY_LOCATION:
             return ipt->priority_sources.empty() ? -1 : ipt->priority_sources.back();
-        case defs::options::clear_priority_list:
+        case defs::Options::CLEAR_PRIORITY_LIST:
             flagval = ipt->priority_sources.empty();
             break;
         default:
@@ -258,25 +258,25 @@ int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option
     }
     bool flagval = false;
     switch (option) {
-        case defs::options::handle_only_transmit_on_change:
+        case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
             flagval = pub->only_update_on_change;
             break;
-        case defs::options::connection_required:
+        case defs::Options::CONNECTION_REQUIRED:
             flagval = pub->required;
             break;
-        case defs::options::connection_optional:
+        case defs::Options::CONNECTION_OPTIONAL:
             flagval = !pub->required;
             break;
-        case defs::options::single_connection_only:
+        case defs::Options::SINGLE_CONNECTION_ONLY:
             flagval = (pub->required_connections == 1);
             break;
-        case defs::options::multiple_connections_allowed:
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             flagval = pub->required_connections != 1;
             break;
-        case defs::options::buffer_data:
+        case defs::Options::BUFFER_DATA:
             flagval = pub->buffer_data;
             break;
-        case defs::options::connections:
+        case defs::Options::CONNECTIONS:
             return static_cast<int32_t>(pub->subscribers.size());
         default:
             break;
@@ -299,7 +299,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     for (const auto& ipt : ihandle) {
         if (ipt->required) {
             if (!ipt->has_target) {
-                issues.emplace_back(helics::defs::errors::connection_failure,
+                issues.emplace_back(helics::defs::Errors::CONNECTION_FAILURE,
                                     fmt::format("Input {} is required but has no connection",
                                                 ipt->key));
             }
@@ -308,13 +308,13 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             if (ipt->input_sources.size() != static_cast<size_t>(ipt->required_connnections)) {
                 if (ipt->required_connnections == 1) {
                     issues.emplace_back(
-                        helics::defs::errors::connection_failure,
+                        helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format(
                             "Input {} is single source only but has more than one connection",
                             ipt->key));
                 } else {
                     issues.emplace_back(
-                        helics::defs::errors::connection_failure,
+                        helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format("Input {} requires {} connections but{} {} were made",
                                     ipt->key,
                                     ipt->required_connnections,
@@ -329,7 +329,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
         for (auto& source : ipt->source_info) {
             if (!checkTypeMatch(ipt->type, source.type, ipt->strict_type_matching)) {
                 issues.emplace_back(
-                    helics::defs::errors::connection_failure,
+                    helics::defs::Errors::CONNECTION_FAILURE,
                     fmt::format(
                         "Input \"{}\" source has mismatched types: {} is not compatible with {}",
                         ipt->key,
@@ -339,7 +339,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             if ((!ipt->ignore_unit_mismatch) &&
                 (!checkUnitMatch(ipt->units, source.units, false))) {
                 issues.emplace_back(
-                    helics::defs::errors::connection_failure,
+                    helics::defs::Errors::CONNECTION_FAILURE,
                     fmt::format(
                         "Input \"{}\" source has incompatible unit: {} is not convertible to {}",
                         ipt->key,
@@ -353,7 +353,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     for (const auto& pub : phandle) {
         if (pub->required) {
             if (pub->subscribers.empty()) {
-                issues.emplace_back(helics::defs::errors::connection_failure,
+                issues.emplace_back(helics::defs::Errors::CONNECTION_FAILURE,
                                     fmt::format("Publication {} is required but has no subscribers",
                                                 pub->key));
             }
@@ -362,13 +362,13 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             if (pub->subscribers.size() != static_cast<size_t>(pub->required_connections)) {
                 if (pub->required_connections == 1) {
                     issues.emplace_back(
-                        helics::defs::errors::connection_failure,
+                        helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format(
                             "Publication {} is single source only but has more than one connection",
                             pub->key));
                 } else {
                     issues.emplace_back(
-                        helics::defs::errors::connection_failure,
+                        helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format("Publication {} requires {} connections but only {} are made",
                                     pub->key,
                                     pub->required_connections,

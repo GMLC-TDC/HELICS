@@ -18,12 +18,12 @@ namespace helics {
 namespace zeromq {
     ZmqCore::ZmqCore() noexcept
     {
-        netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+        netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
     }
 
     ZmqCore::ZmqCore(const std::string& coreName): NetworkCore(coreName)
     {
-        netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+        netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
     }
 
     bool ZmqCore::brokerConnect()
@@ -34,13 +34,13 @@ namespace zeromq {
 
     ZmqCoreSS::ZmqCoreSS() noexcept
     {
-        netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+        netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
         netInfo.appendNameToAddress = true;
     }
 
     ZmqCoreSS::ZmqCoreSS(const std::string& coreName): NetworkCore(coreName)
     {
-        netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+        netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
         netInfo.appendNameToAddress = true;
     }
 

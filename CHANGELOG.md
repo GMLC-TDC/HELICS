@@ -18,6 +18,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - Minimum build requirements to C++17
 - Many of the API functions now use `string_view` instead of `const std::string &`
 - The C shared library now comes with only a single header `helics.h` this should be included for all uses of the C shared library
+- The style of enumerations and structures was changed to match an updated [style guide](./docs/developer-guide/style.md)
 
 ### Fixed
 
@@ -126,7 +127,7 @@ Bug fix release for some build issues and a fix to the `wait_for_current_time` f
 - Update units library to include some typical natural gas units and conversions
 - Use a separate action for automated pr generation
 - Update the CLI11 library
-- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `helics_bool` was already an int.
+- The setOption/getOption functions now take an int32_t as a value instead of a boolean. This does not change the API since in the C library the `HelicsBool` was already an int.
 - In the case of multiple sources, `getInjectionType`, and `getInjectionUnits` now will return a json string vector.
 - The CMake build generation now uses a central location for all build artifacts instead of individual directories.
 - Updated the ASIO library to 1-16
@@ -178,7 +179,7 @@ Some library reorganization, additional static analysis(CppLint and clang-tidy),
 - Update FMT library to version 6.2.0
 - The core and broker Factories use a map instead of a fixed list which is a step toward allowing user defined cores
 - Updated CLI11 included code to customized version to allow configuration of cores and brokers through Json files
-- The ordering of the helics_error_types enum is in ascending order
+- The ordering of the `HelicsErrorTypes` enum is in ascending order
 - Refactored the Matlab and Java swig interface builds to enable standalone builds
 
 ### Fixed

@@ -35,7 +35,7 @@ class NetworkCommsInterface: public CommsInterface {
 
   public:
     /** default constructor*/
-    explicit NetworkCommsInterface(interface_type type,
+    explicit NetworkCommsInterface(InterfaceTypes type,
                                    CommsInterface::thread_generation threads =
                                        CommsInterface::thread_generation::dual) noexcept;
 
@@ -59,8 +59,8 @@ class NetworkCommsInterface: public CommsInterface {
     bool useOsPortAllocation{false};  //!< use the operating system to allocate a port number
     bool appendNameToAddress{false};  //!< flag to append the name to the network address
     bool noAckConnection{false};  //!< flag to bypass the connection acknowledge requirement
-    const interface_type networkType;
-    interface_networks network{interface_networks::ipv4};
+    const InterfaceTypes networkType;
+    InterfaceNetworks network{InterfaceNetworks::IPV4};
     std::atomic<bool> hasBroker{false};
     int maxRetries{5};  // the maximum number of network retries
 

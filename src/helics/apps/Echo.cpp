@@ -76,12 +76,12 @@ namespace apps {
     void Echo::runTo(Time stopTime_input)
     {
         auto md = fed->getCurrentMode();
-        if (md == Federate::modes::startup) {
+        if (md == Federate::Modes::STARTUP) {
             initialize();
         }
-        if (md < Federate::modes::executing) {
+        if (md < Federate::Modes::EXECUTING) {
             fed->enterExecutingMode();
-        } else if (md == Federate::modes::finalize) {
+        } else if (md == Federate::Modes::FINALIZE) {
             return;
         }
         auto ctime = fed->getCurrentTime();

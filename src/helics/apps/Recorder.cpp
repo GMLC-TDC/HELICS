@@ -43,7 +43,7 @@ namespace helics {
 namespace apps {
     Recorder::Recorder(const std::string& appName, FederateInfo& fi): App(appName, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
     Recorder::Recorder(std::vector<std::string> args): App("recorder", std::move(args))
@@ -57,7 +57,7 @@ namespace apps {
     {
         auto app = buildArgParserApp();
         if (!deactivated) {
-            fed->setFlagOption(helics_flag_observer);
+            fed->setFlagOption(HELICS_FLAG_OBSERVER);
             app->parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -73,19 +73,19 @@ namespace apps {
                        const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
     Recorder::Recorder(const std::string& appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
     Recorder::Recorder(const std::string& appName, const std::string& jsonString):
         App(appName, jsonString)
     {
-        fed->setFlagOption(helics_flag_observer);
+        fed->setFlagOption(HELICS_FLAG_OBSERVER);
         Recorder::loadJsonFile(jsonString);
     }
 
@@ -462,8 +462,8 @@ namespace apps {
                 helics::Time T;
                 if (allow_iteration) {
                     auto ItRes =
-                        fed->requestTimeIterative(runToTime, iteration_request::iterate_if_needed);
-                    if (ItRes.state == iteration_result::next_step) {
+                        fed->requestTimeIterative(runToTime, IterationRequest::ITERATE_IF_NEEDED);
+                    if (ItRes.state == IterationResult::NEXT_STEP) {
                         iteration = 0;
                     }
                     T = ItRes.grantedTime;

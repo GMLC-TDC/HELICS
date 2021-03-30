@@ -25,19 +25,19 @@ public class JavaHelicsApiTests {
         JavaHelicsApiTests javaHelicsApiTests = new JavaHelicsApiTests(94);
         try {
             // General HELICS Functions
-            double helicsTimeZero = helics.getHelics_time_zero();
+            double helicsTimeZero = helics.getHELICS_TIME_ZERO();
             if (helicsTimeZero != 0.0) {
                 javaHelicsApiTests.helicsAssert("helicsTimeZero != 0.0.");
             }
-            double helicsTimeEpsilon = helics.getHelics_time_epsilon();
+            double helicsTimeEpsilon = helics.getHELICS_TIME_EPSILON();
             if (helicsTimeEpsilon != 1.0e-9) {
                 javaHelicsApiTests.helicsAssert("helicsTimeEpsilon != 1.0E-9");
             }
-            int helicsTrue = helics.getHelics_true();
+            int helicsTrue = helics.getHELICS_TRUE();
             if (helicsTrue != 1) {
                 javaHelicsApiTests.helicsAssert("helicsTrue != 1");
             }
-            int helicsFalse = helics.getHelics_false();
+            int helicsFalse = helics.getHELICS_FALSE();
             if (helicsFalse != 0) {
                 javaHelicsApiTests.helicsAssert("helicsFalse != 0");
             }
@@ -103,13 +103,13 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("core1IsConnected != 0");
             }
             SWIGTYPE_p_void sourceFilter1 = helics.helicsCoreRegisterFilter(core1,
-                    helics_filter_type.helics_filter_type_delay, "core1SourceFilter");
+                    HelicsFilterTypes.HELICS_FILTER_TYPE_DELAY, "core1SourceFilter");
             if (sourceFilter1 == null) {
                 javaHelicsApiTests.helicsAssert("sourceFilter1 == null");
             }
             helics.helicsFilterAddSourceTarget(sourceFilter1, "ep1");
             SWIGTYPE_p_void destinationFilter1 = helics.helicsCoreRegisterFilter(core1,
-                    helics_filter_type.helics_filter_type_delay, "core1DestinationFilter");
+                    HelicsFilterTypes.HELICS_FILTER_TYPE_DELAY, "core1DestinationFilter");
             if (destinationFilter1 == null) {
                 javaHelicsApiTests.helicsAssert("destinationFilter1 == null");
             }
@@ -135,21 +135,21 @@ public class JavaHelicsApiTests {
             helics.helicsFederateInfoSetCoreName(fedInfo1, "core3");
             helics.helicsFederateInfoSetCoreType(fedInfo1, 3);
             helics.helicsFederateInfoSetCoreTypeFromString(fedInfo1, "zmq");
-            helics.helicsFederateInfoSetFlagOption(fedInfo1, 1, helics.getHelics_true());
+            helics.helicsFederateInfoSetFlagOption(fedInfo1, 1, helics.getHELICS_TRUE());
             helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-                    helics_properties.helics_property_time_input_delay.swigValue(), 1.0);
+                  HelicsProperties.HELICS_PROPERTY_TIME_INPUT_DELAY.swigValue(), 1.0);
             helics.helicsFederateInfoSetIntegerProperty(fedInfo1,
-                    helics_properties.helics_property_int_log_level.swigValue(), 1);
+                    HelicsProperties.HELICS_PROPERTY_INT_LOG_LEVEL.swigValue(), 1);
             helics.helicsFederateInfoSetIntegerProperty(fedInfo1,
-                    helics_properties.helics_property_int_max_iterations.swigValue(), 100);
+                    HelicsProperties.HELICS_PROPERTY_INT_MAX_ITERATIONS.swigValue(), 100);
             helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-                    helics_properties.helics_property_time_output_delay.swigValue(), 1.0);
+                    HelicsProperties.HELICS_PROPERTY_TIME_OUTPUT_DELAY.swigValue(), 1.0);
             helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-                    helics_properties.helics_property_time_period.swigValue(), 1.0);
+                    HelicsProperties.HELICS_PROPERTY_TIME_PERIOD.swigValue(), 1.0);
             helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-                    helics_properties.helics_property_time_delta.swigValue(), 1.0);
+                    HelicsProperties.HELICS_PROPERTY_TIME_DELTA.swigValue(), 1.0);
             helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-                    helics_properties.helics_property_time_offset.swigValue(), 0.1);
+                    HelicsProperties.HELICS_PROPERTY_TIME_OFFSET.swigValue(), 0.1);
             helics.helicsFederateInfoFree(fedInfo1);
             // Federate API Functions
             SWIGTYPE_p_void broker3 = helics.helicsCreateBroker("zmq", "broker3", "--federates 1 --loglevel 1");
@@ -158,9 +158,9 @@ public class JavaHelicsApiTests {
             helics.helicsFederateInfoSetCoreInitString(fedInfo2, coreInitString);
             helics.helicsFederateInfoSetCoreTypeFromString(fedInfo2, "zmq");
             helics.helicsFederateInfoSetIntegerProperty(fedInfo2,
-                    helics_properties.helics_property_int_log_level.swigValue(), 1);
+                    HelicsProperties.HELICS_PROPERTY_INT_LOG_LEVEL.swigValue(), 1);
             helics.helicsFederateInfoSetTimeProperty(fedInfo2,
-                    helics_properties.helics_property_time_delta.swigValue(), 1.0);
+                    HelicsProperties.HELICS_PROPERTY_TIME_DELTA.swigValue(), 1.0);
             SWIGTYPE_p_void fed1 = helics.helicsCreateCombinationFederate("fed1", fedInfo2);
             if (fed1 == null) {
                 javaHelicsApiTests.helicsAssert("fed1 == null");
@@ -174,27 +174,27 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("fed3 == null");
             }
             //set uninterruptible flag
-            helics.helicsFederateSetFlagOption(fed2, 1, helics.getHelics_false());
+            helics.helicsFederateSetFlagOption(fed2, 1, helics.getHELICS_FALSE());
 
          //   helics.helicsFederateSetTimeProperty(fed2,
           //          helics_properties.helics_property_time_input_delay.swigValue(), 1.0);
             helics.helicsFederateSetIntegerProperty(fed1,
-                    helics_properties.helics_property_int_log_level.swigValue(), 1);
+                    HelicsProperties.HELICS_PROPERTY_INT_LOG_LEVEL.swigValue(), 1);
             helics.helicsFederateSetIntegerProperty(fed2,
-                    helics_properties.helics_property_int_max_iterations.swigValue(), 100);
+                    HelicsProperties.HELICS_PROPERTY_INT_MAX_ITERATIONS.swigValue(), 100);
            // helics.helicsFederateSetTimeProperty(fed2,
-            //        helics_properties.helics_property_time_output_delay.swigValue(), 1.0);
-            helics.helicsFederateSetTimeProperty(fed2, helics_properties.helics_property_time_period.swigValue(),
+            //        HelicsProperties..HELICS_PROPERTY_TIME_OUTPUT_DELAY.swigValue(), 1.0);
+            helics.helicsFederateSetTimeProperty(fed2, HelicsProperties.HELICS_PROPERTY_TIME_PERIOD.swigValue(),
                     0.0);
             helics.helicsFederateSetTimeProperty(fed2,
-                    helics_properties.helics_property_time_delta.swigValue(), 1.0);
+                    HelicsProperties.HELICS_PROPERTY_TIME_DELTA.swigValue(), 1.0);
 
             SWIGTYPE_p_void fed1CloningFilter = helics.helicsFederateRegisterCloningFilter(fed1, "fed1/Ep1");
             if (fed1CloningFilter == null) {
                 javaHelicsApiTests.helicsAssert("fed1CloningFilter == null");
             }
             SWIGTYPE_p_void fed1DestinationFilter = helics.helicsFederateRegisterFilter(fed1,
-                    helics_filter_type.helics_filter_type_delay, "fed1DestinationFilter");
+                    HelicsFilterTypes.HELICS_FILTER_TYPE_DELAY, "fed1DestinationFilter");
             if (fed1DestinationFilter == null) {
                 javaHelicsApiTests.helicsAssert("fed1DestinationFilter == null");
             }
@@ -209,7 +209,7 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("ep2 == null");
             }
             SWIGTYPE_p_void pub1 = helics.helicsFederateRegisterGlobalPublication(fed1, "pub1",
-                    helics_data_type.helics_data_type_double, null);
+                    HelicsDataTypes.HELICS_DATA_TYPE_DOUBLE, null);
             if (pub1 == null) {
                 javaHelicsApiTests.helicsAssert("pub1 == null");
             }
@@ -228,7 +228,7 @@ public class JavaHelicsApiTests {
             }
             helics.helicsInputAddTarget(sub2, "Ep2");
             SWIGTYPE_p_void pub3 = helics.helicsFederateRegisterPublication(fed1, "pub3",
-                    helics_data_type.helics_data_type_string, null);
+                    HelicsDataTypes.HELICS_DATA_TYPE_STRING, null);
             if (pub3 == null) {
                 javaHelicsApiTests.helicsAssert("pub3 == null");
             }
@@ -254,7 +254,7 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("!sub1UnitsString.equals(\"\")");
             }
             SWIGTYPE_p_void fed1SourceFilter = helics.helicsFederateRegisterFilter(fed1,
-                    helics_filter_type.helics_filter_type_delay, "fed1SourceFilter");
+                    HelicsFilterTypes.HELICS_FILTER_TYPE_DELAY, "fed1SourceFilter");
             if (fed1SourceFilter == null) {
                 javaHelicsApiTests.helicsAssert("fed1SourceFilter == null");
             }
@@ -295,7 +295,7 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("sub5 == null");
             }
             SWIGTYPE_p_void pub6 = helics.helicsFederateRegisterGlobalPublication(fed1, "pub6",
-                    helics_data_type.helics_data_type_vector, null);
+                    HelicsDataTypes.HELICS_DATA_TYPE_VECTOR, null);
             if (pub6 == null) {
                 javaHelicsApiTests.helicsAssert("pub6 == null");
             }
@@ -306,7 +306,7 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("sub6 == null");
             }
             SWIGTYPE_p_void pub7 = helics.helicsFederateRegisterGlobalPublication(fed1, "pub7",
-                    helics_data_type.helics_data_type_named_point, null);
+                    HelicsDataTypes.HELICS_DATA_TYPE_NAMED_POINT, null);
             if (pub7 == null) {
                 javaHelicsApiTests.helicsAssert("pub7 == null");
             }
@@ -316,7 +316,7 @@ public class JavaHelicsApiTests {
             if (sub7 == null) {
                 javaHelicsApiTests.helicsAssert("sub7 == null");
             }
-            helics.helicsInputSetDefaultBoolean(sub5, helics.getHelics_false());
+            helics.helicsInputSetDefaultBoolean(sub5, helics.getHELICS_FALSE());
             helics.helicsInputSetDefaultComplex(sub2, -9.9, 2.5);
             helics.helicsInputSetDefaultDouble(sub1, 3.4);
             helics.helicsInputSetDefaultInteger(sub4, 6);
@@ -392,7 +392,7 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("!fed1NameString.contains(\"fed1\")");
             }
 
-            helics_federate_state fed1State = helics.helicsFederateGetState(fed1);
+            HelicsFederateState fed1State = helics.helicsFederateGetState(fed1);
             if (fed1State.swigValue() != 2) {
                 javaHelicsApiTests.helicsAssert("fed1State != 2");
             }
@@ -405,7 +405,7 @@ public class JavaHelicsApiTests {
             if (fed1SubCount != 7) {
                 javaHelicsApiTests.helicsAssert("fed1SubCount != 7");
             }
-            helics.helicsPublicationPublishBoolean(pub5, helics.getHelics_true());
+            helics.helicsPublicationPublishBoolean(pub5, helics.getHELICS_TRUE());
             helics.helicsPublicationPublishComplex(pub2, 5.6, -0.67);
             helics.helicsPublicationPublishDouble(pub1, 457.234);
             helics.helicsPublicationPublishInteger(pub4, 1);

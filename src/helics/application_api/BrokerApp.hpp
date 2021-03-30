@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../core/core-types.hpp"
-#include "../core/helics-time.hpp"
+#include "../core/CoreTypes.hpp"
+#include "../core/helicsTime.hpp"
 #include "helics_cxx_export.h"
 
 #include <chrono>
@@ -35,13 +35,13 @@ class HELICS_CXX_EXPORT BrokerApp {
      @param ctype the type of broker to create
      @param args the command line arguments to pass in a reverse vector
     */
-    BrokerApp(core_type ctype, std::vector<std::string> args);
+    BrokerApp(CoreType ctype, std::vector<std::string> args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
      @param broker_name the name of the broker
      @param args the command line arguments to pass in a reverse vector
     */
-    BrokerApp(core_type ctype, const std::string& broker_name, std::vector<std::string> args);
+    BrokerApp(CoreType ctype, const std::string& broker_name, std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -52,14 +52,14 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp(core_type ctype, int argc, char* argv[]);
+    BrokerApp(CoreType ctype, int argc, char* argv[]);
     /** construct from command line arguments
     @param ctype the type of broker to create
     @param brokerName the name of the broker
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp(core_type ctype, const std::string& brokerName, int argc, char* argv[]);
+    BrokerApp(CoreType ctype, const std::string& brokerName, int argc, char* argv[]);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
@@ -68,13 +68,13 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments
     */
-    BrokerApp(core_type ctype, const std::string& argString);
+    BrokerApp(CoreType ctype, const std::string& argString);
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param brokerName the name of the broker
     @param argString a merged string with all the arguments
     */
-    BrokerApp(core_type ctype, const std::string& brokerName, const std::string& argString);
+    BrokerApp(CoreType ctype, const std::string& brokerName, const std::string& argString);
 
     /** create a BrokerApp from a broker pointer*/
     explicit BrokerApp(std::shared_ptr<Broker> brk);

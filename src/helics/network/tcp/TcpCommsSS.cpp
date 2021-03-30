@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace tcp {
     TcpCommsSS::TcpCommsSS() noexcept:
-        NetworkCommsInterface(interface_type::tcp, CommsInterface::thread_generation::single)
+        NetworkCommsInterface(InterfaceTypes::TCP, CommsInterface::thread_generation::single)
     {
     }
 

@@ -19,9 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <random>
 #include <thread>
 
-using helics::core_type;
+using helics::CoreType;
 
-static void BMsendMessage(benchmark::State& state, core_type cType, bool singleCore = false)
+static void BMsendMessage(benchmark::State& state, CoreType cType, bool singleCore = false)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -33,7 +33,7 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
             helics::BrokerFactory::create(cType,
                                           "brokerb",
                                           std::string("--federates=") + std::to_string(fed_count));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel(HELICS_LOG_LEVEL_NO_PRINT);
 
         int wcore_fed_count = 1;
         if (!singleCore) {
@@ -112,7 +112,7 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
 // The first element in the ranges is message size, and the second is message count
 
 // Register the single core benchmark
-BENCHMARK_CAPTURE(BMsendMessage, singleCore, core_type::INPROC, true)
+BENCHMARK_CAPTURE(BMsendMessage, singleCore, CoreType::INPROC, true)
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 20}, {1, 1}})  // 1GB takes about 6 seconds
     ->Ranges({{1, 1}, {1, 1 << 9}})
@@ -123,7 +123,7 @@ BENCHMARK_CAPTURE(BMsendMessage, singleCore, core_type::INPROC, true)
 // Register multi core benchmarks
 // Register the inproc core benchmarks
 // clang-format off
-BENCHMARK_CAPTURE(BMsendMessage, multiCore/inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMsendMessage, multiCore/inprocCore, CoreType::INPROC)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 20}, {1, 1}})  // 1GB takes about 6 seconds
@@ -135,7 +135,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/inprocCore, core_type::INPROC)
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 // clang-format off
-BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqCore, CoreType::ZMQ)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 20}, {1, 1}})  // 1GB takes about 30 seconds
@@ -146,7 +146,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqCore, core_type::ZMQ)
 
 // Register the ZMQ SS benchmarks
 // clang-format off
-BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqssCore, CoreType::ZMQ_SS)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 20}, {1, 1}})
@@ -160,7 +160,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqssCore, core_type::ZMQ_SS)
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
 // clang-format off
-BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, CoreType::IPC)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes Boost transmit error
@@ -177,7 +177,7 @@ BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
 // clang-format off
-BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpCore, CoreType::TCP)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes error/terminate
@@ -189,7 +189,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpCore, core_type::TCP)
 
 // Register the TCP SS benchmarks
 // clang-format off
-BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpssCore, CoreType::TCP_SS)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes error/terminate
@@ -204,7 +204,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpssCore, core_type::TCP_SS)
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
 // clang-format off
-BENCHMARK_CAPTURE(BMsendMessage, multiCore/udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMsendMessage, multiCore/udpCore, CoreType::UDP)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 15},

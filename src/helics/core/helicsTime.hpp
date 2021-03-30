@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef _HELICS_TIME_HEADER_
 #    define _HELICS_TIME_HEADER_
 #    include "../utilities/timeRepresentation.hpp"
-#    include "core-types.hpp"
+#    include "CoreTypes.hpp"
 #    include "helics/helics-config.h"
 
 #    include <cstdint>
@@ -42,7 +42,7 @@ constexpr Time operator"" _t(long double val)
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time {
     Time grantedTime;  //!< the time of the granted step
-    iteration_result state;  //!< the convergence state
+    IterationResult state;  //!< the convergence state
 };
 
 }  // namespace helics

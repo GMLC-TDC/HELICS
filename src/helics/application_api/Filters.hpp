@@ -18,22 +18,22 @@ class FilterOperations;
 class FilterOperator;
 class CoreApp;
 /** a set of common defined filters*/
-enum class filter_types {
-    custom = helics_filter_type_custom,
-    delay = helics_filter_type_delay,
-    random_delay = helics_filter_type_random_delay,
-    random_drop = helics_filter_type_random_drop,
-    reroute = helics_filter_type_reroute,
-    clone = helics_filter_type_clone,
-    firewall = helics_filter_type_firewall,
-    unrecognized = 7
+enum class FilterTypes {
+    CUSTOM = HELICS_FILTER_TYPE_CUSTOM,
+    DELAY = HELICS_FILTER_TYPE_DELAY,
+    RANDOM_DELAY = HELICS_FILTER_TYPE_RANDOM_DELAY,
+    RANDOM_DROP = HELICS_FILTER_TYPE_RANDOM_DROP,
+    REROUTE = HELICS_FILTER_TYPE_REROUTE,
+    CLONE = HELICS_FILTER_TYPE_CLONE,
+    FIREWALL = HELICS_FILTER_TYPE_FIREWALL,
+    UNRECOGNIZED = 7
 
 };
 
 #define EMPTY_STRING std::string()
 
 /** get the filter type from a string*/
-HELICS_CXX_EXPORT filter_types filterTypeFromString(const std::string& filterType) noexcept;
+HELICS_CXX_EXPORT FilterTypes filterTypeFromString(const std::string& filterType) noexcept;
 
 /** class for managing a particular filter*/
 class HELICS_CXX_EXPORT Filter: public Interface {
@@ -92,7 +92,7 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** set a filter operations object */
     void setFilterOperations(std::shared_ptr<FilterOperations> filterOps);
     /** add a defined operation to a filter*/
-    friend void addOperations(Filter* filt, filter_types type, Core* cptr);
+    friend void addOperations(Filter* filt, FilterTypes type, Core* cptr);
 };
 
 /** class used to clone message for delivery to other endpoints*/
@@ -144,7 +144,7 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
 deactivate the filter
 */
 HELICS_CXX_EXPORT Filter&
-    make_filter(filter_types type, Federate* fed, const std::string& name = EMPTY_STRING);
+    make_filter(FilterTypes type, Federate* fed, const std::string& name = EMPTY_STRING);
 
 /** create a  filter
 @param locality the visibility of the filter global or local
@@ -155,7 +155,7 @@ HELICS_CXX_EXPORT Filter&
 deactivate the filter
 */
 HELICS_CXX_EXPORT Filter& make_filter(interface_visibility locality,
-                                      filter_types type,
+                                      FilterTypes type,
                                       Federate* fed,
                                       const std::string& name = EMPTY_STRING);
 
@@ -167,7 +167,7 @@ HELICS_CXX_EXPORT Filter& make_filter(interface_visibility locality,
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(filter_types type, Core* cr, const std::string& name = EMPTY_STRING);
+    make_filter(FilterTypes type, Core* cr, const std::string& name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
@@ -177,7 +177,7 @@ HELICS_CXX_EXPORT std::unique_ptr<Filter>
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(filter_types type, CoreApp& cr, const std::string& name = EMPTY_STRING);
+    make_filter(FilterTypes type, CoreApp& cr, const std::string& name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -187,7 +187,7 @@ HELICS_CXX_EXPORT std::unique_ptr<Filter>
 @return a unique pointer to a destination Filter object,  note destroying the object does not
 deactivate the filter
 */
-HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(filter_types type,
+HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(FilterTypes type,
                                                      Federate* fed,
                                                      const std::string& delivery,
                                                      const std::string& name = EMPTY_STRING);
@@ -202,7 +202,7 @@ HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(filter_types type,
 deactivate the filter
 */
 HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(interface_visibility locality,
-                                                     filter_types type,
+                                                     FilterTypes type,
                                                      Federate* fed,
                                                      const std::string& delivery,
                                                      const std::string& name = EMPTY_STRING);
@@ -216,7 +216,7 @@ HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(interface_visibility locali
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
-    make_cloning_filter(filter_types type,
+    make_cloning_filter(FilterTypes type,
                         Core* cr,
                         const std::string& delivery,
                         const std::string& name = EMPTY_STRING);
@@ -230,7 +230,7 @@ HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
-    make_cloning_filter(filter_types type,
+    make_cloning_filter(FilterTypes type,
                         CoreApp& cr,
                         const std::string& delivery,
                         const std::string& name = EMPTY_STRING);

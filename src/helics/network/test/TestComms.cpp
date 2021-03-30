@@ -85,7 +85,7 @@ namespace testcore {
                 if (!tbroker) {
                     if (autoBroker) {
                         tbroker = std::static_pointer_cast<CoreBroker>(
-                            BrokerFactory::create(core_type::TEST, brokerName, brokerInitString));
+                            BrokerFactory::create(CoreType::TEST, brokerName, brokerInitString));
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
@@ -114,12 +114,12 @@ namespace testcore {
         } else if (!serverMode) {
             milliseconds totalSleep(0);
             while (!tbroker) {
-                auto broker = BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+                auto broker = BrokerFactory::findJoinableBrokerOfType(CoreType::TEST);
                 tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
                 if (!tbroker) {
                     if (autoBroker) {
                         tbroker = std::static_pointer_cast<CoreBroker>(
-                            BrokerFactory::create(core_type::TEST, "", brokerInitString));
+                            BrokerFactory::create(CoreType::TEST, "", brokerInitString));
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {

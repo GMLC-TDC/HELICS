@@ -38,7 +38,7 @@ class messageGenerator {
   public:
     messageGenerator() = default;
 
-    void run(std::function<void()> callOnReady = {})
+    void run(const std::function<void()> &callOnReady = {})
     {
         if (!readyToRun) {
             makeReady();
@@ -58,7 +58,7 @@ class messageGenerator {
         std::string name = "mgen_" + std::to_string(index);
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.setProperty(helics_property_time_period, 1.0);
+        fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         mFed = std::make_unique<helics::MessageFederate>(name, fi);
         epts.reserve(cnt_local_);
         for (int ii = 0; ii < cnt_local_; ++ii) {
@@ -105,13 +105,13 @@ class messageGenerator {
     }
 };
 
-using helics::core_type;
+using helics::CoreType;
 static void BMmgen_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
 
-        auto wcore = helics::CoreFactory::create(core_type::INPROC, std::string("--autobroker "));
+        auto wcore = helics::CoreFactory::create(CoreType::INPROC, std::string("--autobroker "));
         messageGenerator mgen;
         mgen.initialize(wcore->getIdentifier(),
                         static_cast<int>(state.range(0)),
@@ -136,7 +136,7 @@ BENCHMARK(BMmgen_singleCore)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BMmgen_multiCore(benchmark::State& state, core_type cType)
+static void BMmgen_multiCore(benchmark::State& state, CoreType cType)
 {
     for (auto _ : state) {
         if (state.range(0) < state.range(1) * 8) {
@@ -149,7 +149,7 @@ static void BMmgen_multiCore(benchmark::State& state, core_type cType)
         auto broker =
             helics::BrokerFactory::create(cType,
                                           std::string("--federates=") + std::to_string(feds));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel(HELICS_LOG_LEVEL_NO_PRINT);
 
         std::vector<messageGenerator> gens(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
@@ -191,28 +191,28 @@ static void BMmgen_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Ranges({{32, 1 << 15}, {2, 64}})
     ->Iterations(1)
     ->UseRealTime();
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore_big2, core_type::INPROC)
+BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore_big2, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Ranges({{1 << 17, 1 << 19}, {2, 2}})
     ->Iterations(1)
     ->UseRealTime();
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore_big8, core_type::INPROC)
+BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore_big8, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Ranges({{1 << 17, 1 << 19}, {8, 8}})
     ->Iterations(1)
     ->UseRealTime();
 /*
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE (BM_ring_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE (BM_ring_multiCore, zmqCore, CoreType::ZMQ)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
   ->Arg (2)
@@ -224,7 +224,7 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, zmqCore, core_type::ZMQ)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, CoreType::ZMQ_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
   ->Arg (2)
@@ -236,7 +236,7 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->UseRealTime ();
 
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE (BM_ring_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE (BM_ring_multiCore, ipcCore, CoreType::IPC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
   ->Arg (2)
@@ -247,7 +247,7 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, ipcCore, core_type::IPC)
   ->UseRealTime ();
 
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE (BM_ring_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE (BM_ring_multiCore, tcpCore, CoreType::TCP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
   ->Arg (2)
@@ -259,7 +259,7 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, tcpCore, core_type::TCP)
   ->UseRealTime ();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, CoreType::TCP_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
   ->Arg (2)
@@ -271,7 +271,7 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
   ->UseRealTime ();
 
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, CoreType::UDP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
   ->Arg (2)

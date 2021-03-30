@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 them using the jsoncpp library
 */
 
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 
 #include "json/json.h"
 #include <functional>

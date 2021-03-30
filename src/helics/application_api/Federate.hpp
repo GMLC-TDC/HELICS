@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../core/federate_id.hpp"
-#include "../core/helics-time.hpp"
+#include "../core/helicsTime.hpp"
 #include "../helics_enums.h"
 #include "FederateInfo.hpp"
 #include "helics/helics-config.h"
@@ -47,24 +47,32 @@ class Federate;
 class HELICS_CXX_EXPORT Federate {
   public:
     /** the allowable operation modes of the federate*/
-    enum class modes : char {
-        startup = 0,  //!< when created the federate is in startup state
-        initializing = 1,  //!< entered after the enterInitializingMode call has returned
-        executing = 2,  //!< entered after the enterExectuationState call has returned
-        finalize =
-            3,  //!< the federate has finished executing normally final values may be retrieved
-        error = 4,  //!< error state no core communication is possible but values can be retrieved
+    enum class Modes : char {
+        /** when created the federate is in startup state */
+        STARTUP = 0,
+        /** entered after the enterInitializingMode call has returned */
+        INITIALIZING = 1,
+        /** entered after the enterExectuationState call has returned */
+        EXECUTING = 2,
+        /** the federate has finished executing normally final values may be retrieved */
+        FINALIZE = 3,
+        /** error state no core communication is possible but values can be retrieved */
+        ERROR_STATE = 4,
         // the following states are for asynchronous operations
-        pending_init = 5,  //!< indicator that the federate is pending entry to initialization state
-        pending_exec = 6,  //!< state pending EnterExecution State
-        pending_time = 7,  //!< state that the federate is pending a timeRequest
-        pending_iterative_time =
-            8,  //!< state that the federate is pending an iterative time request
-        pending_finalize = 9  //!< state that the federate is pending a finalize call
+        /** indicator that the federate is pending entry to initialization state */
+        PENDING_INIT = 5,
+        /** state pending EnterExecution State */
+        PENDING_EXEC = 6,
+        /** state that the federate is pending a timeRequest */
+        PENDING_TIME = 7,
+        /** state that the federate is pending an iterative time request */
+        PENDING_ITERATIVE_TIME = 8,
+        /** state that the federate is pending a finalize call */
+        PENDING_FINALIZE = 9
     };
 
   protected:
-    std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
+    std::atomic<Modes> currentMode{Modes::STARTUP};  //!< the current state of the simulation
     char nameSegmentSeparator = '/';  //!< the separator between automatically prependend names
     bool strictConfigChecking =
         true;  //!< set to false to allow some invalid configurations to be ignored instead of error
@@ -145,19 +153,18 @@ class HELICS_CXX_EXPORT Federate {
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    iteration_result
-        enterExecutingMode(iteration_request iterate = iteration_request::no_iterations);
+    IterationResult enterExecutingMode(IterationRequest iterate = IterationRequest::NO_ITERATIONS);
     /** enter the normal execution mode
     @details call will return immediately but \ref enterExecutingModeComplete should be called to
     complete the operation
     @param iterate an optional flag indicating the desired iteration mode
     */
-    void enterExecutingModeAsync(iteration_request iterate = iteration_request::no_iterations);
+    void enterExecutingModeAsync(IterationRequest iterate = IterationRequest::NO_ITERATIONS);
     /** complete the async call for entering Execution state
     @details call will not block but will return quickly.  The enterInitializingModeComplete must be
     called before doing other operations
     */
-    iteration_result enterExecutingModeComplete();
+    IterationResult enterExecutingModeComplete();
     /** terminate the simulation
     @details call is will block until the finalize has been acknowledged, no commands that interact
     with the core may be called after this function function */
@@ -220,8 +227,8 @@ class HELICS_CXX_EXPORT Federate {
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration mode
-    @return the granted time step in a structure containing a return time and an iteration_result*/
-    iteration_time requestTimeIterative(Time nextInternalTimeStep, iteration_request iterate);
+    @return the granted time step in a structure containing a return time and an IterationResult*/
+    iteration_time requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate);
 
     /**  request a time advancement and return immediately for asynchronous function.
     @details /ref requestTimeComplete should be called to finish the operation and get the result
@@ -235,7 +242,7 @@ class HELICS_CXX_EXPORT Federate {
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration level (none, require, optional)
     */
-    void requestTimeIterativeAsync(Time nextInternalTimeStep, iteration_request iterate);
+    void requestTimeIterativeAsync(Time nextInternalTimeStep, IterationRequest iterate);
 
     /** request a time advancement
     @return the granted time step*/
@@ -379,8 +386,6 @@ class HELICS_CXX_EXPORT Federate {
     void sendCommand(const std::string& target, const std::string& commandStr);
 
     /** get a command for the Federate
- @param target  the target of the command can be "federation", "federate", "broker", "core", or a
- specific name of a federate, core, or broker
  @return a pair of strings <command,source> with the command instructions for the federate; the
  command string will be empty if no command is given
  */
@@ -388,8 +393,6 @@ class HELICS_CXX_EXPORT Federate {
 
     /** get a command for the Federate, if there is none the call will block until a command is
 received
-@param target  the target of the command can be "federation", "federate", "broker", "core", or a
-specific name of a federate, core, or broker
 @return a pair of strings <command,source> with the command instructions for the federate
 */
     std::pair<std::string, std::string> waitCommand();
@@ -519,7 +522,7 @@ specific name of a federate, core, or broker
     /** get the underlying federateID for the core*/
     auto getID() const noexcept { return fedID; }
     /** get the current state of the federate*/
-    modes getCurrentMode() const { return currentMode.load(); }
+    Modes getCurrentMode() const { return currentMode.load(); }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime() const { return currentTime; }
@@ -541,28 +544,28 @@ specific name of a federate, core, or broker
     */
     void logErrorMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_error, message);
+        logMessage(HELICS_LOG_LEVEL_ERROR, message);
     }
     /** log a warning message to the federate Logger
     @param message the message to log
     */
     void logWarningMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_warning, message);
+        logMessage(HELICS_LOG_LEVEL_WARNING, message);
     }
     /** log an info message to the federate Logger
     @param message the message to log
     */
     void logInfoMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_summary, message);
+        logMessage(HELICS_LOG_LEVEL_SUMMARY, message);
     }
     /** log a debug message to the federate Logger
     @param message the message to log
     */
     void logDebugMessage(const std::string& message) const
     {
-        logMessage(helics_log_level_data, message);
+        logMessage(HELICS_LOG_LEVEL_DATA, message);
     }
     /** call to complete async operation with no output*/
     void completeOperation();

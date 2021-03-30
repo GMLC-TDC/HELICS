@@ -14,8 +14,8 @@ namespace helics {
 class FederateInfo;
 }  // namespace helics
 
-helics::data_type getType(const std::string& typeString);
+helics::DataType getType(const std::string& typeString);
 
-char typeCharacter(helics::data_type type);
+char typeCharacter(helics::DataType type);
 
 bool isBinaryData(helics::SmallBuffer& data);

@@ -100,7 +100,7 @@ external protection, that will result in undefined behavior
     @param pubUnits the units associated with the publication
     */
         void addPublication(const std::string& key,
-                            data_type type,
+                            DataType type,
                             const std::string& pubUnits = std::string());
 
         /** add a publication to a Player
@@ -108,7 +108,7 @@ external protection, that will result in undefined behavior
     @param pubUnits the units associated with the publication
     */
         template<class valType>
-        typename std::enable_if_t<helicsType<valType>() != data_type::helics_custom>
+        typename std::enable_if_t<helicsType<valType>() != DataType::HELICS_CUSTOM>
             addPublication(const std::string& key, const std::string& pubUnits = std::string())
         {
             if (!useLocal) {
@@ -231,8 +231,8 @@ external protection, that will result in undefined behavior
         std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
         std::map<std::string, int> pubids;  //!< publication id map
         std::map<std::string, int> eptids;  //!< endpoint id maps
-        helics::data_type defType =
-            helics::data_type::helics_string;  //!< the default data type unless otherwise specified
+        helics::DataType defType =
+            helics::DataType::HELICS_STRING;  //!< the default data type unless otherwise specified
         size_t pointIndex = 0;  //!< the current point index
         size_t messageIndex = 0;  //!< the current message index
         time_units units = time_units::sec;

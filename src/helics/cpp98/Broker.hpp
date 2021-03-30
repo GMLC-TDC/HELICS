@@ -29,7 +29,7 @@ class Broker {
     {
         broker =
             helicsCreateBroker(type.c_str(), name.c_str(), initString.c_str(), hThrowOnError());
-        if (helicsBrokerIsConnected(broker) != helics_true) {
+        if (helicsBrokerIsConnected(broker) != HELICS_TRUE) {
             throw(std::runtime_error("broker creation failed"));
         }
     }
@@ -75,19 +75,19 @@ class Broker {
         }
     }
     /** cast to the underlying broker*/
-    operator helics_broker() { return broker; }
-    /** get the underlying helics_broker object
-    @return a helics_broker object*/
-    helics_broker baseObject() const { return broker; }
+    operator HelicsBroker() { return broker; }
+    /** get the underlying HelicsBroker object
+    @return a HelicsBroker object*/
+    HelicsBroker baseObject() const { return broker; }
     /** check if the broker is connected*/
-    bool isConnected() const { return (helicsBrokerIsConnected(broker) != helics_false); }
+    bool isConnected() const { return (helicsBrokerIsConnected(broker) != HELICS_FALSE); }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out
      */
     bool waitForDisconnect(int msToWait = -1)
     {
-        return (helicsBrokerWaitForDisconnect(broker, msToWait, hThrowOnError()) != helics_false);
+        return (helicsBrokerWaitForDisconnect(broker, msToWait, hThrowOnError()) != HELICS_FALSE);
     }
     /** disconnect the broker from any other brokers and communications
      */
@@ -152,8 +152,8 @@ class Broker {
   */
     std::string query(const std::string& target, const std::string& queryStr) const
     {
-        // returns helics_query
-        helics_query q = helicsCreateQuery(target.c_str(), queryStr.c_str());
+        // returns HelicsQuery
+        HelicsQuery q = helicsCreateQuery(target.c_str(), queryStr.c_str());
         std::string result(helicsQueryBrokerExecute(q, broker, hThrowOnError()));
         helicsQueryFree(q);
         return result;
@@ -168,7 +168,7 @@ class Broker {
         helicsBrokerSendCommand(broker, target.c_str(), command.c_str(), hThrowOnError());
     }
 
-    void setTimeBarrier(helics_time barrierTime)
+    void setTimeBarrier(HelicsTime barrierTime)
     {
         helicsBrokerSetTimeBarrier(broker, barrierTime, HELICS_IGNORE_ERROR);
     }
@@ -176,7 +176,7 @@ class Broker {
     void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
 
   protected:
-    helics_broker broker;  //!< underlying broker information
+    HelicsBroker broker;  //!< underlying broker information
 };
 
 }  // namespace helicscpp

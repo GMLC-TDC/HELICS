@@ -31,10 +31,10 @@ namespace zeromq {
             return;
         }
         if (!brokerTargetAddress.empty()) {
-            insertProtocol(brokerTargetAddress, interface_type::tcp);
+            insertProtocol(brokerTargetAddress, InterfaceTypes::TCP);
         }
         if (!localTargetAddress.empty()) {
-            insertProtocol(localTargetAddress, interface_type::tcp);
+            insertProtocol(localTargetAddress, InterfaceTypes::TCP);
         }
         if (localTargetAddress == "tcp://localhost") {
             localTargetAddress = "tcp://127.0.0.1";
@@ -49,7 +49,7 @@ namespace zeromq {
         propertyUnLock();
     }
 
-    ZmqComms::ZmqComms() noexcept: NetworkCommsInterface(interface_type::ip) {}
+    ZmqComms::ZmqComms() noexcept: NetworkCommsInterface(InterfaceTypes::IP) {}
 
     /** destructor*/
     ZmqComms::~ZmqComms() { disconnect(); }
