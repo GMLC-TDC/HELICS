@@ -20038,6 +20038,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_flag_single_thread_federate",SWIG_From_int((int)(helics_flag_single_thread_federate)));
   SWIG_Python_SetConstant(d, "helics_flag_ignore_time_mismatch_warnings",SWIG_From_int((int)(helics_flag_ignore_time_mismatch_warnings)));
   SWIG_Python_SetConstant(d, "helics_flag_strict_config_checking",SWIG_From_int((int)(helics_flag_strict_config_checking)));
+  SWIG_Python_SetConstant(d, "helics_flag_event_triggered",SWIG_From_int((int)(helics_flag_event_triggered)));
   SWIG_Python_SetConstant(d, "helics_flag_delay_init_entry",SWIG_From_int((int)(helics_flag_delay_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_enable_init_entry",SWIG_From_int((int)(helics_flag_enable_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_slow_responding",SWIG_From_int((int)(helics_flag_slow_responding)));

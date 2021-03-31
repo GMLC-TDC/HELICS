@@ -173,6 +173,11 @@ r"""
     specify that checking on configuration files should be strict and throw and error on any
       invalid values
     """
+helics_flag_event_triggered = _helics.helics_flag_event_triggered
+r"""
+    specify that the federate is event triggered-meaning (all/most) events are triggered by
+          incoming events
+    """
 helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
 r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
 helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
