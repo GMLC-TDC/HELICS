@@ -38,7 +38,7 @@ class messageGenerator {
   public:
     messageGenerator() = default;
 
-    void run(const std::function<void()> &callOnReady = {})
+    void run(const std::function<void()>& callOnReady = {})
     {
         if (!readyToRun) {
             makeReady();
