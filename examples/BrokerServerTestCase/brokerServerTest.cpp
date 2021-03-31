@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api.hpp"
 #include "helics/core/CoreFactory.hpp"
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
-#include <iostream>
 
 int main(int argc, char** argv)
 {
@@ -54,8 +54,8 @@ int main(int argc, char** argv)
     std::chrono::seconds timeout(30);
     if (argc >= 2) {
         char* eptr{nullptr};
-        auto res = std::strtol(argv[1],&eptr,0);
-        if (eptr - argv[1]>0) {
+        auto res = std::strtol(argv[1], &eptr, 0);
+        if (eptr - argv[1] > 0) {
             timeout = std::chrono::seconds(res);
         }
         std::cout << "value for timeout is not recognized(" << argv[1] << ")" << std::endl;
