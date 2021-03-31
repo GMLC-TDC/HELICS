@@ -38,54 +38,18 @@ _basic_env:
           - valgrind
           - lcov
           - libzmq3-dev
-  - &daily_osx
-    if: type = cron
-    os: osx
-    compiler: clang
   - &linux_base
     os: linux
     compiler: gcc
-  - &osx_base
-    os: osx
-    compiler: clang
-
-# Install macOS dependencies using Homebrew
-addons:
-  homebrew:
-    brewfile: .ci/Brewfile.travis
-    update: true
 
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
   allow_failures:
-    - os: osx
     - name: 'Clang 5 Thread Sanitizer'
     - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
-    # XCode 10.2, OS X 10.14
-    - <<: *osx_base
-      name: 'XCode 10.2, OS X 10.14'
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-        - CI_TEST_EXCLUDE="application-api-ci-tests|system-ci-tests"
-      osx_image: xcode10.2
-
-    # XCode 9.4, OS X 10.13
-    - <<: *osx_base
-      name: 'XCode 9.4, macOS 10.13'
-      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=94"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-        - USE_SWIG=false
-      osx_image: xcode9.4
-      addons:
-        homebrew:
-          brewfile: .ci/Brewfile-minimal.travis
-          update: true
 
     - <<: *linux_base
       name: 'GCC 6'
@@ -269,9 +233,6 @@ script:
 
   # Setup counters for coverage
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh setup-counters && popd ; fi
-
-  - if [[ "TRAVIS_OS_NAME" == "osx" ]]; then python ../scripts/fix_install_names.py ; fi
-  - if [[ "TRAVIS_OS_NAME" == "osx" ]]; then make ${MAKEFLAGS} install ; fi
 
   # Run CI tests
   - export CTEST_OPTIONS="--output-on-failure"
