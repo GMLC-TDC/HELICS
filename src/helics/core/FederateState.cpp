@@ -47,7 +47,7 @@ static const std::string emptyStr;
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
             if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                            \
-                logMessage(HELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                          \
+                logMessage(HELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                           \
             }                                                                                      \
         } while (false)
 
