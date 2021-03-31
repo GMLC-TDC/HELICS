@@ -45,49 +45,8 @@ _basic_env:
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
-  allow_failures:
-    - name: 'Clang 5 Thread Sanitizer'
-    - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
-
-    - <<: *linux_base
-      name: 'GCC 6'
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true
-        - USE_CMAKE_VERSION=3.7.2
-        - BUILD_BENCHMARKS=true
-        - USE_MPI=mpich
-
-    # Clang 5 build
-    - <<: *linux_base
-      name: 'Clang 5'
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - libstdc++-6-dev
-            - clang-5.0
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
-        - CCACHE_CPP2=yes
-        - USE_SWIG=true
-        - BUILD_BENCHMARKS=true
-        - USE_CMAKE_VERSION=3.14.5
-        - CXX_STANDARD=17
-
     - <<: *linux_base
       name: 'GCC 4.9 (No SWIG, Packaging)'
       if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
@@ -183,17 +142,8 @@ jobs:
         - ZMQ_FORCE_SUBPROJECT=true
 
     # ------------------------------------------------
-    # Jobs for daily valgrind and code coverage tests
+    # Jobs for daily code coverage tests
     # ------------------------------------------------
-    # Valgrind build
-    - <<: *daily_linux
-      name: 'GCC 6 Valgrind'
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true
-        - RUN_VALGRIND=true
-        - DISABLE_INTERFACES="Python,Java"
-        - BUILD_TYPE=RelWithDebInfo
     # Code coverage build
     - <<: *daily_linux
       if: (type = cron) OR (branch =~ /(codecov)/) OR (commit_message =~ /(codecov)/)
@@ -207,12 +157,6 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-
-    - stage: trigger dependent repositories
-      if: branch IN (master, develop)
-      before_install: true
-      install: true
-      script: scripts/trigger-dependent-ci-builds.sh
 
 branches:
   except:
