@@ -1,5 +1,12 @@
 clone_depth: 1
 
+branches:
+  only:
+    - main
+    - master
+    - develop
+    - helics3
+
 version: 3.0.0.{build}
 
 image: Visual Studio 2019

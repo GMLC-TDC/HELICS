@@ -2,6 +2,11 @@ trigger:
   branches:
     exclude:
       - pre-commit/*
+pr:
+  - main
+  - master
+  - develop
+  - helics3
 
 jobs:
   - job: Linux
@@ -105,11 +110,29 @@ jobs:
           extraFlags: ''
     pool:
       vmImage: $(imageName)
+    variables:
+      BOOST_ROOT: $(Pipeline.Workspace)/ci-libs/boost
+      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download
 
     steps:
       # -----------------------
       # Install dependencies
       # -----------------------
+      - task: Cache@2
+        inputs:
+          path: $(BOOST_ROOT)
+          key: boost
+          cacheHitVar: BOOST_CACHE_RESTORED
+        displayName: Restore Boost cache
+      - bash: |
+          cd $(mktemp -d)
+          curl --location --output "download.tar.bz2" "$BOOST_URL"
+          tar xfvj "download.tar.bz2"
+          mkdir -p "$BOOST_ROOT"
+          cp -r boost_*/* "$BOOST_ROOT"
+        condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
+        displayName: Install Boost
+
       - bash: choco install swig --yes --limit-output
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
         displayName: Install swig
@@ -127,7 +150,9 @@ jobs:
       # Configure HELICS
       # -----------------------
       - bash: |
-          echo "##vso[task.setvariable variable=BOOST_ROOT]$BOOST_ROOT_1_72_0"
+          echo "BOOST_ROOT=$BOOST_ROOT"
+          env
+        displayName: Show environment info
       - task: CMake@1
         inputs:
           cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON $(extraFlags) ..
