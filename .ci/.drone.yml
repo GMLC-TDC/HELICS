@@ -7,7 +7,7 @@ platform:
 
 steps:
   - name: uname
-    image: alpine
+    image: alpine:3.12
     commands:
       - uname -a
 
@@ -18,7 +18,7 @@ steps:
       - git submodule update --init --recursive
 
   - name: build
-    image: alpine
+    image: alpine:3.12
     commands:
       - apk update
       - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
@@ -30,6 +30,16 @@ steps:
       - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
       - cmake --build .
       - ctest -L Continuous --output-on-failure
+
+trigger:
+  ref:
+    include:
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/develop
+      - refs/heads/helics3
+      - 'refs/pull/**'
+      - 'refs/tags/**'
 
 ---
 kind: pipeline
@@ -64,3 +74,13 @@ steps:
       - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
       - cmake --build .
       - ctest -L Continuous --output-on-failure
+
+trigger:
+  ref:
+    include:
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/develop
+      - refs/heads/helics3
+      - 'refs/pull/**'
+      - 'refs/tags/**'
