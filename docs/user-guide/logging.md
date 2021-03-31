@@ -99,6 +99,7 @@ when specifying log levels through the command line or through config files it i
 - "trace" : all internal messages
 
 ALL CAPS and the Enum value name will also work for converting the string
+
 ```json
 {
   //example json configuration file for a value federate all arguments are optional
