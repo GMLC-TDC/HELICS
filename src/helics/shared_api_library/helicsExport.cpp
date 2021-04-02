@@ -997,7 +997,7 @@ void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, Helic
     queryObj->query = AS_STRING(queryString);
 }
 
-void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err)
+void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err)
 {
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
@@ -1006,7 +1006,7 @@ void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err)
     queryObj->mode = (mode == 0) ? helics_query_mode_fast : helics_query_mode_ordered;
 }
 
-void helicsQueryFree(helics_query query)
+void helicsQueryFree(HelicsQuery query)
 {
     auto* queryObj = getQueryObj(query, nullptr);
     if (queryObj == nullptr) {
@@ -1016,6 +1016,7 @@ void helicsQueryFree(helics_query query)
     queryObj->valid = 0;
     delete queryObj;
 }
+
 void helicsCleanupLibrary(void)
 {
     helics::cleanupHelicsLibrary();

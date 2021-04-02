@@ -72,9 +72,9 @@ class TimeCoordinator {
     Time time_grantBase = Time::minVal();
     Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
     /// these are to maintain an accessible record of dependent federates
-    shared_guarded_m<std::vector<global_federate_id>> dependent_federates;
+    shared_guarded_m<std::vector<GlobalFederateId>> dependent_federates;
     /// these are to maintain an accessible record of dependency federates
-    shared_guarded_m<std::vector<global_federate_id>> dependency_federates;
+    shared_guarded_m<std::vector<GlobalFederateId>> dependency_federates;
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     /// blocks for a particular timeblocking link
     std::vector<std::pair<Time, int32_t>> timeBlocks;
@@ -162,13 +162,13 @@ class TimeCoordinator {
     Time getNextPossibleTime() const;
     Time generateAllowedTime(Time testTime) const;
     /* return true if the skip federate was detected*/
-    bool checkAndSendTimeRequest(ActionMessage& upd, global_federate_id skip) const;
+    bool checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
 
     void sendTimeRequest() const;
     void updateTimeGrant();
     /** transmit message to all federates except the skipFed,  return true if skipFed was used*/
     bool transmitTimingMessages(ActionMessage& msg,
-                                global_federate_id skipFed = global_federate_id{}) const;
+                                GlobalFederateId skipFed =GlobalFederateId{}) const;
 
     message_process_result processTimeBlockMessage(const ActionMessage& cmd);
 
@@ -201,9 +201,9 @@ class TimeCoordinator {
     @param fedID the identifier of the federate to remove*/
     void removeDependent(GlobalFederateId fedID);
 
-    void setAsChild(global_federate_id fedID);
+    void setAsChild(GlobalFederateId fedID);
 
-    void setAsParent(global_federate_id fedID);
+    void setAsParent(GlobalFederateId fedID);
     /** check if entry to the executing state can be granted*/
     MessageProcessingResult checkExecEntry();
     /** request a time
@@ -239,6 +239,6 @@ class TimeCoordinator {
     /** get a count of the active dependencies*/
     int dependencyCount() const;
     /** get a count of the active dependencies*/
-    global_federate_id getMinDependency() const;
+    GlobalFederateId getMinDependency() const;
 };
 }  // namespace helics

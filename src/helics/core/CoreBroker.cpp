@@ -289,17 +289,17 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 _federates.back().nonCounting = true;
             }
             if (checkActionFlag(command, child_flag)) {
-                _federates.back().global_id = global_federate_id(command.getExtraData());
+                _federates.back().global_id = GlobalFederateId(command.getExtraData());
                 _federates.addSearchTermForIndex(_federates.back().global_id,
                                                  _federates.size() - 1);
             } else if (isRootc) {
-                _federates.back().global_id = global_federate_id(
-                    static_cast<global_federate_id::base_type>(_federates.size()) - 1 +
-                    global_federate_id_shift);
+                _federates.back().global_id = GlobalFederateId(
+                    static_cast<GlobalFederateId::BaseType>(_federates.size()) - 1 +
+                    gGlobalFederateIdShift);
                 _federates.addSearchTermForIndex(_federates.back().global_id,
                                                  static_cast<size_t>(
                                                      _federates.back().global_id.baseValue()) -
-                                                     global_federate_id_shift);
+                                                     gGlobalFederateIdShift);
             }
             if (!isRootc) {
                 if (global_broker_id_local.isValid()) {
@@ -579,11 +579,11 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         } break;
         case CMD_REG_ROUTE:
             break;
-        case CMD_BROKER_QUERY:
-        case CMD_QUERY:
         case CMD_SEND_COMMAND:
             processCommandInstruction(command);
             break;
+        case CMD_BROKER_QUERY:
+        case CMD_QUERY:
         case CMD_QUERY_REPLY:
         case CMD_SET_GLOBAL:
             processQueryCommand(command);
@@ -1078,7 +1078,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     }
 
                 } else {
-                transmit(route, command);
+                    transmit(route, command);
+                }
             } else {
                 transmit(getRoute(command.dest_id), command);
             }
@@ -2915,7 +2916,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     queryRep.source_id = global_broker_id_local;
     queryRep.dest_id = m.source_id;
     queryRep.messageID = m.messageID;
-    queryRep.payload = generateQueryAnswer(m.payload, force_ordered);
+    queryRep.payload = generateQueryAnswer(std::string(m.payload.to_string()), force_ordered);
     queryRep.counter = m.counter;
     if (queryRep.payload.to_string() == "#wait") {
         std::get<1>(mapBuilders[mapIndex.at(std::string(m.payload.to_string())).first])
@@ -3002,7 +3003,7 @@ void CoreBroker::processQueryCommand(ActionMessage& cmd)
             break;
         case CMD_SET_GLOBAL:
             if (isRootc) {
-                global_values[cmd.name] = cmd.getString(0);
+                global_values[std::string(cmd.payload.to_string())] = cmd.getString(0);
             } else {
                 if ((global_broker_id_local.isValid()) &&
                     (global_broker_id_local != parent_broker_id)) {

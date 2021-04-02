@@ -511,7 +511,7 @@ received
     virtual void startupToInitializeStateTransition();
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
-    virtual void initializeToExecuteStateTransition(iteration_result iterate);
+    virtual void initializeToExecuteStateTransition(IterationResult iterate);
     /** function to handle any disconnect operations*/
     virtual void disconnectTransition();
     /** function to generate results for a local Query

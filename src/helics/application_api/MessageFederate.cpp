@@ -96,7 +96,7 @@ void MessageFederate::startupToInitializeStateTransition()
 {
     mfManager->startupToInitializeStateTransition();
 }
-void MessageFederate::initializeToExecuteStateTransition(iteration_result result)
+void MessageFederate::initializeToExecuteStateTransition(IterationResult result)
 {
     mfManager->initializeToExecuteStateTransition(result);
 }

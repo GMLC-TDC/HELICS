@@ -280,9 +280,9 @@ void ValueFederateManager::startupToInitializeStateTransition()
     inpHandle->apply([](auto& inp) { inp.loadSourceInformation(); });
 }
 
-void ValueFederateManager::initializeToExecuteStateTransition(iteration_result result)
+void ValueFederateManager::initializeToExecuteStateTransition(IterationResult result)
 {
-    Time ctime = result == iteration_result::next_step ? timeZero : initializationTime;
+    Time ctime = result == IterationResult::NEXT_STEP ? timeZero : initializationTime;
     updateTime(ctime, initializationTime);
 }
 

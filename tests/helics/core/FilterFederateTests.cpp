@@ -13,17 +13,17 @@ using namespace helics;
 
 TEST(FilterFederateTests, constructor_test)
 {
-    FilterFederate a(global_federate_id{23}, "name1", global_broker_id{22342}, nullptr);
-    auto res = a.createFilter(global_broker_id{}, interface_handle(0), "tey1", "", "", false);
+    FilterFederate a(GlobalFederateId{23}, "name1", GlobalBrokerId{22342}, nullptr);
+    auto res = a.createFilter(GlobalBrokerId{}, InterfaceHandle{0}, "tey1", "", "", false);
     EXPECT_NE(res, nullptr);
 }
 
 TEST(FilterFederateTests, constructor_test2)
 {
-    auto a = std::make_unique<FilterFederate>(global_federate_id{23},
+    auto a = std::make_unique<FilterFederate>(GlobalFederateId{23},
                                               "name1",
-                                              global_broker_id{22342},
+                                              GlobalBrokerId{22342},
                                               nullptr);
-    auto res = a->createFilter(global_broker_id{}, interface_handle(0), "tey1", "", "", false);
+    auto res = a->createFilter(GlobalBrokerId{}, InterfaceHandle{0}, "tey1", "", "", false);
     EXPECT_NE(res, nullptr);
 }

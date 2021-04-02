@@ -137,11 +137,11 @@ void ForwardingTimeCoordinator::updateTimeFactors()
     }
 
     if (updateUpstream) {
-        auto upd = generateTimeRequest(upstream, global_federate_id{});
+        auto upd = generateTimeRequest(upstream, GlobalFederateId{});
         transmitTimingMessagesUpstream(upd);
         }
     if (updateDownstream) {
-        auto upd = generateTimeRequest(downstream, global_federate_id{});
+        auto upd = generateTimeRequest(downstream, GlobalFederateId{});
         transmitTimingMessagesDownstream(upd);
     }
 }
@@ -194,7 +194,7 @@ bool ForwardingTimeCoordinator::addDependent(GlobalFederateId fedID)
     return dependencies.addDependent(fedID);
     }
 
-void ForwardingTimeCoordinator::setAsChild(global_federate_id fedID)
+void ForwardingTimeCoordinator::setAsChild(GlobalFederateId fedID)
 {
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
@@ -202,7 +202,7 @@ void ForwardingTimeCoordinator::setAsChild(global_federate_id fedID)
         }
     }
 
-void ForwardingTimeCoordinator::setAsParent(global_federate_id fedID)
+void ForwardingTimeCoordinator::setAsParent(GlobalFederateId fedID)
 {
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
@@ -236,9 +236,9 @@ std::vector<GlobalFederateId> ForwardingTimeCoordinator::getDependencies() const
     return deps;
 }
 
-std::vector<global_federate_id> ForwardingTimeCoordinator::getDependents() const
+std::vector<GlobalFederateId> ForwardingTimeCoordinator::getDependents() const
 {
-    std::vector<global_federate_id> deps;
+    std::vector<GlobalFederateId> deps;
     for (auto& dep : dependencies) {
         if (dep.dependent) {
             deps.push_back(dep.fedID);
@@ -257,12 +257,12 @@ int ForwardingTimeCoordinator::dependencyCount() const
     return dependencies.activeDependencyCount();
 }
 /** get a count of the active dependencies*/
-global_federate_id ForwardingTimeCoordinator::getMinDependency() const
+GlobalFederateId ForwardingTimeCoordinator::getMinDependency() const
 {
     return dependencies.getMinDependency();
 }
 
-message_processing_result ForwardingTimeCoordinator::checkExecEntry()
+MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     if (!dependencies.checkIfReadyForExecEntry(false)) {
@@ -284,7 +284,7 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
 }
 
 ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInfo& dep,
-                                                             global_federate_id fed) const
+                                                             GlobalFederateId fed) const
 {
     ActionMessage nTime(CMD_TIME_REQUEST);
     nTime.source_id = source_id;

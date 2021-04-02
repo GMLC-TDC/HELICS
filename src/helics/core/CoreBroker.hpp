@@ -334,6 +334,10 @@ class CoreBroker: public Broker, public BrokerBase {
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer(const std::string& request, bool force_ordering);
+    /** process a command instruction message*/
+    void processCommandInstruction(ActionMessage& m);
+    /** process a command instruction targeted at this broker*/
+    void processLocalCommandInstruction(ActionMessage& m);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string gidString) const;
     /** locate the route to take to a particular federate*/

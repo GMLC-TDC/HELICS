@@ -69,7 +69,7 @@ void CombinationFederate::startupToInitializeStateTransition()
     MessageFederate::startupToInitializeStateTransition();
 }
 
-void CombinationFederate::initializeToExecuteStateTransition(iteration_result result)
+void CombinationFederate::initializeToExecuteStateTransition(IterationResult result)
 {
     ValueFederate::initializeToExecuteStateTransition(result);
     MessageFederate::initializeToExecuteStateTransition(result);

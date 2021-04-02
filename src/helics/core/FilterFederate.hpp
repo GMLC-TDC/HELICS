@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "global_federate_id.hpp"
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
-#include "helics/external/any.hpp"
 
 #include <functional>
 #include <map>
@@ -23,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <any>
 
 namespace helics {
 class HandleManager;
@@ -31,15 +31,15 @@ class BasicHandleInfo;
 
 class FilterFederate {
   private:
-    global_federate_id mFedID;
-    global_broker_id mCoreID;
+    GlobalFederateId mFedID;
+    GlobalBrokerId mCoreID;
     const std::string mName;
     // Core* mCore{nullptr};
     TimeCoordinator mCoord;
     HandleManager* mHandles{nullptr};
-    federate_state current_state{HELICS_CREATED};
+    FederateStates current_state{HELICS_CREATED};
     /// map of all local filters
-    std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;
+    std::map<InterfaceHandle, std::unique_ptr<FilterCoordinator>> filterCoord;
     // The interface_handle used is here is usually referencing an endpoint
 
     std::function<void(const ActionMessage&)> mQueueMessage;
@@ -50,7 +50,7 @@ class FilterFederate {
     std::function<void(ActionMessage&)> mDeliverMessage;
 
     std::function<void(int, const std::string&, const std::string&)> mLogger;
-    std::function<gmlc::containers::AirLock<stx::any>&(int)> mGetAirLock;
+    std::function<gmlc::containers::AirLock<std::any>&(int)> mGetAirLock;
 
     /// sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;
@@ -60,11 +60,11 @@ class FilterFederate {
      * number bigger than 1 to prevent confusion */
     std::atomic<int32_t> messageCounter{54};
     /// storage for all the filters
-    gmlc::containers::MappedPointerVector<FilterInfo, global_handle> filters;
+    gmlc::containers::MappedPointerVector<FilterInfo, GlobalHandle> filters;
     // bool hasTiming{false};
 
   public:
-    FilterFederate(global_federate_id fedID, std::string name, global_broker_id coreID, Core* core);
+    FilterFederate(GlobalFederateId fedID, std::string name, GlobalBrokerId coreID, Core* core);
     ~FilterFederate();
     /** process any filter or route the message*/
     void processMessageFilter(ActionMessage& cmd);
@@ -73,8 +73,8 @@ class FilterFederate {
     /** process a destination filter message return*/
     void processDestFilterReturn(ActionMessage& command);
     /** create a filter */
-    FilterInfo* createFilter(global_broker_id dest,
-                             interface_handle handle,
+    FilterInfo* createFilter(GlobalBrokerId dest,
+                             InterfaceHandle handle,
                              const std::string& key,
                              const std::string& type_in,
                              const std::string& type_out,
@@ -101,7 +101,7 @@ class FilterFederate {
         mDeliverMessage = std::move(deliverMessage);
     }
 
-    void setAirLockFunction(std::function<gmlc::containers::AirLock<stx::any>&(int)> getAirLock)
+    void setAirLockFunction(std::function<gmlc::containers::AirLock<std::any>&(int)> getAirLock)
     {
         mGetAirLock = std::move(getAirLock);
     }
@@ -115,7 +115,7 @@ class FilterFederate {
 
     void destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
-    void addFilteredEndpoint(Json::Value& block, global_federate_id fed) const;
+    void addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const;
 
     void setHandleManager(HandleManager* handles) { mHandles = handles; }
 
@@ -126,9 +126,9 @@ class FilterFederate {
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/
-    FilterCoordinator* getFilterCoordinator(interface_handle handle);
+    FilterCoordinator* getFilterCoordinator(InterfaceHandle handle);
 
-    FilterInfo* getFilterInfo(global_handle id);
-    FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle);
+    FilterInfo* getFilterInfo(GlobalHandle id);
+    FilterInfo* getFilterInfo(GlobalFederateId fed, InterfaceHandle handle);
 };
 }  // namespace helics

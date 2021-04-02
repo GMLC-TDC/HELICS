@@ -643,7 +643,7 @@ const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateI
 {
     static const std::string filterString = getIdentifier() + "_filters";
 
-    auto* fed = getFederateAt(local_federate_id(federateID.localIndex()));
+    auto* fed = getFederateAt(LocalFederateId(federateID.localIndex()));
     return (fed == nullptr) ? ((federateID == filterFedID) ? filterString : unknownString) :
                               fed->getIdentifier();
 }
@@ -683,7 +683,7 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
             treq.actionTime = next;
             setActionFlag(treq, indicator_flag);
             addActionMessage(treq);
-            auto ret = fed->requestTime(next, iteration_request::no_iterations, false);
+            auto ret = fed->requestTime(next, IterationRequest::NO_ITERATIONS, false);
             switch (ret.state) {
                 case IterationResult::ERROR_RESULT:
                     throw(FunctionExecutionFailure(fed->lastErrorString()));
@@ -1555,7 +1555,7 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
     auto fid = filterFedID.load();
 
     auto handle = createBasicHandle(
-        fid, local_federate_id(), handle_type::filter, filterName, type_in, type_out);
+        fid, LocalFederateId(), InterfaceType::FILTER, filterName, type_in, type_out);
     auto id = handle.getInterfaceHandle();
 
     ActionMessage m(CMD_REG_FILTER);
@@ -1728,14 +1728,13 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
     m.messageID = ++messageCounter;
     m.source_handle = sourceHandle;
     m.source_id = hndl->getFederateId();
-    auto minTime = getFederateAt(hndl->local_fed_id)->nextAllowedSendTime();
-    m.actionTime = std::max(time, minTime);
+    auto minTime = fed->nextAllowedSendTime();
+    m.actionTime = std::max(sendTime, minTime);
     m.flags = hndl->flags;
 
     m.payload.assign(data, length);
     m.setStringData(destination, hndl->key, hndl->key);
-    auto minTime = fed->nextAllowedSendTime();
-    m.actionTime = std::max(sendTime, minTime);
+
     addActionMessage(std::move(m));
 }
 
@@ -2343,7 +2342,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         return generateStringVector_if(
             loopHandles,
             [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == handle_type::filter); });
+            [](const auto& handle) { return (handle.handleType == InterfaceType::FILTER); });
     }
 
     if (queryStr == "endpoints") {
@@ -2632,9 +2631,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 }
                 global_id = GlobalBrokerId(command.dest_id);
                 global_broker_id_local = GlobalBrokerId(command.dest_id);
-                filterFedID = global_federate_id(
-                    global_broker_id_shift -
-                    2 * (global_broker_id_local.baseValue() - global_broker_id_shift + 1));
+                filterFedID = GlobalFederateId(
+                    gGlobalBrokerIdShift -
+                    2 * (global_broker_id_local.baseValue() - gGlobalBrokerIdShift + 1));
                 timeCoord->source_id = global_broker_id_local;
                 higher_broker_id = GlobalBrokerId(command.source_id);
                 transmitDelayedMessages();
@@ -3381,7 +3380,7 @@ void CommonCore::generateFilterFederate()
     newFed.dest_id = parent_broker_id;
     newFed.source_id = global_broker_id_local;
     newFed.setExtraData(fid.baseValue());
-    newFed.name = getIdentifier() + "_filters";
+    newFed.name(getIdentifier() + "_filters");
     transmit(getRoute(higher_broker_id), newFed);
         }
 
@@ -3898,7 +3897,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
         case CMD_BROKER_QUERY:
 
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
-                std::string repStr = coreQuery(cmd.payload, force_ordered);
+                std::string repStr = coreQuery(std::string(cmd.payload.to_string()), force_ordered);
                 if (repStr != "#wait") {
                     if (cmd.source_id == direct_core_id) {
                         // TODO(PT) make setDelayedValue have a move method
@@ -3920,7 +3919,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
-                    std::get<1>(mapBuilders[mapIndex.at(cmd.payload).first]).push_back(queryResp);
+                    std::get<1>(mapBuilders[mapIndex.at(std::string(cmd.payload.to_string())).first]).push_back(queryResp);
                 }
 
             } else {
@@ -3961,10 +3960,10 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 const std::string& target = cmd.getString(targetStringLoc);
                 if (target == getIdentifier()) {
                     queryResp.source_id = global_broker_id_local;
-                    repStr = coreQuery(cmd.payload, force_ordered);
+                    repStr = coreQuery(std::string(cmd.payload.to_string()), force_ordered);
                 } else {
                     auto* fedptr = getFederateCore(target);
-                    repStr = federateQuery(fedptr, cmd.payload, force_ordered);
+                    repStr = federateQuery(fedptr, std::string(cmd.payload.to_string()), force_ordered);
                     if (repStr == "#wait") {
                         if (fedptr != nullptr) {
                             cmd.dest_id = fedptr->global_id;
@@ -4039,7 +4038,7 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
     }
 }
 
-bool CommonCore::hasTimeBlock(global_federate_id fedID)
+bool CommonCore::hasTimeBlock(GlobalFederateId fedID)
 {
     for (auto& tb : timeBlocks) {
         if (fedID == tb.first) {

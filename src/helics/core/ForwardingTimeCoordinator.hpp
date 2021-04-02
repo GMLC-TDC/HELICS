@@ -37,7 +37,7 @@ class ForwardingTimeCoordinator {
 
   public:
     /// the identifier for inserting into the source id field of any generated messages;
-    global_federate_id source_id{0};
+    GlobalFederateId source_id{0};
     /// flag indicating that the coordinator is trying to enter the exec mode
     bool checkingExec{false};
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
@@ -60,7 +60,7 @@ class ForwardingTimeCoordinator {
     /** get a list of actual dependencies*/
     std::vector<GlobalFederateId> getDependencies() const;
     /** get a reference to the dependents vector*/
-    std::vector<global_federate_id> getDependents() const;
+    std::vector<GlobalFederateId> getDependents() const;
 
     /** compute updates to time values
     and send an update if needed
@@ -80,7 +80,7 @@ class ForwardingTimeCoordinator {
     void transmitTimingMessagesUpstream(ActionMessage& msg) const;
     void transmitTimingMessagesDownstream(ActionMessage& msg) const;
     /** generate a timeRequest message based on the dependency info data*/
-    ActionMessage generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const;
+    ActionMessage generateTimeRequest(const DependencyInfo& dep, GlobalFederateId fed) const;
 
   public:
     /** process a message related to time
@@ -105,8 +105,8 @@ class ForwardingTimeCoordinator {
     @param fedID the identifier of the federate to remove*/
     void removeDependent(GlobalFederateId fedID);
 
-    void setAsChild(global_federate_id fedID);
-    void setAsParent(global_federate_id fedID);
+    void setAsChild(GlobalFederateId fedID);
+    void setAsParent(GlobalFederateId fedID);
 
     /** disconnect*/
     void disconnect();
@@ -129,6 +129,6 @@ class ForwardingTimeCoordinator {
     /** get a count of the active dependencies*/
     int dependencyCount() const;
     /** get a count of the active dependencies*/
-    global_federate_id getMinDependency() const;
+    GlobalFederateId getMinDependency() const;
 };
 }  // namespace helics

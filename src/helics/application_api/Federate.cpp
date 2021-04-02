@@ -299,8 +299,8 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
                     currentMode = Modes::ERROR_STATE;
                     break;
                     // LCOV_EXCL_STOP
-                case iteration_result::halted:
-                    currentMode = modes::finished;
+                case IterationResult::HALTED:
+                    currentMode = Modes::FINISHED;
                     break;
             }
             break;
@@ -373,20 +373,20 @@ IterationResult Federate::enterExecutingModeComplete()
                     case IterationResult::NEXT_STEP:
                         currentMode = Modes::EXECUTING;
                         currentTime = timeZero;
-                        initializeToExecuteStateTransition(iteration_result::next_step);
+                        initializeToExecuteStateTransition(IterationResult::NEXT_STEP);
                         break;
                     case IterationResult::ITERATING:
                         currentMode = Modes::INITIALIZING;
                         currentTime = initializationTime;
-                        initializeToExecuteStateTransition(iteration_result::iterating);
+                        initializeToExecuteStateTransition(IterationResult::ITERATING);
                         break;
                     case IterationResult::ERROR_RESULT:
                         // LCOV_EXCL_START
                         currentMode = Modes::ERROR_STATE;
                         break;
                         // LCOV_EXCL_STOP
-                    case iteration_result::halted:
-                        currentMode = modes::finished;
+                    case IterationResult::HALTED:
+                        currentMode = Modes::FINISHED;
                         break;
                 }
 
@@ -466,7 +466,7 @@ void Federate::finalize()
             asyncCallInfo->lock()->timeRequestFuture.get();
             break;
         case Modes::EXECUTING:
-        case modes::finished:
+        case Modes::FINISHED:
             break;
         case Modes::PENDING_ITERATIVE_TIME:
             asyncCallInfo->lock()
@@ -597,14 +597,14 @@ void Federate::globalError(int errorcode, const std::string& message)
 Time Federate::requestTime(Time nextInternalTimeStep)
 {
     switch (currentMode) {
-        case modes::executing:
+        case Modes::EXECUTING:
         try {
             auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
             Time oldTime = currentTime;
             currentTime = newTime;
             updateTime(newTime, oldTime);
             if (newTime == Time::maxVal()) {
-                    currentMode = modes::finished;
+                    currentMode = Modes::FINISHED;
             }
             return newTime;
         }
@@ -613,9 +613,9 @@ Time Federate::requestTime(Time nextInternalTimeStep)
             throw;
         }
             break;
-        case modes::finalize:
-        case modes::finished:
-        return Time::maxVal();
+        case Modes::FINALIZE:
+        case Modes::FINISHED:
+           return Time::maxVal();
         default:
             break;
     }
@@ -638,7 +638,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
             case IterationResult::HALTED:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
-                currentMode = modes::finished;
+                currentMode = Modes::FINISHED;
                 break;
             case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
@@ -648,8 +648,8 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
         }
         return iterativeTime;
     }
-    if (currentMode == modes::finalize || currentMode == modes::finished) {
-        return {Time::maxVal(), iteration_result::halted};
+    if (currentMode == Modes::FINALIZE || currentMode == Modes::FINISHED) {
+        return {Time::maxVal(), IterationResult::HALTED};
     }
     throw(InvalidFunctionCall("cannot call request time in present state"));
 }
@@ -717,7 +717,7 @@ iteration_time Federate::requestTimeIterativeComplete()
             case IterationResult::HALTED:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
-                currentMode = modes::finished;
+                currentMode = Modes::FINISHED;
                 break;
             case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
@@ -740,7 +740,7 @@ void Federate::startupToInitializeStateTransition()
 {
     // child classes may do something with this
 }
-void Federate::initializeToExecuteStateTransition(iteration_result /*unused*/)
+void Federate::initializeToExecuteStateTransition(IterationResult /*unused*/)
 {
     // child classes may do something with this
 }

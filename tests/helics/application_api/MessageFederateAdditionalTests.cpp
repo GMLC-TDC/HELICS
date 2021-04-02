@@ -672,8 +672,8 @@ TEST_F(mfed_tests, message_warnings)
     std::atomic<int> warnings{0};
 
     mFed1->setLoggingCallback(
-        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
-            if (level <= helics_log_level_warning) {
+        [&warnings](int level, std::string_view /*ignored*/, std::string_view /*ignored*/) {
+            if (level <= HELICS_LOG_LEVEL_WARNING) {
                 ++warnings;
             }
         });
@@ -683,12 +683,12 @@ TEST_F(mfed_tests, message_warnings)
     const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
     mFed1->enterExecutingMode();
 
-    mFed1->sendMessage(ep1, "unknown", message1.c_str(), 26);
+    ep1.sendTo(message1.c_str(), 26, "unknown");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(warnings.load(), 1);
 
-    mFed1->sendMessage(ep1, "unknown2", message1.c_str(), 26);
+    ep1.sendTo(message1.c_str(), 26, "unknown2");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(3.0);
     EXPECT_EQ(warnings.load(), 2);
@@ -703,8 +703,8 @@ TEST_F(mfed_tests, message_warnings_ignore)
     std::atomic<int> warnings{0};
 
     mFed1->setLoggingCallback(
-        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
-            if (level <= helics_log_level_warning) {
+        [&warnings](int level, std::string_view /*ignored*/, std::string_view /*ignored*/) {
+            if (level <= HELICS_LOG_LEVEL_WARNING) {
                 ++warnings;
             }
         });
@@ -717,13 +717,13 @@ TEST_F(mfed_tests, message_warnings_ignore)
 
     mFed1->enterExecutingMode();
 
-    mFed1->sendMessage(ep1, mess1);
+    ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(warnings.load(), 1);
     setActionFlag(mess1, optional_flag);
     // it should cause the unknown destination to be ignored
-    mFed1->sendMessage(ep1, mess1);
+    ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(3.0);
     EXPECT_EQ(warnings.load(), 1);
@@ -738,8 +738,8 @@ TEST_F(mfed_tests, message_error)
     std::atomic<int> errors{0};
 
     mFed1->setLoggingCallback(
-        [&errors](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
-            if (level <= helics_log_level_error) {
+        [&errors](int level, std::string_view /*ignored*/, std::string_view /*ignored*/) {
+            if (level <= HELICS_LOG_LEVEL_ERROR) {
                 ++errors;
             }
         });
@@ -752,13 +752,13 @@ TEST_F(mfed_tests, message_error)
 
     mFed1->enterExecutingMode();
 
-    mFed1->sendMessage(ep1, mess1);
+    ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(errors.load(), 0);
     setActionFlag(mess1, required_flag);
     // it should cause the unknown destination to be ignored
-    mFed1->sendMessage(ep1, mess1);
+    ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int err_count{0};
     try {
@@ -776,12 +776,12 @@ TEST_F(mfed_tests, default_endpoint_required)
 {
     SetupTest<helics::MessageFederate>("test", 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    mFed1->setFlagOption(helics_handle_option_connection_required, true);
+    mFed1->setFlagOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED, true);
     std::atomic<int> errors{0};
 
     mFed1->setLoggingCallback(
-        [&errors](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
-            if (level <= helics_log_level_error) {
+        [&errors](int level, std::string_view /*ignored*/, std::string_view /*ignored*/) {
+            if (level <= HELICS_LOG_LEVEL_ERROR) {
                 ++errors;
             }
         });
@@ -790,7 +790,7 @@ TEST_F(mfed_tests, default_endpoint_required)
 
     mFed1->enterExecutingMode();
 
-    ep1.send("unknown", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    ep1.sendTo("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","unknown");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int err_count{0};
     try {
@@ -819,11 +819,11 @@ TEST_F(mfed_tests, message_init_iteration)
     mFed2->enterInitializingMode();
     mFed1->enterInitializingModeComplete();
 
-    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
+    ep1.sendTo(message1.c_str(), 26, "ep2");
     mFed1->enterExecutingModeAsync();
 
-    auto result = mFed2->enterExecutingMode(helics::iteration_request::iterate_if_needed);
-    EXPECT_EQ(result, helics::iteration_result::iterating);
+    auto result = mFed2->enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
+    EXPECT_EQ(result, helics::IterationResult::ITERATING);
 
     EXPECT_TRUE(ep2.hasMessage());
 
@@ -849,12 +849,12 @@ TEST_F(mfed_tests, missing_endpoint)
     auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
     auto& ep2 = mFed1->registerGlobalEndpoint("ep2");
     auto& ep3 = mFed1->registerGlobalEndpoint("ep3");
-    ep2.setOption(helics_handle_option_connection_optional);
-    ep3.setOption(helics_handle_option_connection_required);
+    ep2.setOption(HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL);
+    ep3.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     mFed1->setLoggingCallback(
-        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
             mlog.lock()->emplace_back(level, message);
         });
 
@@ -865,26 +865,26 @@ TEST_F(mfed_tests, missing_endpoint)
 
     mFed1->enterExecutingModeComplete();
 
-    mFed1->sendMessage(ep1, "ep92", message1.c_str(), 26);
+    ep1.sendTo(message1.c_str(), 26, "ep92");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(1.0);
 
     auto mm = mlog.lock();
     EXPECT_EQ(mm->size(), 1U);
     if (!mm->empty()) {
-        EXPECT_EQ(mm->front().first, helics_log_level_warning);
+        EXPECT_EQ(mm->front().first, HELICS_LOG_LEVEL_WARNING);
         EXPECT_THAT(mm->front().second, HasSubstr("ep92"));
         EXPECT_THAT(mm->front().second, HasSubstr("ep1"));
     }
     mm.unlock();
-    mFed1->sendMessage(ep2, "ep92", message1.c_str(), 26);
+    ep2.sendTo(message1.c_str(), 26, "ep92");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     // no warning from this one
     mm = mlog.lock();
     EXPECT_EQ(mm->size(), 1U);
     mm.unlock();
-    mFed1->sendMessage(ep3, "ep92", message1.c_str(), 26);
+    ep3.sendTo(message1.c_str(), 26, "ep92");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     try {
         mFed1->requestTime(3.0);
@@ -894,7 +894,7 @@ TEST_F(mfed_tests, missing_endpoint)
     mm = mlog.lock();
     EXPECT_EQ(mm->size(), 2U);
     if (!mm->empty()) {
-        EXPECT_EQ(mm->back().first, helics_log_level_error);
+        EXPECT_EQ(mm->back().first, HELICS_LOG_LEVEL_ERROR);
         EXPECT_THAT(mm->back().second, HasSubstr("ep92"));
         EXPECT_THAT(mm->back().second, HasSubstr("ep3"));
     }

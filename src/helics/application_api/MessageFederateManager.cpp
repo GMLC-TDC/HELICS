@@ -209,9 +209,9 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 
 void MessageFederateManager::startupToInitializeStateTransition() {}
 
-void MessageFederateManager::initializeToExecuteStateTransition(iteration_result result)
+void MessageFederateManager::initializeToExecuteStateTransition(IterationResult result)
 {
-    Time ctime = result == iteration_result::next_step ? timeZero : initializationTime;
+    Time ctime = result == IterationResult::NEXT_STEP ? timeZero : initializationTime;
     updateTime(ctime, initializationTime);
 }
 

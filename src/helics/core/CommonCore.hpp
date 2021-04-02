@@ -414,7 +414,7 @@ class CommonCore: public Core, public BrokerBase {
     HandleManager loopHandles;  //!< copy of handles to use in the primary processing loop without
                                 //!< thread protection
     /// sets of ongoing time blocks from filtering
-    std::vector<std::pair<global_federate_id, int32_t>> timeBlocks;
+    std::vector<std::pair<GlobalFederateId, int32_t>> timeBlocks;
 
     std::map<int32_t, std::vector<ActionMessage>>
         delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
@@ -428,7 +428,7 @@ class CommonCore: public Core, public BrokerBase {
 
     FilterFederate* filterFed{nullptr};
     std::atomic<std::thread::id> filterThread{std::thread::id{}};
-    std::atomic<global_federate_id> filterFedID;
+    std::atomic<GlobalFederateId> filterFedID;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<std::any>, 4>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
@@ -439,7 +439,7 @@ class CommonCore: public Core, public BrokerBase {
     // generate a timing connection between the core and filter Federate
     void connectFilterTiming();
     /** check if a given federate has a timeblock*/
-    bool hasTimeBlock(global_federate_id fedID);
+    bool hasTimeBlock(GlobalFederateId fedID);
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration();
     /** generate the messages to a set of destinations*/

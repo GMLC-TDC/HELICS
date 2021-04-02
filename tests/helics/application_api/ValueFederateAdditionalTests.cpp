@@ -1087,7 +1087,7 @@ TEST(valuefederate, indexed_targets)
 /** test out register interfaces after configuration make sure that doesn't cause issues*/
 TEST(valuefederate, file_and_config)
 {
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, "-f 2");
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, "-f 2");
 
     auto file1 = std::string(TEST_DIR) + "fed1_config.json";
     auto file2 = std::string(TEST_DIR) + "fed2_config.json";
@@ -1130,7 +1130,7 @@ TEST(valuefederate, file_and_config)
 
 TEST(valuefederate, duplicate_targets)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "core_dup";
     fi.coreInitString = "-f 1 --autobroker";
 

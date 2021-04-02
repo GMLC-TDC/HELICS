@@ -112,7 +112,7 @@ class FederateState {
     std::map<GlobalFederateId, std::deque<ActionMessage>>
         delayQueues;  //!< queue for delaying processing of messages for a time
     std::vector<InterfaceHandle> events;  //!< list of value events to process
-    std::vector<interface_handle> eventMessages;  //!< list of endpoints with messages to process
+    std::vector<InterfaceHandle> eventMessages;  //!< list of endpoints with messages to process
     std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
@@ -322,7 +322,7 @@ class FederateState {
     assumes the caller generated the message returns either converged or nonconverged depending on
     whether an iteration is needed
     */
-    iteration_result enterExecutingMode(iteration_request iterate, bool sendRequest = false);
+    IterationResult enterExecutingMode(IterationRequest iterate, bool sendRequest = false);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param iterate the type of iteration requested
@@ -330,7 +330,7 @@ class FederateState {
     assumes the caller generated the message
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time requestTime(Time nextTime, iteration_request iterate, bool sendRequest = false);
+    iteration_time requestTime(Time nextTime, IterationRequest iterate, bool sendRequest = false);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */

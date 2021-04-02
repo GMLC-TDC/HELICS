@@ -473,7 +473,7 @@ void ValueFederate::startupToInitializeStateTransition()
 {
     vfManager->startupToInitializeStateTransition();
 }
-void ValueFederate::initializeToExecuteStateTransition(iteration_result result)
+void ValueFederate::initializeToExecuteStateTransition(IterationResult result)
 {
     vfManager->initializeToExecuteStateTransition(result);
 }

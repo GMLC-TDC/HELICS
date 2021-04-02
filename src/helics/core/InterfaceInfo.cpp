@@ -197,7 +197,7 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
     return true;
 }
 
-bool InterfaceInfo::setEndpointProperty(interface_handle id, int32_t option, int32_t value)
+bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int32_t value)
 {
     auto* ept = getEndpoint(id);
     if (ept == nullptr) {
@@ -205,10 +205,10 @@ bool InterfaceInfo::setEndpointProperty(interface_handle id, int32_t option, int
 }
     bool bvalue = (value != 0);
     switch (option) {
-        case defs::options::connection_required:
+        case defs::Options::CONNECTION_REQUIRED:
             ept->required = bvalue;
             break;
-        case defs::options::connection_optional:
+        case defs::Options::CONNECTION_OPTIONAL:
             ept->required = !bvalue;
             break;
         default:
@@ -294,7 +294,7 @@ int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option
     return flagval ? 1 : 0;
 }
 
-int32_t InterfaceInfo::getEndpointProperty(interface_handle id, int32_t option) const
+int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle id, int32_t option) const
 {
     const auto* ept = getEndpoint(id);
     if (ept == nullptr) {
@@ -302,10 +302,10 @@ int32_t InterfaceInfo::getEndpointProperty(interface_handle id, int32_t option) 
 }
     bool flagval = false;
     switch (option) {
-        case defs::options::connection_required:
+        case defs::Options::CONNECTION_REQUIRED:
             flagval = ept->required;
             break;
-        case defs::options::connection_optional:
+        case defs::Options::CONNECTION_OPTIONAL:
             flagval = !ept->required;
             break;
         default:

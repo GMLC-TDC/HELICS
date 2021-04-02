@@ -72,7 +72,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
   protected:
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition() override;
-    virtual void initializeToExecuteStateTransition(iteration_result result) override;
+    virtual void initializeToExecuteStateTransition(IterationResult result) override;
     virtual std::string localQuery(const std::string& queryStr) const override;
 
   public:

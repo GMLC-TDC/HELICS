@@ -16,18 +16,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
 
+#include <cassert>
+
 namespace helics {
 
-FilterFederate::FilterFederate(global_federate_id fedID,
+FilterFederate::FilterFederate(GlobalFederateId fedID,
                                std::string name,
-                               global_broker_id coreID,
+                               GlobalBrokerId coreID,
                                Core* /*core*/):
     mFedID(fedID),
     mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
     mCoord.source_id = fedID;
-    mCoord.setOptionFlag(helics::defs::flags::event_triggered, true);
+    mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
 }
 
 FilterFederate::~FilterFederate()
@@ -102,7 +104,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                         }
                         cmd.setSource(source);
                         cmd.dest_id = parent_broker_id;
-                        cmd.dest_handle = interface_handle();
+                        cmd.dest_handle = InterfaceHandle();
                         mDeliverMessage(cmd);
                     } else {
                         cmd.setDestination(source);
@@ -129,7 +131,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                 if (!returnToSender) {
                     cmd.setAction(CMD_SEND_MESSAGE);
                     cmd.dest_id = parent_broker_id;
-                    cmd.dest_handle = interface_handle();
+                    cmd.dest_handle = InterfaceHandle();
                     mDeliverMessage(cmd);
                 } else {
                     cmd.setDestination(source);
@@ -452,7 +454,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
         current_state = std::get<0>(proc_result);
         switch (current_state) {
             case HELICS_INITIALIZING:
-                mCoord.enteringExecMode(iteration_request::no_iterations);
+                mCoord.enteringExecMode(IterationRequest::NO_ITERATIONS);
                 {
                     ActionMessage echeck{CMD_EXEC_CHECK};
                     echeck.dest_id = mFedID;
@@ -462,7 +464,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 break;
             case HELICS_EXECUTING:
                 mCoord.timeRequest(Time::maxVal(),
-                                   iteration_request::no_iterations,
+                                   IterationRequest::NO_ITERATIONS,
                                    Time::maxVal(),
                                    Time::maxVal());
                 break;
@@ -476,10 +478,10 @@ void FilterFederate::handleMessage(ActionMessage& command)
                         errorString += " code:" + std::to_string(command.messageID);
                     }
                 } else {
-                    errorString = command.payload;
+                    errorString = command.payload.to_string();
                 }
                 if (mLogger) {
-                    mLogger(helics_log_level_error, mName, errorString);
+                    mLogger(HELICS_LOG_LEVEL_ERROR, mName, errorString);
                 }
             } break;
             default:
@@ -488,15 +490,15 @@ void FilterFederate::handleMessage(ActionMessage& command)
     }
 
     switch (std::get<1>(proc_result)) {
-        case message_processing_result::continue_processing:
+        case MessageProcessingResult::CONTINUE_PROCESSING:
             break;
-        case message_processing_result::reprocess_message:
+        case MessageProcessingResult::REPROCESS_MESSAGE:
             if (command.dest_id != mFedID) {
                 mSendMessage(command);
                 return;
             }
             return handleMessage(command);
-        case message_processing_result::delay_message:
+        case MessageProcessingResult::DELAY_MESSAGE:
         default:
             return;
     }
@@ -574,7 +576,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 if (filtI != nullptr) {
                     auto op = mGetAirLock(command.counter).try_unload();
                     if (op) {
-                        auto M = stx::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
+                        auto M = std::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
                         filtI->filterOp = std::move(M);
                     }
                 }
@@ -585,15 +587,15 @@ void FilterFederate::handleMessage(ActionMessage& command)
     }
 }
 
-FilterInfo* FilterFederate::createFilter(global_broker_id dest,
-                                         interface_handle handle,
+FilterInfo* FilterFederate::createFilter(GlobalBrokerId dest,
+                                         InterfaceHandle handle,
                                          const std::string& key,
                                          const std::string& type_in,
                                          const std::string& type_out,
                                          bool cloning)
 {
     auto filt = std::make_unique<FilterInfo>((dest == parent_broker_id || dest == mCoreID) ?
-                                                 global_broker_id(mFedID) :
+                                                 GlobalBrokerId(mFedID) :
                                                  dest,
                                              handle,
                                              key,
@@ -621,7 +623,7 @@ FilterInfo* FilterFederate::createFilter(global_broker_id dest,
     return retTarget;
 }
 
-FilterCoordinator* FilterFederate::getFilterCoordinator(interface_handle handle)
+FilterCoordinator* FilterFederate::getFilterCoordinator(InterfaceHandle handle)
 {
     auto fnd = filterCoord.find(handle);
     if (fnd == filterCoord.end()) {
@@ -634,17 +636,17 @@ FilterCoordinator* FilterFederate::getFilterCoordinator(interface_handle handle)
     return fnd->second.get();
 }
 
-FilterInfo* FilterFederate::getFilterInfo(global_handle id)
+FilterInfo* FilterFederate::getFilterInfo(GlobalHandle id)
 {
     return filters.find(id);
 }
 
-FilterInfo* FilterFederate::getFilterInfo(global_federate_id fed, interface_handle handle)
+FilterInfo* FilterFederate::getFilterInfo(GlobalFederateId fed, InterfaceHandle handle)
 {
     if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;
     }
-    return filters.find(global_handle{fed, handle});
+    return filters.find(GlobalHandle{fed, handle});
 }
 
 void FilterFederate::processFilterInfo(ActionMessage& command)
@@ -681,7 +683,7 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
                     ActionMessage err(CMD_ERROR);
                     err.dest_id = command.source_id;
                     err.setSource(command.getDest());
-                    err.messageID = defs::errors::registration_failure;
+                    err.messageID = defs::Errors::REGISTRATION_FAILURE;
                     err.payload =
                         "Endpoint " + endhandle->key + " already has a destination filter";
                     mSendMessageMove(std::move(err));
@@ -690,9 +692,9 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
             }
             auto* newFilter = getFilterInfo(command.getSource());
             if (newFilter == nullptr) {
-                newFilter = createFilter(global_broker_id(command.source_id),
+                newFilter = createFilter(GlobalBrokerId(command.source_id),
                                          command.source_handle,
-                                         command.name,
+                                         std::string(command.payload.to_string()),
                                          command.getString(typeStringLoc),
                                          command.getString(typeOutStringLoc),
                                          checkActionFlag(command, clone_flag));
@@ -718,9 +720,9 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
         if (!FilterAlreadyPresent) {
             auto* newFilter = getFilterInfo(command.getSource());
             if (newFilter == nullptr) {
-                newFilter = createFilter(global_broker_id(command.source_id),
+                newFilter = createFilter(GlobalBrokerId(command.source_id),
                                          command.source_handle,
-                                         command.name,
+                                 std::string(command.payload.to_string()),
                                          command.getString(typeStringLoc),
                                          command.getString(typeOutStringLoc),
                                          checkActionFlag(command, clone_flag));
@@ -791,7 +793,7 @@ void FilterFederate::organizeFilterOperations()
                 if (used[ii]) {
                     continue;
                 }
-                mLogger(helics_log_level_warning,
+                mLogger(HELICS_LOG_LEVEL_WARNING,
                         fi->allSourceFilters[ii]->key,
                         "unable to match types on some filters");
             }
@@ -799,7 +801,7 @@ void FilterFederate::organizeFilterOperations()
     }
 }
 
-void FilterFederate::addFilteredEndpoint(Json::Value& block, global_federate_id fed) const
+void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const
 {
     block["endpoints"] = Json::arrayValue;
     for (const auto& filt : filterCoord) {

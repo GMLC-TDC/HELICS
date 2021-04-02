@@ -39,8 +39,8 @@ class TimeData {
     Time Te{timeZero};  //!< the next currently scheduled event
     Time minDe{timeZero};  //!< min dependency event time
     Time TeAlt{timeZero};  //!< the second min event
-    global_federate_id minFed{};  //!< identifier for the min dependency
-    global_federate_id minFedActual{};  //!< the actual forwarded minimum federate object
+    GlobalFederateId minFed{};  //!< identifier for the min dependency
+    GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     time_state_t time_state{time_state_t::initialized};
 
     TimeData() = default;
@@ -52,7 +52,7 @@ class TimeData {
 /** data class containing information about inter-federate dependencies*/
 class DependencyInfo: public TimeData {
   public:
-    global_federate_id fedID{};  //!< identifier for the dependency
+    GlobalFederateId fedID{};  //!< identifier for the dependency
 
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
@@ -65,7 +65,7 @@ class DependencyInfo: public TimeData {
     /** default constructor*/
     DependencyInfo() = default;
     /** construct from a federate id*/
-    explicit DependencyInfo(global_federate_id id): fedID(id), forwarding{id.isBroker()} {}
+    explicit DependencyInfo(GlobalFederateId id): fedID(id), forwarding{id.isBroker()} {}
 
     explicit DependencyInfo(Time start): TimeData(start) {}
 };
@@ -80,7 +80,7 @@ class TimeDependencies {
     /** return true if the given federate is already a dependency*/
     bool isDependency(GlobalFederateId ofed) const;
     /** return true if the given federate is already a dependent*/
-    bool isDependent(global_federate_id ofed) const;
+    bool isDependent(GlobalFederateId ofed) const;
     /** insert a dependency into the structure
     @return true if the dependency was added, false if it existed already
     */
@@ -88,11 +88,11 @@ class TimeDependencies {
     /** remove  dependency from consideration*/
     void removeDependency(GlobalFederateId id);
     /** update the info about a dependency based on a message*/
-    bool addDependent(global_federate_id id);
+    bool addDependent(GlobalFederateId id);
     /** remove  dependent from consideration*/
-    void removeDependent(global_federate_id id);
+    void removeDependent(GlobalFederateId id);
     /** remove an interdependency from consideration*/
-    void removeInterdependence(global_federate_id id);
+    void removeInterdependence(GlobalFederateId id);
     /** update the info about a dependency based on a message*/
     bool updateTime(const ActionMessage& m);
     /** get the number of dependencies*/
@@ -140,25 +140,25 @@ class TimeDependencies {
     /** get a count of the active dependencies*/
     int activeDependencyCount() const;
     /** get a count of the active dependencies*/
-    global_federate_id getMinDependency() const;
+    GlobalFederateId getMinDependency() const;
 
     void setDependencyVector(const std::vector<DependencyInfo>& deps) { dependencies = deps; }
 };
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
-                                 global_federate_id self,
-                                 global_federate_id ignore = global_federate_id());
+                                 GlobalFederateId self,
+                                 GlobalFederateId ignore = GlobalFederateId{});
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
-                                   global_federate_id self,
-                                   global_federate_id ignore = global_federate_id());
+                                   GlobalFederateId self,
+                                   GlobalFederateId ignore = GlobalFederateId{});
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
-                              global_federate_id self,
-                              global_federate_id ignore = global_federate_id());
+                              GlobalFederateId self,
+                              GlobalFederateId ignore = GlobalFederateId{});
 
 void generateJsonOutputTimeData(Json::Value& output,
                                 const TimeData& dep,

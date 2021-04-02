@@ -155,7 +155,7 @@ void TimeCoordinator::timeRequest(Time nextTime,
         }
     }
     time_requested = nextTime;
-    if (iterating != iteration_request::no_iterations) {
+    if (iterating != IterationRequest::NO_ITERATIONS) {
         time_value = (newValueTime > time_granted) ? newValueTime : time_granted;
         time_message = (newMessageTime > time_granted) ? newMessageTime : time_granted;
     } else {
@@ -331,7 +331,7 @@ int TimeCoordinator::dependencyCount() const
 }
 
 /** get a count of the active dependencies*/
-global_federate_id TimeCoordinator::getMinDependency() const
+GlobalFederateId TimeCoordinator::getMinDependency() const
 {
     return dependencies.getMinDependency();
 }
@@ -415,9 +415,9 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
 bool TimeCoordinator::updateTimeFactors()
 {
-    total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, global_federate_id{});
+    total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, GlobalFederateId{});
     upstream =
-        generateMinTimeUpstream(dependencies, info.restrictive_time_policy, global_federate_id{});
+        generateMinTimeUpstream(dependencies, info.restrictive_time_policy, GlobalFederateId{});
 
     bool update = false;
     time_minminDe = total.minDe;
@@ -507,7 +507,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant()
     return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
-bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, global_federate_id skipFed) const
+bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skipFed) const
 {
     bool changed{false};
     if (lastSend.next != upd.actionTime) {
@@ -519,7 +519,7 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, global_federat
     if (lastSend.Te != upd.Te) {
         changed = true;
     }
-    if (lastSend.minFed != global_federate_id(upd.getExtraData())) {
+    if (lastSend.minFed != GlobalFederateId(upd.getExtraData())) {
         changed = true;
     }
     if (lastSend.time_state != time_state_t::time_requested) {
@@ -529,7 +529,7 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, global_federat
         lastSend.next = upd.actionTime;
         lastSend.minDe = upd.Tdemin;
         lastSend.Te = upd.Te;
-        lastSend.minFed = global_federate_id(upd.getExtraData());
+        lastSend.minFed = GlobalFederateId(upd.getExtraData());
         lastSend.time_state = time_state_t::time_requested;
         return transmitTimingMessages(upd, skipFed);
     }
@@ -553,13 +553,13 @@ void TimeCoordinator::sendTimeRequest() const
         upd.Tdemin = upd.actionTime;
     }
 
-    if (iterating != iteration_request::no_iterations) {
+    if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
     if (checkAndSendTimeRequest(upd, upstream.minFed)) {
         upd.dest_id = upstream.minFed;
-        upd.setExtraData(global_federate_id{}.baseValue());
+        upd.setExtraData(GlobalFederateId{}.baseValue());
         if (info.event_triggered) {
             upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
             upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
@@ -638,7 +638,7 @@ bool TimeCoordinator::addDependent(GlobalFederateId fedID)
             return false;
         }
 
-void TimeCoordinator::setAsChild(global_federate_id fedID)
+void TimeCoordinator::setAsChild(GlobalFederateId fedID)
 {
     if (fedID == source_id) {
         return;
@@ -649,7 +649,7 @@ void TimeCoordinator::setAsChild(global_federate_id fedID)
 }
 }
 
-void TimeCoordinator::setAsParent(global_federate_id fedID)
+void TimeCoordinator::setAsParent(GlobalFederateId fedID)
 {
     if (fedID == source_id) {
         return;
@@ -660,7 +660,7 @@ void TimeCoordinator::setAsParent(global_federate_id fedID)
     }
 }
 
-void TimeCoordinator::removeDependency(global_federate_id fedID)
+void TimeCoordinator::removeDependency(GlobalFederateId fedID)
 {
     dependencies.removeDependency(fedID);
     // remove the thread safe version
@@ -692,7 +692,7 @@ std::vector<GlobalFederateId> TimeCoordinator::getDependencies() const
     return *dependency_federates.lock_shared();
 }
 
-bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, global_federate_id skipFed) const
+bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateId skipFed) const
 {
     bool skipped{false};
     for (auto dep : dependencies) {
@@ -819,7 +819,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 if (dep->next > time_exec) {
                     return message_process_result::delay_processing;
                 }
-                if ((iterating != iteration_request::no_iterations) && (time_exec == dep->next)) {
+                if ((iterating != IterationRequest::NO_ITERATIONS) && (time_exec == dep->next)) {
                     return message_process_result::delay_processing;
                 }
                 break;
@@ -966,7 +966,7 @@ void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
         case defs::Flags::RESTRICTIVE_TIME_POLICY:
             info.restrictive_time_policy = value;
             break;
-        case defs::flags::event_triggered:
+        case defs::Flags::EVENT_TRIGGERED:
             info.event_triggered = value;
             break;
         default:
@@ -1016,7 +1016,7 @@ bool TimeCoordinator::getOptionFlag(int optionFlag) const
             return info.wait_for_current_time_updates;
         case defs::Flags::RESTRICTIVE_TIME_POLICY:
             return info.restrictive_time_policy;
-        case defs::flags::event_triggered:
+        case defs::Flags::EVENT_TRIGGERED:
             return info.event_triggered;
         default:
             throw(std::invalid_argument("flag not recognized"));

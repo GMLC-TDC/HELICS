@@ -976,8 +976,8 @@ static const std::map<helics::Federate::Modes, HelicsFederateState> modeEnumConv
     {helics::Federate::Modes::PENDING_ITERATIVE_TIME, HelicsFederateState::HELICS_STATE_PENDING_ITERATIVE_TIME},
     {helics::Federate::Modes::PENDING_TIME, HelicsFederateState::HELICS_STATE_PENDING_TIME},
     {helics::Federate::Modes::INITIALIZING, HelicsFederateState::HELICS_STATE_INITIALIZATION},
-    {helics::Federate::Modes::PENDING_FINALIZE, HelicsFederateState::HELICS_STATE_PENDING_FINALIZE}};
-    {helics::Federate::modes::finished, helics_federate_state::helics_state_finished}};
+    {helics::Federate::Modes::PENDING_FINALIZE, HelicsFederateState::HELICS_STATE_PENDING_FINALIZE},
+    {helics::Federate::Modes::FINISHED, HelicsFederateState::HELICS_STATE_FINISHED}};
 
 HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err)
 {

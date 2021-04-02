@@ -11,11 +11,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 
 namespace helics {
-std::tuple<federate_state, message_processing_result, bool>
+std::tuple<FederateStates, MessageProcessingResult, bool>
     processCoordinatorMessage(ActionMessage& cmd,
                               TimeCoordinator* timeCoord,
-                              const federate_state state,
+                              const FederateStates state,
                               const bool timeGranted_mode,
-                              const global_federate_id localID);
+                              const GlobalFederateId localID);
 
 }

@@ -49,7 +49,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
                 dep.minDe = dep.Te;
             }
 
-            dep.minFed = global_federate_id(m.getExtraData());
+            dep.minFed = GlobalFederateId(m.getExtraData());
             break;
         case CMD_TIME_GRANT:
             dep.time_state = time_state_t::time_granted;
@@ -59,7 +59,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.next = m.actionTime;
             dep.Te = dep.next;
             dep.minDe = dep.next;
-            dep.minFed = global_federate_id{};
+            dep.minFed = GlobalFederateId{};
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -72,7 +72,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
             dep.minDe = Time::maxVal();
-            dep.minFed = global_federate_id{};
+            dep.minFed = GlobalFederateId{};
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -81,7 +81,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
             dep.minDe = Time::maxVal();
-            dep.minFed = global_federate_id{};
+            dep.minFed = GlobalFederateId{};
             break;
         default:
                 return false;
@@ -204,7 +204,7 @@ bool TimeDependencies::isDependency(GlobalFederateId ofed) const
     return (res->fedID == ofed) ? res->dependency : false;
 }
 
-bool TimeDependencies::isDependent(global_federate_id ofed) const
+bool TimeDependencies::isDependent(GlobalFederateId ofed) const
 {
     auto res = std::lower_bound(dependencies.begin(), dependencies.end(), ofed, dependencyCompare);
     if (res == dependencies.end()) {
@@ -213,7 +213,7 @@ bool TimeDependencies::isDependent(global_federate_id ofed) const
     return (res->fedID == ofed) ? res->dependent : false;
 }
 
-const DependencyInfo* TimeDependencies::getDependencyInfo(global_federate_id id) const
+const DependencyInfo* TimeDependencies::getDependencyInfo(GlobalFederateId id) const
 {
     auto res = std::lower_bound(dependencies.cbegin(), dependencies.cend(), id, dependencyCompare);
     if ((res == dependencies.cend()) || (res->fedID != id)) {
@@ -271,7 +271,7 @@ void TimeDependencies::removeDependency(GlobalFederateId id)
 }
 }
 
-bool TimeDependencies::addDependent(global_federate_id id)
+bool TimeDependencies::addDependent(GlobalFederateId id)
 
 {
     if (dependencies.empty()) {
@@ -296,7 +296,7 @@ bool TimeDependencies::addDependent(global_federate_id id)
     return true;
 }
 
-void TimeDependencies::removeDependent(global_federate_id id)
+void TimeDependencies::removeDependent(GlobalFederateId id)
 {
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
     if (dep != dependencies.end()) {
@@ -309,7 +309,7 @@ void TimeDependencies::removeDependent(global_federate_id id)
     }
 }
 
-void TimeDependencies::removeInterdependence(global_federate_id id)
+void TimeDependencies::removeInterdependence(GlobalFederateId id)
 {
     auto dep = std::lower_bound(dependencies.begin(), dependencies.end(), id, dependencyCompare);
     if (dep != dependencies.end()) {
@@ -356,9 +356,9 @@ int TimeDependencies::activeDependencyCount() const
     });
 }
 /** get a count of the active dependencies*/
-global_federate_id TimeDependencies::getMinDependency() const
+GlobalFederateId TimeDependencies::getMinDependency() const
 {
-    global_federate_id minID;
+    GlobalFederateId minID;
     Time minTime(Time::maxVal());
     for (auto dep : dependencies) {
         if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal())) {
@@ -437,7 +437,7 @@ void TimeDependencies::resetDependentEvents(helics::Time grantTime)
 
 static void generateMinTimeImplementation(TimeData& mTime,
                                           const DependencyInfo& dep,
-                                          global_federate_id ignore)
+                                          GlobalFederateId ignore)
 {
     if (dep.fedID == ignore) {
         if (dep.fedID.isBroker()) {
@@ -479,7 +479,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.minFed = dep.fedID;
         }
         } else if (dep.Te == mTime.Te) {
-            mTime.minFed = global_federate_id{};
+            mTime.minFed = GlobalFederateId{};
             mTime.TeAlt = mTime.Te;
     }
 }
@@ -487,8 +487,8 @@ static void generateMinTimeImplementation(TimeData& mTime,
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
-                                 global_federate_id self,
-                                 global_federate_id ignore)
+                                 GlobalFederateId self,
+                                 GlobalFederateId ignore)
 {
     TimeData mTime(Time::maxVal());
     for (const auto& dep : dependencies) {
@@ -518,8 +518,8 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
-                                   global_federate_id self,
-                                   global_federate_id ignore)
+                                   GlobalFederateId self,
+                                   GlobalFederateId ignore)
 {
     TimeData mTime(Time::maxVal());
     for (const auto& dep : dependencies) {
@@ -549,8 +549,8 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
-                              global_federate_id self,
-                              global_federate_id ignore)
+                              GlobalFederateId self,
+                              GlobalFederateId ignore)
 {
     TimeData mTime(Time::maxVal());
     for (const auto& dep : dependencies) {

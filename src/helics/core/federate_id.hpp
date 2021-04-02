@@ -54,7 +54,7 @@ constexpr LocalFederateId gLocalCoreId(-259);
 
 namespace detail {
     /** constant numerical value for invalid handle identification*/
-    constexpr identififier_base_type invalid_interface_handle{-1'700'000'000};
+    constexpr IdentifierBaseType gInvalidInterfaceHandle{-1'700'000'000};
 }  // namespace detail
 
 /** class defining a LocalFederateId
@@ -78,11 +78,11 @@ class InterfaceHandle {
     /** comparison operator for sorting*/
     bool operator<(InterfaceHandle id) const noexcept { return (hid < id.hid); }
     bool operator>(InterfaceHandle id) const noexcept { return (hid > id.hid); }
-    bool isValid() const { return (hid != invalid_handle); }
+    bool isValid() const { return (hid != mInvalidHandle); }
 
   private:
-    static constexpr base_type invalid_handle{detail::invalid_interface_handle};
-    BaseType hid{invalid_handle};  //!< the underlying index value
+    static constexpr BaseType mInvalidHandle{detail::gInvalidInterfaceHandle};
+    BaseType hid{mInvalidHandle};  //!< the underlying index value
 };
 
 #if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY

@@ -1603,7 +1603,7 @@ HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* quer
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err);
+HELICS_EXPORT void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err);
 
 /**
  * Free the memory associated with a query object.

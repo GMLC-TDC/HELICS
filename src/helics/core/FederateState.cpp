@@ -245,7 +245,7 @@ std::unique_ptr<Message> FederateState::receiveAny(InterfaceHandle& id)
     // Return the message found and remove from the queue
     if (earliest_time <= time_granted) {
         auto result = endpointI->getMessage(time_granted);
-        id = (result) ? endpointI->id.handle : interface_handle{};
+        id = (result) ? endpointI->id.handle : InterfaceHandle{};
 
         return result;
     }
@@ -276,11 +276,6 @@ void FederateState::routeMessage(const ActionMessage& msg)
 
 void FederateState::addAction(const ActionMessage& action)
 {
-    if (action.source_id == global_federate_id(1879048194) &&
-        action.dest_id == global_federate_id(131074) && action.actionTime > timeZero) {
-        queue.push(action);
-        return;
-    }
     if (action.action() != CMD_IGNORE) {
         queue.push(action);
     }
@@ -452,7 +447,7 @@ IterationResult FederateState::enterInitializingMode()
     return ret;
 }
 
-iteration_result FederateState::enterExecutingMode(iteration_request iterate, bool sendRequest)
+IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
@@ -468,7 +463,7 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
         if (ret == MessageProcessingResult::NEXT_STEP) {
             time_granted = timeZero;
             allowed_send_time = timeCoord->allowedSendTime();
-        } else if (ret == message_processing_result::iterating) {
+        } else if (ret == MessageProcessingResult::ITERATING) {
             time_granted = initializationTime;
             allowed_send_time = initializationTime;
         }
@@ -588,7 +583,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         }
 #endif
         auto ret = processQueue();
-        if (ret == message_processing_result::halted) {
+        if (ret == MessageProcessingResult::HALTED) {
             time_granted = Time::maxVal();
             allowed_send_time = Time::maxVal();
             iterating = false;
@@ -897,9 +892,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         switch (std::get<0>(proc_result)) {
             case HELICS_INITIALIZING:
                 LOG_TIMING("Granting Initialization");
-                if (checkInterfaces() != defs::errors::ok) {
+                if (checkInterfaces() != defs::Errors::OK) {
                     setState(HELICS_ERROR);
-                    return message_processing_result::error;
+                    return MessageProcessingResult::ERROR_RESULT;
                 }
                 break;
             case HELICS_EXECUTING:
@@ -916,7 +911,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         errorString += " code:" + std::to_string(cmd.messageID);
                 }
                 } else {
-                    errorString = cmd.payload;
+                    errorString = cmd.payload.to_string();
             }
                 errorCode = cmd.messageID;
                 LOG_ERROR(errorString);
@@ -927,15 +922,15 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             }
 
     switch (std::get<1>(proc_result)) {
-        case message_processing_result::continue_processing:
+        case MessageProcessingResult::CONTINUE_PROCESSING:
             break;
-        case message_processing_result::reprocess_message:
+        case MessageProcessingResult::REPROCESS_MESSAGE:
             if (cmd.dest_id != global_id.load()) {
                     routeMessage(cmd);
-                return message_processing_result::continue_processing;
+                return MessageProcessingResult::CONTINUE_PROCESSING;
                 }
             return processActionMessage(cmd);
-        case message_processing_result::delay_message:
+        case MessageProcessingResult::DELAY_MESSAGE:
                         addFederateToDelay(GlobalFederateId(cmd.source_id));
                         return MessageProcessingResult::DELAY_MESSAGE;
                     default:
@@ -959,9 +954,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     break;
         case CMD_LOG: {
             if (cmd.getStringData().empty()) {
-                logMessage(cmd.messageID, emptyStr, cmd.payload);
+                logMessage(cmd.messageID, emptyStr, cmd.payload.to_string());
             } else {
-                logMessage(cmd.messageID, cmd.getStringData()[0], cmd.payload);
+                logMessage(cmd.messageID, cmd.getStringData()[0], cmd.payload.to_string());
             }
             }
 
@@ -1014,7 +1009,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 break;
         case CMD_CLOSE_INTERFACE:
             if (cmd.source_id == global_id.load()) {
-                closeInterface(cmd.source_handle, static_cast<handle_type>(cmd.counter));
+                closeInterface(cmd.source_handle, static_cast<InterfaceType>(cmd.counter));
             }
             break;
 

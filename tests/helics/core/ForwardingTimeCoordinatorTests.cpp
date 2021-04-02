@@ -228,8 +228,8 @@ TEST(ftc_tests, timing_test1)
 TEST(ftc_tests, timing_test2)
 {
     ForwardingTimeCoordinator ftc;
-    global_federate_id fed2(2);
-    global_federate_id fed3(3);
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
     ftc.addDependency(fed2);
     ftc.addDependency(fed3);
     getFTCtoExecMode(ftc);

@@ -655,7 +655,7 @@ TEST_F(filter_tests, reroute_separate)
     p1.setDefaultDestination("rec");
     auto& p3 = filt->registerGlobalEndpoint("reroute");
 
-    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
     f1.addSourceTarget("send");
     f1.setString("newdestination", "reroute");
@@ -693,8 +693,8 @@ TEST_F(filter_tests, reroute_separate)
     }
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessages(), 0U);
-    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
     EXPECT_EQ(cnt, 11);
     EXPECT_EQ(cntb, 0);
     filt->finalize();
@@ -716,7 +716,7 @@ TEST_F(filter_tests, reroute_separate2)
     p1.setDefaultDestination("rec");
     auto& p3 = filt->registerGlobalEndpoint("reroute");
 
-    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
     f1.addSourceTarget("send");
     f1.setString("newdestination", "reroute");
@@ -762,8 +762,8 @@ TEST_F(filter_tests, reroute_separate2)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(p2.pendingMessages(), 0U);
-    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
     EXPECT_EQ(cnt, 11);
     // auto res2 = broker->query("root", "global_time_debugging");
     broker->waitForDisconnect();
@@ -785,7 +785,7 @@ TEST_F(filter_tests, reroute_separate3)
     p1.setDefaultDestination("rec");
     auto& p3 = filt->registerGlobalEndpoint("reroute");
 
-    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
     f1.addSourceTarget("send");
     f1.setString("newdestination", "reroute");
@@ -820,8 +820,8 @@ TEST_F(filter_tests, reroute_separate3)
     }
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessages(), 0U);
-    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
     EXPECT_EQ(cnt, 11);
     filt->finalize();
 }
@@ -857,7 +857,7 @@ TEST_F(filter_tests, reroute_separate2_5message)
 
     auto& p3 = filt->registerGlobalEndpoint("reroute");
 
-    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
 
     f1.addSourceTarget("send1");
     f1.addSourceTarget("send2");
@@ -921,13 +921,13 @@ TEST_F(filter_tests, reroute_separate2_5message)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessages(), 0U);
-    EXPECT_EQ(r2.pendingMessages(), 0U);
-    EXPECT_EQ(r3.pendingMessages(), 0U);
-    EXPECT_EQ(r4.pendingMessages(), 0U);
-    EXPECT_EQ(r5.pendingMessages(), 0U);
+    EXPECT_EQ(r1.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r3.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r4.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r5.pendingMessagesCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessages(), 0U);
+    EXPECT_EQ(p3.pendingMessagesCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index = 0;
@@ -973,11 +973,11 @@ TEST_F(filter_tests, reroute_separate2_5message_b)
 
     auto& p3 = filt->registerGlobalEndpoint("reroute");
 
-    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt1");
-    auto& f2 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt2");
-    auto& f3 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt3");
-    auto& f4 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt4");
-    auto& f5 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt5");
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt1");
+    auto& f2 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt2");
+    auto& f3 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt3");
+    auto& f4 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt4");
+    auto& f5 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt5");
 
     f1.addSourceTarget("send1");
     f2.addSourceTarget("send2");
@@ -1045,13 +1045,13 @@ TEST_F(filter_tests, reroute_separate2_5message_b)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessages(), 0U);
-    EXPECT_EQ(r2.pendingMessages(), 0U);
-    EXPECT_EQ(r3.pendingMessages(), 0U);
-    EXPECT_EQ(r4.pendingMessages(), 0U);
-    EXPECT_EQ(r5.pendingMessages(), 0U);
+    EXPECT_EQ(r1.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r3.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r4.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r5.pendingMessagesCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessages(), 0U);
+    EXPECT_EQ(p3.pendingMessagesCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index{0};
