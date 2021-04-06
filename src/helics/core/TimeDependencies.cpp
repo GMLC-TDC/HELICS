@@ -84,10 +84,10 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.minFed = GlobalFederateId{};
             break;
         default:
-                return false;
-            }
-                    return true;
-                }
+            return false;
+    }
+    return true;
+}
 
 bool TimeData::update(const TimeData& update)
 {
@@ -100,12 +100,12 @@ bool TimeData::update(const TimeData& update)
     if (update.Te != Te) {
         updated = true;
         Te = update.Te;
-                    }
+    }
 
     if (update.minDe != minDe) {
         updated = true;
         minDe = update.minDe;
-                }
+    }
     if (update.TeAlt != TeAlt) {
         updated = true;
         TeAlt = update.TeAlt;
@@ -113,7 +113,7 @@ bool TimeData::update(const TimeData& update)
 
     if (prev_next != next) {
         updated = true;
-            }
+    }
 
     if (update.minFed != minFed) {
         minFed = update.minFed;
@@ -265,10 +265,10 @@ void TimeDependencies::removeDependency(GlobalFederateId id)
         if (dep->fedID == id) {
             dep->dependency = false;
             if (!dep->dependent) {
-            dependencies.erase(dep);
+                dependencies.erase(dep);
+            }
         }
     }
-}
 }
 
 bool TimeDependencies::addDependent(GlobalFederateId id)
@@ -431,8 +431,8 @@ void TimeDependencies::resetDependentEvents(helics::Time grantTime)
         if (dep.dependency) {
             dep.Te = (std::max)(dep.next, grantTime);
             dep.minDe = dep.Te;
+        }
     }
-}
 }
 
 static void generateMinTimeImplementation(TimeData& mTime,
@@ -452,7 +452,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
-                }
+            }
         } else {
             // this minimum dependent event time received was invalid and can't be trusted
             // therefore it can't be used to determine a time grant
@@ -477,12 +477,12 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.minFedActual = dep.minFed;
             } else {
                 mTime.minFed = dep.fedID;
-        }
+            }
         } else if (dep.Te == mTime.Te) {
             mTime.minFed = GlobalFederateId{};
             mTime.TeAlt = mTime.Te;
+        }
     }
-}
 }
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,

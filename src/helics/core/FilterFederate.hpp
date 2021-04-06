@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 
+#include <any>
 #include <functional>
 #include <map>
 #include <memory>
@@ -22,7 +23,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
-#include <any>
 
 namespace helics {
 class HandleManager;

@@ -129,7 +129,7 @@ typedef enum {
        incoming events*/
     HELICS_FLAG_EVENT_TRIGGERED = 81
 } HelicsFederateFlags;
-    
+
 /** enumeration of additional core flags*/
 typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/

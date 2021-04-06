@@ -3919,7 +3919,9 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
-                    std::get<1>(mapBuilders[mapIndex.at(std::string(cmd.payload.to_string())).first]).push_back(queryResp);
+                    std::get<1>(
+                        mapBuilders[mapIndex.at(std::string(cmd.payload.to_string())).first])
+                        .push_back(queryResp);
                 }
 
             } else {
@@ -3963,7 +3965,8 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     repStr = coreQuery(std::string(cmd.payload.to_string()), force_ordered);
                 } else {
                     auto* fedptr = getFederateCore(target);
-                    repStr = federateQuery(fedptr, std::string(cmd.payload.to_string()), force_ordered);
+                    repStr =
+                        federateQuery(fedptr, std::string(cmd.payload.to_string()), force_ordered);
                     if (repStr == "#wait") {
                         if (fedptr != nullptr) {
                             cmd.dest_id = fedptr->global_id;
