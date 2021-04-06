@@ -598,30 +598,30 @@ Time Federate::requestTime(Time nextInternalTimeStep)
 {
     switch (currentMode) {
         case Modes::EXECUTING:
-        try {
-            auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
-            Time oldTime = currentTime;
-            currentTime = newTime;
-            updateTime(newTime, oldTime);
-            if (newTime == Time::maxVal()) {
+            try {
+                auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+                Time oldTime = currentTime;
+                currentTime = newTime;
+                updateTime(newTime, oldTime);
+                if (newTime == Time::maxVal()) {
                     currentMode = Modes::FINISHED;
+                }
+                return newTime;
             }
-            return newTime;
-        }
-        catch (const FunctionExecutionFailure&) {
-            currentMode = Modes::ERROR_STATE;
-            throw;
-        }
+            catch (const FunctionExecutionFailure&) {
+                currentMode = Modes::ERROR_STATE;
+                throw;
+            }
             break;
         case Modes::FINALIZE:
         case Modes::FINISHED:
-           return Time::maxVal();
+            return Time::maxVal();
         default:
             break;
     }
 
-        throw(InvalidFunctionCall("cannot call request time in present state"));
-    }
+    throw(InvalidFunctionCall("cannot call request time in present state"));
+}
 
 iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate)
 {

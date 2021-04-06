@@ -58,10 +58,11 @@ ActionMessage::ActionMessage(const ActionMessage& act):
 
 ActionMessage::ActionMessage(std::unique_ptr<Message> message):
     messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), flags(message->flags),
-    actionTime(message->time), payload(std::move(message->data)), stringData({std::move(message->dest),
-                                                   std::move(message->source),
-                                                   std::move(message->original_source),
-                                                   std::move(message->original_dest)})
+    actionTime(message->time), payload(std::move(message->data)),
+    stringData({std::move(message->dest),
+                std::move(message->source),
+                std::move(message->original_source),
+                std::move(message->original_dest)})
 {
 }
 

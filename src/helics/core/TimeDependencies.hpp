@@ -14,16 +14,16 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class ActionMessage;
 
-    /**enumeration of possible states for a federate to be in regards to time request*/
+/**enumeration of possible states for a federate to be in regards to time request*/
 enum class time_state_t : uint8_t {
-        initialized = 0,
-        exec_requested_iterative = 1,
-        exec_requested = 2,
-        time_granted = 3,
-        time_requested_iterative = 4,
-        time_requested = 5,
-        error = 7
-    };
+    initialized = 0,
+    exec_requested_iterative = 1,
+    exec_requested = 2,
+    time_granted = 3,
+    time_requested_iterative = 4,
+    time_requested = 5,
+    error = 7
+};
 
 enum class ConnectionType : uint8_t {
     independent = 0,

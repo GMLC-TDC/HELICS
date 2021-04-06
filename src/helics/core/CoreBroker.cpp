@@ -293,9 +293,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 _federates.addSearchTermForIndex(_federates.back().global_id,
                                                  _federates.size() - 1);
             } else if (isRootc) {
-                _federates.back().global_id = GlobalFederateId(
-                    static_cast<GlobalFederateId::BaseType>(_federates.size()) - 1 +
-                    gGlobalFederateIdShift);
+                _federates.back().global_id =
+                    GlobalFederateId(static_cast<GlobalFederateId::BaseType>(_federates.size()) -
+                                     1 + gGlobalFederateIdShift);
                 _federates.addSearchTermForIndex(_federates.back().global_id,
                                                  static_cast<size_t>(
                                                      _federates.back().global_id.baseValue()) -
@@ -495,8 +495,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             if (fed != _federates.end()) {
                 auto route = fed->route;
                 if (!fed->global_id.isValid()) {
-                fed->global_id = command.dest_id;
-                _federates.addSearchTerm(command.dest_id, fed->name);
+                    fed->global_id = command.dest_id;
+                    _federates.addSearchTerm(command.dest_id, fed->name);
                 }
                 transmit(route, command);
                 routing_table.emplace(fed->global_id, route);
@@ -2903,9 +2903,9 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
-    }
+            }
             break;
-}
+    }
 }
 
 void CoreBroker::processLocalQuery(const ActionMessage& m)

@@ -82,18 +82,18 @@ bool EndpointInfo::updateTimeInclusive(Time newTime)
 std::unique_ptr<Message> EndpointInfo::getMessage(Time maxTime)
 {
     if (mAvailableMessages.load() > 0) {
-    auto handle = message_queue.lock();
-    if (handle->empty()) {
-        return nullptr;
-    }
-    if (handle->front()->time <= maxTime) {
+        auto handle = message_queue.lock();
+        if (handle->empty()) {
+            return nullptr;
+        }
+        if (handle->front()->time <= maxTime) {
             if (mAvailableMessages > 0) {
                 --mAvailableMessages;
             }
-        auto msg = std::move(handle->front());
-        handle->pop_front();
-        return msg;
-    }
+            auto msg = std::move(handle->front());
+            handle->pop_front();
+            return msg;
+        }
     }
     return nullptr;
 }

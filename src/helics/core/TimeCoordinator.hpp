@@ -168,7 +168,7 @@ class TimeCoordinator {
     void updateTimeGrant();
     /** transmit message to all federates except the skipFed,  return true if skipFed was used*/
     bool transmitTimingMessages(ActionMessage& msg,
-                                GlobalFederateId skipFed =GlobalFederateId{}) const;
+                                GlobalFederateId skipFed = GlobalFederateId{}) const;
 
     message_process_result processTimeBlockMessage(const ActionMessage& cmd);
 

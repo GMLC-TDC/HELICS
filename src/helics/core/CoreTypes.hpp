@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define HELICS_CORE_TYPES_HEADER
 
 #    include "../helics_enums.h"
+
 #    include <string>
 /** @file
 @details definitions of types an enumerations used in helics
