@@ -285,7 +285,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void setLogFile(const std::string& lfile) override final;
     virtual std::string query(const std::string& target,
                               const std::string& queryStr,
-                              helics_query_mode mode = helics_query_mode_fast) override final;
+                              HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr) override final;

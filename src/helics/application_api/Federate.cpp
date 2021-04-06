@@ -1083,7 +1083,7 @@ std::string Federate::localQuery(const std::string& /*queryStr*/) const
 {
     return std::string{};
 }
-std::string Federate::query(const std::string& queryStr, helics_query_mode mode)
+std::string Federate::query(const std::string& queryStr, HelicsQueryModes mode)
 {
     std::string res;
     if (queryStr == "name") {
@@ -1110,7 +1110,7 @@ std::string Federate::query(const std::string& queryStr, helics_query_mode mode)
 }
 
 std::string
-    Federate::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
+    Federate::query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode)
 {
     std::string res;
     if ((target.empty()) || (target == "federate") || (target == getName())) {
@@ -1127,7 +1127,7 @@ std::string
 
 query_id_t Federate::queryAsync(const std::string& target,
                                 const std::string& queryStr,
-                                helics_query_mode mode)
+                                HelicsQueryModes mode)
 {
     auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
         return coreObject->query(target, queryStr, mode);
@@ -1139,7 +1139,7 @@ query_id_t Federate::queryAsync(const std::string& target,
     return query_id_t(cnt);
 }
 
-query_id_t Federate::queryAsync(const std::string& queryStr, helics_query_mode mode)
+query_id_t Federate::queryAsync(const std::string& queryStr, HelicsQueryModes mode)
 {
     auto queryFut =
         std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });

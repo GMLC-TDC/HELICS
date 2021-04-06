@@ -353,7 +353,7 @@ namespace apps {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
                 auto pubs = vectorizeQueryResult(
-                    fed->query(capt, "publications", helics_query_mode_ordered));
+                    fed->query(capt, "publications", HELICS_QUERY_MODE_ORDERED));
                 for (auto& pub : pubs) {
                     addSubscription(pub);
                 }

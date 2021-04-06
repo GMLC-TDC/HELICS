@@ -2453,7 +2453,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
 
 std::string CommonCore::query(const std::string& target,
                               const std::string& queryStr,
-                              helics_query_mode mode)
+                              HelicsQueryModes mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -2464,7 +2464,7 @@ std::string CommonCore::query(const std::string& target,
         }
         return generateJsonErrorResponse(410, "Core has terminated");
     }
-    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
+    ActionMessage querycmd(mode == HELICS_QUERY_MODE_FAST ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = direct_core_id;
     querycmd.dest_id = parent_broker_id;
     querycmd.payload = queryStr;
@@ -2481,7 +2481,7 @@ std::string CommonCore::query(const std::string& target,
             res = generateJsonQuotedString(getAddress());
             return res;
         }
-        querycmd.setAction(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
+        querycmd.setAction(mode == HELICS_QUERY_MODE_FAST ? CMD_BROKER_QUERY :
                                                             CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
@@ -2491,7 +2491,7 @@ std::string CommonCore::query(const std::string& target,
             (target != "federate") ? getFederate(target) : getFederateAt(LocalFederateId(0));
         if (fed != nullptr) {
             querycmd.dest_id = fed->global_id;
-            if (mode != helics_query_mode_ordered) {
+            if (mode != HELICS_QUERY_MODE_ORDERED) {
                 std::string ret = federateQuery(fed, queryStr, false);
             if (ret != "#wait") {
                 return ret;
@@ -2511,7 +2511,7 @@ std::string CommonCore::query(const std::string& target,
                     }
                         case std::future_status::timeout: {  // federate query may need to wait or
                                                              // can get the result now
-                        ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+                        ret = federateQuery(fed, queryStr, mode == HELICS_QUERY_MODE_ORDERED);
                         if (ret != "#wait") {
                             activeQueries.finishedWithValue(index);
                             return ret;
@@ -3989,6 +3989,8 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             } else {
                 transmit(getRoute(cmd.dest_id), cmd);
             }
+            break;
+        default:
             break;
     }
 }

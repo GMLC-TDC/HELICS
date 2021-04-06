@@ -144,11 +144,11 @@ if the query was not valid
 */
     std::string query(const std::string& target,
                       const std::string& queryStr,
-                      helics_query_mode mode = helics_query_mode_fast) const
+                      HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) const
     {
         // returns HelicsQuery
         HelicsQuery q = helicsCreateQuery(target.c_str(), queryStr.c_str());
-        if (mode != helics_query_mode_fast) {
+        if (mode != HELICS_QUERY_MODE_FAST) {
             helicsQuerySetOrdering(q, mode, HELICS_IGNORE_ERROR);
         }
         std::string result(helicsQueryCoreExecute(q, core, hThrowOnError()));

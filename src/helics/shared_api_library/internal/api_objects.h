@@ -143,7 +143,7 @@ class QueryObject {
     std::string response;  //!< the response to the query
     std::shared_ptr<Federate> activeFed;  //!< pointer to the fed with the active Query
     bool activeAsync{false};
-    helics_query_mode mode{helics_query_mode_fast};  //!< the ordering mode used for the query
+    HelicsQueryModes mode{HELICS_QUERY_MODE_FAST};  //!< the ordering mode used for the query
     query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
     int valid{0};
 };

@@ -113,7 +113,7 @@ class HELICS_CXX_EXPORT BrokerApp {
     */
     std::string query(const std::string& target,
                       const std::string& queryStr,
-                      helics_query_mode mode = helics_query_mode_fast);
+                      HelicsQueryModes mode = HELICS_QUERY_MODE_FAST);
     /** set a federation global value
      @details this overwrites any previous value for this name
      globals can be queried with a target of "global" or "global_value" and queryStr of the value to
