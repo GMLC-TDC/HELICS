@@ -1082,3 +1082,74 @@ TEST(valuefederate, indexed_targets)
 
     Fed1->finalize();
 }
+
+#ifdef ENABLE_ZMQ_CORE
+/** test out register interfaces after configuration make sure that doesn't cause issues*/
+TEST(valuefederate, file_and_config)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, "-f 2");
+
+    auto file1 = std::string(TEST_DIR) + "fed1_config.json";
+    auto file2 = std::string(TEST_DIR) + "fed2_config.json";
+    auto Fed1 = std::make_shared<helics::ValueFederate>(file1);
+    auto Fed2 = std::make_shared<helics::ValueFederate>(file2);
+
+    Fed1->registerInterfaces(file1);
+    Fed2->registerInterfaces(file2);
+
+    EXPECT_EQ(Fed1->getInputCount(), 1);
+    EXPECT_EQ(Fed2->getInputCount(), 1);
+    EXPECT_EQ(Fed1->getPublicationCount(), 1);
+    EXPECT_EQ(Fed2->getPublicationCount(), 1);
+
+    auto& p1 = Fed1->getPublication(0);
+    auto& i1 = Fed2->getInput(0);
+    EXPECT_TRUE(i1.isValid());
+    EXPECT_TRUE(p1.isValid());
+
+    Fed1->enterExecutingModeAsync();
+    Fed2->enterExecutingMode();
+    Fed1->enterExecutingModeComplete();
+
+    EXPECT_TRUE(Fed2->getFlagOption(HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE));
+    p1.publish(std::complex<double>(1, 2));
+
+    Fed1->requestTimeAsync(1.0);
+    auto t2 = Fed2->requestTime(1.0);
+    EXPECT_EQ(t2, 0.5);  // fed2 has wait_for_current_time flag active
+    Fed2->requestTimeAsync(1.0);
+    Fed1->requestTimeComplete();
+    auto val = i1.getValue<std::complex<double>>();
+
+    EXPECT_EQ(val, std::complex<double>(1, 2));
+
+    Fed1->finalize();
+    t2 = Fed2->requestTimeComplete();
+    EXPECT_EQ(t2, 1.0);
+    Fed2->finalize();
+    broker->disconnect();
+}
+#endif
+
+TEST(valuefederate, duplicate_targets)
+{
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.coreName = "core_dup";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
+    auto& p1 = Fed1->registerGlobalPublication<int64_t>("pub");
+
+    auto& s1 = Fed1->registerGlobalInput<int64_t>("inp");
+
+    s1.addTarget("pub");
+    s1.addTarget("pub");
+    Fed1->enterExecutingMode();
+
+    p1.publish(8);
+    Fed1->requestNextStep();
+
+    EXPECT_EQ(s1.getValue<int64_t>(), 8);
+
+    Fed1->finalize();
+}

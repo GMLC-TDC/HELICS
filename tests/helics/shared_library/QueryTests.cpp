@@ -40,6 +40,7 @@ TEST_P(query_tests, publication_queries)
     EXPECT_EQ(res, "[\"pub1\",\"fed0/pub2\"]");
     helicsQueryFree(q1);
     q1 = helicsCreateQuery(nullptr, "publications");
+    CE(helicsQuerySetOrdering(q1, 1, &err));
     CE(std::string res2 = helicsQueryExecute(q1, vFed2, &err));
     EXPECT_EQ(res2, "[\"fed1/pub3\"]");
 

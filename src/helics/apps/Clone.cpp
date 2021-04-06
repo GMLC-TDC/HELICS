@@ -181,15 +181,18 @@ namespace apps {
     void Clone::generateInterfaces()
     {
         auto res = waitForInit(fed.get(), captureFederate);
+        std::this_thread::yield();
         if (res) {
-            auto pubs = vectorizeQueryResult(fed->query(captureFederate, "publications"));
+            auto pubs = vectorizeQueryResult(
+                fed->query(captureFederate, "publications", HELICS_QUERY_MODE_ORDERED));
             for (auto& pub : pubs) {
                 if (pub.empty()) {
                     continue;
                 }
                 addSubscription(pub);
             }
-            auto epts = vectorizeQueryResult(fed->query(captureFederate, "endpoints"));
+            auto epts = vectorizeQueryResult(
+                fed->query(captureFederate, "endpoints", HELICS_QUERY_MODE_ORDERED));
             for (auto& ept : epts) {
                 if (ept.empty()) {
                     continue;
@@ -204,7 +207,7 @@ namespace apps {
                                                      std::string{}),
                                          cloneSubscriptionNames.end());
 
-            fedConfig = fed->query(captureFederate, "config");
+            fedConfig = fed->query(captureFederate, "config", HELICS_QUERY_MODE_ORDERED);
         }
     }
 

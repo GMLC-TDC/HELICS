@@ -793,10 +793,12 @@ class Core {
     get a json structure with the name and value
     @param target the specific target of the query
     @param queryStr the actual query
+    @param mode the synchronization mode for the query
     @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
-    virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
+    virtual std::string
+        query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode) = 0;
 
     /** supply a query callback function
     @details the intention of the query callback is to allow federates to answer particular requests

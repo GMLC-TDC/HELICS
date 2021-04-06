@@ -79,10 +79,14 @@ class Broker {
     query is a broken
     @param target the specific target of the query
     @param queryStr the actual query
+    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered
+    (synchronous) is slower but has more ordering guarantees
       @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
-    virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
+    virtual std::string query(const std::string& target,
+                              const std::string& queryStr,
+                              HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) = 0;
 
     /** set a federation global value
     @details this overwrites any previous value for this name

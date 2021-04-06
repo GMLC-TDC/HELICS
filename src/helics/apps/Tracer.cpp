@@ -229,7 +229,8 @@ namespace apps {
         for (auto& capt : captureInterfaces) {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
-                auto pubs = vectorizeQueryResult(fed->query(capt, "publications"));
+                auto pubs = vectorizeQueryResult(
+                    fed->query(capt, "publications", HELICS_QUERY_MODE_ORDERED));
                 for (auto& pub : pubs) {
                     addSubscription(pub);
                 }

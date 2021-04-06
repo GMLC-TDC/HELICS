@@ -38,6 +38,11 @@ class PublicationInfo {
     int32_t required_connections{0};  //!< the number of required connections 0 is no requirement
     /** check the value if it is the same as the most recent data and if changed, store it*/
     bool CheckSetValue(const char* dataToCheck, uint64_t len);
+    /** add a new subscriber to the publication
+@return true if the subscriber was added false if duplicate
+*/
+    bool addSubscriber(GlobalHandle newSubscriber);
+
     /** remove a subscriber*/
     void removeSubscriber(GlobalHandle subscriberToRemove);
 };
