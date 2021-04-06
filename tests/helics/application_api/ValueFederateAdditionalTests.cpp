@@ -1104,11 +1104,14 @@ TEST(valuefederate, file_and_config)
 
     auto& p1 = Fed1->getPublication(0);
     auto& i1 = Fed2->getInput(0);
+    EXPECT_TRUE(i1.isValid());
+    EXPECT_TRUE(p1.isValid());
 
     Fed1->enterExecutingModeAsync();
     Fed2->enterExecutingMode();
     Fed1->enterExecutingModeComplete();
 
+    EXPECT_TRUE(Fed2->getFlagOption(HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE));
     p1.publish(std::complex<double>(1, 2));
 
     Fed1->requestTimeAsync(1.0);

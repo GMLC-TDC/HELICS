@@ -695,7 +695,7 @@ std::vector<GlobalFederateId> TimeCoordinator::getDependencies() const
 bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateId skipFed) const
 {
     bool skipped{false};
-    for (auto dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependent) {
             if (dep.fedID == skipFed) {
                 skipped = true;
@@ -704,8 +704,8 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
             msg.dest_id = dep.fedID;
         sendMessageFunction(msg);
     }
+	}
     return skipped;
-}
 }
 
 MessageProcessingResult TimeCoordinator::checkExecEntry()

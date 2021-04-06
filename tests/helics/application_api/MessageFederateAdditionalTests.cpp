@@ -757,7 +757,7 @@ TEST_F(mfed_tests, message_error)
     mFed1->requestTime(2.0);
     EXPECT_EQ(errors.load(), 0);
     setActionFlag(mess1, required_flag);
-    // it should cause the unknown destination to be ignored
+    // it should cause the unknown destination to be to generate an error
     ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int err_count{0};

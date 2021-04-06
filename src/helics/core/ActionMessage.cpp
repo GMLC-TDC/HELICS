@@ -57,8 +57,8 @@ ActionMessage::ActionMessage(const ActionMessage& act):
 }
 
 ActionMessage::ActionMessage(std::unique_ptr<Message> message):
-    messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), actionTime(message->time),
-    payload(std::move(message->data)), stringData({std::move(message->dest),
+    messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), flags(message->flags),
+    actionTime(message->time), payload(std::move(message->data)), stringData({std::move(message->dest),
                                                    std::move(message->source),
                                                    std::move(message->original_source),
                                                    std::move(message->original_dest)})
@@ -124,6 +124,7 @@ ActionMessage& ActionMessage::operator=(std::unique_ptr<Message> message) noexce
 {
     messageAction = CMD_SEND_MESSAGE;
     messageID = message->messageID;
+    flags = message->flags;
     payload = std::move(message->data);
     actionTime = message->time;
     stringData = {std::move(message->dest),
@@ -544,6 +545,7 @@ std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd)
     }
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
+    msg->flags = cmd.flags;
     msg->messageID = cmd.messageID;
 
     return msg;
@@ -576,6 +578,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
     }
     msg->data = std::move(cmd.payload);
     msg->time = cmd.actionTime;
+    msg->flags = cmd.flags;
     msg->messageID = cmd.messageID;
     return msg;
 }

@@ -119,8 +119,10 @@ class InputInfo {
     bool updateTimeNextIteration(Time newTime);
     /** get the event based on the event queue*/
     Time nextValueTime() const;
-    /** add a new source target to the input*/
-    void addSource(GlobalHandle newSource,
+    /** add a new source target to the input
+    @return true if the source was added false if duplicate
+    */
+    bool addSource(GlobalHandle newSource,
                    const std::string& sourceName,
                    const std::string& stype,
                    const std::string& sunits);

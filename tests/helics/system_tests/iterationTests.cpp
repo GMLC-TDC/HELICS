@@ -401,8 +401,8 @@ TEST_F(iteration_tests, iteration_counter)
             pub1.publish(c1);
             pub2.publish(c2);
         }
-        std::cout << "iteration " << c1 << std::endl;
-       
+       // std::cout << "iteration " << c1 << std::endl;
+        vFed1->requestTimeIterativeAsync(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
         if (c1 <= 10) {
             res = vFed2->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
         } else {
@@ -422,7 +422,7 @@ TEST_F(iteration_tests, iteration_counter)
         }
         res = vFed1->requestTimeIterativeComplete();
         ++cc;
-        std::cout << "iteration granted " << c1 << std::endl;
+        //std::cout << "iteration granted " << c1 << std::endl;
         if (c1 <= 10) {
             EXPECT_TRUE(res.state == helics::IterationResult::ITERATING);
             EXPECT_EQ(res.grantedTime, 0.0);

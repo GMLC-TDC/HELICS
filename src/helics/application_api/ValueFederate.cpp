@@ -248,8 +248,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 auto units = getOrDefault(sub, "unit", emptyStr);
                 replaceIfMember(sub, "units", units);
                 subAct = &registerInput(emptyStr, type, units);
+                subAct->addTarget(key);
             }
-            subAct->addTarget(key);
             loadOptions(this, sub, *subAct);
         }
     }
@@ -330,8 +330,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 replaceIfMember(sub, "units", units);
 
                 id = &registerInput(emptyStr, type, units);
+                id->addTarget(key);
             }
-            id->addTarget(key);
+            
 
             loadOptions(this, sub, *id);
         }
