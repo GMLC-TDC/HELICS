@@ -2472,9 +2472,8 @@ void CoreBroker::setLogFile(const std::string& lfile)
 }
 
 // public query function
-std::string CoreBroker::query(const std::string& target,
-                              const std::string& queryStr,
-                              HelicsQueryModes mode)
+std::string
+    CoreBroker::query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode)
 {
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
