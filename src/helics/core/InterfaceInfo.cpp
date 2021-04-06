@@ -201,8 +201,8 @@ bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int3
 {
     auto* ept = getEndpoint(id);
     if (ept == nullptr) {
-    return false;
-}
+        return false;
+    }
     bool bvalue = (value != 0);
     switch (option) {
         case defs::Options::CONNECTION_REQUIRED:
@@ -298,8 +298,8 @@ int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle id, int32_t option) c
 {
     const auto* ept = getEndpoint(id);
     if (ept == nullptr) {
-    return 0;
-}
+        return 0;
+    }
     bool flagval = false;
     switch (option) {
         case defs::Options::CONNECTION_REQUIRED:

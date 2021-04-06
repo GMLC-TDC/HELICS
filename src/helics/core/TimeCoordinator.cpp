@@ -66,11 +66,11 @@ void TimeCoordinator::disconnect()
             auto& dep = *dependencies.begin();
             if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                 bye.dest_id = dep.fedID;
-            if (bye.dest_id == source_id) {
-                processTimeMessage(bye);
-            } else {
-                sendMessageFunction(bye);
-            }
+                if (bye.dest_id == source_id) {
+                    processTimeMessage(bye);
+                } else {
+                    sendMessageFunction(bye);
+                }
             }
 
         } else {
@@ -79,11 +79,11 @@ void TimeCoordinator::disconnect()
                 if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                     bye.dest_id = dep.fedID;
                     if (dep.fedID == source_id) {
-                    processTimeMessage(bye);
-                } else {
-                    appendMessage(multi, bye);
+                        processTimeMessage(bye);
+                    } else {
+                        appendMessage(multi, bye);
+                    }
                 }
-            }
             }
             sendMessageFunction(multi);
         }
@@ -109,11 +109,11 @@ void TimeCoordinator::localError()
             auto& dep = *dependencies.begin();
             if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                 bye.dest_id = dep.fedID;
-            if (bye.dest_id == source_id) {
-                processTimeMessage(bye);
-            } else {
-                sendMessageFunction(bye);
-            }
+                if (bye.dest_id == source_id) {
+                    processTimeMessage(bye);
+                } else {
+                    sendMessageFunction(bye);
+                }
             }
 
         } else {
@@ -122,11 +122,11 @@ void TimeCoordinator::localError()
                 if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                     bye.dest_id = dep.fedID;
                     if (dep.fedID == source_id) {
-                    processTimeMessage(bye);
-                } else {
-                    appendMessage(multi, bye);
+                        processTimeMessage(bye);
+                    } else {
+                        appendMessage(multi, bye);
+                    }
                 }
-            }
             }
             sendMessageFunction(multi);
         }
@@ -159,8 +159,8 @@ void TimeCoordinator::timeRequest(Time nextTime,
         time_value = (newValueTime > time_granted) ? newValueTime : time_granted;
         time_message = (newMessageTime > time_granted) ? newMessageTime : time_granted;
     } else {
-    time_value = (newValueTime > time_next) ? newValueTime : time_next;
-    time_message = (newMessageTime > time_next) ? newMessageTime : time_next;
+        time_value = (newValueTime > time_next) ? newValueTime : time_next;
+        time_message = (newMessageTime > time_next) ? newMessageTime : time_next;
     }
 
     time_exec = std::min({time_value, time_message, time_requested});
@@ -635,8 +635,8 @@ bool TimeCoordinator::addDependent(GlobalFederateId fedID)
         dependent_federates.lock()->push_back(fedID);
         return true;
     }
-            return false;
-        }
+    return false;
+}
 
 void TimeCoordinator::setAsChild(GlobalFederateId fedID)
 {
@@ -646,7 +646,7 @@ void TimeCoordinator::setAsChild(GlobalFederateId fedID)
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
         dep->connection = ConnectionType::child;
-}
+    }
 }
 
 void TimeCoordinator::setAsParent(GlobalFederateId fedID)
@@ -674,13 +674,13 @@ void TimeCoordinator::removeDependency(GlobalFederateId fedID)
 void TimeCoordinator::removeDependent(GlobalFederateId fedID)
 {
     dependencies.removeDependent(fedID);
-            // remove the thread safe version
-            auto dlock = dependent_federates.lock();
-            auto res = std::find(dlock.begin(), dlock.end(), fedID);
-            if (res != dlock.end()) {
-                dlock->erase(res);
-            }
-        }
+    // remove the thread safe version
+    auto dlock = dependent_federates.lock();
+    auto res = std::find(dlock.begin(), dlock.end(), fedID);
+    if (res != dlock.end()) {
+        dlock->erase(res);
+    }
+}
 
 DependencyInfo* TimeCoordinator::getDependencyInfo(GlobalFederateId ofed)
 {
@@ -702,9 +702,9 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
                 continue;
             }
             msg.dest_id = dep.fedID;
-        sendMessageFunction(msg);
+            sendMessageFunction(msg);
+        }
     }
-	}
     return skipped;
 }
 
@@ -909,7 +909,7 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
     if (added) {
         if (checkActionFlag(cmd, child_flag)) {
             setAsChild(cmd.source_id);
-}
+        }
         if (checkActionFlag(cmd, parent_flag)) {
             setAsParent(cmd.source_id);
         }

@@ -13,10 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value converters
  */
+#include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/application_api/MessageFederate.hpp"
 
 #include <future>
 
@@ -252,7 +252,7 @@ TEST_F(iteration_tests, time_iteration_test_message)
     mFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed1->enterExecutingMode();
-    eptid.sendTo("message1","ept");
+    eptid.sendTo("message1", "ept");
 
     auto comp = mFed1->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
 
@@ -401,7 +401,7 @@ TEST_F(iteration_tests, iteration_counter)
             pub1.publish(c1);
             pub2.publish(c2);
         }
-       // std::cout << "iteration " << c1 << std::endl;
+        // std::cout << "iteration " << c1 << std::endl;
         vFed1->requestTimeIterativeAsync(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
         if (c1 <= 10) {
             res = vFed2->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
@@ -422,7 +422,7 @@ TEST_F(iteration_tests, iteration_counter)
         }
         res = vFed1->requestTimeIterativeComplete();
         ++cc;
-        //std::cout << "iteration granted " << c1 << std::endl;
+        // std::cout << "iteration granted " << c1 << std::endl;
         if (c1 <= 10) {
             EXPECT_TRUE(res.state == helics::IterationResult::ITERATING);
             EXPECT_EQ(res.grantedTime, 0.0);

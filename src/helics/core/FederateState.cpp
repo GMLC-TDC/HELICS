@@ -206,7 +206,7 @@ uint64_t FederateState::getQueueSize(InterfaceHandle id) const
 {
     const auto* epI = interfaceInformation.getEndpoint(id);
     return (epI != nullptr) ? epI->availableMessages() : 0;
-    }
+}
 
 uint64_t FederateState::getQueueSize() const
 {
@@ -452,11 +452,11 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
         if (sendRequest) {
-        ActionMessage exec(CMD_EXEC_REQUEST);
-        exec.source_id = global_id.load();
-        setIterationFlags(exec, iterate);
+            ActionMessage exec(CMD_EXEC_REQUEST);
+            exec.source_id = global_id.load();
+            setIterationFlags(exec, iterate);
             setActionFlag(exec, indicator_flag);
-        addAction(exec);
+            addAction(exec);
         }
 
         auto ret = processQueue();
@@ -547,13 +547,13 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
         if (sendRequest) {
-        ActionMessage treq(CMD_TIME_REQUEST);
-        treq.source_id = global_id.load();
-        treq.actionTime = nextTime;
-        setIterationFlags(treq, iterate);
+            ActionMessage treq(CMD_TIME_REQUEST);
+            treq.source_id = global_id.load();
+            treq.actionTime = nextTime;
+            setIterationFlags(treq, iterate);
             setActionFlag(treq, indicator_flag);
-        addAction(treq);
-        LOG_TRACE(timeCoord->printTimeStatus());
+            addAction(treq);
+            LOG_TRACE(timeCoord->printTimeStatus());
         }
 
 // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
@@ -588,9 +588,9 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
             allowed_send_time = Time::maxVal();
             iterating = false;
         } else {
-        time_granted = timeCoord->getGrantedTime();
-        allowed_send_time = timeCoord->allowedSendTime();
-        iterating = (ret == MessageProcessingResult::ITERATING);
+            time_granted = timeCoord->getGrantedTime();
+            allowed_send_time = timeCoord->allowedSendTime();
+            iterating = (ret == MessageProcessingResult::ITERATING);
         }
 
         iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
@@ -639,8 +639,8 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
             if (!ignore_time_mismatch_warnings) {
                 LOG_WARNING(fmt::format(
                     "Time mismatch detected: granted time greater than requested time {} vs {}",
-                                static_cast<double>(retTime.grantedTime),
-                                static_cast<double>(nextTime)));
+                    static_cast<double>(retTime.grantedTime),
+                    static_cast<double>(nextTime)));
             }
         }
         return retTime;
@@ -671,7 +671,7 @@ void FederateState::fillEventVectorUpTo(Time currentTime)
         bool updated = ept->updateTimeUpTo(currentTime);
         if (updated) {
             eventMessages.push_back(ept->id.handle);
-}
+        }
     }
 }
 
@@ -689,7 +689,7 @@ void FederateState::fillEventVectorInclusive(Time currentTime)
         bool updated = ept->updateTimeInclusive(currentTime);
         if (updated) {
             eventMessages.push_back(ept->id.handle);
-}
+        }
     }
 }
 
@@ -707,7 +707,7 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
         bool updated = ept->updateTimeNextIteration(currentTime);
         if (updated) {
             eventMessages.push_back(ept->id.handle);
-}
+        }
     }
 }
 
@@ -865,23 +865,23 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
     LOG_TRACE(fmt::format("processing command {}", prettyPrintString(cmd)));
 
     if (cmd.action() == CMD_TIME_REQUEST) {
-            if ((cmd.source_id == global_id.load()) &&
+        if ((cmd.source_id == global_id.load()) &&
             checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
-                IterationRequest iterate = IterationRequest::NO_ITERATIONS;
-                if (checkActionFlag(cmd, iteration_requested_flag)) {
-                    iterate = (checkActionFlag(cmd, required_flag)) ?
-                        IterationRequest::FORCE_ITERATION :
-                        IterationRequest::ITERATE_IF_NEEDED;
-                }
+            IterationRequest iterate = IterationRequest::NO_ITERATIONS;
+            if (checkActionFlag(cmd, iteration_requested_flag)) {
+                iterate = (checkActionFlag(cmd, required_flag)) ?
+                    IterationRequest::FORCE_ITERATION :
+                    IterationRequest::ITERATE_IF_NEEDED;
+            }
             timeCoord->timeRequest(cmd.actionTime, iterate, nextValueTime(), nextMessageTime());
-                timeGranted_mode = false;
-                auto ret = processDelayQueue();
-                if (returnableResult(ret)) {
-                    return ret;
-                }
+            timeGranted_mode = false;
+            auto ret = processDelayQueue();
+            if (returnableResult(ret)) {
+                return ret;
+            }
             cmd.setAction(CMD_TIME_CHECK);
-            }
-            }
+        }
+    }
     auto proc_result = processCoordinatorMessage(
         cmd, timeCoord.get(), getState(), timeGranted_mode, global_id.load());
 
@@ -899,8 +899,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 break;
             case HELICS_EXECUTING:
                 timeCoord->updateTimeFactors();
-                        LOG_TIMING("Granting Execution");
-                        break;
+                LOG_TIMING("Granting Execution");
+                break;
             case HELICS_FINISHED:
                 LOG_TIMING("Terminating");
                 break;
@@ -909,34 +909,34 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     errorString = commandErrorString(cmd.messageID);
                     if (errorString == "unknown") {
                         errorString += " code:" + std::to_string(cmd.messageID);
-                }
+                    }
                 } else {
                     errorString = cmd.payload.to_string();
-            }
+                }
                 errorCode = cmd.messageID;
                 LOG_ERROR(errorString);
                 break;
             default:
                 break;
-                }
-            }
+        }
+    }
 
     switch (std::get<1>(proc_result)) {
         case MessageProcessingResult::CONTINUE_PROCESSING:
             break;
         case MessageProcessingResult::REPROCESS_MESSAGE:
             if (cmd.dest_id != global_id.load()) {
-                    routeMessage(cmd);
+                routeMessage(cmd);
                 return MessageProcessingResult::CONTINUE_PROCESSING;
-                }
+            }
             return processActionMessage(cmd);
         case MessageProcessingResult::DELAY_MESSAGE:
-                        addFederateToDelay(GlobalFederateId(cmd.source_id));
-                        return MessageProcessingResult::DELAY_MESSAGE;
-                    default:
+            addFederateToDelay(GlobalFederateId(cmd.source_id));
+            return MessageProcessingResult::DELAY_MESSAGE;
+        default:
             if (timeGranted_mode) {
-                        time_granted = timeCoord->getGrantedTime();
-                        allowed_send_time = timeCoord->allowedSendTime();
+                time_granted = timeCoord->getGrantedTime();
+                allowed_send_time = timeCoord->allowedSendTime();
                 if (cmd.action() == CMD_FORCE_TIME_GRANT) {
                     if (!ignore_time_mismatch_warnings) {
                         LOG_WARNING(fmt::format("forced Granted Time={}", time_granted));
@@ -950,17 +950,17 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
 
     switch (cmd.action()) {
         case CMD_IGNORE:
-                default:
-                    break;
+        default:
+            break;
         case CMD_LOG: {
             if (cmd.getStringData().empty()) {
                 logMessage(cmd.messageID, emptyStr, cmd.payload.to_string());
             } else {
                 logMessage(cmd.messageID, cmd.getStringData()[0], cmd.payload.to_string());
             }
-            }
+        }
 
-            break;
+        break;
 
         case CMD_EXEC_REQUEST:
             if ((cmd.source_id == global_id.load()) &&
@@ -984,29 +984,29 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     routeMessage(cmd);
                 }
             } else {
-            switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
-                    addFederateToDelay(GlobalFederateId(cmd.source_id));
-                    return MessageProcessingResult::DELAY_MESSAGE;
-                case message_process_result::no_effect:
-                    return MessageProcessingResult::CONTINUE_PROCESSING;
-                default:
+                switch (timeCoord->processTimeMessage(cmd)) {
+                    case message_process_result::delay_processing:
+                        addFederateToDelay(GlobalFederateId(cmd.source_id));
+                        return MessageProcessingResult::DELAY_MESSAGE;
+                    case message_process_result::no_effect:
+                        return MessageProcessingResult::CONTINUE_PROCESSING;
+                    default:
+                        break;
+                }
+                if (state != HELICS_EXECUTING) {
                     break;
-            }
-            if (state != HELICS_EXECUTING) {
-                break;
-            }
-            if (!timeGranted_mode) {
-                auto ret = timeCoord->checkTimeGrant();
-                if (returnableResult(ret)) {
-                    time_granted = timeCoord->getGrantedTime();
-                    allowed_send_time = timeCoord->allowedSendTime();
-                    timeGranted_mode = true;
-                    return ret;
+                }
+                if (!timeGranted_mode) {
+                    auto ret = timeCoord->checkTimeGrant();
+                    if (returnableResult(ret)) {
+                        time_granted = timeCoord->getGrantedTime();
+                        allowed_send_time = timeCoord->allowedSendTime();
+                        timeGranted_mode = true;
+                        return ret;
+                    }
                 }
             }
-            }
-                break;
+            break;
         case CMD_CLOSE_INTERFACE:
             if (cmd.source_id == global_id.load()) {
                 closeInterface(cmd.source_handle, static_cast<InterfaceType>(cmd.counter));
@@ -1063,11 +1063,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
                 if (subI->addSource(cmd.getSource(),
-                                std::string(cmd.name()),
-                                cmd.getString(typeStringLoc),
-                                cmd.getString(unitStringLoc))){
+                                    std::string(cmd.name()),
+                                    cmd.getString(typeStringLoc),
+                                    cmd.getString(unitStringLoc))) {
                     addDependency(cmd.source_id);
-                    }
+                }
             }
         } break;
         case CMD_ADD_SUBSCRIBER: {
@@ -1548,10 +1548,10 @@ Time FederateState::nextMessageTime() const
         if (messageTime < time_granted) {
             messageTime = time_granted;
         }
-            if (messageTime < firstMessageTime) {
-                firstMessageTime = messageTime;
-            }
+        if (messageTime < firstMessageTime) {
+            firstMessageTime = messageTime;
         }
+    }
     return firstMessageTime;
 }
 

@@ -790,7 +790,7 @@ TEST_F(mfed_tests, default_endpoint_required)
 
     mFed1->enterExecutingMode();
 
-    ep1.sendTo("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","unknown");
+    ep1.sendTo("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", "unknown");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     int err_count{0};
     try {

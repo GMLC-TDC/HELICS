@@ -444,7 +444,7 @@ bool CommonCore::allDisconnected() const
         if (afed) {
             if (!timeCoord->hasActiveTimeDependencies()) {
                 return true;
-    }
+            }
             if (timeCoord->dependencyCount() == 1 && timeCoord->getMinDependency() == filterFedID) {
                 return !filterFed->hasActiveTimeDependencies();
             }
@@ -1883,7 +1883,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
             // now we deal with local processing
             if (checkActionFlag(*localP, has_dest_filter_flag)) {
                 filterFed->destinationProcessMessage(message, localP);
-                            }
+            }
             if (message.dest_id == parent_broker_id) {
                 message.dest_id = localP->getFederateId();
                 message.dest_handle = localP->getInterfaceHandle();
@@ -2129,11 +2129,11 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
         if (filterFed != nullptr) {
             filterFed->addFilteredEndpoint(base, fed->global_id);
         }
-                } else {
+    } else {
         base["name"] = getIdentifier();
         base["id"] = global_broker_id_local.baseValue();
         base["endpoints"] = Json::arrayValue;
-                }
+    }
     return generateJsonString(base);
 }
 
@@ -2158,13 +2158,13 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     }
     if (queryStr == "state") {
         if (!force_ordering) {
-        return fedStateString(fed->getState());
-    }
+            return fedStateString(fed->getState());
+        }
     }
     if (queryStr == "filtered_endpoints") {
         if (!force_ordering) {
-        return filteredEndpointQuery(fed);
-    }
+            return filteredEndpointQuery(fed);
+        }
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
@@ -2252,7 +2252,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
             int brkindex = builder.generatePlaceHolder("federates", filterFedID.load().baseValue());
             std::string ret = filterFed->query(request);
             builder.addComponent(ret, brkindex);
-    }
+        }
     }
 
     switch (index) {
@@ -2493,37 +2493,37 @@ std::string CommonCore::query(const std::string& target,
             querycmd.dest_id = fed->global_id;
             if (mode != helics_query_mode_ordered) {
                 std::string ret = federateQuery(fed, queryStr, false);
-            if (ret != "#wait") {
-                return ret;
-            }
+                if (ret != "#wait") {
+                    return ret;
+                }
 
-            auto queryResult = activeQueries.getFuture(querycmd.messageID);
-            fed->addAction(std::move(querycmd));
-            std::future_status status = std::future_status::timeout;
-            while (status == std::future_status::timeout) {
-                status = queryResult.wait_for(std::chrono::milliseconds(50));
-                switch (status) {
-                    case std::future_status::ready:
-                    case std::future_status::deferred: {
-                        auto qres = queryResult.get();
-                        activeQueries.finishedWithValue(index);
-                        return qres;
-                    }
+                auto queryResult = activeQueries.getFuture(querycmd.messageID);
+                fed->addAction(std::move(querycmd));
+                std::future_status status = std::future_status::timeout;
+                while (status == std::future_status::timeout) {
+                    status = queryResult.wait_for(std::chrono::milliseconds(50));
+                    switch (status) {
+                        case std::future_status::ready:
+                        case std::future_status::deferred: {
+                            auto qres = queryResult.get();
+                            activeQueries.finishedWithValue(index);
+                            return qres;
+                        }
                         case std::future_status::timeout: {  // federate query may need to wait or
                                                              // can get the result now
-                        ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
-                        if (ret != "#wait") {
-                            activeQueries.finishedWithValue(index);
-                            return ret;
-                        }
-                    } break;
-                    default:
-                        status = std::future_status::ready;  // LCOV_EXCL_LINE
+                            ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+                            if (ret != "#wait") {
+                                activeQueries.finishedWithValue(index);
+                                return ret;
+                            }
+                        } break;
+                        default:
+                            status = std::future_status::ready;  // LCOV_EXCL_LINE
+                    }
                 }
+                return generateJsonErrorResponse(500, "Unexpected Error #13");  // LCOV_EXCL_LINE
             }
-            return generateJsonErrorResponse(500, "Unexpected Error #13");  // LCOV_EXCL_LINE
         }
-    }
     }
 
     auto queryResult = activeQueries.getFuture(querycmd.messageID);
@@ -2962,7 +2962,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     break;
                 }
             }
-                routeMessage(command);
+            routeMessage(command);
             break;
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_FED:
@@ -3098,7 +3098,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                                  command.payload.to_string());
                     auto fed = loopFederates.find(command.source_id);
                     if (fed != loopFederates.end()) {
-                    fed->state = operation_state::error;
+                        fed->state = operation_state::error;
                     } else if (command.source_id == filterFedID) {
                         filterFed->handleMessage(command);
                         // filterFed->
@@ -3336,11 +3336,11 @@ void CommonCore::registerInterface(ActionMessage& command)
                     generateFilterFederate();
                 }
                 filterFed->createFilter(filterFedID.load(),
-                             command.source_handle,
-                             std::string(command.name()),
-                             command.getString(typeStringLoc),
-                             command.getString(typeOutStringLoc),
-                             checkActionFlag(command, clone_flag));
+                                        command.source_handle,
+                                        std::string(command.name()),
+                                        command.getString(typeStringLoc),
+                                        command.getString(typeOutStringLoc),
+                                        checkActionFlag(command, clone_flag));
                 connectFilterTiming();
                 break;
             default:
@@ -3351,8 +3351,8 @@ void CommonCore::registerInterface(ActionMessage& command)
         }
     } else {
         routeMessage(std::move(command));
-            }
-            }
+    }
+}
 
 void CommonCore::generateFilterFederate()
 {
@@ -3382,7 +3382,7 @@ void CommonCore::generateFilterFederate()
     newFed.setExtraData(fid.baseValue());
     newFed.name(getIdentifier() + "_filters");
     transmit(getRoute(higher_broker_id), newFed);
-        }
+}
 
 void CommonCore::connectFilterTiming()
 {
@@ -3397,7 +3397,7 @@ void CommonCore::connectFilterTiming()
         transmit(getRoute(higher_broker_id), add);
         timeCoord->addDependency(higher_broker_id);
         timeCoord->setAsParent(higher_broker_id);
-}
+    }
     // now add the filterFederate as a timeDependency
     timeCoord->addDependency(fid);
     timeCoord->setAsChild(fid);
@@ -3606,7 +3606,7 @@ void CommonCore::disconnectInterface(ActionMessage& command)
     if (handleInfo->getFederateId() == filterFedID.load()) {
         if (filterFed != nullptr) {
             filterFed->handleMessage(command);
-            }
+        }
     } else {
         if (handleInfo->handleType != InterfaceType::FILTER) {
             auto* fed = getFederateCore(command.source_id);
@@ -3660,17 +3660,17 @@ void CommonCore::removeTargetFromInterface(ActionMessage& command)
     if (command.dest_id == filterFedID) {
         filterFed->handleMessage(command);
     } else {  // just forward these to the appropriate federate
-    if (command.action() == CMD_REMOVE_FILTER) {
+        if (command.action() == CMD_REMOVE_FILTER) {
             command.dest_id = filterFedID;
             removeTargetFromInterface(command);
         } else {
-        auto* fed = getFederateCore(command.dest_id);
-        if (fed != nullptr) {
-            fed->addAction(command);
+            auto* fed = getFederateCore(command.dest_id);
+            if (fed != nullptr) {
+                fed->addAction(command);
+            }
         }
     }
 }
-    }
 
 void CommonCore::processQueryResponse(const ActionMessage& m)
 {
@@ -3877,7 +3877,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case UPDATE_FILTER_OPERATOR:
             if (filterFed != nullptr) {
                 filterFed->handleMessage(cmd);
-                }
+            }
             break;
         default:
             LOG_WARNING(global_broker_id_local,
@@ -3919,7 +3919,9 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
-                    std::get<1>(mapBuilders[mapIndex.at(std::string(cmd.payload.to_string())).first]).push_back(queryResp);
+                    std::get<1>(
+                        mapBuilders[mapIndex.at(std::string(cmd.payload.to_string())).first])
+                        .push_back(queryResp);
                 }
 
             } else {
@@ -3963,7 +3965,8 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     repStr = coreQuery(std::string(cmd.payload.to_string()), force_ordered);
                 } else {
                     auto* fedptr = getFederateCore(target);
-                    repStr = federateQuery(fedptr, std::string(cmd.payload.to_string()), force_ordered);
+                    repStr =
+                        federateQuery(fedptr, std::string(cmd.payload.to_string()), force_ordered);
                     if (repStr == "#wait") {
                         if (fedptr != nullptr) {
                             cmd.dest_id = fedptr->global_id;
@@ -3978,8 +3981,8 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 if (queryResp.dest_id == direct_core_id) {
                     processQueryResponse(queryResp);
                 } else {
-                transmit(getRoute(queryResp.dest_id), queryResp);
-            }
+                    transmit(getRoute(queryResp.dest_id), queryResp);
+                }
             }
             break;
         case CMD_QUERY_REPLY:
@@ -4131,7 +4134,7 @@ bool CommonCore::checkAndProcessDisconnect()
             dis.source_id = filterFedID;
             filterFed->handleMessage(dis);
             return true;
-    }
+        }
     }
     return false;
 }
@@ -4165,7 +4168,7 @@ void CommonCore::sendDisconnect()
     }
     if (filterFed != nullptr) {
         filterFed->handleMessage(bye);
-}
+    }
 }
 
 bool CommonCore::checkForLocalPublication(ActionMessage& cmd)
@@ -4316,7 +4319,7 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
     clearActionFlag(m, filter_processing_required_flag);
     if (checkActionFlag(*handle, has_source_filter_flag)) {
         if (filterFed != nullptr) {
-        return filterFed->processMessage(m, handle);
+            return filterFed->processMessage(m, handle);
         }
     }
 

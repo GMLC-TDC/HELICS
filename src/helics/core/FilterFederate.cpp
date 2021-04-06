@@ -722,7 +722,7 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
             if (newFilter == nullptr) {
                 newFilter = createFilter(GlobalBrokerId(command.source_id),
                                          command.source_handle,
-                                 std::string(command.payload.to_string()),
+                                         std::string(command.payload.to_string()),
                                          command.getString(typeStringLoc),
                                          command.getString(typeOutStringLoc),
                                          checkActionFlag(command, clone_flag));

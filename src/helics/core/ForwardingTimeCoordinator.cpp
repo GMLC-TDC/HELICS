@@ -36,7 +36,7 @@ void ForwardingTimeCoordinator::enteringExecMode()
             fedOnly = false;
             noParent = false;
             break;
-}
+        }
         if (dep.connection == ConnectionType::child && dep.fedID.isBroker()) {
             fedOnly = false;
         }
@@ -139,7 +139,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
     if (updateUpstream) {
         auto upd = generateTimeRequest(upstream, GlobalFederateId{});
         transmitTimingMessagesUpstream(upd);
-        }
+    }
     if (updateDownstream) {
         auto upd = generateTimeRequest(downstream, GlobalFederateId{});
         transmitTimingMessagesDownstream(upd);
@@ -164,12 +164,12 @@ void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) con
             Json::Value depblock;
             generateJsonOutputDependency(depblock, dep);
             base["dependencies"].append(depblock);
-    }
+        }
         if (dep.dependent) {
             base["dependents"].append(dep.fedID.baseValue());
-    }
         }
     }
+}
 
 std::string ForwardingTimeCoordinator::printTimeStatus() const
 {
@@ -192,22 +192,22 @@ bool ForwardingTimeCoordinator::addDependency(GlobalFederateId fedID)
 bool ForwardingTimeCoordinator::addDependent(GlobalFederateId fedID)
 {
     return dependencies.addDependent(fedID);
-    }
+}
 
 void ForwardingTimeCoordinator::setAsChild(GlobalFederateId fedID)
 {
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
         dep->connection = ConnectionType::child;
-        }
     }
+}
 
 void ForwardingTimeCoordinator::setAsParent(GlobalFederateId fedID)
 {
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
         dep->connection = ConnectionType::parent;
-}
+    }
 }
 
 void ForwardingTimeCoordinator::removeDependency(GlobalFederateId fedID)
@@ -218,7 +218,7 @@ void ForwardingTimeCoordinator::removeDependency(GlobalFederateId fedID)
 void ForwardingTimeCoordinator::removeDependent(GlobalFederateId fedID)
 {
     dependencies.removeDependent(fedID);
-        }
+}
 
 const DependencyInfo* ForwardingTimeCoordinator::getDependencyInfo(GlobalFederateId ofed) const
 {
@@ -230,8 +230,8 @@ std::vector<GlobalFederateId> ForwardingTimeCoordinator::getDependencies() const
     std::vector<GlobalFederateId> deps;
     for (auto& dep : dependencies) {
         if (dep.dependency) {
-        deps.push_back(dep.fedID);
-    }
+            deps.push_back(dep.fedID);
+        }
     }
     return deps;
 }
@@ -311,14 +311,14 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
     if (sendMessageFunction) {
         for (auto dep : dependencies) {
             if (dep.connection == ConnectionType::child) {
-                            continue;
-                        }
+                continue;
+            }
             if (!dep.dependent) {
                 continue;
-                    }
+            }
             msg.dest_id = dep.fedID;
             sendMessageFunction(msg);
-                }
+        }
     }
 }
 
@@ -328,8 +328,8 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
         if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
             for (auto dep : dependencies) {
                 if (dep.connection != ConnectionType::child) {
-                        continue;
-                    }
+                    continue;
+                }
                 if (!dep.dependent) {
                     continue;
                 }
@@ -353,11 +353,11 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
             for (auto dep : dependencies) {
                 if (dep.dependent) {
                     msg.dest_id = dep.fedID;
-                sendMessageFunction(msg);
+                    sendMessageFunction(msg);
+                }
             }
         }
     }
-}
 }
 
 bool ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
@@ -404,7 +404,7 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage(const ActionMessa
     }
     if (checkActionFlag(cmd, child_flag)) {
         setAsChild(cmd.source_id);
-}
+    }
     if (checkActionFlag(cmd, parent_flag)) {
         setAsParent(cmd.source_id);
     }
