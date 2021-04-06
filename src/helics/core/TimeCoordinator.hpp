@@ -41,7 +41,9 @@ class tcoptions {
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
     bool restrictive_time_policy = false;
-    // 1 byte gap
+    /** have the shown event time match dependency events for use with federates
+    that trigger on events but don't have internal generated events*/
+    bool event_triggered = false;
     int maxIterations = 50;
 };
 
@@ -51,6 +53,10 @@ mode
 */
 class TimeCoordinator {
   private:
+    /// the variables for time coordination
+    TimeData upstream;
+    TimeData total;
+    mutable TimeData lastSend;
     // the variables for time coordination
     Time time_granted = Time::minVal();  //!< the most recent time granted
     Time time_requested = Time::maxVal();  //!< the most recent time requested
@@ -61,20 +67,17 @@ class TimeCoordinator {
     Time time_exec = Time::maxVal();  //!< the time of the next targeted execution
     Time time_message = Time::maxVal();  //!< the time of the earliest message event
     Time time_value = Time::maxVal();  //!< the time of the earliest value event
-    Time time_grantBase =
-        Time::minVal();  //!< time to use as a basis for calculating the next grantable
-    //!< time(usually time granted unless values are changing)
+    /** time to use as a basis for calculating the next grantable
+    time(usually time granted unless values are changing) */
+    Time time_grantBase = Time::minVal();
     Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
-    shared_guarded_m<std::vector<GlobalFederateId>>
-        dependent_federates;  //!< these are to maintain an accessible record of dependent federates
-    shared_guarded_m<std::vector<GlobalFederateId>>
-        dependency_federates;  //!< these are to maintain an accessible record of dependency
-                               //!< federates
+    /// these are to maintain an accessible record of dependent federates
+    shared_guarded_m<std::vector<GlobalFederateId>> dependent_federates;
+    /// these are to maintain an accessible record of dependency federates
+    shared_guarded_m<std::vector<GlobalFederateId>> dependency_federates;
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<GlobalFederateId>
-        dependents;  //!< federates which temporally depend on this federate
-    std::vector<std::pair<Time, int32_t>>
-        timeBlocks;  //!< blocks for a particular timeblocking link
+    /// blocks for a particular timeblocking link
+    std::vector<std::pair<Time, int32_t>> timeBlocks;
     tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage&)>
         sendMessageFunction;  //!< callback used to send the messages
@@ -158,10 +161,14 @@ class TimeCoordinator {
     /** get the next possible time that a time coordinator could grant*/
     Time getNextPossibleTime() const;
     Time generateAllowedTime(Time testTime) const;
+    /* return true if the skip federate was detected*/
+    bool checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
 
     void sendTimeRequest() const;
     void updateTimeGrant();
-    void transmitTimingMessage(ActionMessage& msg) const;
+    /** transmit message to all federates except the skipFed,  return true if skipFed was used*/
+    bool transmitTimingMessages(ActionMessage& msg,
+                                GlobalFederateId skipFed =GlobalFederateId{}) const;
 
     message_process_result processTimeBlockMessage(const ActionMessage& cmd);
 
@@ -194,6 +201,9 @@ class TimeCoordinator {
     @param fedID the identifier of the federate to remove*/
     void removeDependent(GlobalFederateId fedID);
 
+    void setAsChild(GlobalFederateId fedID);
+
+    void setAsParent(GlobalFederateId fedID);
     /** check if entry to the executing state can be granted*/
     MessageProcessingResult checkExecEntry();
     /** request a time
@@ -222,5 +232,13 @@ class TimeCoordinator {
     bool hasActiveTimeDependencies() const;
     /** generate a configuration string(JSON)*/
     void generateConfig(Json::Value& base) const;
+
+    /** generate debugging time information*/
+    void generateDebuggingTimeInfo(Json::Value& base) const;
+
+    /** get a count of the active dependencies*/
+    int dependencyCount() const;
+    /** get a count of the active dependencies*/
+    GlobalFederateId getMinDependency() const;
 };
 }  // namespace helics

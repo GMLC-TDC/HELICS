@@ -26,7 +26,7 @@ class filter_tests: public FederateTestFixture, public ::testing::Test {
 
 /** test registration of filters*/
 
-TEST_P(filter_type_tests, registration)
+TEST_P(filter_simple_type_tests, registration)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, HELICS_TIME_ZERO, "filter");
@@ -79,7 +79,7 @@ TEST_P(filter_type_tests, registration)
 /**
 Test filter info fields
 */
-TEST_P(filter_type_tests, info_tests)
+TEST_P(filter_simple_type_tests, info_tests)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, HELICS_TIME_ZERO, "filter");
@@ -158,7 +158,7 @@ TEST_F(filter_tests, core_filter_reg)
     helicsCloseLibrary();
 }
 
-TEST_P(filter_type_tests, message_filter_function)
+TEST_P(filter_simple_type_tests, message_filter_function)
 {
     HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -287,7 +287,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
 simulation
 */
-TEST_P(filter_type_tests, function_two_stage)
+TEST_P(filter_simple_type_tests, function_two_stage)
 {
     HelicsBroker broker = AddBroker(GetParam(), 3);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -371,7 +371,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 simulation
 */
 
-TEST_P(filter_type_tests, function2)
+TEST_P(filter_simple_type_tests, function2)
 {
     HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -442,7 +442,7 @@ TEST_P(filter_type_tests, function2)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_P(filter_type_tests, message_filter_function3)
+TEST_P(filter_simple_type_tests, message_filter_function3)
 {
     HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");

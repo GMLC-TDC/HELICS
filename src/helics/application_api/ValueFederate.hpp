@@ -422,7 +422,7 @@ class HELICS_CXX_EXPORT ValueFederate:
   protected:
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition() override;
-    virtual void initializeToExecuteStateTransition() override;
+    virtual void initializeToExecuteStateTransition(IterationResult result) override;
     virtual std::string localQuery(const std::string& queryStr) const override;
 
   public:
