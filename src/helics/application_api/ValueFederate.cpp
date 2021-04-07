@@ -336,7 +336,6 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 id = &registerInput(emptyStr, type, units);
                 id->addTarget(key);
             }
-            
 
             loadOptions(this, sub, *id);
         }
