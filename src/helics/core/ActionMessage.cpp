@@ -538,6 +538,7 @@ std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd)
     }
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
+    msg->flags = cmd.flags;
     msg->messageID = cmd.messageID;
 
     return msg;
@@ -570,6 +571,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
     }
     msg->data = std::move(cmd.payload);
     msg->time = cmd.actionTime;
+    msg->flags = cmd.flags;
     msg->messageID = cmd.messageID;
     return msg;
 }

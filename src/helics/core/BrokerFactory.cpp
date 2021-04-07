@@ -184,7 +184,35 @@ thread which allows the destructor to fire if need be without issue*/
 
     std::shared_ptr<Broker> findBroker(const std::string& brokerName)
     {
-        return searchableBrokers.findObject(brokerName);
+        auto brk = searchableBrokers.findObject(brokerName);
+        if (brk) {
+            return brk;
+        }
+        if (brokerName.empty()) {
+            return findBroker();
+        }
+        if (brokerName.front() == '#') {
+            return findBroker(brokerName.substr(1));
+        }
+        try {
+            auto val = std::stoull(brokerName);
+            return findBroker(val);
+        }
+        catch (...)
+        {
+            return nullptr;
+        }
+    }
+
+    std::shared_ptr<Broker> findBroker()
+    {
+        return searchableBrokers.findObject([](auto& ptr) { return ptr->isConnected(); });
+    }
+
+    std::shared_ptr<Broker> findBroker(size_t index)
+    {
+        auto brks = searchableBrokers.getObjects();
+        return brks.size() > index ? brks[index] : nullptr;
     }
 
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)

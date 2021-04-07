@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "gmlc/utilities/stringOps.h"
+#include "../application_api/BrokerApp.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -125,7 +126,22 @@ void terminalFunction(std::vector<std::string> args)
                       << " open:" << brk->isOpenToNewFederates() << '\n';
         }
     };
-    auto newBroker = []() {};
+
+    std::vector<std::string> bargs;
+    auto newBroker = [&bargs]() {
+        std::reverse(bargs.begin(), bargs.end());
+        try
+        {
+            helics::BrokerApp brk(bargs);
+
+            std::cout << "broker has started: " << brk->isConnected() << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    };
+
     /*
     auto restartBroker = [&broker, &args] (std::vector<std::string> broker_args, bool force) {
         if (!broker_args.empty ())
@@ -202,11 +218,13 @@ void terminalFunction(std::vector<std::string> args)
     termProg.add_subcommand("ls", "list all brokers")->callback(lsbrokers);
     termProg.add_subcommand("terminate", "terminate the broker servers")
         ->callback(closeBrokerServer);
-    termProg.add_subcommand("broker", "create a new broker with the given arguments")
+    auto brokersub=termProg.add_subcommand("broker", "create a new broker with the given arguments")
         ->callback(newBroker);
 
+    brokersub->add_option("args", bargs, "arguments for the query");
+
     termProg
-        .add_subcommand("terminate!",
+        .add_subcommand("force_terminate",
                         "forcibly terminate the broker servers, shutdown all brokers and exit")
         ->callback([closeBrokerServer, &cmdcont]() {
             cmdcont = false;
@@ -233,47 +251,43 @@ void terminalFunction(std::vector<std::string> args)
     termProg.add_subcommand("help", "display the help")->callback([&termProg]() {
         termProg.helics_parse("-?");
     });
-    /*
-    std::string target;
-    std::string query;
 
-    auto queryCall = [&broker, &target, &query] () {
-        if (!broker)
-        {
-            std::cout << "Broker is not available\n";
-            return;
+   std::vector<std::string> qargs;
+    auto queryCall = [&qargs]() {
+        std::shared_ptr<helics::Broker> brk{nullptr};
+
+        std::string target;
+        std::string query;
+        if (qargs.size() >= 3) {
+            brk = helics::BrokerFactory::findBroker(qargs[0]);
+            target = qargs[1];
+            query = qargs[2];
+        } else {
+            brk = helics::BrokerFactory::findBroker();
+            if (qargs.size() == 2) {
+                target = qargs[0];
+                query = qargs[1];
+            } else if (qargs.size() == 1) {
+                target = "root";
+                query = qargs[0];
+            } else {
+                target = "root";
+                query = "status";
+            }
         }
-        std::string res;
-        if (target.empty ())
-        {
-            res = (*broker)->query ("broker", query);
-        }
-        else
-        {
-            res = (*broker)->query (target, query);
-        }
-        auto qvec = vectorizeQueryResult (std::move (res));
-        std::cout << "results: ";
-        for (const auto &vres : qvec)
-        {
-            std::cout << vres << '\n';
-        }
+        std::string res = (brk) ? brk->query(target, query) : "#invalid";
+        std::cout << res << std::endl;
     };
-    auto querySub = termProg.add_subcommand (
-      "query", "make a query of some target >>query <target> <query> or query <query> to query the
-    broker"); auto qgroup1 = querySub->add_option_group ("targetGroup")->enabled_by_default ();
-    qgroup1->add_option ("target", target, "the name of object to target");
-    auto qgroup2 = querySub->add_option_group ("queryGroup");
-    qgroup2->add_option ("query", query, "the query to make")->required ();
-    querySub->preparse_callback ([qgroup1, &target] (size_t argcount) {
-        if (argcount < 2)
-        {
-            target.clear ();
-            qgroup1->disabled ();
-        }
-    });
+    
+
+    auto querySub = termProg.add_subcommand(
+        "query",
+        "make a query of some target >>query <broker> <target> <query> or query <target> <query> to a target on the current broker or query <query> to target the root federation of the current broker");
+    querySub->add_option ("args", qargs, "arguments for the query");
+    
+    querySub->preparse_callback([&args](size_t ) { args.clear();});
     querySub->callback (queryCall);
-    */
+
     while (cmdcont) {
         std::string cmdin;
         std::cout << "\nhelics_broker_server>>";

@@ -118,7 +118,9 @@ TEST_F(network_tests, test_external_udp_ipv4)
     vFed1->enterExecutingMode();
     vFed1->finalize();
 }
+#endif
 
+#ifdef ENABLE_ZMQ_CORE
 TEST_F(network_tests, test_otherport)
 {
     const std::string brokerArgs = "--interface=tcp://127.0.0.1:33200";
