@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "../application_api/BrokerApp.hpp"
 #include "../application_api/Federate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../apps/BrokerServer.hpp"
@@ -11,7 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "gmlc/utilities/stringOps.h"
-#include "../application_api/BrokerApp.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -130,14 +130,12 @@ void terminalFunction(std::vector<std::string> args)
     std::vector<std::string> bargs;
     auto newBroker = [&bargs]() {
         std::reverse(bargs.begin(), bargs.end());
-        try
-        {
+        try {
             helics::BrokerApp brk(bargs);
 
             std::cout << "broker has started: " << brk->isConnected() << std::endl;
         }
-        catch (const std::exception &e)
-        {
+        catch (const std::exception& e) {
             std::cout << e.what() << std::endl;
         }
     };
@@ -218,8 +216,9 @@ void terminalFunction(std::vector<std::string> args)
     termProg.add_subcommand("ls", "list all brokers")->callback(lsbrokers);
     termProg.add_subcommand("terminate", "terminate the broker servers")
         ->callback(closeBrokerServer);
-    auto brokersub=termProg.add_subcommand("broker", "create a new broker with the given arguments")
-        ->callback(newBroker);
+    auto brokersub =
+        termProg.add_subcommand("broker", "create a new broker with the given arguments")
+            ->callback(newBroker);
 
     brokersub->add_option("args", bargs, "arguments for the query");
 
@@ -252,7 +251,7 @@ void terminalFunction(std::vector<std::string> args)
         termProg.helics_parse("-?");
     });
 
-   std::vector<std::string> qargs;
+    std::vector<std::string> qargs;
     auto queryCall = [&qargs]() {
         std::shared_ptr<helics::Broker> brk{nullptr};
 
@@ -278,15 +277,14 @@ void terminalFunction(std::vector<std::string> args)
         std::string res = (brk) ? brk->query(target, query) : "#invalid";
         std::cout << res << std::endl;
     };
-    
 
     auto querySub = termProg.add_subcommand(
         "query",
         "make a query of some target >>query <broker> <target> <query> or query <target> <query> to a target on the current broker or query <query> to target the root federation of the current broker");
-    querySub->add_option ("args", qargs, "arguments for the query");
-    
-    querySub->preparse_callback([&args](size_t ) { args.clear();});
-    querySub->callback (queryCall);
+    querySub->add_option("args", qargs, "arguments for the query");
+
+    querySub->preparse_callback([&args](size_t) { args.clear(); });
+    querySub->callback(queryCall);
 
     while (cmdcont) {
         std::string cmdin;

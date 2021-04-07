@@ -234,7 +234,7 @@ std::pair<return_val, std::string>
             if (cmdstr == "create") {
                 command = cmd::create;
             }
-            
+
             if (cmdstr == "barrier") {
                 command = cmd::barrier;
             }
