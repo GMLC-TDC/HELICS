@@ -367,7 +367,7 @@ std::pair<return_val, std::string>
             return {return_val::ok, emptyString};
         case cmd::barrier: {
             if (!brkr) {
-                brkr = helics::BrokerFactory::findBroker();
+                brkr = helics::BrokerFactory::getConnectedBroker();
                 if (!brkr) {
                     return {return_val::bad_request, "unable to locate broker"};
                 }
@@ -386,7 +386,7 @@ std::pair<return_val, std::string>
         }
         case cmd::clear_barrier:
             if (!brkr) {
-                brkr = helics::BrokerFactory::findBroker();
+                brkr = helics::BrokerFactory::getConnectedBroker();
                 if (!brkr) {
                     return {return_val::bad_request, "unable to locate broker"};
                 }
@@ -399,7 +399,7 @@ std::pair<return_val, std::string>
 
     bool autoquery{false};
     if (!brkr) {
-        brkr = helics::BrokerFactory::findBroker();
+        brkr = helics::BrokerFactory::getConnectedBroker();
         if (!brkr) {
             return {return_val::not_found, brokerName + " not found"};
         }

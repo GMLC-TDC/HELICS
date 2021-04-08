@@ -189,26 +189,26 @@ thread which allows the destructor to fire if need be without issue*/
             return brk;
         }
         if (brokerName.empty()) {
-            return findBroker();
+            return getConnectedBroker();
         }
         if (brokerName.front() == '#') {
-            return findBroker(brokerName.substr(1));
-        }
-        try {
-            auto val = std::stoull(brokerName);
-            return findBroker(val);
-        }
+            try {
+                auto val = std::stoull(brokerName.substr(1));
+                return getBrokerByIndex(val);
+            }
         catch (...) {
-            return nullptr;
+                return nullptr;
+            }
         }
+        return nullptr;
     }
 
-    std::shared_ptr<Broker> findBroker()
+    std::shared_ptr<Broker> getConnectedBroker()
     {
         return searchableBrokers.findObject([](auto& ptr) { return ptr->isConnected(); });
     }
 
-    std::shared_ptr<Broker> findBroker(size_t index)
+    std::shared_ptr<Broker> getBrokerByIndex(size_t index)
     {
         auto brks = searchableBrokers.getObjects();
         return brks.size() > index ? brks[index] : nullptr;

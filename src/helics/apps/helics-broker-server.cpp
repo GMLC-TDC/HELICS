@@ -22,11 +22,11 @@ void terminalFunction(std::vector<std::string> args);
 
 int main(int argc, char* argv[])
 {
-    int ret = 0;
-    bool runterminal = false;
+    int ret{0};
+    bool runterminal{false};
 
     helics::helicsCLI11App cmdLine("helics broker server command line");
-    auto term =
+    auto* term =
         cmdLine
             .add_subcommand("term",
                             "helics_broker_server term will start a broker server "
@@ -216,7 +216,7 @@ void terminalFunction(std::vector<std::string> args)
     termProg.add_subcommand("ls", "list all brokers")->callback(lsbrokers);
     termProg.add_subcommand("terminate", "terminate the broker servers")
         ->callback(closeBrokerServer);
-    auto brokersub =
+    auto* brokersub =
         termProg.add_subcommand("broker", "create a new broker with the given arguments")
             ->callback(newBroker);
 
@@ -262,7 +262,7 @@ void terminalFunction(std::vector<std::string> args)
             target = qargs[1];
             query = qargs[2];
         } else {
-            brk = helics::BrokerFactory::findBroker();
+            brk = helics::BrokerFactory::getConnectedBroker();
             if (qargs.size() == 2) {
                 target = qargs[0];
                 query = qargs[1];
@@ -278,12 +278,12 @@ void terminalFunction(std::vector<std::string> args)
         std::cout << res << std::endl;
     };
 
-    auto querySub = termProg.add_subcommand(
+    auto* querySub = termProg.add_subcommand(
         "query",
         "make a query of some target >>query <broker> <target> <query> or query <target> <query> to a target on the current broker or query <query> to target the root federation of the current broker");
     querySub->add_option("args", qargs, "arguments for the query");
 
-    querySub->preparse_callback([&args](size_t) { args.clear(); });
+    querySub->preparse_callback([&args](size_t /*unused*/) { args.clear(); });
     querySub->callback(queryCall);
 
     while (cmdcont) {
