@@ -7,7 +7,7 @@ Enhancing the tools for debugging a HELICS based co-simulation is one area of fo
 HELICS provides built-in support for various types of logging from federates, brokers, and more. See [Logging](./logging.md) for more details on how to enable and use.
 
 ## Players and Recorders
-Often an early step in debugging is to isolate the problem. HELICS provides the [**Recorder**](../apps/Recorder.html) and [**Player**](../apps/Player.html) apps to help with doing so for federates and to enable modular development and testing of federations even before all of the federates are working:
+Often an early step in debugging is to isolate the problem. HELICS provides the [**Recorder**](../apps/Recorder.md) and [**Player**](../apps/Player.md) apps to help with doing so for federates and to enable modular development and testing of federations even before all of the federates are working:
 * A recorder is just that: a tool that readily records some or all of the traffic that is sent via HELICS (both value-based publication/subscrition and message end points). Looking through this output can confirm that the data and timing in HELICS behaves as expected.
 * The basic idea for a player is that rather than running all of the other federates, you can test out a single or subset by reading the data that other federates would send from a file instead. 
 
