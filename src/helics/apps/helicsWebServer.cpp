@@ -297,8 +297,20 @@ std::pair<return_val, std::string>
     if (brokerName == "brokers" || (brokerName.empty() && query == "brokers")) {
         return {return_val::ok, getBrokerList()};
     }
-    std::shared_ptr<helics::Broker> brkr =
-        helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName : target.to_string());
+    
+    std::shared_ptr<helics::Broker> brkr;
+    if (brokerName.empty())
+    {
+        if (!target.empty())
+        {
+            brkr = helics::BrokerFactory::findBroker(target.to_string());
+        }
+    }
+    else
+    {
+        brkr = helics::BrokerFactory::findBroker(brokerName);
+    }
+        
     if (!brkr) {
         if (fields.find("broker") != fields.end()) {
             if (query.empty()) {
