@@ -327,7 +327,6 @@ TEST_F(webTest, deleteBroker)
 
 TEST_F(webTest, createBrokerUUID)
 {
-
     Json::Value v4;
     v4["command"] = "query";
     v4["query"] = "brokers";
