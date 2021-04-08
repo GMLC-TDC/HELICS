@@ -196,7 +196,7 @@ thread which allows the destructor to fire if need be without issue*/
                 auto val = std::stoull(brokerName.substr(1));
                 return getBrokerByIndex(val);
             }
-        catch (...) {
+            catch (...) {
                 return nullptr;
             }
         }
