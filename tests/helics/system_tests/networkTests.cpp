@@ -118,6 +118,7 @@ TEST_F(network_tests, test_external_udp_ipv4)
     vFed1->enterExecutingMode();
     vFed1->finalize();
 }
+#endif
 
 #endif
 
