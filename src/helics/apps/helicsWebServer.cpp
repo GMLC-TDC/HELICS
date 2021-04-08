@@ -204,18 +204,6 @@ std::string getBrokerList()
     return generateJsonString(base);
 }
 
-/** get a connected Broker*/
-static std::shared_ptr<helics::Broker> getValidBroker()
-{
-    auto brks = helics::BrokerFactory::getAllBrokers();
-    for (auto& brk : brks) {
-        if (brk->isConnected()) {
-            return brk;
-        }
-    }
-    return nullptr;
-}
-
 enum class return_val : std::int32_t {
     ok = 0,
     bad_request = static_cast<std::int32_t>(http::status::bad_request),
@@ -239,9 +227,14 @@ std::pair<return_val, std::string>
             if (cmdstr == "query" || cmdstr == "search" || cmdstr == "get") {
                 command = cmd::query;
             }
+            if (cmdstr == "status") {
+                command = cmd::query;
+                query = "status";
+            }
             if (cmdstr == "create") {
                 command = cmd::create;
             }
+
             if (cmdstr == "barrier") {
                 command = cmd::barrier;
             }
@@ -304,8 +297,20 @@ std::pair<return_val, std::string>
     if (brokerName == "brokers" || (brokerName.empty() && query == "brokers")) {
         return {return_val::ok, getBrokerList()};
     }
-    std::shared_ptr<helics::Broker> brkr =
-        helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName : target.to_string());
+    
+    std::shared_ptr<helics::Broker> brkr;
+    if (brokerName.empty())
+    {
+        if (!target.empty())
+        {
+            brkr = helics::BrokerFactory::findBroker(target.to_string());
+        }
+    }
+    else
+    {
+        brkr = helics::BrokerFactory::findBroker(brokerName);
+    }
+        
     if (!brkr) {
         if (fields.find("broker") != fields.end()) {
             if (query.empty()) {
@@ -374,7 +379,7 @@ std::pair<return_val, std::string>
             return {return_val::ok, emptyString};
         case cmd::barrier: {
             if (!brkr) {
-                brkr = getValidBroker();
+                brkr = helics::BrokerFactory::getConnectedBroker();
                 if (!brkr) {
                     return {return_val::bad_request, "unable to locate broker"};
                 }
@@ -393,7 +398,7 @@ std::pair<return_val, std::string>
         }
         case cmd::clear_barrier:
             if (!brkr) {
-                brkr = getValidBroker();
+                brkr = helics::BrokerFactory::getConnectedBroker();
                 if (!brkr) {
                     return {return_val::bad_request, "unable to locate broker"};
                 }
@@ -406,7 +411,7 @@ std::pair<return_val, std::string>
 
     bool autoquery{false};
     if (!brkr) {
-        brkr = getValidBroker();
+        brkr = helics::BrokerFactory::getConnectedBroker();
         if (!brkr) {
             return {return_val::not_found, brokerName + " not found"};
         }
