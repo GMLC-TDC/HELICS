@@ -39,6 +39,10 @@ TEST(federate_tests, federate_initialize_tests)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::initializing);
     Fed->enterExecutingMode();
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+
+    //const auto& coreName = core->getIdentifier();
+    //const auto& fedName = Fed->getName();
+    //EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
 

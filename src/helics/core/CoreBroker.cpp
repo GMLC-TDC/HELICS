@@ -266,7 +266,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 ActionMessage badInit(CMD_FED_ACK);
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;
-                badInit.messageID = 5;
+                badInit.messageID = already_init_error_code;
                 badInit.name = command.name;
                 transmit(getRoute(command.source_id), badInit);
                 return;
@@ -276,7 +276,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 ActionMessage badName(CMD_FED_ACK);
                 setActionFlag(badName, error_flag);
                 badName.source_id = global_broker_id_local;
-                badName.messageID = 6;
+                badName.messageID = duplicate_federate_name_error_code;
                 badName.name = command.name;
                 transmit(getRoute(command.source_id), badName);
                 return;
@@ -380,7 +380,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;
                 badInit.name = command.name;
-                badInit.messageID = 5;
+                badInit.messageID = already_init_error_code;
                 transmit(newroute, badInit);
 
                 if (route_created) {
@@ -2499,7 +2499,8 @@ enum subqueries : std::uint16_t {
     data_flow_graph = 4,
     version_all = 5,
     global_state = 6,
-    global_time_debugging = 7
+    global_time_debugging = 7,
+    global_flush = 8
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2510,7 +2511,10 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"version_all", {version_all, false}},
     {"global_state", {global_state, true}},
     {"global_time_debugging", {global_time_debugging, true}},
-};
+    {"global_flush", {global_flush,true}
+}
+}
+;
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
@@ -2530,7 +2534,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;counter;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_state;status;global_time;version;version_all;exists]";
+               "current_time;current_state;global_state;status;global_time;version;version_all;exists;global_flush]";
     }
     if (request == "address") {
         return getAddress();
@@ -2753,6 +2757,10 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     }
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
+    if (index == global_flush)
+    {
+        queryReq.setAction(CMD_BROKER_QUERY_ORDERED);
+    }
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
@@ -2814,6 +2822,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
         case federate_map:
         case current_time_map:
         case data_flow_graph:
+        case global_flush:
         default:
             break;
         case dependency_graph: {
@@ -3073,6 +3082,11 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
         auto& requestors = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(m.payload, m.messageID)) {
             auto str = builder.generate();
+            if (m.counter == global_flush)
+            {
+                str = "{\"status\":true}";
+            }
+            
             for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
                 if (requestors[ii].dest_id == global_broker_id_local) {
                     activeQueries.setDelayedValue(requestors[ii].messageID, str);

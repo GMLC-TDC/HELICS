@@ -1602,6 +1602,9 @@ std::string FederateState::processQueryActual(const std::string& query) const
         interfaceInformation.generateInferfaceConfig(base);
         return generateJsonString(base);
     }
+    if (query == "global_flush") {
+        return "{\"status\":true}";
+    }
     if (query == "subscriptions") {
         std::ostringstream s;
         s << "[";
