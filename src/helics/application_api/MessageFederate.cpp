@@ -96,9 +96,9 @@ void MessageFederate::startupToInitializeStateTransition()
 {
     mfManager->startupToInitializeStateTransition();
 }
-void MessageFederate::initializeToExecuteStateTransition()
+void MessageFederate::initializeToExecuteStateTransition(IterationResult result)
 {
-    mfManager->initializeToExecuteStateTransition();
+    mfManager->initializeToExecuteStateTransition(result);
 }
 
 std::string MessageFederate::localQuery(const std::string& queryStr) const

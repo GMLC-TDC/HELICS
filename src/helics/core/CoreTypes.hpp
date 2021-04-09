@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #    include "../helics_enums.h"
 
+#    include <string>
 /** @file
 @details definitions of types an enumerations used in helics
 */
@@ -27,6 +28,9 @@ enum FederateStates {
     HELICS_FINISHED,  //!< the federation has finished its execution
     HELICS_UNKNOWN,  //!< unknown state
 };
+
+/** convert the state into a human readable string*/
+const std::string& fedStateString(FederateStates state);
 
 /** the type of the cores that are available */
 enum class CoreType : int {
@@ -63,7 +67,8 @@ enum class MessageProcessingResult : signed char {
     NEXT_STEP = 0,  //!< indicator that the iterations have completed
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
-    ERROR_RESULT = 7  //!< indicator that an error has occurred
+    ERROR_RESULT = 7,  //!< indicator that an error has occurred
+    REPROCESS_MESSAGE = 8  // indicator that the message needs to be processed again
 };
 /** function to check if the message processing result should be returned or processing continued*/
 inline bool returnableResult(MessageProcessingResult result)

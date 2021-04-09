@@ -172,6 +172,7 @@ TEST(InfoClass_tests, endpointinfo_test)
     EXPECT_EQ(endPI.queueSize(maxT), 4);
     EXPECT_EQ(endPI.firstMessageTime(), minT);
 
+    endPI.updateTimeInclusive(minT);
     // Test maxTime parameter for getMessage(), and proper dequeuing
     auto msg = endPI.getMessage(minT);
     EXPECT_EQ(msg->data.to_string(), "minT");
@@ -181,6 +182,7 @@ TEST(InfoClass_tests, endpointinfo_test)
 
     // Message at time 0 should now be the first
     EXPECT_EQ(endPI.firstMessageTime(), zeroT);
+    endPI.updateTimeInclusive(zeroT);
     msg = endPI.getMessage(zeroT);
     EXPECT_EQ(msg->data.to_string(), "zeroT");
     EXPECT_EQ(endPI.queueSize(maxT), 2);
@@ -188,12 +190,15 @@ TEST(InfoClass_tests, endpointinfo_test)
 
     // Now message at time 1 (bFed) should be the first
     EXPECT_EQ(endPI.firstMessageTime(), helics::Time(1));
-    EXPECT_EQ(endPI.queueSize(1), 1);
+    endPI.updateTimeInclusive(1);
+    EXPECT_EQ(endPI.availableMessages(), 1);
 
     // Insert another message at time 1 (aFed) to test ordering by original source name
     endPI.addMessage(std::move(msg_time_one_a));
+    endPI.updateTimeInclusive(1);
     EXPECT_EQ(endPI.firstMessageTime(), helics::Time(1));
-    EXPECT_EQ(endPI.queueSize(1), 2);
+    EXPECT_EQ(endPI.availableMessages(), 2);
+    endPI.updateTimeInclusive(1);
     msg = endPI.getMessage(1);
     EXPECT_EQ(msg->data.to_string(), "oneAT");
     EXPECT_EQ(endPI.queueSize(1), 1);
@@ -217,15 +222,17 @@ TEST(InfoClass_tests, endpointinfo_test)
     endPI.addMessage(std::move(msg_time_one_a));
     endPI.addMessage(std::move(msg_time_one_b));
     EXPECT_EQ(endPI.queueSize(1), 2);
+    endPI.updateTimeInclusive(1);
     msg = endPI.getMessage(1);
     EXPECT_EQ(msg->data.to_string(), "oneAT");
     EXPECT_EQ(endPI.queueSize(1), 1);
     msg = endPI.getMessage(1);
     EXPECT_EQ(msg->data.to_string(), "oneBT");
     EXPECT_EQ(endPI.queueSize(1), 0);
-
+    endPI.updateTimeInclusive(maxT);
     // Test removing all elements from queue
     msg = endPI.getMessage(maxT);
+    ASSERT_TRUE(msg);
     EXPECT_EQ(msg->data.to_string(), "maxT");
     EXPECT_EQ(endPI.queueSize(maxT), 0);
     EXPECT_TRUE(endPI.getMessage(maxT) == nullptr);

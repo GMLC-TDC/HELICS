@@ -141,7 +141,7 @@ class ValueFederateManager {
     /** transition from Startup To the Initialize State*/
     void startupToInitializeStateTransition();
     /** transition from initialize to execution State*/
-    void initializeToExecuteStateTransition();
+    void initializeToExecuteStateTransition(IterationResult result);
     /** generate results for a local query */
     std::string localQuery(const std::string& queryStr) const;
     /** get a list of all the values that have been updated since the last call

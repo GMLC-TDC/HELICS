@@ -84,23 +84,24 @@ TEST(ftc_tests, dependent_tests)
     GlobalFederateId fed3(3);
     ftc.addDependent(fed2);
     ftc.addDependent(fed3);
-    auto& deps = ftc.getDependents();
+    auto deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
     // test repeated inputs are dealt with correctly
     ftc.addDependent(fed3);
-    // deps is a reference so it should change automatically
+    deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
 
     ftc.removeDependent(fed2);
+    deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
     // remove same one
     ftc.removeDependent(fed2);
-
+    deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }
@@ -116,12 +117,13 @@ TEST(ftc_tests, dependent_test_message)
     ftc.processDependencyUpdateMessage(addDep);
     addDep.source_id = fed3;
     ftc.processDependencyUpdateMessage(addDep);
-    const auto& deps = ftc.getDependents();
+    auto deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage(addDep);
+    deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);
@@ -129,13 +131,14 @@ TEST(ftc_tests, dependent_test_message)
     ActionMessage remDep(CMD_REMOVE_DEPENDENT);
     remDep.source_id = fed2;
     ftc.processDependencyUpdateMessage(remDep);
-
+    deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 
     // remove unrecognized one
     remDep.source_id = GlobalFederateId(10);
     ftc.processDependencyUpdateMessage(remDep);
+    deps = ftc.getDependents();
     EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }
@@ -207,7 +210,7 @@ TEST(ftc_tests, timing_test1)
     EXPECT_TRUE(modified);
     ftc.updateTimeFactors();
     // there should be no update yet
-    EXPECT_TRUE(lastMessage.action() == CMD_INVALID);
+    EXPECT_TRUE(lastMessage.action() == CMD_TIME_REQUEST);
 
     timeUpdate.source_id = fed3;
     timeUpdate.actionTime = 0.5;
@@ -220,4 +223,14 @@ TEST(ftc_tests, timing_test1)
     EXPECT_EQ(lastMessage.Te, 1.0);
     EXPECT_EQ(lastMessage.Tdemin, 0.5);
     EXPECT_TRUE(lastMessage.action() == CMD_TIME_REQUEST);
+}
+
+TEST(ftc_tests, timing_test2)
+{
+    ForwardingTimeCoordinator ftc;
+    GlobalFederateId fed2(2);
+    GlobalFederateId fed3(3);
+    ftc.addDependency(fed2);
+    ftc.addDependency(fed3);
+    getFTCtoExecMode(ftc);
 }

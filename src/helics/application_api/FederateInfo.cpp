@@ -168,6 +168,9 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"force_logging_flush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"forceloggingflush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"dumplog", HELICS_FLAG_DUMPLOG},
+    {"event_triggered", HELICS_FLAG_EVENT_TRIGGERED},
+    {"eventtriggered", HELICS_FLAG_EVENT_TRIGGERED},
+    {"eventTriggered", HELICS_FLAG_EVENT_TRIGGERED},
     {"terminate_on_error", HELICS_FLAG_TERMINATE_ON_ERROR},
     {"terminateOnError", HELICS_FLAG_TERMINATE_ON_ERROR},
     {"terminateonerror", HELICS_FLAG_TERMINATE_ON_ERROR}};

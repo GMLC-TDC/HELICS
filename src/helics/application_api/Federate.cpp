@@ -287,11 +287,12 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
                 case IterationResult::NEXT_STEP:
                     currentMode = Modes::EXECUTING;
                     currentTime = timeZero;
-                    initializeToExecuteStateTransition();
+                    initializeToExecuteStateTransition(res);
                     break;
                 case IterationResult::ITERATING:
                     currentMode = Modes::INITIALIZING;
-                    updateTime(getCurrentTime(), getCurrentTime());
+                    currentTime = initializationTime;
+                    initializeToExecuteStateTransition(res);
                     break;
                 case IterationResult::ERROR_RESULT:
                     // LCOV_EXCL_START
@@ -299,7 +300,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
                     break;
                     // LCOV_EXCL_STOP
                 case IterationResult::HALTED:
-                    currentMode = Modes::FINALIZE;
+                    currentMode = Modes::FINISHED;
                     break;
             }
             break;
@@ -372,11 +373,12 @@ IterationResult Federate::enterExecutingModeComplete()
                     case IterationResult::NEXT_STEP:
                         currentMode = Modes::EXECUTING;
                         currentTime = timeZero;
-                        initializeToExecuteStateTransition();
+                        initializeToExecuteStateTransition(IterationResult::NEXT_STEP);
                         break;
                     case IterationResult::ITERATING:
                         currentMode = Modes::INITIALIZING;
-                        updateTime(getCurrentTime(), getCurrentTime());
+                        currentTime = initializationTime;
+                        initializeToExecuteStateTransition(IterationResult::ITERATING);
                         break;
                     case IterationResult::ERROR_RESULT:
                         // LCOV_EXCL_START
@@ -384,7 +386,7 @@ IterationResult Federate::enterExecutingModeComplete()
                         break;
                         // LCOV_EXCL_STOP
                     case IterationResult::HALTED:
-                        currentMode = Modes::FINALIZE;
+                        currentMode = Modes::FINISHED;
                         break;
                 }
 
@@ -464,6 +466,7 @@ void Federate::finalize()
             asyncCallInfo->lock()->timeRequestFuture.get();
             break;
         case Modes::EXECUTING:
+        case Modes::FINISHED:
             break;
         case Modes::PENDING_ITERATIVE_TIME:
             asyncCallInfo->lock()
@@ -593,26 +596,31 @@ void Federate::globalError(int errorcode, const std::string& message)
 
 Time Federate::requestTime(Time nextInternalTimeStep)
 {
-    if (currentMode == Modes::EXECUTING) {
-        try {
-            auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
-            Time oldTime = currentTime;
-            currentTime = newTime;
-            updateTime(newTime, oldTime);
-            if (newTime == Time::maxVal()) {
-                currentMode = Modes::FINALIZE;
+    switch (currentMode) {
+        case Modes::EXECUTING:
+            try {
+                auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+                Time oldTime = currentTime;
+                currentTime = newTime;
+                updateTime(newTime, oldTime);
+                if (newTime == Time::maxVal()) {
+                    currentMode = Modes::FINISHED;
+                }
+                return newTime;
             }
-            return newTime;
-        }
-        catch (const FunctionExecutionFailure&) {
-            currentMode = Modes::ERROR_STATE;
-            throw;
-        }
-    } else if (currentMode == Modes::FINALIZE) {
-        return Time::maxVal();
-    } else {
-        throw(InvalidFunctionCall("cannot call request time in present state"));
+            catch (const FunctionExecutionFailure&) {
+                currentMode = Modes::ERROR_STATE;
+                throw;
+            }
+            break;
+        case Modes::FINALIZE:
+        case Modes::FINISHED:
+            return Time::maxVal();
+        default:
+            break;
     }
+
+    throw(InvalidFunctionCall("cannot call request time in present state"));
 }
 
 iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate)
@@ -630,7 +638,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
             case IterationResult::HALTED:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
-                currentMode = Modes::FINALIZE;
+                currentMode = Modes::FINISHED;
                 break;
             case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
@@ -640,7 +648,7 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
         }
         return iterativeTime;
     }
-    if (currentMode == Modes::FINALIZE) {
+    if (currentMode == Modes::FINALIZE || currentMode == Modes::FINISHED) {
         return {Time::maxVal(), IterationResult::HALTED};
     }
     throw(InvalidFunctionCall("cannot call request time in present state"));
@@ -709,7 +717,7 @@ iteration_time Federate::requestTimeIterativeComplete()
             case IterationResult::HALTED:
                 currentTime = iterativeTime.grantedTime;
                 updateTime(currentTime, oldTime);
-                currentMode = Modes::FINALIZE;
+                currentMode = Modes::FINISHED;
                 break;
             case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
@@ -732,7 +740,7 @@ void Federate::startupToInitializeStateTransition()
 {
     // child classes may do something with this
 }
-void Federate::initializeToExecuteStateTransition()
+void Federate::initializeToExecuteStateTransition(IterationResult /*unused*/)
 {
     // child classes may do something with this
 }
@@ -1075,7 +1083,7 @@ std::string Federate::localQuery(const std::string& /*queryStr*/) const
 {
     return std::string{};
 }
-std::string Federate::query(const std::string& queryStr)
+std::string Federate::query(const std::string& queryStr, HelicsQueryModes mode)
 {
     std::string res;
     if (queryStr == "name") {
@@ -1093,7 +1101,7 @@ std::string Federate::query(const std::string& queryStr)
     }
     if (res.empty()) {
         if (coreObject) {
-            res = coreObject->query(getName(), queryStr);
+            res = coreObject->query(getName(), queryStr, mode);
         } else {
             res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
@@ -1101,14 +1109,15 @@ std::string Federate::query(const std::string& queryStr)
     return res;
 }
 
-std::string Federate::query(const std::string& target, const std::string& queryStr)
+std::string
+    Federate::query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode)
 {
     std::string res;
     if ((target.empty()) || (target == "federate") || (target == getName())) {
         res = query(queryStr);
     } else {
         if (coreObject) {
-            res = coreObject->query(target, queryStr);
+            res = coreObject->query(target, queryStr, mode);
         } else {
             res = generateJsonErrorResponse(410, "Federate is disconnected");
         }
@@ -1116,10 +1125,12 @@ std::string Federate::query(const std::string& target, const std::string& queryS
     return res;
 }
 
-query_id_t Federate::queryAsync(const std::string& target, const std::string& queryStr)
+query_id_t Federate::queryAsync(const std::string& target,
+                                const std::string& queryStr,
+                                HelicsQueryModes mode)
 {
-    auto queryFut = std::async(std::launch::async, [this, target, queryStr]() {
-        return coreObject->query(target, queryStr);
+    auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
+        return coreObject->query(target, queryStr, mode);
     });
     auto asyncInfo = asyncCallInfo->lock();
     int cnt = asyncInfo->queryCounter++;
@@ -1128,9 +1139,10 @@ query_id_t Federate::queryAsync(const std::string& target, const std::string& qu
     return query_id_t(cnt);
 }
 
-query_id_t Federate::queryAsync(const std::string& queryStr)
+query_id_t Federate::queryAsync(const std::string& queryStr, HelicsQueryModes mode)
 {
-    auto queryFut = std::async(std::launch::async, [this, queryStr]() { return query(queryStr); });
+    auto queryFut =
+        std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });
     auto asyncInfo = asyncCallInfo->lock();
     int cnt = asyncInfo->queryCounter++;
 
@@ -1365,7 +1377,7 @@ void Interface::setOption(int32_t option, int32_t value)
         cr->setHandleOption(handle, option, value);
     } else {
         throw(InvalidFunctionCall(
-            "set Option cannot be called on uninitialized interface or after close/disconnect"));
+            "setInterfaceOption cannot be called on uninitialized federate or after finalize call"));
     }
 }
 

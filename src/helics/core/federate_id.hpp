@@ -52,6 +52,11 @@ std::ostream& operator<<(std::ostream& os, LocalFederateId fid);
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr LocalFederateId gLocalCoreId(-259);
 
+namespace detail {
+    /** constant numerical value for invalid handle identification*/
+    constexpr IdentifierBaseType gInvalidInterfaceHandle{-1'700'000'000};
+}  // namespace detail
+
 /** class defining a LocalFederateId
  @details  the intent of this class is to limit the operations available on a federate identifier
  to those that are actually required and make sense, and make it as low impact as possible.
@@ -73,11 +78,11 @@ class InterfaceHandle {
     /** comparison operator for sorting*/
     bool operator<(InterfaceHandle id) const noexcept { return (hid < id.hid); }
     bool operator>(InterfaceHandle id) const noexcept { return (hid > id.hid); }
-    bool isValid() const { return (hid != invalid_handle); }
+    bool isValid() const { return (hid != mInvalidHandle); }
 
   private:
-    static constexpr BaseType invalid_handle{-1'700'000'000};
-    BaseType hid{invalid_handle};  //!< the underlying index value
+    static constexpr BaseType mInvalidHandle{detail::gInvalidInterfaceHandle};
+    BaseType hid{mInvalidHandle};  //!< the underlying index value
 };
 
 #if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
