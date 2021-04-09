@@ -66,9 +66,9 @@ enum class message_processing_result : signed char {
     continue_processing = -2,  //!< the current loop should continue
     delay_message = -1,  //!< delay the current message and continue processing
     next_step = 0,  //!< indicator that the iterations have completed
-    iterating = 2,  //!< indicator that the iterations need to continue
-    halted = 3,  //!< indicator that the simulation has been halted
-    error = 7,  //!< indicator that an error has occurred
+    error = 1,  //!< indicator that an error has occurred
+    halted = 2,  //!< indicator that the simulation has been halted
+    iterating = 3,  //!< indicator that the iterations need to continue
     reprocess_message = 8  // indicator that the message needs to be processed again
 };
 /** function to check if the message processing result should be returned or processing continued*/
@@ -76,13 +76,14 @@ inline bool returnableResult(message_processing_result result)
 {
     return (result >= message_processing_result::next_step);
 }
+
 /** enumeration of the possible states of iteration*/
 enum class iteration_result : signed char {
     next_step = 0,  //!< indicator that the iterations have completed and the federate has moved to
                     //!< the next step
-    iterating = 2,  //!< indicator that the iterations need to continue
-    halted = 3,  //!< indicator that the simulation has been halted
-    error = 7,  //!< indicator that an error has occurred
+    error = 1,  //!< indicator that an error has occurred
+    halted = 2,  //!< indicator that the simulation has been halted
+    iterating = 3,  //!< indicator that the iterations need to continue
 };
 
 /** enumeration of the possible iteration requests by a federate*/

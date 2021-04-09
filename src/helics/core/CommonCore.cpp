@@ -1882,7 +1882,8 @@ enum subqueries : std::uint16_t {
     dependency_graph = 3,
     data_flow_graph = 4,
     global_state = 6,
-    global_time_debugging = 7
+    global_time_debugging = 7,
+    global_flush = 8
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -1891,6 +1892,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"data_flow_graph", {data_flow_graph, false}},
     {"global_state", {global_state, true}},
     {"global_time_debugging", {global_time_debugging, true}},
+    {"global_flush", {global_flush, true}},
 };
 
 void CommonCore::setQueryCallback(local_federate_id federateID,
@@ -1960,7 +1962,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;exists;name;identifier;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;version;version_all;counter;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;global_state;current_state]";
+               "publications;filters;version;version_all;counter;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;global_state;current_state;global_flush]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2013,6 +2015,10 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
     ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
+    if (index == global_flush)
+    {
+        queryReq.setAction(CMD_QUERY_ORDERED);
+    }
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
@@ -3373,6 +3379,10 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
         auto& requestors = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(m.payload, m.messageID)) {
             auto str = builder.generate();
+            if (m.counter == global_flush)
+            {
+                str = "{\"status\":true}";
+            }
             for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
                 if (requestors[ii].dest_id == global_broker_id_local) {
                     activeQueries.setDelayedValue(requestors[ii].messageID, str);
