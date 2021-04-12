@@ -440,7 +440,11 @@ namespace apps {
     /** run the Player until the specified time*/
     void Recorder::runTo(Time runToTime)
     {
-        initialize();
+        if (fed->getCurrentMode() == Federate::modes::startup)
+        {
+            initialize();
+        }
+        
         if (!mapfile.empty()) {
             std::ofstream out(mapfile);
             for (auto& stat : vStat) {
