@@ -546,7 +546,10 @@ void TimeCoordinator::sendTimeRequest() const
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
     }
-    upd.Tdemin = std::min(upstream.Te, upd.Te);
+    upd.Tdemin = std::min(upstream.Te + info.outputDelay, upd.Te);
+    if (info.event_triggered) {
+        upd.Tdemin = std::min(upd.Tdemin, upstream.minDe + info.outputDelay);
+    }
     upd.setExtraData(upstream.minFed.baseValue());
 
     if (upd.Tdemin < upd.actionTime) {

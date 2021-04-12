@@ -481,6 +481,9 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
+    
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    rec1.runTo(8.0);
     EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto m = rec1.getMessage(0);
