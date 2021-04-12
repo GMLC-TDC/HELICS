@@ -1689,8 +1689,6 @@ void CommonCore::deliverMessage(ActionMessage& message)
                 message.dest_handle = localP->getInterfaceHandle();
             }
 
-            // timeCoord->processTimeMessage(message);
-
             auto* fed = getFederateCore(localP->getFederateId());
             if (fed != nullptr) {
                 fed->addAction(std::move(message));

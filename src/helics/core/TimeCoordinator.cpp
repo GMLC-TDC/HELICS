@@ -407,7 +407,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
         }
         if (time_message < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
-                sendTimeRequest();
+               sendTimeRequest();
             }
         }
     }
