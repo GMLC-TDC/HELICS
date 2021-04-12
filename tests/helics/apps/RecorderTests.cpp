@@ -82,16 +82,16 @@ TEST(recorder_tests, simple_recorder_test2)
     fut.get();
     rec1.finalize();
     auto v1 = rec1.getValue(0);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(3.4));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.4));
 
     v1 = rec1.getValue(1);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(4.7));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(4.7));
 
     v1 = rec1.getValue(2);
-    EXPECT_EQ(v1.first, std::string());
-    EXPECT_EQ(v1.second, std::string());
+    EXPECT_EQ(std::get<1>(v1), std::string());
+    EXPECT_EQ(std::get<2>(v1), std::string());
 
     auto m2 = rec1.getMessage(4);
     EXPECT_TRUE(!m2);
@@ -170,19 +170,19 @@ TEST_P(recorder_file_tests, test_files)
     rec1.finalize();
     EXPECT_EQ(rec1.pointCount(), 4U);
     auto v1 = rec1.getValue(0);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(3.4));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.4));
     v1 = rec1.getValue(1);
-    EXPECT_EQ(v1.first, "pub2");
-    EXPECT_EQ(v1.second, std::to_string(5.7));
+    EXPECT_EQ(std::get<1>(v1), "pub2");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(5.7));
 
     v1 = rec1.getValue(2);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(4.7));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(4.7));
 
     v1 = rec1.getValue(3);
-    EXPECT_EQ(v1.first, "pub2");
-    EXPECT_EQ(v1.second, std::to_string(3.9));
+    EXPECT_EQ(std::get<1>(v1), "pub2");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.9));
 }
 
 static constexpr const char* simple_files[] = {"example1.recorder",
@@ -245,19 +245,19 @@ TEST_P(recorder_message_file_tests, test_message_files)
     EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto v1 = rec1.getValue(0);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(3.4));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.4));
     v1 = rec1.getValue(1);
-    EXPECT_EQ(v1.first, "pub2");
-    EXPECT_EQ(v1.second, std::to_string(5.7));
+    EXPECT_EQ(std::get<1>(v1), "pub2");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(5.7));
 
     v1 = rec1.getValue(2);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(4.7));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(4.7));
 
     v1 = rec1.getValue(3);
-    EXPECT_EQ(v1.first, "pub2");
-    EXPECT_EQ(v1.second, std::to_string(3.9));
+    EXPECT_EQ(std::get<1>(v1), "pub2");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.9));
 
     auto m = rec1.getMessage(1);
     ASSERT_TRUE(m);
@@ -321,19 +321,19 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
     EXPECT_EQ(rec1.messageCount(), 2U);
 
     auto v1 = rec1.getValue(0);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(3.4));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.4));
     v1 = rec1.getValue(1);
-    EXPECT_EQ(v1.first, "pub2");
-    EXPECT_EQ(v1.second, std::to_string(5.7));
+    EXPECT_EQ(std::get<1>(v1), "pub2");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(5.7));
 
     v1 = rec1.getValue(2);
-    EXPECT_EQ(v1.first, "pub1");
-    EXPECT_EQ(v1.second, std::to_string(4.7));
+    EXPECT_EQ(std::get<1>(v1), "pub1");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(4.7));
 
     v1 = rec1.getValue(3);
-    EXPECT_EQ(v1.first, "pub2");
-    EXPECT_EQ(v1.second, std::to_string(3.9));
+    EXPECT_EQ(std::get<1>(v1), "pub2");
+    EXPECT_EQ(std::get<2>(v1), std::to_string(3.9));
 
     auto m = rec1.getMessage(1);
     ASSERT_TRUE(m);
