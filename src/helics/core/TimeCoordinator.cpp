@@ -220,7 +220,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
     }
 }
 
-void TimeCoordinator::updateValueTime(Time valueUpdateTime)
+void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSend)
 {
     if (!executionMode)  // updates before exec mode
     {
@@ -243,7 +243,10 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
         }
         if (time_value < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
-                sendTimeRequest();
+                if (allowRequestSend)
+                {
+                    sendTimeRequest();
+                }
             }
         }
     }
@@ -383,7 +386,7 @@ Time TimeCoordinator::generateAllowedTime(Time testTime) const
     return testTime;
 }
 
-void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
+void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowRequestSend)
 {
     if (!executionMode)  // updates before exec mode
     {
@@ -407,7 +410,11 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
         }
         if (time_message < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
-                sendTimeRequest();
+                if (allowRequestSend)
+                {
+                    sendTimeRequest();
+                }
+               
             }
         }
     }
@@ -546,7 +553,10 @@ void TimeCoordinator::sendTimeRequest() const
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
     }
-    upd.Tdemin = std::min(upstream.Te, upd.Te);
+    upd.Tdemin = std::min(upstream.Te + info.outputDelay, upd.Te);
+    if (info.event_triggered) {
+        upd.Tdemin = std::min(upd.Tdemin, upstream.minDe + info.outputDelay);
+    }
     upd.setExtraData(upstream.minFed.baseValue());
 
     if (upd.Tdemin < upd.actionTime) {
