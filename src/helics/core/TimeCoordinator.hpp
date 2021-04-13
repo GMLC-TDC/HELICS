@@ -138,11 +138,13 @@ class TimeCoordinator {
     */
     bool updateTimeFactors();
     /** update the time_value variable with a new value if needed
+    if allowed it will send an updated time request message
      */
-    void updateValueTime(Time valueUpdateTime);
+    void updateValueTime(Time valueUpdateTime, bool allowRequestSend);
     /** update the time_message variable with a new value if needed
+    if allowed it will send an updated time request message
      */
-    void updateMessageTime(Time messageUpdateTime);
+    void updateMessageTime(Time messageUpdateTime, bool allowRequestSend);
 
   private:
     /** take a global id and get a pointer to the dependencyInfo for the other fed

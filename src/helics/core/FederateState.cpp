@@ -1010,8 +1010,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr) {
-                if (!timeGranted_mode) {
-                    timeCoord->updateMessageTime(cmd.actionTime);
+                //if (!epi->not_interruptible)
+                {
+                    timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                 }
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
                 if (cmd.actionTime < time_granted) {
@@ -1035,8 +1036,8 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                                   cmd.actionTime,
                                   cmd.counter,
                                   std::make_shared<const data_block>(std::move(cmd.payload)));
-                    if (!subI->not_interruptible && !timeGranted_mode) {
-                        timeCoord->updateValueTime(cmd.actionTime);
+                    if (!subI->not_interruptible) {
+                        timeCoord->updateValueTime(cmd.actionTime, !timeGranted_mode);
                         LOG_TRACE(timeCoord->printTimeStatus());
                     }
                     LOG_DATA(fmt::format("receive publication {} from {}",
