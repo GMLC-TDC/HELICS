@@ -440,11 +440,10 @@ namespace apps {
     /** run the Player until the specified time*/
     void Recorder::runTo(Time runToTime)
     {
-        if (fed->getCurrentMode() == Federate::modes::startup)
-        {
+        if (fed->getCurrentMode() == Federate::modes::startup) {
             initialize();
         }
-        
+
         if (!mapfile.empty()) {
             std::ofstream out(mapfile);
             for (auto& stat : vStat) {
@@ -555,7 +554,8 @@ namespace apps {
     std::tuple<Time, std::string, std::string> Recorder::getValue(int index) const
     {
         if (isValidIndex(index, points)) {
-            return {points[index].time, subscriptions[points[index].index].getTarget(),
+            return {points[index].time,
+                    subscriptions[points[index].index].getTarget(),
                     points[index].value};
         }
         return {Time(), std::string(), std::string()};

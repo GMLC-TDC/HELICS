@@ -1010,7 +1010,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr) {
-                //if (!epi->not_interruptible)
+                // if (!epi->not_interruptible)
                 {
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                 }
