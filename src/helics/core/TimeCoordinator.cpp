@@ -220,7 +220,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
     }
 }
 
-void TimeCoordinator::updateValueTime(Time valueUpdateTime)
+void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSend)
 {
     if (!executionMode)  // updates before exec mode
     {
@@ -243,7 +243,10 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
         }
         if (time_value < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
-                sendTimeRequest();
+                if (allowRequestSend)
+                {
+                    sendTimeRequest();
+                }
             }
         }
     }
@@ -383,7 +386,7 @@ Time TimeCoordinator::generateAllowedTime(Time testTime) const
     return testTime;
 }
 
-void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
+void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowRequestSend)
 {
     if (!executionMode)  // updates before exec mode
     {
@@ -407,7 +410,11 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
         }
         if (time_message < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
-               sendTimeRequest();
+                if (allowRequestSend)
+                {
+                    sendTimeRequest();
+                }
+               
             }
         }
     }
