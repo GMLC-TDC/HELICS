@@ -2511,10 +2511,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"version_all", {version_all, false}},
     {"global_state", {global_state, true}},
     {"global_time_debugging", {global_time_debugging, true}},
-    {"global_flush", {global_flush,true}
-}
-}
-;
+    {"global_flush", {global_flush, true}}};
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
@@ -2757,8 +2754,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     }
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
-    if (index == global_flush)
-    {
+    if (index == global_flush) {
         queryReq.setAction(CMD_BROKER_QUERY_ORDERED);
     }
     queryReq.payload = request;
@@ -3082,11 +3078,10 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
         auto& requestors = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(m.payload, m.messageID)) {
             auto str = builder.generate();
-            if (m.counter == global_flush)
-            {
+            if (m.counter == global_flush) {
                 str = "{\"status\":true}";
             }
-            
+
             for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
                 if (requestors[ii].dest_id == global_broker_id_local) {
                     activeQueries.setDelayedValue(requestors[ii].messageID, str);

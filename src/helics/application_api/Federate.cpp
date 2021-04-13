@@ -47,26 +47,21 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
     if (fi.coreName.empty()) {
         coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
         if (!coreObject) {
-            if (!name.empty())
-            {
-                //we need to create a core here so loop until we find a number that is not already occupied
+            if (!name.empty()) {
+                // we need to create a core here so loop until we find a number that is not already
+                // occupied
                 int cnt{0};
                 std::string cname = fedName + "_core";
                 auto cobj = CoreFactory::findCore(cname);
-                while (cobj)
-                {
+                while (cobj) {
                     ++cnt;
                     cname = fedName + "_core" + std::to_string(cnt);
                     cobj = CoreFactory::findCore(cname);
                 }
-                coreObject = CoreFactory::create(fi.coreType,
-                                                 cname,
-                                                 generateFullCoreInitString(fi));
-            }
-            else
-            {
-                coreObject = CoreFactory::create(fi.coreType,
-                                                 generateFullCoreInitString(fi));
+                coreObject =
+                    CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+            } else {
+                coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
             }
         }
     } else {
@@ -92,7 +87,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
             throw(RegistrationFailure("Unable to connect to broker->unable to register federate"));
         }
     }
-   
+
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(name, fi);
     nameSegmentSeparator = fi.separator;

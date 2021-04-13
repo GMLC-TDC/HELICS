@@ -2013,8 +2013,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
     ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
-    if (index == global_flush)
-    {
+    if (index == global_flush) {
         queryReq.setAction(CMD_QUERY_ORDERED);
     }
     queryReq.payload = request;
@@ -3377,8 +3376,7 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
         auto& requestors = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(m.payload, m.messageID)) {
             auto str = builder.generate();
-            if (m.counter == global_flush)
-            {
+            if (m.counter == global_flush) {
                 str = "{\"status\":true}";
             }
             for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {

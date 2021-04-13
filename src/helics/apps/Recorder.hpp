@@ -85,7 +85,8 @@ namespace apps {
         auto messageCount() const { return messages.size(); }
         /** get a string with the value of point index
     @param index the number of the point to retrieve
-    @return a tuple with Time as the first element the tag as the 2nd element and the value as the third
+    @return a tuple with Time as the first element the tag as the 2nd element and the value as the
+    third
     */
         std::tuple<Time, std::string, std::string> getValue(int index) const;
         /** get a message
