@@ -266,6 +266,14 @@ const std::vector<std::shared_ptr<const data_block>>&
 void FederateState::routeMessage(const ActionMessage& msg)
 {
     if (parent_ != nullptr) {
+        if (msg.action() == CMD_TIME_REQUEST && !requestingMode)
+        {
+            LOG_ERROR("sending time request in invalid state");
+        }
+        if (msg.action() == CMD_TIME_GRANT)
+        {
+            requestingMode.store(false);
+        }
         parent_->addActionMessage(msg);
     } else {
         queue.push(msg);
@@ -861,6 +869,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
     if (cmd.action() == CMD_TIME_REQUEST) {
         if ((cmd.source_id == global_id.load()) &&
             checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
+            requestingMode.store(true);
             iteration_request iterate = iteration_request::no_iterations;
             if (checkActionFlag(cmd, iteration_requested_flag)) {
                 iterate = (checkActionFlag(cmd, required_flag)) ?
