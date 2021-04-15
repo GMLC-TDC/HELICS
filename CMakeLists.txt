@@ -17,12 +17,10 @@ else()
     cmake_policy(VERSION 3.18)
 endif()
 
-# Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given
-# vcpkg installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
+# Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
+# installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-        CACHE STRING ""
-    )
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
 project(HELICS VERSION 2.6.1)
