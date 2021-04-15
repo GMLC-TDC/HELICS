@@ -78,6 +78,13 @@ namespace BrokerFactory {
 @param brokerName the name of the broker
 @return a shared_ptr to the Broker*/
     std::shared_ptr<Broker> findBroker(const std::string& brokerName);
+    /** get the first available Connected broker
+@return a shared_ptr to the Broker*/
+    std::shared_ptr<Broker> getConnectedBroker();
+    /**  get a broker by index (0 based)
+@param index, the index counter value of the broker
+@return a shared_ptr to the Broker*/
+    std::shared_ptr<Broker> getBrokerByIndex(size_t index);
 
     /** try to find a joinable broker of a specific type*/
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type);

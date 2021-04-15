@@ -2652,13 +2652,14 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_helics_message swig_types[16]
 #define SWIGTYPE_p_helics_multi_input_mode swig_types[17]
 #define SWIGTYPE_p_helics_properties swig_types[18]
-#define SWIGTYPE_p_int swig_types[19]
-#define SWIGTYPE_p_int16_t swig_types[20]
-#define SWIGTYPE_p_int32_t swig_types[21]
-#define SWIGTYPE_p_p_char swig_types[22]
-#define SWIGTYPE_p_void swig_types[23]
-static swig_type_info *swig_types[25];
-static swig_module_info swig_module = {swig_types, 24, 0, 0, 0, 0};
+#define SWIGTYPE_p_helics_query_mode swig_types[19]
+#define SWIGTYPE_p_int swig_types[20]
+#define SWIGTYPE_p_int16_t swig_types[21]
+#define SWIGTYPE_p_int32_t swig_types[22]
+#define SWIGTYPE_p_p_char swig_types[23]
+#define SWIGTYPE_p_void swig_types[24]
+static swig_type_info *swig_types[26];
+static swig_module_info swig_module = {swig_types, 25, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -9409,6 +9410,59 @@ SWIGINTERN PyObject *_wrap_helicsQuerySetQueryString(PyObject *SWIGUNUSEDPARM(se
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsQuerySetOrdering(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_query arg1 = (helics_query) 0 ;
+  int32_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsQuerySetOrdering", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQuerySetOrdering" "', argument " "1"" of type '" "helics_query""'"); 
+  }
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQuerySetOrdering" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsQuerySetOrdering" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *((int32_t *)(argp2));
+    }
+  }
+  helicsQuerySetOrdering(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
   {
     if (arg3->error_code!=helics_ok)
     {
@@ -17466,6 +17520,15 @@ static PyMethodDef SwigMethods[] = {
 		":type queryString: string\n"
 		":param queryString: the new queryString\n"
 		""},
+	 { "helicsQuerySetOrdering", _wrap_helicsQuerySetOrdering, METH_VARARGS, "\n"
+		"Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence\n"
+		"\n"
+		":type query: void\n"
+		":param query: The query object to change the order for.\n"
+		":type mode: int32_t\n"
+		":param mode: 0 for fast, 1 for ordered\n"
+		"\n"
+		""},
 	 { "helicsQueryFree", _wrap_helicsQueryFree, METH_O, "Free the memory associated with a query object."},
 	 { "helicsCleanupLibrary", _wrap_helicsCleanupLibrary, METH_NOARGS, "\n"
 		"Function to do some housekeeping work.\n"
@@ -18576,14 +18639,16 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsEndpointSetInfo", _wrap_helicsEndpointSetInfo, METH_VARARGS, "\n"
 		"Set the data in the info field for a filter.\n"
 		"\n"
-		":param end: The endpoint to query.\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint to query.\n"
 		":type info: string\n"
 		":param info: The string to set.\n"
 		""},
 	 { "helicsEndpointSetOption", _wrap_helicsEndpointSetOption, METH_VARARGS, "\n"
 		"Set a handle option on an endpoint.\n"
 		"\n"
-		":param end: The endpoint to modify.\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint to modify.\n"
 		":type option: int\n"
 		":param option: Integer code for the option to set /ref helics_handle_options.\n"
 		":type value: int\n"
@@ -18592,7 +18657,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsEndpointGetOption", _wrap_helicsEndpointGetOption, METH_VARARGS, "\n"
 		"Set a handle option on an endpoint.\n"
 		"\n"
-		":param end: The endpoint to modify.\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint to modify.\n"
 		":type option: int\n"
 		":param option: Integer code for the option to set /ref helics_handle_options.\n"
 		":rtype: int\n"
@@ -19110,6 +19176,7 @@ static swig_type_info _swigt__p_helics_log_levels = {"_p_helics_log_levels", "en
 static swig_type_info _swigt__p_helics_message = {"_p_helics_message", "struct helics_message *|helics_message *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_multi_input_mode = {"_p_helics_multi_input_mode", "enum helics_multi_input_mode *|helics_multi_input_mode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_properties = {"_p_helics_properties", "enum helics_properties *|helics_properties *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_query_mode = {"_p_helics_query_mode", "enum helics_query_mode *|helics_query_mode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "helics_bool *|int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
@@ -19136,6 +19203,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_helics_message,
   &_swigt__p_helics_multi_input_mode,
   &_swigt__p_helics_properties,
+  &_swigt__p_helics_query_mode,
   &_swigt__p_int,
   &_swigt__p_int16_t,
   &_swigt__p_int32_t,
@@ -19162,6 +19230,7 @@ static swig_cast_info _swigc__p_helics_log_levels[] = {  {&_swigt__p_helics_log_
 static swig_cast_info _swigc__p_helics_message[] = {  {&_swigt__p_helics_message, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_multi_input_mode[] = {  {&_swigt__p_helics_multi_input_mode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_properties[] = {  {&_swigt__p_helics_properties, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_query_mode[] = {  {&_swigt__p_helics_query_mode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -19188,6 +19257,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_helics_message,
   _swigc__p_helics_multi_input_mode,
   _swigc__p_helics_properties,
+  _swigc__p_helics_query_mode,
   _swigc__p_int,
   _swigc__p_int16_t,
   _swigc__p_int32_t,
@@ -19968,6 +20038,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_flag_single_thread_federate",SWIG_From_int((int)(helics_flag_single_thread_federate)));
   SWIG_Python_SetConstant(d, "helics_flag_ignore_time_mismatch_warnings",SWIG_From_int((int)(helics_flag_ignore_time_mismatch_warnings)));
   SWIG_Python_SetConstant(d, "helics_flag_strict_config_checking",SWIG_From_int((int)(helics_flag_strict_config_checking)));
+  SWIG_Python_SetConstant(d, "helics_flag_event_triggered",SWIG_From_int((int)(helics_flag_event_triggered)));
   SWIG_Python_SetConstant(d, "helics_flag_delay_init_entry",SWIG_From_int((int)(helics_flag_delay_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_enable_init_entry",SWIG_From_int((int)(helics_flag_enable_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_slow_responding",SWIG_From_int((int)(helics_flag_slow_responding)));
@@ -20041,6 +20112,8 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_filter_type_reroute",SWIG_From_int((int)(helics_filter_type_reroute)));
   SWIG_Python_SetConstant(d, "helics_filter_type_clone",SWIG_From_int((int)(helics_filter_type_clone)));
   SWIG_Python_SetConstant(d, "helics_filter_type_firewall",SWIG_From_int((int)(helics_filter_type_firewall)));
+  SWIG_Python_SetConstant(d, "helics_query_mode_fast",SWIG_From_int((int)(helics_query_mode_fast)));
+  SWIG_Python_SetConstant(d, "helics_query_mode_ordered",SWIG_From_int((int)(helics_query_mode_ordered)));
   globals = SWIG_globals();
   if (!globals) {
     PyErr_SetString(PyExc_TypeError, "Failure to create SWIG globals.");
@@ -20075,6 +20148,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_state_pending_time",SWIG_From_int((int)(helics_state_pending_time)));
   SWIG_Python_SetConstant(d, "helics_state_pending_iterative_time",SWIG_From_int((int)(helics_state_pending_iterative_time)));
   SWIG_Python_SetConstant(d, "helics_state_pending_finalize",SWIG_From_int((int)(helics_state_pending_finalize)));
+  SWIG_Python_SetConstant(d, "helics_state_finished",SWIG_From_int((int)(helics_state_finished)));
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else

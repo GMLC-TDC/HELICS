@@ -334,8 +334,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 replaceIfMember(sub, "units", units);
 
                 id = &registerInput(emptyStr, type, units);
+                id->addTarget(key);
             }
-            id->addTarget(key);
 
             loadOptions(this, sub, *id);
         }
@@ -497,9 +497,9 @@ void ValueFederate::startupToInitializeStateTransition()
 {
     vfManager->startupToInitializeStateTransition();
 }
-void ValueFederate::initializeToExecuteStateTransition()
+void ValueFederate::initializeToExecuteStateTransition(iteration_result result)
 {
-    vfManager->initializeToExecuteStateTransition();
+    vfManager->initializeToExecuteStateTransition(result);
 }
 
 std::string ValueFederate::localQuery(const std::string& queryStr) const

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 
+#include "json/forwards.h"
 #include <atomic>
 #include <functional>
 #include <string>
@@ -17,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
 /** class managing the coordination of time in HELICS for forwarding object (cores, brokers)
 the time coordinator manages dependencies and computes whether time can advance or enter execution
 mode
@@ -24,32 +26,28 @@ mode
 class ForwardingTimeCoordinator {
   private:
     // the variables for time coordination
-    Time time_next{timeZero};  //!< the next possible internal event time
-    Time time_minminDe{timeZero};  //!< the minimum  of the minimum dependency event Time
-    Time time_minDe{timeZero};  //!< the minimum event time of the dependencies
+    DependencyInfo upstream;
+    DependencyInfo downstream;
 
-    DependencyInfo::time_state_t time_state{
-        DependencyInfo::time_state_t::time_requested};  //!< the current forwarding time state
-    global_federate_id lastMinFed{};  //!< the latest minimum fed
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<global_federate_id>
-        dependents;  //!< federates which temporally depend on this federate
-
-    std::function<void(const ActionMessage&)>
-        sendMessageFunction;  //!< callback used to send the messages
+    /// callback used to send the messages
+    std::function<void(const ActionMessage&)> sendMessageFunction;
 
   public:
-    global_federate_id source_id{
-        0};  //!< the identifier for inserting into the source id field of any generated messages;
-    bool checkingExec{
-        false};  //!< flag indicating that the coordinator is trying to enter the exec mode
+    /// the identifier for inserting into the source id field of any generated messages;
+    global_federate_id source_id{0};
+    /// flag indicating that the coordinator is trying to enter the exec mode
+    bool checkingExec{false};
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
-    bool restrictive_time_policy{
-        false};  //!< flag indicating that a restrictive time policy should be used
+    /// flag indicating that a restrictive time policy should be used
+    bool restrictive_time_policy{false};
+    bool noParent{false};  //!< indicator that the coordinator does not have parents
+  private:
+    bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
     ForwardingTimeCoordinator() = default;
 
@@ -62,7 +60,7 @@ class ForwardingTimeCoordinator {
     /** get a list of actual dependencies*/
     std::vector<global_federate_id> getDependencies() const;
     /** get a reference to the dependents vector*/
-    const std::vector<global_federate_id>& getDependents() const { return dependents; }
+    std::vector<global_federate_id> getDependents() const;
 
     /** compute updates to time values
     and send an update if needed
@@ -75,16 +73,14 @@ class ForwardingTimeCoordinator {
     const DependencyInfo* getDependencyInfo(global_federate_id ofed) const;
     /** check whether a federate is a dependency*/
     bool isDependency(global_federate_id ofed) const;
+    /** check whether a timeCoordinator has any dependencies or dependents*/
+    bool empty() const { return dependencies.empty(); }
 
   private:
-    /**send out the latest time request command*/
-    void sendTimeRequest() const;
-    void transmitTimingMessage(ActionMessage& msg) const;
-    /** generate a new timing request message by recalculating the times ignoring a particular
-     * brokers input
-     */
-    ActionMessage generateTimeRequestIgnoreDependency(const ActionMessage& msg,
-                                                      global_federate_id iFed) const;
+    void transmitTimingMessagesUpstream(ActionMessage& msg) const;
+    void transmitTimingMessagesDownstream(ActionMessage& msg) const;
+    /** generate a timeRequest message based on the dependency info data*/
+    ActionMessage generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const;
 
   public:
     /** process a message related to time
@@ -109,6 +105,9 @@ class ForwardingTimeCoordinator {
     @param fedID the identifier of the federate to remove*/
     void removeDependent(global_federate_id fedID);
 
+    void setAsChild(global_federate_id fedID);
+    void setAsParent(global_federate_id fedID);
+
     /** disconnect*/
     void disconnect();
     /** check if entry to the executing state can be granted*/
@@ -120,10 +119,16 @@ class ForwardingTimeCoordinator {
 
     /** generate a string with the current time status*/
     std::string printTimeStatus() const;
+    /** generate debugging time information*/
+    void generateDebuggingTimeInfo(Json::Value& base) const;
 
     /** check if there are any active Time dependencies*/
     bool hasActiveTimeDependencies() const;
     /** get the current next time*/
-    Time getNextTime() const { return time_next; }
+    Time getNextTime() const { return downstream.next; }
+    /** get a count of the active dependencies*/
+    int dependencyCount() const;
+    /** get a count of the active dependencies*/
+    global_federate_id getMinDependency() const;
 };
 }  // namespace helics

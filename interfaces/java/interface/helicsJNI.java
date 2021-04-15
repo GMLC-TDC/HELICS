@@ -50,6 +50,7 @@ public class helicsJNI {
   public final static native int helics_flag_single_thread_federate_get();
   public final static native int helics_flag_ignore_time_mismatch_warnings_get();
   public final static native int helics_flag_strict_config_checking_get();
+  public final static native int helics_flag_event_triggered_get();
   public final static native int helics_flag_delay_init_entry_get();
   public final static native int helics_flag_enable_init_entry_get();
   public final static native int helics_flag_slow_responding_get();
@@ -123,6 +124,8 @@ public class helicsJNI {
   public final static native int helics_filter_type_reroute_get();
   public final static native int helics_filter_type_clone_get();
   public final static native int helics_filter_type_firewall_get();
+  public final static native int helics_query_mode_fast_get();
+  public final static native int helics_query_mode_ordered_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
   public final static native double helics_time_invalid_get();
@@ -283,6 +286,7 @@ public class helicsJNI {
   public final static native int helicsQueryIsCompleted(long jarg1);
   public final static native void helicsQuerySetTarget(long jarg1, String jarg2);
   public final static native void helicsQuerySetQueryString(long jarg1, String jarg2);
+  public final static native void helicsQuerySetOrdering(long jarg1, long jarg2);
   public final static native void helicsQueryFree(long jarg1);
   public final static native void helicsCleanupLibrary();
   public final static native long helicsFederateRegisterSubscription(long jarg1, String jarg2, String jarg3);

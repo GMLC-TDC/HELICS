@@ -156,11 +156,26 @@ workflows:
   version: 2
   helics_test:
     jobs:
-      - helicsMSan
-      - helicsASan
-      - helicsInstall1
-      - helicsInstall2
-      - helicsgccTSan
+      - helicsMSan:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - helicsASan:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - helicsInstall1:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - helicsInstall2:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - helicsgccTSan:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
 
   nightly:
     triggers:

@@ -115,7 +115,9 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     helics_flag_strict_config_checking = 75,
-
+    /** specify that the federate is event triggered-meaning (all/most) events are triggered by
+       incoming events*/
+    helics_flag_event_triggered = 81
 } helics_federate_flags;
 
 /** enumeration of additional core flags*/
@@ -304,6 +306,13 @@ typedef enum {
     helics_filter_type_firewall = 6
 
 } helics_filter_type;
+
+/** enumeration of sequencing modes for queries
+fast is the default, meaning the query travels along priority channels and takes precedence of over
+existing messages; ordered means it follows normal priority patterns and will be ordered along with
+existing messages
+*/
+typedef enum { helics_query_mode_fast = 0, helics_query_mode_ordered = 1 } helics_query_mode;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

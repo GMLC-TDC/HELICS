@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <map>
 #include <memory>
+#include <queue>
 #include <string>
 #include <utility>
 
@@ -50,6 +51,9 @@ namespace testcore {
     void TestComms::queue_tx_function()
     {
         using std::chrono::milliseconds;
+        bool bufferData{false};
+        int32_t allowedSend{0};
+        std::queue<std::pair<route_id, ActionMessage>> buffer;
         // make sure the link to the localTargetAddress is in place
         if (name != localTargetAddress) {
             if (!brokerName.empty()) {
@@ -148,8 +152,16 @@ namespace testcore {
         while (!haltLoop) {
             route_id rid;
             ActionMessage cmd;
+            if (!buffer.empty() && (!bufferData || allowedSend > 0)) {
+                auto& pr = buffer.front();
+                rid = pr.first;
+                cmd = std::move(pr.second);
+                buffer.pop();
+                --allowedSend;
+            } else {
+                std::tie(rid, cmd) = txQueue.pop();
+            }
 
-            std::tie(rid, cmd) = txQueue.pop();
             bool processed = false;
             if (isProtocolCommand(cmd)) {
                 if (rid == control_route) {
@@ -193,13 +205,31 @@ namespace testcore {
                         case DISCONNECT:
                             haltLoop = true;
                             continue;
+                        case PAUSE_TRANSMITTER:
+                            bufferData = true;
+                            allowedSend = 0;
+                            continue;
+                        case UNPAUSE_TRANSMITTER:
+                            bufferData = false;
+                            allowedSend = 0;
+                            continue;
+                        case ALLOW_MESSAGES:
+                            allowedSend += cmd.getExtraData();
+                            continue;
                     }
                 }
             }
             if (processed) {
                 continue;
             }
-
+            if (bufferData) {
+                if (allowedSend == 0) {
+                    buffer.emplace(rid, std::move(cmd));
+                    continue;
+                } else {
+                    --allowedSend;
+                }
+            }
             if (rid == parent_route_id) {
                 if (tbroker) {
                     tbroker->addActionMessage(std::move(cmd));
@@ -241,6 +271,24 @@ namespace testcore {
         if (getTxStatus() == connection_status::connected) {
             ActionMessage cmd(CMD_PROTOCOL);
             cmd.messageID = DISCONNECT;
+            transmit(control_route, cmd);
+        }
+    }
+
+    void TestComms::pauseComms(bool paused)
+    {
+        if (getTxStatus() == connection_status::connected) {
+            ActionMessage cmd(CMD_PROTOCOL);
+            cmd.messageID = (paused) ? PAUSE_TRANSMITTER : UNPAUSE_TRANSMITTER;
+            transmit(control_route, cmd);
+        }
+    }
+
+    void TestComms::allowMessages(int count)
+    {
+        if (getTxStatus() == connection_status::connected) {
+            ActionMessage cmd(CMD_PROTOCOL);
+            cmd.setExtraData(count);
             transmit(control_route, cmd);
         }
     }

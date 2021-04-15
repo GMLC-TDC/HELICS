@@ -10,12 +10,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/core/flagOperations.hpp"
 #include "testFixtures.hpp"
 
 #include <future>
+#include <gmlc/libguarded/guarded.hpp>
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
+
 /** these test cases test out the message federates
  */
 
@@ -258,9 +262,11 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
     mFed1->setMessageNotificationCallback(epid,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e1cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) { ++e1cnt; });
     mFed2->setMessageNotificationCallback(epid2,
-                                          [&](const helics::Endpoint&, helics::Time) { ++e2cnt; });
+                                          [&](const helics::Endpoint& /*unused*/,
+                                              helics::Time /*unused*/) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(helics_property_time_delta, 1.0);
     mFed2->setProperty(helics_property_time_delta, 1.0);
@@ -344,7 +350,7 @@ class PingPongFed {
   public:
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
-  public:
+
     PingPongFed(const std::string& fname, helics::Time tDelta, helics::core_type ctype):
         delta(tDelta), name(fname), coreType(ctype)
     {
@@ -370,7 +376,6 @@ class PingPongFed {
         ep = &mFed->registerEndpoint("port");
     }
 
-  private:
     void processMessages(helics::Time currentTime)
     {
         while (mFed->hasMessage(*ep)) {
@@ -532,7 +537,9 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
 
     EXPECT_EQ(mFed.getFilter(0).getInfo(),
               "this is an information string for use by the application");
+    auto cr = mFed.getCorePointer();
     mFed.disconnect();
+    cr->disconnect();
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
@@ -657,4 +664,241 @@ TEST(messageFederate, constructor5)
     EXPECT_EQ(mf1.getCorePointer()->getIdentifier(), "mfc5");
     mf1.enterExecutingMode();
     mf1.finalize();
+}
+
+TEST_F(mfed_tests, message_warnings)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> warnings{0};
+
+    mFed1->setLoggingCallback(
+        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_warning) {
+                ++warnings;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, "unknown", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(warnings.load(), 1);
+
+    mFed1->sendMessage(ep1, "unknown2", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(3.0);
+    EXPECT_EQ(warnings.load(), 2);
+
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, message_warnings_ignore)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> warnings{0};
+
+    mFed1->setLoggingCallback(
+        [&warnings](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_warning) {
+                ++warnings;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    helics::Message mess1;
+    mess1.data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    mess1.dest = "unknown";
+
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(warnings.load(), 1);
+    setActionFlag(mess1, optional_flag);
+    // it should cause the unknown destination to be ignored
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(3.0);
+    EXPECT_EQ(warnings.load(), 1);
+
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, message_error)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    std::atomic<int> errors{0};
+
+    mFed1->setLoggingCallback(
+        [&errors](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_error) {
+                ++errors;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    helics::Message mess1;
+    mess1.data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    mess1.dest = "unknown";
+
+    mFed1->enterExecutingMode();
+
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    EXPECT_EQ(errors.load(), 0);
+    setActionFlag(mess1, required_flag);
+    // it should cause the unknown destination to be ignored
+    mFed1->sendMessage(ep1, mess1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    int err_count{0};
+    try {
+        mFed1->requestTime(3.0);
+    }
+    catch (...) {
+        ++err_count;
+    }
+    EXPECT_EQ(errors.load(), 1);
+    EXPECT_GT(err_count, 0);
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, default_endpoint_required)
+{
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    mFed1->setFlagOption(helics_handle_option_connection_required, true);
+    std::atomic<int> errors{0};
+
+    mFed1->setLoggingCallback(
+        [&errors](int level, const std::string& /*ignored*/, const std::string& /*ignored*/) {
+            if (level <= helics_log_level_error) {
+                ++errors;
+            }
+        });
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    mFed1->enterExecutingMode();
+
+    ep1.send("unknown", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    int err_count{0};
+    try {
+        mFed1->requestTime(1.0);
+    }
+    catch (...) {
+        ++err_count;
+    }
+    EXPECT_EQ(errors.load(), 1);
+    EXPECT_GT(err_count, 0);
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, message_init_iteration)
+{
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+
+    auto& ep2 = mFed2->registerGlobalEndpoint("ep2");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterInitializingModeAsync();
+    mFed2->enterInitializingMode();
+    mFed1->enterInitializingModeComplete();
+
+    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
+    mFed1->enterExecutingModeAsync();
+
+    auto result = mFed2->enterExecutingMode(helics::iteration_request::iterate_if_needed);
+    EXPECT_EQ(result, helics::iteration_result::iterating);
+
+    EXPECT_TRUE(ep2.hasMessage());
+
+    auto m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_LT(m->time, helics::timeZero);
+    }
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+    mFed2->finalize();
+
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, missing_endpoint)
+{
+    using ::testing::HasSubstr;
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+    auto& ep2 = mFed1->registerGlobalEndpoint("ep2");
+    auto& ep3 = mFed1->registerGlobalEndpoint("ep3");
+    ep2.setOption(helics_handle_option_connection_optional);
+    ep3.setOption(helics_handle_option_connection_required);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    mFed1->setLoggingCallback(
+        [&mlog](int level, const std::string& /*unused*/, const std::string& message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingModeAsync();
+
+    mFed2->enterExecutingMode();
+
+    mFed1->enterExecutingModeComplete();
+
+    mFed1->sendMessage(ep1, "ep92", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(1.0);
+
+    auto mm = mlog.lock();
+    EXPECT_EQ(mm->size(), 1U);
+    if (!mm->empty()) {
+        EXPECT_EQ(mm->front().first, helics_log_level_warning);
+        EXPECT_THAT(mm->front().second, HasSubstr("ep92"));
+        EXPECT_THAT(mm->front().second, HasSubstr("ep1"));
+    }
+    mm.unlock();
+    mFed1->sendMessage(ep2, "ep92", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mFed1->requestTime(2.0);
+    // no warning from this one
+    mm = mlog.lock();
+    EXPECT_EQ(mm->size(), 1U);
+    mm.unlock();
+    mFed1->sendMessage(ep3, "ep92", message1.c_str(), 26);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    try {
+        mFed1->requestTime(3.0);
+    }
+    catch (...) {
+    }
+    mm = mlog.lock();
+    EXPECT_EQ(mm->size(), 2U);
+    if (!mm->empty()) {
+        EXPECT_EQ(mm->back().first, helics_log_level_error);
+        EXPECT_THAT(mm->back().second, HasSubstr("ep92"));
+        EXPECT_THAT(mm->back().second, HasSubstr("ep3"));
+    }
+    mm.unlock();
+    mFed1->finalize();
 }

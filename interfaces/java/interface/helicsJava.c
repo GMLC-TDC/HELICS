@@ -713,6 +713,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1strict_1con
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1event_1triggered_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_federate_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_federate_flags)helics_flag_event_triggered;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1delay_1init_1entry_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_core_flags result;
@@ -1584,6 +1596,30 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1filter_1type_1fir
   (void)jenv;
   (void)jcls;
   result = (helics_filter_type)helics_filter_type_firewall;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1query_1mode_1fast_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_query_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_query_mode)helics_query_mode_fast;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1query_1mode_1ordered_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_query_mode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_query_mode)helics_query_mode_ordered;
   jresult = (jint)result; 
   return jresult;
 }
@@ -5431,6 +5467,37 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsQuerySetQueryString
   }
   helicsQuerySetQueryString(arg1,(char const *)arg2,arg3);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsQuerySetOrdering(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  helics_query arg1 = (helics_query) 0 ;
+  int32_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int32_t *argp2 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_query *)&jarg1; 
+  argp2 = *(int32_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int32_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  helicsQuerySetOrdering(arg1,arg2,arg3);
   {
     if (arg3->error_code!=helics_ok)
     {
