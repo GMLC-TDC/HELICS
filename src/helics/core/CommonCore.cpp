@@ -1682,7 +1682,10 @@ void CommonCore::deliverMessage(ActionMessage& message)
             }
             // now we deal with local processing
             if (checkActionFlag(*localP, has_dest_filter_flag)) {
-                filterFed->destinationProcessMessage(message, localP);
+                if (!filterFed->destinationProcessMessage(message, localP))
+                {
+                    return;
+                }
             }
             if (message.dest_id == parent_broker_id) {
                 message.dest_id = localP->getFederateId();

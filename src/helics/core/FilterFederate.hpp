@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <deque>
 
 namespace helics {
 class HandleManager;
@@ -51,7 +52,8 @@ class FilterFederate {
 
     std::function<void(int, const std::string&, const std::string&)> mLogger;
     std::function<gmlc::containers::AirLock<stx::any>&(int)> mGetAirLock;
-
+    std::deque<std::pair<int32_t, Time>> timeBlockProcesses;
+    Time minReturnTime{Time::maxVal()};
     /// sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;
     /// sets of ongoing destination filter processing
@@ -112,8 +114,8 @@ class FilterFederate {
     void processFilterInfo(ActionMessage& command);
 
     ActionMessage& processMessage(ActionMessage& command, const BasicHandleInfo* handle);
-
-    void destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
+    /** process destination filters on the message return true if the original command should be delivered to a federate*/
+    bool destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
     void addFilteredEndpoint(Json::Value& block, global_federate_id fed) const;
 
@@ -129,6 +131,14 @@ class FilterFederate {
     FilterCoordinator* getFilterCoordinator(interface_handle handle);
 
     FilterInfo* getFilterInfo(global_handle id);
+
     FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle);
+    const FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle) const;
+    /** run the destination filters associated with an endpoint*/
+    void runCloningDestinationFilters(const FilterCoordinator* filt,
+                                      const BasicHandleInfo* handle,
+                                      const ActionMessage& command) const;
+    void addTimeReturn(int32_t id, Time TimeVal);
+    void clearTimeReturn(int32_t id);
 };
 }  // namespace helics

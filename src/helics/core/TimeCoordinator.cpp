@@ -466,7 +466,7 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::halted;
         }
     }
-    if (time_block <= time_exec && time_block < Time::maxVal()) {
+    if ((time_block <= time_exec && time_block < Time::maxVal())||(nonGranting && time_exec<time_requested)) {
         return message_processing_result::continue_processing;
     }
     if ((iterating == iteration_request::no_iterations) ||
@@ -549,10 +549,12 @@ void TimeCoordinator::sendTimeRequest() const
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
+        upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(upstream.Te + info.outputDelay, upd.Te);
     if (info.event_triggered) {
         upd.Tdemin = std::min(upd.Tdemin, upstream.minDe + info.outputDelay);
+        upd.Tdemin = std::min(upd.Tdemin, upd.actionTime);
     }
     upd.setExtraData(upstream.minFed.baseValue());
 
@@ -572,6 +574,9 @@ void TimeCoordinator::sendTimeRequest() const
             upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
         }
         upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
+        if (info.event_triggered) {
+            upd.Tdemin = std::min(upd.Tdemin, upd.actionTime);
+        }
         sendMessageFunction(upd);
     }
 
