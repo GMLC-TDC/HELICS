@@ -36,6 +36,7 @@ To set up your environment:
     To use it, follow the vcpkg getting started directions to install vcpkg and then run `cmake` using
     `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
     variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
+
 3.  _Optional_ Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
     We **highly recommend skipping** this step and running CMake with the
     `HELICS_ZMQ_SUBPROJECT=ON` option enabled(which is default on windows) to automatically set up a project-only
