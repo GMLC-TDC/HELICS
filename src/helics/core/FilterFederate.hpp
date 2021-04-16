@@ -140,5 +140,12 @@ class FilterFederate {
                                       const ActionMessage& command) const;
     void addTimeReturn(int32_t id, Time TimeVal);
     void clearTimeReturn(int32_t id);
+    const FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle) const;
+    /** run the destination filters associated with an endpoint*/
+    void runCloningDestinationFilters(const FilterCoordinator* filt,
+                                      const BasicHandleInfo* handle,
+                                      const ActionMessage& command) const;
+    void addTimeReturn(int32_t id, Time TimeVal);
+    void clearTimeReturn(int32_t id);
 };
 }  // namespace helics

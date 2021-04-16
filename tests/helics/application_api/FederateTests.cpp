@@ -43,6 +43,10 @@ TEST(federate_tests, federate_initialize_tests)
     // const auto& coreName = core->getIdentifier();
     // const auto& fedName = Fed->getName();
     // EXPECT_EQ(fedName+"_core", coreName);
+
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
 

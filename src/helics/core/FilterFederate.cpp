@@ -31,6 +31,7 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
     mCoord.source_id = fedID;
     mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
     mCoord.specifyNonGranting(true);
+    mCoord.specifyNonGranting(true);
 }
 
 FilterFederate::~FilterFederate()
