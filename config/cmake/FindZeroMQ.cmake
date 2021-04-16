@@ -66,8 +66,8 @@ if(MSVC)
                                           # is returned
         set(
             _ZeroMQ_VERSIONS
-        "4_3_4"
-        "4_3_3"
+            "4_3_4"
+            "4_3_3"
             "4_3_2"
             "4_3_1"
             "4_3_0"
