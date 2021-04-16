@@ -810,6 +810,26 @@ TEST_F(query, update_values_all)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, global_flush)
+{
+    SetupTest<helics::ValueFederate>("test_4", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed1->registerSubscription("pub1");
+
+    vFed1->enterExecutingMode();
+    p1.publish(45.7);
+    vFed1->requestTime(1.0);
+
+    auto qres = vFed1->query("root", "global_flush");
+    vFed1->finalize();
+    helics::cleanupHelicsLibrary();
+    auto val = loadJsonStr(qres);
+    ASSERT_TRUE(val["status"].isBool());
+    EXPECT_TRUE(val["status"].asBool());
+}
+
 #ifdef ENABLE_ZMQ_CORE
 TEST_F(query, query_subscriptions)
 {

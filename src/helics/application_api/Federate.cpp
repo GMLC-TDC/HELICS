@@ -41,10 +41,28 @@ void cleanupHelicsLibrary()
 
 Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fedName)
 {
+    if (name.empty()) {
+        name = fi.defName;
+    }
     if (fi.coreName.empty()) {
         coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
         if (!coreObject) {
-            coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
+            if (!name.empty()) {
+                // we need to create a core here so loop until we find a number that is not already
+                // occupied
+                int cnt{0};
+                std::string cname = fedName + "_core";
+                auto cobj = CoreFactory::findCore(cname);
+                while (cobj) {
+                    ++cnt;
+                    cname = fedName + "_core" + std::to_string(cnt);
+                    cobj = CoreFactory::findCore(cname);
+                }
+                coreObject =
+                    CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+            } else {
+                coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
+            }
         }
     } else {
         coreObject =
@@ -69,9 +87,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
             throw(RegistrationFailure("Unable to connect to broker->unable to register federate"));
         }
     }
-    if (name.empty()) {
-        name = fi.defName;
-    }
+
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(name, fi);
     nameSegmentSeparator = fi.separator;
