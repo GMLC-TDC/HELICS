@@ -28,9 +28,9 @@ static auto StartBrokerImp(const std::string& CoreType_name, std::string initial
     }
     if (hasIndexCode(CoreType_name)) {
         std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
-        return helicsCreateBroker(new_type.c_str(), NULL, initialization_string.c_str(), 0);
+        return helicsCreateBroker(new_type.c_str(), NULL, initialization_string.c_str(), nullptr);
     }
-    return helicsCreateBroker(CoreType_name.c_str(), NULL, initialization_string.c_str(), 0);
+    return helicsCreateBroker(CoreType_name.c_str(), NULL, initialization_string.c_str(), nullptr);
 }
 
 bool FederateTestFixture::hasIndexCode(const std::string& type_name)
@@ -55,14 +55,14 @@ FederateTestFixture::FederateTestFixture()
 FederateTestFixture::~FederateTestFixture()
 {
     for (auto& fed : federates) {
-        if (fed) {
+        if (fed != nullptr) {
             HelicsFederateState state = helicsFederateGetState(fed, nullptr);
             HelicsCore core = helicsFederateGetCore(fed, nullptr);
             if (state != HELICS_STATE_FINALIZE) {
                 helicsFederateFinalize(fed, nullptr);
             }
             helicsFederateFree(fed);
-            if (helicsCoreIsValid(core)) {
+            if (helicsCoreIsValid(core)!=HELICS_FALSE) {
                 helicsCoreDisconnect(core, nullptr);
             }
             helicsCoreFree(core);
@@ -155,7 +155,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
         case 1:
         default: {
             auto init = initString + " --federates " + std::to_string(count);
-            auto core = helicsCreateCore(CoreType_name.c_str(), NULL, init.c_str(), &err);
+            auto core = helicsCreateCore(CoreType_name.c_str(), nullptr, init.c_str(), &err);
 
             helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
             assert(err.error_code == 0);
@@ -174,7 +174,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii) {
                 auto init = initString + " --federates 1";
-                auto core = helicsCreateCore(CoreType_name.c_str(), NULL, init.c_str(), &err);
+                auto core = helicsCreateCore(CoreType_name.c_str(), nullptr, init.c_str(), &err);
 
                 helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
                 assert(err.error_code == 0);

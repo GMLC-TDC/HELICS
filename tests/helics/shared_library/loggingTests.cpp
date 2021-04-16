@@ -29,7 +29,7 @@ TEST(logging_tests, check_log_message)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
@@ -67,7 +67,7 @@ TEST(logging_tests, check_log_message_levels)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
@@ -114,7 +114,7 @@ TEST(logging_tests, check_log_message_levels_high)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
@@ -154,7 +154,7 @@ TEST(logging_tests, core_logging)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
@@ -174,7 +174,7 @@ TEST(logging_tests, broker_logging)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
