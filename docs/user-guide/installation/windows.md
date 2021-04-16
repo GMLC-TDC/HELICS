@@ -30,6 +30,13 @@ To set up your environment:
     Building with Visual Studio 2017 will require boost 1.65.1 or newer and CMake 3.9
     or newer. Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017. Visual studio 2019 will require CMake 3.14 or later.
     Boost 1.70 with CMake 3.14+ is the current recommended configuration.
+
+    As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it is slower
+    because it builds all dependencies but handles getting the right install paths to dependencies set correctly.
+    To use it, follow the vcpkg getting started directions to install vcpkg and then run `cmake` using
+    `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
+    variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
+
 3.  _Optional_ Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
     We **highly recommend skipping** this step and running CMake with the
     `HELICS_ZMQ_SUBPROJECT=ON` option enabled(which is default on windows) to automatically set up a project-only

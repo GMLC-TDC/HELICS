@@ -35,7 +35,13 @@ To set up your environment:
    the [homebrew](https://brew.sh/) package manager. These directions
    assume this approach, so unless you prefer to track these
    libraries and dependencies down yourself, install it if you don't
-   have it yet.
+   have it yet. As an alternative package manager, you can use
+   [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it
+   is slower because it builds all dependencies for source, but instead
+   of following step below you could either run `cmake` using
+   `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`
+   as shown in the vcpkg getting started instructions, or by setting the
+   environment variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
 3. (if needed) Setup a command-line compile environment
 
    a) Install a C++11 compiler (C++14 preferred). e.g. `clang`
