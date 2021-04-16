@@ -44,8 +44,8 @@ class hThrowOnError {
     exception */
     ~hThrowOnError() HELICS_THROWS_EXCEPTION
     {
-        if (eObj.errorCode != 0) {
-            throw HelicsException(eObj.errorCode, eObj.message);
+        if (eObj.error_code != 0) {
+            throw HelicsException(eObj.error_code, eObj.message);
         }
     }
     /** this is an implicit conversion operation for use with HelicsError*/
