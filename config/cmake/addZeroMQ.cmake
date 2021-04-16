@@ -42,9 +42,16 @@ mark_as_advanced(${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY)
 mark_as_advanced(${PROJECT_NAME}_ZMQ_SUBPROJECT)
 mark_as_advanced(${PROJECT_NAME}_ZMQ_FORCE_SUBPROJECT)
 
-option(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY "use the ZMQ static library" OFF)
-
-mark_as_advanced(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
+# Add option after seeing if only the static ZMQ library is available
+# Using a macro so the option() command appears near other option() commands
+macro(add_zmq_static_lib_option)
+    if(ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_LIBRARY)
+        option(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY "use the ZMQ static library" ON)
+    else()
+        option(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY "use the ZMQ static library" OFF)
+    endif()
+    mark_as_advanced(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
+endmacro()
 
 # flag that zeromq headers are required
 set(ZeroMQ_REQUIRE_HEADERS ON)
@@ -106,10 +113,8 @@ else()
                 show_variable(ZeroMQ_LIBRARY FILEPATH "path to the ZeroMQ library" "")
                 show_variable(ZeroMQ_ROOT_DIR PATH "path to the ZeroMQ root directory"
                               "")
-                if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
-                    show_variable(ZeroMQ_STATIC_LIBRARY FILEPATH
-                                  "path to the ZeroMQ static library" "")
-                endif()
+                show_variable(ZeroMQ_STATIC_LIBRARY FILEPATH
+                              "path to the ZeroMQ static library" "")
                 show_variable(ZeroMQ_INCLUDE_DIR PATH
                               "path to the ZeroMQ include directory" "")
             endif()
@@ -120,6 +125,8 @@ else()
 
 endif() # ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY
 hide_variable(ZeroMQ_DIR)
+
+add_zmq_static_lib_option()
 
 if(WIN32 AND NOT MSYS AND NOT CYGWIN)
     if(TARGET libzmq)
