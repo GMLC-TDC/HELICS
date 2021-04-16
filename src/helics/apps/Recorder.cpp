@@ -351,6 +351,7 @@ namespace apps {
         for (auto& capt : captureInterfaces) {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
+                fed->query("root", "global_flush", helics_query_mode_ordered);
                 auto pubs = vectorizeQueryResult(
                     fed->query(capt, "publications", helics_query_mode_ordered));
                 for (auto& pub : pubs) {
@@ -439,7 +440,10 @@ namespace apps {
     /** run the Player until the specified time*/
     void Recorder::runTo(Time runToTime)
     {
-        initialize();
+        if (fed->getCurrentMode() == Federate::modes::startup) {
+            initialize();
+        }
+
         if (!mapfile.empty()) {
             std::ofstream out(mapfile);
             for (auto& stat : vStat) {
@@ -547,12 +551,14 @@ namespace apps {
         captureInterfaces.push_back(captureDesc);
     }
 
-    std::pair<std::string, std::string> Recorder::getValue(int index) const
+    std::tuple<Time, std::string, std::string> Recorder::getValue(int index) const
     {
         if (isValidIndex(index, points)) {
-            return {subscriptions[points[index].index].getTarget(), points[index].value};
+            return {points[index].time,
+                    subscriptions[points[index].index].getTarget(),
+                    points[index].value};
         }
-        return {std::string(), std::string()};
+        return {Time(), std::string(), std::string()};
     }
 
     std::unique_ptr<Message> Recorder::getMessage(int index) const
