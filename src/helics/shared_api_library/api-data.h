@@ -98,19 +98,19 @@ const helics_bool helics_false = 0; /*!< indicator used for a false response */
  * enumeration of the different iteration results
  */
 typedef enum {
-    helics_iteration_request_no_iteration, /*!< no iteration is requested */
-    helics_iteration_request_force_iteration, /*!< force iteration return when able */
-    helics_iteration_request_iterate_if_needed /*!< only return an iteration if necessary */
+    helics_iteration_request_no_iteration = 0, /*!< no iteration is requested */
+    helics_iteration_request_force_iteration = 1, /*!< force iteration return when able */
+    helics_iteration_request_iterate_if_needed = 2 /*!< only return an iteration if necessary */
 } helics_iteration_request;
 
 /**
  * enumeration of possible return values from an iterative time request
  */
 typedef enum {
-    helics_iteration_result_next_step, /*!< the iterations have progressed to the next time */
-    helics_iteration_result_error, /*!< there was an error */
-    helics_iteration_result_halted, /*!< the federation has halted */
-    helics_iteration_result_iterating /*!< the federate is iterating at current time */
+    helics_iteration_result_next_step = 0, /*!< the iterations have progressed to the next time */
+    helics_iteration_result_error = 1, /*!< there was an error */
+    helics_iteration_result_halted = 2, /*!< the federation has halted */
+    helics_iteration_result_iterating = 3 /*!< the federate is iterating at current time */
 } helics_iteration_result;
 
 /**
@@ -118,17 +118,17 @@ typedef enum {
  */
 typedef enum {
     helics_state_startup = 0, /*!< when created the federate is in startup state */
-    helics_state_initialization, /*!< entered after the enterInitializingMode call has returned */
-    helics_state_execution, /*!< entered after the enterExectuationState call has returned */
-    helics_state_finalize, /*!< the federate has finished executing normally final values may be retrieved */
-    helics_state_error, /*!< error state no core communication is possible but values can be retrieved */
+    helics_state_initialization = 1, /*!< entered after the enterInitializingMode call has returned */
+    helics_state_execution = 2, /*!< entered after the enterExectuationState call has returned */
+    helics_state_finalize = 3, /*!< the federate has finished executing normally final values may be retrieved */
+    helics_state_error = 4, /*!< error state no core communication is possible but values can be retrieved */
     /* the following states are for asynchronous operations */
-    helics_state_pending_init, /*!< indicator that the federate is pending entry to initialization state */
-    helics_state_pending_exec, /*!< state pending EnterExecution State */
-    helics_state_pending_time, /*!< state that the federate is pending a timeRequest */
-    helics_state_pending_iterative_time, /*!< state that the federate is pending an iterative time request */
-    helics_state_pending_finalize, /*!< state that the federate is pending a finalize request */
-    helics_state_finished /*!< state that the federate is finished simulating but still connected */
+    helics_state_pending_init = 5, /*!< indicator that the federate is pending entry to initialization state */
+    helics_state_pending_exec = 6, /*!< state pending EnterExecution State */
+    helics_state_pending_time = 7, /*!< state that the federate is pending a timeRequest */
+    helics_state_pending_iterative_time = 8, /*!< state that the federate is pending an iterative time request */
+    helics_state_pending_finalize = 9, /*!< state that the federate is pending a finalize request */
+    helics_state_finished = 10 /*!< state that the federate is finished simulating but still connected */
 } helics_federate_state;
 
 /**

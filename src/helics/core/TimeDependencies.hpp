@@ -60,7 +60,7 @@ class DependencyInfo: public TimeData {
     bool dependent{false};  //!< indicator the dependency is a dependent object
     bool dependency{false};  //!< indicator that the dependency is an actual dependency
     bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
-
+    bool nonGranting{false};  //!< indicator that the dependency is a non granting time coordinator
     // Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;

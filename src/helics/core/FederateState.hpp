@@ -91,10 +91,13 @@ class FederateState {
   public:
     std::atomic<bool> init_requested{
         false};  //!< this federate has requested entry to initialization
+    // temporary
+    std::atomic<bool> requestingMode{false};
+
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
     bool timeGranted_mode{false};  //!< indicator if the federate is in a granted state or a
-                                   //!< requested state waiting to grant
+                                   //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
     int logLevel{1};  //!< the level of logging used in the federate
