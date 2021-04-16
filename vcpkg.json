@@ -1,0 +1,31 @@
+{
+  "name": "helics",
+  "version-string": "2.7.0",
+  "description": "Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS)",
+  "homepage": "https://helics.org/",
+  "default-features": ["zeromq", "ipc", "webserver"],
+  "dependencies": ["boost-core"],
+  "features": {
+    "zeromq": {
+      "description": "Build ZeroMQ core",
+      "dependencies": [
+        {
+          "name": "zeromq",
+          "features": ["sodium"]
+        }
+      ]
+    },
+    "ipc": {
+      "description": "Build IPC core",
+      "dependencies": ["boost-interprocess"]
+    },
+    "mpi": {
+      "description": "Build MPI core",
+      "dependencies": ["mpi"]
+    },
+    "webserver": {
+      "description": "Build webserver in broker_server",
+      "dependencies": ["boost-beast"]
+    }
+  }
+}

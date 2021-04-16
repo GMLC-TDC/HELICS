@@ -26,6 +26,12 @@ To set up your environment:
    sudo apt-get install libzmq5-dev
    ```
 
+   As an alternative, you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it is slower
+   because it builds all dependencies from source but could have newer versions of dependencies than apt-get.
+   To use it, follow the vcpkg getting started directions to install vcpkg and then run `cmake` using
+   `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
+   variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
+
 2. Make sure _CMake_ and _git_ are available in the Command Prompt. If they aren't, add them to the system PATH variable.
 
 Getting and building from source:
