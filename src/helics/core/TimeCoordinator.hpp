@@ -96,7 +96,8 @@ class TimeCoordinator {
   private:
     std::atomic<int32_t> iteration{0};  //!< iteration counter
     bool disconnected{false};
-    bool nonGranting{false};  //specify the that the timeCoordinator should not grant times and instead operate in a continuous manner until completion
+    bool nonGranting{false};  // specify the that the timeCoordinator should not grant times and
+                              // instead operate in a continuous manner until completion
   public:
     /** default constructor*/
     TimeCoordinator();
@@ -147,6 +148,7 @@ class TimeCoordinator {
     void updateMessageTime(Time messageUpdateTime, bool allowRequestSend);
 
     void specifyNonGranting(bool value = true) { nonGranting = value; };
+
   private:
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist

@@ -1682,8 +1682,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
             }
             // now we deal with local processing
             if (checkActionFlag(*localP, has_dest_filter_flag)) {
-                if (!filterFed->destinationProcessMessage(message, localP))
-                {
+                if (!filterFed->destinationProcessMessage(message, localP)) {
                     return;
                 }
             }

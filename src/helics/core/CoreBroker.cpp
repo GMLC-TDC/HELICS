@@ -1092,35 +1092,35 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_REG_PUB:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
-                //break;
+                // break;
             }
             addPublication(command);
             break;
         case CMD_REG_INPUT:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
-                //break;
+                // break;
             }
             addInput(command);
             break;
         case CMD_REG_ENDPOINT:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
-                //break;
+                // break;
             }
             addEndpoint(command);
             break;
         case CMD_REG_FILTER:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
-                //break;
+                // break;
             }
             addFilter(command);
             break;
         case CMD_CLOSE_INTERFACE:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
-                //break;
+                // break;
             }
             handles.removeHandle(command.getSource());
             break;

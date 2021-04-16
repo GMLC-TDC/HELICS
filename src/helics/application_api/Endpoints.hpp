@@ -205,7 +205,7 @@ class HELICS_CXX_EXPORT Endpoint {
     /** get the specified type of the endpoint*/
     const std::string& getType() const { return fed->getExtractionType(*this); }
     ///** get the number of filters applied to the endpoint*/
-    //int32_t getFilterCount() const {};
+    // int32_t getFilterCount() const {};
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle() const { return handle; }
     /** implicit conversion operator for extracting the handle*/
