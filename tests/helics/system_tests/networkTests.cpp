@@ -120,8 +120,6 @@ TEST_F(network_tests, test_external_udp_ipv4)
 }
 #endif
 
-#endif
-
 #ifdef ENABLE_ZMQ_CORE
 TEST_F(network_tests, test_otherport)
 {

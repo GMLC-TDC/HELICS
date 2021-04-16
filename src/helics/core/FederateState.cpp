@@ -268,6 +268,12 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
 void FederateState::routeMessage(const ActionMessage& msg)
 {
     if (parent_ != nullptr) {
+        if (msg.action() == CMD_TIME_REQUEST && !requestingMode) {
+            LOG_ERROR("sending time request in invalid state");
+        }
+        if (msg.action() == CMD_TIME_GRANT) {
+            requestingMode.store(false);
+        }
         parent_->addActionMessage(msg);
     } else {
         queue.push(msg);
@@ -867,6 +873,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
     if (cmd.action() == CMD_TIME_REQUEST) {
         if ((cmd.source_id == global_id.load()) &&
             checkActionFlag(cmd, indicator_flag)) {  // this sets up a time request
+            requestingMode.store(true);
             IterationRequest iterate = IterationRequest::NO_ITERATIONS;
             if (checkActionFlag(cmd, iteration_requested_flag)) {
                 iterate = (checkActionFlag(cmd, required_flag)) ?
@@ -1016,7 +1023,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (epi != nullptr) {
-                timeCoord->updateMessageTime(cmd.actionTime);
+                // if (!epi->not_interruptible)
+                {
+                    timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
+                }
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
                 if (cmd.actionTime < time_granted) {
                     LOG_WARNING(
@@ -1040,7 +1050,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                   cmd.counter,
                                   std::make_shared<const SmallBuffer>(std::move(cmd.payload)));
                     if (!subI->not_interruptible) {
-                        timeCoord->updateValueTime(cmd.actionTime);
+                        timeCoord->updateValueTime(cmd.actionTime, !timeGranted_mode);
                         LOG_TRACE(timeCoord->printTimeStatus());
                     }
                     LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
@@ -1681,6 +1691,9 @@ std::string FederateState::processQueryActual(std::string_view query) const
         Json::Value base;
         interfaceInformation.generateInferfaceConfig(base);
         return generateJsonString(base);
+    }
+    if (query == "global_flush") {
+        return "{\"status\":true}";
     }
     if (query == "subscriptions") {
         std::ostringstream s;

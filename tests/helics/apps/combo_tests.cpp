@@ -73,12 +73,23 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     EXPECT_EQ(retTime, 4.0);
     mfed2.requestTimeComplete();
 
+    mfed2.requestTimeAsync(6.0);
+    retTime = mfed.requestTime(6.0);
+    EXPECT_EQ(retTime, 6.0);
+    mfed2.requestTimeComplete();
+
+    fut.get();
+
     mfed.finalize();
     mfed2.finalize();
-    fut.get();
+
     EXPECT_EQ(rec1.messageCount(), 2U);
     EXPECT_EQ(rec1.pointCount(), 3U);
 
+    EXPECT_LT(std::get<0>(rec1.getValue(0)), 0.0001);
+    EXPECT_GE(std::get<0>(rec1.getValue(0)), 0.0);
+    EXPECT_EQ(std::get<0>(rec1.getValue(1)), 1.0);
+    EXPECT_EQ(std::get<0>(rec1.getValue(2)), 2.0);
     rec1.saveFile(f1.string());
 
     EXPECT_TRUE(ghc::filesystem::exists(f1));

@@ -30,6 +30,7 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
 {
     mCoord.source_id = fedID;
     mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
+    mCoord.specifyNonGranting(true);
 }
 
 FilterFederate::~FilterFederate()
@@ -90,12 +91,25 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                         ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);
                     auto source = cmd.getSource();
                     auto mid = cmd.messageID;
+                    if (FiltI->filterOp) {
                     auto tempMessage = createMessageFromCommand(std::move(cmd));
+                        auto dest = tempMessage->dest;
                     tempMessage = FiltI->filterOp->process(std::move(tempMessage));
+
                     if (tempMessage) {
+                            if (tempMessage->dest != dest && destFilter) {
+                                // the destination was altered we need to start the process over
                         cmd = ActionMessage(std::move(tempMessage));
+                                cmd.dest_id = parent_broker_id;
+                        cmd.dest_handle = InterfaceHandle{};
+                                mDeliverMessage(cmd);
+                                cmd = CMD_IGNORE;
                     } else {
+                                cmd = ActionMessage(std::move(tempMessage));
+                            }
+                        } else {
                         cmd = CMD_IGNORE;
+                    }
                     }
 
                     if (!returnToSender) {
@@ -181,6 +195,7 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
                 unblock.source_id = fid;
                 mSendMessage(unblock);
             }
+            clearTimeReturn(messID);
         }
         auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         if (filtFunc->hasSourceFilters) {
@@ -206,6 +221,7 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
                             unblock.source_id = fid;
                             mSendMessage(unblock);
                         }
+                        clearTimeReturn(messID);
                         return;
                     }
                 } else {
@@ -217,6 +233,7 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
                     } else {
                         cmd.setAction(CMD_SEND_FOR_FILTER);
                         ongoingFilterProcesses[fid_index].erase(messID);
+                        clearTimeReturn(messID);
                     }
                     mSendMessage(cmd);
                     if (ongoingFilterProcesses[fid_index].empty()) {
@@ -230,6 +247,7 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
             }
         }
         ongoingFilterProcesses[fid_index].erase(messID);
+        clearTimeReturn(messID);
         mDeliverMessage(cmd);
         if (ongoingFilterProcesses[fid_index].empty()) {
             ActionMessage unblock(CMD_TIME_UNBLOCK);
@@ -251,6 +269,7 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
         auto& ongoingDestProcess = ongoingDestFilterProcesses[handle->getFederateId().baseValue()];
         if (ongoingDestProcess.find(messID) != ongoingDestProcess.end()) {
             ongoingDestProcess.erase(messID);
+            clearTimeReturn(messID);
             if (command.action() == CMD_NULL_DEST_MESSAGE) {
                 ActionMessage removeTimeBlock(CMD_TIME_UNBLOCK, mCoreID, command.dest_id);
                 removeTimeBlock.messageID = messID;
@@ -259,28 +278,9 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
             }
             auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
 
-            // now go to the cloning filters
-            for (auto* clFilter : filtFunc->cloningDestFilters) {
-                if (checkActionFlag(*clFilter, disconnected_flag)) {
-                    continue;
+            if (!filtFunc->cloningDestFilters.empty()) {
+                runCloningDestinationFilters(filtFunc, handle, command);
                 }
-                if (clFilter->core_id == mFedID) {
-                    auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
-                    if (FiltI != nullptr) {
-                        if (FiltI->filterOp != nullptr) {
-                            if (FiltI->cloning) {
-                                (void)(FiltI->filterOp->process(createMessageFromCommand(command)));
-                            }
-                        }
-                    }
-                } else {
-                    ActionMessage clone(command);
-                    clone.setAction(CMD_SEND_FOR_FILTER);
-                    clone.dest_id = clFilter->core_id;
-                    clone.dest_handle = clFilter->handle;
-                    mSendMessage(clone);
-                }
-            }
 
             // mCoord->processTimeMessage(command);
             command.setAction(CMD_SEND_MESSAGE);
@@ -350,6 +350,7 @@ ActionMessage& FilterFederate::processMessage(ActionMessage& command, const Basi
                     }
                     ongoingFilterProcesses[handle->getFederateId().baseValue()].insert(
                         command.messageID);
+                    addTimeReturn(command.messageID, command.actionTime);
                 } else {
                     command.setAction(CMD_SEND_FOR_FILTER);
                 }
@@ -361,7 +362,7 @@ ActionMessage& FilterFederate::processMessage(ActionMessage& command, const Basi
     return command;
 }
 
-void FilterFederate::destinationProcessMessage(ActionMessage& command,
+bool FilterFederate::destinationProcessMessage(ActionMessage& command,
                                                const BasicHandleInfo* handle)
 {
     auto* ffunc = getFilterCoordinator(handle->getInterfaceHandle());
@@ -378,6 +379,7 @@ void FilterFederate::destinationProcessMessage(ActionMessage& command,
                     tblock.messageID = mid;
                     mSendMessage(tblock);
                     ongoingDestFilterProcesses[fed_id.baseValue()].emplace(mid);
+                    addTimeReturn(mid, command.actionTime);
                     // now send a message to get filtered
                     command.setAction(CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                     command.messageID = mid;
@@ -387,18 +389,36 @@ void FilterFederate::destinationProcessMessage(ActionMessage& command,
                     command.dest_handle = ffunc->destFilter->handle;
 
                     mSendMessageMove(std::move(command));
-                    return;
+                    return false;
                 }
                 // the filter is part of this core
-                auto tempMessage = createMessageFromCommand(std::move(command));
+
                 if (ffunc->destFilter->filterOp) {
+                auto tempMessage = createMessageFromCommand(std::move(command));
+                    auto odest = tempMessage->dest;
                     auto nmessage = ffunc->destFilter->filterOp->process(std::move(tempMessage));
+                    if (odest == nmessage->dest) {
                     command = std::move(nmessage);
                 } else {
-                    command = std::move(tempMessage);
+                        // handle destination reroute filters
+                        command = std::move(nmessage);
+                        mDeliverMessage(command);
+                        return false;
                 }
             }
         }
+        }
+        if (!ffunc->cloningDestFilters.empty()) {
+            runCloningDestinationFilters(ffunc, handle, command);
+        }
+    }
+    return true;
+}
+
+void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* ffunc,
+                                                  const BasicHandleInfo* handle,
+                                                  const ActionMessage& command) const
+{
         // now go to the cloning filters
         for (auto* clFilter : ffunc->cloningDestFilters) {
             if (checkActionFlag(*clFilter, disconnected_flag)) {
@@ -436,6 +456,38 @@ void FilterFederate::destinationProcessMessage(ActionMessage& command,
                 mSendMessage(clone);
             }
         }
+    }
+
+void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
+{
+    timeBlockProcesses.emplace_back(id, TimeVal);
+    if (TimeVal < minReturnTime) {
+        minReturnTime = TimeVal;
+        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
+}
+}
+
+void FilterFederate::clearTimeReturn(int32_t id)
+{
+    if (timeBlockProcesses.empty()) {
+        return;
+    }
+    bool recheckTime = false;
+    if (timeBlockProcesses.front().first == id) {
+        if (timeBlockProcesses.front().second == minReturnTime) {
+            recheckTime = true;
+        }
+        timeBlockProcesses.pop_front();
+    } else {
+    }
+    if (recheckTime) {
+        minReturnTime = Time::maxVal();
+        for (const auto& tBP : timeBlockProcesses) {
+            if (tBP.second < minReturnTime) {
+                minReturnTime = tBP.second;
+            }
+        }
+        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
     }
 }
 
@@ -642,6 +694,14 @@ FilterInfo* FilterFederate::getFilterInfo(GlobalHandle id)
 }
 
 FilterInfo* FilterFederate::getFilterInfo(GlobalFederateId fed, InterfaceHandle handle)
+{
+    if (fed == parent_broker_id || fed == mCoreID) {
+        fed = mFedID;
+    }
+    return filters.find(GlobalHandle{fed, handle});
+}
+
+const FilterInfo* FilterFederate::getFilterInfo(GlobalFederateId fed, InterfaceHandle handle) const
 {
     if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;
