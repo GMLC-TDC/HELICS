@@ -147,7 +147,7 @@ class TimeCoordinator {
      */
     void updateMessageTime(Time messageUpdateTime, bool allowRequestSend);
 
-    void specifyNonGranting(bool value = true) { nonGranting = value; };
+    void specifyNonGranting(bool value = true) { nonGranting = value; }
 
   private:
     /** take a global id and get a pointer to the dependencyInfo for the other fed

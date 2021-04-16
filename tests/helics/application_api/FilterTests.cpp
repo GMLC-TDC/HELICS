@@ -944,7 +944,7 @@ TEST_F(filter_tests, separate_slow_filter_ci_skip)
             while (rec->hasMessage()) {
                 ++mcnt;
                 auto m = rec->getMessage();
-                EXPECT_TRUE(m->data.to_string().back() == 'b');
+                EXPECT_EQ(m->data.to_string().back(),'b');
             }
         }
         rec->finalize();
@@ -1011,7 +1011,7 @@ TEST_F(filter_tests, separate_slow_dest_filter_ci_skip)
             while (rec->hasMessage()) {
                 ++mcnt;
                 auto m = rec->getMessage();
-                EXPECT_TRUE(m->data.to_string().back() == 'b');
+                EXPECT_EQ(m->data.to_string().back(),'b');
             }
         }
         rec->finalize();
