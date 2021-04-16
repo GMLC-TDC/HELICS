@@ -29,20 +29,20 @@ TEST(logging_tests, check_log_message)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogInfoMessage(fed, "test MEXAGE", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     auto llock = mlog.lock();
     bool found = false;
     for (auto& m : llock) {
@@ -67,7 +67,7 @@ TEST(logging_tests, check_log_message_levels)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
@@ -75,14 +75,14 @@ TEST(logging_tests, check_log_message_levels)
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
     helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     auto llock = mlog.lock();
     bool found_low = false;
@@ -114,21 +114,21 @@ TEST(logging_tests, check_log_message_levels_high)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
     helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     auto llock = mlog.lock();
     bool found_low = false;
@@ -154,13 +154,13 @@ TEST(logging_tests, core_logging)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
     auto err = helicsErrorInitialize();
     helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     helicsCoreDisconnect(core, nullptr);
     helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
@@ -174,13 +174,13 @@ TEST(logging_tests, broker_logging)
 
     logblocktype mlog;
 
-    auto logg = [](int level, const char*, const char* message, void* udata) {
+    auto logg = [](int level, const char* /*unused*/, const char* message, void* udata) {
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
     auto err = helicsErrorInitialize();
     helicsBrokerSetLoggingCallback(broker, logg, &mlog, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     helicsBrokerDisconnect(broker, nullptr);
     helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
@@ -197,7 +197,7 @@ TEST(logging_tests, broker_logging_file)
     helicsCloseLibrary();
     EXPECT_TRUE(ghc::filesystem::exists(lfile));
     ghc::filesystem::remove(lfile);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(logging_tests, core_logging_file)

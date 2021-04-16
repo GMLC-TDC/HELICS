@@ -153,16 +153,16 @@ class QueryObject {
 /** definitions to simplify error returns if an error already exists*/
 #define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
     do {                                                                                                                                   \
-        if (((err) != nullptr) && ((err)->errorCode != 0)) {                                                                               \
+        if (((err) != nullptr) && ((err)->error_code != 0)) {                                                                              \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
 
 /** assign an error string and code to an error object if it exists*/
-inline void assignError(HelicsError* err, int errorCode, const char* string)
+inline void assignError(HelicsError* err, int error_code, const char* string)
 {
     if (err != nullptr) {
-        err->errorCode = errorCode;
+        err->error_code = error_code;
         err->message = string;
     }
 }
