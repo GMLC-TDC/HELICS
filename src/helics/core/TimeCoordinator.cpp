@@ -466,7 +466,8 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::halted;
         }
     }
-    if ((time_block <= time_exec && time_block < Time::maxVal())||(nonGranting && time_exec<time_requested)) {
+    if ((time_block <= time_exec && time_block < Time::maxVal()) ||
+        (nonGranting && time_exec < time_requested)) {
         return message_processing_result::continue_processing;
     }
     if ((iterating == iteration_request::no_iterations) ||
@@ -545,8 +546,10 @@ void TimeCoordinator::sendTimeRequest() const
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
-    if (nonGranting) {setActionFlag(upd, non_granting_flag);}
-    
+    if (nonGranting) {
+        setActionFlag(upd, non_granting_flag);
+    }
+
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
@@ -555,7 +558,6 @@ void TimeCoordinator::sendTimeRequest() const
     upd.Tdemin = std::min(upstream.Te + info.outputDelay, upd.Te);
     if (info.event_triggered) {
         upd.Tdemin = std::min(upd.Tdemin, upstream.minDe + info.outputDelay);
-
     }
     upd.setExtraData(upstream.minFed.baseValue());
 

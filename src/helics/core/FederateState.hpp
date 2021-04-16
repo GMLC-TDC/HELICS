@@ -91,8 +91,9 @@ class FederateState {
   public:
     std::atomic<bool> init_requested{
         false};  //!< this federate has requested entry to initialization
-    //temporary 
+    // temporary
     std::atomic<bool> requestingMode{false};
+
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
     bool timeGranted_mode{false};  //!< indicator if the federate is in a granted state or a
@@ -101,7 +102,6 @@ class FederateState {
                                      //!< error it should cause a co-simulation abort
     int logLevel{1};  //!< the level of logging used in the federate
 
-    
     //   std::vector<ActionMessage> messLog;
   private:
     std::shared_ptr<MessageTimer>

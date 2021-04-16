@@ -407,8 +407,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
                 if (dep.time_state == time_state_t::time_granted) {
                     return false;
                 }
-                if (dep.time_state == time_state_t::time_requested && dep.nonGranting)
-                {
+                if (dep.time_state == time_state_t::time_requested && dep.nonGranting) {
                     return false;
                 }
             }

@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/MappedPointerVector.hpp"
 #include "helics/external/any.hpp"
 
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
@@ -23,7 +24,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
-#include <deque>
 
 namespace helics {
 class HandleManager;
@@ -114,7 +114,8 @@ class FilterFederate {
     void processFilterInfo(ActionMessage& command);
 
     ActionMessage& processMessage(ActionMessage& command, const BasicHandleInfo* handle);
-    /** process destination filters on the message return true if the original command should be delivered to a federate*/
+    /** process destination filters on the message return true if the original command should be
+     * delivered to a federate*/
     bool destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
     void addFilteredEndpoint(Json::Value& block, global_federate_id fed) const;

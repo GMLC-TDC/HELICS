@@ -266,12 +266,10 @@ const std::vector<std::shared_ptr<const data_block>>&
 void FederateState::routeMessage(const ActionMessage& msg)
 {
     if (parent_ != nullptr) {
-        if (msg.action() == CMD_TIME_REQUEST && !requestingMode)
-        {
+        if (msg.action() == CMD_TIME_REQUEST && !requestingMode) {
             LOG_ERROR("sending time request in invalid state");
         }
-        if (msg.action() == CMD_TIME_GRANT)
-        {
+        if (msg.action() == CMD_TIME_GRANT) {
             requestingMode.store(false);
         }
         parent_->addActionMessage(msg);

@@ -93,7 +93,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                         auto tempMessage = createMessageFromCommand(std::move(cmd));
                         auto dest = tempMessage->dest;
                         tempMessage = FiltI->filterOp->process(std::move(tempMessage));
-                        
+
                         if (tempMessage) {
                             if (tempMessage->dest != dest && destFilter) {
                                 // the destination was altered we need to start the process over
@@ -102,9 +102,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                                 cmd.dest_handle = interface_handle();
                                 mDeliverMessage(cmd);
                                 cmd = CMD_IGNORE;
-                            }
-                            else
-                            {
+                            } else {
                                 cmd = ActionMessage(std::move(tempMessage));
                             }
                         } else {
@@ -408,8 +406,7 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
                 }
             }
         }
-        if (!ffunc->cloningDestFilters.empty())
-        {
+        if (!ffunc->cloningDestFilters.empty()) {
             runCloningDestinationFilters(ffunc, handle, command);
         }
     }
@@ -418,9 +415,8 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
 
 void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* ffunc,
                                                   const BasicHandleInfo* handle,
-                                                      const ActionMessage& command) const
+                                                  const ActionMessage& command) const
 {
-
     // now go to the cloning filters
     for (auto* clFilter : ffunc->cloningDestFilters) {
         if (checkActionFlag(*clFilter, disconnected_flag)) {
@@ -463,8 +459,7 @@ void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* ffunc
 void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
 {
     timeBlockProcesses.emplace_back(id, TimeVal);
-    if (TimeVal < minReturnTime)
-    {
+    if (TimeVal < minReturnTime) {
         minReturnTime = TimeVal;
         mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
     }
@@ -472,33 +467,25 @@ void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
 
 void FilterFederate::clearTimeReturn(int32_t id)
 {
-    if (timeBlockProcesses.empty())
-    {
+    if (timeBlockProcesses.empty()) {
         return;
     }
     bool recheckTime = false;
-    if (timeBlockProcesses.front().first == id)
-    {
-        if (timeBlockProcesses.front().second == minReturnTime)
-        {
+    if (timeBlockProcesses.front().first == id) {
+        if (timeBlockProcesses.front().second == minReturnTime) {
             recheckTime = true;
         }
         timeBlockProcesses.pop_front();
-    }
-    else
-    {
-
+    } else {
     }
     if (recheckTime) {
         minReturnTime = Time::maxVal();
-        for (const auto& tBP : timeBlockProcesses)
-        {
-            if (tBP.second < minReturnTime)
-            {
+        for (const auto& tBP : timeBlockProcesses) {
+            if (tBP.second < minReturnTime) {
                 minReturnTime = tBP.second;
             }
         }
-        mCoord.updateMessageTime(minReturnTime, current_state==HELICS_EXECUTING);
+        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
     }
 }
 
@@ -712,7 +699,8 @@ FilterInfo* FilterFederate::getFilterInfo(global_federate_id fed, interface_hand
     return filters.find(global_handle{fed, handle});
 }
 
-const FilterInfo* FilterFederate::getFilterInfo(global_federate_id fed, interface_handle handle) const
+const FilterInfo* FilterFederate::getFilterInfo(global_federate_id fed,
+                                                interface_handle handle) const
 {
     if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;

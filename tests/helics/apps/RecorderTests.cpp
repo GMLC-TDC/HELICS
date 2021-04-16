@@ -464,7 +464,6 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     mfed.enterExecutingMode();
     mfed2.enterExecutingModeComplete();
 
-
     mfed2.requestTimeAsync(1.0);
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
@@ -482,7 +481,7 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    
+
     EXPECT_EQ(rec1.messageCount(), 2U);
     rec1.runTo(8.0);
     EXPECT_EQ(rec1.messageCount(), 2U);
@@ -490,12 +489,10 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     auto m = rec1.getMessage(0);
     rec1.finalize();
     ASSERT_TRUE(m);
-    if (m)
-    {
+    if (m) {
         EXPECT_EQ(m->data.to_string(), "this is a test message");
         EXPECT_EQ(m->time, 1.0);
     }
-    
 }
 
 class recorder_clone_file_tests: public ::testing::TestWithParam<const char*> {
