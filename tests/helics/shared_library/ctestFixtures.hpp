@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define CE(command)                                                                                \
     helicsErrorClear(&err);                                                                        \
     command;                                                                                       \
-    EXPECT_TRUE(err.errorCode == HELICS_OK) << err.message
+    EXPECT_TRUE(err.error_code == HELICS_OK) << err.message
 
 #define HELICS_SIZE_MAX 512
 

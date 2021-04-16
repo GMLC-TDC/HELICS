@@ -139,7 +139,7 @@ TEST_F(vfed2_tests, file_load)
     // fi = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
     vFed = helicsCreateValueFederateFromConfig(TEST_DIR "/example_value_fed.json", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     ASSERT_FALSE(vFed == nullptr);
     const char* s = helicsFederateGetName(vFed);
     EXPECT_STREQ(s, "valueFed");

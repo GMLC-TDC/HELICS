@@ -158,13 +158,13 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
             auto core = helicsCreateCore(CoreType_name.c_str(), NULL, init.c_str(), &err);
 
             helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
-            assert(err.errorCode == 0);
+            assert(err.error_code == 0);
             size_t offset = federates.size();
             federates.resize(count + offset);
             for (int ii = 0; ii < count; ++ii) {
                 auto name = name_prefix + std::to_string(ii + offset);
                 auto fed = ctor(name.c_str(), fi, &err);
-                assert(err.errorCode == 0);
+                assert(err.error_code == 0);
                 federates[ii + offset] = fed;
             }
             helicsCoreFree(core);
@@ -177,10 +177,10 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
                 auto core = helicsCreateCore(CoreType_name.c_str(), NULL, init.c_str(), &err);
 
                 helicsFederateInfoSetCoreName(fi, helicsCoreGetIdentifier(core), &err);
-                assert(err.errorCode == 0);
+                assert(err.error_code == 0);
                 auto name = name_prefix + std::to_string(ii + offset);
                 auto fed = ctor(name.c_str(), fi, &err);
-                assert(err.errorCode == 0);
+                assert(err.error_code == 0);
                 federates[ii + offset] = fed;
                 helicsCoreFree(core);
             }
