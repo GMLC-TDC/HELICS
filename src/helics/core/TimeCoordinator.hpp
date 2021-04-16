@@ -96,7 +96,7 @@ class TimeCoordinator {
   private:
     std::atomic<int32_t> iteration{0};  //!< iteration counter
     bool disconnected{false};
-    bool nonGranting{false};  // specify the that the timeCoordinator should not grant times and
+    bool nonGranting{false};  // specify that the timeCoordinator should not grant times and
                               // instead operate in a continuous manner until completion
   public:
     /** default constructor*/

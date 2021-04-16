@@ -114,7 +114,7 @@ class FilterFederate {
     void processFilterInfo(ActionMessage& command);
 
     ActionMessage& processMessage(ActionMessage& command, const BasicHandleInfo* handle);
-    /** process destination filters on the message return true if the original command should be
+    /** process destination filters on the message and return true if the original command should be
      * delivered to a federate*/
     bool destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
 
