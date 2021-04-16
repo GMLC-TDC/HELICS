@@ -62,7 +62,7 @@ FederateTestFixture::~FederateTestFixture()
                 helicsFederateFinalize(fed, nullptr);
             }
             helicsFederateFree(fed);
-            if (helicsCoreIsValid(core)!=HELICS_FALSE) {
+            if (helicsCoreIsValid(core) != HELICS_FALSE) {
                 helicsCoreDisconnect(core, nullptr);
             }
             helicsCoreFree(core);
