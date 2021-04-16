@@ -545,7 +545,8 @@ void TimeCoordinator::sendTimeRequest() const
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
-
+    if (nonGranting) {setActionFlag(upd, non_granting_flag);}
+    
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
@@ -554,7 +555,7 @@ void TimeCoordinator::sendTimeRequest() const
     upd.Tdemin = std::min(upstream.Te + info.outputDelay, upd.Te);
     if (info.event_triggered) {
         upd.Tdemin = std::min(upd.Tdemin, upstream.minDe + info.outputDelay);
-        upd.Tdemin = std::min(upd.Tdemin, upd.actionTime);
+
     }
     upd.setExtraData(upstream.minFed.baseValue());
 
@@ -574,9 +575,6 @@ void TimeCoordinator::sendTimeRequest() const
             upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
         }
         upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
-        if (info.event_triggered) {
-            upd.Tdemin = std::min(upd.Tdemin, upd.actionTime);
-        }
         sendMessageFunction(upd);
     }
 
