@@ -859,7 +859,14 @@ TEST_F(query, queries_query)
     // federate queries
     auto res = vFed1->query("queries");
     auto vec = helics::vectorizeQueryResult(res);
+    bool skipversion = std::string(helics::versionString).find("error") != std::string::npos;
+
     for (auto& qstr : vec) {
+        if (skipversion) {
+            if (qstr == "version" || qstr == "version_all") {
+                continue;
+            }
+        }
         auto qres = vFed1->query(qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error";
         try {
@@ -873,6 +880,11 @@ TEST_F(query, queries_query)
     res = vFed1->query("core", "queries");
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
+        if (skipversion) {
+            if (qstr == "version" || qstr == "version_all") {
+                continue;
+            }
+        }
         auto qres = vFed1->query("core", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in core";
         try {
@@ -886,6 +898,11 @@ TEST_F(query, queries_query)
     res = vFed1->query("root", "queries");
     vec = helics::vectorizeQueryResult(res);
     for (auto& qstr : vec) {
+        if (skipversion) {
+            if (qstr == "version" || qstr == "version_all") {
+                continue;
+            }
+        }
         auto qres = vFed1->query("root", qstr);
         EXPECT_EQ(qres.find("error"), std::string::npos) << qstr << " produced an error in root";
         try {
