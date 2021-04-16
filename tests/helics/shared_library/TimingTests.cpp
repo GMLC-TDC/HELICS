@@ -106,7 +106,7 @@ TEST_F(timing_tests, simple_timing_test_message)
 
     auto ept1 = helicsFederateRegisterGlobalEndpoint(vFed1, "e1", "", &err);
     helicsFederateRegisterGlobalEndpoint(vFed2, "e2", "", &err);
-    ASSERT_EQ(err.errorCode, 0);
+    ASSERT_EQ(err.error_code, 0);
     CE(helicsFederateEnterExecutingModeAsync(vFed1, &err));
     CE(helicsFederateEnterExecutingMode(vFed2, &err));
     CE(helicsFederateEnterExecutingModeComplete(vFed1, &err));

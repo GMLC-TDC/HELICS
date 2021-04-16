@@ -228,7 +228,7 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
 
     // this one should be invalid
     auto pubid_d = helicsFederateGetPublicationByIndex(vFed1, 5, &err);
-    EXPECT_NE(err.errorCode, 0);
+    EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(pubid_d, nullptr);
     helicsErrorClear(&err);
 
@@ -276,7 +276,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     EXPECT_EQ(helicsPublicationIsValid(pub), HELICS_TRUE);
 
     helicsInputSetDefaultBytes(inp_raw1, nullptr, -2, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     char data[256] = "this is a string";
     helicsInputSetDefaultBytes(inp_raw2, data, 30, &err);
 
@@ -289,7 +289,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsInputSetDefaultNamedPoint(inp_np, data, 15.7, &err);
 
     helicsFederateEnterExecutingMode(vFed1, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(helicsInputGetInjectionUnits(inp_double), "MW");
     EXPECT_STREQ(helicsInputGetInjectionUnits(inp_double2), "MW");
     EXPECT_STREQ(helicsInputGetType(inp_double), "double");
@@ -300,7 +300,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     int actSize = 56;
     // this should not be an error
     helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 0);
 
     auto optset = helicsInputGetOption(inp_double2, HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
@@ -340,12 +340,12 @@ TEST_F(vfed_single_tests, default_value_tests)
     int actLen = 66;
     double rval = 19.0;
     helicsInputGetNamedPoint(inp_np, nullptr, 5, &actLen, &rval, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actLen, 0);
     EXPECT_DOUBLE_EQ(rval, 15.7);
     rval = 19.0;
     helicsInputGetNamedPoint(inp_np, out, 8, &actLen, &rval, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(out, "this is");
     EXPECT_EQ(actLen, 8);
     EXPECT_DOUBLE_EQ(rval, 15.7);
@@ -959,12 +959,12 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
         helicsFederateRegisterGlobalTypePublication(vFed, "pub2", "int", "", &err);
     HelicsPublication pubid3 =
         helicsFederateRegisterPublication(vFed, "pub3", HELICS_DATA_TYPE_DOUBLE, "V", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     // these aren't meant to match the publications
     auto subid = helicsFederateRegisterSubscription(vFed, "sub1", "", &err);
     auto subid2 = helicsFederateRegisterSubscription(vFed, "sub2", "", &err);
     auto subid3 = helicsFederateRegisterSubscription(vFed, "sub3", "V", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     // enter execution
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 

@@ -194,7 +194,7 @@ HelicsFilter helicsFederateGetFilter(HelicsFederate fed, const char* name, Helic
     try {
         auto& id = fedObj->getFilter(name);
         if (!id.isValid()) {
-            err->errorCode = HELICS_ERROR_INVALID_ARGUMENT;
+            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
             err->message = invalidFiltName;
             return nullptr;
         }
@@ -230,7 +230,7 @@ HelicsFilter helicsFederateGetFilterByIndex(HelicsFederate fed, int index, Helic
     try {
         auto& id = fedObj->getFilter(index);
         if (!id.isValid()) {
-            err->errorCode = HELICS_ERROR_INVALID_ARGUMENT;
+            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
             err->message = invalidFiltIndex;
             return nullptr;
         }
