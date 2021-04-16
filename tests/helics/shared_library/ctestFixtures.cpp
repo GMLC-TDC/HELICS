@@ -28,9 +28,15 @@ static auto StartBrokerImp(const std::string& CoreType_name, std::string initial
     }
     if (hasIndexCode(CoreType_name)) {
         std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
-        return helicsCreateBroker(new_type.c_str(), nullptr, initialization_string.c_str(), nullptr);
+        return helicsCreateBroker(new_type.c_str(),
+                                  nullptr,
+                                  initialization_string.c_str(),
+                                  nullptr);
     }
-    return helicsCreateBroker(CoreType_name.c_str(), nullptr, initialization_string.c_str(), nullptr);
+    return helicsCreateBroker(CoreType_name.c_str(),
+                              nullptr,
+                              initialization_string.c_str(),
+                              nullptr);
 }
 
 bool FederateTestFixture::hasIndexCode(const std::string& type_name)
