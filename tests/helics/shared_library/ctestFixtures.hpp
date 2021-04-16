@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define CE(command)                                                                                \
     helicsErrorClear(&err);                                                                        \
     command;                                                                                       \
-    EXPECT_TRUE(err.errorCode == HELICS_OK) << err.message
+    EXPECT_TRUE(err.error_code == HELICS_OK) << err.message
 
 #define HELICS_SIZE_MAX 512
 
@@ -53,6 +53,6 @@ struct FederateTestFixture {
     std::string ctype;
 
   private:
-    bool hasIndexCode(const std::string& type_name);
-    int getIndexCode(const std::string& type_name);
+    static bool hasIndexCode(const std::string& type_name);
+    static int getIndexCode(const std::string& type_name);
 };

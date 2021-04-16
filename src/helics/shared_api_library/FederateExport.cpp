@@ -137,7 +137,7 @@ static const char* invalidFedInfoString = "helics Federate info object was not v
 
 static helics::FederateInfo* getFedInfo(HelicsFederateInfo fi, HelicsError* err)
 {
-    if ((err != nullptr) && (err->errorCode != 0)) {
+    if ((err != nullptr) && (err->error_code != 0)) {
         return nullptr;
     }
     if (fi == nullptr) {
@@ -256,7 +256,7 @@ void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* 
     auto ctype = helics::core::coreTypeFromString(coretype);
     if (ctype == helics::CoreType::UNRECOGNIZED) {
         if (err != nullptr) {
-            err->errorCode = HELICS_ERROR_INVALID_ARGUMENT;
+            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
             err->message = getMasterHolder()->addErrorString(std::string(coretype) + " is not a valid core type");
             return;
         }

@@ -47,7 +47,7 @@ TEST_P(mfed_simple_type_tests, endpoint_registration)
 
     auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     CE(helicsFederateEnterExecutingMode(mFed1, &err));
 
     CE(HelicsFederateState mFed1State = helicsFederateGetState(mFed1, &err));
@@ -84,7 +84,7 @@ TEST_P(mfed_simple_type_tests, send_receive)
 
     auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     CE(helicsFederateSetTimeProperty(mFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
 
     CE(helicsFederateEnterExecutingMode(mFed1, &err));
@@ -127,7 +127,7 @@ TEST_P(mfed_simple_type_tests, send_receive_mobj)
 
     auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     CE(helicsFederateSetTimeProperty(mFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
 
     CE(helicsFederateEnterExecutingMode(mFed1, &err));
@@ -171,7 +171,7 @@ TEST_F(mfed_tests, message_object_tests)
 
     auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", nullptr, &err);
     auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ep2", "random", &err);
-    EXPECT_EQ(err.errorCode, HELICS_OK);
+    EXPECT_EQ(err.error_code, HELICS_OK);
     CE(helicsFederateSetTimeProperty(mFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
 
     CE(helicsFederateEnterExecutingMode(mFed1, &err));
@@ -231,7 +231,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     CE(auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed2, "ep2", "random", &err));
 
     helicsEndpointSetOption(epid, HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS, HELICS_TRUE, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     CE(helicsFederateSetTimeProperty(mFed1, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
     CE(helicsFederateSetTimeProperty(mFed2, HELICS_PROPERTY_TIME_DELTA, 1.0, &err));
@@ -400,14 +400,14 @@ TEST(message_object, test1)
     char data[20];
     int actSize = 10;
     helicsMessageGetBytes(m2, nullptr, 0, &actSize, &err);
-    EXPECT_NE(err.errorCode, 0);
+    EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(actSize, 0);
     helicsErrorClear(&err);
 
     EXPECT_EQ(helicsMessageGetBytesPointer(nullptr), nullptr);
 
     helicsMessageGetBytes(m2, data, 20, &actSize, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
@@ -424,7 +424,7 @@ TEST(message_object, test1)
 
     helicsMessageSetFlagOption(m1, 22, HELICS_TRUE, &err);
     EXPECT_EQ(helicsMessageGetFlagOption(m1, 22), HELICS_FALSE);
-    EXPECT_NE(err.errorCode, 0);
+    EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
     helicsMessageResize(m2, 500, nullptr);
@@ -440,11 +440,11 @@ TEST(message_object, test1)
 
     // this should generate an out of memory exception
     helicsMessageResize(m2, -8, &err);
-    EXPECT_NE(err.errorCode, 0);
+    EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     // this should generate an out of memory exception
     helicsMessageReserve(m2, -2, &err);
-    EXPECT_NE(err.errorCode, 0);
+    EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     helicsFederateInfoFree(fi);
     helicsFederateFinalize(fed, nullptr);
@@ -479,10 +479,10 @@ TEST(message_object, copy)
     auto err = helicsErrorInitialize();
 
     helicsMessageCopy(m1, m2, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
 
     helicsMessageCopy(m1, nullptr, &err);
-    EXPECT_NE(err.errorCode, 0);
+    EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
     EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
@@ -498,7 +498,7 @@ TEST(message_object, copy)
     int actSize = 10;
 
     helicsMessageGetBytes(m2, data, 20, &actSize, &err);
-    EXPECT_EQ(err.errorCode, 0);
+    EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
