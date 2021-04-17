@@ -92,24 +92,24 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                     auto source = cmd.getSource();
                     auto mid = cmd.messageID;
                     if (FiltI->filterOp) {
-                    auto tempMessage = createMessageFromCommand(std::move(cmd));
+                        auto tempMessage = createMessageFromCommand(std::move(cmd));
                         auto dest = tempMessage->dest;
-                    tempMessage = FiltI->filterOp->process(std::move(tempMessage));
+                        tempMessage = FiltI->filterOp->process(std::move(tempMessage));
 
-                    if (tempMessage) {
+                        if (tempMessage) {
                             if (tempMessage->dest != dest && destFilter) {
                                 // the destination was altered we need to start the process over
-                        cmd = ActionMessage(std::move(tempMessage));
+                                cmd = ActionMessage(std::move(tempMessage));
                                 cmd.dest_id = parent_broker_id;
-                        cmd.dest_handle = InterfaceHandle{};
+                                cmd.dest_handle = InterfaceHandle{};
                                 mDeliverMessage(cmd);
                                 cmd = CMD_IGNORE;
-                    } else {
+                            } else {
                                 cmd = ActionMessage(std::move(tempMessage));
                             }
                         } else {
-                        cmd = CMD_IGNORE;
-                    }
+                            cmd = CMD_IGNORE;
+                        }
                     }
 
                     if (!returnToSender) {
@@ -280,7 +280,7 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
 
             if (!filtFunc->cloningDestFilters.empty()) {
                 runCloningDestinationFilters(filtFunc, handle, command);
-                }
+            }
 
             // mCoord->processTimeMessage(command);
             command.setAction(CMD_SEND_MESSAGE);
@@ -394,19 +394,19 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
                 // the filter is part of this core
 
                 if (ffunc->destFilter->filterOp) {
-                auto tempMessage = createMessageFromCommand(std::move(command));
+                    auto tempMessage = createMessageFromCommand(std::move(command));
                     auto odest = tempMessage->dest;
                     auto nmessage = ffunc->destFilter->filterOp->process(std::move(tempMessage));
                     if (odest == nmessage->dest) {
-                    command = std::move(nmessage);
-                } else {
+                        command = std::move(nmessage);
+                    } else {
                         // handle destination reroute filters
                         command = std::move(nmessage);
                         mDeliverMessage(command);
                         return false;
+                    }
                 }
             }
-        }
         }
         if (!ffunc->cloningDestFilters.empty()) {
             runCloningDestinationFilters(ffunc, handle, command);
@@ -419,44 +419,44 @@ void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* ffunc
                                                   const BasicHandleInfo* handle,
                                                   const ActionMessage& command) const
 {
-        // now go to the cloning filters
-        for (auto* clFilter : ffunc->cloningDestFilters) {
-            if (checkActionFlag(*clFilter, disconnected_flag)) {
-                continue;
-            }
-            if (clFilter->core_id == mFedID) {
-                auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
-                if (FiltI != nullptr) {
-                    if (FiltI->filterOp != nullptr) {
-                        // this is a cloning filter so it generates a bunch(?) of new
-                        // messages
-                        auto new_messages =
-                            FiltI->filterOp->processVector(createMessageFromCommand(command));
-                        for (auto& msg : new_messages) {
-                            if (msg) {
-                                if (msg->dest == handle->key) {
-                                    // in case the clone filter send to itself.
-                                    ActionMessage cmd(std::move(msg));
-                                    cmd.dest_id = handle->handle.fed_id;
-                                    cmd.dest_handle = handle->handle.handle;
-                                    mSendMessageMove(std::move(cmd));
-                                } else {
-                                    ActionMessage cmd(std::move(msg));
-                                    mDeliverMessage(cmd);
-                                }
+    // now go to the cloning filters
+    for (auto* clFilter : ffunc->cloningDestFilters) {
+        if (checkActionFlag(*clFilter, disconnected_flag)) {
+            continue;
+        }
+        if (clFilter->core_id == mFedID) {
+            auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
+            if (FiltI != nullptr) {
+                if (FiltI->filterOp != nullptr) {
+                    // this is a cloning filter so it generates a bunch(?) of new
+                    // messages
+                    auto new_messages =
+                        FiltI->filterOp->processVector(createMessageFromCommand(command));
+                    for (auto& msg : new_messages) {
+                        if (msg) {
+                            if (msg->dest == handle->key) {
+                                // in case the clone filter send to itself.
+                                ActionMessage cmd(std::move(msg));
+                                cmd.dest_id = handle->handle.fed_id;
+                                cmd.dest_handle = handle->handle.handle;
+                                mSendMessageMove(std::move(cmd));
+                            } else {
+                                ActionMessage cmd(std::move(msg));
+                                mDeliverMessage(cmd);
                             }
                         }
                     }
                 }
-            } else {
-                ActionMessage clone(command);
-                clone.setAction(CMD_SEND_FOR_FILTER);
-                clone.dest_id = clFilter->core_id;
-                clone.dest_handle = clFilter->handle;
-                mSendMessage(clone);
             }
+        } else {
+            ActionMessage clone(command);
+            clone.setAction(CMD_SEND_FOR_FILTER);
+            clone.dest_id = clFilter->core_id;
+            clone.dest_handle = clFilter->handle;
+            mSendMessage(clone);
         }
     }
+}
 
 void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
 {
@@ -464,7 +464,7 @@ void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
     if (TimeVal < minReturnTime) {
         minReturnTime = TimeVal;
         mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
-}
+    }
 }
 
 void FilterFederate::clearTimeReturn(int32_t id)

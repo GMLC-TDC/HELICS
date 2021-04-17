@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 
-#include <deque>
 #include <any>
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
