@@ -1884,7 +1884,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
             if (checkActionFlag(*localP, has_dest_filter_flag)) {
                 if (!filterFed->destinationProcessMessage(message, localP)) {
                     return;
-            }
+                }
             }
             if (message.dest_id == parent_broker_id) {
                 message.dest_id = localP->getFederateId();

@@ -244,11 +244,11 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSen
         if (time_value < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
                 if (allowRequestSend) {
-                sendTimeRequest();
+                    sendTimeRequest();
+                }
             }
         }
     }
-}
 }
 
 void TimeCoordinator::generateConfig(Json::Value& base) const
@@ -410,11 +410,11 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
         if (time_message < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
                 if (allowRequestSend) {
-                sendTimeRequest();
+                    sendTimeRequest();
+                }
             }
         }
     }
-}
 }
 
 bool TimeCoordinator::updateTimeFactors()

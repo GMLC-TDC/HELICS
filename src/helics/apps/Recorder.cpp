@@ -442,7 +442,7 @@ namespace apps {
     void Recorder::runTo(Time runToTime)
     {
         if (fed->getCurrentMode() == Federate::Modes::STARTUP) {
-        initialize();
+            initialize();
         }
 
         if (!mapfile.empty()) {
@@ -556,9 +556,7 @@ namespace apps {
     std::tuple<Time, std::string_view, std::string> Recorder::getValue(int index) const
     {
         if (isValidIndex(index, points)) {
-            return {points[index].time,
-                    targets[points[index].index],
-                    points[index].value};
+            return {points[index].time, targets[points[index].index], points[index].value};
         }
         return {Time{}, {}, std::string()};
     }

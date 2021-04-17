@@ -409,9 +409,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
                 }
                 if (dep.time_state == time_state_t::time_requested && dep.nonGranting) {
                     return false;
+                }
             }
         }
-    }
     }
     return true;
 }
