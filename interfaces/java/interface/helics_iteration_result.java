@@ -15,19 +15,19 @@ public final class helics_iteration_result {
   /**
    *  the iterations have progressed to the next time 
    */
-  public final static helics_iteration_result helics_iteration_result_next_step = new helics_iteration_result("helics_iteration_result_next_step");
+  public final static helics_iteration_result helics_iteration_result_next_step = new helics_iteration_result("helics_iteration_result_next_step", helicsJNI.helics_iteration_result_next_step_get());
   /**
    *  there was an error 
    */
-  public final static helics_iteration_result helics_iteration_result_error = new helics_iteration_result("helics_iteration_result_error");
+  public final static helics_iteration_result helics_iteration_result_error = new helics_iteration_result("helics_iteration_result_error", helicsJNI.helics_iteration_result_error_get());
   /**
    *  the federation has halted 
    */
-  public final static helics_iteration_result helics_iteration_result_halted = new helics_iteration_result("helics_iteration_result_halted");
+  public final static helics_iteration_result helics_iteration_result_halted = new helics_iteration_result("helics_iteration_result_halted", helicsJNI.helics_iteration_result_halted_get());
   /**
    *  the federate is iterating at current time 
    */
-  public final static helics_iteration_result helics_iteration_result_iterating = new helics_iteration_result("helics_iteration_result_iterating");
+  public final static helics_iteration_result helics_iteration_result_iterating = new helics_iteration_result("helics_iteration_result_iterating", helicsJNI.helics_iteration_result_iterating_get());
 
   public final int swigValue() {
     return swigValue;
