@@ -55,6 +55,9 @@ constexpr uint16_t filter_processing_required_flag =
     extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for
                   // filters yet
 
+/// overload of extra_flag1 to indicate the request is from a non-granting federate
+constexpr uint16_t non_granting_flag = extra_flag1;
+
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
 @tparam FlagIndex a type that can be used as part of a shift to index into a flag object
