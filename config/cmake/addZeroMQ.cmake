@@ -113,8 +113,10 @@ else()
                 show_variable(ZeroMQ_LIBRARY FILEPATH "path to the ZeroMQ library" "")
                 show_variable(ZeroMQ_ROOT_DIR PATH "path to the ZeroMQ root directory"
                               "")
-                show_variable(ZeroMQ_STATIC_LIBRARY FILEPATH
-                              "path to the ZeroMQ static library" "")
+                if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
+                    show_variable(ZeroMQ_STATIC_LIBRARY FILEPATH
+                                  "path to the ZeroMQ static library" "")
+                endif()
                 show_variable(ZeroMQ_INCLUDE_DIR PATH
                               "path to the ZeroMQ include directory" "")
             endif()
