@@ -18,7 +18,12 @@
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the
-Advanced Topics section assumes you, the reader, have a familiarity and experience with running HELICS co-simulations. If that's not the case, it's well worth your while to go review the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) and [corresponding examples](../examples/fundamental_examples/fundamental_examples_index.md). In this section it will be assumed you know things like: - The difference between value and message passing in HELICS - How to configure HELICS federate appropriately - Familiarity with the common HELICS APIs (_e.g._ requesting time, getting subscribed values, publishing values) - Experience running HELICS co-simulations
+Advanced Topics section assumes you, the reader, have a familiarity and experience with running HELICS co-simulations. If that's not the case, it's well worth your while to go review the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) and [corresponding examples](../examples/fundamental_examples/fundamental_examples_index.md). In this section it will be assumed you know things like: 
+
+- The difference between value and message passing in HELICS
+- How to configure HELICS federate appropriately 
+- Familiarity with the common HELICS APIs (_e.g._ requesting time, getting subscribed values, publishing values) 
+- Experience running HELICS co-simulations
 
 The Advanced Topics section will dig into specific features of HELICS that are less commonly used but can be very useful in particular situations. Each section below provides a description of the feature, what it does, the kind of use case that might utilize it, and then links to examples that demonstrate an implementation. Its important to note that there are many other HELICS features and APIs not demonstrated here that can also be useful. As they say in academia, we'll leave it as an exercise to the reader to discover these. (Hint: The [API references](../../api-reference) and the [Configuration Options Reference](../configuration_options_reference.md) are good starting points to see what's out there in the broader HELICS world.)
 
