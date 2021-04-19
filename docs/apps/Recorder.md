@@ -33,7 +33,7 @@ configuration:
   --period arg           the period of the federate
   --timedelta arg        the time delta of the federate
   --rttolerance arg      the time tolerance of the real time mode
-  -i [ --coreinitstring ] arg   the core initialization string
+  -i [ --coreinit ] arg  the core initialization string
   --separator arg        separator character for local federates
   --inputdelay arg       the input delay on incoming communication of the
                          federate

@@ -36,7 +36,7 @@ if(MSVC)
         ${PROJECT_SOURCE_DIR}/CHANGELOG.md
         ${PROJECT_SOURCE_DIR}/CONTRIBUTORS.md
         ${PROJECT_SOURCE_DIR}/CONTRIBUTING.md
-        ${PROJECT_SOURCE_DIR}/docs/developer-guide/Public_API.md
+        ${PROJECT_SOURCE_DIR}/docs/Public_API.md
         ${PROJECT_SOURCE_DIR}/docs/docker.md
         ${PROJECT_SOURCE_DIR}/docs/ROADMAP.md
     )
