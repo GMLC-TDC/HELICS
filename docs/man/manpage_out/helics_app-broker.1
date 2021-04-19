@@ -42,7 +42,7 @@ helics_app-broker \- intermediary or root in the HELICS hierarchy
     [\-\-local|\-\-ipv4|\-\-ipv6|\-\-all|\-\-external] [\-\-brokeraddress <address>]
     [\-\-reuse_address] [\-\-broker <identifier>] [\-\-brokername <name>]
     [\-\-maxsize <buffer size>] [\-\-maxcount <num msgs>] [\-\-networkretries <num>]
-    [\-\-osport|\-\-use_os_port] [\-\-autobroker] [\-\-brokerinitstring <init str>]
+    [\-\-osport|\-\-use_os_port] [\-\-autobroker] [\-\-brokerinit <init str>]
     [\-\-client|\-\-server] [\-p|\-\-port <num>] [\-\-brokerport <num>] [\-\-localport <num>]
     [\-\-portstart <num>] [\-\-interface|\-\-localinterface <network interface>] [\-\-root]
     [\-\-force_logging_flush] [\-\-logfile <file>] [\-\-loglevel <level>]
@@ -136,7 +136,7 @@ Specify that ports should be allocated by the host operating system\&.
 Allow a broker to automatically be created if one is not available\&.
 .RE
 .PP
-\-\-brokerinitstring <init str>
+\-\-brokerinit <init str>
 .RS 4
 The initialization string for the broker\&.
 .RE

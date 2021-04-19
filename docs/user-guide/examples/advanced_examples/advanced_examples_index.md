@@ -1,0 +1,207 @@
+# Advanced Examples
+
+
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+    
+    advanced_default
+    advanced_brokers_simultaneous
+    advanced_brokers_hierarchies
+    advanced_brokers_multibroker
+    advanced_query
+    advanced_multi_input
+    advanced_orchestration
+
+```
+
+
+
+![](../../../img/user_guide_combinations_advanced.png)
+
+
+The Advanced Examples are modular, each building upon the [base example](./advanced_default.md). Users are encouraged to dive into a specific concept to build their HELICS knowledge once they have mastered the default setup in the [base example](./advanced_default.md).
+
+This page describes the model for the Advanced Examples. This model is topically the same as the Fundamental Examples, but more complex in its execution. This allows the research question to become more nuanced and for the user to define new components to a HELICS co-simulation.
+
+* [Where is the code?](#where-is-the-code)
+* [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
+	* [Differences Compared to the Fundamental Examples](#differences-compared-to-the-fundamental-examples)
+		* [HELICS Differences](#helics-differences)
+		* [Research Question Complexity Differences](#research-question-complexity-differences)
+* [HELICS Components](#helics-components)
+	* [Federates with infinite time](#federates-with-infinite-time)
+	* [Initial time requests and model initialization](#initial-time-requests-and-model-initialization)
+
+
+<a name="where-is-the-code">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+Where is the code?
+</span>
+</strong>
+</a>
+
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+
+```
+TODO:
+UPDATE IMAGE
+```
+
+
+[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+
+<a name="what-is-this-co-simulation-doing">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+What is this co-simulation doing?
+</span>
+</strong>
+</a>
+
+The Advanced Examples are similar in theme to the [Base Example](../fundamental_examples/fundamental_default.md) in that both are looking at power management for an EV charging garage. The implemented federates, however, are slightly more sophisticated and include a new centralized charging controller federate. 
+
+* **Battery.py** - Models a set of the EV batteries being charged. The EV is randomly assigned to support a particular charging level and receives an applied charging voltage based on that level. Using the applied voltage and the current SOC (initially randomly assigned), a charging current is calculated returned to the charger.
+* **Charger.py** - Models a set of EV charging terminals all capable of supporting three defined charging levels: level 1, 2, and 3. Applies a charging voltage based on the charging terminal power rating and (imperfectly) measures the returned current. Based on this current, it estimates the SOC and sends that information to the controller. When commanded to terminate charging it removes the applied charging voltage.
+* **Controller.py** - Receives periodic updates about the SOC of each charging vehicle and when they are considered close enough to full, command the charger to terminate charging.
+
+Every time charging is terminated on an EV, a new EV to take its place is randomly assigned a supported charging level and initial SOC. 
+
+<a name="differences-compared-to-the-fundamental-example">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Differences compared to the fundamental examples
+</span>
+</strong>
+</a>
+
+There are a few important distinctions between the Fundamental Examples and the Advanced Examples, which can be grouped into __HELICS__ differences and __research question complexity__ differences.
+
+<a name="helics-differences">
+<strong>
+<span style="font-size:small;color:black;text-decoration:underline;">
+HELICS differences
+</span>
+</strong>
+</a>
+
+1. **Communication:** Both physical value exchanges and abstract information exchanges are modeled. The exchange of physical values takes place between the Battery and Charger federates (this was also introduced in a slimmed-down fashion in the [Fundamental Communication Example](../fundamental_examples/fundamental_communication.md)). The message exchange (control signals, in this case) takes place between the Charger and Controller federates. For a further look at the difference between these two messaging mechanisms see our User Guide page on [value federates](../../fundamental_topics/value_federates.md) and [message federates.](../../fundamental_topics/message_federates.md)
+2. **Timing:** The Controller federate has no regular update interval. The Controller works in pure abstract information and has no regular time steps to simulate. As such, it requests a maximum simulated time supported by HELICS (`HELICS_TIME_MAXTIME`) and makes sure it can be interrupted by setting `uninterruptable` to `false` in its configuration file. Any time a message comes in for the Controller, HELICS grants it a time, the Controller performs the required calculation, sends out a new control signal, and requests `HELICS_TIME_MAXTIME` again.
+
+<a name="reaserach-question-complexity-differences">
+<strong>
+<span style="font-size:small;color:black;text-decoration:underline;">
+Research question complexity differences
+</span>
+</strong>
+</a>
+
+In the [Fundamental Base Example](../fundamental_examples/fundamental_default.md), a similar research question is being addressed by this co-simulation anlaysis: estimate the **instantaneous power draw** from the EVs in the garage. And though you may have similar questions, there are several complicating changes in the new model:
+
+1. A **third federate** (where previously there were only two) models responsibilities of a charger. The charger stops charging the battery by removing the charging voltage rather than the battery stopping the charging process. The Battery federate synthesizes an EV battery when the existing EV is considered fully charged.
+2. The measurement of the charging current (used to calculate the actual charging power) has some **noise** built into it. This is modeled as random variation of the charging current in the federate itself and is a percentage of the charging current. The charging current decreases as the SOC of the battery increases leading to a noisier SOC estimate by the Charger federate at higher SOCs. This results in the Controller tending to terminate charging prematurely as a single sample of the noisy charging current can lead to over-estimation of the SOC.
+3. We can now model both **physics** and **measurement of physics**. There are two SOC values modeled in this co-simulation: the "actual" SOC of the battery modeled in the Battery federate and the estimate of the SOC as measured by the Charger federate. Both federates calculate the SOC in the same manner: use the effective resistive load of the battery, R, and a pre-defined relationship between R and SOC. You can see that both the Battery and Charger federates use the exact same relationship between SOC and effective R (SOC of zero is equivalent to an effective resistance of 8 ohms; SOC of 1 has an effective resistance of 150 ohms). Due to the noise in the charger current measurement, there is error built into its calculation of the SOC and therefore should be considered an estimate of the SOC.
+
+
+This existence of two values for one property is not uncommon and is as much a feature as a bug. If this system were to be implemented in actual hardware, the only way that a charger would know the SOC of a battery would be through some kind of external **measurement**. And certainly there would be times where the charger would have even less information (such as the specific relationship between SOC and effective resistance) and would have to use historical data, heuristics, or smarter algorithms to know how to charge the battery effectively. Simulation allows us to use two separate models and thus independently model the actual SOC as known by the battery and the estimated SOC as calculated by the charger. 
+
+
+Since the decision to declare an EV fully charged has been abstracted away from the Charger and Battery (to the Controller), a slightly different procedure is used to disconnect a charged EV from the charger and replace it with a new one to be charged. In this advanced example, a mini-protocol has been designed and implemented:
+
+1. The Charger receives a message from the Controller indicating the EV should be considered fully charged.
+2. The Charger reduces the Charging voltage to zero volts and publishes it.
+3. The Battery, detecting this change in charging voltage, infers that it is fully charged. The Battery federate instantiates a new EV with a battery at a random initial state of charge. The Battery federate also calculates a charging current of zero amps and publishes it.
+4. The Charger federate, seeing a charging current of zero amps, infers a new EV has been set up to charge, randomly assigns one of three charging powers, and publishes this new charging voltage.
+
+At this point the co-simulation proceeds as previously defined. The Battery uses its internal knowledge of the state-of-charge to define the charging current which the Charger uses to estimate the state-of-charge and sends on to the Controller. The Controller sends back a message to the Charger based on this state-of-charge estimate indicating whether the EV should continue to be charged or not.
+
+
+
+<a name="helics-components">
+<strong>
+<span style="font-size:larger;color:black;text-decoration:underline;">
+HELICS components
+</span>
+</strong>
+</a>
+
+The HELICS components introduced in the Fundamental Examples are extended in the Advanced Examples with additional discussion of timing and initialization of federates. These new components enter into the sequence as follows:
+
+1. Register and Configure Federates
+2. <span style="color:red">Initialization</span>
+2. Enter Execution Mode
+3. Define Time Variables
+	4. <span style="color:red">Tell Controller federates to request `h.HELICS_TIME_MAXTIME`</span>
+4. Initiate Time Steps for the Time Loop
+5. Send and Receive Communication between Federates
+6. Finalize Co-simulation
+
+
+<a name="federates-with-infinite-time">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Federates with infinite time
+</span>
+</strong>
+</a>
+
+
+Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
+
+**TODO: Get rid of fake\_max\_time**
+
+**why do we divide helics\_time\_maxtime by 1000?**
+
+**shouldn't we also show how this federate is configured? where is best for that?**
+
+```
+ 		hours = 24*7 # one week
+    	total_interval = int(60 * 60 * hours)
+    	grantedtime = 0
+    	fake_max_time = int(h.HELICS_TIME_MAXTIME/1000)
+    	starttime = fake_max_time
+    	logger.debug(f'Requesting initial time {starttime}')
+    	grantedtime = h.helicsFederateRequestTime (fed, starttime)
+    	logger.debug(f'Granted time {grantedtime}')
+
+```
+
+
+<a name="initial-time-requests-and-model-initialization">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Initial time requests and model initialization
+</span>
+</strong>
+</a>
+
+As in the [Base Example](../fundamental_examples/fundamental_default.md), the EV batteries are assumed connected to the chargers at the beginning of the simulation and information exchange is initiated by the Charger federate sending the charging voltage to the Battery federate. In the Advanced Examples, this is a convenient choice as the charging voltage is constant and thus is never a function of the charging current. In a more realistic model, it's easy to imagine that the charger has an algorithm that adjusts the charging voltage based on the charging current to, say, ensure the battery is charged at a particular power level. In that case, __the dependency of the models is circular__; this is common component that needs to be addressed. 
+
+If the early time steps of the simulation are not as important (a model warm up period), then ensuring each federate has a default value it will provide when the input is null (and assuming the controller dynamics are not overly aggressive) will allow the models to bootstrap and through several iterations reach a consistent state. If this is not the case then HELICS does have a provision for getting models into a consistent state prior to the start of execution: initialization mode. **TODO: link to documentation or example on initialization mode.**  This mode allows for this same iteration between models with no simulated time passing. It is the responsibility of the modeler to make sure there is a method to reach and detect convergence of the models and when such conditions are met, enter execution mode as would normally be done.
+
+
+```
+add examples for where this is inserted in the code
+
+```
+
+<a name="examples-covered-in-advanced-examples">
+<strong>
+<span style="color:black;text-decoration:underline;">
+Examples Covered in Advanced Examples
+</span>
+</strong>
+</a>
+
+Using the [Advanced Default Example](./advanced_default.md) as the starting point, the following examples have also been constructed:
+
+- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value handle.
+- [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
+- **Multiple Brokers**
+	- [**Connecting Multiple Core Types (Multi-Protocol Broker)**](./advanced_brokers_multibroker.md) - Demonstration of how to configure a multi-protocol broker
+	- [**Broker Hierarchies**](./advanced_brokers_hierarchies.md) - Purpose of broker hierarchies and how to configure a HELICS co-simulation to implement one.
+	- [**Simultaneous co-simulations**](./advanced_brokers_simultaneous.md) - Demonstration of how to run multiple independent federations simultaneously on a single compute node.
+- [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.
