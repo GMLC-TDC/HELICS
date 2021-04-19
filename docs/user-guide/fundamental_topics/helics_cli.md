@@ -1,9 +1,8 @@
 # helics_cli
 
-
 Execution of the HELICS co-simulation is done from the command line with `helics_cli`, or Command Line Interface. Each simulator must be executed individually in order to join the federation. `helics_cli` condenses these command line execution commands into one executable, called the runner file.
 
-All the [examples](../examples/examples_index.md) are written with a runner file for execution. In the [Fundamental Base Example](../examples/fundamental_examples/fundamental_examples_index.md), we need to launch three things: the broker, the Battery federate, and the Charger federate. 
+All the [examples](../examples/examples_index.md) are written with a runner file for execution. In the [Fundamental Base Example](../examples/fundamental_examples/fundamental_examples_index.md), we need to launch three things: the broker, the Battery federate, and the Charger federate.
 
 The file `fundamental_default_runner.json` includes:
 

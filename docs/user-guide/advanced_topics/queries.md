@@ -5,18 +5,20 @@ Queries are an asynchronous means within a HELICS federation of asking for and r
 The general function looks like this:
 
 **C++**
+
 ```cpp
 std::string query(const std::string& target, const std::string& queryStr)
 ```
 
 **Python**
+
 ```Python
 query_result = h.helicsCreateQuery(traget_string, query_string)
 ```
 
 ## Targets
 
-Each query must define a "target", the component in the federation that is being queried. The target is either specified in terms of the relationship to the querying federate (_e.g._ "broker", "core") or by name of the federation component (_e.g._  "dist_system_1_fed"). The table below lists the valid query targets; if a federate happens to be named one of the target names listed below, it will not be queries by that name. For example, naming one of your brokers "broker" will prevent it being a valid target of a query by name. Instead, any federate that queries "broker" will end up targeting their broker. 
+Each query must define a "target", the component in the federation that is being queried. The target is either specified in terms of the relationship to the querying federate (_e.g._ "broker", "core") or by name of the federation component (_e.g._ "dist_system_1_fed"). The table below lists the valid query targets; if a federate happens to be named one of the target names listed below, it will not be queries by that name. For example, naming one of your brokers "broker" will prevent it being a valid target of a query by name. Instead, any federate that queries "broker" will end up targeting their broker.
 
 ```eval_rst
 +------------------------------------------+---------------------------------------------------------------------------------------+
@@ -92,7 +94,7 @@ The following queries are defined for federates. Federates may specify a callbac
 
 ### Local Federate Queries
 
-The following queries are defined for federates but can only be queried on the local federate, that is, the federate making the query. Federates may specify a callback function which allows arbitrary user defined Queries. 
+The following queries are defined for federates but can only be queried on the local federate, that is, the federate making the query. Federates may specify a callback function which allows arbitrary user defined Queries.
 
 ```eval_rst
 +---------------------------+------------------------------------------------------------+
@@ -109,7 +111,6 @@ The following queries are defined for federates but can only be queried on the l
 | ``time``                  | the current granted time [string]                          |
 +---------------------------+------------------------------------------------------------+
 ```
-
 
 ### Core queries
 
@@ -165,7 +166,7 @@ The following queries will be answered by a core:
 +----------------------+-------------------------------------------------------------------------------------+
 ```
 
-The last two are valid but are not usually queried directly. 
+The last two are valid but are not usually queried directly.
 
 ### Broker Queries
 
@@ -257,18 +258,15 @@ There is also an asyncrhonous version (that is, non-blocking) that returns a `qu
 query_id_t     queryAsync(const std::string& target, const std::string& queryStr)
 ```
 
-
-
 In the header [`<helics\queryFunctions.hpp>`](../doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
 ### C API and interface API's
 
 Queries in the [`C API`](https://docs.helics.org/en/latest/c-api-reference/index.html#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
 
-This function returns a query object that can be used in one of the execute functions (`helicsQueryExecute()`, `helicsQueryExecuteAsync()`, `helicsQueryBrokerExecute()`, `helicsQueryCoreExecute()`,  to perform the query and receive back results. The query can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
+This function returns a query object that can be used in one of the execute functions (`helicsQueryExecute()`, `helicsQueryExecuteAsync()`, `helicsQueryBrokerExecute()`, `helicsQueryCoreExecute()`, to perform the query and receive back results. The query can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use `helicsQueryFree()`.
 
-
-
 ## Example
+
 A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query)).

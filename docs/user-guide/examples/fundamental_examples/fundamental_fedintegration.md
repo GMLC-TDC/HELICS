@@ -2,69 +2,72 @@
 
 The Federate Integration Example extends the Base Example to demonstrate how to integrate federates using the HELICS API instead of JSON config files.
 
-
 ![](../../../img/fed_int_setup.png)
 
 This tutorial is organized as follows:
 
-* [Computing Environment](#computing-environment)
-* [Example files](#example-files)  
-* [Federate Integration with PyHELICS API](#federate-integration-with-pyhelics-api)
-	* [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api)
-	* [Federate integration with API calls](#federate-integration-with-api-calls)
-	* [Dynamic Pub/Subs with API calls](#dynamic-pub-subs-with-api-calls)
-	* [Co-simulation Execution](co-simulation-execution)
-* [Questions and Help](#questions-and-help)
-
-
+- [Computing Environment](#computing-environment)
+- [Example files](#example-files)
+- [Federate Integration with PyHELICS API](#federate-integration-with-pyhelics-api)
+  - [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api)
+  - [Federate integration with API calls](#federate-integration-with-api-calls)
+  - [Dynamic Pub/Subs with API calls](#dynamic-pub-subs-with-api-calls)
+  - [Co-simulation Execution](co-simulation-execution)
+- [Questions and Help](#questions-and-help)
 
 ## Computing Environment
 
 This example was successfully run on `Tue Nov 10 11:16:44 PST 2020` with the following computing environment.
 
-* 	Operating System
+-     Operating System
 
 ```
 $ sw_vers
-ProductName:	Mac OS X
-ProductVersion:	10.14.6
-BuildVersion:	18G6032
+ProductName:    Mac OS X
+ProductVersion:    10.14.6
+BuildVersion:    18G6032
 ```
-*  python version
+
+- python version
 
 ```
 $ python
-Python 3.7.6 (default, Jan  8 2020, 13:42:34) 
+Python 3.7.6 (default, Jan  8 2020, 13:42:34)
 [Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
 Type "help", "copyright", "credits" or "license" for more information.
 ```
-* python modules for this example
+
+- python modules for this example
 
 ```
 $ pip list | grep matplotlib
-matplotlib                    3.1.3    
+matplotlib                    3.1.3
 $ pip list | grep numpy
-numpy                         1.18.5 
+numpy                         1.18.5
 ```
+
 If these modules are not installed, you can install them with
 
 ```
 $ pip install matplotlib
 $ pip install numpy
 ```
-* 	helics_broker version
+
+-     helics_broker version
 
 ```
 $ helics_broker --version
 2.4.0 (2020-02-04)
 ```
-* 	helics_cli version
+
+-     helics_cli version
 
 ```
 $ helics --version
 0.4.1-HEAD-ef36755
 ```
-*	pyhelics init file
+
+- pyhelics init file
 
 ```
 $ python
@@ -74,7 +77,6 @@ $ python
 '/Users/[username]/Software/pyhelics/helics/__init__.py'
 ```
 
-
 ## Example files
 
 All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_integration)
@@ -83,9 +85,9 @@ All files necessary to run the Federate Integration Example can be found in the 
 
 The files include:
 
-* Python program for Battery federate
-* Python program for Charger federate
-* "runner" JSON to enable `helics_cli` execution of the co-simulation
+- Python program for Battery federate
+- Python program for Charger federate
+- "runner" JSON to enable `helics_cli` execution of the co-simulation
 
 ## Federate Integration with PyHELICS API
 
@@ -112,7 +114,7 @@ We can see from this config file that we need to find API method to assign the `
 
 ### Translation from JSON to PyHELICS API methods
 
-Configuration with the API is done within the federate, where an API call sets the properties of the federate. With our Battery federate, the following API calls will set all the properties from our JSON file (except pub/sub, which we'll cover in a moment).  These calls set:
+Configuration with the API is done within the federate, where an API call sets the properties of the federate. With our Battery federate, the following API calls will set all the properties from our JSON file (except pub/sub, which we'll cover in a moment). These calls set:
 
 1. `name`
 2. `loglevel`
@@ -137,15 +139,15 @@ h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_WAIT_FOR_CURRENT_TIME_U
 
 If you find yourself wanting to set additional properties, there are a handful of places you can look:
 
-* [C++ source code](https://docs.helics.org/en/latest/doxygen/helics__enums_8h_source.html): Do a string search for the JSON property. This can provide clarity into which `enum` to use from the API.
-*  [PyHELICS API methods](https://python.helics.org/api/capi-py/): API methods specific to PyHELICS, with suggestions for making the calls pythonic.
-*  [Configuration Options Reference](../../configuration_options_reference.html): API calls for C++, C, Python, and Julia
+- [C++ source code](https://docs.helics.org/en/latest/doxygen/helics__enums_8h_source.html): Do a string search for the JSON property. This can provide clarity into which `enum` to use from the API.
+- [PyHELICS API methods](https://python.helics.org/api/capi-py/): API methods specific to PyHELICS, with suggestions for making the calls pythonic.
+- [Configuration Options Reference](../../configuration_options_reference.html): API calls for C++, C, Python, and Julia
 
 ### Federate integration with API calls
 
 We now know which API calls are analogous to the JSON configurations -- how should these methods be called in the co-simulation to properly integrate the federate?
 
-It's common practice to rely on a helper funtion to integrate the federate using API calls. With our Battery/Controller co-simulation, this is done by defining a `create_value_federate` function (named for the fact that the messages passed between the two federates are physical values). In `Battery.py` this function is:
+It's common practice to rely on a helper function to integrate the federate using API calls. With our Battery/Controller co-simulation, this is done by defining a `create_value_federate` function (named for the fact that the messages passed between the two federates are physical values). In `Battery.py` this function is:
 
 ```
 def create_value_federate(fedinitstring,name,period):
@@ -161,6 +163,7 @@ def create_value_federate(fedinitstring,name,period):
     return fed
 
 ```
+
 Notice that we have passed three items to this function: `fedinitstring`, `name`, and `period`. This allows us to flexibly reuse this function if we decide later to change the name or the period (the most common values to change).
 
 We create the federate and integrate it into the co-simulation by calling this function at the beginning of the program main loop:
@@ -175,7 +178,7 @@ We create the federate and integrate it into the co-simulation by calling this f
 
 What step created the value federate?
 
->! fed = h.helicsCreateValueFederate(name, fedinfo)
+> ! fed = h.helicsCreateValueFederate(name, fedinfo)
 
 <details><summary>Click for answer</summary>
 <p>
@@ -183,7 +186,8 @@ This line from the `create_value_federate` function:
 
 `fed = h.helicsCreateValueFederate(name, fedinfo)`
 
-Notice that we pass to this API the `fedinfo` set by all preceeding API calls.
+Notice that we pass to this API the `fedinfo` set by all preceding API calls.
+
 </p>
 </details>
 
@@ -235,11 +239,11 @@ Using the PyHELICS API methods, we can register any number of publications and s
 
 ```
 
-Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method.  Note that subscriptions are analogous to [_inputs_](../../inputs.md), and as such retain similar properties. 
+Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../inputs.md), and as such retain similar properties.
 
 ### Co-simulation Execution
 
-In this tutorial, we have covered how to integrate federates into a co-simulation using the PyHELICS API.  Integration covers configuration of federates and registration of communication connections.  Execution of the co-simulation is done the same as with the Base Example, with a runner JSON we sent to `helics_cli`. The runner JSON has not changed from the Base Example:
+In this tutorial, we have covered how to integrate federates into a co-simulation using the PyHELICS API. Integration covers configuration of federates and registration of communication connections. Execution of the co-simulation is done the same as with the Base Example, with a runner JSON we sent to `helics_cli`. The runner JSON has not changed from the Base Example:
 
 ```
 {
@@ -265,7 +269,7 @@ In this tutorial, we have covered how to integrate federates into a co-simulatio
   ],
   "name": "EV_toy"
 }
-``` 
+```
 
 Execute the co-simulation with the same command as the Base Example
 
@@ -278,14 +282,12 @@ This results in the same output; the only thing we have changed is the method of
 ![](../../../img/fundamental_default_resultbattery.png)
 ![](../../../img/fundamental_default_resultcharger.png)
 
-If your output is not the same as with the Base Example, it can be helpful to pinpoint source of the difference -- have you used the correct API method? 
-
+If your output is not the same as with the Base Example, it can be helpful to pinpoint source of the difference -- have you used the correct API method?
 
 ## [Questions and Help](../support.md)
 
-Do you have questions about HELICS or need help?  
+Do you have questions about HELICS or need help?
 
 1. Come to [office hours](mailto:helicsteam@helics.org)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!
-

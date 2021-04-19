@@ -61,6 +61,7 @@ The handling method specifies how the reduction operation occurs the value can t
 Multi Input handling can be configured through the programming API or through a file based configuration.
 
 **C++**
+
 ```cpp
 auto& in1 = vFed1->registerInput<double>("");
     in1.addTarget("pub1");
@@ -71,6 +72,7 @@ auto& in1 = vFed1->registerInput<double>("");
 ```
 
 **C**
+
 ```c
 /*errors are ignored here*/
 helics_input in1 = helicsFederateRegisterInput("",helics_data_type_double,"",nullptr);
@@ -82,6 +84,7 @@ helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics
 ```
 
 **Python**
+
 ```python
 in1 = h.helicsFederateRegisterInput("",h.helics_data_type_double,"");
 h.helicsInputAddTarget(in1,"pub1");
@@ -94,6 +97,7 @@ h.helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,heli
 The handling can also be configured in the configuration file for the federate
 
 **TOML**
+
 ```toml
 inputs=[
 {key="ipt2",  type="double", targets=["pub1","pub2"], connections=2, multi_input_handling_method="average"}
@@ -101,6 +105,7 @@ inputs=[
 ```
 
 **JSON**
+
 ```JSON
 "inputs": [
     {

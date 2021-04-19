@@ -38,14 +38,14 @@ TCP communications is an alternative to ZMQ on platforms where ZMQ is not availa
 
 ## TCP_SS
 
-The TCP_SS core uses TCP as the underlying messaging technology and is targeted at at networking environments where it is convenient or required that outgoing connections be made from the cores or brokers but have only a single external socket exposed. 
+The TCP_SS core uses TCP as the underlying messaging technology and is targeted at at networking environments where it is convenient or required that outgoing connections be made from the cores or brokers but have only a single external socket exposed.
 
 ## MPI
 
 MPI communications is often used in HPC systems. It uses the message passing interface to communicate between nodes in an HPC system. It is still in testing and over time there is expected to be a few different levels of the MPI core used in different platforms depending on MPI versions available and federation needs.
 
-
 ## Example
+
 Generally, all federates in a federation utilize the same core type. There could be reasons for this not to be the case, though. For example, part of the federation could be running on MPI in an HPC environment while the rest is running on one or more compute nodes outside that environment. To allow the federates in the HPC environment to take advantage of the high-speed MPI bus but to allow the rest of the federation without access to MPI to use ZMQ, a "multi-broker" or "multi-protocol broker" must be set up.
 
 A full co-simulation example showing how to implement a multi-core federation [is written up here](../examples/advanced_examples/advanced_brokers_multibroker.md) (and the source code can be found [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/multi_broker)).

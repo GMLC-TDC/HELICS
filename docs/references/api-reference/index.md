@@ -1,7 +1,5 @@
 # API Reference
 
-
-
 ## [C++ API (doxygen)](https://docs.helics.org/en/latest/doxygen/index.html)
 
 ## [C API](./C_API.md)

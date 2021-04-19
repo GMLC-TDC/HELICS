@@ -10,15 +10,15 @@ Targeted endpoint configuration example:
 
 ```json
 {
- "name": "EV_Controller",
-    "coreType": "zmq",
-    "timeDelta": 1.0,
-    "endpoints":[
+  "name": "EV_Controller",
+  "coreType": "zmq",
+  "timeDelta": 1.0,
+  "endpoints": [
     {
-        "name": "EV_Controller/EV6",
-        "global": true,
-        "destinationTarget": "charger/ep"
+      "name": "EV_Controller/EV6",
+      "global": true,
+      "destinationTarget": "charger/ep"
     }
-    ]
+  ]
 }
 ```

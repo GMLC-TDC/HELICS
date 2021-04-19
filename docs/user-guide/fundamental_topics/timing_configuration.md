@@ -1,16 +1,15 @@
 # Timing Configuration
 
-The two fundamental roles of a co-simulation platform are to provide a means of data exchange between members of the co-simulation (federates) and a means of keeping the federation synchronized in simulated time. 
+The two fundamental roles of a co-simulation platform are to provide a means of data exchange between members of the co-simulation (federates) and a means of keeping the federation synchronized in simulated time.
 
 In HELICS, time synchronization across the federates is managed by each federate requesting a time (via a HELICS API call). When granted a time, the federate will:
 
 1. Checks all its inputs and grab any new signals (values or messages) that have been sent to it,
-2. Execute its native simulation code and update its state to the current simulated time (_e.g._ solving equations governing the behavior of a physical model, calculating a control action, processing and logging data, etc), 
-3. Publish new values or send new messages to other federates, and 
-4. Request the next simulated time to update again. 
+2. Execute its native simulation code and update its state to the current simulated time (_e.g._ solving equations governing the behavior of a physical model, calculating a control action, processing and logging data, etc),
+3. Publish new values or send new messages to other federates, and
+4. Request the next simulated time to update again.
 
-Sometimes this timing configuration is determined by the construction of the simulator (for example, if it has a fixed simulation time step size) and sometimes the simulator will have nothing to do until it receives a new input (for example, with a controller). 
-
+Sometimes this timing configuration is determined by the construction of the simulator (for example, if it has a fixed simulation time step size) and sometimes the simulator will have nothing to do until it receives a new input (for example, with a controller).
 
 In most federates there will be a line of code that look like this (at least if their [using the C API](../../references/api-reference/index.md)):
 
@@ -22,16 +21,13 @@ It is the role of each federate to determine which time it should request and it
 
 When a federate makes a time request it calls a HELICS function that blocks the execution of that thread in HELICS. (If the simulator in question is multi-threaded then other threads can continue to operate; hopefully whatever they're working on is largely independent of the rest of the federation.) The federate sits and waits for a return value from that function (the granted time), allowing the rest of the federation to execute. The implication of making a time request is that, given the current state of its boundary conditions, the federate has no tasks to execute until the time it is requesting, or until it receives from another federate a new value that changes its boundary conditions.
 
-After making a time request, federates are granted a time by their HELICS core and the time they are granted will be one of two values: the time they requested (or the next available valid time as defined by their configuration) or an earlier valid time. Being granted a time earlier than requested is always accompanied by a new value or message in one of its inputs, subscriptions, or endpoints. A change in the federate's boundary conditions may require a change in one of the outputs for that federate and its core is obliged to wake up the federate so it can process this new information. 
+After making a time request, federates are granted a time by their HELICS core and the time they are granted will be one of two values: the time they requested (or the next available valid time as defined by their configuration) or an earlier valid time. Being granted a time earlier than requested is always accompanied by a new value or message in one of its inputs, subscriptions, or endpoints. A change in the federate's boundary conditions may require a change in one of the outputs for that federate and its core is obliged to wake up the federate so it can process this new information.
 
-Based on the time requests and grants from all the connected federates, a core will determine the next time it can grant to a federate to guarantee none of the federates will be asked to simulate a point in time that occurs in the past. Every federate will receive a time that is the same as or larger than the last time it was granted. HELICS does support a configuration and some other situations that allows a federate to break this rule, but this is a very special situation and would require all the federates to support this jumping back in time, or accept non-causality and some randomness in execution. 
+Based on the time requests and grants from all the connected federates, a core will determine the next time it can grant to a federate to guarantee none of the federates will be asked to simulate a point in time that occurs in the past. Every federate will receive a time that is the same as or larger than the last time it was granted. HELICS does support a configuration and some other situations that allows a federate to break this rule, but this is a very special situation and would require all the federates to support this jumping back in time, or accept non-causality and some randomness in execution.
 
-The [section on federates](./federates.md) addressed the data-exchange responsibility of the co-simulation platform and this will address the timing and synchronization requirements. These two functions work hand-in-hand; for data-exchange between federates to be productive, data must be delivered to each federate at the appropriate time. 
-
-
+The [section on federates](./federates.md) addressed the data-exchange responsibility of the co-simulation platform and this will address the timing and synchronization requirements. These two functions work hand-in-hand; for data-exchange between federates to be productive, data must be delivered to each federate at the appropriate time.
 
 <!-- (There are a few mechanisms by which trivial or nuisance updates for a federate can be ignored and will be discussed later in this section.) -->
-
 
 HELICS co-simulations end under one of two conditions: when all federates have been granted the time of `HELICS_TIME_MAXTIME` or when all federates have notified the broker (via their core) that they are terminating. The termination of the federates triggers a cascade of terminations throughout the federation: once all the federates associated with a core have terminated, the core itself terminates and once all cores associated with a broker have terminated, the broker itself terminates. This concludes the co-simulation and leaves the original models, configuration files, executing simulators, and results files in place for review.
 
@@ -56,19 +52,19 @@ Below is an example of how the most common of these are implemented in a federat
   ...
 }
 ```
+
 `period`, `offset`, and `time_delta` are all related in units of seconds.
 
 - `period`: Defines the resolution of the federate and is often tied to the underlying simulation tool. Period forces time grants to intervals.
-- `offset`: Requires all time grants to be offset in time by the amount indicated. 
+- `offset`: Requires all time grants to be offset in time by the amount indicated.
 - `time_delta`: Forces the granted time to a minimum interval from the last granted time.
 
-The granted time will be of value `n*period + offset` and it must be later than the last grant by time `time_delta`. 
+The granted time will be of value `n*period + offset` and it must be later than the last grant by time `time_delta`.
 
 The other two options are flags which may be invoked:
 
 - `uninterruptible`: Forces the granted time to be the requested time. Generally HELICS will grant a federate a time when it receives new values on any of its inputs under the assumption that it is inherently interested in responding to new information that the federate has explicitly subscribed to. If that is not the case, setting this flag will reduce nuisance grants and move the federate forward in a predictable manner.
-- `wait_for_current_time_update`: Force the federate with this flag set to be the last one granted a given time and thereby ensures that all other federates have produced outputs for that time. By being last, a federate will have updated outputs from all other federates and have the most comprehensive understanding of the system state at that time.  
-
+- `wait_for_current_time_update`: Force the federate with this flag set to be the last one granted a given time and thereby ensures that all other federates have produced outputs for that time. By being last, a federate will have updated outputs from all other federates and have the most comprehensive understanding of the system state at that time.
 
 ## Example: Timing in a Small Federation
 

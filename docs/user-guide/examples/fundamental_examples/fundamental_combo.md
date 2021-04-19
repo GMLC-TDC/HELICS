@@ -4,13 +4,12 @@ The Federate Message + Communication Configuration Example extends the Base Exam
 
 This tutorial is organized as follows:
 
-* [Example files](#example-files)  
-* [Combination Federation](#combination-federation)
-	* [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-	* [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
-	* [Co-simulation Execution](co-simulation-execution)
-* [Questions and Help](#questions-and-help)
-
+- [Example files](#example-files)
+- [Combination Federation](#combination-federation)
+  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
+  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
+  - [Co-simulation Execution](co-simulation-execution)
+- [Questions and Help](#questions-and-help)
 
 ## Example files
 
@@ -18,39 +17,38 @@ All files necessary to run the Federate Integration Example can be found in the 
 
 [![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
-* Python program and configuration JSON for Battery federate
-* Python program and configuration JSON for Charger federate
-* Python program and configuration JSON for Controller federate
-* "runner" JSON to enable `helics_cli` execution of the co-simulation
+- Python program and configuration JSON for Battery federate
+- Python program and configuration JSON for Charger federate
+- Python program and configuration JSON for Controller federate
+- "runner" JSON to enable `helics_cli` execution of the co-simulation
 
 ## Combination Federation
 
-A quick glance at the [Fundamental examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/) on github will show that almost all these introductory examples are mocked up with two federates. These two federates pass information back and forth, and the examples show different ways this can be done. 
+A quick glance at the [Fundamental examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/) on github will show that almost all these introductory examples are mocked up with two federates. These two federates pass information back and forth, and the examples show different ways this can be done.
 
 This is the only example in the Fundamental series which models three federates -- it is also exactly the same model as the [Base Example](../advanced_examples/advanced_default.md) in the Advanced series. Why are we introducing a third federate?
 
-In the [Endpoints Example](./fundamental_endpoints.md), we learned how to pass messages between two federates. The problem with this setup -- which we will resolve in this example -- is that **physical values** should not be modeled with messages/endpoints (see [the example](./fundamental_endpoints.md#federate-communication-with-endpoints) for a reminder). We introduce a third federate -- a **combination federate** -- to preserve the handling of physical values among *value federates* and allow for nuanced message passing (and interruption) among *message federates*. The key with combo federates is that they are the go-between for these two types. Combination federates can update (send) values *and* intercept messages. (For a refresher on values and messages, see the section on [Types of Federates](../../fundamental_topics/federates.html). In brief: values have a physics-based unit, and messages are typically strings).
-  
+In the [Endpoints Example](./fundamental_endpoints.md), we learned how to pass messages between two federates. The problem with this setup -- which we will resolve in this example -- is that **physical values** should not be modeled with messages/endpoints (see [the example](./fundamental_endpoints.md#federate-communication-with-endpoints) for a reminder). We introduce a third federate -- a **combination federate** -- to preserve the handling of physical values among _value federates_ and allow for nuanced message passing (and interruption) among _message federates_. The key with combo federates is that they are the go-between for these two types. Combination federates can update (send) values _and_ intercept messages. (For a refresher on values and messages, see the section on [Types of Federates](../../fundamental_topics/federates.html). In brief: values have a physics-based unit, and messages are typically strings).
+
 Here is our new federation of three federates:
 
 ![](../../../img/fundamental_complete.png)
 
 We have:
 
-* Battery (**value federate**: passes values with Charger through pub/subs)
-* Charger (**combo federate**: passes values with Battery, passes messages with Controller)
-* Controller (**message federate**: passes messages with Charger through endpoints)
+- Battery (**value federate**: passes values with Charger through pub/subs)
+- Charger (**combo federate**: passes values with Battery, passes messages with Controller)
+- Controller (**message federate**: passes messages with Charger through endpoints)
 
 ### Redistribution of Federate Roles
 
-The full co-simulation is still asking the same question: "What is the expected instantaneous power draw from a dedicated EV charging garage?" With the introduction of a *Controller* federate, we now have additional flexibility in addressing the nuances to this question. For example, the charging controller does not have direct knowledge of the instantaneous current in the battery -- the onboard charger needs to estimate this in order to calculate the EV's state of charge. Let's walk through the roles of each federate.
+The full co-simulation is still asking the same question: "What is the expected instantaneous power draw from a dedicated EV charging garage?" With the introduction of a _Controller_ federate, we now have additional flexibility in addressing the nuances to this question. For example, the charging controller does not have direct knowledge of the instantaneous current in the battery -- the onboard charger needs to estimate this in order to calculate the EV's state of charge. Let's walk through the roles of each federate.
 
 #### Battery
 
-The Battery federate operates in the same way as in the Base Example. The only difference is that it is now allowed to request a new battery when an existing one is deemed to have a full SOC. This information is in the `charging_voltage` value from the Battery's subscription to the Charger; if the Charger applies zero voltage, this means the Battery can no longer charge. The Battery federate selects a new battery randomly from three sizes -- small, medium, and large -- and assings a random SOC between 0% and 80%.
+The Battery federate operates in the same way as in the Base Example. The only difference is that it is now allowed to request a new battery when an existing one is deemed to have a full SOC. This information is in the `charging_voltage` value from the Battery's subscription to the Charger; if the Charger applies zero voltage, this means the Battery can no longer charge. The Battery federate selects a new battery randomly from three sizes -- small, medium, and large -- and assigns a random SOC between 0% and 80%.
 
 There are no differences in the config file. As in the Base Example, the Battery federate logs and plots the internally calculated SOC over time at each charging port.
-
 
 #### Charger
 
@@ -81,9 +79,9 @@ Since this federate also communicated via endpoints, we need to register them al
 
 ```
 
-The Charger federate is gaining the new role of *estimating the Battery's current* and shifting the role of *deciding when to stop charging* to the Controller federate. 
+The Charger federate is gaining the new role of _estimating the Battery's current_ and shifting the role of _deciding when to stop charging_ to the Controller federate.
 
-The Charger federate estimates the Battery federate's current with a new helper function call `estimate_SOC`. The Charger does not know the exact SOC of the Battery; it must estimate the SOC from the effective resistance, which is a function of applied voltage (from the Charger) and the measured current (from the Battery).  This is the same function as used in the Battery federate, but with noise added to the measurement of the current.
+The Charger federate estimates the Battery federate's current with a new helper function call `estimate_SOC`. The Charger does not know the exact SOC of the Battery; it must estimate the SOC from the effective resistance, which is a function of applied voltage (from the Charger) and the measured current (from the Battery). This is the same function as used in the Battery federate, but with noise added to the measurement of the current.
 
 ```
 def estimate_SOC(charging_V, charging_A):
@@ -95,7 +93,7 @@ def estimate_SOC(charging_V, charging_A):
     measured_A = charging_A + noise
     measured_R = charging_V / measured_A
     SOC_estimate = np.interp(measured_R, effective_R, socs)
-    
+
     return SOC_estimate
 ```
 
@@ -108,10 +106,10 @@ The estimated SOC is sent to the Controller every 15 minutes -- this mimics an o
 ```
 # Send message to Controller with SOC every 15 minutes
 if grantedtime % 900 == 0:
-    h.helicsEndpointSendBytesTo(endid[j], "",f'{currentsoc[j]:4f}'.encode())  
+    h.helicsEndpointSendBytesTo(endid[j], "",f'{currentsoc[j]:4f}'.encode())
 ```
 
-The Charger federate is allowed to be interrupted if there is a message from the Controller. 
+The Charger federate is allowed to be interrupted if there is a message from the Controller.
 
 ```
 # Check for messages from EV Controller
@@ -121,7 +119,7 @@ if h.helicsEndpointHasMessage(endid[j]):
     instructions = h.helicsMessageGetString(msg)
 ```
 
-The Charger will receive a message every 15 minutes as well, however it will only change actions if it is told to stop charging. When this happens, the Charger "disengages" from the charging port by applying zero voltage to the Battery. 
+The Charger will receive a message every 15 minutes as well, however it will only change actions if it is told to stop charging. When this happens, the Charger "disengages" from the charging port by applying zero voltage to the Battery.
 
 ```
 if int(instructions) == 0:
@@ -130,7 +128,6 @@ if int(instructions) == 0:
     logger.info(f'\tEV full; removing charging voltage')
 
 ```
- 
 
 #### Controller
 
@@ -145,7 +142,7 @@ The Controller is a new federate whose role is to decide whether to keep chargin
   ]
 ```
 
-Note that there is no default destination -- the Controller will *respond* to a request for instructions from the Charger. This is accomplished by calling the `h.helicsMessageGetOriginalSource()` API:
+Note that there is no default destination -- the Controller will _respond_ to a request for instructions from the Charger. This is accomplished by calling the `h.helicsMessageGetOriginalSource()` API:
 
 ```
 while h.helicsEndpointHasMessage(endid):
@@ -163,43 +160,42 @@ message = str(instructions)
 h.helicsEndpointSendBytesTo(endid, source, message.encode())
 ```
 
-The Controller federate only operates when it receives a message -- it is a *passive* federate. This can be set up by:
+The Controller federate only operates when it receives a message -- it is a _passive_ federate. This can be set up by:
 
 1. Initializing the start time of the federate to `h.HELICS_TIME_MAXTIME`:
 
-	```
-	    fake_max_time = int(h.HELICS_TIME_MAXTIME)
-	    starttime = fake_max_time
-	    logger.debug(f'Requesting initial time {starttime}')
-	    grantedtime = h.helicsFederateRequestTime (fed, starttime)
-	```
-	
+   ```
+       fake_max_time = int(h.HELICS_TIME_MAXTIME)
+       starttime = fake_max_time
+       logger.debug(f'Requesting initial time {starttime}')
+       grantedtime = h.helicsFederateRequestTime (fed, starttime)
+   ```
+
 2. Allow the federate to be interrupted and set a minimum `timedelta` (`ControllerConfig.json`):
 
-	```
-	{
-     "name": "Controller",
-     ...
-     "timedelta": 1,
-     "uninterruptible": false,
-     ...
+   ```
+   {
+    "name": "Controller",
+    ...
+    "timedelta": 1,
+    "uninterruptible": false,
+    ...
    }
-	```
+   ```
 
 3. Only execute an action when there is a message:
 
-	```
-	while h.helicsEndpointHasMessage(endid):
-	```
+   ```
+   while h.helicsEndpointHasMessage(endid):
+   ```
 
 4. Re-request the `h.HELICS_TIME_MAXTIME` after a message has been received:
 
-	```
-	grantedtime = h.helicsFederateRequestTime (fed, fake_max_time)
-	```
-	
+   ```
+   grantedtime = h.helicsFederateRequestTime (fed, fake_max_time)
+   ```
 
-The message the Controller receives is the SOC estimated by the Charger.  If the estimated SOC is greater than 95%, the Controller sends the message back to stop charging.
+The message the Controller receives is the SOC estimated by the Charger. If the estimated SOC is greater than 95%, the Controller sends the message back to stop charging.
 
 ```
 soc_full = 0.95
@@ -209,8 +205,6 @@ else:
     instructions = 0
 ```
 
-
-
 ### Co-simulation execution
 
 With these three federates -- Battery, Charger, and Controller -- we have partitioned the roles into the most logical places. Execution of this co-simulation is done as before with `helics_cli`:
@@ -218,7 +212,6 @@ With these three federates -- Battery, Charger, and Controller -- we have partit
 ```
 helics run --path=fundamental_combo_runner.json
 ```
-
 
 The resulting figures show the actual on board SOC at each EV charging port, the instantaneous power draw, and the SOC estimated by the on board charger.
 
@@ -228,15 +221,15 @@ The resulting figures show the actual on board SOC at each EV charging port, the
 
 Note that we have made a number of simplifying assumptions in this analysis:
 
-* There will always be an EV waiting to be charged (the charging ports are never idle).
-* There is a constant number of charging ports -- we know what the power draw will look like given a static number of ports, but we do not know the underlying demand for power from EVs.
-* The equipment which ferries the messages between the Charger and the Controller never fails -- we haven't incorporated [Filters](./fundamental_filters.md).
+- There will always be an EV waiting to be charged (the charging ports are never idle).
+- There is a constant number of charging ports -- we know what the power draw will look like given a static number of ports, but we do not know the underlying demand for power from EVs.
+- The equipment which ferries the messages between the Charger and the Controller never fails -- we haven't incorporated [Filters](./fundamental_filters.md).
 
-How would you model an unknown demand for vehicle charging? How would you model idle charging ports? What other simplifications do you see that can be addressed? 
+How would you model an unknown demand for vehicle charging? How would you model idle charging ports? What other simplifications do you see that can be addressed?
 
 ## [Questions and Help](../support.md)
 
-Do you have questions about HELICS or need help?  
+Do you have questions about HELICS or need help?
 
 1. Come to [office hours](mailto:helicsteam@helics.org)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!

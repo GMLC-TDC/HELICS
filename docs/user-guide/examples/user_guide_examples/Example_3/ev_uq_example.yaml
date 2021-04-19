@@ -32,4 +32,3 @@ study:
       run:
         cmd: rm $(MERLIN_INFO)/samples.csv
         depends: [start_parallel_sims_*]
-

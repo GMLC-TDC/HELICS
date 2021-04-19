@@ -1,14 +1,11 @@
 # Logging
 
+Logging in HELICS provides a way to understand the operation of a federate and is normally handled through an independent thread. The thread prints message to the console and or to a file as events within a federate occur. This section discusses how to use the log files to confirm the co-simulation executed properly and to debug when it doesn't.
 
-Logging in HELICS  provides a way to understand the operation of a federate and is normally handled through an independent thread. The thread prints message to the console and or to a file as events within a federate occur. This section discusses how to use the log files to confirm the co-simulation executed properly and to debug when it doesn't. 
-
-* [Log Levels](#log-levels)
-* [Setting up the Simulator for Logging](#setting-up-the-simulator-for-logging)
-* [Setting up the Federate for Logging](#setting-up-the-federate-for-logging)
-* [Setting up the Core/Broker for Logging](#setting-up-the-core-broker-for-logging)
-
-
+- [Log Levels](#log-levels)
+- [Setting up the Simulator for Logging](#setting-up-the-simulator-for-logging)
+- [Setting up the Federate for Logging](#setting-up-the-federate-for-logging)
+- [Setting up the Core/Broker for Logging](#setting-up-the-core-broker-for-logging)
 
 ## Log Levels
 
@@ -24,7 +21,7 @@ helics_log_level_interfaces = 4,
 helics_log_level_timing = 5,
 helics_log_level_data = 6,
 helics_log_level_trace = 7
-```    
+```
 
 - `helics_log_level_no_print` Don't log anything
 - `helics_log_level_error` Log error and faults from within HELICS
@@ -40,8 +37,6 @@ NOTE: these levels currently correspond to (-1 through 7) but this may change in
 
 `timing`, `data` and `trace` log levels can generate a large number of messages and should primarily be used for debugging. `trace` will produce a very large number of messages most of which deal with internal communications and is primarily for debugging timing in HELICS.
 
-
-
 Log lines will often look like
 
 ```text
@@ -55,8 +50,6 @@ commMessage||26516-enRPa-PzaBB-ZG190-lj14t:got new broker information
 ```
 
 which includes a name and internal id code for the federate followed by a time in parenthesis and the message. If it is a warning or error, there will be an indicator before the object name. Names for brokers or cores are often auto generated and look like `26516-enRPa-PzaBB-ZG190-lj14t` which is essentially a random string with a thread id in the front. In this case, the `commMessage` indicates it came from one of the communication modules.
-
-
 
 ## Setting up the Simulator for Logging
 
@@ -75,8 +68,7 @@ logger.setLevel(logging.DEBUG)
 
 Now we can use the `logger` to print different levels of detail about the co-simulation execution to log files. These files will be generated for each federate in the co-simulation and the broker with the naming convention "name assigned to federate/broker"`.log`.
 
-
-A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file. 
+A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file.
 
 ```
 logger.info('Only prints to log file if log_level = 2 or summary')
@@ -85,8 +77,6 @@ logger.error('Only prints to log file if log_level = 0 or error')
 logger.warning('Only prints to log file if log_level = 1 or warning')
 
 ```
-
-
 
 ## Setting up the Federate for Logging
 
@@ -113,8 +103,6 @@ Or with the API interface functions for each federate:
 ```python
 h.helicsFederateInfoSetIntegerProperty(fed,h.helics_property_int_log_level, 1)
 ```
-
-
 
 ## Setting up the Core/Broker for Logging
 
@@ -152,7 +140,7 @@ Within the `helics_cli` runner JSON:
 }
 ```
 
-A federate also can set a logging callback so log messages can be processed in whatever fashion is desired by a federate. 
+A federate also can set a logging callback so log messages can be processed in whatever fashion is desired by a federate.
 
 In C++ the method on a federate is:
 
@@ -171,9 +159,3 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 - loglevel an integer code describing the level of the message as described above.
 - identifier a string with the name of the object generating the message (may be empty)
 - message the actual message to log
-
-
-
-
-
-

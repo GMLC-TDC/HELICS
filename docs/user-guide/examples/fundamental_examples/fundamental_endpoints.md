@@ -4,15 +4,14 @@ The Federate Message + Communication Configuration Example extends the Base Exam
 
 This tutorial is organized as follows:
 
-* [Example files](#example-files)  
-* [Federate Communication with Endpoints](#federate-communication-with-endpoints)
-	* [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-	* [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
-		* [Config Files](#config-files)
-		* [Simulators](#simulators)
-	* [Co-simulation Execution](co-simulation-execution)
-* [Questions and Help](#questions-and-help)
-
+- [Example files](#example-files)
+- [Federate Communication with Endpoints](#federate-communication-with-endpoints)
+  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
+  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
+    - [Config Files](#config-files)
+    - [Simulators](#simulators)
+  - [Co-simulation Execution](co-simulation-execution)
+- [Questions and Help](#questions-and-help)
 
 ## Example files
 
@@ -22,9 +21,9 @@ All files necessary to run the Federate Integration Example can be found in the 
 
 The files include:
 
-* Python program and configuration JSON for Battery federate
-* Python program and configuration JSON for Charger federate
-* "runner" JSON to enable `helics_cli` execution of the co-simulation
+- Python program and configuration JSON for Battery federate
+- Python program and configuration JSON for Charger federate
+- "runner" JSON to enable `helics_cli` execution of the co-simulation
 
 ## Federate Communication with Endpoints
 
@@ -91,15 +90,13 @@ With this pub/sub configuration, we have established a **direct** communication 
 
 ![](../../../img/battery_sub.png)
 
+---
 
-------------------------------
-
-
-***If we accept that the information being passed between the two is not physics-based,*** then the communication link only depends on each federate having an endpoint:
+**_If we accept that the information being passed between the two is not physics-based,_** then the communication link only depends on each federate having an endpoint:
 
 ![](../../../img/ep_connection.png)
 
-In departure from the directly-coupled communication links of pub/subs, messages sent from **endpoints** can be intercepted, delayed, or picked up by any federate. In that sense, communication via pub/subs can be thought of as sealed letters sent via pneumatic tubes, and messages sent via endpoints as a return-address labeled letter sent into the USPS system. 
+In departure from the directly-coupled communication links of pub/subs, messages sent from **endpoints** can be intercepted, delayed, or picked up by any federate. In that sense, communication via pub/subs can be thought of as sealed letters sent via pneumatic tubes, and messages sent via endpoints as a return-address labeled letter sent into the USPS system.
 
 You might ask yourself: "How does HELICS know where to send the message?" There are ways to set this up as default. Before we dive into the code, it's important to understand the following about messages and endpoints:
 
@@ -108,8 +105,7 @@ You might ask yourself: "How does HELICS know where to send the message?" There 
 3. Endpoints should not be used to model physics
 4. Messages sent from endpoints are allowed to be corrupted (see [Filters](./fundamental_filters.md)!)
 5. Messages sent from endpoints do not show up on a HELICS `dependency_graph`
-	(A `dependency_graph` is a graph of dependencies in a federation. Because pub/subs have explicit connections, HELICS can establish when the information arrives through a `dependency_graph`. See [Queries](../../advanced_topics/queries.md) for more information.)
-
+   (A `dependency_graph` is a graph of dependencies in a federation. Because pub/subs have explicit connections, HELICS can establish when the information arrives through a `dependency_graph`. See [Queries](../../advanced_topics/queries.md) for more information.)
 
 ### Translation from pub/sub to endpoints
 
@@ -145,19 +141,19 @@ As with the Base Example, configuration can be done with JSON files. The first c
     ]
 ```
 
-If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have  `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../configuration_options_reference.html#period-0) that the `period` controls the minimum time resolution for a federate. 
+If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../configuration_options_reference.html#period-0) that the `period` controls the minimum time resolution for a federate.
 
 We have a federation sending messages at the same time (`"period": 60`), and HELICS doesn't know which message arrives first. We need to introduce an `offset` to the config file of one of the federates to force it to wait until the message has been received. We also need to keep `"uninterruptible": false`, so that the federate will be granted the time at which it has received a message (which will be `"period": 60`).
 
 The order of operation is:
 
-| Step   |    HELICS Time  |  Charger |  Battery  | 
-|--------|:---------------|:------|:-------------|
-| 1 	  |  0  | requests time = 60, granted time = 60 |  requests time = 70  |  
-| 2 	  |  60  | sends message to default destination `"Battery/EV1_current"` |  granted time = 60 because message has arrived |  
-| 3 	  |  60  |     | sends message to default destination `"Charger/EV1_voltage"` |  
+| Step | HELICS Time | Charger                                                      | Battery                                                      |
+| ---- | :---------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| 1    | 0           | requests time = 60, granted time = 60                        | requests time = 70                                           |
+| 2    | 60          | sends message to default destination `"Battery/EV1_current"` | granted time = 60 because message has arrived                |
+| 3    | 60          |                                                              | sends message to default destination `"Charger/EV1_voltage"` |
 
-Introducing the `offset` into the config file (along with `"uninterruptible": false`)  instructs HELICS about the dependencies. These adjustments are:
+Introducing the `offset` into the config file (along with `"uninterruptible": false`) instructs HELICS about the dependencies. These adjustments are:
 
 `BatteryConfig.json`:
 
@@ -187,7 +183,6 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
 ```
 
 Notice that we have only introduced an `offset` into the Battery config file, as we have set up the federates such that the Battery is waiting for information from the Charger.
-
 
 #### Simulators
 
@@ -249,7 +244,7 @@ An alternative to using `h.helicsMessageGetOriginalSource(msg)` is to set a defa
 The `Battery.py` simulator takes the `charging_voltage` from the `Charger.py` simulator and calculates the `charging_current` to send back. Sending messages to a default `destination` is then done with:
 
 ```
-            h.helicsEndpointSendBytesTo(endid[j], "",str(charging_current))  
+            h.helicsEndpointSendBytesTo(endid[j], "",str(charging_current))
 ```
 
 Where the `""` can also be replaced with a string for the desired destination -- we can check `""` against `source` to confirm the messages are going to their intended destinations.
@@ -324,7 +319,7 @@ Armed now with the knowledge of endpoints and messages, how could you change the
 
 ## [Questions and Help](../support.md)
 
-Do you have questions about HELICS or need help?  
+Do you have questions about HELICS or need help?
 
 1. Come to [office hours](mailto:helicsteam@helics.org)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!

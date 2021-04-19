@@ -1,58 +1,35 @@
 # Multi-Input
 
-
 ![placeholder](../../../img/user_guide_combinations_advanced.png)
-
 
 This demonstrates the use of federation queries and performs dynamic configuration by using the information from the query to configure the Battery federate.
 
-* [Where is the code?](#where-is-the-code)
-* [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-	* [Differences Compared to the Fundamental Examples](#differences-compared-to-the-advanced-default-example)
-		* [HELICS Differences](#helics-differences)
-	* [HELICS Components](#helics-components)
-* [Execution and Results](#execution-and-results)
-
-
-	
-	
-	
+- [Where is the code?](#where-is-the-code)
+- [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
+  - [Differences Compared to the Fundamental Examples](#differences-compared-to-the-advanced-default-example)
+    - [HELICS Differences](#helics-differences)
+  - [HELICS Components](#helics-components)
+- [Execution and Results](#execution-and-results)
 
 ## Where is the code?
 
 This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
-
 [![](../../../img/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
-
-
-
-
-
-
 
 ## What is this co-simulation doing?
 
 This example shows how to use inputs, allowing multiple publications to arrive at the same input handle (similar to a subscription, as you'll see) and a demonstration on one method of managing data conflicts that can arise.
 
-
-
-
-
 ### Difference compared to the Advanced Default example
 
-This example deviates fairly significantly from the  [Advanced Default example](./advanced_default.md) in that it only has a Battery and Charger federate. The Charger federate was modeled with one charging terminal that branches out to the five Battery terminals. That is, from the Charger federates perspective, there is only one charging voltage and one charging current even though the federation is still constructed to charge five batteries. 
-
+This example deviates fairly significantly from the [Advanced Default example](./advanced_default.md) in that it only has a Battery and Charger federate. The Charger federate was modeled with one charging terminal that branches out to the five Battery terminals. That is, from the Charger federates perspective, there is only one charging voltage and one charging current even though the federation is still constructed to charge five batteries.
 
 ![](../../../img/advanced_multi_input_differences.png)
 
 The difference in the model is entirely implied by the HELICS configuration; the physics of the system is modeled through the configuration and this is one valid interpretation.
 
-
 Additionally, since the protocol (to use the term loosely) in the Advanced Default example for a Battery indicating it was fully charged and the Charger confirming was the removal of the charging voltage, this simple protocol won't work as written when using multi-inputs. Rather than implementing a more sophisticated protocol and to keep the code simple, we decided to just charge one battery at each terminal over the duration of the simulation. Also, due to the removal of the protocol, there is no need of the Controller federate to determine when to stop charging the battery as the batteries self-terminate their charging.
-
-
-
 
 #### HELICS differences
 
@@ -82,7 +59,7 @@ With a single charger being used to charge five batteries, each battery still pu
       "unit":"A",
       "global": true
     },
-	...
+    ...
   ],
   "subscriptions":[
     {
@@ -106,18 +83,18 @@ The Charger federate configuration is also altered, using an `input` rather than
   "period": 60,
   "uninterruptible": false,
   "terminate_on_error": true,
-  "publications":[
+  "publications": [
     {
-      "key":"Charger/EV_voltage",
-      "type":"double",
-      "unit":"V",
+      "key": "Charger/EV_voltage",
+      "type": "double",
+      "unit": "V",
       "global": true
     }
   ],
-  "inputs":[
+  "inputs": [
     {
-      "key":"Battery/charging_current",
-      "type":"double",
+      "key": "Battery/charging_current",
+      "type": "double",
       "global": true,
       "multi_input_handling_method": "sum",
       "targets": [
@@ -125,18 +102,16 @@ The Charger federate configuration is also altered, using an `input` rather than
         "Battery/EV2_current",
         "Battery/EV3_current",
         "Battery/EV4_current",
-        "Battery/EV5_current"]
+        "Battery/EV5_current"
+      ]
     }
   ]
 }
 ```
 
-
 ### HELICS Components
 
 `Battery.py` and `Charger.py` have both been simplified such that only battery per charging terminal is charged over the duration of the simulation. When the battery reaches full SOC, it self-terminates charging.
-
-
 
 ## Execution and Results
 
@@ -147,6 +122,5 @@ Run the co-simulation:
 The primary result of interest is still the cumulative charging power.
 
 ![placeholder](../../../img/advanced_multi_input_power.png)
-
 
 As the batteries are not replaced during charging, the initial charging power will be the peak power. The points in time when a battery reaches full charge, though, can be clearly seen as the discrete changes in cumulative charging power.

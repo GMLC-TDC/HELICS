@@ -1,8 +1,5 @@
 # Base Example Co-Simulation
 
-
-
-
 The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation.
 
 ![](../../../img/default_setup.png)
@@ -11,15 +8,12 @@ The base example described here will go into detail about the necessary componen
 
 The Base Example tutorial is organized as follows:
 
-
-* [Example files](#example-files)  
-* [Default Setup](#default-setup)
-	* [Messages + Communication: pub sub](#messages-communication-pub-sub)
-	* [Simulator Integration: External JSON](#simulator-integration-external-json)
-	* [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics-cli)
-* [Questions and Help](#questions-and-help)
-
-
+- [Example files](#example-files)
+- [Default Setup](#default-setup)
+  - [Messages + Communication: pub sub](#messages-communication-pub-sub)
+  - [Simulator Integration: External JSON](#simulator-integration-external-json)
+  - [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics-cli)
+- [Questions and Help](#questions-and-help)
 
 ## Example files
 
@@ -29,9 +23,9 @@ All files necessary to run the Base Example can be found in the [Fundamental exa
 
 The files include:
 
-* Python program and configuration JSON for Battery federate
-* Python program and configuration JSON for Charger federate
-* "runner" JSON to enable `helics_cli` execution of the co-simulation
+- Python program and configuration JSON for Battery federate
+- Python program and configuration JSON for Charger federate
+- "runner" JSON to enable `helics_cli` execution of the co-simulation
 
 ## Default Setup
 
@@ -41,7 +35,7 @@ The default setup, used in the Base Example, integrates the federate configurati
 
 In the Base Example, the information being passed between the `Battery.py` federate and the `Charger.py` federate is the **voltage** applied to the battery, and the **current** measured across the battery and fed back to the charger. Voltage and current are both physical quantities, meaning that unless we act on these quantities to change them, they will retain their values. For this reason, in HELICS, physical quantities are called **values**. Values are sent via publication and subscription -- a federate can publish its value(s), and another federate can subscribe this value(s).
 
-When configuring the communication passage between federates, it is important to connect the federate to the correct **handle**. In the image below, we have a Battery federate and a Charger federate. Each federate has a **publication** handle  (red) and a **subscription** handle (yellow). The publication handle is also called the **output**, and the subscription handle the **input**. How are values passed between federates with pubs and subs?
+When configuring the communication passage between federates, it is important to connect the federate to the correct **handle**. In the image below, we have a Battery federate and a Charger federate. Each federate has a **publication** handle (red) and a **subscription** handle (yellow). The publication handle is also called the **output**, and the subscription handle the **input**. How are values passed between federates with pubs and subs?
 
 ![](../../../img/handles.png)
 
@@ -49,7 +43,7 @@ We have **named** the publication handle for the `Battery` federate `EV_current`
 
 ![](../../../img/battery_pub.png)
 
-How does the current value get from the Battery federate's publication to the Charger federate? The Charger must subscribe to this publication handle -- the Charger will subscribe to `Battery/EV_current`. The Charger subscription handle has not been given a name (e.g., `Charger/EV_current`), but it will receive **input** -- the Charger subscription is a defined unnamed input with a targeted publication. In this example, we configure the target of the Charger subscription in the JSON to  the publication handle name `Battery/EV_current`.
+How does the current value get from the Battery federate's publication to the Charger federate? The Charger must subscribe to this publication handle -- the Charger will subscribe to `Battery/EV_current`. The Charger subscription handle has not been given a name (e.g., `Charger/EV_current`), but it will receive **input** -- the Charger subscription is a defined unnamed input with a targeted publication. In this example, we configure the target of the Charger subscription in the JSON to the publication handle name `Battery/EV_current`.
 
 ![](../../../img/charger_sub.png)
 
@@ -59,15 +53,13 @@ Thus far we have established that the Battery is publishing its current from the
 
 In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery will have an unnamed input subscription which targets the `Charger/EV_voltage` handle.
 
-![](../../../img/battery_sub.png) 
+![](../../../img/battery_sub.png)
 
 With a better understanding of how we want to configure the pubs and subs, we can now move on to the mechanics of integrating the two simulators.
 
-
-
 ### Simulator Integration: External JSON
 
-Configuration of federates may be done with JSON files. Each federate will have its own configuration ("config") file. It's good practice to mirror the name of the federate with the config file. For example, the `Battery.py` federate will have a config file named `BatteryConfig.json`. 
+Configuration of federates may be done with JSON files. Each federate will have its own configuration ("config") file. It's good practice to mirror the name of the federate with the config file. For example, the `Battery.py` federate will have a config file named `BatteryConfig.json`.
 
 There are [extensive ways](../../configuration_options_reference.html) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
 
@@ -114,6 +106,7 @@ This federate is configured with pubs and subs, so it will need an option to ind
 This pub and sub configuration is telling us that the `Battery.py` federate is publishing in units of amps (`A`) for current from the named handle (`key`) `Battery/EV1_current`. This federate is also subscribing to information from the `Charger.py` federate. It has subscribed to a value in units of volts (`V`) at the named handle (`key`) `Charger/EV1_voltage`.
 
 As discussed in [Register and Configure Federates](#register-and-configure-federates), the federate registration and configuration with JSON files in the python federate is done with one line of code:
+
 ```
 fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 ```
@@ -122,10 +115,6 @@ Recall that federate registration and configuration is typically done **before**
 
 <!-- **outstanding allison question:**
 (can you create a new configuration after entering execution mode?) -->
-
-
-
-
 
 ### Co-simulation Execution: `helics_cli`
 
@@ -162,7 +151,7 @@ The runner JSON for the Base Example is called `fundamental_default_runner.json`
   ],
   "name": "fundamental_default"
 }
-``` 
+```
 
 This runner tells `helics_broker` that there are three federates and to take a specific action for each federate:
 
@@ -185,9 +174,8 @@ We can see the state of charge of each battery over the duration of the co-simul
 
 ## [Questions and Help](../support.md)
 
-Do you have questions about HELICS or need help?  
+Do you have questions about HELICS or need help?
 
 1. Come to [office hours](mailto:helicsteam@helics.org)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!
-

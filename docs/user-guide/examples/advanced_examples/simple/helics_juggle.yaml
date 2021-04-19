@@ -1,12 +1,11 @@
 description:
-    name: Test helics 
-    description: Juggle helics data
+  name: Test helics
+  description: Juggle helics data
 
 env:
   variables:
     OUTPUT_PATH: ./helics_juggle_output
     N_SAMPLES: 8
-
 
 merlin:
   samples:
@@ -18,18 +17,16 @@ merlin:
     file: samples.csv
     column_labels: [FED]
 
-
 study:
-    - name: start_federates
-      description: say Hello 
-      run:
-        cmd: |
-          spack load helics
-          /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
-          echo "DONE"
-    - name: cleanup
-      description: Clean up
-      run:
-        cmd: rm $(SPECROOT)/samples.csv
-        depends: [start_federates_*]
-
+  - name: start_federates
+    description: say Hello
+    run:
+      cmd: |
+        spack load helics
+        /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
+        echo "DONE"
+  - name: cleanup
+    description: Clean up
+    run:
+      cmd: rm $(SPECROOT)/samples.csv
+      depends: [start_federates_*]

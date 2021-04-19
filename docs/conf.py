@@ -179,7 +179,7 @@ html_sidebars = {
 
 
 # Adding last updated timestamp at the bottom of every page
-html_last_updated_fmt = '' # Empty string = '%b %d, %Y'
+html_last_updated_fmt = ""  # Empty string = '%b %d, %Y'
 
 
 # -- Options for HTMLHelp output ------------------------------------------
