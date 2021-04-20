@@ -46,37 +46,37 @@
     {
       "key": "IEEE_123_feeder_0/totalLoad",
       "type": "complex",
-      "connection_required": true
+      "required": true
     },
     {
       "key": "IEEE_123_feeder_0/charge_EV6",
       "type": "complex",
-      "connection_required": true
+      "required": true
     },
     {
       "key": "IEEE_123_feeder_0/charge_EV5",
       "type": "complex",
-      "connection_required": true
+      "required": true
     },
     {
       "key": "IEEE_123_feeder_0/charge_EV4",
       "type": "complex",
-      "connection_required": true
+      "required": true
     },
     {
       "key": "IEEE_123_feeder_0/charge_EV3",
       "type": "complex",
-      "connection_required": true
+      "required": true
     },
     {
       "key": "IEEE_123_feeder_0/charge_EV2",
       "type": "complex",
-      "connection_required": true
+      "required": true
     },
     {
       "key": "IEEE_123_feeder_0/charge_EV1",
       "type": "complex",
-      "connection_required": true
+      "required": true
     }
   ]
 }

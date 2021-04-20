@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # HELICS documentation build configuration file, created by
@@ -110,7 +110,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "HELICS"
-copyright = "Copyright (c) 2017-2020,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n"
+copyright = "2017-2020 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
 author = "Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -176,6 +176,11 @@ html_sidebars = {
         "donate.html",
     ]
 }
+
+
+# Adding last updated timestamp at the bottom of every page
+html_last_updated_fmt = ""  # Empty string = '%b %d, %Y'
+
 
 # -- Options for HTMLHelp output ------------------------------------------
 

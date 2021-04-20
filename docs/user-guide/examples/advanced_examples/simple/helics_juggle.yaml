@@ -1,0 +1,32 @@
+description:
+  name: Test helics
+  description: Juggle helics data
+
+env:
+  variables:
+    OUTPUT_PATH: ./helics_juggle_output
+    N_SAMPLES: 8
+
+merlin:
+  samples:
+    generate:
+      cmd: |
+        python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
+        cp $(SPECROOT)/pireceiver.py $(MERLIN_INFO)
+        cp $(SPECROOT)/pisender.py $(MERLIN_INFO)
+    file: samples.csv
+    column_labels: [FED]
+
+study:
+  - name: start_federates
+    description: say Hello
+    run:
+      cmd: |
+        spack load helics
+        /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
+        echo "DONE"
+  - name: cleanup
+    description: Clean up
+    run:
+      cmd: rm $(SPECROOT)/samples.csv
+      depends: [start_federates_*]

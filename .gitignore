@@ -5,7 +5,7 @@
 build
 build*/
 install*/
-!docs/installation/
+!docs/user-guide/installation/
 .vscode/
 bin/
 docs/html
@@ -255,3 +255,4 @@ tags
 ### MATLAB ###
 *.mex*
 .DS_Store
+HELICS_xcode

@@ -8,10 +8,8 @@ Co-simulation is a powerful analysis technique that allows simulators of differe
 
     orientation
     installation/index
-    fundamental_topics
-    advanced_topics
-    configuration_options_reference
-    examples/index
+    helics_user_tutorial
+    examples/examples_index
     support
 
 ```
