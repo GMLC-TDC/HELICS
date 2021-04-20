@@ -220,7 +220,7 @@ class CommonCore: public Core, public BrokerBase {
 
     virtual std::string query(const std::string& target,
                               const std::string& queryStr,
-                              helics_query_mode mode) override;
+                              helics_sequencing_mode mode) override;
     virtual void
         setQueryCallback(local_federate_id federateID,
                          std::function<std::string(const std::string&)> queryFunction) override;

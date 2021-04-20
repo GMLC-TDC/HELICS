@@ -215,7 +215,7 @@ const std::string& BrokerApp::getAddress() const
 }
 /** make a query at the broker*/
 std::string
-    BrokerApp::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
+    BrokerApp::query(const std::string& target, const std::string& queryStr, helics_sequencing_mode mode)
 {
     return (broker) ? broker->query(target, queryStr, mode) : std::string("#error");
 }

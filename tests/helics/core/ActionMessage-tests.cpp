@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-TEST(ActionMessage_tests, action_test_to_string_conversion)
+TEST(ActionMessage, action_test_to_string_conversion)
 {
     helics::ActionMessage m(CMD_IGNORE);
     /*
@@ -33,7 +33,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion)
     m.source_id = global_federate_id{232324};
     m.dest_id = global_federate_id{22552215};
     m.dest_handle = interface_handle{2322342};
-
+    m.sequenceID = 987;
     std::string data;
     m.to_string(data);
 
@@ -46,9 +46,10 @@ TEST(ActionMessage_tests, action_test_to_string_conversion)
     EXPECT_EQ(m.dest_handle, fr.dest_handle);
     EXPECT_EQ(m.dest_id, fr.dest_id);
     EXPECT_TRUE(m.actionTime == fr.actionTime);
+    EXPECT_TRUE(m.sequenceID == fr.sequenceID);
 }
 
-TEST(ActionMessage_tests, action_test_to_string_conversion_info)
+TEST(ActionMessage, action_test_to_string_conversion_info)
 {
     helics::ActionMessage m(CMD_REG_INPUT);
     /*
@@ -68,6 +69,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     m.source_id = global_federate_id(232324);
     m.dest_id = global_federate_id(22552215);
     m.dest_handle = interface_handle(2322342);
+    m.sequenceID = 987;
 
     m.setString(sourceStringLoc, "this is a long source string to test");
     m.setString(origSourceStringLoc, "this is a longer alternate source string to test");
@@ -85,11 +87,11 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     EXPECT_EQ(m.dest_handle, fr.dest_handle);
     EXPECT_EQ(m.dest_id, fr.dest_id);
     EXPECT_TRUE(m.actionTime == fr.actionTime);
-
+    EXPECT_EQ(m.sequenceID,fr.sequenceID);
     EXPECT_TRUE(m.getStringData() == fr.getStringData());
 }
 
-TEST(ActionMessage_tests, action_test_to_string_time_request)
+TEST(ActionMessage, action_test_to_string_time_request)
 {
     helics::ActionMessage m(CMD_TIME_REQUEST);
     /*
@@ -134,7 +136,7 @@ TEST(ActionMessage_tests, action_test_to_string_time_request)
     EXPECT_TRUE(m.Tdemin == fr.Tdemin);
 }
 
-TEST(ActionMessage_tests, constructor_test)
+TEST(ActionMessage, constructor_test)
 {
     // Default constructor
     helics::ActionMessage cmd;
@@ -145,6 +147,7 @@ TEST(ActionMessage_tests, constructor_test)
     EXPECT_TRUE(!cmd.dest_handle.isValid());
     EXPECT_EQ(cmd.counter, 0);
     EXPECT_EQ(cmd.flags, 0);
+    EXPECT_EQ(cmd.sequenceID, 0U);
     EXPECT_EQ(cmd.actionTime, helics::Time::zeroVal());
     EXPECT_TRUE(cmd.payload.empty());
 
@@ -158,7 +161,7 @@ TEST(ActionMessage_tests, constructor_test)
     EXPECT_TRUE(cmd2.action() == helics::CMD_INIT);
 }
 
-TEST(ActionMessage_tests, copy_constructor_test)
+TEST(ActionMessage, copy_constructor_test)
 {
     helics::ActionMessage cmd(helics::CMD_INIT);
     cmd.source_id = global_federate_id{1};
@@ -168,7 +171,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal();
     cmd.payload = "hello world";
-
+    cmd.sequenceID = 876;
     cmd.Te = helics::Time::maxVal();
     cmd.Tdemin = helics::Time::minVal();
     cmd.setStringData("target", "source", "original_source");
@@ -181,6 +184,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     EXPECT_EQ(cmd_copy.dest_id.baseValue(), 3);
     EXPECT_EQ(cmd_copy.dest_handle.baseValue(), 4);
     EXPECT_EQ(cmd_copy.flags, 0x1a2F);
+    EXPECT_EQ(cmd_copy.sequenceID, 876U);
     EXPECT_EQ(cmd_copy.actionTime, helics::Time::maxVal());
     EXPECT_EQ(cmd_copy.payload, "hello world");
     EXPECT_EQ(cmd_copy.name, "hello world");  // aliased to payload
@@ -192,13 +196,14 @@ TEST(ActionMessage_tests, copy_constructor_test)
     EXPECT_EQ(cmd_copy.getString(origSourceStringLoc), "original_source");
 }
 
-TEST(ActionMessage_tests, assignment_test)
+TEST(ActionMessage, assignment_test)
 {
     helics::ActionMessage cmd(helics::CMD_INIT);
     cmd.source_id = global_federate_id(1);
     cmd.source_handle = interface_handle(2);
     cmd.dest_id = global_federate_id(3);
     cmd.dest_handle = interface_handle(4);
+    cmd.sequenceID = 876U;
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
     setActionFlag(cmd, error_flag);
@@ -222,6 +227,7 @@ TEST(ActionMessage_tests, assignment_test)
     EXPECT_EQ(cmd_assign.actionTime, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.payload, "hello world");
     EXPECT_EQ(cmd_assign.name, "hello world");  // aliased to payload
+    EXPECT_EQ(cmd_assign.sequenceID, 876U);
 
     EXPECT_EQ(cmd_assign.Te, helics::Time::maxVal());
     EXPECT_EQ(cmd_assign.Tdemin, helics::Time::minVal());
@@ -231,7 +237,7 @@ TEST(ActionMessage_tests, assignment_test)
     EXPECT_EQ(cmd_assign.getString(origDestStringLoc), "original_dest");
 }
 
-TEST(ActionMessage_tests, comparison_test)
+TEST(ActionMessage, comparison_test)
 {
     helics::ActionMessage cmd1(helics::CMD_INIT);
     cmd1.actionTime = helics::Time::minVal();
@@ -261,13 +267,14 @@ TEST(ActionMessage_tests, comparison_test)
     }
 }
 
-TEST(ActionMessage_tests, conversion_test)
+TEST(ActionMessage, conversion_test)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id(1);
     cmd.source_handle = interface_handle(2);
     cmd.dest_id = global_federate_id(3);
     cmd.dest_handle = interface_handle(4);
+    cmd.messageID = 762354;
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
     setActionFlag(cmd, error_flag);
@@ -287,6 +294,7 @@ TEST(ActionMessage_tests, conversion_test)
     EXPECT_EQ(cmd.dest_handle, cmd2.dest_handle);
     EXPECT_EQ(cmd.payload, cmd2.payload);
     EXPECT_EQ(cmd.flags, cmd2.flags);
+    EXPECT_EQ(cmd.messageID, 762354);
     EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
 }
 
