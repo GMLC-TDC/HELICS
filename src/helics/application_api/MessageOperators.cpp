@@ -29,12 +29,12 @@ void MessageTimeOperator::setTimeFunction(std::function<Time(Time)> userTimeFunc
     TimeFunction = std::move(userTimeFunction);
 }
 
-MessageDataOperator::MessageDataOperator(std::function<void(data_block &)> userDataFunction):
+MessageDataOperator::MessageDataOperator(std::function<void(data_block&)> userDataFunction):
     dataFunction(std::move(userDataFunction))
 {
 }
 
-void MessageDataOperator::setDataFunction(std::function<void(data_block &)> userDataFunction)
+void MessageDataOperator::setDataFunction(std::function<void(data_block&)> userDataFunction)
 {
     dataFunction = std::move(userDataFunction);
 }

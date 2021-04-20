@@ -65,7 +65,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 #### ZeroMQ related Options
 
 - `HELICS_USE_SYSTEM_ZEROMQ_ONLY`: \[Default=OFF\] Only find Zeromq through the system libraries, never attempt a local build.
-- `HELICS_USE_ZMQ_STATIC_LIBRARY`: \[Default=OFF\] Build and link Zeromq using a static library. (NOTE: This has licensing implications if the resulting binary is distributed)
+- `HELICS_USE_ZMQ_STATIC_LIBRARY`: \[Default=OFF (unless only libzmq-static found)\] Build and link Zeromq using a static library. (NOTE: This has licensing implications if the resulting binary is distributed)
 - `HELICS_ZMQ_SUBPROJECT`: \[Default=ON (MSVC) OFF(otherwise)\] Allow ZeroMQ to be built as a subproject if a system library is not found
 - `HELICS_ZMQ_FORCE_SUBPROJECT`: \[Default=OFF\] Force ZMQ to be built and linked as a subproject.
 - `ZeroMQ_INSTALL_PATH`: Can be used to specify a path to ZeroMQ for inclusion.

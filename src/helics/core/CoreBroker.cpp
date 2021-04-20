@@ -2425,7 +2425,7 @@ std::string CoreBroker::query(const std::string& target,
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
         ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -2441,7 +2441,7 @@ std::string CoreBroker::query(const std::string& target,
             return "#na";
         }
         ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
@@ -2453,7 +2453,7 @@ std::string CoreBroker::query(const std::string& target,
     }
     if ((target == "root") || (target == "rootbroker")) {
         ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;

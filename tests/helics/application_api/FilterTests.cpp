@@ -716,20 +716,17 @@ TEST_F(filter_tests, many_filters)
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
     AddFederates<helics::MessageFederate>("test_2", 18, broker, 1.0, "filter");
-    
 
     auto send = GetFederateAs<helics::MessageFederate>(0);
     auto rec = GetFederateAs<helics::MessageFederate>(1);
-
 
     auto& p1 = send->registerGlobalEndpoint("send");
     auto& p2 = rec->registerGlobalEndpoint("rec");
     p1.setDefaultDestination("rec");
 
     std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
-    for (int ii = 0; ii < 18; ++ii)
-    {
-        auto filt = GetFederateAs<helics::MessageFederate>(2+ii);
+    for (int ii = 0; ii < 18; ++ii) {
+        auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
         auto& f1 = filt->registerFilter("f1");
         auto op = std::make_shared<helics::MessageDataOperator>();
         op->setDataFunction([ii](helics::data_block& db) { db.push_back('a' + ii); });
@@ -737,7 +734,6 @@ TEST_F(filter_tests, many_filters)
         f1.addSourceTarget("send");
         filterFeds.push_back(std::move(filt));
     }
-    
 
     auto act1 = [&p1, &send]() {
         send->enterExecutingMode();
@@ -749,7 +745,7 @@ TEST_F(filter_tests, many_filters)
         send->finalize();
     };
     int cntb{0};
-    auto act2 = [&rec, &cntb,&p2]() {
+    auto act2 = [&rec, &cntb, &p2]() {
         rec->enterExecutingMode();
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {
@@ -766,18 +762,17 @@ TEST_F(filter_tests, many_filters)
     auto t1 = std::thread(act1);
     auto t2 = std::thread(act2);
 
-    for (auto &ffed:filterFeds)
-    {
-        ffed -> enterExecutingModeAsync();
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeAsync();
     }
     for (auto& ffed : filterFeds) {
         ffed->enterExecutingModeComplete();
         ffed->requestTimeAsync(50);
     }
-    
+
     helics::Time tr = helics::timeZero;
     helics::Time ptr = helics::timeZero;
-    
+
     t1.join();
     t2.join();
     EXPECT_EQ(p2.pendingMessages(), 0U);
@@ -865,7 +860,6 @@ TEST_F(filter_tests, many_filters_multi)
         ffed->finalize();
     }
 }
-
 
 TEST_F(filter_tests, reroute_separate2)
 {
@@ -1349,8 +1343,7 @@ TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
         send->enterExecutingMode();
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {
-            for (int kk = 0; kk < 100;++kk)
-            {
+            for (int kk = 0; kk < 100; ++kk) {
                 s1.send("this is a message1");
 
                 s2.send("this is a message2");
@@ -1415,7 +1408,7 @@ TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
     for (auto& mc : mcount) {
         totalMessageCount += mc;
         EXPECT_TRUE(mc == 500 || mc == 0) << "incorrect # of messages in interval [" << index
-                                        << "], (" << mc << ") messages instead of 50 ";
+                                          << "], (" << mc << ") messages instead of 50 ";
         ++index;
     }
     EXPECT_EQ(totalMessageCount, 5000);
