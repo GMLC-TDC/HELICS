@@ -2215,7 +2215,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
 
 std::string CommonCore::query(const std::string& target,
                               const std::string& queryStr,
-                              helics_query_mode mode)
+                              helics_sequencing_mode mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -2226,7 +2226,7 @@ std::string CommonCore::query(const std::string& target,
         }
         return "#disconnected";
     }
-    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
+    ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = direct_core_id;
     querycmd.dest_id = parent_broker_id;
     querycmd.payload = queryStr;
@@ -2242,8 +2242,8 @@ std::string CommonCore::query(const std::string& target,
         if (queryStr == "address") {
             return getAddress();
         }
-        querycmd.setAction(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
-                                                            CMD_BROKER_QUERY_ORDERED);
+        querycmd.setAction(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
+                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
     if (querycmd.dest_id != direct_core_id) {
@@ -2252,7 +2252,7 @@ std::string CommonCore::query(const std::string& target,
             (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
         if (fed != nullptr) {
             querycmd.dest_id = fed->global_id;
-            if (mode != helics_query_mode_ordered) {
+            if (mode != helics_sequencing_mode_ordered) {
                 std::string ret = federateQuery(fed, queryStr, false);
                 if (ret != "#wait") {
                     return ret;
@@ -2272,7 +2272,9 @@ std::string CommonCore::query(const std::string& target,
                         }
                         case std::future_status::timeout: {  // federate query may need to wait or
                                                              // can get the result now
-                            ret = federateQuery(fed, queryStr, mode == helics_query_mode_ordered);
+                            ret = federateQuery(fed,
+                                                queryStr,
+                                                mode == helics_sequencing_mode_ordered);
                             if (ret != "#wait") {
                                 activeQueries.finishedWithValue(index);
                                 return ret;
@@ -3783,10 +3785,15 @@ bool CommonCore::waitCoreRegistration()
 void CommonCore::manageTimeBlocks(const ActionMessage& command)
 {
     if (command.action() == CMD_TIME_BLOCK) {
+        bool found{false};
         for (auto& tb : timeBlocks) {
             if (command.source_id == tb.first) {
                 ++tb.second;
+                found = true;
             }
+        }
+        if (!found) {
+            timeBlocks.emplace_back(command.source_id, 1);
         }
     } else if (command.action() == CMD_TIME_UNBLOCK) {
         for (auto& tb : timeBlocks) {

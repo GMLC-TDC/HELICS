@@ -208,8 +208,9 @@ const std::string& CoreApp::getAddress() const
 }
 
 /** make a query at the core*/
-std::string
-    CoreApp::query(const std::string& target, const std::string& queryStr, helics_query_mode mode)
+std::string CoreApp::query(const std::string& target,
+                           const std::string& queryStr,
+                           helics_sequencing_mode mode)
 {
     return (core) ? core->query(target, queryStr, mode) : std::string("#error");
 }

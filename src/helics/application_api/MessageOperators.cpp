@@ -29,12 +29,12 @@ void MessageTimeOperator::setTimeFunction(std::function<Time(Time)> userTimeFunc
     TimeFunction = std::move(userTimeFunction);
 }
 
-MessageDataOperator::MessageDataOperator(std::function<data_view(data_view)> userDataFunction):
+MessageDataOperator::MessageDataOperator(std::function<void(data_block&)> userDataFunction):
     dataFunction(std::move(userDataFunction))
 {
 }
 
-void MessageDataOperator::setDataFunction(std::function<data_view(data_view)> userDataFunction)
+void MessageDataOperator::setDataFunction(std::function<void(data_block&)> userDataFunction)
 {
     dataFunction = std::move(userDataFunction);
 }
@@ -42,8 +42,7 @@ void MessageDataOperator::setDataFunction(std::function<data_view(data_view)> us
 std::unique_ptr<Message> MessageDataOperator::process(std::unique_ptr<Message> message)
 {
     if (dataFunction) {
-        auto dv = dataFunction(data_view(message->data));
-        message->data = dv.to_data_block();
+        dataFunction(message->data);
     }
     return message;
 }

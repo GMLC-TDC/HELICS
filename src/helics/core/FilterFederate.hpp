@@ -139,6 +139,10 @@ class FilterFederate {
     void runCloningDestinationFilters(const FilterCoordinator* filt,
                                       const BasicHandleInfo* handle,
                                       const ActionMessage& command) const;
+
+    std::pair<ActionMessage&, bool> executeFilter(ActionMessage& command, FilterInfo* filt);
+    void generateProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime);
+    void acceptProcessReturn(global_federate_id fid, uint32_t pid);
     void addTimeReturn(int32_t id, Time TimeVal);
     void clearTimeReturn(int32_t id);
 };

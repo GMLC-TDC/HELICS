@@ -318,7 +318,7 @@ class HELICS_CXX_EXPORT Federate {
     */
     std::string query(const std::string& target,
                       const std::string& queryStr,
-                      helics_query_mode mode = helics_query_mode_fast);
+                      helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -332,7 +332,8 @@ class HELICS_CXX_EXPORT Federate {
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& queryStr, helics_query_mode mode = helics_query_mode_fast);
+    std::string query(const std::string& queryStr,
+                      helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending
@@ -347,7 +348,7 @@ class HELICS_CXX_EXPORT Federate {
     */
     query_id_t queryAsync(const std::string& target,
                           const std::string& queryStr,
-                          helics_query_mode mode = helics_query_mode_fast);
+                          helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending
@@ -357,7 +358,7 @@ class HELICS_CXX_EXPORT Federate {
     @return a query_id_t used to get the results of the query in the future
     */
     query_id_t queryAsync(const std::string& queryStr,
-                          helics_query_mode mode = helics_query_mode_fast);
+                          helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** get the results of an async query
     @details the call will block until the results are returned inquiry of queryCompleted() to check
