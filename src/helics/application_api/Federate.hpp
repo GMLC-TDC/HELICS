@@ -332,7 +332,8 @@ class HELICS_CXX_EXPORT Federate {
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& queryStr, helics_sequencing_mode mode = helics_sequencing_mode_fast);
+    std::string query(const std::string& queryStr,
+                      helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending

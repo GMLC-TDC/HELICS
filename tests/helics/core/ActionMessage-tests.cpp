@@ -87,7 +87,7 @@ TEST(ActionMessage, action_test_to_string_conversion_info)
     EXPECT_EQ(m.dest_handle, fr.dest_handle);
     EXPECT_EQ(m.dest_id, fr.dest_id);
     EXPECT_TRUE(m.actionTime == fr.actionTime);
-    EXPECT_EQ(m.sequenceID,fr.sequenceID);
+    EXPECT_EQ(m.sequenceID, fr.sequenceID);
     EXPECT_TRUE(m.getStringData() == fr.getStringData());
 }
 

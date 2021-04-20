@@ -125,7 +125,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                         cmd.sequenceID = seqID;
                         if (cmd.action() == CMD_IGNORE) {
                             cmd.setAction(destFilter ? CMD_NULL_DEST_MESSAGE : CMD_NULL_MESSAGE);
-                            
+
                             mDeliverMessage(cmd);
                             return;
                         }
@@ -176,9 +176,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
     }
 }
 
-void FilterFederate::generateProcessMarker(
-    global_federate_id fid,
-    uint32_t pid, Time returnTime)
+void FilterFederate::generateProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
@@ -218,7 +216,7 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
     auto mid = cmd.sequenceID;
     auto fid = handle->getFederateId();
     auto fid_index = fid.baseValue();
-    
+
     if (ongoingFilterProcesses[fid_index].find(mid) != ongoingFilterProcesses[fid_index].end()) {
         if (cmd.action() == CMD_NULL_MESSAGE) {
             acceptProcessReturn(fid, mid);
@@ -227,38 +225,34 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
         auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
         cmd.setAction(CMD_SEND_MESSAGE);
         bool needToSendMessage{true};
-            for (auto ii = static_cast<size_t>(cmd.counter) + 1;
-                 ii < filtFunc->sourceFilters.size();
-                 ++ii) {
-                auto* filt = filtFunc->sourceFilters[ii];
-                if (checkActionFlag(*filt, disconnected_flag)) {
-                    continue;
-                }
-                
-                auto pres = executeFilter(cmd, filt);
-                if (!pres.second) {
-                    if (cmd.action() == CMD_IGNORE) {
-                        needToSendMessage = false;
-                        break;
-                    }
-                    
-                    if (ii < filtFunc->sourceFilters.size() - 1) {
-                        cmd.counter = static_cast<uint16_t>(ii);
-                        cmd.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
-                        cmd.sequenceID = messageCounter++;
-                        cmd.setSource(handle->handle);
-                        generateProcessMarker(handle->getFederateId(),
-                                              cmd.sequenceID,
-                                              cmd.actionTime);
-                    } else {
-                        cmd.setAction(CMD_SEND_FOR_FILTER);
-                    }
+        for (auto ii = static_cast<size_t>(cmd.counter) + 1; ii < filtFunc->sourceFilters.size();
+             ++ii) {
+            auto* filt = filtFunc->sourceFilters[ii];
+            if (checkActionFlag(*filt, disconnected_flag)) {
+                continue;
+            }
+
+            auto press = executeFilter(cmd, filt);
+            if (!press.second) {
+                if (cmd.action() == CMD_IGNORE) {
+                    needToSendMessage = false;
                     break;
                 }
+
+                if (ii < filtFunc->sourceFilters.size() - 1) {
+                    cmd.counter = static_cast<uint16_t>(ii);
+                    cmd.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
+                    cmd.sequenceID = messageCounter++;
+                    cmd.setSource(handle->handle);
+                    generateProcessMarker(handle->getFederateId(), cmd.sequenceID, cmd.actionTime);
+                } else {
+                    cmd.setAction(CMD_SEND_FOR_FILTER);
+                }
+                break;
+            }
         }
-            acceptProcessReturn(fid, mid);
-        if (needToSendMessage)
-        {
+        acceptProcessReturn(fid, mid);
+        if (needToSendMessage) {
             mDeliverMessage(cmd);
         }
     }
@@ -354,8 +348,8 @@ ActionMessage& FilterFederate::processMessage(ActionMessage& command, const Basi
             if (checkActionFlag(*filt, disconnected_flag)) {
                 continue;
             }
-            auto pres = executeFilter(command, filt);
-            if (!pres.second) {
+            auto press = executeFilter(command, filt);
+            if (!press.second) {
                 if (command.action() == CMD_IGNORE) {
                     return command;
                 }

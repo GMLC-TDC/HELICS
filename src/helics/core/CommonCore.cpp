@@ -2243,7 +2243,7 @@ std::string CommonCore::query(const std::string& target,
             return getAddress();
         }
         querycmd.setAction(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
-                                                            CMD_BROKER_QUERY_ORDERED);
+                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
     if (querycmd.dest_id != direct_core_id) {
@@ -2272,7 +2272,9 @@ std::string CommonCore::query(const std::string& target,
                         }
                         case std::future_status::timeout: {  // federate query may need to wait or
                                                              // can get the result now
-                            ret = federateQuery(fed, queryStr, mode == helics_sequencing_mode_ordered);
+                            ret = federateQuery(fed,
+                                                queryStr,
+                                                mode == helics_sequencing_mode_ordered);
                             if (ret != "#wait") {
                                 activeQueries.finishedWithValue(index);
                                 return ret;
@@ -3790,8 +3792,7 @@ void CommonCore::manageTimeBlocks(const ActionMessage& command)
                 found = true;
             }
         }
-        if (!found)
-        {
+        if (!found) {
             timeBlocks.emplace_back(command.source_id, 1);
         }
     } else if (command.action() == CMD_TIME_UNBLOCK) {
