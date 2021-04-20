@@ -59,13 +59,12 @@ class HELICS_CXX_EXPORT MessageDataOperator: public FilterOperator {
     /** default constructor*/
     MessageDataOperator() = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit MessageDataOperator(std::function<data_view(data_view)> userDataFunction);
+    explicit MessageDataOperator(std::function<void(data_block&)> userDataFunction);
     /** set the function to modify the data of the message*/
-    void setDataFunction(std::function<data_view(data_view)> userDataFunction);
+    void setDataFunction(std::function<void(data_block&)> userDataFunction);
 
   private:
-    std::function<data_view(data_view)>
-        dataFunction;  //!< the function actually doing the processing
+    std::function<void(data_block&)> dataFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 

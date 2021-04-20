@@ -283,7 +283,8 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual const std::string& getAddress() const override final;
     virtual void setLoggingLevel(int logLevel) override final;
     virtual void setLogFile(const std::string& lfile) override final;
-    virtual std::string query(const std::string& target,
+    virtual std::string
+        query(const std::string& target,
                               const std::string& queryStr,
                               HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;

@@ -2485,7 +2485,7 @@ std::string
             res = generateJsonQuotedString(getAddress());
             return res;
         }
-        querycmd.setAction(mode == HELICS_QUERY_MODE_FAST ? CMD_BROKER_QUERY :
+        querycmd.setAction(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
                                                             CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
@@ -4103,10 +4103,15 @@ bool CommonCore::waitCoreRegistration()
 void CommonCore::manageTimeBlocks(const ActionMessage& command)
 {
     if (command.action() == CMD_TIME_BLOCK) {
+        bool found{false};
         for (auto& tb : timeBlocks) {
             if (command.source_id == tb.first) {
                 ++tb.second;
+                found = true;
             }
+        }
+        if (!found) {
+            timeBlocks.emplace_back(command.source_id, 1);
         }
     } else if (command.action() == CMD_TIME_UNBLOCK) {
         for (auto& tb : timeBlocks) {

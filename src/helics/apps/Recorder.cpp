@@ -352,7 +352,7 @@ namespace apps {
         for (auto& capt : captureInterfaces) {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
-                fed->query("root", "global_flush", helics_query_mode_ordered);
+                fed->query("root", "global_flush", helics_sequencing_mode_ordered);
                 auto pubs = vectorizeQueryResult(
                     fed->query(capt, "publications", HELICS_QUERY_MODE_ORDERED));
                 for (auto& pub : pubs) {
