@@ -2420,11 +2420,11 @@ void CoreBroker::setLogFile(const std::string& lfile)
 // public query function
 std::string CoreBroker::query(const std::string& target,
                               const std::string& queryStr,
-                              helics_query_mode mode)
+                              helics_sequencing_mode mode)
 {
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
-        ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
+        ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
@@ -2440,7 +2440,7 @@ std::string CoreBroker::query(const std::string& target,
         if (isRootc) {
             return "#na";
         }
-        ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
+        ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         querycmd.messageID = ++queryCounter;
@@ -2452,7 +2452,7 @@ std::string CoreBroker::query(const std::string& target,
         return ret;
     }
     if ((target == "root") || (target == "rootbroker")) {
-        ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_BROKER_QUERY :
+        ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_BROKER_QUERY :
                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
@@ -2466,7 +2466,7 @@ std::string CoreBroker::query(const std::string& target,
         return ret;
     }
 
-    ActionMessage querycmd(mode == helics_query_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
+    ActionMessage querycmd(mode == helics_sequencing_mode_fast ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = gid;
     auto index = ++queryCounter;
     querycmd.messageID = index;
