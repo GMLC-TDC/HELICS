@@ -76,7 +76,7 @@
 
 %typemap(freearg) HelicsError *
 {
-    if ($1->errorCode!=HELICS_OK)
+    if ($1->error_code!=HELICS_OK)
     {
         jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
         (*jenv)->ThrowNew(jenv, clazz, $1->message);

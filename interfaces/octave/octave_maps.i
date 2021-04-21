@@ -6,7 +6,7 @@
 
 /* throw a helics error */
 static octave_value Helics_ErrorType(HelicsError *err) {
-switch (err->errorCode)
+switch (err->error_code)
   {
   case HELICS_ERROR_REGISTRATION_FAILURE:
     return "helics:registration_failure";
@@ -52,7 +52,7 @@ static octave_value throwHelicsOctaveError(HelicsError *err) {
 
 %typemap(freearg) HelicsError *
 {
-    if ($1->errorCode!=HELICS_OK)
+    if ($1->error_code!=HELICS_OK)
     {
         throwHelicsOctaveError($1);
     }
