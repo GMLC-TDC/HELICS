@@ -1224,7 +1224,7 @@ namespace swig {
 #define SWIGTYPE_p_helics_message swig_types[15]
 #define SWIGTYPE_p_helics_multi_input_mode swig_types[16]
 #define SWIGTYPE_p_helics_properties swig_types[17]
-#define SWIGTYPE_p_helics_query_mode swig_types[18]
+#define SWIGTYPE_p_helics_sequencing_mode swig_types[18]
 #define SWIGTYPE_p_int swig_types[19]
 #define SWIGTYPE_p_int16_t swig_types[20]
 #define SWIGTYPE_p_int32_t swig_types[21]
@@ -14430,7 +14430,7 @@ static swig_type_info _swigt__p_helics_log_levels = {"_p_helics_log_levels", "en
 static swig_type_info _swigt__p_helics_message = {"_p_helics_message", "helics_message *", 0, 0, (void*)"helics.helics_message", 0};
 static swig_type_info _swigt__p_helics_multi_input_mode = {"_p_helics_multi_input_mode", "enum helics_multi_input_mode *|helics_multi_input_mode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_properties = {"_p_helics_properties", "enum helics_properties *|helics_properties *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helics_query_mode = {"_p_helics_query_mode", "enum helics_query_mode *|helics_query_mode *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_sequencing_mode = {"_p_helics_sequencing_mode", "enum helics_sequencing_mode *|helics_sequencing_mode *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "helics_bool *|int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
@@ -14456,7 +14456,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_helics_message,
   &_swigt__p_helics_multi_input_mode,
   &_swigt__p_helics_properties,
-  &_swigt__p_helics_query_mode,
+  &_swigt__p_helics_sequencing_mode,
   &_swigt__p_int,
   &_swigt__p_int16_t,
   &_swigt__p_int32_t,
@@ -14482,7 +14482,7 @@ static swig_cast_info _swigc__p_helics_log_levels[] = {  {&_swigt__p_helics_log_
 static swig_cast_info _swigc__p_helics_message[] = {  {&_swigt__p_helics_message, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_multi_input_mode[] = {  {&_swigt__p_helics_multi_input_mode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_properties[] = {  {&_swigt__p_helics_properties, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helics_query_mode[] = {  {&_swigt__p_helics_query_mode, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_sequencing_mode[] = {  {&_swigt__p_helics_sequencing_mode, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -14508,7 +14508,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_helics_message,
   _swigc__p_helics_multi_input_mode,
   _swigc__p_helics_properties,
-  _swigc__p_helics_query_mode,
+  _swigc__p_helics_sequencing_mode,
   _swigc__p_int,
   _swigc__p_int16_t,
   _swigc__p_int32_t,
@@ -14887,8 +14887,8 @@ SWIGINTERN const char* SwigConstantName(int con_id) {
   case 112: return "helics_filter_type_reroute";
   case 113: return "helics_filter_type_clone";
   case 114: return "helics_filter_type_firewall";
-  case 115: return "helics_query_mode_fast";
-  case 116: return "helics_query_mode_ordered";
+  case 115: return "helics_sequencing_mode_fast";
+  case 116: return "helics_sequencing_mode_ordered";
   case 117: return "helics_iteration_request_no_iteration";
   case 118: return "helics_iteration_request_force_iteration";
   case 119: return "helics_iteration_request_iterate_if_needed";
@@ -15052,8 +15052,8 @@ SWIGINTERN int swigConstant(int SWIGUNUSEDPARM(resc), mxArray *resv[], int argc,
   case 112: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filter_type_reroute",SWIG_From_int(static_cast< int >(helics_filter_type_reroute)));; break;
   case 113: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filter_type_clone",SWIG_From_int(static_cast< int >(helics_filter_type_clone)));; break;
   case 114: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filter_type_firewall",SWIG_From_int(static_cast< int >(helics_filter_type_firewall)));; break;
-  case 115: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_query_mode_fast",SWIG_From_int(static_cast< int >(helics_query_mode_fast)));; break;
-  case 116: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_query_mode_ordered",SWIG_From_int(static_cast< int >(helics_query_mode_ordered)));; break;
+  case 115: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_sequencing_mode_fast",SWIG_From_int(static_cast< int >(helics_sequencing_mode_fast)));; break;
+  case 116: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_sequencing_mode_ordered",SWIG_From_int(static_cast< int >(helics_sequencing_mode_ordered)));; break;
   case 117: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_no_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_no_iteration)));; break;
   case 118: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_force_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_force_iteration)));; break;
   case 119: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_iterate_if_needed",SWIG_From_int(static_cast< int >(helics_iteration_request_iterate_if_needed)));; break;

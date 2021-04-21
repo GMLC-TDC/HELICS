@@ -14,9 +14,9 @@ package com.java.helics;
  * existing messages; ordered means it follows normal priority patterns and will be ordered along with<br>
  * existing messages
  */
-public final class helics_query_mode {
-  public final static helics_query_mode helics_query_mode_fast = new helics_query_mode("helics_query_mode_fast", helicsJNI.helics_query_mode_fast_get());
-  public final static helics_query_mode helics_query_mode_ordered = new helics_query_mode("helics_query_mode_ordered", helicsJNI.helics_query_mode_ordered_get());
+public final class helics_sequencing_mode {
+  public final static helics_sequencing_mode helics_sequencing_mode_fast = new helics_sequencing_mode("helics_sequencing_mode_fast", helicsJNI.helics_sequencing_mode_fast_get());
+  public final static helics_sequencing_mode helics_sequencing_mode_ordered = new helics_sequencing_mode("helics_sequencing_mode_ordered", helicsJNI.helics_sequencing_mode_ordered_get());
 
   public final int swigValue() {
     return swigValue;
@@ -26,33 +26,33 @@ public final class helics_query_mode {
     return swigName;
   }
 
-  public static helics_query_mode swigToEnum(int swigValue) {
+  public static helics_sequencing_mode swigToEnum(int swigValue) {
     if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
       return swigValues[swigValue];
     for (int i = 0; i < swigValues.length; i++)
       if (swigValues[i].swigValue == swigValue)
         return swigValues[i];
-    throw new IllegalArgumentException("No enum " + helics_query_mode.class + " with value " + swigValue);
+    throw new IllegalArgumentException("No enum " + helics_sequencing_mode.class + " with value " + swigValue);
   }
 
-  private helics_query_mode(String swigName) {
+  private helics_sequencing_mode(String swigName) {
     this.swigName = swigName;
     this.swigValue = swigNext++;
   }
 
-  private helics_query_mode(String swigName, int swigValue) {
+  private helics_sequencing_mode(String swigName, int swigValue) {
     this.swigName = swigName;
     this.swigValue = swigValue;
     swigNext = swigValue+1;
   }
 
-  private helics_query_mode(String swigName, helics_query_mode swigEnum) {
+  private helics_sequencing_mode(String swigName, helics_sequencing_mode swigEnum) {
     this.swigName = swigName;
     this.swigValue = swigEnum.swigValue;
     swigNext = this.swigValue+1;
   }
 
-  private static helics_query_mode[] swigValues = { helics_query_mode_fast, helics_query_mode_ordered };
+  private static helics_sequencing_mode[] swigValues = { helics_sequencing_mode_fast, helics_sequencing_mode_ordered };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

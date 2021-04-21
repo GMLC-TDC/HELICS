@@ -367,8 +367,8 @@ r"""
     a customizable filter type that can perform different actions on a message based on
           firewall like rules
     """
-helics_query_mode_fast = _helics.helics_query_mode_fast
-helics_query_mode_ordered = _helics.helics_query_mode_ordered
+helics_sequencing_mode_fast = _helics.helics_sequencing_mode_fast
+helics_sequencing_mode_ordered = _helics.helics_sequencing_mode_ordered
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
 helics_iteration_request_force_iteration = _helics.helics_iteration_request_force_iteration
