@@ -457,7 +457,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     /** get an input object from a 2-d vector of inputs
     @return an invalid input object if the target is valid otherwise a reference to the
     corresponding input*/
-    const Input& getInput(const std::string&name, int index1, int index2) const;
+    const Input& getInput(const std::string& name, int index1, int index2) const;
 
     /** get the input id based on target
     @return an invalid input object if the target is valid otherwise a reference to the

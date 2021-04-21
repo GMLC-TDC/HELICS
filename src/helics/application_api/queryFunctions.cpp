@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-    using namespace fileops;
+using namespace fileops;
 std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
 {
     if (queryres.empty()) {

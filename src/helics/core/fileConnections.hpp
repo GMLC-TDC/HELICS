@@ -16,9 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <type_traits>
 
-namespace helics{
+namespace helics {
 
-    namespace fileops {
+namespace fileops {
     template<class brkX>
     void makeConnectionsToml(brkX* brk, const std::string& file)
     {

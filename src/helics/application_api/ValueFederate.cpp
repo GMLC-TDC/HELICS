@@ -110,7 +110,8 @@ Input& ValueFederate::registerInput(const std::string& name,
                                     const std::string& type,
                                     const std::string& units)
 {
-    return vfManager->registerInput((!name.empty()) ? (getName() + nameSegmentSeparator + name) : name,
+    return vfManager->registerInput((!name.empty()) ? (getName() + nameSegmentSeparator + name) :
+                                                      name,
                                     type,
                                     units);
 }
