@@ -124,8 +124,8 @@ public class helicsJNI {
   public final static native int helics_filter_type_reroute_get();
   public final static native int helics_filter_type_clone_get();
   public final static native int helics_filter_type_firewall_get();
-  public final static native int helics_query_mode_fast_get();
-  public final static native int helics_query_mode_ordered_get();
+  public final static native int helics_sequencing_mode_fast_get();
+  public final static native int helics_sequencing_mode_ordered_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
   public final static native double helics_time_invalid_get();

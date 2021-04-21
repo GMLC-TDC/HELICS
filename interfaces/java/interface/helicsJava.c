@@ -1601,25 +1601,25 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1filter_1type_1fir
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1query_1mode_1fast_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1sequencing_1mode_1fast_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  helics_query_mode result;
+  helics_sequencing_mode result;
   
   (void)jenv;
   (void)jcls;
-  result = (helics_query_mode)helics_query_mode_fast;
+  result = (helics_sequencing_mode)helics_sequencing_mode_fast;
   jresult = (jint)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1query_1mode_1ordered_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1sequencing_1mode_1ordered_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
-  helics_query_mode result;
+  helics_sequencing_mode result;
   
   (void)jenv;
   (void)jcls;
-  result = (helics_query_mode)helics_query_mode_ordered;
+  result = (helics_sequencing_mode)helics_sequencing_mode_ordered;
   jresult = (jint)result; 
   return jresult;
 }
