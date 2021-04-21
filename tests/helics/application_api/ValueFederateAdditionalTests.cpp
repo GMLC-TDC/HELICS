@@ -73,11 +73,11 @@ TEST_P(valuefed_add_ztype_tests, publication_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    const auto& sv = pubid.getKey();
-    const auto& sv2 = pubid2.getKey();
+    const auto& sv = pubid.getName();
+    const auto& sv2 = pubid2.getName();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    const auto& pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getExtractionType(), "double");
@@ -109,11 +109,11 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    const auto& sv = pubid.getKey();
-    const auto& sv2 = pubid2.getKey();
+    const auto& sv = pubid.getName();
+    const auto& sv2 = pubid2.getName();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    const auto& pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0-pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");
@@ -195,11 +195,11 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_and_publication_regi
 
     // check publications
 
-    sv = pubid.getKey();
-    sv2 = pubid2.getKey();
+    sv = pubid.getName();
+    sv2 = pubid2.getName();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    const auto& pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getExtractionType(), "double");
@@ -232,10 +232,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     // check subscriptions
     EXPECT_EQ(subid.getTarget(), "pub2");
-    EXPECT_EQ(subid2.getKey(), "sub2");
+    EXPECT_EQ(subid2.getName(), "sub2");
 
     EXPECT_EQ(subid.getName(), "fed0/sub1");
-    EXPECT_EQ(subid.getKey(), "fed0/sub1");
+    EXPECT_EQ(subid.getName(), "fed0/sub1");
     EXPECT_EQ(vFed1->getTarget(subid), "pub2");
 
     EXPECT_EQ(subid.getExtractionType(), "vector");
@@ -245,11 +245,11 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, input_and_publication_registratio
 
     // check publications
 
-    auto& sv = pubid.getKey();
-    auto& sv2 = pubid2.getKey();
+    auto& sv = pubid.getName();
+    auto& sv2 = pubid2.getName();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto& pub3name = pubid3.getKey();
+    auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getExtractionType(), "double");
@@ -595,7 +595,7 @@ TEST_P(valuefed_add_configfile_tests, file_load)
     EXPECT_EQ(key, "fedName/pub2");
 
     EXPECT_EQ(id.getInfo(), "this is an information string for use by the application");
-    auto pub2name = vFed.getPublication(1).getKey();
+    auto pub2name = vFed.getPublication(1).getName();
     EXPECT_EQ(pub2name, "valueFed/pub2");
     // test the info from a file
     EXPECT_EQ(vFed.getPublication(0).getInfo(),

@@ -213,7 +213,7 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
     Json::Value v1;
     v1["name"] = "point";
     v1["value"] = val;
-    EXPECT_TRUE(checkTypeConversion1(vp, generateJsonString(v1)));
+    EXPECT_TRUE(checkTypeConversion1(vp, helics::fileops::generateJsonString(v1)));
 
     NamedPoint vp2{"v2[3.0,-4.0]", std::nan("0")};
     double v2 = 5.0;

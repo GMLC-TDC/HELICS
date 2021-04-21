@@ -87,7 +87,7 @@ class HELICS_CXX_EXPORT Federate {
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
         asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
-    std::string name;  //!< the name of the federate
+    std::string mName;  //!< the name of the federate
 
   public:
     /**constructor taking a federate information structure
@@ -540,7 +540,7 @@ received
     @details the most recent granted time of the federate*/
     Time getCurrentTime() const { return currentTime; }
     /** get the federate name*/
-    const std::string& getName() const { return name; }
+    const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/
     const std::shared_ptr<Core>& getCorePointer() { return coreObject; }
     // interface for filter objects
@@ -623,10 +623,10 @@ class HELICS_CXX_EXPORT Interface {
     bool operator!=(const Interface& inp) const { return (handle != inp.handle); }
     /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
-    const std::string& getName() const { return mName; }
+    const std::string& getLocalName() const { return mName; }
     /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
-    const std::string& getKey() const;
+    const std::string& getName() const;
     /** get an associated target*/
     const std::string& getTarget() const;
     /** subscribe to a named publication*/

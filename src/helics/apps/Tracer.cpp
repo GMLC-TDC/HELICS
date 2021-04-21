@@ -93,7 +93,7 @@ namespace apps {
             eptNames[endpoints.back().getName()] = static_cast<int>(endpoints.size() - 1);
         }
 
-        auto doc = loadJson(jsonString);
+        auto doc = fileops::loadJson(jsonString);
 
         auto tags = doc["tag"];
         if (tags.isArray()) {

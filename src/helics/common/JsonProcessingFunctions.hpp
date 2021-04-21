@@ -16,6 +16,8 @@ them using the jsoncpp library
 #include "json/json.h"
 #include <functional>
 #include <string>
+namespace helics::fileops {
+
 /** check if the file has a valid JSON extension*/
 bool hasJsonExtension(const std::string& jsonString);
 
@@ -33,7 +35,7 @@ helics::Time loadJsonTime(const Json::Value& timeElement,
                           time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
-std::string getKey(const Json::Value& element);
+std::string getName(const Json::Value& element);
 
 /** generate a Json String*/
 std::string generateJsonString(const Json::Value& block);
@@ -140,3 +142,5 @@ inline void replaceIfMember(const Json::Value& element, const std::string& key, 
         sval = element[key].asDouble();
     }
 }
+
+}  // namespace helics::fileops

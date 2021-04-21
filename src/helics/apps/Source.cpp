@@ -84,7 +84,7 @@ namespace apps {
             gen->set(name, prop.asDouble());
         } else {
             try {
-                auto time = loadJsonTime(prop);
+                auto time = fileops::loadJsonTime(prop);
                 if (time > Time::minVal()) {
                     gen->set(name, static_cast<double>(time));
                 } else {
@@ -101,12 +101,12 @@ namespace apps {
     {
         // we want to load the default period before constructing the interfaces so the default
         // period works
-        auto doc = loadJson(jsonString);
+        auto doc = fileops::loadJson(jsonString);
 
         if (doc.isMember("source")) {
             auto appConfig = doc["source"];
             if (appConfig.isMember("defaultperiod")) {
-                defaultPeriod = loadJsonTime(appConfig["defaultperiod"]);
+                defaultPeriod = fileops::loadJsonTime(appConfig["defaultperiod"]);
             }
         }
 
@@ -114,7 +114,7 @@ namespace apps {
         auto pubCount = fed->getPublicationCount();
         for (int ii = 0; ii < pubCount; ++ii) {
             sources.emplace_back(fed->getPublication(ii), defaultPeriod);
-            pubids[sources.back().pub.getKey()] = static_cast<int>(sources.size()) - 1;
+            pubids[sources.back().pub.getName()] = static_cast<int>(sources.size()) - 1;
         }
         /* auto eptCount = fed->getEndpointCount();
      for (int ii = 0; ii < eptCount; ++ii)
@@ -128,12 +128,12 @@ namespace apps {
             auto pubArray = doc["publications"];
 
             for (const auto& pubElement : pubArray) {
-                auto key = getKey(pubElement);
+                auto key = fileops::getName(pubElement);
                 if (pubElement.isMember("start")) {
-                    setStartTime(key, loadJsonTime(pubElement["start"]));
+                    setStartTime(key, fileops::loadJsonTime(pubElement["start"]));
                 }
                 if (pubElement.isMember("period")) {
-                    setPeriod(key, loadJsonTime(pubElement["period"]));
+                    setPeriod(key, fileops::loadJsonTime(pubElement["period"]));
                 }
                 if (pubElement.isMember("generator")) {
                     if (pubElement["generator"].isInt()) {
@@ -147,7 +147,7 @@ namespace apps {
         if (doc.isMember("generators")) {
             auto genArray = doc["generators"];
             for (const auto& genElement : genArray) {
-                auto key = getKey(genElement);
+                auto key = fileops::getName(genElement);
                 auto type = genElement["type"];
                 int index = -1;
                 if (!type.isNull()) {
@@ -206,7 +206,7 @@ namespace apps {
                 }
             } else {
                 if (src.generatorIndex >= static_cast<int>(generators.size())) {
-                    std::cerr << "invalid generator index for " << src.pub.getKey()
+                    std::cerr << "invalid generator index for " << src.pub.getName()
                               << "disabling output\n";
                     src.nextTime = Time::maxVal();
                 }

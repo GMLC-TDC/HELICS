@@ -303,7 +303,7 @@ void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::st
     for (const auto& str : val) {
         V.append(str);
     }
-    auto strgen = generateJsonString(V);
+    auto strgen = fileops::generateJsonString(V);
     return ValueConverter<std::string_view>::convert(strgen, store);
 }
 
@@ -314,7 +314,7 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
     val.clear();
     auto str = ValueConverter<std::string_view>::interpret(block);
     try {
-        Json::Value V = loadJsonStr(str);
+        Json::Value V = fileops::loadJsonStr(str);
         if (V.isArray()) {
             val.reserve(V.size());
             for (auto& av : V) {

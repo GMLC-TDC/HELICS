@@ -93,8 +93,8 @@ class Publication {
     {
         helicsPublicationPublishBoolean(pub, val ? HELICS_TRUE : HELICS_FALSE, HELICS_IGNORE_ERROR);
     }
-    /** get the key for the publication*/
-    const char* getKey() const { return helicsPublicationGetKey(pub); }
+    /** get the name of the publication*/
+    const char* getName() const { return helicsPublicationGetName(pub); }
     /** get the units of the publication*/
     const char* getUnits() const { return helicsPublicationGetUnits(pub); }
     /** get the type for the publication*/

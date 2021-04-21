@@ -121,7 +121,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
     /// holder for the query map builder information
-    std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+    std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
 
     std::vector<ActionMessage> earlyMessages;  //!< list of messages that came before connection
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process

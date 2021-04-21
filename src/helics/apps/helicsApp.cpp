@@ -113,7 +113,7 @@ namespace apps {
         app->add_flag("--local",
                       useLocal,
                       "specify otherwise unspecified endpoints and publications as local( "
-                      "i.e.the keys will be prepended with the player name)");
+                      "i.e.the names will be prepended with the player name)");
         app->add_option("--stop", stopTime, "The time to stop the app");
         app->add_option("--input,input", masterFileName, "The primary input file")
             ->check(CLI::ExistingFile);
@@ -160,7 +160,7 @@ namespace apps {
     {
         fed->registerInterfaces(jsonString);
 
-        auto doc = loadJson(jsonString);
+        auto doc = fileops::loadJson(jsonString);
 
         if (doc.isMember("app")) {
             auto appConfig = doc["app"];
@@ -179,7 +179,7 @@ namespace apps {
     void App::loadConfigOptions(const Json::Value& element)
     {
         if (element.isMember("stop")) {
-            stopTime = loadJsonTime(element["stop"]);
+            stopTime = fileops::loadJsonTime(element["stop"]);
         }
         if (element.isMember("local")) {
             useLocal = element["local"].asBool();
