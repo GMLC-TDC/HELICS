@@ -73,4 +73,4 @@ class JsonBuilder {
     /** reset the builder*/
     void reset();
 };
-}  // namespace helics
+}  // namespace helics::fileops
