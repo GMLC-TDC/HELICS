@@ -40,6 +40,7 @@ namespace http = beast::http;  // from <boost/beast/http.hpp>
 namespace net = boost::asio;  // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
+using namespace helics::fileops;
 const std::string localhost{"localhost"};
 
 class webTest: public ::testing::Test {
@@ -306,21 +307,21 @@ TEST_F(webTest, deleteBroker)
     Json::Value v1;
     v1["command"] = "delete";
     v1["broker"] = "brk2";
-    sendText(generateJsonString(v1));
+    sendText(helics::fileops::generateJsonString(v1));
 
     Json::Value v2;
     v2["command"] = "query";
     v2["query"] = "brokers";
     auto result = sendText(generateJsonString(v2));
     EXPECT_FALSE(result.empty());
-    auto val = loadJson(result);
+    auto val = helics::fileops::loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 2U);
     v1["broker"] = "brk1";
     sendText(generateJsonString(v1));
     result = sendText(generateJsonString(v2));
     EXPECT_FALSE(result.empty());
-    val = loadJson(result);
+    val = helics::fileops::loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 1U);
 }

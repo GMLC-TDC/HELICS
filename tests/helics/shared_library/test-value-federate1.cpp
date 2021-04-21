@@ -60,11 +60,11 @@ TEST_F(vfed_single_tests, publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsPublicationGetKey(pubid);
+    auto sv = helicsPublicationGetName(pubid);
     EXPECT_STREQ(sv, "fed0/pub1");
-    auto sv2 = helicsPublicationGetKey(pubid2);
+    auto sv2 = helicsPublicationGetName(pubid2);
     EXPECT_STREQ(sv2, "pub2");
-    auto pub3name = helicsPublicationGetKey(pubid3);
+    auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
     auto type = helicsPublicationGetType(pubid3);
@@ -98,11 +98,11 @@ TEST_F(vfed_single_tests, publisher_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsPublicationGetKey(pubid);
-    auto sv2 = helicsPublicationGetKey(pubid2);
+    auto sv = helicsPublicationGetName(pubid);
+    auto sv2 = helicsPublicationGetName(pubid2);
     EXPECT_STREQ(sv, "fed0/pub1");
     EXPECT_STREQ(sv2, "pub2");
-    auto pub3name = helicsPublicationGetKey(pubid3);
+    auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
     auto type = helicsPublicationGetType(pubid3);
@@ -135,12 +135,12 @@ TEST_F(vfed_single_tests, subscription_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsSubscriptionGetKey(subid);
-    auto sv2 = helicsSubscriptionGetKey(subid2);
+    auto sv = helicsSubscriptionGetTarget(subid);
+    auto sv2 = helicsSubscriptionGetTarget(subid2);
     EXPECT_STREQ(sv, "sub1");
     EXPECT_STREQ(sv2, "sub2");
 
-    auto sub3name = helicsSubscriptionGetKey(subid3);
+    auto sub3name = helicsSubscriptionGetTarget(subid3);
 
     // vFed1->addSubscriptionShortcut (subid, "Shortcut");
     EXPECT_STREQ(sub3name, "sub3");
@@ -183,12 +183,12 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsSubscriptionGetKey(subid);
-    auto sv2 = helicsSubscriptionGetKey(subid2);
+    auto sv = helicsSubscriptionGetTarget(subid);
+    auto sv2 = helicsSubscriptionGetTarget(subid2);
 
     EXPECT_STREQ(sv, "sub1");
     EXPECT_STREQ(sv2, "sub2");
-    auto sub3name = helicsSubscriptionGetKey(subid3);
+    auto sub3name = helicsSubscriptionGetTarget(subid3);
     EXPECT_STREQ(sub3name, "sub3");
 
     auto units = helicsInputGetUnits(subid3);
@@ -196,7 +196,7 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
 
     // check the getSubscription function
     auto subid_b = helicsFederateGetSubscription(vFed1, "sub1", &err);
-    const char* tmp = helicsSubscriptionGetKey(subid_b);
+    const char* tmp = helicsSubscriptionGetTarget(subid_b);
     EXPECT_STREQ(tmp, "sub1");
     // check the getSubscriptionByIndex function
     auto subid_c = helicsFederateGetInputByIndex(vFed1, 2, &err);
@@ -204,11 +204,11 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     EXPECT_STREQ(tmp, "V");
     // check publications
 
-    sv = helicsPublicationGetKey(pubid);
-    sv2 = helicsPublicationGetKey(pubid2);
+    sv = helicsPublicationGetName(pubid);
+    sv2 = helicsPublicationGetName(pubid2);
     EXPECT_STREQ(sv, "fed0/pub1");
     EXPECT_STREQ(sv2, "pub2");
-    auto pub3name = helicsPublicationGetKey(pubid3);
+    auto pub3name = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pub3name, "fed0/pub3");
 
     const char* type = helicsPublicationGetType(pubid3);
@@ -969,12 +969,12 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
     // check subscriptions
-    const char* subname = helicsSubscriptionGetKey(subid);
-    const char* subname2 = helicsSubscriptionGetKey(subid2);
+    const char* subname = helicsSubscriptionGetTarget(subid);
+    const char* subname2 = helicsSubscriptionGetTarget(subid2);
 
     EXPECT_STREQ(subname, "sub1");
     EXPECT_STREQ(subname2, "sub2");
-    const char* subname3 = helicsSubscriptionGetKey(subid3);
+    const char* subname3 = helicsSubscriptionGetTarget(subid3);
     EXPECT_STREQ(subname3, "sub3");
 
     // subtype=helicsInputGetType (subid);
@@ -987,12 +987,12 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     EXPECT_STREQ(subunit3, "V");
 
     // check publications
-    const char* pubname = helicsPublicationGetKey(pubid);
-    const char* pubname2 = helicsPublicationGetKey(pubid2);
+    const char* pubname = helicsPublicationGetName(pubid);
+    const char* pubname2 = helicsPublicationGetName(pubid2);
 
     EXPECT_STREQ(pubname, "fed0/pub1");
     EXPECT_STREQ(pubname2, "pub2");
-    const char* pubname3 = helicsPublicationGetKey(pubid3);
+    const char* pubname3 = helicsPublicationGetName(pubid3);
     EXPECT_STREQ(pubname3, "fed0/pub3");
 
     const char* pubtype = helicsPublicationGetType(pubid3);

@@ -966,7 +966,7 @@ std::string FilterFederate::query(const std::string& queryStr) const
         base["input"] = 0;
         base["endpoints"] = 0;
         base["granted_time"] = static_cast<double>(mCoord.getGrantedTime());
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "global_state") {
         Json::Value base;
@@ -974,7 +974,7 @@ std::string FilterFederate::query(const std::string& queryStr) const
         base["id"] = mFedID.baseValue();
         base["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time_debugging") {
         Json::Value base;
@@ -983,17 +983,17 @@ std::string FilterFederate::query(const std::string& queryStr) const
         base["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
         mCoord.generateDebuggingTimeInfo(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "timeconfig") {
         Json::Value base;
         mCoord.generateConfig(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "config") {
         Json::Value base;
         mCoord.generateConfig(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "dependents") {
         return generateStringVector(mCoord.getDependents(),
@@ -1022,7 +1022,7 @@ std::string FilterFederate::query(const std::string& queryStr) const
                 base["filters"].append(std::move(filter));
             }
         }
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time") {
         Json::Value base;
@@ -1031,7 +1031,7 @@ std::string FilterFederate::query(const std::string& queryStr) const
         base["parent"] = mCoreID.baseValue();
         base["granted_time"] = static_cast<double>(mCoord.getGrantedTime());
         base["send_time"] = static_cast<double>(mCoord.allowedSendTime());
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "dependency_graph") {
         Json::Value base;
@@ -1046,7 +1046,7 @@ std::string FilterFederate::query(const std::string& queryStr) const
         for (auto& dep : mCoord.getDependencies()) {
             base["dependencies"].append(dep.baseValue());
         }
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
 
     return "#invalid";

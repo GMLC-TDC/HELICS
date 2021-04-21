@@ -287,7 +287,7 @@ static defV vectorizeOperation(const std::vector<defV>& vals)
                 svect.append(std::get<std::string>(val));
             }
 
-            return generateJsonString(svect);
+            return fileops::generateJsonString(svect);
         }
         case complex_vector_loc: {
             if (vals.empty()) {
@@ -709,18 +709,18 @@ void Input::loadSourceInformation()
     if ((injectionType == DataType::HELICS_MULTI) || (!iUnits.empty() && iUnits.front() == '[')) {
         sourceTypes.clear();
         if (injectionType == DataType::HELICS_MULTI) {
-            auto jvalue = loadJsonStr(iType);
+            auto jvalue = fileops::loadJsonStr(iType);
             for (auto& res : jvalue) {
                 sourceTypes.emplace_back(getTypeFromString(res.asCString()), nullptr);
             }
         } else {
-            auto iValue = loadJsonStr(iUnits);
+            auto iValue = fileops::loadJsonStr(iUnits);
             sourceTypes.resize(iValue.size(), {injectionType, nullptr});
         }
         if (!iUnits.empty()) {
             if (iUnits.front() == '[') {
                 multiUnits = true;
-                auto iValue = loadJsonStr(iUnits);
+                auto iValue = fileops::loadJsonStr(iUnits);
                 int ii{0};
                 for (auto& res : iValue) {
                     auto str = res.asString();

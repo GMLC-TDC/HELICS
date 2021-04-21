@@ -974,9 +974,9 @@ TEST(federate_tests, error_after_disconnect)
     auto& fb2 = Fedref.getFilter("filt1");
     auto& fb3 = Fedref.getFilter("notafilter");
     auto& fb4 = Fed1->getFilter("filt1");
-    EXPECT_EQ(fb.getKey(), f1.getKey());
-    EXPECT_EQ(fb2.getKey(), f1.getKey());
-    EXPECT_EQ(fb4.getKey(), f1.getKey());
+    EXPECT_EQ(fb.getName(), f1.getName());
+    EXPECT_EQ(fb2.getName(), f1.getName());
+    EXPECT_EQ(fb4.getName(), f1.getName());
     EXPECT_FALSE(fb3.isValid());
 
     EXPECT_THROW(Fed1->setGlobal("global1", "global1"), helics::InvalidFunctionCall);

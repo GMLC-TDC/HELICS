@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <string>
 
+namespace helics::fileops {
+
 bool hasJsonExtension(const std::string& jsonString)
 {
     auto ext = jsonString.substr(jsonString.length() - 4);
@@ -87,7 +89,7 @@ helics::Time loadJsonTime(const Json::Value& timeElement, time_units defaultUnit
     return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.asString());
 }
 
-std::string getKey(const Json::Value& element)
+std::string getName(const Json::Value& element)
 {
     return (element.isMember("key")) ?
         element["key"].asString() :
@@ -105,3 +107,5 @@ std::string generateJsonString(const Json::Value& block)
     auto ret = sstr.str();
     return ret;
 }
+
+}  // namespace helics::fileops

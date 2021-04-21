@@ -51,7 +51,7 @@ namespace apps {
     void BrokerServer::startServers()
     {
         if (!configFile_.empty()) {
-            config_ = std::make_unique<Json::Value>(loadJson(configFile_));
+            config_ = std::make_unique<Json::Value>(fileops::loadJson(configFile_));
         } else {
             config_ = std::make_unique<Json::Value>();
         }

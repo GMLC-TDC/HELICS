@@ -811,14 +811,14 @@ HELICS_EXPORT const char* helicsPublicationGetType(HelicsPublication pub);
  *
  * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetKey(HelicsInput ipt);
+HELICS_EXPORT const char* helicsInputGetName(HelicsInput ipt);
 
 /**
  * Get the key of a subscription.
  *
  * @return A const char with the subscription key.
  */
-HELICS_EXPORT const char* helicsSubscriptionGetKey(HelicsInput ipt);
+HELICS_EXPORT const char* helicsSubscriptionGetTarget(HelicsInput ipt);
 
 /**
  * Get the key of a publication.
@@ -829,7 +829,7 @@ HELICS_EXPORT const char* helicsSubscriptionGetKey(HelicsInput ipt);
  *
  * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsPublicationGetKey(HelicsPublication pub);
+HELICS_EXPORT const char* helicsPublicationGetName(HelicsPublication pub);
 
 /**
  * Get the units of an input.

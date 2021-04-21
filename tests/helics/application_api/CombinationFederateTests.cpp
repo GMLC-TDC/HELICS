@@ -57,11 +57,11 @@ TEST_P(combofed_single_type_tests, publication_registration)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    auto& sv = pubid.getKey();
-    auto& sv2 = pubid2.getKey();
+    auto& sv = pubid.getName();
+    auto& sv2 = pubid2.getName();
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
-    auto& pub3name = pubid3.getKey();
+    auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getExtractionType(), "double");
@@ -122,8 +122,8 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    auto& sv = epid.getKey();
-    auto& sv2 = epid2.getKey();
+    auto& sv = epid.getName();
+    auto& sv2 = epid2.getName();
     EXPECT_EQ(sv, "fed0/ep1");
     EXPECT_EQ(sv2, "ep2");
 

@@ -130,14 +130,14 @@ namespace apps {
                 [this](const Endpoint& ept, Time messageTime) { echoMessage(ept, messageTime); });
         }
 
-        auto doc = loadJson(jsonFile);
+        auto doc = fileops::loadJson(jsonFile);
 
         if (doc.isMember("echo")) {
             auto echoConfig = doc["echo"];
 
             if (echoConfig.isMember("delay")) {
                 std::lock_guard<std::mutex> lock(delayTimeLock);
-                delayTime = loadJsonTime(echoConfig["delay"]);
+                delayTime = fileops::loadJsonTime(echoConfig["delay"]);
             }
         }
     }

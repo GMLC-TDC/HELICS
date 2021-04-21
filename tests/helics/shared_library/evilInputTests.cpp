@@ -2413,14 +2413,14 @@ TEST(evil_pub_test, helicsPublicationGetType)
     EXPECT_STREQ(res2, "");
 }
 
-TEST(evil_pub_test, helicsPublicationGetKey)
+TEST(evil_pub_test, helicsPublicationGetName)
 {
-    // const char*  helicsPublicationGetKey(HelicsPublication pub);
+    // const char*  helicsPublicationGetName(HelicsPublication pub);
     char rdata[256];
     auto evil_pub = reinterpret_cast<HelicsPublication>(rdata);
-    auto res1 = helicsPublicationGetKey(nullptr);
+    auto res1 = helicsPublicationGetName(nullptr);
     EXPECT_STREQ(res1, "");
-    auto res2 = helicsPublicationGetKey(evil_pub);
+    auto res2 = helicsPublicationGetName(evil_pub);
     EXPECT_STREQ(res2, "");
 }
 
@@ -2959,25 +2959,25 @@ TEST(evil_input_test, helicsInputGetPublicationType)
     EXPECT_STREQ(res2, "");
 }
 
-TEST(evil_input_test, helicsInputGetKey)
+TEST(evil_input_test, helicsInputGetName)
 {
-    // const char*  helicsInputGetKey(HelicsInput ipt);
+    // const char*  helicsInputGetName(HelicsInput ipt);
     char rdata[256];
     auto evil_input = reinterpret_cast<HelicsInput>(rdata);
-    auto res1 = helicsInputGetKey(nullptr);
+    auto res1 = helicsInputGetName(nullptr);
     EXPECT_STREQ(res1, "");
-    auto res2 = helicsInputGetKey(evil_input);
+    auto res2 = helicsInputGetName(evil_input);
     EXPECT_STREQ(res2, "");
 }
 
-TEST(evil_input_test, helicsSubscriptionGetKey)
+TEST(evil_input_test, helicsSubscriptionGetTarget)
 {
-    // const char*  helicsSubscriptionGetKey(HelicsInput ipt);
+    // const char*  helicsSubscriptionGetTarget(HelicsInput ipt);
     char rdata[256];
     auto evil_input = reinterpret_cast<HelicsInput>(rdata);
-    auto res1 = helicsSubscriptionGetKey(nullptr);
+    auto res1 = helicsSubscriptionGetTarget(nullptr);
     EXPECT_STREQ(res1, "");
-    auto res2 = helicsSubscriptionGetKey(evil_input);
+    auto res2 = helicsSubscriptionGetTarget(evil_input);
     EXPECT_STREQ(res2, "");
 }
 

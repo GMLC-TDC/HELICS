@@ -15,7 +15,7 @@ namespace Json {
 class Value;
 }  // namespace Json
 
-namespace helics {
+namespace helics::fileops {
 /** class handling the construction in pieces of a JSON map*/
 class JsonMapBuilder {
   private:
