@@ -126,7 +126,7 @@ void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int str
 {
     static const char* invalidBuffer = "The given buffer is not valid";
 
-    if (((err) != nullptr) && ((err)->errorCode != 0)) {
+    if (((err) != nullptr) && ((err)->error_code != 0)) {
         return;
     }
     if (buffer == nullptr) {

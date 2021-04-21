@@ -501,7 +501,7 @@ typedef struct HelicsComplex {
  * otherwise it will be an empty string
  */
 typedef struct HelicsError {
-    int32_t errorCode; /*!< an error code associated with the error*/
+    int32_t error_code; /*!< an error code associated with the error*/
     const char* message; /*!< a message associated with the error*/
 } HelicsError;
 

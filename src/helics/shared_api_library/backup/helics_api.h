@@ -226,7 +226,7 @@ typedef struct HelicsComplex {
 } HelicsComplex;
 
 typedef struct HelicsError {
-    int32_t errorCode;
+    int32_t error_code;
     const char* message;
 } HelicsError;
 
