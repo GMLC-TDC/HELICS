@@ -182,7 +182,7 @@ static void loadOptions(const Inp& data, Endpoint& ept)
     });
 
     auto defTarget = getOrDefault(data, "target", emptyStr);
-    replaceIfMember(data, "destination", defTarget);
+    fileops::replaceIfMember(data, "destination", defTarget);
     if (!defTarget.empty()) {
         ept.setDefaultDestination(defTarget);
     }
