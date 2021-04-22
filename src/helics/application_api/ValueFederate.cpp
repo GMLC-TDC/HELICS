@@ -184,7 +184,7 @@ template<class Inp, class Obj>
 static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 {
     using fileops::getOrDefault;
-    
+
     addTargets(data, "flags", [&objUpdate](const std::string& target) {
         if (target.front() != '-') {
             objUpdate.setOption(getOptionIndex(target), 1);
@@ -282,8 +282,8 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
-    using fileops::replaceIfMember;
     using fileops::isMember;
+    using fileops::replaceIfMember;
 
     toml::value doc;
     try {
