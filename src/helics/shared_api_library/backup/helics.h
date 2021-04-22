@@ -451,19 +451,19 @@ const HelicsBool HELICS_FALSE = 0; /*!< indicator used for a false response */
  * enumeration of the different iteration results
  */
 typedef enum {
-    HELICS_ITERATION_REQUEST_NO_ITERATION, /*!< no iteration is requested */
-    HELICS_ITERATION_REQUEST_FORCE_ITERATION, /*!< force iteration return when able */
-    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED /*!< only return an iteration if necessary */
+    HELICS_ITERATION_REQUEST_NO_ITERATION = 0, /*!< no iteration is requested */
+    HELICS_ITERATION_REQUEST_FORCE_ITERATION = 1, /*!< force iteration return when able */
+    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = 2 /*!< only return an iteration if necessary */
 } HelicsIterationRequest;
 
 /**
  * enumeration of possible return values from an iterative time request
  */
 typedef enum {
-    HELICS_ITERATION_RESULT_NEXT_STEP, /*!< the iterations have progressed to the next time */
-    HELICS_ITERATION_RESULT_ERROR, /*!< there was an error */
-    HELICS_ITERATION_RESULT_HALTED, /*!< the federation has halted */
-    HELICS_ITERATION_RESULT_ITERATING /*!< the federate is iterating at current time */
+    HELICS_ITERATION_RESULT_NEXT_STEP = 0, /*!< the iterations have progressed to the next time */
+    HELICS_ITERATION_RESULT_ERROR = 1, /*!< there was an error */
+    HELICS_ITERATION_RESULT_HALTED = 2, /*!< the federation has halted */
+    HELICS_ITERATION_RESULT_ITERATING = 3 /*!< the federate is iterating at current time */
 } HelicsIterationResult;
 
 /**
@@ -471,17 +471,17 @@ typedef enum {
  */
 typedef enum {
     HELICS_STATE_STARTUP = 0, /*!< when created the federate is in startup state */
-    HELICS_STATE_INITIALIZATION, /*!< entered after the enterInitializingMode call has returned */
-    HELICS_STATE_EXECUTION, /*!< entered after the enterExectuationState call has returned */
-    HELICS_STATE_FINALIZE, /*!< the federate has finished executing normally final values may be retrieved */
-    HELICS_STATE_ERROR, /*!< error state no core communication is possible but values can be retrieved */
+    HELICS_STATE_INITIALIZATION = 1, /*!< entered after the enterInitializingMode call has returned */
+    HELICS_STATE_EXECUTION = 2, /*!< entered after the enterExectuationState call has returned */
+    HELICS_STATE_FINALIZE = 3, /*!< the federate has finished executing normally final values may be retrieved */
+    HELICS_STATE_ERROR = 4, /*!< error state no core communication is possible but values can be retrieved */
     /* the following states are for asynchronous operations */
-    HELICS_STATE_PENDING_INIT, /*!< indicator that the federate is pending entry to initialization state */
-    HELICS_STATE_PENDING_EXEC, /*!< state pending EnterExecution State */
-    HELICS_STATE_PENDING_TIME, /*!< state that the federate is pending a timeRequest */
-    HELICS_STATE_PENDING_ITERATIVE_TIME, /*!< state that the federate is pending an iterative time request */
-    HELICS_STATE_PENDING_FINALIZE, /*!< state that the federate is pending a finalize request */
-    HELICS_STATE_FINISHED /*!< state that the federate is finished simulating but still connected */
+    HELICS_STATE_PENDING_INIT = 5, /*!< indicator that the federate is pending entry to initialization state */
+    HELICS_STATE_PENDING_EXEC = 6, /*!< state pending EnterExecution State */
+    HELICS_STATE_PENDING_TIME = 7, /*!< state that the federate is pending a timeRequest */
+    HELICS_STATE_PENDING_ITERATIVE_TIME = 8, /*!< state that the federate is pending an iterative time request */
+    HELICS_STATE_PENDING_FINALIZE = 9, /*!< state that the federate is pending a finalize request */
+    HELICS_STATE_FINISHED = 10 /*!< state that the federate is finished simulating but still connected */
 } HelicsFederateState;
 
 /**
@@ -2897,14 +2897,14 @@ HELICS_EXPORT const char* helicsPublicationGetType(HelicsPublication pub);
  *
  * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsInputGetKey(HelicsInput ipt);
+HELICS_EXPORT const char* helicsInputGetName(HelicsInput ipt);
 
 /**
  * Get the key of a subscription.
  *
  * @return A const char with the subscription key.
  */
-HELICS_EXPORT const char* helicsSubscriptionGetKey(HelicsInput ipt);
+HELICS_EXPORT const char* helicsSubscriptionGetTarget(HelicsInput ipt);
 
 /**
  * Get the key of a publication.
@@ -2915,7 +2915,7 @@ HELICS_EXPORT const char* helicsSubscriptionGetKey(HelicsInput ipt);
  *
  * @return A void enumeration, HELICS_OK if everything worked.
  */
-HELICS_EXPORT const char* helicsPublicationGetKey(HelicsPublication pub);
+HELICS_EXPORT const char* helicsPublicationGetName(HelicsPublication pub);
 
 /**
  * Get the units of an input.

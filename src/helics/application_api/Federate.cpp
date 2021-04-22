@@ -845,8 +845,8 @@ static void loadOptions(const Inp& data, Filter& filt)
 
 void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 {
-    using namespace fileops;
-    auto doc = loadJson(jsonString);
+    using fileops::getOrDefault;
+    auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("filters")) {
         for (const auto& filt : doc["filters"]) {
@@ -954,10 +954,12 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 
 void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 {
-    using namespace fileops;
+    using fileops::getOrDefault;
+    using fileops::isMember;
+
     toml::value doc;
     try {
-        doc = loadToml(tomlString);
+        doc = fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));

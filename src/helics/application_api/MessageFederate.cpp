@@ -154,7 +154,7 @@ static const std::string emptyStr;
 template<class Inp>
 static void loadOptions(const Inp& data, Endpoint& ept)
 {
-    using namespace fileops;
+    using fileops::getOrDefault;
     addTargets(data, "flags", [&ept](const std::string& target) {
         if (target.front() != '-') {
             ept.setOption(getOptionIndex(target), true);

@@ -183,7 +183,8 @@ static const std::string emptyStr;
 template<class Inp, class Obj>
 static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 {
-    using namespace fileops;
+    using fileops::getOrDefault;
+    
     addTargets(data, "flags", [&objUpdate](const std::string& target) {
         if (target.front() != '-') {
             objUpdate.setOption(getOptionIndex(target), 1);
@@ -197,7 +198,7 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
         [](const std::string& value) { return getOptionValue(value); },
         [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
 
-    callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
+    fileops::callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
     });
 
@@ -280,10 +281,13 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 
 void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 {
-    using namespace fileops;
+    using fileops::getOrDefault;
+    using fileops::replaceIfMember;
+    using fileops::isMember;
+
     toml::value doc;
     try {
-        doc = loadToml(tomlString);
+        doc = fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
