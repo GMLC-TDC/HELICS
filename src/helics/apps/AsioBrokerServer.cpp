@@ -129,8 +129,8 @@ namespace apps {
         // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("tcp")) {
             auto V = (*config_)["tcp"];
-            replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", tcpport);
+            helics::fileops::replaceIfMember(V, "interface", ext_interface);
+            helics::fileops::replaceIfMember(V, "port", tcpport);
         }
         auto server = helics::tcp::TcpServer::create(
             ioctx, ext_interface, static_cast<uint16_t>(tcpport), true, 2048);
@@ -180,8 +180,8 @@ namespace apps {
         // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("udp")) {
             auto V = (*config_)["udp"];
-            replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", udpport);
+            helics::fileops::replaceIfMember(V, "interface", ext_interface);
+            helics::fileops::replaceIfMember(V, "port", udpport);
         }
         return std::make_shared<udp::UdpServer>(ioctx, ext_interface, udpport);
     }

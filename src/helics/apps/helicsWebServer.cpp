@@ -128,13 +128,13 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
     }
     if (!body.empty()) {
         if (body.front() == '{') {
-            Json::Value val = loadJsonStr(body.to_string());
+            Json::Value val = helics::fileops::loadJsonStr(body.to_string());
             auto mnames = val.getMemberNames();
             for (auto& vb : mnames) {
                 if (val[vb].isString()) {
                     results.second[vb] = val[vb].asString();
                 } else {
-                    results.second[vb] = generateJsonString(val[vb]);
+                    results.second[vb] = helics::fileops::generateJsonString(val[vb]);
                 }
             }
         } else {
@@ -199,7 +199,7 @@ std::string getBrokerList()
         brokerBlock["isRoot"] = brk->isRoot();
         base["brokers"].append(brokerBlock);
     }
-    return generateJsonString(base);
+    return helics::fileops::generateJsonString(base);
 }
 
 enum class return_val : std::int32_t {
@@ -550,7 +550,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
                 break;
         }
 
-        boost::beast::ostream(buffer) << generateJsonString(response);  // NOLINT
+        boost::beast::ostream(buffer) << helics::fileops::generateJsonString(response);  // NOLINT
         ws.async_write(buffer.data(),
                        beast::bind_front_handler(&WebSocketsession::on_write, shared_from_this()));
     }
@@ -903,8 +903,8 @@ void WebServer::mainLoop()
     if (http_enabled_) {
         if (config->isMember("http")) {
             auto V = (*config)["http"];
-            replaceIfMember(V, "interface", httpAddress_);
-            replaceIfMember(V, "port", httpPort_);
+            helics::fileops::replaceIfMember(V, "interface", httpAddress_);
+            helics::fileops::replaceIfMember(V, "port", httpPort_);
         }
         auto const address = net::ip::make_address(httpAddress_);
         // Create and launch a listening port
@@ -916,8 +916,8 @@ void WebServer::mainLoop()
     if (websocket_enabled_) {
         if (config->isMember("websocket")) {
             auto V = (*config)["websocket"];
-            replaceIfMember(V, "interface", websocketAddress_);
-            replaceIfMember(V, "port", websocketPort_);
+            helics::fileops::replaceIfMember(V, "interface", websocketAddress_);
+            helics::fileops::replaceIfMember(V, "port", websocketPort_);
         }
         auto const address = net::ip::make_address(websocketAddress_);
         // Create and launch a listening port

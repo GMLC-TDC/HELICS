@@ -118,7 +118,7 @@ namespace apps {
             eptids.emplace(endpoints.back().getHandle(), static_cast<int>(endpoints.size() - 1));
         }
 
-        auto doc = loadJson(jsonString);
+        auto doc = fileops::loadJson(jsonString);
 
         auto tags = doc["tag"];
         if (tags.isArray()) {
@@ -503,16 +503,16 @@ namespace apps {
         }
     }
     /** add a subscription to record*/
-    void Recorder::addSubscription(const std::string& key)
+    void Recorder::addSubscription(const std::string& name)
     {
-        auto res = subkeys.find(key);
+        auto res = subkeys.find(name);
         if ((res == subkeys.end()) || (res->second == -1)) {
-            subscriptions.emplace_back(fed->registerSubscription(key));
-            targets.emplace_back(key);
+            subscriptions.emplace_back(fed->registerSubscription(name));
+            targets.emplace_back(name);
             auto index = static_cast<int>(subscriptions.size()) - 1;
             auto id = subscriptions.back().getHandle();
             subids[id] = index;  // this is a new element
-            subkeys[key] = index;  // this is a potential replacement
+            subkeys[name] = index;  // this is a potential replacement
         }
     }
     /** add an endpoint*/

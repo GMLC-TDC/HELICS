@@ -341,7 +341,7 @@ std::string helicsNamedPointString(std::string_view pointName, double val)
     } else {
         NP["name"] = Json::Value(pointName.data(), pointName.data() + pointName.size());
     }
-    return generateJsonString(NP);
+    return fileops::generateJsonString(NP);
 }
 
 std::vector<double> helicsGetVector(std::string_view val)
@@ -362,7 +362,7 @@ NamedPoint helicsGetNamedPoint(std::string_view val)
 {
     NamedPoint p;
     try {
-        auto jv = loadJsonStr(val);
+        auto jv = fileops::loadJsonStr(val);
         switch (jv.type()) {
             case Json::ValueType::realValue:
                 p.value = jv.asDouble();
@@ -379,8 +379,8 @@ NamedPoint helicsGetNamedPoint(std::string_view val)
                 p.name = "value";
                 break;
             case Json::ValueType::objectValue:
-                replaceIfMember(jv, "value", p.value);
-                replaceIfMember(jv, "name", p.name);
+                fileops::replaceIfMember(jv, "value", p.value);
+                fileops::replaceIfMember(jv, "name", p.name);
                 break;
             default:
                 break;
@@ -543,8 +543,8 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
             data.resize(0);
             data.push_back(V);
         } else {
-            auto JV = loadJsonStr(val);
-            int cnt = 0;
+            auto JV = fileops::loadJsonStr(val);
+            int cnt{0};
             switch (JV.type()) {
                 case Json::ValueType::realValue:
                 case Json::ValueType::intValue:

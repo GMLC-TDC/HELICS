@@ -477,7 +477,7 @@ TEST_F(multiInput, vectorize_string)
 
     vFed1->requestNextStep();
     val = in1.getValue<std::string>();
-    auto jv = loadJsonStr(val);
+    auto jv = fileops::loadJsonStr(val);
 
     EXPECT_EQ(jv.size(), 3U);
     EXPECT_STREQ(jv[0].asCString(), "test1");

@@ -91,35 +91,36 @@ ValueFederate& ValueFederate::operator=(ValueFederate&& fed) noexcept
     return *this;
 }
 
-Publication& ValueFederate::registerPublication(const std::string& key,
+Publication& ValueFederate::registerPublication(const std::string& name,
                                                 const std::string& type,
                                                 const std::string& units)
 {
     return vfManager->registerPublication(
-        (!key.empty()) ? (getName() + nameSegmentSeparator + key) : key, type, units);
+        (!name.empty()) ? (getName() + nameSegmentSeparator + name) : name, type, units);
 }
 
-Publication& ValueFederate::registerGlobalPublication(const std::string& key,
+Publication& ValueFederate::registerGlobalPublication(const std::string& name,
                                                       const std::string& type,
                                                       const std::string& units)
 {
-    return vfManager->registerPublication(key, type, units);
+    return vfManager->registerPublication(name, type, units);
 }
 
-Input& ValueFederate::registerInput(const std::string& key,
+Input& ValueFederate::registerInput(const std::string& name,
                                     const std::string& type,
                                     const std::string& units)
 {
-    return vfManager->registerInput((!key.empty()) ? (getName() + nameSegmentSeparator + key) : key,
+    return vfManager->registerInput((!name.empty()) ? (getName() + nameSegmentSeparator + name) :
+                                                      name,
                                     type,
                                     units);
 }
 
-Input& ValueFederate::registerGlobalInput(const std::string& key,
+Input& ValueFederate::registerGlobalInput(const std::string& name,
                                           const std::string& type,
                                           const std::string& units)
 {
-    return vfManager->registerInput(key, type, units);
+    return vfManager->registerInput(name, type, units);
 }
 
 Input& ValueFederate::registerSubscription(const std::string& target, const std::string& units)
@@ -171,7 +172,7 @@ void ValueFederate::registerInterfaces(const std::string& configString)
 
 void ValueFederate::registerValueInterfaces(const std::string& configString)
 {
-    if (hasTomlExtension(configString)) {
+    if (fileops::hasTomlExtension(configString)) {
         registerValueInterfacesToml(configString);
     } else {
         registerValueInterfacesJson(configString);
@@ -182,6 +183,8 @@ static const std::string emptyStr;
 template<class Inp, class Obj>
 static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 {
+    using fileops::getOrDefault;
+    
     addTargets(data, "flags", [&objUpdate](const std::string& target) {
         if (target.front() != '-') {
             objUpdate.setOption(getOptionIndex(target), 1);
@@ -195,7 +198,7 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
         [](const std::string& value) { return getOptionValue(value); },
         [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
 
-    callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
+    fileops::callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
     });
 
@@ -214,24 +217,24 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 
 void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 {
-    auto doc = loadJson(jsonString);
+    auto doc = fileops::loadJson(jsonString);
     bool defaultGlobal = false;
-    replaceIfMember(doc, "defaultglobal", defaultGlobal);
+    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
     if (doc.isMember("publications")) {
         auto pubs = doc["publications"];
         for (const auto& pub : pubs) {
-            auto key = getKey(pub);
+            auto name = fileops::getName(pub);
 
-            Publication* pubAct = &vfManager->getPublication(key);
+            Publication* pubAct = &vfManager->getPublication(name);
             if (!pubAct->isValid()) {
-                auto type = getOrDefault(pub, "type", emptyStr);
-                auto units = getOrDefault(pub, "unit", emptyStr);
-                replaceIfMember(pub, "units", units);
-                bool global = getOrDefault(pub, "global", defaultGlobal);
+                auto type = fileops::getOrDefault(pub, "type", emptyStr);
+                auto units = fileops::getOrDefault(pub, "unit", emptyStr);
+                fileops::replaceIfMember(pub, "units", units);
+                bool global = fileops::getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
-                    pubAct = &registerGlobalPublication(key, type, units);
+                    pubAct = &registerGlobalPublication(name, type, units);
                 } else {
-                    pubAct = &registerPublication(key, type, units);
+                    pubAct = &registerPublication(name, type, units);
                 }
             }
 
@@ -241,14 +244,14 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
     if (doc.isMember("subscriptions")) {
         auto subs = doc["subscriptions"];
         for (const auto& sub : subs) {
-            auto key = getKey(sub);
-            auto* subAct = &vfManager->getSubscription(key);
+            auto name = fileops::getName(sub);
+            auto* subAct = &vfManager->getSubscription(name);
             if (!subAct->isValid()) {
-                auto type = getOrDefault(sub, "type", emptyStr);
-                auto units = getOrDefault(sub, "unit", emptyStr);
-                replaceIfMember(sub, "units", units);
+                auto type = fileops::getOrDefault(sub, "type", emptyStr);
+                auto units = fileops::getOrDefault(sub, "unit", emptyStr);
+                fileops::replaceIfMember(sub, "units", units);
                 subAct = &registerInput(emptyStr, type, units);
-                subAct->addTarget(key);
+                subAct->addTarget(name);
             }
             loadOptions(this, sub, *subAct);
         }
@@ -256,18 +259,18 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
     if (doc.isMember("inputs")) {
         auto ipts = doc["inputs"];
         for (const auto& ipt : ipts) {
-            auto key = getKey(ipt);
+            auto name = fileops::getName(ipt);
 
-            Input* inp = &vfManager->getInput(key);
+            Input* inp = &vfManager->getInput(name);
             if (!inp->isValid()) {
-                auto type = getOrDefault(ipt, "type", emptyStr);
-                auto units = getOrDefault(ipt, "unit", emptyStr);
-                replaceIfMember(ipt, "units", units);
-                bool global = getOrDefault(ipt, "global", defaultGlobal);
+                auto type = fileops::getOrDefault(ipt, "type", emptyStr);
+                auto units = fileops::getOrDefault(ipt, "unit", emptyStr);
+                fileops::replaceIfMember(ipt, "units", units);
+                bool global = fileops::getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
-                    inp = &registerGlobalInput(key, type, units);
+                    inp = &registerGlobalInput(name, type, units);
                 } else {
-                    inp = &registerInput(key, type, units);
+                    inp = &registerInput(name, type, units);
                 }
             }
 
@@ -278,9 +281,13 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 
 void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 {
+    using fileops::getOrDefault;
+    using fileops::replaceIfMember;
+    using fileops::isMember;
+
     toml::value doc;
     try {
-        doc = loadToml(tomlString);
+        doc = fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
@@ -295,18 +302,18 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         }
         auto& pubArray = pubs.as_array();
         for (const auto& pub : pubArray) {
-            auto key = getKey(pub);
+            auto name = fileops::getName(pub);
 
-            Publication* pubObj = &vfManager->getPublication(key);
+            Publication* pubObj = &vfManager->getPublication(name);
             if (!pubObj->isValid()) {
                 auto type = getOrDefault(pub, "type", emptyStr);
                 auto units = getOrDefault(pub, "unit", emptyStr);
                 replaceIfMember(pub, "units", units);
                 bool global = getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
-                    pubObj = &registerGlobalPublication(key, type, units);
+                    pubObj = &registerGlobalPublication(name, type, units);
                 } else {
-                    pubObj = &registerPublication(key, type, units);
+                    pubObj = &registerPublication(name, type, units);
                 }
             }
             loadOptions(this, pub, *pubObj);
@@ -322,15 +329,15 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         }
         auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
-            auto key = getKey(sub);
-            Input* id = &vfManager->getSubscription(key);
+            auto name = fileops::getName(sub);
+            Input* id = &vfManager->getSubscription(name);
             if (!id->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "unit", emptyStr);
                 replaceIfMember(sub, "units", units);
 
                 id = &registerInput(emptyStr, type, units);
-                id->addTarget(key);
+                id->addTarget(name);
             }
 
             loadOptions(this, sub, *id);
@@ -344,18 +351,18 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         }
         auto& iptArray = ipts.as_array();
         for (const auto& ipt : iptArray) {
-            auto key = getKey(ipt);
+            auto name = fileops::getName(ipt);
 
-            Input* id = &vfManager->getInput(key);
+            Input* id = &vfManager->getInput(name);
             if (!id->isValid()) {
                 auto type = getOrDefault(ipt, "type", emptyStr);
                 auto units = getOrDefault(ipt, "unit", emptyStr);
                 replaceIfMember(ipt, "units", units);
                 bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
-                    id = &registerGlobalInput(key, type, units);
+                    id = &registerGlobalInput(name, type, units);
                 } else {
-                    id = &registerInput(key, type, units);
+                    id = &registerInput(name, type, units);
                 }
             }
 
@@ -405,7 +412,7 @@ void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 {
     auto jv = [&]() {
         try {
-            return loadJson(jsonString);
+            return fileops::loadJson(jsonString);
         }
         catch (const std::invalid_argument&) {
             throw(helics::InvalidParameter("unable to load file or string"));
@@ -433,7 +440,7 @@ void ValueFederate::publishJSON(const std::string& jsonString)
 {
     auto jv = [&]() {
         try {
-            return loadJson(jsonString);
+            return fileops::loadJson(jsonString);
         }
         catch (const std::invalid_argument&) {
             throw(helics::InvalidParameter("unable to load file or string"));
@@ -493,20 +500,20 @@ const std::string& ValueFederate::getTarget(const Input& inp) const
     return vfManager->getTarget(inp);
 }
 
-const Input& ValueFederate::getInput(const std::string& key) const
+const Input& ValueFederate::getInput(const std::string& name) const
 {
-    auto& inp = vfManager->getInput(key);
+    auto& inp = vfManager->getInput(name);
     if (!inp.isValid()) {
-        return vfManager->getInput(getName() + nameSegmentSeparator + key);
+        return vfManager->getInput(getName() + nameSegmentSeparator + name);
     }
     return inp;
 }
 
-Input& ValueFederate::getInput(const std::string& key)
+Input& ValueFederate::getInput(const std::string& name)
 {
-    auto& inp = vfManager->getInput(key);
+    auto& inp = vfManager->getInput(name);
     if (!inp.isValid()) {
-        return vfManager->getInput(getName() + nameSegmentSeparator + key);
+        return vfManager->getInput(getName() + nameSegmentSeparator + name);
     }
     return inp;
 }
@@ -521,14 +528,14 @@ Input& ValueFederate::getInput(int index)
     return vfManager->getInput(index);
 }
 
-const Input& ValueFederate::getInput(const std::string& key, int index1) const
+const Input& ValueFederate::getInput(const std::string& name, int index1) const
 {
-    return vfManager->getInput(key + '_' + std::to_string(index1));
+    return vfManager->getInput(name + '_' + std::to_string(index1));
 }
 
-const Input& ValueFederate::getInput(const std::string& key, int index1, int index2) const
+const Input& ValueFederate::getInput(const std::string& name, int index1, int index2) const
 {
-    return vfManager->getInput(key + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+    return vfManager->getInput(name + '_' + std::to_string(index1) + '_' + std::to_string(index2));
 }
 
 const Input& ValueFederate::getSubscription(const std::string& target) const
@@ -541,20 +548,20 @@ Input& ValueFederate::getSubscription(const std::string& target)
     return vfManager->getSubscription(target);
 }
 
-Publication& ValueFederate::getPublication(const std::string& key)
+Publication& ValueFederate::getPublication(const std::string& name)
 {
-    auto& pub = vfManager->getPublication(key);
+    auto& pub = vfManager->getPublication(name);
     if (!pub.isValid()) {
-        return vfManager->getPublication(getName() + nameSegmentSeparator + key);
+        return vfManager->getPublication(getName() + nameSegmentSeparator + name);
     }
     return pub;
 }
 
-const Publication& ValueFederate::getPublication(const std::string& key) const
+const Publication& ValueFederate::getPublication(const std::string& name) const
 {
-    auto& pub = vfManager->getPublication(key);
+    auto& pub = vfManager->getPublication(name);
     if (!pub.isValid()) {
-        return vfManager->getPublication(getName() + nameSegmentSeparator + key);
+        return vfManager->getPublication(getName() + nameSegmentSeparator + name);
     }
     return pub;
 }
@@ -569,15 +576,15 @@ const Publication& ValueFederate::getPublication(int index) const
     return vfManager->getPublication(index);
 }
 
-const Publication& ValueFederate::getPublication(const std::string& key, int index1) const
+const Publication& ValueFederate::getPublication(const std::string& name, int index1) const
 {
-    return vfManager->getPublication(key + '_' + std::to_string(index1));
+    return vfManager->getPublication(name + '_' + std::to_string(index1));
 }
 
 const Publication&
-    ValueFederate::getPublication(const std::string& key, int index1, int index2) const
+    ValueFederate::getPublication(const std::string& name, int index1, int index2) const
 {
-    return vfManager->getPublication(key + '_' + std::to_string(index1) + '_' +
+    return vfManager->getPublication(name + '_' + std::to_string(index1) + '_' +
                                      std::to_string(index2));
 }
 

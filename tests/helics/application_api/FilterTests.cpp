@@ -461,10 +461,10 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     }
     if (mFed->hasMessage(p2)) {
         auto m2 = mFed->getMessage(p2);
-        const auto& ept1Name = p1.getKey();
+        const auto& ept1Name = p1.getName();
         if (ept1Name.size() > 1) {
-            EXPECT_EQ(m2->source, p1.getKey());
-            EXPECT_EQ(m2->original_source, p1.getKey());
+            EXPECT_EQ(m2->source, p1.getName());
+            EXPECT_EQ(m2->original_source, p1.getName());
         }
 
         EXPECT_EQ(m2->dest, p2Name);

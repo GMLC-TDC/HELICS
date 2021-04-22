@@ -424,7 +424,8 @@ class CommonCore: public Core, public BrokerBase {
     /// holder for active queries
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;
     /// holder for the query map builder information
-    mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+    mutable std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>>
+        mapBuilders;
 
     FilterFederate* filterFed{nullptr};
     std::atomic<std::thread::id> filterThread{std::thread::id{}};

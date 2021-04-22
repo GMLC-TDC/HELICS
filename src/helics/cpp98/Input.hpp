@@ -180,9 +180,9 @@ class Input {
     void clearUpdate() { helicsInputClearUpdate(inp); }
     // call helicsInputIsUpdated for each inp
 
-    /** get the Name/Key for the input
-   @details the name is the local name if given, key is the full key name*/
-    const char* getKey() const { return helicsInputGetKey(inp); }
+    /** get the Name for the input
+   @details the name is full name vs the local one for non-global interfaces*/
+    const char* getName() const { return helicsInputGetName(inp); }
     /** get the units associated with a input*/
     const char* getUnits() const { return helicsInputGetExtractionUnits(inp); }
     /** get the units associated with an inputs publication*/
@@ -192,7 +192,7 @@ class Input {
     /** get the type of the input*/
     const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
-    const char* getTarget() const { return helicsSubscriptionGetKey(inp); }
+    const char* getTarget() const { return helicsSubscriptionGetTarget(inp); }
     /** get the interface information field of the filter*/
     const char* getInfo() const { return helicsInputGetInfo(inp); }
     /** set the interface information field of the publication*/

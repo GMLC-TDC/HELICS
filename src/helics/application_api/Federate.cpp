@@ -40,15 +40,15 @@ void cleanupHelicsLibrary()
     BrokerFactory::cleanUpBrokers(100ms);
 }
 
-Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fedName)
+Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fedName)
 {
-    if (name.empty()) {
-        name = fi.defName;
+    if (mName.empty()) {
+        mName = fi.defName;
     }
     if (fi.coreName.empty()) {
         coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
         if (!coreObject) {
-            if (!name.empty()) {
+            if (!mName.empty()) {
                 // we need to create a core here so loop until we find a number that is not already
                 // occupied
                 int cnt{0};
@@ -90,7 +90,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
     }
 
     // this call will throw an error on failure
-    fedID = coreObject->registerFederate(name, fi);
+    fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
     currentTime = coreObject->getCurrentTime(fedID);
@@ -107,7 +107,7 @@ Federate::Federate(const std::string& fedName,
                    const std::shared_ptr<Core>& core,
                    const FederateInfo& fi):
     coreObject(core),
-    name(fedName)
+    mName(fedName)
 {
     if (!coreObject) {
         if (fi.coreName.empty()) {
@@ -125,10 +125,10 @@ Federate::Federate(const std::string& fedName,
     if (!coreObject->isConnected()) {
         coreObject->connect();
     }
-    if (name.empty()) {
-        name = fi.defName;
+    if (mName.empty()) {
+        mName = fi.defName;
     }
-    fedID = coreObject->registerFederate(name, fi);
+    fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
     currentTime = coreObject->getCurrentTime(fedID);
@@ -163,7 +163,7 @@ Federate::Federate(Federate&& fed) noexcept
     strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     fManager = std::move(fed.fManager);
-    name = std::move(fed.name);
+    mName = std::move(fed.mName);
 }
 
 Federate& Federate::operator=(Federate&& fed) noexcept
@@ -177,7 +177,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
     strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     fManager = std::move(fed.fManager);
-    name = std::move(fed.name);
+    mName = std::move(fed.mName);
     return *this;
 }
 
@@ -578,13 +578,13 @@ void Federate::completeOperation()
 
 void Federate::localError(int errorcode)
 {
-    std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + name;
+    std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + mName;
     localError(errorcode, errorString);
 }
 
 void Federate::globalError(int errorcode)
 {
-    std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + name;
+    std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + mName;
     globalError(errorcode, errorString);
 }
 
@@ -775,7 +775,7 @@ void Federate::registerInterfaces(const std::string& configString)
 
 void Federate::registerFilterInterfaces(const std::string& configString)
 {
-    if (hasTomlExtension(configString)) {
+    if (fileops::hasTomlExtension(configString)) {
         registerFilterInterfacesToml(configString);
     } else {
         try {
@@ -829,7 +829,7 @@ static void loadOptions(const Inp& data, Filter& filt)
         [](const std::string& value) { return getOptionValue(value); },
         [&filt](int32_t option, int32_t value) { filt.setOption(option, value); });
 
-    auto info = getOrDefault(data, "info", emptyStr);
+    auto info = fileops::getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
         filt.setInfo(info);
     }
@@ -845,7 +845,8 @@ static void loadOptions(const Inp& data, Filter& filt)
 
 void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 {
-    auto doc = loadJson(jsonString);
+    using fileops::getOrDefault;
+    auto doc = fileops::loadJson(jsonString);
 
     if (doc.isMember("filters")) {
         for (const auto& filt : doc["filters"]) {
@@ -953,9 +954,12 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 
 void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 {
+    using fileops::getOrDefault;
+    using fileops::isMember;
+
     toml::value doc;
     try {
-        doc = loadToml(tomlString);
+        doc = fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
@@ -1332,7 +1336,7 @@ Interface::Interface(Federate* federate, InterfaceHandle id, std::string_view ac
     }
 }
 
-const std::string& Interface::getKey() const
+const std::string& Interface::getName() const
 {
     return (cr != nullptr) ? (cr->getHandleName(handle)) : emptyStr;
 }
