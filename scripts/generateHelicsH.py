@@ -22,7 +22,7 @@ if len(sys.argv) > 2:
 outfile = open(os.path.join(outpath, "helics.h"), "w")
 
 outfile.write("/*\n")
-outfile.write("Copyright (c) 2017-2020,\n")
+outfile.write("Copyright (c) 2017-2021,\n")
 outfile.write(
     "Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for\n"
 )
@@ -107,7 +107,7 @@ outfile.close()
 outfile2 = open(os.path.join(outpath, "helics_api.h"), "w")
 
 outfile2.write("/*\n")
-outfile2.write("Copyright (c) 2017-2020,\n")
+outfile2.write("Copyright (c) 2017-2021,\n")
 outfile2.write(
     "Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for\n"
 )
