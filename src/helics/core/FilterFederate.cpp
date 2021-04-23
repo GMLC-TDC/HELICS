@@ -132,7 +132,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                             return;
                         }
                         cmd.setAction(destFilter ? CMD_DEST_FILTER_RESULT : CMD_FILTER_RESULT);
-                        
+
                         mDeliverMessage(cmd);
                     }
                 }
@@ -206,7 +206,9 @@ void FilterFederate::acceptProcessReturn(global_federate_id fid, uint32_t pid)
     clearTimeReturn(pid);
 }
 
-void FilterFederate::generateDestProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime)
+void FilterFederate::generateDestProcessMarker(global_federate_id fid,
+                                               uint32_t pid,
+                                               Time returnTime)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
@@ -411,7 +413,7 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
                     auto mid = ++messageCounter;
                     auto fed_id = handle->getFederateId();
                     generateDestProcessMarker(handle->getFederateId(), mid, command.actionTime);
-                    
+
                     // now send a message to get filtered
                     command.setAction(CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                     command.sequenceID = mid;

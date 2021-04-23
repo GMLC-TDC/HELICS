@@ -887,7 +887,9 @@ TEST_F(filter_tests, reroute_cascade)
     std::vector<helics::Filter> filters;
     for (int ii = 0; ii < 8; ++ii) {
         auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
-        auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), std::string("rrfilt")+std::to_string(ii));
+        auto& f1 = helics::make_filter(helics::filter_types::reroute,
+                                       filt.get(),
+                                       std::string("rrfilt") + std::to_string(ii));
         f1.addDestinationTarget(std::string("rec") + std::to_string(ii + 1));
         f1.setString("newdestination", std::string("rec") + std::to_string(ii + 2));
         filters.push_back(f1);
