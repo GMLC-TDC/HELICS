@@ -123,6 +123,8 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                         cmd.setDestination(source);
                         cmd.counter = filterCounter;
                         cmd.sequenceID = seqID;
+                        cmd.source_handle = FiltI->handle;
+                        cmd.source_id = mFedID;
                         if (cmd.action() == CMD_IGNORE) {
                             cmd.setAction(destFilter ? CMD_NULL_DEST_MESSAGE : CMD_NULL_MESSAGE);
 
@@ -130,8 +132,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
                             return;
                         }
                         cmd.setAction(destFilter ? CMD_DEST_FILTER_RESULT : CMD_FILTER_RESULT);
-                        cmd.source_handle = FiltI->handle;
-                        cmd.source_id = mFedID;
+                        
                         mDeliverMessage(cmd);
                     }
                 }
@@ -205,6 +206,36 @@ void FilterFederate::acceptProcessReturn(global_federate_id fid, uint32_t pid)
     clearTimeReturn(pid);
 }
 
+void FilterFederate::generateDestProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime)
+{
+    // nothing further to process
+    auto fid_index = fid.baseValue();
+    if (ongoingDestFilterProcesses[fid_index].empty()) {
+        ActionMessage block(CMD_TIME_BLOCK);
+        block.dest_id = fid;
+        block.source_id = mFedID;
+        block.sequenceID = pid;
+        mSendMessage(block);
+    }
+    ongoingDestFilterProcesses[fid_index].insert(pid);
+    addTimeReturn(pid, returnTime);
+}
+
+void FilterFederate::acceptDestProcessReturn(global_federate_id fid, uint32_t pid)
+{
+    // nothing further to process
+    auto fid_index = fid.baseValue();
+    ongoingDestFilterProcesses[fid_index].erase(pid);
+    if (ongoingDestFilterProcesses[fid_index].empty()) {
+        ActionMessage unblock(CMD_TIME_UNBLOCK);
+        unblock.dest_id = fid;
+        unblock.source_id = mFedID;
+        unblock.sequenceID = pid;
+        mSendMessage(unblock);
+    }
+    clearTimeReturn(pid);
+}
+
 /** process a filter message return*/
 void FilterFederate::processFilterReturn(ActionMessage& cmd)
 {
@@ -266,15 +297,13 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
         if (handle == nullptr) {
             return;
         }
-        auto sequenceID = command.sequenceID;
-        auto& ongoingDestProcess = ongoingDestFilterProcesses[handle->getFederateId().baseValue()];
-        if (ongoingDestProcess.find(sequenceID) != ongoingDestProcess.end()) {
-            ongoingDestProcess.erase(sequenceID);
-            clearTimeReturn(sequenceID);
+        auto mid = command.sequenceID;
+        auto fid = handle->getFederateId();
+
+        auto& ongoingDestProcess = ongoingDestFilterProcesses[fid.baseValue()];
+        if (ongoingDestProcess.find(mid) != ongoingDestProcess.end()) {
             if (command.action() == CMD_NULL_DEST_MESSAGE) {
-                ActionMessage removeTimeBlock(CMD_TIME_UNBLOCK, mCoreID, command.dest_id);
-                removeTimeBlock.sequenceID = sequenceID;
-                mSendMessage(removeTimeBlock);
+                acceptDestProcessReturn(fid, mid);
                 return;
             }
             auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
@@ -286,10 +315,7 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
             // mCoord->processTimeMessage(command);
             command.setAction(CMD_SEND_MESSAGE);
             mSendMessageMove(std::move(command));
-            // now unblock the time
-            ActionMessage removeTimeBlock(CMD_TIME_UNBLOCK, mCoreID, handle->getFederateId());
-            removeTimeBlock.sequenceID = sequenceID;
-            mSendMessage(removeTimeBlock);
+            acceptDestProcessReturn(fid, mid);
         }
     }
 }
@@ -357,15 +383,9 @@ ActionMessage& FilterFederate::processMessage(ActionMessage& command, const Basi
                 if (ii < filtFunc->sourceFilters.size() - 1) {
                     command.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
                     command.sequenceID = messageCounter++;
-                    if (ongoingFilterProcesses[handle->getFederateId().baseValue()].empty()) {
-                        ActionMessage block(CMD_TIME_BLOCK);
-                        block.dest_id = mCoreID;
-                        block.source_id = handle->getFederateId();
-                        mSendMessage(block);
-                    }
-                    ongoingFilterProcesses[handle->getFederateId().baseValue()].insert(
-                        command.sequenceID);
-                    addTimeReturn(command.sequenceID, command.actionTime);
+                    generateProcessMarker(handle->getFederateId(),
+                                          command.sequenceID,
+                                          command.actionTime);
                 } else {
                     command.setAction(CMD_SEND_FOR_FILTER);
                 }
@@ -388,13 +408,10 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
                                                              // processing destination filter
                     // first block the federate time advancement until the return is
                     // received
-                    auto fed_id = handle->getFederateId();
-                    ActionMessage tblock(CMD_TIME_BLOCK, mCoreID, fed_id);
                     auto mid = ++messageCounter;
-                    tblock.sequenceID = mid;
-                    mSendMessage(tblock);
-                    ongoingDestFilterProcesses[fed_id.baseValue()].emplace(mid);
-                    addTimeReturn(mid, command.actionTime);
+                    auto fed_id = handle->getFederateId();
+                    generateDestProcessMarker(handle->getFederateId(), mid, command.actionTime);
+                    
                     // now send a message to get filtered
                     command.setAction(CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                     command.sequenceID = mid;
@@ -430,17 +447,17 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
     return true;
 }
 
-void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* ffunc,
+void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* fcoord,
                                                   const BasicHandleInfo* handle,
                                                   const ActionMessage& command) const
 {
     // now go to the cloning filters
-    for (auto* clFilter : ffunc->cloningDestFilters) {
+    for (auto* clFilter : fcoord->cloningDestFilters) {
         if (checkActionFlag(*clFilter, disconnected_flag)) {
             continue;
         }
         if (clFilter->core_id == mFedID) {
-            auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
+            const auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
             if (FiltI != nullptr) {
                 if (FiltI->filterOp != nullptr) {
                     // this is a cloning filter so it generates a bunch(?) of new

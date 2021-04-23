@@ -750,7 +750,7 @@ TEST_F(filter_tests, many_filters)
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {
             tr = rec->requestTimeAdvance(1.0);
-            if (rec->hasMessage()) {
+            if (p2.hasMessage()) {
                 ++cntb;
                 auto m = p2.getMessage();
                 EXPECT_EQ(m->data.size(), 17 + 18);
@@ -827,7 +827,7 @@ TEST_F(filter_tests, many_filters_multi)
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {
             tr = rec->requestTimeAdvance(1.0);
-            while (rec->hasMessage()) {
+            while (p2.hasMessage()) {
                 ++cntb;
                 auto m = p2.getMessage();
                 EXPECT_EQ(m->data.size(), 18 + 8);
@@ -853,6 +853,98 @@ TEST_F(filter_tests, many_filters_multi)
     t1.join();
     t2.join();
     EXPECT_EQ(p2.pendingMessages(), 0U);
+
+    EXPECT_EQ(cntb, 40);
+    for (auto& ffed : filterFeds) {
+        ffed->requestTimeComplete();
+        ffed->finalize();
+    }
+}
+
+TEST_F(filter_tests, reroute_cascade)
+{
+    auto broker = AddBroker("test", 10);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>("test_2", 8, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& s1 = send->registerGlobalEndpoint("send");
+    auto& r1 = rec->registerGlobalEndpoint("rec1");
+    auto& r2 = rec->registerGlobalEndpoint("rec2");
+    auto& r3 = rec->registerGlobalEndpoint("rec3");
+    auto& r4 = rec->registerGlobalEndpoint("rec4");
+    auto& r5 = rec->registerGlobalEndpoint("rec5");
+    auto& r6 = rec->registerGlobalEndpoint("rec6");
+    auto& r7 = rec->registerGlobalEndpoint("rec7");
+    auto& r8 = rec->registerGlobalEndpoint("rec8");
+    auto& r9 = rec->registerGlobalEndpoint("rec9");
+    s1.setDefaultDestination("rec1");
+
+    std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
+    std::vector<helics::Filter> filters;
+    for (int ii = 0; ii < 8; ++ii) {
+        auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
+        auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), std::string("rrfilt")+std::to_string(ii));
+        f1.addDestinationTarget(std::string("rec") + std::to_string(ii + 1));
+        f1.setString("newdestination", std::string("rec") + std::to_string(ii + 2));
+        filters.push_back(f1);
+        filterFeds.push_back(std::move(filt));
+    }
+
+    auto act1 = [&s1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            s1.send("this is a message1");
+            s1.send("this is a message2");
+            s1.send("this is a message3");
+            s1.send("this is a message4");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb, &r9]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            while (r9.hasMessage()) {
+                ++cntb;
+                auto m = r9.getMessage();
+                EXPECT_EQ(m->data.size(), 18);
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeAsync();
+    }
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeComplete();
+        ffed->requestTimeAsync(50);
+    }
+
+    helics::Time tr = helics::timeZero;
+    helics::Time ptr = helics::timeZero;
+
+    t1.join();
+    t2.join();
+    EXPECT_EQ(r1.pendingMessages(), 0U);
+    EXPECT_EQ(r2.pendingMessages(), 0U);
+    EXPECT_EQ(r3.pendingMessages(), 0U);
+    EXPECT_EQ(r4.pendingMessages(), 0U);
+    EXPECT_EQ(r5.pendingMessages(), 0U);
+    EXPECT_EQ(r6.pendingMessages(), 0U);
+    EXPECT_EQ(r7.pendingMessages(), 0U);
+    EXPECT_EQ(r8.pendingMessages(), 0U);
 
     EXPECT_EQ(cntb, 40);
     for (auto& ffed : filterFeds) {
