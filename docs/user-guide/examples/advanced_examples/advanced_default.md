@@ -37,7 +37,7 @@ As you may or may not have read in the [User Guide](../../fundamental_topics/mes
 
 As in the [Fundamental Base Example](../fundamental_examples/fundamental_default.md), `helics_cli` is used to launch the co-simulation:
 
-```
+```shell
 > helics run --path=advanced_default_runner.json
 ```
 

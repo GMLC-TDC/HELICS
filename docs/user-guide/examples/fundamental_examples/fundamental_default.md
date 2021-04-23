@@ -63,7 +63,7 @@ Configuration of federates may be done with JSON files. Each federate will have 
 
 There are [extensive ways](../../configuration_options_reference.html) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
 
-```
+```json
 {
   "name": "Battery",
   "log_level": 1,
@@ -82,7 +82,7 @@ In this configuration, we have named the federate `Battery`, set the `log_level`
 
 This federate is configured with pubs and subs, so it will need an option to indicate the publication and the subscription configurations (for brevity, only the first pub and sub are printed below):
 
-```
+```json
   "publications":[
     {
       "key":"Battery/EV1_current",
@@ -107,7 +107,7 @@ This pub and sub configuration is telling us that the `Battery.py` federate is p
 
 As discussed in [Register and Configure Federates](#register-and-configure-federates), the federate registration and configuration with JSON files in the python federate is done with one line of code:
 
-```
+```python
 fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 ```
 
@@ -127,7 +127,7 @@ It's now time to launch the co-simulation with `helics_cli` ([install helics_cli
 
 The runner JSON for the Base Example is called `fundamental_default_runner.json`:
 
-```
+```json
 {
   "federates": [
     {
@@ -161,7 +161,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 
 The final step is to launch our Base Example with `helics_cli` from the command line:
 
-```
+```shell
 >helics run --path=fundamental_default_runner.json
 ```
 

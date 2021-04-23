@@ -21,7 +21,7 @@ This example was successfully run on `Tue Nov 10 11:16:44 PST 2020` with the fol
 
 -     Operating System
 
-```
+```shell
 $ sw_vers
 ProductName:    Mac OS X
 ProductVersion:    10.14.6
@@ -30,7 +30,7 @@ BuildVersion:    18G6032
 
 - python version
 
-```
+```shell
 $ python
 Python 3.7.6 (default, Jan  8 2020, 13:42:34)
 [Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
@@ -39,7 +39,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 - python modules for this example
 
-```
+```shell
 $ pip list | grep matplotlib
 matplotlib                    3.1.3
 $ pip list | grep numpy
@@ -48,28 +48,28 @@ numpy                         1.18.5
 
 If these modules are not installed, you can install them with
 
-```
+```shell
 $ pip install matplotlib
 $ pip install numpy
 ```
 
 -     helics_broker version
 
-```
+```shell
 $ helics_broker --version
 2.4.0 (2020-02-04)
 ```
 
 -     helics_cli version
 
-```
+```shell
 $ helics --version
 0.4.1-HEAD-ef36755
 ```
 
 - pyhelics init file
 
-```
+```shell
 $ python
 
 >>> import helics as h
@@ -95,7 +95,7 @@ This example differs from the Base Example in that we integrate the federates (s
 
 For example, let's look at our JSON config file of the Battery federate from the Base Example:
 
-```
+```json
 {
   "name": "Battery",
   "loglevel": 1,
@@ -125,7 +125,7 @@ Configuration with the API is done within the federate, where an API call sets t
 7. `terminate_on_error`
 8. `wait_for_current_time_update`
 
-```
+```python
 h.helicsCreateValueFederate("Battery", fedinfo)
 h.helicsFederateInfoSetIntegerProperty(fedinfo,h.HELICS_PROPERTY_INT_LOG_LEVEL, 1)
 h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -149,7 +149,7 @@ We now know which API calls are analogous to the JSON configurations -- how shou
 
 It's common practice to rely on a helper function to integrate the federate using API calls. With our Battery/Controller co-simulation, this is done by defining a `create_value_federate` function (named for the fact that the messages passed between the two federates are physical values). In `Battery.py` this function is:
 
-```
+```python
 def create_value_federate(fedinitstring,name,period):
     fedinfo = h.helicsCreateFederateInfo()
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -168,7 +168,7 @@ Notice that we have passed three items to this function: `fedinitstring`, `name`
 
 We create the federate and integrate it into the co-simulation by calling this function at the beginning of the program main loop:
 
-```
+```python
     fedinitstring = " --federates=1"
     name = "Battery"
     period = 60
@@ -195,7 +195,7 @@ Notice that we pass to this API the `fedinfo` set by all preceding API calls.
 
 In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate handles needed to be explicitly defined for a predetermined number of connections:
 
-```
+```json
   "publications":[
     {
       "key":"Battery/EV1_current",
@@ -221,7 +221,7 @@ With the PyHELICS API methods, you have the flexibility to define the connection
 
 Using the PyHELICS API methods, we can register any number of publications and subscriptions. This example sets up pub/sub registration using for loops:
 
-```
+```python
     num_EVs = 5
     pub_count = num_EVs
     pubid = {}
@@ -245,7 +245,7 @@ Here we only need to designate the number of connections to register in one plac
 
 In this tutorial, we have covered how to integrate federates into a co-simulation using the PyHELICS API. Integration covers configuration of federates and registration of communication connections. Execution of the co-simulation is done the same as with the Base Example, with a runner JSON we sent to `helics_cli`. The runner JSON has not changed from the Base Example:
 
-```
+```json
 {
   "federates": [
     {
@@ -273,7 +273,7 @@ In this tutorial, we have covered how to integrate federates into a co-simulatio
 
 Execute the co-simulation with the same command as the Base Example
 
-```
+```shell
 >helics run --path=EVtoyrunner.json
 ```
 

@@ -6,7 +6,7 @@ All the [examples](../examples/examples_index.md) are written with a runner file
 
 The file `fundamental_default_runner.json` includes:
 
-```
+```json
 {
   "federates": [
     {
@@ -38,7 +38,7 @@ The other two federates are Python based. We instruct `helics_cli` to launch the
 
 Once the runner file is specified to include information about where the executables live (`directory`), the execution command for each (`exec`), the host, and the name, the entire federation can be launched with the following command:
 
-```
+```shell
 > helics run --path=fundamental_default_runner.json
 ```
 

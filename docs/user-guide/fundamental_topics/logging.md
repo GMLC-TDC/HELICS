@@ -11,7 +11,7 @@ Logging in HELICS provides a way to understand the operation of a federate and i
 
 There are several levels used inside HELICS for logging. The level can be set with either an integer or the string.
 
-```
+```python
 helics_log_level_no_print = -1,
 helics_log_level_error = 0,
 helics_log_level_warning = 1,
@@ -57,7 +57,7 @@ The [Fundamental Base Example](../examples/fudnamental_examples/fundamental_defa
 
 In the Battery simulator, we need to import `logging` and set up the logger:
 
-```
+```python
 import logging
 
 
@@ -70,7 +70,7 @@ Now we can use the `logger` to print different levels of detail about the co-sim
 
 A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file.
 
-```
+```python
 logger.info('Only prints to log file if log_level = 2 or summary')
 logger.debug('Only prints to log file if log_level = 6 or data')
 logger.error('Only prints to log file if log_level = 0 or error')
@@ -90,7 +90,7 @@ Most of the time the log for a federate is the same as for its core. This is man
 
 These properties can be set using the JSON configuration for each federate:
 
-```
+```json
 {
   "name": "Battery",
   "log_level": 1,
@@ -111,7 +111,7 @@ This can be specified through the coreinit string `--logfile logfile.txt`
 
 or on a core object
 
-```
+```python
 h.helicsCoreSetLogFile(core,"logfile.txt");
 ```
 
@@ -119,13 +119,13 @@ A similar function is available for a broker. The Federate version will set the 
 
 With the API:
 
-```
+```python
 h.helicsFederateSetLogFile(fed,"logfile.txt");
 ```
 
 Within the `helics_cli` runner JSON:
 
-```
+```json
 {
   "federates": [
     {
@@ -150,7 +150,7 @@ setLoggingCallback (const std::function<void(int, const std::string &, const std
 
 In PyHELICS:
 
-```
+```python
 h.helicsFederateSetLoggingCallback (fed, logger, user_data)
 ```
 
