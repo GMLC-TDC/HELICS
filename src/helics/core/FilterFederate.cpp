@@ -299,9 +299,8 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
         }
         auto mid = command.sequenceID;
         auto fid = handle->getFederateId();
-        auto fid_index = fid.baseValue();
 
-        auto& ongoingDestProcess = ongoingDestFilterProcesses[handle->getFederateId().baseValue()];
+        auto& ongoingDestProcess = ongoingDestFilterProcesses[fid.baseValue()];
         if (ongoingDestProcess.find(mid) != ongoingDestProcess.end()) {
             if (command.action() == CMD_NULL_DEST_MESSAGE) {
                 acceptDestProcessReturn(fid, mid);
@@ -448,17 +447,17 @@ bool FilterFederate::destinationProcessMessage(ActionMessage& command,
     return true;
 }
 
-void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* ffunc,
+void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* fcoord,
                                                   const BasicHandleInfo* handle,
                                                   const ActionMessage& command) const
 {
     // now go to the cloning filters
-    for (auto* clFilter : ffunc->cloningDestFilters) {
+    for (auto* clFilter : fcoord->cloningDestFilters) {
         if (checkActionFlag(*clFilter, disconnected_flag)) {
             continue;
         }
         if (clFilter->core_id == mFedID) {
-            auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
+            const auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
             if (FiltI != nullptr) {
                 if (FiltI->filterOp != nullptr) {
                     // this is a cloning filter so it generates a bunch(?) of new

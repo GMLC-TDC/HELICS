@@ -136,7 +136,7 @@ class FilterFederate {
     FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle);
     const FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle) const;
     /** run the destination filters associated with an endpoint*/
-    void runCloningDestinationFilters(const FilterCoordinator* filt,
+    void runCloningDestinationFilters(const FilterCoordinator* fcoord,
                                       const BasicHandleInfo* handle,
                                       const ActionMessage& command) const;
 
