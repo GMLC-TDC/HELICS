@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - '!develop'
+      - '!main'
       - '!master'
       - '!helics3'
     paths:
