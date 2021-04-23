@@ -15,6 +15,8 @@ inpath = "../"
 
 if len(sys.argv) > 1:
     outpath = sys.argv[1]
+    if not os.path.exists(outpath):
+        os.makedirs(outpath)
 
 if len(sys.argv) > 2:
     inpath = sys.argv[2]
