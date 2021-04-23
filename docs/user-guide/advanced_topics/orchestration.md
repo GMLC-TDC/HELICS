@@ -67,8 +67,8 @@ describes the name and a short description about the study.
 
 ```yaml
 description:
-    name: Test helics
-    description: Juggle helics data
+  name: Test helics
+  description: Juggle helics data
 ```
 
 The env block describes the environment that the study will execute
@@ -124,15 +124,15 @@ created.
 
 ```json
 {
-    "federates": [
-        {
-            "directory": ".",
-            "exec": "python3 -u pisender.py 0",
-            "host": "localhost",
-            "name": "pisender0"
-        }
-    ],
-    "name": "pisender0"
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python3 -u pisender.py 0",
+      "host": "localhost",
+      "name": "pisender0"
+    }
+  ],
+  "name": "pisender0"
 }
 ```
 
@@ -148,13 +148,12 @@ run segment is where you will tell merlin what commands need to be
 executed.
 
 ```yaml
-    - name: start_federates <-- Name of the step
-      description: say Hello
-      run:
-        cmd: |
-          helics run --path=$(FED) <-- execute the helics_cli for each column in samples.csv
-          echo "DONE"
-
+- name: start_federates <-- Name of the step
+  description: say Hello
+  run:
+    cmd: |
+      helics run --path=$(FED) <-- execute the helics_cli for each column in samples.csv
+      echo "DONE"
 ```
 
 In the example snippet we ask Merlin to execute the json file that was
@@ -168,14 +167,13 @@ and 8 pi-senders and execute it as a merlin workflow.
 
 ```yaml
 description:
-    name: Test helics
-    description: Juggle helics data
+  name: Test helics
+  description: Juggle helics data
 
 env:
   variables:
     OUTPUT_PATH: ./helics_juggle_output
     N_SAMPLES: 8
-
 
 merlin:
   samples:
@@ -187,20 +185,19 @@ merlin:
     file: samples.csv
     column_labels: [FED]
 
-
 study:
-    - name: start_federates
-      description: say Hello
-      run:
-        cmd: |
-          spack load helics
-          /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
-          echo "DONE"
-    - name: cleanup
-      description: Clean up
-      run:
-        cmd: rm $(SPECROOT)/samples.csv
-        depends: [start_federates_*]
+  - name: start_federates
+    description: say Hello
+    run:
+      cmd: |
+        spack load helics
+        /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
+        echo "DONE"
+  - name: cleanup
+    description: Clean up
+    run:
+      cmd: rm $(SPECROOT)/samples.csv
+      depends: [start_federates_*]
 ```
 
 ### DAG of the spec
