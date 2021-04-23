@@ -8,9 +8,9 @@ This tutorial is organized as follows:
 
 - [Computing Environment](#computing-environment)
 - [Example files](#example-files)
-- [Federate Integration with PyHELICS API](#federate-integration-with-pyhelics-api)
+- [Federate Integration using the PyHELICS API](#federate-integration-using-the-pyhelics-api)
   - [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api)
-  - [Federate integration with API calls](#federate-integration-with-api-calls)
+  - [Federate Integration with API calls](#federate-integration-with-api-calls)
   - [Dynamic Pub/Subs with API calls](#dynamic-pub-subs-with-api-calls)
   - [Co-simulation Execution](co-simulation-execution)
 - [Questions and Help](#questions-and-help)
@@ -89,7 +89,7 @@ The files include:
 - Python program for Charger federate
 - "runner" JSON to enable `helics_cli` execution of the co-simulation
 
-## Federate Integration with PyHELICS API
+## Federate Integration using the PyHELICS API
 
 This example differs from the Base Example in that we integrate the federates (simulators) into the co-simulation using the API instead of an external JSON config file. Integration and configuration of federates can be done either way -- the biggest hurdle for most beginning users of HELICS is learning how to look for the appropriate API key to mirror the JSON config style.
 
@@ -143,7 +143,7 @@ If you find yourself wanting to set additional properties, there are a handful o
 - [PyHELICS API methods](https://python.helics.org/api/capi-py/): API methods specific to PyHELICS, with suggestions for making the calls pythonic.
 - [Configuration Options Reference](../../configuration_options_reference.html): API calls for C++, C, Python, and Julia
 
-### Federate integration with API calls
+### Federate Integration with API calls
 
 We now know which API calls are analogous to the JSON configurations -- how should these methods be called in the co-simulation to properly integrate the federate?
 

@@ -5,7 +5,7 @@ The Federate Message + Communication Configuration Example extends the Base Exam
 This tutorial is organized as follows:
 
 - [Example files](#example-files)
-- [Combination Federation](#combination-federation)
+- [Combination Federates](#combination-federates)
   - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
   - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
   - [Co-simulation Execution](co-simulation-execution)
@@ -22,7 +22,7 @@ All files necessary to run the Federate Integration Example can be found in the 
 - Python program and configuration JSON for Controller federate
 - "runner" JSON to enable `helics_cli` execution of the co-simulation
 
-## Combination Federation
+## Combination Federates
 
 A quick glance at the [Fundamental examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/) on github will show that almost all these introductory examples are mocked up with two federates. These two federates pass information back and forth, and the examples show different ways this can be done.
 
