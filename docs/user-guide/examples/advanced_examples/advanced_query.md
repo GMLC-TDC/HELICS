@@ -35,7 +35,7 @@ In most of the examples presented here, the configuration of the federation is d
 
 - Sleeping a few seconds to ensure all other federates in the federation have configured so that the Battery federate can query the federation and know it is seeing the comprehensive configuration.
 
-  ```
+  ```python
   sleep_time = 5
   logger.debug(f'Sleeping for {sleep_time} seconds')
   time.sleep(sleep_time)
@@ -43,16 +43,16 @@ In most of the examples presented here, the configuration of the federation is d
 
 - `eval_data_flow_graph` is a new function that performs a data graph query on the federation. This query evaluates the connections between federates, showing who is publishing and subscribing to what. The function also takes the output from the query and parses it into a form that can be easily used for the dynamic configuration.
 
-  ```
+  ```python
   def eval_data_flow_graph(fed):
       query = h.helicsCreateQuery("broker", "data_flow_graph")
       graph = h.helicsQueryExecute(query, fed)
   ...
   ```
 
-* The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
+- The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
 
-  ```
+  ```python
   for core in graph['cores']:
       if core['federates'][0]['name'] == 'Charger':
           for pub in core['federates'][0]['publications']:
@@ -63,7 +63,7 @@ In most of the examples presented here, the configuration of the federation is d
 
 - After making the subscription, the Battery federate re-evaulates the data flow graph and updates its own internal record of the configuration
 
-  ```
+  ```python
   # The data flow graph can be a time-intensive query for large
   #   federations
   # Verifying dynamic configuration worked.
@@ -95,7 +95,7 @@ Since this is only a change to the configuration method of the federation, the r
 
 The dynamic configuration can also been seen by looking at the log file for the Battery federate (`Battery.log`). The pre-configure data flow graph only showed five subscriptions, all made by the Charger federate of the Battery federates current
 
-```
+```shell
 Pre-configure data-flow graph query.
 Federate Charger (with id 131072) has the following subscriptions:
     Battery/EV1_current from federate Battery
@@ -108,7 +108,7 @@ Added subscription Charger/EV1_voltage
 
 After analyzing the results of the data-flow graph, the Battery federate subscribing to the appropriate publications from the Charger federate, and re-running the query, the subscription list looks like this:
 
-```
+```shell
 Post-configure data-flow graph query.
 Federate Battery (with id 131073) has the following subscriptions:
     Charger/EV1_voltage from federate Charger

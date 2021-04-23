@@ -27,7 +27,7 @@ The [Examples](../examples/examples_index.md) illustrate in detail how to integr
 
 The most common parameters are set in the file `ChargerConfig.json`. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [Configurations Options Reference](../../references/configuration_options_reference.md).
 
-```
+```json
 {
   "name": "Charger",
   "loglevel": 7,
@@ -107,7 +107,7 @@ The following example of a federate interface configuration with the PyHELICS AP
 
 In the `Charger.py` simulator, the following function calls the APIs to create a federate:
 
-```
+```python
 def create_combo_federate(fedinitstring,name,period):
     fedinfo = h.helicsCreateFederateInfo()
     # "coreType": "zmq",
@@ -128,7 +128,7 @@ def create_combo_federate(fedinitstring,name,period):
 
 The interface configurations are finalized and registered in one step using the following APIs:
 
-```
+```python
     fedinitstring = " --federates=1"
     name = "Charger"
     period = 60
@@ -162,7 +162,7 @@ The interface configurations are finalized and registered in one step using the 
 
 All the API calls reference the PyHELICS library with
 
-```
+```python
 import helics as h
 ```
 

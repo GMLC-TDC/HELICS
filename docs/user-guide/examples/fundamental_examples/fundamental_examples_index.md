@@ -65,7 +65,7 @@ The co-simulation has two federates: one for the EVs, and one for the Chargers. 
 
 Within the federate `Battery.py`, EV battery sizes can be generated using the function `get_new_battery`:
 
-```
+```python
 def get_new_battery(numBattery):
     # Probabilities of a new EV battery having small capacity (lvl1),
     # medium capacity (lvl2), and large capacity (lvl3).
@@ -82,7 +82,7 @@ def get_new_battery(numBattery):
 
 Within the federate `Charger.py`, the charge rate for each EV is generated using the function `get_new_EV`:
 
-```
+```python
 def get_new_EV(numEVs):
     # Probabilities of a new EV charging at the specified level.
     lvl1 = 0.05
@@ -122,7 +122,7 @@ Register and Configure Federates
 
 The first task is to register and configure the federates with HELICS within each python program:
 
-```
+```python
     ##########  Registering  federate and configuring from JSON################
     fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
     federate_name = h.helicsFederateGetName(fed)
@@ -143,7 +143,7 @@ Enter Execution Mode
 
 The HELICS co-simulation starts by instructing each federate to enter execution mode.
 
-```
+```python
     ##############  Entering Execution Mode  ##################################
     h.helicsFederateEnterExecutingMode(fed)
     logger.info('Entered HELICS execution mode')
@@ -160,7 +160,7 @@ Define Time Variables
 
 Time management is a vital component to HELICS co-simulations. Every HELICS co-simulation needs to be provided information about the start time (`grantedtime`), the end time (`total_interval`) and the time step (`update_interval`). Federates can step through time at different rates [LINK TO TIME MD], and it is allowable to have federates start and stop at different times, but this must be curated to meet the needs of the research question.
 
-```
+```python
     hours = 24 * 7
     total_interval = int(60 * 60 * hours)
     update_interval = int(h.helicsFederateGetTimeProperty(
@@ -182,7 +182,7 @@ Starting the co-simulation time sequence is also a function of the needs of the 
 
 In the `Battery.py` federate, Time is initiated by starting a `while` loop and requesting the first time stamp:
 
-```
+```python
     while grantedtime < total_interval:
 
         # Time request for the next physical interval to be simulated
@@ -194,7 +194,7 @@ In the `Battery.py` federate, Time is initiated by starting a `while` loop and r
 
 In the `Charger.py` federate, we need to send the first signal **before** entering the time `while` loop. This is accomplished by requesting an initial time (outside the `while` loop), sending the signal, and then starting the time `while` loop:
 
-```
+```python
     # Blocking call for a time request at simulation time 0
     initial_time = 60
     logger.debug(f'Requesting initial time {initial_time}')
@@ -233,7 +233,7 @@ Once inside the time loop, information is requested and sent between federates a
 
 The `Battery.py` federate first asks for voltage information from the handles to which it subscribes:
 
-```
+```python
             # Get the applied charging voltage from the EV
             charging_voltage = h.helicsInputGetDouble((subid[0]))
             logger.debug(f'\tReceived voltage {charging_voltage:.2f} from input'
@@ -242,7 +242,7 @@ The `Battery.py` federate first asks for voltage information from the handles to
 
 And then (after doing some internal calculations) publishes the charging current of the battery at its publication handle:
 
-```
+```python
             # Publish out charging current
             h.helicsPublicationPublishDouble(pubid[j], charging_current)
             logger.debug(f'\tPublished {pub_name[j]} with value '
@@ -251,7 +251,7 @@ And then (after doing some internal calculations) publishes the charging current
 
 Meanwhile, the `Charger.py` federate asks for charging current from the handles to which it subscribes:
 
-```
+```python
             charging_current[j] = h.helicsInputGetDouble((subid[j]))
             logger.debug(f'\tCharging current: {charging_current[j]:.2f} from '
                          f'input {h.helicsSubscriptionGetKey(subid[j])}')
@@ -260,7 +260,7 @@ Meanwhile, the `Charger.py` federate asks for charging current from the handles 
 
 And publishes the charging voltage at its publication handle:
 
-```
+```python
             # Publish updated charging voltage
             h.helicsPublicationPublishDouble(pubid[j], charging_voltage[j])
             logger.debug(
@@ -278,7 +278,7 @@ Finalize Co-simulation
 
 After all the time steps have completed, it's good practice to finalize the co-simulation by freeing the federates and closing the HELICS libraries:
 
-```
+```python
 status = h.helicsFederateFinalize(fed)
 h.helicsFederateFree(fed)
 h.helicsCloseLibrary()
