@@ -20,6 +20,9 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Generate C API Headers
+      run: |
+              python3 scripts/generateHelicsH.py src/helics/shared_api_library/backup/helics/ ./
     - name: Run SWIG
       run: |
         rm -rf interfaces/*/interface/*
@@ -35,7 +38,7 @@ jobs:
         popd
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
-      run: git add interfaces/
+      run: git add interfaces/ src/helics/shared_api_library/backup/
     - uses: gmlc-tdc/create-pr-action@v0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
