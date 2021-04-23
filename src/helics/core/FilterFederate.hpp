@@ -136,13 +136,17 @@ class FilterFederate {
     FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle);
     const FilterInfo* getFilterInfo(global_federate_id fed, interface_handle handle) const;
     /** run the destination filters associated with an endpoint*/
-    void runCloningDestinationFilters(const FilterCoordinator* filt,
+    void runCloningDestinationFilters(const FilterCoordinator* fcoord,
                                       const BasicHandleInfo* handle,
                                       const ActionMessage& command) const;
 
     std::pair<ActionMessage&, bool> executeFilter(ActionMessage& command, FilterInfo* filt);
     void generateProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime);
     void acceptProcessReturn(global_federate_id fid, uint32_t pid);
+
+    void generateDestProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime);
+    void acceptDestProcessReturn(global_federate_id fid, uint32_t pid);
+
     void addTimeReturn(int32_t id, Time TimeVal);
     void clearTimeReturn(int32_t id);
 };
