@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
+
 std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
 {
     if (queryres.empty()) {
@@ -23,20 +24,20 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
 
     if (queryres.front() == '[') {
         try {
-            auto v = loadJsonStr(queryres);
+            auto v = fileops::loadJsonStr(queryres);
             std::vector<std::string> strs;
             if (v.isArray()) {
                 for (auto& str : v) {
                     if (str.isString()) {
                         strs.emplace_back(str.asCString());
                     } else {
-                        strs.emplace_back(generateJsonString(str));
+                        strs.emplace_back(fileops::generateJsonString(str));
                     }
                 }
             } else if (v.isString()) {
                 strs.emplace_back(v.asCString());
             } else {
-                strs.emplace_back(generateJsonString(v));
+                strs.emplace_back(fileops::generateJsonString(v));
             }
             return strs;
         }
@@ -52,20 +53,20 @@ std::vector<std::string> vectorizeQueryResult(const std::string& queryres)
 {
     if (queryres.front() == '[') {
         try {
-            auto v = loadJsonStr(queryres);
+            auto v = fileops::loadJsonStr(queryres);
             std::vector<std::string> strs;
             if (v.isArray()) {
                 for (auto& str : v) {
                     if (str.isString()) {
                         strs.emplace_back(str.asCString());
                     } else {
-                        strs.emplace_back(generateJsonString(str));
+                        strs.emplace_back(fileops::generateJsonString(str));
                     }
                 }
             } else if (v.isString()) {
                 strs.emplace_back(v.asCString());
             } else {
-                strs.emplace_back(generateJsonString(v));
+                strs.emplace_back(fileops::generateJsonString(v));
             }
             return strs;
         }
@@ -85,7 +86,7 @@ std::vector<int> vectorizeIndexQuery(const std::string& queryres)
 
     if (queryres.front() == '[') {
         try {
-            auto v = loadJsonStr(queryres);
+            auto v = fileops::loadJsonStr(queryres);
             if (v.isArray()) {
                 for (auto& val : v) {
                     if (val.isInt()) {

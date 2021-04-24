@@ -193,31 +193,31 @@ const HelicsBool HELICS_TRUE = 1;
 const HelicsBool HELICS_FALSE = 0;
 
 typedef enum {
-    HELICS_ITERATION_REQUEST_NO_ITERATION,
-    HELICS_ITERATION_REQUEST_FORCE_ITERATION,
-    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED
+    HELICS_ITERATION_REQUEST_NO_ITERATION = 0,
+    HELICS_ITERATION_REQUEST_FORCE_ITERATION = 1,
+    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = 2
 } HelicsIterationRequest;
 
 typedef enum {
-    HELICS_ITERATION_RESULT_NEXT_STEP,
-    HELICS_ITERATION_RESULT_ERROR,
-    HELICS_ITERATION_RESULT_HALTED,
-    HELICS_ITERATION_RESULT_ITERATING
+    HELICS_ITERATION_RESULT_NEXT_STEP = 0,
+    HELICS_ITERATION_RESULT_ERROR = 1,
+    HELICS_ITERATION_RESULT_HALTED = 2,
+    HELICS_ITERATION_RESULT_ITERATING = 3
 } HelicsIterationResult;
 
 typedef enum {
     HELICS_STATE_STARTUP = 0,
-    HELICS_STATE_INITIALIZATION,
-    HELICS_STATE_EXECUTION,
-    HELICS_STATE_FINALIZE,
-    HELICS_STATE_ERROR,
+    HELICS_STATE_INITIALIZATION = 1,
+    HELICS_STATE_EXECUTION = 2,
+    HELICS_STATE_FINALIZE = 3,
+    HELICS_STATE_ERROR = 4,
 
-    HELICS_STATE_PENDING_INIT,
-    HELICS_STATE_PENDING_EXEC,
-    HELICS_STATE_PENDING_TIME,
-    HELICS_STATE_PENDING_ITERATIVE_TIME,
-    HELICS_STATE_PENDING_FINALIZE,
-    HELICS_STATE_FINISHED
+    HELICS_STATE_PENDING_INIT = 5,
+    HELICS_STATE_PENDING_EXEC = 6,
+    HELICS_STATE_PENDING_TIME = 7,
+    HELICS_STATE_PENDING_ITERATIVE_TIME = 8,
+    HELICS_STATE_PENDING_FINALIZE = 9,
+    HELICS_STATE_FINISHED = 10
 } HelicsFederateState;
 
 typedef struct HelicsComplex {
@@ -443,9 +443,9 @@ void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double va
 const char* helicsInputGetType(HelicsInput ipt);
 const char* helicsInputGetPublicationType(HelicsInput ipt);
 const char* helicsPublicationGetType(HelicsPublication pub);
-const char* helicsInputGetKey(HelicsInput ipt);
-const char* helicsSubscriptionGetKey(HelicsInput ipt);
-const char* helicsPublicationGetKey(HelicsPublication pub);
+const char* helicsInputGetName(HelicsInput ipt);
+const char* helicsSubscriptionGetTarget(HelicsInput ipt);
+const char* helicsPublicationGetName(HelicsPublication pub);
 const char* helicsInputGetUnits(HelicsInput ipt);
 const char* helicsInputGetInjectionUnits(HelicsInput ipt);
 const char* helicsInputGetExtractionUnits(HelicsInput ipt);

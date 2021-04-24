@@ -336,7 +336,7 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
             [](const auto& inp) { return inp.getDisplayName(); },
             [](const auto& inp) { return (inp.isUpdated()); });
     } else if (queryStr == "updates") {
-        JsonBuilder JB;
+        fileops::JsonBuilder JB;
         for (const auto& inp : inputs.lock_shared()) {
             if (inp.isUpdated()) {
                 auto inpTemp = inp;
@@ -355,7 +355,7 @@ std::string ValueFederateManager::localQuery(const std::string& queryStr) const
         }
         ret = JB.generate();
     } else if (queryStr == "values") {
-        JsonBuilder JB;
+        fileops::JsonBuilder JB;
         for (const auto& inp : inputs.lock_shared()) {
             auto inpTemp = inp;
             inpTemp.checkUpdate(true);

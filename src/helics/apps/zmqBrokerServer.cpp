@@ -57,14 +57,14 @@ namespace apps {
         if (zmq_enabled_) {
             if (config_->isMember("zmq")) {
                 auto V = (*config_)["zmq"];
-                replaceIfMember(V, "interface", ext_interface);
-                replaceIfMember(V, "port", port);
+                fileops::replaceIfMember(V, "interface", ext_interface);
+                fileops::replaceIfMember(V, "port", port);
             }
         } else {
             if (config_->isMember("zmqss")) {
                 auto V = (*config_)["zmqss"];
-                replaceIfMember(V, "interface", ext_interface);
-                replaceIfMember(V, "port", port);
+                fileops::replaceIfMember(V, "interface", ext_interface);
+                fileops::replaceIfMember(V, "port", port);
             }
         }
 
@@ -98,8 +98,8 @@ namespace apps {
         std::chrono::milliseconds timeout(20000);
         if (config_->isMember("zmq")) {
             auto V = (*config_)["zmq"];
-            replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", retval.second);
+            fileops::replaceIfMember(V, "interface", ext_interface);
+            fileops::replaceIfMember(V, "port", retval.second);
         }
         retval.first = std::make_unique<zmq::socket_t>(ctx, ZMQ_REP);
         retval.first->setsockopt(ZMQ_LINGER, 500);
@@ -123,8 +123,8 @@ namespace apps {
         std::chrono::milliseconds timeout(20000);
         if (config_->isMember("zmqss")) {
             auto V = (*config_)["zmqss"];
-            replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", retval.second);
+            fileops::replaceIfMember(V, "interface", ext_interface);
+            fileops::replaceIfMember(V, "port", retval.second);
         }
         retval.first = std::make_unique<zmq::socket_t>(ctx, ZMQ_ROUTER);
         retval.first->setsockopt(ZMQ_LINGER, 500);

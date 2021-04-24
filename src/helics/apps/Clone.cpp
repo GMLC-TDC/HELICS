@@ -105,7 +105,7 @@ namespace apps {
             }
             return;
         }
-        Json::Value doc = loadJsonStr(fedConfig);
+        Json::Value doc = fileops::loadJsonStr(fedConfig);
         doc["defaultglobal"] = true;
         if (!cloneSubscriptionNames.empty()) {
             doc["optional"] = true;

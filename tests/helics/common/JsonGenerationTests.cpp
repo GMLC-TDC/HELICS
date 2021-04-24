@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 
 using namespace helics;
-
+using namespace helics::fileops;
 class jsonStringGen_tests: public ::testing::TestWithParam<const char*> {
 };
 

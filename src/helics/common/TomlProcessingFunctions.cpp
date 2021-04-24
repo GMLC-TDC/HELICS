@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <string>
 
+namespace helics::fileops {
+
 bool hasTomlExtension(const std::string& tomlString)
 {
     auto ext = tomlString.substr(tomlString.length() - 4);
@@ -92,7 +94,7 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
     return helics::Time::minVal();
 }
 
-std::string getKey(const toml::value& element)
+std::string getName(const toml::value& element)
 {
     std::string retval = toml::find_or(element, "key", emptyString);
     if (retval.empty()) {
@@ -117,3 +119,4 @@ std::string tomlAsString(const toml::value& element)
         }
     }
 }
+}  // namespace helics::fileops

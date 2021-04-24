@@ -86,7 +86,6 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param dest string name of the destination
     @param data pointer to data location
     @param data_size the length of the data
-    @param sendTime the time to send the message
     */
     void sendTo(const char* data, size_t data_size, std::string_view dest) const;
     /** send a data block and length
