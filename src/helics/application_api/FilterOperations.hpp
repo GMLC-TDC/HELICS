@@ -114,7 +114,7 @@ class RerouteFilterOperation: public FilterOperations {
     virtual void set(const std::string& property, double val) override;
     virtual void setString(const std::string& property, const std::string& val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
-
+    
   private:
     /** function to execute the rerouting operation*/
     std::string rerouteOperation(const std::string& src, const std::string& dest) const;
@@ -154,7 +154,6 @@ class CloneFilterOperation: public FilterOperations {
     virtual void set(const std::string& property, double val) override;
     virtual void setString(const std::string& property, const std::string& val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
-
   private:
     /** run the send message function which copies the message and forwards to all destinations
     @param mess a message to clone*/
