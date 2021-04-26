@@ -8,9 +8,10 @@ on:
       - '**.webp'
   push:
     branches:
-      - !develop
-      - !master
-      - !helics3
+      - '!develop'
+      - '!main'
+      - '!master'
+      - '!helics3'
     paths:
       - '**.jpg'
       - '**.jpeg'

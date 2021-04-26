@@ -827,7 +827,7 @@ HELICS_EXPORT const char* helicsSubscriptionGetTarget(HelicsInput ipt);
  *
  * @param pub The publication to query.
  *
- * @retur A const char with the publication name.
+ * @return A const char with the publication name.
  */
 HELICS_EXPORT const char* helicsPublicationGetName(HelicsPublication pub);
 
