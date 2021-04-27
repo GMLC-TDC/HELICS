@@ -326,12 +326,14 @@ namespace apps {
         captureFederate = federateName;
     }
 
-    std::pair<std::string, std::string> Clone::getValue(int index) const
+    std::tuple<Time, std::string, std::string> Clone::getValue(int index) const
     {
         if (isValidIndex(index, points)) {
-            return {subscriptions[points[index].index].getTarget(), points[index].value};
+            return {points[index].time,
+                    subscriptions[points[index].index].getTarget(),
+                    points[index].value};
         }
-        return {std::string(), std::string()};
+        return {Time(), std::string(), std::string()};
     }
 
     std::unique_ptr<Message> Clone::getMessage(int index) const
