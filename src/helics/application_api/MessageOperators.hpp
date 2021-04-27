@@ -47,6 +47,7 @@ class HELICS_CXX_EXPORT MessageDestOperator: public FilterOperator {
     void setDestFunction(
         std::function<std::string(const std::string&, const std::string&)> userDestFunction);
     virtual bool isMessageGenerating() const override { return true; }
+
   private:
     std::function<std::string(const std::string&, const std::string&)>
         DestUpdateFunction;  //!< the function that actually does the processing
@@ -103,6 +104,7 @@ class HELICS_CXX_EXPORT CloneOperator: public FilterOperator {
     void setCloneFunction(
         std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction);
     virtual bool isMessageGenerating() const override { return true; }
+
   private:
     std::function<std::vector<std::unique_ptr<Message>>(const Message*)>
         evalFunction;  //!< the function actually doing the processing
