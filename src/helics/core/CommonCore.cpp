@@ -3118,6 +3118,11 @@ void CommonCore::connectFilterTiming()
     ad.dest_id = fid;
     ad.source_id = global_broker_id_local;
     filterFed->handleMessage(ad);
+    // TODO(PT) this should be conditional as it probably isn't needed in all cases
+    ad.setAction(CMD_ADD_DEPENDENCY);
+    timeCoord->addDependent(fid);
+    filterFed->handleMessage(ad);
+    //
     filterTiming = true;
 }
 
