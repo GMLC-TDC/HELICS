@@ -3122,7 +3122,7 @@ void CommonCore::connectFilterTiming()
     ad.setAction(CMD_ADD_DEPENDENCY);
     timeCoord->addDependent(fid);
     filterFed->handleMessage(ad);
-    //  
+    //
     filterTiming = true;
 }
 
