@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [2.7.0][] - 2021-04-28
 
-This release includes a major change internally for filters. Testing and usage revealed some scenarios which could cause deadlock or acausal message arrival. These scenarios were not common so the release was delayed until a fix was in place. As of the 2.7.0 release all the identified issues related to the initial bug have been resolved. There remains some outstanding cases that fail rarely in the CI systems specifically related to rerouting filters that are separate from both the location they are rerouting from an too. The resolution of these is uncertain but will be available in a patch release when resolved. Additional changes include major changes to the CI builds due to changing support of Travis CI and other CI services.
+This release includes a major change internally for filters. Testing and usage revealed some scenarios which could cause deadlock or acausal message arrival. These scenarios were not common so the release was delayed until a fix was in place. As of the 2.7.0 release all the identified issues related to the initial bug have been resolved. There remains some outstanding cases that fail rarely in the CI systems specifically related to rerouting filters that are separate from both the location they are rerouting from and to. The resolution of these is uncertain but will be available in a patch release when resolved. Additional changes include major changes to the CI builds due to changing support of Travis CI and other CI services.
 
 ### Changed
 
@@ -22,7 +22,7 @@ This release includes a major change internally for filters. Testing and usage r
 ### Fixed
 
 - Tests and fixes allowing multiple filters on the same endpoint #1852
-- some failing broker server tests related to input arguments #1825
+- Fixed some failing broker server tests related to input arguments #1825
 - Fixed an issue with barrier and maxTime requests #1788
 - Fixed a timing bug when using offset and some specific time requests immediately after the enterExecutingMode #1759
 - Several fixes and changes to CI systems related to changes in CI infrastructure #1754, #1790, #1828, #1744, #1739
@@ -32,13 +32,13 @@ This release includes a major change internally for filters. Testing and usage r
 
 ### Added
 
-- add support for ZMQ 4.3.4(this will become default in the next version) #1841
-- added a `global_flush` query to sweep the internal action message queues #1832
-- a vcpkg manifest file for some vcpkg support #1835
-- added an event triggered flag to better handle timing on federates that are primarily or exclusively triggered by events like filters #1804
-- added ordered queries which allow queries to run on the normal vs priority pathways for queries that are desired to be synchronous with the other helics messages #1793
-- add a github workflow to compress images #1626
-- additional and clearer warning messages when a message is sent to an unknown destination #1702
+- Support for ZMQ 4.3.4 (this will become default in the next version) #1841
+- Added a `global_flush` query to sweep the internal action message queues #1832
+- A vcpkg manifest file for some vcpkg support #1835
+- Added an event triggered flag to better handle timing on federates that are primarily or exclusively triggered by events like filters #1804
+- Added ordered queries which allow queries to run on the normal vs priority pathways for queries that are desired to be synchronous with the other helics messages #1793
+- Added github workflow to compress images #1626
+- Additional and clearer warning messages when a message is sent to an unknown destination #1702
 
 ## [2.6.1][] - 2020-10-15
 
