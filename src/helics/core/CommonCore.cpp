@@ -2132,7 +2132,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     if (queryStr == "counter") {
         return fmt::format("{}", generateMapObjectCounter());
     }
-    if (queryStr == "filtered_endpoints" || queryStr=="endpoint_filters") {
+    if (queryStr == "filtered_endpoints" || queryStr == "endpoint_filters") {
         return filteredEndpointQuery(nullptr);
     }
     if (queryStr == "current_time") {
