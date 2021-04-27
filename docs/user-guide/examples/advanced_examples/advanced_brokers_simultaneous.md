@@ -27,13 +27,14 @@ Two primary changes:
 
 1. This example contains a set of co-simulations with each instance using a different random number generator seed in Battery.py
 
-```if __name__ == "__main__":
+```python
+if __name__ == "__main__":
     np.random.seed(2608)
 ```
 
 and Charger.py
 
-```
+```python
 if __name__ == "__main__":
     np.random.seed(1490)
 ```

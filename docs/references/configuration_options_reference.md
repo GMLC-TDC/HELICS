@@ -1086,7 +1086,7 @@ _API:_ `helicsFederateRegisterFilter`
 
 Filters have a predefined set of operations they can perform. The following list defines the valid operations for filters. Most filters require additional specifications in properties data structure, an example of which is shown for each filter type.
 
-##### `reroute`
+#### `reroute`
 
 This filter reroutes a message to a new destination. it also has an optional filtering mechanism that will only reroute if some patterns are matching. The patterns should be specified by "condition" in the set string the conditions are regular expression pattern matching strings.
 
@@ -1108,7 +1108,7 @@ Example `property` object:
 ...
 ```
 
-##### `delay`
+#### `delay`
 
 This filter will delay a message by a certain amount fo time.
 
@@ -1124,7 +1124,7 @@ Example `property` object:
 ...
 ```
 
-##### `random_delay` | `randomdelay` | `randomDelay`
+#### `random_delay` | `randomdelay` | `randomDelay`
 
 This filter will randomly delay a message according to specified random distribution
 available options include distribution selection, and 2 parameters for the distribution
@@ -1193,7 +1193,7 @@ some distributions only take one parameter in which case the second is ignored. 
 ...
 ```
 
-##### `random_drop` | `randomdrop` | `randomDrop`
+#### `random_drop` | `randomdrop` | `randomDrop`
 
 This filter will randomly drop a message, the drop probability is specified, and is modeled as a uniform distribution between zero and one.
 
@@ -1207,7 +1207,7 @@ This filter will randomly drop a message, the drop probability is specified, and
 ...
 ```
 
-##### `clone`
+#### `clone`
 
 This filter will copy a message and send it to the original destination plus a new one.
 

@@ -23,13 +23,9 @@ Integration of federates requires definition of the message topology (who is pas
 
 This section introduces the simplest broker topology for integrating federates into a federation, and the basics for integrating federates with a JSON and with API calls.
 
-```
-fix toc to be direct links
-```
+**todo: fix toc to be direct links**
 
-```
-make link/reference to tools with HELICS support -- these will need to be configured with jsons
-```
+**todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
 
 ```eval_rst
 .. toctree::

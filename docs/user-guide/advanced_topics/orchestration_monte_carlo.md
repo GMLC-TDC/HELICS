@@ -8,11 +8,7 @@ familiarity with how Merlin works.
 We will walk through how to user Merlin to setup and run a Monte Carlo simulation using HELICS. Code for the Monte Carlo simulation and the
 full Merlin spec and be found in the [**User Guide Examples**](https://github.com/GMLC-TDC/HELICS/tree/v3userguide/examples/user_guide_examples/) under [**Example 3**](https://github.com/GMLC-TDC/HELICS/tree/v3userguide/examples/user_guide_examples/Example_3).
 
-# TEST!!!!
-
-this is a test to see if U+03BB works or λ or $\lambda$ or _λ_ or $$\lambda$$ or $\lambda $
-
-# Monte Carlo Cosimulation
+## Monte Carlo Cosimulation
 
 A Monte Carlo simulation allows the practitioner to sample random numbers repeatedly from a predefined distribution to explore and quantify uncertainty in their analysis. Additional detail about Monte Carlo methods can be found on [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_method) and [MIT Open Courses](https://www.youtube.com/watch?v=OgO1gpXSUzU).
 
@@ -27,11 +23,11 @@ is distributed uniformly with bounds $a$ and $b$."
 
 The uniform distribution is among the most simple of probability distributions. Additional resources on probability and statistics are plentiful; [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/) is highly recommended.
 
-## Monte Carlo Cosim Example: EV Garage Charging
+### Monte Carlo Cosim Example: EV Garage Charging
 
 The example cosimulation to demonstrate Monte Carlo distribution sampling is that of an electric vehicle (EV) charging hub. Imagine a parking garage that only serves EVs, has a static number of charging ports, and always has an EV connected to a charging port. An electrical engineer planning to upgrade the distribution transformer prior to building the garage may ask the question: What is the likely power draw that EVs will demand?
 
-### Probability Distributions
+#### Probability Distributions
 
 _Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value $\lambda$ and the number of samples $k$. Then we can write the distribution for the number of chargers in each level, $L$, as
 
@@ -77,7 +73,7 @@ Notice that the individual overplotted distributions in the two histograms above
 
 We have described the individual distributions for each level of charging port. What we don't know, prior to running the Monte Carlo simulation, is how these distributions will jointly impact the research question.
 
-### Research Question Configuration
+#### Research Question Configuration
 
 We want to address the research question: What is the likely power draw that EVs will demand?
 
@@ -85,11 +81,11 @@ In [**Example 3**](https://github.com/GMLC-TDC/HELICS/tree/v3userguide/examples/
 
 After the two federates pass information between each other -- EV federate sends SOC, EV Controller federate instructs whether to keep charging or resample the distributions -- the EV federate calculates the total power demanded in the last time interval.
 
-### Cosimulation Reproduction
+#### Cosimulation Reproduction
 
 As best practice, we recommend setting a seed for a single cosimulation. Management of multiple iterations of the cosimulation can be done by setting the seed as a function of the number of brokers, where there will be one broker for each iteration. In Python 3.X:
 
-```
+```python
 import argparse
 
 parser = argparse.ArgumentParser(description='EV simulator')
@@ -107,7 +103,7 @@ The cosimulation in [**Example 3**](https://github.com/GMLC-TDC/HELICS/tree/v3us
 
 The result of running the cosimulation 10 times tells us that we can anticipate needed
 
-# Merlin spec for Cosimulation
+## Merlin spec for Cosimulation
 
 In this specification we will be using the
 [helics_cli](https://github.com/GMLC-TDC/helics-cli) to execute each
@@ -115,7 +111,7 @@ cosimulation run since this is a Monte Carlo simulation. This means
 that helics_cli will be executed multiple times with different
 helics_cli runner files.
 
-## Helics_cli in Merlin
+### helics_cli in Merlin
 
 Since we are using the helics_cli to manage and execute all the
 federates, we need to create these runner files for helics_cli.
@@ -126,7 +122,7 @@ study step.
 An example of how the helics_cli runner file looks like is shown
 below.
 
-```
+```json
 Example of helics_cli runner for UQ EV example
 ```
 
@@ -136,16 +132,16 @@ broker. Helics_cli will start each of these federates. In the Merlin
 spec, Merlin will be instructed to execute the helics_cli with all the
 generated helics_cli runner files.
 
-## Merlin Specification
+### Merlin Specification
 
-### Environment
+#### Environment
 
 In the Merlin spec we will instruct Merlin to execute N number of the
 Monte Carlo co-simulations. The number of samples is the number
 specified as the `N_SAMPLES` env variable in the env section of the
 merlin spec.
 
-```
+```yaml
 env:
   variables:
     OUTPUT_PATH: ./UQ_EV_Study
@@ -156,7 +152,7 @@ We set the output directory to UQ_EV_Study, this is where all the
 output files will be stored. Every co-simulation run executed by
 merlin will have it's own subdirectory in `./UQ_EV_Study`.
 
-### Merlin Step
+#### Merlin Step
 
 Remember this step is for Merlin to setup all the files and data it
 needs to execute it's jobs. In the Monte Carlo co-simulation there is
@@ -167,7 +163,7 @@ use. The csv file contains all the names of the runner files. Merlin
 will go down this list of file names and execute the helics_cli for
 each file name.
 
-```
+```yaml
 merlin:
   samples:
     generate:
@@ -177,46 +173,45 @@ merlin:
         cp $(SPECROOT)/EVControllerMsgFed.py $(MERLIN_INFO)
     file: $(MERLIN_INFO)/samples.csv
     column_labels: [FED]
-
 ```
 
 The samples the get generated should look something like below. This
 is the runner file that helics_cli will use to start the
 co-simulation.
 
-```
+```json
 {
-    "federates": [
-        {
-            "directory": ".",
-            "exec": "helics_broker --federates=2 --loglevel=5 --type=tcpss --port 12345",
-            "host": "broker",
-            "name": "broker_0",
-            "loglevel": 3
-        },
-        {
-            "directory": ".",
-            "exec": "python3 EVMsgFed.py --port 12345 --seed 1",
-            "host": "broker",
-            "name": "EVMsgFed_0",
-            "loglevel": 3
-        },
-        {
-            "directory": ".",
-            "exec": "python3 EVControllerMsgFed.py --port 12345",
-            "host": "broker",
-            "name": "EVController_0",
-            "loglevel": 3
-        }
-    ],
-    "name": "Generated by make samples"
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "helics_broker --federates=2 --loglevel=5 --type=tcpss --port 12345",
+      "host": "broker",
+      "name": "broker_0",
+      "loglevel": 3
+    },
+    {
+      "directory": ".",
+      "exec": "python3 EVMsgFed.py --port 12345 --seed 1",
+      "host": "broker",
+      "name": "EVMsgFed_0",
+      "loglevel": 3
+    },
+    {
+      "directory": ".",
+      "exec": "python3 EVControllerMsgFed.py --port 12345",
+      "host": "broker",
+      "name": "EVController_0",
+      "loglevel": 3
+    }
+  ],
+  "name": "Generated by make samples"
 }
 ```
 
 Once the samples have been created, we copy the 2 federates to the
 `MERLIN_INFO` directory.
 
-### Study Step
+#### Study Step
 
 We have made it to the study step. This step will execute all 10 Monte
 Carlo co-simulations. There are 2 steps in the study step. The first
@@ -226,21 +221,20 @@ depends on the first step. Once `start_parallel_sims` is complete the
 `cleanup` step will remove any temporary data that is no longer
 needed.
 
-```
-
+```yaml
 study:
-    - name: start_parallel_sims
-      description: Run a bunch of UQ sims in parallel
-      run:
-        cmd: |
-          spack load helics
-          /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(MERLIN_INFO)/$(FED)
-          echo "DONE"
-    - name: cleanup
-      description: Clean up
-      run:
-        cmd: rm $(MERLIN_INFO)/samples.csv
-        depends: [start_parallel_sims_*]
+  - name: start_parallel_sims
+    description: Run a bunch of UQ sims in parallel
+    run:
+      cmd: |
+        spack load helics
+        /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(MERLIN_INFO)/$(FED)
+        echo "DONE"
+  - name: cleanup
+    description: Clean up
+    run:
+      cmd: rm $(MERLIN_INFO)/samples.csv
+      depends: [start_parallel_sims_*]
 ```
 
 Below is what the DAG of the Merlin study will look like. Each of the

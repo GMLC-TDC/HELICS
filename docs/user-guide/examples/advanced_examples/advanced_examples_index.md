@@ -40,10 +40,7 @@ Where is the code?
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
 
-```
-TODO:
-UPDATE IMAGE
-```
+**TODO: UPDATE IMAGE**
 
 [![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
 
@@ -144,8 +141,8 @@ Federates which are abstractions of reality (e.g., controllers) do not need regu
 
 **shouldn't we also show how this federate is configured? where is best for that?**
 
-```
-         hours = 24*7 # one week
+```python
+        hours = 24*7 # one week
         total_interval = int(60 * 60 * hours)
         grantedtime = 0
         fake_max_time = int(h.HELICS_TIME_MAXTIME/1000)
@@ -168,10 +165,7 @@ As in the [Base Example](../fundamental_examples/fundamental_default.md), the EV
 
 If the early time steps of the simulation are not as important (a model warm up period), then ensuring each federate has a default value it will provide when the input is null (and assuming the controller dynamics are not overly aggressive) will allow the models to bootstrap and through several iterations reach a consistent state. If this is not the case then HELICS does have a provision for getting models into a consistent state prior to the start of execution: initialization mode. **TODO: link to documentation or example on initialization mode.** This mode allows for this same iteration between models with no simulated time passing. It is the responsibility of the modeler to make sure there is a method to reach and detect convergence of the models and when such conditions are met, enter execution mode as would normally be done.
 
-```
-add examples for where this is inserted in the code
-
-```
+**todo: add examples for where this is inserted in the code**
 
 <a name="examples-covered-in-advanced-examples">
 <strong>

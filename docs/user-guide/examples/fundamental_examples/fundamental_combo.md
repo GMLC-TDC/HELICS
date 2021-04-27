@@ -5,7 +5,7 @@ The Federate Message + Communication Configuration Example extends the Base Exam
 This tutorial is organized as follows:
 
 - [Example files](#example-files)
-- [Combination Federation](#combination-federation)
+- [Combination Federates](#combination-federates)
   - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
   - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
   - [Co-simulation Execution](co-simulation-execution)
@@ -22,7 +22,7 @@ All files necessary to run the Federate Integration Example can be found in the 
 - Python program and configuration JSON for Controller federate
 - "runner" JSON to enable `helics_cli` execution of the co-simulation
 
-## Combination Federation
+## Combination Federates
 
 A quick glance at the [Fundamental examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/) on github will show that almost all these introductory examples are mocked up with two federates. These two federates pass information back and forth, and the examples show different ways this can be done.
 
@@ -54,7 +54,7 @@ There are no differences in the config file. As in the Base Example, the Battery
 
 The Charger federate is now a combination federate -- it will communicate via pub/subs with the Battery, and via endpoints with the Controller. This difference from the Base Example Charger is seen in the config file; in addition to the pub/subs with the Battery, there are now also endpoints. Notice that the default destination for each of these named endpoints is the same -- there is one controller for all the charging ports.
 
-```
+```json
   "endpoints": [
     {
       "name": "Charger/EV1.soc",
@@ -65,7 +65,7 @@ The Charger federate is now a combination federate -- it will communicate via pu
 
 Since this federate also communicated via endpoints, we need to register them along with the existing pub/subs:
 
-```
+```python
     ##############  Registering  federate from json  ##########################
     fed = h.helicsCreateCombinationFederateFromConfig("ChargerConfig.json")
     federate_name = h.helicsFederateGetName(fed)
@@ -83,7 +83,7 @@ The Charger federate is gaining the new role of _estimating the Battery's curren
 
 The Charger federate estimates the Battery federate's current with a new helper function call `estimate_SOC`. The Charger does not know the exact SOC of the Battery; it must estimate the SOC from the effective resistance, which is a function of applied voltage (from the Charger) and the measured current (from the Battery). This is the same function as used in the Battery federate, but with noise added to the measurement of the current.
 
-```
+```python
 def estimate_SOC(charging_V, charging_A):
     socs = np.array([0, 1])
     effective_R = np.array([8, 150])
@@ -103,7 +103,7 @@ If the current received from the Battery federate is zero, this means that we ha
 
 The estimated SOC is sent to the Controller every 15 minutes -- this mimics an on board charging agent regularly pinging the charging port to confirm if it should continue charging:
 
-```
+```python
 # Send message to Controller with SOC every 15 minutes
 if grantedtime % 900 == 0:
     h.helicsEndpointSendBytesTo(endid[j], "",f'{currentsoc[j]:4f}'.encode())
@@ -111,7 +111,7 @@ if grantedtime % 900 == 0:
 
 The Charger federate is allowed to be interrupted if there is a message from the Controller.
 
-```
+```python
 # Check for messages from EV Controller
 endpoint_name = h.helicsEndpointGetName(endid[j])
 if h.helicsEndpointHasMessage(endid[j]):
@@ -121,7 +121,7 @@ if h.helicsEndpointHasMessage(endid[j]):
 
 The Charger will receive a message every 15 minutes as well, however it will only change actions if it is told to stop charging. When this happens, the Charger "disengages" from the charging port by applying zero voltage to the Battery.
 
-```
+```python
 if int(instructions) == 0:
     # Stop charging this EV
     charging_voltage[j] = 0
@@ -133,7 +133,7 @@ if int(instructions) == 0:
 
 The Controller is a new federate whose role is to decide whether to keep charging an EV based. This decision is based entirely on the estimated SOC calculated by the Charger. Since this decision logic is simple and can be applied to all the EVs modeled by the federation, we can set up the config file with one endpoint:
 
-```
+```json
   "endpoints": [
     {
       "name": "Controller/ep",
@@ -144,7 +144,7 @@ The Controller is a new federate whose role is to decide whether to keep chargin
 
 Note that there is no default destination -- the Controller will _respond_ to a request for instructions from the Charger. This is accomplished by calling the `h.helicsMessageGetOriginalSource()` API:
 
-```
+```python
 while h.helicsEndpointHasMessage(endid):
 
     # Get the SOC from the EV/charging terminal in question
@@ -155,7 +155,7 @@ while h.helicsEndpointHasMessage(endid):
 
 And then sending the message to this source:
 
-```
+```python
 message = str(instructions)
 h.helicsEndpointSendBytesTo(endid, source, message.encode())
 ```
@@ -164,7 +164,7 @@ The Controller federate only operates when it receives a message -- it is a _pas
 
 1. Initializing the start time of the federate to `h.HELICS_TIME_MAXTIME`:
 
-   ```
+   ```python
        fake_max_time = int(h.HELICS_TIME_MAXTIME)
        starttime = fake_max_time
        logger.debug(f'Requesting initial time {starttime}')
@@ -173,7 +173,7 @@ The Controller federate only operates when it receives a message -- it is a _pas
 
 2. Allow the federate to be interrupted and set a minimum `timedelta` (`ControllerConfig.json`):
 
-   ```
+   ```json
    {
     "name": "Controller",
     ...
@@ -185,19 +185,19 @@ The Controller federate only operates when it receives a message -- it is a _pas
 
 3. Only execute an action when there is a message:
 
-   ```
+   ```python
    while h.helicsEndpointHasMessage(endid):
    ```
 
 4. Re-request the `h.HELICS_TIME_MAXTIME` after a message has been received:
 
-   ```
+   ```python
    grantedtime = h.helicsFederateRequestTime (fed, fake_max_time)
    ```
 
 The message the Controller receives is the SOC estimated by the Charger. If the estimated SOC is greater than 95%, the Controller sends the message back to stop charging.
 
-```
+```python
 soc_full = 0.95
 if float(currentsoc) <= soc_full:
     instructions = 1
@@ -209,7 +209,7 @@ else:
 
 With these three federates -- Battery, Charger, and Controller -- we have partitioned the roles into the most logical places. Execution of this co-simulation is done as before with `helics_cli`:
 
-```
+```shell
 helics run --path=fundamental_combo_runner.json
 ```
 
