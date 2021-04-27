@@ -964,7 +964,6 @@ class rfcheck {
   public:
     int mCnt{0};
 
-  public:
     rfcheck() = default;
     rfcheck(std::shared_ptr<helics::MessageFederate> fed, int index):
         mFed(std::move(fed)), mIndex(index)
@@ -990,7 +989,7 @@ class rfcheck {
         id = std::thread(act1);
     }
     void join() { id.join(); };
-};
+}
 
 /** this test case fails as of yet with no good path to resolving it yet
 TEST_F(filter_tests, reroute_cascade_2_ci_skip)
@@ -1095,7 +1094,7 @@ TEST_F(filter_tests, reroute_separate2)
 
     auto act1 = [&p1, &send]() {
         send->enterExecutingMode();
-        helics::Time tr = helics::timeZero;
+        helics::Time tr{helics::timeZero};
         while (tr < 10.0) {
             p1.send("this is a message");
             tr = send->requestTimeAdvance(1.0);
@@ -1105,7 +1104,7 @@ TEST_F(filter_tests, reroute_separate2)
 
     auto act2 = [&rec]() {
         rec->enterExecutingMode();
-        helics::Time tr = helics::timeZero;
+        helics::Time tr{helics::timeZero};
         while (tr < 10.0) {
             tr = rec->requestTimeAdvance(1.0);
         }
@@ -1115,7 +1114,7 @@ TEST_F(filter_tests, reroute_separate2)
     int cnt{0};
     auto act3 = [&filt, &cnt]() {
         filt->enterExecutingMode();
-        helics::Time tr = helics::timeZero;
+        helics::Time tr{helics::timeZero};
         while (tr < 20.0) {
             tr = filt->requestTime(helics::Time::maxVal());
             ++cnt;
