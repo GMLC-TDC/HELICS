@@ -47,7 +47,7 @@ Answers to queries can be
 
 ## sequencing_mode
 
-As of HELICS 2.7.0  Queries have an optional parameter to describe a sequencing mode.  There are currently two modes fast `helics_sequencing_mode_fast` which travels along priority channels and is identical to previous versions which all queries traveled along those channels.  The other mode is `helics_sequencing_mode_ordered` which travels along lower priority channels but is ordered with all other messages in the system.  This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run.  The `global_flush` query is forced to run in ordered mode at least after it gets to the specified target.  
+As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing mode. There are currently two modes fast `helics_sequencing_mode_fast` which travels along priority channels and is identical to previous versions which all queries traveled along those channels. The other mode is `helics_sequencing_mode_ordered` which travels along lower priority channels but is ordered with all other messages in the system. This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run. The `global_flush` query is forced to run in ordered mode at least after it gets to the specified target.
 
 ### Federate Queries
 
@@ -92,7 +92,8 @@ The following queries are defined for federates. Federates may specify a callbac
 | ``version``        | the version string of the helics library [string]          |
 +--------------------+------------------------------------------------------------+
 ```
-The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels.  See the `Core` and `Broker` queries for more description of them.  
+
+The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them.
 
 ### Local Federate Queries
 
@@ -244,7 +245,7 @@ The Following queries will be answered by a broker.
 +--------------------------+-------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.  `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower.  
+`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower.
 
 ## Usage Notes
 

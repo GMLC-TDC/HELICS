@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [2.7.0][] - 2021-04-28
 
-This release includes a major change internally for filters.  Testing and usage revealed some scenarios which could cause deadlock or acausal message arrival.  These scenarios were not common so the release was delayed until a fix was in place.  As of the 2.7.0 release all the identified issues related to the initial bug have been resolved.  There remains some outstanding cases that fail rarely in the CI systems specifically related to rerouting filters that are separate from both the location they are rerouting from an too.  The resolution of these is uncertain but will be avaialable in a patch release when resolved.  Additional changes include major changes to the CI builds due to changing support of Travis CI and other CI services.  
+This release includes a major change internally for filters. Testing and usage revealed some scenarios which could cause deadlock or acausal message arrival. These scenarios were not common so the release was delayed until a fix was in place. As of the 2.7.0 release all the identified issues related to the initial bug have been resolved. There remains some outstanding cases that fail rarely in the CI systems specifically related to rerouting filters that are separate from both the location they are rerouting from an too. The resolution of these is uncertain but will be available in a patch release when resolved. Additional changes include major changes to the CI builds due to changing support of Travis CI and other CI services.
 
 ### Changed
 
@@ -18,7 +18,6 @@ This release includes a major change internally for filters.  Testing and usage 
 - Default `HELICS_USE_ZMQ_STATIC_LIB` to `ON` if only the static library is found in the search path #1845
 - Primary CI systems are now on azure instead of travis #1819
 - Only a very limited CI test set is run on formatting PR's #1761
-
 
 ### Fixed
 
@@ -40,7 +39,6 @@ This release includes a major change internally for filters.  Testing and usage 
 - added ordered queries which allow queries to run on the normal vs priority pathways for queries that are desired to be synchronous with the other helics messages #1793
 - add a github workflow to compress images #1626
 - additional and clearer warning messages when a message is sent to an unknown destination #1702
-
 
 ## [2.6.1][] - 2020-10-15
 
