@@ -8,6 +8,38 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [2.7.0][] - 2021-04-28
+
+This release includes a major change internally for filters. Testing and usage revealed some scenarios which could cause deadlock or acausal message arrival. These scenarios were not common so the release was delayed until a fix was in place. As of the 2.7.0 release all the identified issues related to the initial bug have been resolved. There remains some outstanding cases that fail rarely in the CI systems specifically related to rerouting filters that are separate from both the location they are rerouting from and to. The resolution of these is uncertain but will be available in a patch release when resolved. Additional changes include major changes to the CI builds due to changing support of Travis CI and other CI services.
+
+### Changed
+
+- Update spdlog, fmtlib, filesystem, asio, and units libraries to latest releases (#1798, #1802, #1803)
+- Default `HELICS_USE_ZMQ_STATIC_LIB` to `ON` if only the static library is found in the search path #1845
+- Primary CI systems are now on azure instead of travis #1819
+- Only a very limited CI test set is run on formatting PR's #1761
+
+### Fixed
+
+- Tests and fixes allowing multiple filters on the same endpoint #1852
+- Fixed some failing broker server tests related to input arguments #1825
+- Fixed an issue with barrier and maxTime requests #1788
+- Fixed a timing bug when using offset and some specific time requests immediately after the enterExecutingMode #1759
+- Several fixes and changes to CI systems related to changes in CI infrastructure #1754, #1790, #1828, #1744, #1739
+- Fixed deadlock caused when querying a disconnected HELICS object #1705
+- Fixed major timing bug with the use of filters #1717
+- Fixed issue when sending messages before execution time #1717
+
+### Added
+
+- Support for ZMQ 4.3.4 (this will become default in the next version) #1841
+- Added a `global_flush` query to sweep the internal action message queues #1832
+- A vcpkg manifest file for some vcpkg support #1835
+- Added an event triggered flag to better handle timing on federates that are primarily or exclusively triggered by events like filters #1804
+- Added ordered queries which allow queries to run on the normal vs priority pathways for queries that are desired to be synchronous with the other helics messages #1793
+- Added github workflow to compress images #1626
+- Additional and clearer warning messages when a message is sent to an unknown destination #1702
+
 ## [2.6.1][] - 2020-10-15
 
 Several small bug fixes and minor enhancements to query operations
