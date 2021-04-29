@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -334,8 +334,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 replaceIfMember(sub, "units", units);
 
                 id = &registerInput(emptyStr, type, units);
+                id->addTarget(key);
             }
-            id->addTarget(key);
 
             loadOptions(this, sub, *id);
         }
@@ -497,9 +497,9 @@ void ValueFederate::startupToInitializeStateTransition()
 {
     vfManager->startupToInitializeStateTransition();
 }
-void ValueFederate::initializeToExecuteStateTransition()
+void ValueFederate::initializeToExecuteStateTransition(iteration_result result)
 {
-    vfManager->initializeToExecuteStateTransition();
+    vfManager->initializeToExecuteStateTransition(result);
 }
 
 std::string ValueFederate::localQuery(const std::string& queryStr) const

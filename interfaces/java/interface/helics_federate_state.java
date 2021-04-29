@@ -19,39 +19,43 @@ public final class helics_federate_state {
   /**
    *  entered after the enterInitializingMode call has returned 
    */
-  public final static helics_federate_state helics_state_initialization = new helics_federate_state("helics_state_initialization");
+  public final static helics_federate_state helics_state_initialization = new helics_federate_state("helics_state_initialization", helicsJNI.helics_state_initialization_get());
   /**
    *  entered after the enterExectuationState call has returned 
    */
-  public final static helics_federate_state helics_state_execution = new helics_federate_state("helics_state_execution");
+  public final static helics_federate_state helics_state_execution = new helics_federate_state("helics_state_execution", helicsJNI.helics_state_execution_get());
   /**
    *  the federate has finished executing normally final values may be retrieved 
    */
-  public final static helics_federate_state helics_state_finalize = new helics_federate_state("helics_state_finalize");
+  public final static helics_federate_state helics_state_finalize = new helics_federate_state("helics_state_finalize", helicsJNI.helics_state_finalize_get());
   /**
    *  error state no core communication is possible but values can be retrieved 
    */
-  public final static helics_federate_state helics_state_error = new helics_federate_state("helics_state_error");
+  public final static helics_federate_state helics_state_error = new helics_federate_state("helics_state_error", helicsJNI.helics_state_error_get());
   /**
    *  indicator that the federate is pending entry to initialization state 
    */
-  public final static helics_federate_state helics_state_pending_init = new helics_federate_state("helics_state_pending_init");
+  public final static helics_federate_state helics_state_pending_init = new helics_federate_state("helics_state_pending_init", helicsJNI.helics_state_pending_init_get());
   /**
    *  state pending EnterExecution State 
    */
-  public final static helics_federate_state helics_state_pending_exec = new helics_federate_state("helics_state_pending_exec");
+  public final static helics_federate_state helics_state_pending_exec = new helics_federate_state("helics_state_pending_exec", helicsJNI.helics_state_pending_exec_get());
   /**
    *  state that the federate is pending a timeRequest 
    */
-  public final static helics_federate_state helics_state_pending_time = new helics_federate_state("helics_state_pending_time");
+  public final static helics_federate_state helics_state_pending_time = new helics_federate_state("helics_state_pending_time", helicsJNI.helics_state_pending_time_get());
   /**
    *  state that the federate is pending an iterative time request 
    */
-  public final static helics_federate_state helics_state_pending_iterative_time = new helics_federate_state("helics_state_pending_iterative_time");
+  public final static helics_federate_state helics_state_pending_iterative_time = new helics_federate_state("helics_state_pending_iterative_time", helicsJNI.helics_state_pending_iterative_time_get());
   /**
    *  state that the federate is pending a finalize request 
    */
-  public final static helics_federate_state helics_state_pending_finalize = new helics_federate_state("helics_state_pending_finalize");
+  public final static helics_federate_state helics_state_pending_finalize = new helics_federate_state("helics_state_pending_finalize", helicsJNI.helics_state_pending_finalize_get());
+  /**
+   *  state that the federate is finished simulating but still connected 
+   */
+  public final static helics_federate_state helics_state_finished = new helics_federate_state("helics_state_finished", helicsJNI.helics_state_finished_get());
 
   public final int swigValue() {
     return swigValue;
@@ -87,7 +91,7 @@ public final class helics_federate_state {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_federate_state[] swigValues = { helics_state_startup, helics_state_initialization, helics_state_execution, helics_state_finalize, helics_state_error, helics_state_pending_init, helics_state_pending_exec, helics_state_pending_time, helics_state_pending_iterative_time, helics_state_pending_finalize };
+  private static helics_federate_state[] swigValues = { helics_state_startup, helics_state_initialization, helics_state_execution, helics_state_finalize, helics_state_error, helics_state_pending_init, helics_state_pending_exec, helics_state_pending_time, helics_state_pending_iterative_time, helics_state_pending_finalize, helics_state_finished };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

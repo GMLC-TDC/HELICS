@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -1092,6 +1092,7 @@ TEST(valuefederate, indexed_targets)
     Fed1->finalize();
 }
 
+#ifdef ENABLE_ZMQ_CORE
 /** test out register interfaces after configuration make sure that doesn't cause issues*/
 TEST(valuefederate, file_and_config)
 {
@@ -1134,6 +1135,7 @@ TEST(valuefederate, file_and_config)
     Fed2->finalize();
     broker->disconnect();
 }
+#endif
 
 TEST(valuefederate, duplicate_targets)
 {

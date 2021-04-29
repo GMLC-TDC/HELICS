@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -229,7 +229,9 @@ namespace apps {
         for (auto& capt : captureInterfaces) {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
-                auto pubs = vectorizeQueryResult(fed->query(capt, "publications"));
+                fed->query("root", "global_flush", helics_sequencing_mode_ordered);
+                auto pubs = vectorizeQueryResult(
+                    fed->query(capt, "publications", helics_sequencing_mode_ordered));
                 for (auto& pub : pubs) {
                     addSubscription(pub);
                 }

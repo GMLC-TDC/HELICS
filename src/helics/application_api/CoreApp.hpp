@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -108,9 +108,13 @@ class HELICS_CXX_EXPORT CoreApp {
     @param target the target of the query "federation", "parent", "core","broker" or a specific
     named object
     @param queryStr the query to make
+    @param mode defaults to fast (asynchronous) meaning the query goes into priority channels,
+    ordered (synchronous) means slower queries but has more ordering guarantees
     @return a string containing the query results
     */
-    std::string query(const std::string& target, const std::string& queryStr);
+    std::string query(const std::string& target,
+                      const std::string& queryStr,
+                      helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** set a federation global value
     @details this overwrites any previous value for this name

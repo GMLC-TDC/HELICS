@@ -15,15 +15,15 @@ public final class helics_iteration_request {
   /**
    *  no iteration is requested 
    */
-  public final static helics_iteration_request helics_iteration_request_no_iteration = new helics_iteration_request("helics_iteration_request_no_iteration");
+  public final static helics_iteration_request helics_iteration_request_no_iteration = new helics_iteration_request("helics_iteration_request_no_iteration", helicsJNI.helics_iteration_request_no_iteration_get());
   /**
    *  force iteration return when able 
    */
-  public final static helics_iteration_request helics_iteration_request_force_iteration = new helics_iteration_request("helics_iteration_request_force_iteration");
+  public final static helics_iteration_request helics_iteration_request_force_iteration = new helics_iteration_request("helics_iteration_request_force_iteration", helicsJNI.helics_iteration_request_force_iteration_get());
   /**
    *  only return an iteration if necessary 
    */
-  public final static helics_iteration_request helics_iteration_request_iterate_if_needed = new helics_iteration_request("helics_iteration_request_iterate_if_needed");
+  public final static helics_iteration_request helics_iteration_request_iterate_if_needed = new helics_iteration_request("helics_iteration_request_iterate_if_needed", helicsJNI.helics_iteration_request_iterate_if_needed_get());
 
   public final int swigValue() {
     return swigValue;

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -214,9 +214,11 @@ const std::string& BrokerApp::getAddress() const
     return (broker) ? broker->getAddress() : estring;
 }
 /** make a query at the broker*/
-std::string BrokerApp::query(const std::string& target, const std::string& queryStr)
+std::string BrokerApp::query(const std::string& target,
+                             const std::string& queryStr,
+                             helics_sequencing_mode mode)
 {
-    return (broker) ? broker->query(target, queryStr) : std::string("#error");
+    return (broker) ? broker->query(target, queryStr, mode) : std::string("#error");
 }
 
 void BrokerApp::setGlobal(const std::string& valueName, const std::string& value)

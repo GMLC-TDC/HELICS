@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -854,9 +854,9 @@ const char* helicsQueryExecute(helics_query query, helics_federate fed, helics_e
         return invalidStringConst;
     }
     if (queryObj->target.empty()) {
-        queryObj->response = fedObj->query(queryObj->query);
+        queryObj->response = fedObj->query(queryObj->query, queryObj->mode);
     } else {
-        queryObj->response = fedObj->query(queryObj->target, queryObj->query);
+        queryObj->response = fedObj->query(queryObj->target, queryObj->query, queryObj->mode);
     }
 
     return queryObj->response.c_str();
@@ -873,7 +873,7 @@ const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_
         return invalidStringConst;
     }
     try {
-        queryObj->response = coreObj->query(queryObj->target, queryObj->query);
+        queryObj->response = coreObj->query(queryObj->target, queryObj->query, queryObj->mode);
         return queryObj->response.c_str();
     }
     // LCOV_EXCL_START
@@ -896,7 +896,7 @@ const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, h
         return invalidStringConst;
     }
     try {
-        queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
+        queryObj->response = brokerObj->query(queryObj->target, queryObj->query, queryObj->mode);
         return queryObj->response.c_str();
     }
     // LCOV_EXCL_START
@@ -977,6 +977,15 @@ void helicsQuerySetQueryString(helics_query query, const char* queryString, heli
         return;
     }
     queryObj->query = AS_STRING(queryString);
+}
+
+void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err)
+{
+    auto* queryObj = getQueryObj(query, err);
+    if (queryObj == nullptr) {
+        return;
+    }
+    queryObj->mode = (mode == 0) ? helics_sequencing_mode_fast : helics_sequencing_mode_ordered;
 }
 
 void helicsQueryFree(helics_query query)

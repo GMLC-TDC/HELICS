@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -31,6 +31,7 @@ namespace apps {
         helicsCLI11App app("Options specific to the Echo App");
         app.add_option("--delay", delayTime, "the delay with which the echo app will echo message");
         if (!deactivated) {
+            fed->setFlagOption(helics_flag_event_triggered);
             app.parse(remArgs);
             if (!masterFileName.empty()) {
                 loadFile(masterFileName);
@@ -41,19 +42,25 @@ namespace apps {
         }
     }
 
-    Echo::Echo(const std::string& name, const FederateInfo& fi): App(name, fi) {}
+    Echo::Echo(const std::string& name, const FederateInfo& fi): App(name, fi)
+    {
+        fed->setFlagOption(helics_flag_event_triggered);
+    }
 
     Echo::Echo(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi):
         App(name, core, fi)
     {
+        fed->setFlagOption(helics_flag_event_triggered);
     }
 
     Echo::Echo(const std::string& name, CoreApp& core, const FederateInfo& fi): App(name, core, fi)
     {
+        fed->setFlagOption(helics_flag_event_triggered);
     }
 
     Echo::Echo(const std::string& name, const std::string& jsonString): App(name, jsonString)
     {
+        fed->setFlagOption(helics_flag_event_triggered);
         Echo::loadJsonFile(jsonString);
     }
 

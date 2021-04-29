@@ -1,7 +1,8 @@
 freebsd_instance:
-  image_family: freebsd-12-1
+  image_family: freebsd-12-2
 
 task:
+  skip: $CIRRUS_BRANCH == 'pre-commit/.*'
   install_script: |
     pkg install -y cmake libzmq4 ninja git
   build_script: |

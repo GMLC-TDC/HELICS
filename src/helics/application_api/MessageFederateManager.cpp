@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -167,6 +167,9 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto epCount = coreObject->receiveCountAny(fedID);
+    if (epCount == 0) {
+        return;
+    }
     // lock the data updates
     auto eptDat = eptData.lock();
 
@@ -180,17 +183,15 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-
         auto fid = epts->find(endpoint_id);
         if (fid != epts->end()) {  // assign the data
 
             Endpoint& currentEpt = *fid;
             auto localEndpointIndex = fid->referenceIndex;
             (*eptDat)[localEndpointIndex]->messages.emplace(std::move(message));
-
-            if ((*eptDat)[localEndpointIndex]->callback) {
+            auto cb = (*eptDat)[localEndpointIndex]->callback.load();
+            if (cb) {
                 // need to be copied otherwise there is a potential race condition on lock removal
-                auto cb = (*eptDat)[localEndpointIndex]->callback;
                 eptDat.unlock();
                 epts.unlock();
                 cb(currentEpt, CurrentTime);
@@ -209,7 +210,11 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 
 void MessageFederateManager::startupToInitializeStateTransition() {}
 
-void MessageFederateManager::initializeToExecuteStateTransition() {}
+void MessageFederateManager::initializeToExecuteStateTransition(iteration_result result)
+{
+    Time ctime = result == iteration_result::next_step ? timeZero : initializationTime;
+    updateTime(ctime, initializationTime);
+}
 
 std::string MessageFederateManager::localQuery(const std::string& queryStr) const
 {

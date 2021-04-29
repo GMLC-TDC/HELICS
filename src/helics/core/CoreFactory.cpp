@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -110,7 +110,10 @@ namespace CoreFactory {
             throw(helics::RegistrationFailure("unable to create core"));
         }
         core->configure(configureString);
-        registerCore(core, type);
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
+        }
 
         return core;
     }
@@ -136,7 +139,10 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
-        registerCore(core, type);
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
+        }
 
         return core;
     }
@@ -162,7 +168,10 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
-        registerCore(core, type);
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
+        }
 
         return core;
     }

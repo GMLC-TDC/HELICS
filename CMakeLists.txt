@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -17,14 +17,20 @@ else()
     cmake_policy(VERSION 3.18)
 endif()
 
-project(HELICS VERSION 2.6.1)
+# Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
+# installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
+project(HELICS VERSION 2.7.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-10-15")
+set(HELICS_DATE "2021-04-29")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"

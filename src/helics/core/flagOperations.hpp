@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -24,7 +24,7 @@ enum operation_flags : uint16_t {
     optional_flag = 8,  //!< flag indicating that a connection is optional and may not be matched
     clone_flag =
         9,  //!< flag indicating the filter is a clone filter or the data needs to be cloned
-    extra_flag2 = 8,  //!< extra flag
+    extra_flag2 = 10,  //!< extra flag
     destination_processing_flag =
         11,  //!< flag indicating the message is for destination processing
     disconnected_flag = 12,  //!< flag indicating that a broker/federate is disconnected
@@ -33,12 +33,23 @@ enum operation_flags : uint16_t {
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
-constexpr uint16_t slow_responding_flag =
-    extra_flag4;  // overload of extra_flag4 indicating a federate, core or broker is slow
-                  // responding
+/// overload of extra_flag4 indicating a federate, core or broker is slow responding
+constexpr uint16_t slow_responding_flag = extra_flag4;
 
-constexpr uint16_t cancel_flag =
-    extra_flag3;  // overload of extra_flag3 indicating an operation is canceled
+/// overload of extra_flag3 indicating an operation is canceled
+constexpr uint16_t cancel_flag = extra_flag3;
+
+/// overload of extra_flag3 indicating the message is from a parent object
+constexpr uint16_t parent_flag = extra_flag3;
+
+/// overload of extra_flag4 indicating a message is from a child object
+constexpr uint16_t child_flag = extra_flag4;
+
+/// overload of nameless_interface_flag indicating that a federate should not count in any totals
+constexpr uint16_t non_counting_flag = nameless_interface_flag;
+
+/// overload of extra_flag1 to indicate the request is from a non-granting federate
+constexpr uint16_t non_granting_flag = extra_flag1;
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

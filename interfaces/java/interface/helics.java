@@ -1516,6 +1516,16 @@ public class helics {
   }
 
   /**
+   * Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence<br>
+   * <br>
+   * @param query The query object to change the order for.<br>
+   * @param mode 0 for fast, 1 for ordered
+   */
+  public static void helicsQuerySetOrdering(SWIGTYPE_p_void query, SWIGTYPE_p_int32_t mode) {
+    helicsJNI.helicsQuerySetOrdering(SWIGTYPE_p_void.getCPtr(query), SWIGTYPE_p_int32_t.getCPtr(mode));
+  }
+
+  /**
    * Free the memory associated with a query object.
    */
   public static void helicsQueryFree(SWIGTYPE_p_void query) {
@@ -2853,7 +2863,7 @@ public class helics {
   /**
    * Set the data in the info field for a filter.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to query.<br>
    * @param info The string to set.
    */
   public static void helicsEndpointSetInfo(SWIGTYPE_p_void endpoint, String info) {
@@ -2863,7 +2873,7 @@ public class helics {
   /**
    * Set a handle option on an endpoint.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to modify.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
    * @param value The value to set the option to.
    */
@@ -2874,7 +2884,7 @@ public class helics {
   /**
    * Set a handle option on an endpoint.<br>
    * <br>
-   * <br>
+   * @param endpoint The endpoint to modify.<br>
    * @param option Integer code for the option to set /ref helics_handle_options.<br>
    * @return the value of the option, for boolean options will be 0 or 1
    */

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -140,8 +140,9 @@ class QueryObject {
     std::string query;  //!< the actual query itself
     std::string response;  //!< the response to the query
     std::shared_ptr<Federate> activeFed;  //!< pointer to the fed with the active Query
-    query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
     bool activeAsync{false};
+    helics_sequencing_mode mode{helics_sequencing_mode_fast};  //!< the ordering mode used for the query
+    query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
     int valid{0};
 };
 

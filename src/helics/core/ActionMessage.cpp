@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -33,7 +33,7 @@ ActionMessage::ActionMessage(action_message_def::action_t startingAction,
 ActionMessage::ActionMessage(ActionMessage&& act) noexcept:
     messageAction(act.messageAction), messageID(act.messageID), source_id(act.source_id),
     source_handle(act.source_handle), dest_id(act.dest_id), dest_handle(act.dest_handle),
-    counter(act.counter), flags(act.flags), actionTime(act.actionTime),
+    counter(act.counter), flags(act.flags), sequenceID(act.sequenceID), actionTime(act.actionTime),
     payload(std::move(act.payload)), name(payload), Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso),
     stringData(std::move(act.stringData))
 {
@@ -42,15 +42,16 @@ ActionMessage::ActionMessage(ActionMessage&& act) noexcept:
 ActionMessage::ActionMessage(const ActionMessage& act):
     messageAction(act.messageAction), messageID(act.messageID), source_id(act.source_id),
     source_handle(act.source_handle), dest_id(act.dest_id), dest_handle(act.dest_handle),
-    counter(act.counter), flags(act.flags), actionTime(act.actionTime), payload(act.payload),
-    name(payload), Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso), stringData(act.stringData)
+    counter(act.counter), flags(act.flags), sequenceID(act.sequenceID), actionTime(act.actionTime),
+    payload(act.payload), name(payload), Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso),
+    stringData(act.stringData)
 
 {
 }
 
 ActionMessage::ActionMessage(std::unique_ptr<Message> message):
-    messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), actionTime(message->time),
-    payload(std::move(message->data.m_data)), name(payload),
+    messageAction(CMD_SEND_MESSAGE), messageID(message->messageID), flags(message->flags),
+    actionTime(message->time), payload(std::move(message->data.m_data)), name(payload),
     stringData({std::move(message->dest),
                 std::move(message->source),
                 std::move(message->original_source),
@@ -85,6 +86,7 @@ ActionMessage& ActionMessage::operator=(const ActionMessage& act)  // NOLINT
     dest_handle = act.dest_handle;
     counter = act.counter;
     flags = act.flags;
+    sequenceID = act.sequenceID;
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
@@ -104,6 +106,7 @@ ActionMessage& ActionMessage::operator=(ActionMessage&& act) noexcept
     dest_handle = act.dest_handle;
     counter = act.counter;
     flags = act.flags;
+    sequenceID = act.sequenceID;
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
@@ -117,6 +120,7 @@ ActionMessage& ActionMessage::operator=(std::unique_ptr<Message> message) noexce
 {
     messageAction = CMD_SEND_MESSAGE;
     messageID = message->messageID;
+    flags = message->flags;
     payload = std::move(message->data.m_data);
     actionTime = message->time;
     stringData = {std::move(message->dest),
@@ -537,6 +541,7 @@ std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd)
     }
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
+    msg->flags = cmd.flags;
     msg->messageID = cmd.messageID;
 
     return msg;
@@ -569,6 +574,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
     }
     msg->data = std::move(cmd.payload);
     msg->time = cmd.actionTime;
+    msg->flags = cmd.flags;
     msg->messageID = cmd.messageID;
     return msg;
 }

@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -15,6 +15,7 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
+        boost_1_75_0
         boost_1_74_0
         boost_1_73_0
         boost_1_72_0

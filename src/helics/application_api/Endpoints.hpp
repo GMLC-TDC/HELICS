@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -204,6 +204,8 @@ class HELICS_CXX_EXPORT Endpoint {
     const std::string& getKey() const { return fed->getInterfaceName(handle); }
     /** get the specified type of the endpoint*/
     const std::string& getType() const { return fed->getExtractionType(*this); }
+    ///** get the number of filters applied to the endpoint*/
+    // int32_t getFilterCount() const {};
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle() const { return handle; }
     /** implicit conversion operator for extracting the handle*/
@@ -212,11 +214,10 @@ class HELICS_CXX_EXPORT Endpoint {
     const std::string& getInfo() const { return fed->getInfo(handle); }
     /** set the interface information field of the publication*/
     void setInfo(const std::string& info) { fed->setInfo(handle, info); }
-    void setOption(int32_t option, int32_t value)
+    void setOption(int32_t option, int32_t value = 1)
     {
         fed->setInterfaceOption(handle, option, value);
     }
-
     /** get the current value of a flag for the handle*/
     int32_t getOption(int32_t option) const { return fed->getInterfaceOption(handle, option); }
     /** close the endpoint from receiving more messages*/

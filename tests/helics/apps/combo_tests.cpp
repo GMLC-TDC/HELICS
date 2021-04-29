@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -68,12 +68,28 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
+    mfed2.requestTimeAsync(4.0);
+    retTime = mfed.requestTime(4.0);
+    EXPECT_EQ(retTime, 4.0);
+    mfed2.requestTimeComplete();
+
+    mfed2.requestTimeAsync(6.0);
+    retTime = mfed.requestTime(6.0);
+    EXPECT_EQ(retTime, 6.0);
+    mfed2.requestTimeComplete();
+
+    fut.get();
+
     mfed.finalize();
     mfed2.finalize();
-    fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 3u);
 
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 3U);
+
+    EXPECT_LT(std::get<0>(rec1.getValue(0)), 0.0001);
+    EXPECT_GE(std::get<0>(rec1.getValue(0)), 0.0);
+    EXPECT_EQ(std::get<0>(rec1.getValue(1)), 1.0);
+    EXPECT_EQ(std::get<0>(rec1.getValue(2)), 2.0);
     rec1.saveFile(f1.string());
 
     EXPECT_TRUE(ghc::filesystem::exists(f1));
@@ -94,10 +110,10 @@ static void useFile(const std::string& corename, const std::string& file)
     play1.loadFile(file);
 
     play1.initialize();
-    EXPECT_EQ(play1.pointCount(), 3u);
-    EXPECT_EQ(play1.publicationCount(), 1u);
-    EXPECT_EQ(play1.messageCount(), 2u);
-    EXPECT_EQ(play1.endpointCount(), 2u);
+    EXPECT_EQ(play1.pointCount(), 3U);
+    EXPECT_EQ(play1.publicationCount(), 1U);
+    EXPECT_EQ(play1.messageCount(), 2U);
+    EXPECT_EQ(play1.endpointCount(), 2U);
 
     play1.finalize();
     ghc::filesystem::remove(file);
@@ -167,11 +183,17 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     mfed2.requestTimeComplete();
     pub1.publish(4.7);
 
+    mfed2.requestTimeAsync(3.0);
+    retTime = mfed.requestTime(3.0);
+    EXPECT_EQ(retTime, 3.0);
+
+    mfed2.requestTimeComplete();
+
     mfed.finalize();
     mfed2.finalize();
     fut.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 3u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 3U);
 
     rec1.saveFile(f1.string());
 
@@ -194,10 +216,10 @@ static void useFileBinary(const std::string& corename, const std::string& file)
     play1.loadFile(file);
 
     play1.initialize();
-    EXPECT_EQ(play1.pointCount(), 3u);
-    EXPECT_EQ(play1.publicationCount(), 1u);
-    EXPECT_EQ(play1.messageCount(), 2u);
-    EXPECT_EQ(play1.endpointCount(), 2u);
+    EXPECT_EQ(play1.pointCount(), 3U);
+    EXPECT_EQ(play1.publicationCount(), 1U);
+    EXPECT_EQ(play1.messageCount(), 2U);
+    EXPECT_EQ(play1.endpointCount(), 2U);
 
     auto& b1 = play1.getMessage(0);
     helics::data_block n5(256);
@@ -218,6 +240,8 @@ static void useFileBinary(const std::string& corename, const std::string& file)
 
 TEST(combo_tests, save_load_file_binary)
 {
+    auto tpath = ghc::filesystem::temp_directory_path();
+
     auto filename1 = ghc::filesystem::temp_directory_path() / "savefile_binary.txt";
     auto filename2 = ghc::filesystem::temp_directory_path() / "savefile_binary.json";
 
@@ -262,10 +286,10 @@ TEST(combo_tests, check_combination_file_load)
             fed.getPublication(1).publish(1);
         }
     }
-    EXPECT_EQ(fed.pendingMessages(), 3u);
+    EXPECT_EQ(fed.pendingMessages(), 3U);
     fed.finalize();
     fut_play.get();
     fut_rec.get();
-    EXPECT_EQ(rec1.messageCount(), 2u);
-    EXPECT_EQ(rec1.pointCount(), 2u);
+    EXPECT_EQ(rec1.messageCount(), 2U);
+    EXPECT_EQ(rec1.pointCount(), 2U);
 }

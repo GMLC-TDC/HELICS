@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -418,20 +418,30 @@ namespace apps {
                 if (pointElement.isMember("time")) {
                     auto str = pointElement["time"].asString();
                     auto cloc = str.find_last_of(':');
-                    if (cloc != std::string::npos) {
+                    if (cloc == std::string::npos) {
                         ptime = loadJsonTime(str, units);
                     } else {
                         ptime = loadJsonTime(str.substr(0, cloc - 1), units);
-                        iterationIndex = std::stoi(str.substr(cloc + 1));
+                        try {
+                            iterationIndex = std::stoi(str.substr(cloc + 1));
+                        }
+                        catch (const std::exception&) {
+                            iterationIndex = 0;
+                        }
                     }
                 } else if (pointElement.isMember("t")) {
                     auto str = pointElement["t"].asString();
                     auto cloc = str.find_last_of(':');
-                    if (cloc != std::string::npos) {
+                    if (cloc == std::string::npos) {
                         ptime = loadJsonTime(str, units);
                     } else {
                         ptime = loadJsonTime(str.substr(0, cloc - 1), units);
-                        iterationIndex = std::stoi(str.substr(cloc + 1));
+                        try {
+                            iterationIndex = std::stoi(str.substr(cloc + 1));
+                        }
+                        catch (const std::exception&) {
+                            iterationIndex = 0;
+                        }
                     }
                 } else {
                     std::cout << "time not specified\n";

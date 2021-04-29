@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -46,6 +46,7 @@ class HELICS_CXX_EXPORT MessageDestOperator: public FilterOperator {
     /** set the function to modify the time of the message*/
     void setDestFunction(
         std::function<std::string(const std::string&, const std::string&)> userDestFunction);
+    virtual bool isMessageGenerating() const override { return true; }
 
   private:
     std::function<std::string(const std::string&, const std::string&)>
@@ -59,13 +60,12 @@ class HELICS_CXX_EXPORT MessageDataOperator: public FilterOperator {
     /** default constructor*/
     MessageDataOperator() = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit MessageDataOperator(std::function<data_view(data_view)> userDataFunction);
+    explicit MessageDataOperator(std::function<void(data_block&)> userDataFunction);
     /** set the function to modify the data of the message*/
-    void setDataFunction(std::function<data_view(data_view)> userDataFunction);
+    void setDataFunction(std::function<void(data_block&)> userDataFunction);
 
   private:
-    std::function<data_view(data_view)>
-        dataFunction;  //!< the function actually doing the processing
+    std::function<void(data_block&)> dataFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -103,6 +103,7 @@ class HELICS_CXX_EXPORT CloneOperator: public FilterOperator {
     /** set the function to modify the data of the message*/
     void setCloneFunction(
         std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction);
+    virtual bool isMessageGenerating() const override { return true; }
 
   private:
     std::function<std::vector<std::unique_ptr<Message>>(const Message*)>

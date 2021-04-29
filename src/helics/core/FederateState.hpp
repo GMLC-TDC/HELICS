@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -91,10 +91,13 @@ class FederateState {
   public:
     std::atomic<bool> init_requested{
         false};  //!< this federate has requested entry to initialization
+    // temporary
+    std::atomic<bool> requestingMode{false};
+
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
     bool timeGranted_mode{false};  //!< indicator if the federate is in a granted state or a
-                                   //!< requested state waiting to grant
+                                   //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
     int logLevel{1};  //!< the level of logging used in the federate
@@ -110,6 +113,7 @@ class FederateState {
     std::map<global_federate_id, std::deque<ActionMessage>>
         delayQueues;  //!< queue for delaying processing of messages for a time
     std::vector<interface_handle> events;  //!< list of value events to process
+    std::vector<interface_handle> eventMessages;  //!< list of endpoints with messages to process
     std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
@@ -315,15 +319,19 @@ class FederateState {
     iteration_result enterInitializingMode();
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
-    returns either converged or nonconverged depending on whether an iteration is needed
+    @param sendRequest generates the local actionMessage inside the function leaving to false
+    assumes the caller generated the message returns either converged or nonconverged depending on
+    whether an iteration is needed
     */
-    iteration_result enterExecutingMode(iteration_request iterate);
+    iteration_result enterExecutingMode(iteration_request iterate, bool sendRequest = false);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param iterate the type of iteration requested
+    @param sendRequest generates the local actionMessage inside the function leaving to false
+    assumes the caller generated the message
     @return an iteration time with two elements the granted time and the convergence state
     */
-    iteration_time requestTime(Time nextTime, iteration_request iterate);
+    iteration_time requestTime(Time nextTime, iteration_request iterate, bool sendRequest = false);
     /** get a list of current subscribers to a publication
     @param handle the publication handle to use
     */
@@ -368,9 +376,10 @@ class FederateState {
     }
     /** generate the result of a query string
     @param query a query string
+    @param force_ordering true if the query should be processed in a force_ordering way
     @return the resulting string from the query or "#wait" if the federate is not available to
     answer immediately*/
-    std::string processQuery(const std::string& query) const;
+    std::string processQuery(const std::string& query, bool force_ordering = false) const;
     /** check if a value should be published or not and if needed archive it as a changed value for
     future change detection
     @param pub_id the handle of the publication
@@ -392,6 +401,4 @@ class FederateState {
     void closeInterface(interface_handle handle, handle_type type);
 };
 
-/** convert the state into a human readable string*/
-const std::string& fedStateString(federate_state state);
 }  // namespace helics

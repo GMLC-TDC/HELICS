@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define HELICS_CORE_TYPES_HEADER
 
 #    include "../helics_enums.h"
+
+#    include <string>
 
 /** @file
 @details definitions of types an enumerations used in helics
@@ -27,6 +29,9 @@ enum federate_state {
     HELICS_FINISHED,  //!< the federation has finished its execution
     HELICS_UNKNOWN,  //!< unknown state
 };
+
+/** convert the state into a human readable string*/
+const std::string& fedStateString(federate_state state);
 
 /** the type of the cores that are available */
 enum class core_type : int {
@@ -58,26 +63,27 @@ enum class core_type : int {
 
 /** enumeration of the possible message processing results*/
 enum class message_processing_result : signed char {
-
     continue_processing = -2,  //!< the current loop should continue
     delay_message = -1,  //!< delay the current message and continue processing
     next_step = 0,  //!< indicator that the iterations have completed
-    iterating = 2,  //!< indicator that the iterations need to continue
-    halted = 3,  //!< indicator that the simulation has been halted
-    error = 7,  //!< indicator that an error has occurred
+    error = 1,  //!< indicator that an error has occurred
+    halted = 2,  //!< indicator that the simulation has been halted
+    iterating = 3,  //!< indicator that the iterations need to continue
+    reprocess_message = 8  // indicator that the message needs to be processed again
 };
 /** function to check if the message processing result should be returned or processing continued*/
 inline bool returnableResult(message_processing_result result)
 {
     return (result >= message_processing_result::next_step);
 }
+
 /** enumeration of the possible states of iteration*/
 enum class iteration_result : signed char {
     next_step = 0,  //!< indicator that the iterations have completed and the federate has moved to
                     //!< the next step
-    iterating = 2,  //!< indicator that the iterations need to continue
-    halted = 3,  //!< indicator that the simulation has been halted
-    error = 7,  //!< indicator that an error has occurred
+    error = 1,  //!< indicator that an error has occurred
+    halted = 2,  //!< indicator that the simulation has been halted
+    iterating = 3,  //!< indicator that the iterations need to continue
 };
 
 /** enumeration of the possible iteration requests by a federate*/
@@ -102,8 +108,8 @@ constexpr auto ITERATE_IF_NEEDED =
                                                    //!< should iterate if
 //!< warranted
 
-// #TOBEDEPRECTATED The use of the the core-types header for the functions contained in
-// ../application_api/typeOperations.hpp is deprectaced and will be removed in HELICS 3.0 please use
+// #TOBEDEPRECTATED The use of the core-types header for the functions contained in
+// ../application_api/typeOperations.hpp is deprecated and will be removed in HELICS 3.0 please use
 // ../application_api/typeOperations.hpp directory for those functions.
 // This next section should be removed in HELICS 3.0 but is needed to prevent breaking changes
 #    if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY

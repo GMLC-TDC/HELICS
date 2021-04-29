@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -92,10 +92,14 @@ class Broker {
     query is a broken
     @param target the specific target of the query
     @param queryStr the actual query
+    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered
+    (synchronous) is slower but has more ordering guarantees
       @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
-    virtual std::string query(const std::string& target, const std::string& queryStr) = 0;
+    virtual std::string query(const std::string& target,
+                              const std::string& queryStr,
+                              helics_sequencing_mode mode = helics_sequencing_mode_fast) = 0;
 
     /** set a federation global value
     @details this overwrites any previous value for this name

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -118,7 +118,9 @@ TEST_F(network_tests, test_external_udp_ipv4)
     vFed1->enterExecutingMode();
     vFed1->finalize();
 }
+#endif
 
+#ifdef ENABLE_ZMQ_CORE
 TEST_F(network_tests, test_otherport)
 {
     const std::string brokerArgs = "--interface=tcp://127.0.0.1:33200";

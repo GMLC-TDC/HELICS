@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -87,7 +87,7 @@ consistent answers if used from multiple threads unless protected.
 
       private:
         /** load information from a JSON file*/
-        virtual void loadJsonFile(const std::string& filename) override;
+        virtual void loadJsonFile(const std::string& jsonFile) override;
         /** echo an actual message from an endpoint*/
         void echoMessage(const Endpoint& ept, Time currentTime);
 

@@ -1,0 +1,36 @@
+name: Compress Images
+on:
+  pull_request:
+    paths:
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.png'
+      - '**.webp'
+  push:
+    branches:
+      - !develop
+      - !master
+      - !helics3
+    paths:
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.png'
+      - '**.webp'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: calibreapp/image-actions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compress Images
+        id: calibre
+        uses: calibreapp/image-actions@master
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          # For PR builds from this repository, automatically add the compressed images; otherwise just compress images
+          compressOnly: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+      # If steps.calibre.outputs.markdown != '' then images were compressed.
+      # An additional enhancement would be to check if the PR was from a fork and post a message saying how much space can be saved with compression.
+      # For pushes to some branches, opening a PR with the compressed files could be good (ideally before the images have been merged into the main branch).

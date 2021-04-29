@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -115,7 +115,9 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     helics_flag_strict_config_checking = 75,
-
+    /** specify that the federate is event triggered-meaning (all/most) events are triggered by
+       incoming events*/
+    helics_flag_event_triggered = 81
 } helics_federate_flags;
 
 /** enumeration of additional core flags*/
@@ -304,6 +306,16 @@ typedef enum {
     helics_filter_type_firewall = 6
 
 } helics_filter_type;
+
+/** enumeration of sequencing modes for queries
+fast is the default, meaning the query travels along priority channels and takes precedence of over
+existing messages; ordered means it follows normal priority patterns and will be ordered along with
+existing messages
+*/
+typedef enum {
+    helics_sequencing_mode_fast = 0,
+    helics_sequencing_mode_ordered = 1
+} helics_sequencing_mode;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

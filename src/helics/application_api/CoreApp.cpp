@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -208,9 +208,11 @@ const std::string& CoreApp::getAddress() const
 }
 
 /** make a query at the core*/
-std::string CoreApp::query(const std::string& target, const std::string& queryStr)
+std::string CoreApp::query(const std::string& target,
+                           const std::string& queryStr,
+                           helics_sequencing_mode mode)
 {
-    return (core) ? core->query(target, queryStr) : std::string("#error");
+    return (core) ? core->query(target, queryStr, mode) : std::string("#error");
 }
 
 void CoreApp::setGlobal(const std::string& valueName, const std::string& value)

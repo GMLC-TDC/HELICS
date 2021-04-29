@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -29,12 +29,12 @@ void MessageTimeOperator::setTimeFunction(std::function<Time(Time)> userTimeFunc
     TimeFunction = std::move(userTimeFunction);
 }
 
-MessageDataOperator::MessageDataOperator(std::function<data_view(data_view)> userDataFunction):
+MessageDataOperator::MessageDataOperator(std::function<void(data_block&)> userDataFunction):
     dataFunction(std::move(userDataFunction))
 {
 }
 
-void MessageDataOperator::setDataFunction(std::function<data_view(data_view)> userDataFunction)
+void MessageDataOperator::setDataFunction(std::function<void(data_block&)> userDataFunction)
 {
     dataFunction = std::move(userDataFunction);
 }
@@ -42,8 +42,7 @@ void MessageDataOperator::setDataFunction(std::function<data_view(data_view)> us
 std::unique_ptr<Message> MessageDataOperator::process(std::unique_ptr<Message> message)
 {
     if (dataFunction) {
-        auto dv = dataFunction(data_view(message->data));
-        message->data = dv.to_data_block();
+        dataFunction(message->data);
     }
     return message;
 }
@@ -63,7 +62,9 @@ void MessageDestOperator::setDestFunction(
 std::unique_ptr<Message> MessageDestOperator::process(std::unique_ptr<Message> message)
 {
     if (DestUpdateFunction) {
-        message->original_dest = message->dest;
+        if (message->original_dest.empty()) {
+            message->original_dest = message->dest;
+        }
         message->dest = DestUpdateFunction(message->source, message->dest);
     }
     return message;

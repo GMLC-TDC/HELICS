@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -85,7 +85,7 @@ constexpr const char* ztypes[] = {ZMQTEST ZMQSSTEST ZMQTEST2 ZMQTEST3 ZMQSSTEST2
 #endif
 
 constexpr const char* core_types[] =
-    {"test", ZMQTEST3 IPCTEST2 TCPTEST INPROCTEST2 ZMQTEST UDPTEST TCPSSTEST ZMQSSTEST INPROCTEST3};
+    {"test", ZMQTEST3 IPCTEST2 TCPTEST INPROCTEST2 ZMQTEST UDPTEST TCPSSTEST ZMQSSTEST ZMQTEST2};
 
 constexpr const char* core_types_2[] = {IPCTEST2 TCPTEST2 ZMQSSTEST2 "test_2",
                                         TCPSSTEST2 ZMQTEST2 UDPTEST2};

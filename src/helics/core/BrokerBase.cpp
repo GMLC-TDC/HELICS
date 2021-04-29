@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -480,6 +480,12 @@ void BrokerBase::setLogLevels(int32_t consoleLevel, int32_t fileLevel)
 
 void BrokerBase::addActionMessage(const ActionMessage& m)
 {
+    // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194))
+    // {
+    ///   if (m.action() == CMD_TIME_REQUEST && m.actionTime>timeZero) {
+    //       printf("adding action message\n");
+    //  }
+    //}
     if (isPriorityCommand(m)) {
         actionQueue.pushPriority(m);
     } else {
@@ -490,6 +496,12 @@ void BrokerBase::addActionMessage(const ActionMessage& m)
 
 void BrokerBase::addActionMessage(ActionMessage&& m)
 {
+    // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194))
+    // {
+    //    if (m.action() == CMD_TIME_REQUEST && m.actionTime > timeZero) {
+    //        printf("adding action message 2\n");
+    //    }
+    //}
     if (isPriorityCommand(m)) {
         actionQueue.emplacePriority(std::move(m));
     } else {

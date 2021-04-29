@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -29,12 +29,17 @@ across different compilers*/
         cmd_route_ack = -16,  //!< acknowledge reply to a route registration
         cmd_register_route = -15,  //!< instructions to create a direct route to another federate
         cmd_reg_fed = -105,  //!< register a federate
-        cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that
+        cmd_priority_ack =
+            -254,  //!< priority commands usually do not have an ack this is an ack that
         //!< doesn't do anything
         cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
+        cmd_query_ordered =
+            937,  //!< send a query along the synchronous paths instead of priority channels
         cmd_set_global = -cmd_info_basis - 55,  //!< set a global value
         cmd_broker_query = -37,  //!< send a query to a core
+        cmd_broker_query_ordered = 939,  //!< send a query to a core
         cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
+        cmd_query_reply_ordered = 942,  //!< response to a query on normal paths
         cmd_reg_broker =
             -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
         cmd_broker_location = cmd_info_basis - 57,  //!< command to define a new broker location
@@ -311,8 +316,11 @@ across different compilers*/
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
 
 #define CMD_QUERY action_message_def::action_t::cmd_query
+#define CMD_QUERY_ORDERED action_message_def::action_t::cmd_query_ordered
 #define CMD_BROKER_QUERY action_message_def::action_t::cmd_broker_query
+#define CMD_BROKER_QUERY_ORDERED action_message_def::action_t::cmd_broker_query_ordered
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
+#define CMD_QUERY_REPLY_ORDERED action_message_def::action_t::cmd_query_reply_ordered
 #define CMD_SET_GLOBAL action_message_def::action_t::cmd_set_global
 
 #define CMD_MULTI_MESSAGE action_message_def::action_t::cmd_multi_message
@@ -321,6 +329,11 @@ across different compilers*/
 #define PROTOCOL_PING 10
 #define PROTOCOL_PONG 11
 #define CLOSE_RECEIVER 23425215
+/// some definitions for test core debugging
+#define PAUSE_TRANSMITTER 453623
+#define ALLOW_MESSAGES 453624
+#define UNPAUSE_TRANSMITTER 453625
+// routing information
 #define NEW_ROUTE 233
 #define REMOVE_ROUTE 244
 #define CONNECTION_INFORMATION 299

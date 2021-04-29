@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -11,10 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 /** a shift in the global federate id numbers to allow discrimination between local ids and global
    ones this value allows 131072 federates to be available in each core 1,878,917,120 allowable
-   federates in the system and 268,435,455 brokers allowed  if we need more than that this, program
-   has been phenomenally successful beyond all wildest imaginations and we can probably afford to
-   change these to 64 bit numbers to accommodate
-    */
+   federates in the system and 268,435,455 brokers allowed  if we need more than that this, HELICS
+   as a program has been phenomenally successful beyond all wildest imaginations and we can probably
+   afford to change these to 64 bit numbers to accommodate.  Of the available federates there is 1
+   federate number that can be defined per core for various purposes.  These are the upper number of
+   federate id's so 268,435,455 reserved federate id's.  An ID of 1 is reserved for the root broker
+   */
 constexpr identififier_base_type global_federate_id_shift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
 constexpr identififier_base_type global_broker_id_shift{0x7000'0000};
@@ -41,8 +43,11 @@ class global_broker_id {
     {
         return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift));
     }
-    bool isBroker() const { return (gid >= global_broker_id_shift); }
-    bool isValid() const { return (gid != invalid_global_broker_id); }
+    bool isBroker() const { return (gid >= global_broker_id_shift || gid == 1); }
+    bool isValid() const
+    {
+        return (gid != invalid_global_broker_id && gid != detail::invalid_interface_handle);
+    }
     base_type localIndex() const { return gid - global_broker_id_shift; }
 
   private:
@@ -98,9 +103,12 @@ class global_federate_id {
         return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift));
     }
     /** return true if the broker_id is a valid broker id code*/
-    bool isBroker() const { return (gid >= global_broker_id_shift); }
+    bool isBroker() const { return (gid >= global_broker_id_shift || gid == 1); }
     /** return true if the broker_id is a valid broker id code*/
-    bool isValid() const { return (gid != invalid_global_fed_id); }
+    bool isValid() const
+    {
+        return (gid != invalid_global_fed_id && gid != detail::invalid_interface_handle);
+    }
     /** generate a local offset index
         @details the global_id is shifted by a certain amount*/
     constexpr base_type localIndex() const { return gid - global_federate_id_shift; }

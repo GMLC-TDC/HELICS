@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -86,6 +86,9 @@ class BrokerBase {
     std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
+    // time coordinator for managing filters
+    // std::unique_ptr<TimeCoordinator> filterTimeCoord;
+    // global_federate_id filterFedID;
     /** enumeration of the possible core states*/
     enum class broker_state_t : int16_t {
         created = -6,  //!< the broker has been created

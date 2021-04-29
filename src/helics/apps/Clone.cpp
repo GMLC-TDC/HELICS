@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -182,14 +182,17 @@ namespace apps {
     {
         auto res = waitForInit(fed.get(), captureFederate);
         if (res) {
-            auto pubs = vectorizeQueryResult(fed->query(captureFederate, "publications"));
+            fed->query("root", "global_flush", helics_sequencing_mode_ordered);
+            auto pubs = vectorizeQueryResult(
+                fed->query(captureFederate, "publications", helics_sequencing_mode_ordered));
             for (auto& pub : pubs) {
                 if (pub.empty()) {
                     continue;
                 }
                 addSubscription(pub);
             }
-            auto epts = vectorizeQueryResult(fed->query(captureFederate, "endpoints"));
+            auto epts = vectorizeQueryResult(
+                fed->query(captureFederate, "endpoints", helics_sequencing_mode_ordered));
             for (auto& ept : epts) {
                 if (ept.empty()) {
                     continue;
@@ -204,7 +207,7 @@ namespace apps {
                                                      std::string{}),
                                          cloneSubscriptionNames.end());
 
-            fedConfig = fed->query(captureFederate, "config");
+            fedConfig = fed->query(captureFederate, "config", helics_sequencing_mode_ordered);
         }
     }
 
@@ -323,12 +326,14 @@ namespace apps {
         captureFederate = federateName;
     }
 
-    std::pair<std::string, std::string> Clone::getValue(int index) const
+    std::tuple<Time, std::string, std::string> Clone::getValue(int index) const
     {
         if (isValidIndex(index, points)) {
-            return {subscriptions[points[index].index].getTarget(), points[index].value};
+            return {points[index].time,
+                    subscriptions[points[index].index].getTarget(),
+                    points[index].value};
         }
-        return {std::string(), std::string()};
+        return {Time(), std::string(), std::string()};
     }
 
     std::unique_ptr<Message> Clone::getMessage(int index) const

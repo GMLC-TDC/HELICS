@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -63,7 +63,7 @@ TEST_P(filter_single_type_test, message_filter_registration)
     EXPECT_TRUE(ep1.getHandle().isValid());
 
     mFed->finalizeAsync();
-    // std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     auto& f3 = fFed->registerCloningFilter();
     fFed->addSourceTarget(f3, "filter0/fout");
     f3.addDestinationTarget("port2");
@@ -275,10 +275,11 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 simulation
 */
 
-TEST_P(filter_all_type_test, message_dest_filter_function_t2)
+TEST_P(filter_single_type_test, message_source_filter_function)
 {
-    auto broker = AddBroker(GetParam(), 2);
-    AddFederates<helics::MessageFederate>(GetParam(), 2, broker, 0.5, "message");
+    auto p = GetParam();
+    auto broker = AddBroker(p, 2);
+    AddFederates<helics::MessageFederate>(p, 2, broker, 0.5, "message");
 
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
@@ -302,9 +303,15 @@ TEST_P(filter_all_type_test, message_dest_filter_function_t2)
     mFed1->sendMessage(p1, "port2", data);
 
     mFed1->requestTimeAsync(1.0);
-    mFed2->requestTime(1.0);
-    mFed1->requestTimeComplete();
+    mFed2->requestTimeAsync(1.0);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // auto res1 = broker->query("root", "global_time_debugging");
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // std::this_thread::yield();
+    // auto res2 = broker->query("root", "global_time_debugging");
 
+    mFed1->requestTimeComplete();
+    mFed2->requestTimeComplete();
     auto res = mFed2->hasMessage();
     EXPECT_TRUE(!res);
 
@@ -353,6 +360,8 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 
     fFed->enterExecutingModeAsync();
     mFed->enterExecutingMode();
+    // std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    // auto qres = fFed->query("root", "global_time_debugging");
     fFed->enterExecutingModeComplete();
 
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::modes::executing);
@@ -361,6 +370,7 @@ TEST_P(filter_single_type_test, message_dest_filter_object)
 
     mFed->requestTimeAsync(1.0);
     fFed->requestTime(1.0);
+
     mFed->requestTimeComplete();
 
     auto res = mFed->hasMessage();
@@ -627,6 +637,1117 @@ TEST_F(filter_tests, message_filter_function_two_stage_brokerApp_filter_link)
 
     bool res = two_stage_filter_test(mFed, fFed, fFed2, p1, p2, f1, f2);
     EXPECT_TRUE(res);
+}
+#ifdef ENABLE_ZMQ_CORE
+static const std::string rerouteType("zmq");
+#else
+static const std::string rerouteType("test");
+#endif
+
+TEST_F(filter_tests, reroute_separate)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+
+    f1.addSourceTarget("send");
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            if (rec->hasMessage()) {
+                ++cntb;
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    int cnt{0};
+    filt->enterExecutingMode();
+    helics::Time tr = helics::timeZero;
+    helics::Time ptr = helics::timeZero;
+    while (tr < 20.0) {
+        tr = filt->requestTime(21.0);
+        if (tr < 20.0) {
+            EXPECT_EQ(tr - ptr, 1.0);
+            ptr = tr;
+        }
+        ++cnt;
+    }
+    t1.join();
+    t2.join();
+    EXPECT_EQ(p2.pendingMessages(), 0U);
+    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(cnt, 11);
+    EXPECT_EQ(cntb, 0);
+    filt->finalize();
+}
+
+TEST_F(filter_tests, many_filters)
+{
+    auto broker = AddBroker("test", 20);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>("test_2", 18, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+
+    std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
+    for (int ii = 0; ii < 18; ++ii) {
+        auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
+        auto& f1 = filt->registerFilter("f1");
+        auto op = std::make_shared<helics::MessageDataOperator>();
+        op->setDataFunction([ii](helics::data_block& db) { db.push_back('a' + ii); });
+        f1.setOperator(op);
+        f1.addSourceTarget("send");
+        filterFeds.push_back(std::move(filt));
+    }
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb, &p2]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            if (p2.hasMessage()) {
+                ++cntb;
+                auto m = p2.getMessage();
+                EXPECT_EQ(m->data.size(), 17 + 18);
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeAsync();
+    }
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeComplete();
+        ffed->requestTimeAsync(50);
+    }
+
+    helics::Time tr = helics::timeZero;
+    helics::Time ptr = helics::timeZero;
+
+    t1.join();
+    t2.join();
+    EXPECT_EQ(p2.pendingMessages(), 0U);
+
+    EXPECT_EQ(cntb, 10);
+    for (auto& ffed : filterFeds) {
+        ffed->requestTimeComplete();
+        ffed->finalize();
+    }
+}
+
+TEST_F(filter_tests, many_filters_multi)
+{
+    auto broker = AddBroker("test", 10);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>("test_2", 8, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+
+    std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
+    for (int ii = 0; ii < 8; ++ii) {
+        auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
+        auto& f1 = filt->registerFilter("f1");
+        auto op = std::make_shared<helics::MessageDataOperator>();
+        op->setDataFunction([ii](helics::data_block& db) { db.push_back('a' + ii); });
+        f1.setOperator(op);
+        f1.addSourceTarget("send");
+        filterFeds.push_back(std::move(filt));
+    }
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message1");
+            p1.send("this is a message2");
+            p1.send("this is a message3");
+            p1.send("this is a message4");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb, &p2]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            while (p2.hasMessage()) {
+                ++cntb;
+                auto m = p2.getMessage();
+                EXPECT_EQ(m->data.size(), 18 + 8);
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeAsync();
+    }
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeComplete();
+        ffed->requestTimeAsync(50);
+    }
+
+    helics::Time tr = helics::timeZero;
+    helics::Time ptr = helics::timeZero;
+
+    t1.join();
+    t2.join();
+    EXPECT_EQ(p2.pendingMessages(), 0U);
+
+    EXPECT_EQ(cntb, 40);
+    for (auto& ffed : filterFeds) {
+        ffed->requestTimeComplete();
+        ffed->finalize();
+    }
+}
+
+TEST_F(filter_tests, reroute_cascade)
+{
+    auto broker = AddBroker("test", 10);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>("test_2", 8, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& s1 = send->registerGlobalEndpoint("send");
+    auto& r1 = rec->registerGlobalEndpoint("rec1");
+    auto& r2 = rec->registerGlobalEndpoint("rec2");
+    auto& r3 = rec->registerGlobalEndpoint("rec3");
+    auto& r4 = rec->registerGlobalEndpoint("rec4");
+    auto& r5 = rec->registerGlobalEndpoint("rec5");
+    auto& r6 = rec->registerGlobalEndpoint("rec6");
+    auto& r7 = rec->registerGlobalEndpoint("rec7");
+    auto& r8 = rec->registerGlobalEndpoint("rec8");
+    auto& r9 = rec->registerGlobalEndpoint("rec9");
+    s1.setDefaultDestination("rec1");
+
+    std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
+    std::vector<helics::Filter> filters;
+    for (int ii = 0; ii < 8; ++ii) {
+        auto filt = GetFederateAs<helics::MessageFederate>(2 + ii);
+        auto& f1 = helics::make_filter(helics::filter_types::reroute,
+                                       filt.get(),
+                                       std::string("rrfilt") + std::to_string(ii));
+        f1.addDestinationTarget(std::string("rec") + std::to_string(ii + 1));
+        f1.setString("newdestination", std::string("rec") + std::to_string(ii + 2));
+        filters.push_back(f1);
+        filterFeds.push_back(std::move(filt));
+    }
+
+    auto act1 = [&s1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            s1.send("this is a message1");
+            s1.send("this is a message2");
+            s1.send("this is a message3");
+            s1.send("this is a message4");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb, &r9]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            while (r9.hasMessage()) {
+                ++cntb;
+                auto m = r9.getMessage();
+                EXPECT_EQ(m->data.size(), 18);
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeAsync();
+    }
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeComplete();
+        ffed->requestTimeAsync(50);
+    }
+
+    helics::Time tr = helics::timeZero;
+    helics::Time ptr = helics::timeZero;
+
+    t1.join();
+    t2.join();
+    EXPECT_EQ(r1.pendingMessages(), 0U);
+    EXPECT_EQ(r2.pendingMessages(), 0U);
+    EXPECT_EQ(r3.pendingMessages(), 0U);
+    EXPECT_EQ(r4.pendingMessages(), 0U);
+    EXPECT_EQ(r5.pendingMessages(), 0U);
+    EXPECT_EQ(r6.pendingMessages(), 0U);
+    EXPECT_EQ(r7.pendingMessages(), 0U);
+    EXPECT_EQ(r8.pendingMessages(), 0U);
+
+    EXPECT_EQ(cntb, 40);
+    for (auto& ffed : filterFeds) {
+        ffed->requestTimeComplete();
+        ffed->finalize();
+    }
+}
+
+class rfcheck {
+  private:
+    std::thread id;
+    std::shared_ptr<helics::MessageFederate> mFed;
+    int mIndex{0};
+
+  public:
+    int mCnt{0};
+
+    rfcheck() = default;
+    rfcheck(std::shared_ptr<helics::MessageFederate> fed, int index):
+        mFed(std::move(fed)), mIndex(index)
+    {
+    }
+
+    void run()
+    {
+        auto& r1 = mFed->registerGlobalEndpoint(std::string("rec") + std::to_string(mIndex));
+        auto act1 = [this, &r1]() {
+            mFed->enterExecutingMode();
+            helics::Time tr = helics::timeZero;
+            while (tr < 10.0) {
+                tr = mFed->requestTimeAdvance(1.0);
+                while (r1.hasMessage()) {
+                    ++mCnt;
+                    auto m = r1.getMessage();
+                    EXPECT_EQ(m->data.size(), 18);
+                }
+            }
+            mFed->finalize();
+        };
+        id = std::thread(act1);
+    }
+    void join() { id.join(); }
+};
+
+/** this test case fails as of yet with no good path to resolving it yet
+TEST_F(filter_tests, reroute_cascade_2_ci_skip)
+{
+    auto broker = AddBroker("test", 18);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>("test_2", 9, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>("test_2", 8, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    std::vector<rfcheck> recFeds;
+    for (int ii = 1; ii < 10; ++ii) {
+        recFeds.emplace_back(GetFederateAs<helics::MessageFederate>(ii), ii);
+    }
+
+    auto& s1 = send->registerGlobalEndpoint("send");
+    s1.setDefaultDestination("rec1");
+
+    std::vector<std::shared_ptr<helics::MessageFederate>> filterFeds;
+    std::vector<helics::Filter> filters;
+    for (int ii = 0; ii < 8; ++ii) {
+        auto filt = GetFederateAs<helics::MessageFederate>(10 + ii);
+        auto& f1 = helics::make_filter(helics::filter_types::reroute,
+                                       filt.get(),
+                                       std::string("rrfilt") + std::to_string(ii));
+        f1.addDestinationTarget(std::string("rec") + std::to_string(ii + 1));
+        f1.setString("newdestination", std::string("rec") + std::to_string(ii + 2));
+        filters.push_back(f1);
+        filterFeds.push_back(std::move(filt));
+    }
+
+    auto acts = [&s1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            s1.send("this is a message1");
+            s1.send("this is a message2");
+            s1.send("this is a message3");
+            s1.send("this is a message4");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    auto t1 = std::thread(acts);
+
+    for (auto& rfed : recFeds) {
+        rfed.run();
+    }
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeAsync();
+    }
+    for (auto& ffed : filterFeds) {
+        ffed->enterExecutingModeComplete();
+        ffed->requestTimeAsync(50);
+    }
+
+    helics::Time tr = helics::timeZero;
+    helics::Time ptr = helics::timeZero;
+
+    t1.join();
+
+     for (auto& rfed : recFeds) {
+        rfed.join();
+    }
+
+    EXPECT_EQ(recFeds[0].mCnt, 0);
+    EXPECT_EQ(recFeds[1].mCnt, 0);
+    EXPECT_EQ(recFeds[2].mCnt, 0);
+    EXPECT_EQ(recFeds[3].mCnt, 0);
+    EXPECT_EQ(recFeds[4].mCnt, 0);
+    EXPECT_EQ(recFeds[5].mCnt, 0);
+    EXPECT_EQ(recFeds[6].mCnt, 0);
+    EXPECT_EQ(recFeds[7].mCnt, 0);
+    EXPECT_EQ(recFeds[8].mCnt, 40);
+
+    for (auto& ffed : filterFeds) {
+        ffed->requestTimeComplete();
+        ffed->finalize();
+    }
+}
+*/
+TEST_F(filter_tests, reroute_separate2)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+
+    f1.addSourceTarget("send");
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr{helics::timeZero};
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+
+    auto act2 = [&rec]() {
+        rec->enterExecutingMode();
+        helics::Time tr{helics::timeZero};
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+        }
+        rec->finalize();
+    };
+
+    int cnt{0};
+    auto act3 = [&filt, &cnt]() {
+        filt->enterExecutingMode();
+        helics::Time tr{helics::timeZero};
+        while (tr < 20.0) {
+            tr = filt->requestTime(helics::Time::maxVal());
+            ++cnt;
+        }
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    auto t3 = std::thread(act3);
+
+    t1.join();
+    t2.join();
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    // auto res = broker->query("root", "global_time_debugging");
+    t3.join();
+    filt->finalize();
+    EXPECT_EQ(p2.pendingMessages(), 0U);
+    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(cnt, 11);
+    // auto res2 = broker->query("root", "global_time_debugging");
+    broker->waitForDisconnect();
+}
+
+TEST_F(filter_tests, reroute_separate3)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+
+    f1.addSourceTarget("send");
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+
+    auto act2 = [&rec]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    int cnt{0};
+    filt->enterExecutingMode();
+    helics::Time tr = helics::timeZero;
+    while (tr < 20.0) {
+        tr = filt->requestTime(helics::Time::maxVal());
+        ++cnt;
+    }
+    t1.join();
+    t2.join();
+    EXPECT_EQ(p2.pendingMessages(), 0U);
+    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(cnt, 11);
+    filt->finalize();
+}
+
+TEST_F(filter_tests, reroute_separate_dest_target)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+
+    f1.addDestinationTarget("rec");
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            if (rec->hasMessage()) {
+                ++cntb;
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    int cnt{0};
+    filt->enterExecutingMode();
+    helics::Time tr = helics::timeZero;
+    while (tr < 20.0) {
+        tr = filt->requestTime(21.0);
+        ++cnt;
+    }
+    t1.join();
+    t2.join();
+    EXPECT_EQ(p2.pendingMessages(), 0U);
+    EXPECT_EQ(p3.pendingMessages(), 10U);
+    EXPECT_EQ(cnt, 11);
+    EXPECT_EQ(cntb, 0);
+    filt->finalize();
+}
+
+TEST_F(filter_tests, separate_slow_filter_ci_skip)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+
+    auto& f1 = helics::make_filter(helics::filter_types::custom, filt.get(), "rrfilt");
+
+    auto op = std::make_shared<helics::CustomMessageOperator>();
+    auto mop = [](std::unique_ptr<helics::Message> m) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        m->data.append("bb");
+        return m;
+    };
+
+    op->setMessageFunction(mop);
+    f1.setOperator(op);
+    f1.addSourceTarget("send");
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    int mcnt{0};
+    auto act2 = [&rec, &cntb, &mcnt]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            ++cntb;
+            while (rec->hasMessage()) {
+                ++mcnt;
+                auto m = rec->getMessage();
+                EXPECT_EQ(m->data.to_string().back(), 'b');
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    filt->enterExecutingMode();
+    helics::Time tr = helics::timeZero;
+    while (tr < 20.0) {
+        tr = filt->requestTime(21.0);
+    }
+    t1.join();
+    t2.join();
+    EXPECT_EQ(mcnt, 10);
+    EXPECT_EQ(cntb, 10);
+    filt->finalize();
+}
+
+TEST_F(filter_tests, separate_slow_dest_filter_ci_skip)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+
+    auto& f1 = helics::make_filter(helics::filter_types::custom, filt.get(), "rrfilt");
+
+    auto op = std::make_shared<helics::CustomMessageOperator>();
+    auto mop = [](std::unique_ptr<helics::Message> m) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        m->data.append("bb");
+        return m;
+    };
+
+    op->setMessageFunction(mop);
+    f1.setOperator(op);
+    f1.addDestinationTarget("rec");
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    int mcnt{0};
+    auto act2 = [&rec, &cntb, &mcnt]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            ++cntb;
+            while (rec->hasMessage()) {
+                ++mcnt;
+                auto m = rec->getMessage();
+                EXPECT_EQ(m->data.to_string().back(), 'b');
+            }
+        }
+        rec->finalize();
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    filt->enterExecutingMode();
+    helics::Time tr = helics::timeZero;
+    while (tr < 20.0) {
+        tr = filt->requestTime(21.0);
+    }
+    t1.join();
+    t2.join();
+    EXPECT_EQ(mcnt, 10);
+    EXPECT_EQ(cntb, 10);
+    filt->finalize();
+}
+
+TEST_F(filter_tests, reroute_separate2_5message)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "send");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "rec");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "filt");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& s1 = send->registerGlobalEndpoint("send1");
+    auto& s2 = send->registerGlobalEndpoint("send2");
+    auto& s3 = send->registerGlobalEndpoint("send3");
+    auto& s4 = send->registerGlobalEndpoint("send4");
+    auto& s5 = send->registerGlobalEndpoint("send5");
+
+    auto& r1 = rec->registerGlobalEndpoint("rec1");
+    auto& r2 = rec->registerGlobalEndpoint("rec2");
+    auto& r3 = rec->registerGlobalEndpoint("rec3");
+    auto& r4 = rec->registerGlobalEndpoint("rec4");
+    auto& r5 = rec->registerGlobalEndpoint("rec5");
+
+    s1.setDefaultDestination("rec1");
+    s2.setDefaultDestination("rec2");
+    s3.setDefaultDestination("rec3");
+    s4.setDefaultDestination("rec4");
+    s5.setDefaultDestination("rec5");
+
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+
+    f1.addSourceTarget("send1");
+    f1.addSourceTarget("send2");
+    f1.addSourceTarget("send3");
+    f1.addSourceTarget("send4");
+    f1.addSourceTarget("send5");
+
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            s1.send("this is a message1");
+
+            s2.send("this is a message2");
+            // std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            s3.send("this is a message3");
+            s4.send("this is a message4");
+            s5.send("this is a message5");
+            // std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+
+    auto act2 = [&rec]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+        }
+        rec->finalize();
+    };
+
+    int cnt{0};
+    std::vector<int> mcount;
+    auto act3 = [&]() {
+        filt->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 20.0) {
+            tr = filt->requestTime(helics::Time::maxVal());
+            mcount.push_back(0);
+            while (p3.hasMessage()) {
+                auto m = p3.getMessage();
+                ++mcount[cnt];
+            }
+            ++cnt;
+        }
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    auto t3 = std::thread(act3);
+
+    t1.join();
+    t2.join();
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    // auto res = broker->query("root", "global_time_debugging");
+    t3.join();
+    filt->finalize();
+    EXPECT_EQ(r1.pendingMessages(), 0U);
+    EXPECT_EQ(r2.pendingMessages(), 0U);
+    EXPECT_EQ(r3.pendingMessages(), 0U);
+    EXPECT_EQ(r4.pendingMessages(), 0U);
+    EXPECT_EQ(r5.pendingMessages(), 0U);
+
+    EXPECT_EQ(p3.pendingMessages(), 0U);
+    EXPECT_EQ(cnt, 11);
+    int totalMessageCount{0};
+    int index = 0;
+    for (auto& mc : mcount) {
+        totalMessageCount += mc;
+        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval [" << index
+                                        << "], (" << mc << ") messages instead of 5 ";
+        ++index;
+    }
+    EXPECT_EQ(totalMessageCount, 50);
+    // auto res2 = broker->query("root", "global_time_debugging");
+    broker->waitForDisconnect();
+}
+
+TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "send");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "rec");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "filt");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& s1 = send->registerGlobalEndpoint("send1");
+    auto& s2 = send->registerGlobalEndpoint("send2");
+    auto& s3 = send->registerGlobalEndpoint("send3");
+    auto& s4 = send->registerGlobalEndpoint("send4");
+    auto& s5 = send->registerGlobalEndpoint("send5");
+
+    auto& r1 = rec->registerGlobalEndpoint("rec1");
+    auto& r2 = rec->registerGlobalEndpoint("rec2");
+    auto& r3 = rec->registerGlobalEndpoint("rec3");
+    auto& r4 = rec->registerGlobalEndpoint("rec4");
+    auto& r5 = rec->registerGlobalEndpoint("rec5");
+
+    s1.setDefaultDestination("rec1");
+    s2.setDefaultDestination("rec2");
+    s3.setDefaultDestination("rec3");
+    s4.setDefaultDestination("rec4");
+    s5.setDefaultDestination("rec5");
+
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt");
+
+    f1.addSourceTarget("send1");
+    f1.addSourceTarget("send2");
+    f1.addSourceTarget("send3");
+    f1.addSourceTarget("send4");
+    f1.addSourceTarget("send5");
+
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            for (int kk = 0; kk < 100; ++kk) {
+                s1.send("this is a message1");
+
+                s2.send("this is a message2");
+                // std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                s3.send("this is a message3");
+                s4.send("this is a message4");
+                s5.send("this is a message5");
+            }
+            // std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+
+    auto act2 = [&rec]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+        }
+        rec->finalize();
+    };
+
+    int cnt{0};
+    std::vector<int> mcount;
+    auto act3 = [&]() {
+        filt->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 20.0) {
+            tr = filt->requestTime(helics::Time::maxVal());
+            mcount.push_back(0);
+            while (p3.hasMessage()) {
+                auto m = p3.getMessage();
+                ++mcount[cnt];
+            }
+            ++cnt;
+        }
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    auto t3 = std::thread(act3);
+
+    t1.join();
+    t2.join();
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    // auto res = broker->query("root", "global_time_debugging");
+    t3.join();
+    filt->finalize();
+    EXPECT_EQ(r1.pendingMessages(), 0U);
+    EXPECT_EQ(r2.pendingMessages(), 0U);
+    EXPECT_EQ(r3.pendingMessages(), 0U);
+    EXPECT_EQ(r4.pendingMessages(), 0U);
+    EXPECT_EQ(r5.pendingMessages(), 0U);
+
+    EXPECT_EQ(p3.pendingMessages(), 0U);
+    EXPECT_EQ(cnt, 11);
+    int totalMessageCount{0};
+    int index = 0;
+    for (auto& mc : mcount) {
+        totalMessageCount += mc;
+        EXPECT_TRUE(mc == 500 || mc == 0) << "incorrect # of messages in interval [" << index
+                                          << "], (" << mc << ") messages instead of 50 ";
+        ++index;
+    }
+    EXPECT_EQ(totalMessageCount, 5000);
+    // auto res2 = broker->query("root", "global_time_debugging");
+    broker->waitForDisconnect();
+}
+
+TEST_F(filter_tests, reroute_separate2_5message_b)
+{
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "send");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "rec");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "filt");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& s1 = send->registerGlobalEndpoint("send1");
+    auto& s2 = send->registerGlobalEndpoint("send2");
+    auto& s3 = send->registerGlobalEndpoint("send3");
+    auto& s4 = send->registerGlobalEndpoint("send4");
+    auto& s5 = send->registerGlobalEndpoint("send5");
+
+    auto& r1 = rec->registerGlobalEndpoint("rec1");
+    auto& r2 = rec->registerGlobalEndpoint("rec2");
+    auto& r3 = rec->registerGlobalEndpoint("rec3");
+    auto& r4 = rec->registerGlobalEndpoint("rec4");
+    auto& r5 = rec->registerGlobalEndpoint("rec5");
+
+    s1.setDefaultDestination("rec1");
+    s2.setDefaultDestination("rec2");
+    s3.setDefaultDestination("rec3");
+    s4.setDefaultDestination("rec4");
+    s5.setDefaultDestination("rec5");
+
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt1");
+    auto& f2 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt2");
+    auto& f3 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt3");
+    auto& f4 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt4");
+    auto& f5 = helics::make_filter(helics::filter_types::reroute, filt.get(), "rrfilt5");
+
+    f1.addSourceTarget("send1");
+    f2.addSourceTarget("send2");
+    f3.addSourceTarget("send3");
+    f4.addSourceTarget("send4");
+    f5.addSourceTarget("send5");
+
+    f1.setString("newdestination", "reroute");
+    f2.setString("newdestination", "reroute");
+    f3.setString("newdestination", "reroute");
+    f4.setString("newdestination", "reroute");
+    f5.setString("newdestination", "reroute");
+
+    auto act1 = [&]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            s1.send("this is a message1");
+
+            s2.send("this is a message2");
+            // std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            s3.send("this is a message3");
+            s4.send("this is a message4");
+            s5.send("this is a message5");
+            // std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+
+    auto act2 = [&rec]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+        }
+        rec->finalize();
+    };
+
+    int cnt{0};
+    std::vector<int> mcount;
+    auto act3 = [&]() {
+        filt->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 20.0) {
+            tr = filt->requestTime(helics::Time::maxVal());
+            mcount.push_back(0);
+            while (p3.hasMessage()) {
+                auto m = p3.getMessage();
+                ++mcount[cnt];
+            }
+            ++cnt;
+        }
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    auto t3 = std::thread(act3);
+
+    t1.join();
+    t2.join();
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    // auto res = broker->query("root", "global_time_debugging");
+    t3.join();
+    filt->finalize();
+    EXPECT_EQ(r1.pendingMessages(), 0U);
+    EXPECT_EQ(r2.pendingMessages(), 0U);
+    EXPECT_EQ(r3.pendingMessages(), 0U);
+    EXPECT_EQ(r4.pendingMessages(), 0U);
+    EXPECT_EQ(r5.pendingMessages(), 0U);
+
+    EXPECT_EQ(p3.pendingMessages(), 0U);
+    EXPECT_EQ(cnt, 11);
+    int totalMessageCount{0};
+    int index{0};
+    for (auto& mc : mcount) {
+        totalMessageCount += mc;
+        EXPECT_TRUE(mc == 5 || mc == 0) << "incorrect # of messages in interval [" << index
+                                        << "], (" << mc << ") messages instead of 5 ";
+        ++index;
+    }
+    EXPECT_EQ(totalMessageCount, 50);
+    // auto res2 = broker->query("root", "global_time_debugging");
+    broker->waitForDisconnect();
 }
 
 TEST_F(filter_tests, message_filter_function_two_stage_coreApp_filter_link)

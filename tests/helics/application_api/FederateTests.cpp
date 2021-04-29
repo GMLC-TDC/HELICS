@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -39,6 +39,10 @@ TEST(federate_tests, federate_initialize_tests)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::initializing);
     Fed->enterExecutingMode();
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
 
@@ -93,7 +97,7 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
     EXPECT_TRUE(!cptr->isConnected());
     res = Fed->requestTime(4.0);
     EXPECT_EQ(res, helics::Time::maxVal());
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::finalize);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::finished);
 }
 
 #ifdef ENABLE_ZMQ_CORE
@@ -1056,7 +1060,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = Fed2->query("global", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = cr->query("global", "global1");
+    str1 = cr->query("global", "global1", helics_sequencing_mode_fast);
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = brk->query("global", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
@@ -1065,7 +1069,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is another global value");
     str1 = Fed2->query("global", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = cr->query("global", "global2");
+    str1 = cr->query("global", "global2", helics_sequencing_mode_fast);
     EXPECT_EQ(str1, "this is another global value");
     str1 = brk->query("global", "global2");
     EXPECT_EQ(str1, "this is another global value");

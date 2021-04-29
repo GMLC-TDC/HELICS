@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <set>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -85,9 +86,10 @@ namespace apps {
         auto messageCount() const { return messages.size(); }
         /** get a string with the value of point index
     @param index the number of the point to retrieve
-    @return a pair with the tag as the first element and the value as the second
+    @return a tuple with Time as the first element the tag as the 2nd element and the value as the
+    third
     */
-        std::pair<std::string, std::string> getValue(int index) const;
+        std::tuple<Time, std::string, std::string> getValue(int index) const;
         /** get a message
     @details makes a copy of a message and returns it in a unique_ptr
     @param index the number of the message to retrieve

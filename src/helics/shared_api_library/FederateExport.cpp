@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -979,7 +979,8 @@ static const std::map<helics::Federate::modes, helics_federate_state> modeEnumCo
     {helics::Federate::modes::pending_iterative_time, helics_federate_state::helics_state_pending_iterative_time},
     {helics::Federate::modes::pending_time, helics_federate_state::helics_state_pending_time},
     {helics::Federate::modes::initializing, helics_federate_state::helics_state_initialization},
-    {helics::Federate::modes::pending_finalize, helics_federate_state::helics_state_pending_finalize}};
+    {helics::Federate::modes::pending_finalize, helics_federate_state::helics_state_pending_finalize},
+    {helics::Federate::modes::finished, helics_federate_state::helics_state_finished}};
 
 helics_federate_state helicsFederateGetState(helics_federate fed, helics_error* err)
 {

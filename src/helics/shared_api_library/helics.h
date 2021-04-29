@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -1523,6 +1523,18 @@ HELICS_EXPORT void helicsQuerySetTarget(helics_query query, const char* target, 
  * @endforcpponly
  */
 HELICS_EXPORT void helicsQuerySetQueryString(helics_query query, const char* queryString, helics_error* err);
+
+/**
+ * Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence
+ *
+ * @param query The query object to change the order for.
+ * @param mode 0 for fast, 1 for ordered
+ *
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsQuerySetOrdering(helics_query query, int32_t mode, helics_error* err);
 
 /**
  * Free the memory associated with a query object.

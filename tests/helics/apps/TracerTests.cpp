@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -529,7 +529,10 @@ TEST(tracer_tests, tracer_test_endpoint_clone)
         EXPECT_EQ((*mhandle)->original_dest, "d2");
     }
     e2.send("d1", "this is a test message2");
-
+    mfed2.requestTimeAsync(3.0);
+    retTime = mfed.requestTime(3.0);
+    EXPECT_EQ(retTime, 3.0);
+    mfed2.requestTimeComplete();
     mfed.finalize();
     mfed2.finalize();
     fut.get();
@@ -574,9 +577,15 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     helics::Endpoint& e2 = mfed2.registerGlobalEndpoint("d2");
 
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
-    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    std::atomic<int> mcount{0};
+    auto cb = [&mguard, &lastTime, &mcount](helics::Time tm,
+                                            std::unique_ptr<helics::Message> mess) {
         mguard = std::move(mess);
         lastTime = static_cast<double>(tm);
+        if (tm == helics::Time::maxVal()) {
+            lastTime = helics::Time::minVal();
+        }
+        ++mcount;
     };
     trace1.setClonedMessageCallback(cb);
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5.0); });
@@ -602,6 +611,7 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
             break;
         }
     }
+    EXPECT_EQ(mcount.load(), 1);
     EXPECT_DOUBLE_EQ(lastTime.load(), 1.0);
     {
         auto mhandle = mguard.lock();
@@ -612,9 +622,14 @@ TEST_P(tracer_clone_file_tests, simple_clone_test_file)
     }
 
     e2.send("d1", "this is a test message2");
+    mfed2.requestTimeAsync(3.0);
+    retTime = mfed.requestTime(3.0);
+    mfed2.requestTimeComplete();
+
     mfed.finalize();
     mfed2.finalize();
     fut.get();
+    EXPECT_EQ(mcount.load(), 2);
     EXPECT_DOUBLE_EQ(lastTime.load(), 2.0);
     {
         auto mhandle = mguard.lock();

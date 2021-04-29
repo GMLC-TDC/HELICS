@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -57,7 +57,8 @@ class HELICS_CXX_EXPORT Federate {
         pending_time = 7,  //!< state that the federate is pending a timeRequest
         pending_iterative_time =
             8,  //!< state that the federate is pending an iterative time request
-        pending_finalize = 9  //!< state that the federate is pending a finalize call
+        pending_finalize = 9,  //!< state that the federate is pending a finalize call
+        finished = 10  //!< the simulation has finished normally but everything is still connected
     };
 
   protected:
@@ -309,11 +310,15 @@ class HELICS_CXX_EXPORT Federate {
     specific name of a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
+    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered
+      (synchronous) is slower but has more ordering guarantees
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& target, const std::string& queryStr);
+    std::string query(const std::string& target,
+                      const std::string& queryStr,
+                      helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -321,11 +326,14 @@ class HELICS_CXX_EXPORT Federate {
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate if the local federate does not recognize the query it
     sends it on to the federation
+    @param mode fast (asynchronous; default) means the query goes on priority channels, ordered
+    (synchronous) is slower but has more ordering guarantees
     @return a string with the value requested.  this is either going to be a vector of strings value
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& queryStr);
+    std::string query(const std::string& queryStr,
+                      helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending
@@ -334,9 +342,13 @@ class HELICS_CXX_EXPORT Federate {
     specific name of a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
+    @param mode fast (asynchronous; default) means the query goes on priority channels,
+    ordered(synchronous) is slower but has more ordering guarantees
     @return a query_id_t to use for returning the result
     */
-    query_id_t queryAsync(const std::string& target, const std::string& queryStr);
+    query_id_t queryAsync(const std::string& target,
+                          const std::string& queryStr,
+                          helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending
@@ -345,7 +357,8 @@ class HELICS_CXX_EXPORT Federate {
     query, can be defined by the federate
     @return a query_id_t used to get the results of the query in the future
     */
-    query_id_t queryAsync(const std::string& queryStr);
+    query_id_t queryAsync(const std::string& queryStr,
+                          helics_sequencing_mode mode = helics_sequencing_mode_fast);
 
     /** get the results of an async query
     @details the call will block until the results are returned inquiry of queryCompleted() to check
@@ -498,7 +511,7 @@ class HELICS_CXX_EXPORT Federate {
     virtual void startupToInitializeStateTransition();
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
-    virtual void initializeToExecuteStateTransition();
+    virtual void initializeToExecuteStateTransition(iteration_result iterate);
     /** function to generate results for a local Query
     @details should return an empty string if the query is not recognized*/
     virtual std::string localQuery(const std::string& queryStr) const;

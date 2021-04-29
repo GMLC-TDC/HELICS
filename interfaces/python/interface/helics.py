@@ -173,6 +173,11 @@ r"""
     specify that checking on configuration files should be strict and throw and error on any
       invalid values
     """
+helics_flag_event_triggered = _helics.helics_flag_event_triggered
+r"""
+    specify that the federate is event triggered-meaning (all/most) events are triggered by
+          incoming events
+    """
 helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
 r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
 helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
@@ -362,6 +367,8 @@ r"""
     a customizable filter type that can perform different actions on a message based on
           firewall like rules
     """
+helics_sequencing_mode_fast = _helics.helics_sequencing_mode_fast
+helics_sequencing_mode_ordered = _helics.helics_sequencing_mode_ordered
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
 helics_iteration_request_force_iteration = _helics.helics_iteration_request_force_iteration
@@ -396,6 +403,8 @@ helics_state_pending_iterative_time = _helics.helics_state_pending_iterative_tim
 r""" state that the federate is pending an iterative time request"""
 helics_state_pending_finalize = _helics.helics_state_pending_finalize
 r""" state that the federate is pending a finalize request"""
+helics_state_finished = _helics.helics_state_finished
+r""" state that the federate is finished simulating but still connected"""
 class helics_complex(object):
     r""" structure defining a basic complex type"""
 
@@ -1990,6 +1999,18 @@ def helicsQuerySetQueryString(query: "helics_query", queryString: "char const *"
     """
     return _helics.helicsQuerySetQueryString(query, queryString)
 
+def helicsQuerySetOrdering(query: "helics_query", mode: "int32_t") -> "void":
+    r"""
+    Update the ordering mode of the query, fast runs on priority channels, ordered goes on normal channels but goes in sequence
+
+    :type query: void
+    :param query: The query object to change the order for.
+    :type mode: int32_t
+    :param mode: 0 for fast, 1 for ordered
+
+    """
+    return _helics.helicsQuerySetOrdering(query, mode)
+
 def helicsQueryFree(query: "helics_query") -> "void":
     r"""Free the memory associated with a query object."""
     return _helics.helicsQueryFree(query)
@@ -3434,7 +3455,8 @@ def helicsEndpointSetInfo(endpoint: "helics_endpoint", info: "char const *") -> 
     r"""
     Set the data in the info field for a filter.
 
-    :param end: The endpoint to query.
+    :type endpoint: void
+    :param endpoint: The endpoint to query.
     :type info: string
     :param info: The string to set.
     """
@@ -3444,7 +3466,8 @@ def helicsEndpointSetOption(endpoint: "helics_endpoint", option: "int", value: "
     r"""
     Set a handle option on an endpoint.
 
-    :param end: The endpoint to modify.
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :type value: int
@@ -3456,7 +3479,8 @@ def helicsEndpointGetOption(endpoint: "helics_endpoint", option: "int") -> "int"
     r"""
     Set a handle option on an endpoint.
 
-    :param end: The endpoint to modify.
+    :type endpoint: void
+    :param endpoint: The endpoint to modify.
     :type option: int
     :param option: Integer code for the option to set /ref helics_handle_options.
     :rtype: int

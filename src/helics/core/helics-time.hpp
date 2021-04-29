@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -33,6 +33,10 @@ constexpr Time timeZero = Time::zeroVal();
 constexpr Time timeEpsilon = Time::epsilon();
 /** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon();
+
+/** common definition of currentTime in initialization mode*/
+constexpr Time initializationTime = negEpsilon;
+
 /** user defined literal for a time variable*/
 constexpr Time operator"" _t(long double val)
 {

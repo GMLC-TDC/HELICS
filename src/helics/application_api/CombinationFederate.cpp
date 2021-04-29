@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2020,
+Copyright (c) 2017-2021,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -69,10 +69,10 @@ void CombinationFederate::startupToInitializeStateTransition()
     MessageFederate::startupToInitializeStateTransition();
 }
 
-void CombinationFederate::initializeToExecuteStateTransition()
+void CombinationFederate::initializeToExecuteStateTransition(iteration_result result)
 {
-    ValueFederate::initializeToExecuteStateTransition();
-    MessageFederate::initializeToExecuteStateTransition();
+    ValueFederate::initializeToExecuteStateTransition(result);
+    MessageFederate::initializeToExecuteStateTransition(result);
 }
 
 std::string CombinationFederate::localQuery(const std::string& queryStr) const
