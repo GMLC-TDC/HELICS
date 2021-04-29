@@ -2726,9 +2726,8 @@ std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
     } else {
         state = "init_requested";
     }
-    
-    if (state != "operating")
-    {
+
+    if (state != "operating") {
         Json::Value v;
         v["status"] = state;
         v["timestep"] = -1;
@@ -2750,17 +2749,14 @@ std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
 
     Json::Value v;
 
-    if (tste != "operating")
-    {
+    if (tste != "operating") {
         v["status"] = tste;
         v["timestep"] = -1;
-    }
-    else
-    {
+    } else {
         v["status"] = jv;
         v["timestep"] = builder.getJValue();
     }
-    
+
     return generateJsonString(v);
 }
 

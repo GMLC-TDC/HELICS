@@ -110,9 +110,9 @@ namespace CoreFactory {
             throw(helics::RegistrationFailure("unable to create core"));
         }
         core->configure(configureString);
-        if (!registerCore(core, type))
-        {
-            throw(helics::RegistrationFailure(std::string("core ")+core->getIdentifier()+" failed to register properly"));
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
         }
 
         return core;
