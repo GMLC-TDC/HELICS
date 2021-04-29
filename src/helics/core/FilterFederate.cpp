@@ -180,7 +180,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
     }
 }
 
-void FilterFederate::generateProcessMarker(global_federate_id fid, uint32_t pid, Time returnTime)
+void FilterFederate::generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
@@ -194,7 +194,7 @@ void FilterFederate::generateProcessMarker(global_federate_id fid, uint32_t pid,
     addTimeReturn(pid, returnTime);
 }
 
-void FilterFederate::acceptProcessReturn(global_federate_id fid, uint32_t pid)
+void FilterFederate::acceptProcessReturn(GlobalFederateId fid, uint32_t pid)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
@@ -209,7 +209,7 @@ void FilterFederate::acceptProcessReturn(global_federate_id fid, uint32_t pid)
     clearTimeReturn(pid);
 }
 
-void FilterFederate::generateDestProcessMarker(global_federate_id fid,
+void FilterFederate::generateDestProcessMarker(GlobalFederateId fid,
                                                uint32_t pid,
                                                Time returnTime)
 {
@@ -226,7 +226,7 @@ void FilterFederate::generateDestProcessMarker(global_federate_id fid,
     addTimeReturn(pid, returnTime);
 }
 
-void FilterFederate::acceptDestProcessReturn(global_federate_id fid, uint32_t pid)
+void FilterFederate::acceptDestProcessReturn(GlobalFederateId fid, uint32_t pid)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();

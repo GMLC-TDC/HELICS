@@ -286,7 +286,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual std::string
         query(const std::string& target,
                               const std::string& queryStr,
-                              HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) override final;
+                              HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr) override final;
@@ -363,7 +363,7 @@ class CoreBroker: public Broker, public BrokerBase {
                               bool reset,
                               bool force_ordering);
 
-    std::string generateGlobalStatus(JsonMapBuilder& builder);
+    std::string generateGlobalStatus(fileops::JsonMapBuilder& builder);
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);

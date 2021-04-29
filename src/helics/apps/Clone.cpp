@@ -182,9 +182,9 @@ namespace apps {
     {
         auto res = waitForInit(fed.get(), captureFederate);
         if (res) {
-            fed->query("root", "global_flush", HELICS_QUERY_MODE_ORDERED);
+            fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
             auto pubs = vectorizeQueryResult(
-                fed->query(captureFederate, "publications", HELICS_QUERY_MODE_ORDERED));
+                fed->query(captureFederate, "publications", HELICS_SEQUENCING_MODE_ORDERED));
             for (auto& pub : pubs) {
                 if (pub.empty()) {
                     continue;
@@ -192,7 +192,7 @@ namespace apps {
                 addSubscription(pub);
             }
             auto epts = vectorizeQueryResult(
-                fed->query(captureFederate, "endpoints", HELICS_QUERY_MODE_ORDERED));
+                fed->query(captureFederate, "endpoints", HELICS_SEQUENCING_MODE_ORDERED));
             for (auto& ept : epts) {
                 if (ept.empty()) {
                     continue;
@@ -207,7 +207,7 @@ namespace apps {
                                                      std::string{}),
                                          cloneSubscriptionNames.end());
 
-            fedConfig = fed->query(captureFederate, "config", HELICS_QUERY_MODE_ORDERED);
+            fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
         }
     }
 
