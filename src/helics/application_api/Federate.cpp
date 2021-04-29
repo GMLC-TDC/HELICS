@@ -59,8 +59,16 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
                     cname = fedName + "_core" + std::to_string(cnt);
                     cobj = CoreFactory::findCore(cname);
                 }
-                coreObject =
-                    CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+                try {
+                    coreObject =
+                        CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+                }
+                catch (const helics::RegistrationFailure&) {
+                    // there is a possibility of race condition here in the naming resulting a
+                    // failure this catches and reverts to previous naming which is randomly
+                    // generated
+                    coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
+                }
             } else {
                 coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
             }
