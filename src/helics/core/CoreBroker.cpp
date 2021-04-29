@@ -2726,13 +2726,14 @@ std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
     } else {
         state = "init_requested";
     }
-    if (state == "error") {
+    
+    if (state != "operating")
+    {
         Json::Value v;
-        v["status"] = "error";
+        v["status"] = state;
         v["timestep"] = -1;
         return generateJsonString(v);
     }
-
     Time mv{Time::maxVal()};
     if (!builder.getJValue()["cores"][0].isObject()) {
         state = "init_requested";
@@ -2745,11 +2746,21 @@ std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
             }
         }
     }
-    std::string tste = (mv >= timeZero) ? std::string("connected") : std::string("init_requested");
+    std::string tste = (mv >= timeZero) ? std::string("operating") : std::string("init_requested");
 
     Json::Value v;
-    v["status"] = jv;
-    v["timestep"] = builder.getJValue();
+
+    if (tste != "operating")
+    {
+        v["status"] = tste;
+        v["timestep"] = -1;
+    }
+    else
+    {
+        v["status"] = jv;
+        v["timestep"] = builder.getJValue();
+    }
+    
     return generateJsonString(v);
 }
 
