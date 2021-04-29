@@ -1883,11 +1883,13 @@ enum subqueries : std::uint16_t {
     data_flow_graph = 4,
     global_state = 6,
     global_time_debugging = 7,
-    global_flush = 8
+    global_flush = 8,
+    global_status = 9
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {current_time_map, true}},
+    {"global_status", {global_status, true}},
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
     {"global_state", {global_state, true}},
@@ -2044,6 +2046,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
 
     switch (index) {
         case current_time_map:
+        case global_status:
             if (hasTimeDependency) {
                 base["next_time"] = static_cast<double>(timeCoord->getNextTime());
             }

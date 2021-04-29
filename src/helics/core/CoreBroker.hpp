@@ -358,6 +358,8 @@ class CoreBroker: public Broker, public BrokerBase {
                               bool reset,
                               bool force_ordering);
 
+     std::string generateGlobalStatus(JsonMapBuilder& builder);
+
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);
     /** send a disconnect message to time dependencies and child brokers*/
