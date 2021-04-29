@@ -101,12 +101,12 @@ end
 %!   pubid3 = helicsFederateRegisterTypePublication(feds.vFed, 'pub3', 'double', 'V');
 %!   helicsFederateEnterExecutingMode(feds.vFed);
 %!
-%!   publication_key = helicsPublicationGetKey(pubid1);
-%!   assert(publication_key,'fed1/pub1');
-%!   publication_key = helicsPublicationGetKey(pubid2);
-%!   assert(publication_key,'pub2');
-%!   publication_key = helicsPublicationGetKey(pubid3);
-%!   assert(publication_key,'fed1/pub3');
+%!   publication_name = helicsPublicationGetName(pubid1);
+%!   assert(publication_name,'fed1/pub1');
+%!   publication_namey = helicsPublicationGetName(pubid2);
+%!   assert(publication_name,'pub2');
+%!   publication_name = helicsPublicationGetName(pubid3);
+%!   assert(publication_name,'fed1/pub3');
 %!   publication_type = helicsPublicationGetType(pubid3);
 %!   assert(publication_type,'double');
 %!   publication_units = helicsPublicationGetUnits(pubid3);
@@ -258,21 +258,21 @@ end
 %!     pubid2 = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub2', HELICS_DATA_TYPE_INT, '');
 %!     pubid3 = helicsFederateRegisterPublication(feds.vFed, 'pub3', HELICS_DATA_TYPE_DOUBLE, 'V');
 %!
-%!     publication_key = helicsPublicationGetKey(pubid1);
+%!     publication_name = helicsPublicationGetName(pubid1);
 %!
-%! assert(publication_key,'fed1/pub1');
+%! assert(publication_name,'fed1/pub1');
 %! publication_type = helicsPublicationGetType(pubid1);
 %!
 %! assert(publication_type,'string');
-%! publication_key = helicsPublicationGetKey(pubid2);
+%! publication_name = helicsPublicationGetName(pubid2);
 %!
-%! assert(publication_key,'pub2');
+%! assert(publication_name,'fed1/pub2');
 %! publication_type = helicsPublicationGetType(pubid2);
 %!
 %! assert(publication_type,'int64');
-%! publication_key = helicsPublicationGetKey(pubid3);
+%! publication_name = helicsPublicationGetName(pubid3);
 %!
-%! assert(publication_key,'fed1/pub3');
+%! assert(publication_name,'fed1/pub3');
 %! publication_type = helicsPublicationGetType(pubid3);
 %!
 %! assert(publication_type,'double');

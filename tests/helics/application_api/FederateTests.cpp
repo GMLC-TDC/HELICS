@@ -1060,7 +1060,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = Fed2->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = cr->query("global_value", "global1", HELICS_QUERY_MODE_FAST);
+    str1 = cr->query("global_value", "global1", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = brk->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
@@ -1069,7 +1069,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is another global value");
     str1 = Fed2->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = cr->query("global_value", "global2", HELICS_QUERY_MODE_FAST);
+    str1 = cr->query("global_value", "global2", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(str1, "this is another global value");
     str1 = brk->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");

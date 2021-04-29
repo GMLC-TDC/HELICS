@@ -352,9 +352,9 @@ namespace apps {
         for (auto& capt : captureInterfaces) {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
-                fed->query("root", "global_flush", helics_sequencing_mode_ordered);
+                fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
                 auto pubs = vectorizeQueryResult(
-                    fed->query(capt, "publications", HELICS_QUERY_MODE_ORDERED));
+                    fed->query(capt, "publications", HELICS_SEQUENCING_MODE_ORDERED));
                 for (auto& pub : pubs) {
                     addSubscription(pub);
                 }

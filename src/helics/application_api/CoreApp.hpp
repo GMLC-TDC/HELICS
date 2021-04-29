@@ -114,7 +114,7 @@ class HELICS_CXX_EXPORT CoreApp {
     */
     std::string query(const std::string& target,
                       const std::string& queryStr,
-                      HelicsQueryModes mode = HELICS_QUERY_MODE_FAST);
+                      HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** set a federation global value
     @details this overwrites any previous value for this name

@@ -204,7 +204,7 @@ TEST(clone_tests, simple_clone_test_combo)
     auto pcnt = c1.pointCount();
     EXPECT_EQ(pcnt, 3U);
     if (pcnt != 3) {
-        for (int ii = 0; ii < pcnt; ++ii) {
+        for (int ii = 0; ii < static_cast<int>(pcnt); ++ii) {
             auto pv = c1.getValue(ii);
             std::cout << "Point " << ii << " source:" << std::get<1>(pv) << " at "
                       << std::get<0>(pv) << ", value: " << std::get<2>(pv) << std::endl;

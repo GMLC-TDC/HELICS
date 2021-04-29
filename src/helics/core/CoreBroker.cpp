@@ -2472,13 +2472,14 @@ void CoreBroker::setLogFile(const std::string& lfile)
 }
 
 // public query function
-std::string
-    CoreBroker::query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode)
+std::string CoreBroker::query(const std::string& target,
+                              const std::string& queryStr,
+                              HelicsSequencingModes mode)
 {
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
-        ActionMessage querycmd(mode == HELICS_QUERY_MODE_FAST ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+        ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -2493,8 +2494,8 @@ std::string
         if (isRootc) {
             return generateJsonErrorResponse(404, "broker has no parent");  // LCOV_EXCL_LINE
         }
-        ActionMessage querycmd(mode == HELICS_QUERY_MODE_FAST ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+        ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
@@ -2505,8 +2506,8 @@ std::string
         return ret;
     }
     if ((target == "root") || (target == "rootbroker")) {
-        ActionMessage querycmd(mode == HELICS_QUERY_MODE_FAST ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+        ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -2519,7 +2520,7 @@ std::string
         return ret;
     }
 
-    ActionMessage querycmd(mode == HELICS_QUERY_MODE_FAST ? CMD_QUERY : CMD_QUERY_ORDERED);
+    ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = gid;
     auto index = ++queryCounter;
     querycmd.messageID = index;
@@ -2688,7 +2689,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
             Json::Value gs;
             gs["status"] = "disconnected";
             gs["timestep"] = -1;
-            return generateJsonString(gs);
+            return fileops::generateJsonString(gs);
         }
     }
     auto mi = mapIndex.find(std::string(request));
@@ -2780,10 +2781,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     return generateJsonErrorResponse(400, "unrecognized broker query");
 }
 
-std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
+std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
 {
     auto cstate = generateQueryAnswer("current_state", false);
-    auto jv = loadJsonStr(cstate);
+    auto jv = fileops::loadJsonStr(cstate);
     std::string state;
     if (jv["federates"][0].isObject()) {
         state = jv["state"].asString();
@@ -2795,7 +2796,7 @@ std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
         Json::Value v;
         v["status"] = state;
         v["timestep"] = -1;
-        return generateJsonString(v);
+        return fileops::generateJsonString(v);
     }
     Time mv{Time::maxVal()};
     if (!builder.getJValue()["cores"][0].isObject()) {
@@ -2821,7 +2822,7 @@ std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
         v["timestep"] = builder.getJValue();
     }
 
-    return generateJsonString(v);
+    return fileops::generateJsonString(v);
 }
 
 std::string CoreBroker::getNameList(std::string gidString) const
@@ -3190,7 +3191,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                     str = generateGlobalStatus(builder);
                     break;
                 case global_flush:
-                str = "{\"status\":true}";
+                    str = "{\"status\":true}";
                     break;
                 default:
                     str = builder.generate();
