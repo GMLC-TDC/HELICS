@@ -4,15 +4,17 @@ Debugging a co-simulation can be challenging. There are often many components ru
 Enhancing the tools for debugging a HELICS based co-simulation is one area of focus for the coming year and we expect significant changes and improvements as we gain experience in this area. There are now a few basic capabilities in HELICS that support and help with debugging. Those capabilities are outlined in this document and will continue to be expanded.
 
 ## Logging
+
 HELICS provides built-in support for various types of logging from federates, brokers, and more. See [Logging](./logging.md) for more details on how to enable and use.
 
 ## Players and Recorders
+
 Often an early step in debugging is to isolate the problem. HELICS provides the [**Recorder**](../apps/Recorder.md) and [**Player**](../apps/Player.md) apps to help with doing so for federates and to enable modular development and testing of federations even before all of the federates are working:
-* A recorder is just that: a tool that readily records some or all of the traffic that is sent via HELICS (both value-based publication/subscrition and message end points). Looking through this output can confirm that the data and timing in HELICS behaves as expected.
-* The basic idea for a player is that rather than running all of the other federates, you can test out a single or subset by reading the data that other federates would send from a file instead. 
+
+- A recorder is just that: a tool that readily records some or all of the traffic that is sent via HELICS (both value-based publication/subscrition and message end points). Looking through this output can confirm that the data and timing in HELICS behaves as expected.
+- The basic idea for a player is that rather than running all of the other federates, you can test out a single or subset by reading the data that other federates would send from a file instead.
 
 Players and recorders can also compliment each other, since the files created by a recorder can be played back directly by the players, making it possible to take the partial results from a part of a federation as a recording and then play back--without possible delays or other challenges from the other federates--to troubleshoot the rest of the federation.
-
 
 ## Queries
 
