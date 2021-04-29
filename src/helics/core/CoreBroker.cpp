@@ -2500,7 +2500,8 @@ enum subqueries : std::uint16_t {
     version_all = 5,
     global_state = 6,
     global_time_debugging = 7,
-    global_flush = 8
+    global_flush = 8,
+    global_status = 9
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
@@ -2511,6 +2512,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"version_all", {version_all, false}},
     {"global_state", {global_state, true}},
     {"global_time_debugging", {global_time_debugging, true}},
+    {"global_status", {global_status, true}},
     {"global_flush", {global_flush, true}}};
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
@@ -2531,7 +2533,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;identifier;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;counter;data_flow_graph;dependencies;dependson;dependents;"
-               "current_time;current_state;global_state;status;global_time;version;version_all;exists;global_flush]";
+               "current_time;current_state;global_state;status;global_status;global_time;version;version_all;exists;global_flush]";
     }
     if (request == "address") {
         return getAddress();
@@ -2617,6 +2619,14 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         return timeCoord->printTimeStatus();
     }
+    if (request == "global_status") {
+        if (!isConnected()) {
+            Json::Value gs;
+            gs["status"] = "disconnected";
+            gs["timestep"] = -1;
+            return generateJsonString(gs);
+        }
+    }
     auto mi = mapIndex.find(request);
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
@@ -2639,6 +2649,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
             if (!mi->second.second) {
                 auto center = generateMapObjectCounter();
                 std::get<0>(mapBuilders[index]).setCounterCode(center);
+            }
+            if (index == global_status) {
+                return generateGlobalStatus(std::get<0>(mapBuilders[index]));
             }
             return std::get<0>(mapBuilders[index]).generate();
         }
@@ -2701,6 +2714,54 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         return generateJsonString(base);
     }
     return "#invalid";
+}
+
+std::string CoreBroker::generateGlobalStatus(JsonMapBuilder& builder)
+{
+    auto cstate = generateQueryAnswer("current_state", false);
+    auto jv = loadJsonStr(cstate);
+    std::string state;
+    if (jv["federates"][0].isObject()) {
+        state = jv["state"].asString();
+    } else {
+        state = "init_requested";
+    }
+    
+    if (state != "operating")
+    {
+        Json::Value v;
+        v["status"] = state;
+        v["timestep"] = -1;
+        return generateJsonString(v);
+    }
+    Time mv{Time::maxVal()};
+    if (!builder.getJValue()["cores"][0].isObject()) {
+        state = "init_requested";
+    }
+    for (auto& cr : builder.getJValue()["cores"]) {
+        for (auto fed : cr["federates"]) {
+            auto dv = fed["granted_time"].asDouble();
+            if (dv < mv) {
+                mv = dv;
+            }
+        }
+    }
+    std::string tste = (mv >= timeZero) ? std::string("operating") : std::string("init_requested");
+
+    Json::Value v;
+
+    if (tste != "operating")
+    {
+        v["status"] = tste;
+        v["timestep"] = -1;
+    }
+    else
+    {
+        v["status"] = jv;
+        v["timestep"] = builder.getJValue();
+    }
+    
+    return generateJsonString(v);
 }
 
 std::string CoreBroker::getNameList(std::string gidString) const
@@ -2817,6 +2878,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     switch (index) {
         case federate_map:
         case current_time_map:
+        case global_status:
         case data_flow_graph:
         case global_flush:
         default:
@@ -3077,9 +3139,17 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
         auto& builder = std::get<0>(mapBuilders[m.counter]);
         auto& requestors = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(m.payload, m.messageID)) {
-            auto str = builder.generate();
-            if (m.counter == global_flush) {
-                str = "{\"status\":true}";
+            std::string str;
+            switch (m.counter) {
+                case global_status:
+                    str = generateGlobalStatus(builder);
+                    break;
+                case global_flush:
+                    str = "{\"status\":true}";
+                    break;
+                default:
+                    str = builder.generate();
+                    break;
             }
 
             for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
