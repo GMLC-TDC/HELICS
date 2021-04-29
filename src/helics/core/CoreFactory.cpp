@@ -110,7 +110,10 @@ namespace CoreFactory {
             throw(helics::RegistrationFailure("unable to create core"));
         }
         core->configure(configureString);
-        registerCore(core, type);
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
+        }
 
         return core;
     }
@@ -136,7 +139,10 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, coreName);
         core->configureFromVector(std::move(args));
-        registerCore(core, type);
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
+        }
 
         return core;
     }
@@ -162,7 +168,10 @@ namespace CoreFactory {
     {
         auto core = makeCore(type, coreName);
         core->configureFromArgs(argc, argv);
-        registerCore(core, type);
+        if (!registerCore(core, type)) {
+            throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
+                                              " failed to register properly"));
+        }
 
         return core;
     }
