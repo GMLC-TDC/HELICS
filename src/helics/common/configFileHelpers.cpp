@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 bool looksLikeFile(const std::string& configString)
 {
-    if (hasTomlExtension(configString)) {
+    if (helics::fileops::hasTomlExtension(configString)) {
         return true;
     }
-    if ((hasJsonExtension(configString)) ||
+    if ((helics::fileops::hasJsonExtension(configString)) ||
         (configString.find_first_of('{') != std::string::npos)) {
         return true;
     }

@@ -160,10 +160,10 @@ bool CoreBroker::verifyBrokerKey(const std::string& key) const
 
 void CoreBroker::makeConnections(const std::string& file)
 {
-    if (hasTomlExtension(file)) {
-        makeConnectionsToml(this, file);
+    if (fileops::hasTomlExtension(file)) {
+        fileops::makeConnectionsToml(this, file);
     } else {
-        makeConnectionsJson(this, file);
+        fileops::makeConnectionsJson(this, file);
     }
 }
 
@@ -636,7 +636,7 @@ std::string CoreBroker::generateFederationSummary() const
     block["endpoints"] = epts;
     summary["summary"] = block;
 
-    return generateJsonString(summary);
+    return fileops::generateJsonString(summary);
 }
 
 void CoreBroker::generateTimeBarrier(ActionMessage& m)
@@ -2614,7 +2614,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         base["state"] = brokerStateName(brokerState.load());
         base["status"] = isConnected();
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (request == "counts") {
         Json::Value base;
@@ -2629,7 +2629,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         base["brokers"] = static_cast<int>(_brokers.size());
         base["federates"] = static_cast<int>(_federates.size());
         base["handles"] = static_cast<int>(handles.size());
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (request == "summary") {
         return generateFederationSummary();
@@ -2673,7 +2673,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
                 base["brokers"].append(std::move(brkstate));
             }
         }
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (request == "current_time") {
         if (!hasTimeDependency) {
@@ -2762,7 +2762,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         for (const auto& dep : timeCoord->getDependencies()) {
             base["dependencies"].append(dep.baseValue());
         }
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     return generateJsonErrorResponse(400, "unrecognized broker query");
 }
@@ -3056,13 +3056,13 @@ void CoreBroker::processQuery(ActionMessage& m)
                 Json::Value v;
                 v["name"] = std::string(m.payload.to_string());
                 v["value"] = gfind->second;
-                queryResp.payload = generateJsonString(v);
+                queryResp.payload = fileops::generateJsonString(v);
             }
         } else if (m.payload.to_string() == "list") {
             queryResp.payload =
                 generateStringVector(global_values, [](const auto& gv) { return gv.first; });
         } else if (m.payload.to_string() == "all") {
-            JsonMapBuilder globalSet;
+            fileops::JsonMapBuilder globalSet;
             auto& jv = globalSet.getJValue();
             for (auto& val : global_values) {
                 jv[val.first] = val.second;

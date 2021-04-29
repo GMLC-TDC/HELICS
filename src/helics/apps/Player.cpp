@@ -399,7 +399,7 @@ namespace apps {
             eptids[endpoints.back().getName()] = static_cast<int>(endpoints.size() - 1);
         }
 
-        auto doc = loadJson(jsonString);
+        auto doc = fileops::loadJson(jsonString);
 
         if (doc.isMember("player")) {
             auto playerConfig = doc["player"];
@@ -419,9 +419,9 @@ namespace apps {
                     auto str = pointElement["time"].asString();
                     auto cloc = str.find_last_of(':');
                     if (cloc == std::string::npos) {
-                        ptime = loadJsonTime(str, units);
+                        ptime = fileops::loadJsonTime(str, units);
                     } else {
-                        ptime = loadJsonTime(str.substr(0, cloc - 1), units);
+                        ptime = fileops::loadJsonTime(str.substr(0, cloc - 1), units);
                         try {
                             iterationIndex = std::stoi(str.substr(cloc + 1));
                         }
@@ -433,9 +433,9 @@ namespace apps {
                     auto str = pointElement["t"].asString();
                     auto cloc = str.find_last_of(':');
                     if (cloc == std::string::npos) {
-                        ptime = loadJsonTime(str, units);
+                        ptime = fileops::loadJsonTime(str, units);
                     } else {
-                        ptime = loadJsonTime(str.substr(0, cloc - 1), units);
+                        ptime = fileops::loadJsonTime(str.substr(0, cloc - 1), units);
                         try {
                             iterationIndex = std::stoi(str.substr(cloc + 1));
                         }
@@ -498,9 +498,9 @@ namespace apps {
             for (const auto& messageElement : messageArray) {
                 Time ptime;
                 if (messageElement.isMember("time")) {
-                    ptime = loadJsonTime(messageElement["time"], units);
+                    ptime = fileops::loadJsonTime(messageElement["time"], units);
                 } else if (messageElement.isMember("t")) {
-                    ptime = loadJsonTime(messageElement["t"], units);
+                    ptime = fileops::loadJsonTime(messageElement["t"], units);
                 } else {
                     std::cout << "time not specified\n";
                     continue;
@@ -522,7 +522,7 @@ namespace apps {
                 Time sendTime = ptime;
                 std::string type;
                 if (messageElement.isMember("sendtime")) {
-                    ptime = loadJsonTime(messageElement["sendtime"], units);
+                    ptime = fileops::loadJsonTime(messageElement["sendtime"], units);
                 }
 
                 messages.resize(messages.size() + 1);
@@ -730,23 +730,23 @@ namespace apps {
         }
     }
 
-    void Player::addPublication(const std::string& key, DataType type, const std::string& pubUnits)
+    void Player::addPublication(const std::string& name, DataType type, const std::string& pubUnits)
     {
         // skip already existing publications
-        if (pubids.find(key) != pubids.end()) {
+        if (pubids.find(name) != pubids.end()) {
             std::cerr << "publication already exists\n";
         }
         if (!useLocal) {
-            publications.emplace_back(GLOBAL, fed.get(), key, type, pubUnits);
+            publications.emplace_back(GLOBAL, fed.get(), name, type, pubUnits);
         } else {
-            auto kp = key.find_first_of("./");
+            auto kp = name.find_first_of("./");
             if (kp == std::string::npos) {
-                publications.emplace_back(fed.get(), key, type, pubUnits);
+                publications.emplace_back(fed.get(), name, type, pubUnits);
             } else {
-                publications.emplace_back(GLOBAL, fed.get(), key, type, pubUnits);
+                publications.emplace_back(GLOBAL, fed.get(), name, type, pubUnits);
             }
         }
-        pubids[key] = static_cast<int>(publications.size()) - 1;
+        pubids[name] = static_cast<int>(publications.size()) - 1;
     }
 
     void Player::addEndpoint(const std::string& endpointName, const std::string& endpointType)

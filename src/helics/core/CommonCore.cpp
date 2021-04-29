@@ -1623,10 +1623,10 @@ InterfaceHandle CommonCore::getFilter(const std::string& name) const
 
 void CommonCore::makeConnections(const std::string& file)
 {
-    if (hasTomlExtension(file)) {
-        makeConnectionsToml(this, file);
+    if (fileops::hasTomlExtension(file)) {
+        fileops::makeConnectionsToml(this, file);
     } else {
-        makeConnectionsJson(this, file);
+        fileops::makeConnectionsJson(this, file);
     }
 }
 
@@ -2136,7 +2136,7 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
         base["id"] = global_broker_id_local.baseValue();
         base["endpoints"] = Json::arrayValue;
     }
-    return generateJsonString(base);
+    return fileops::generateJsonString(base);
 }
 
 std::string CommonCore::federateQuery(const FederateState* fed,
@@ -2388,7 +2388,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
         base["version"] = versionString;
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "current_state") {
         Json::Value base;
@@ -2397,7 +2397,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         });
         base["state"] = brokerStateName(brokerState.load());
 
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     auto mi = mapIndex.find(queryStr);
     if (mi != mapIndex.end()) {
@@ -2433,7 +2433,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
             val["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
         });
 
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "dependencies") {
         Json::Value base;
@@ -2446,12 +2446,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         for (const auto& dep : timeCoord->getDependencies()) {
             base["dependencies"].append(dep.baseValue());
         }
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryStr == "federate_map") {
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     return generateJsonErrorResponse(400, "unrecognized core query");
 }

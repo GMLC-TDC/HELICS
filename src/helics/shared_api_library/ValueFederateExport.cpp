@@ -430,17 +430,17 @@ HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsE
     // LCOV_EXCL_STOP
 }
 
-static constexpr char invalidSubKey[] = "the specified subscription key is a not a recognized key";
+static constexpr char invalidSubKey[] = "the specified subscription target is a not a recognized";
 
-HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, HelicsError* err)
+HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* target, HelicsError* err)
 {
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
     }
-    CHECK_NULL_STRING(key, nullptr);
+    CHECK_NULL_STRING(target, nullptr);
     try {
-        auto& id = fedObj->getSubscription(key);
+        auto& id = fedObj->getSubscription(target);
         if (!id.isValid()) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidSubKey);
             return nullptr;
@@ -1150,7 +1150,7 @@ const char* helicsPublicationGetType(HelicsPublication pub)
     // LCOV_EXCL_STOP
 }
 
-const char* helicsInputGetKey(HelicsInput inp)
+const char* helicsInputGetName(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
@@ -1158,7 +1158,7 @@ const char* helicsInputGetKey(HelicsInput inp)
     }
 
     try {
-        const std::string& key = inpObj->inputPtr->getKey();
+        const std::string& key = inpObj->inputPtr->getName();
         return key.c_str();
     }
     // LCOV_EXCL_START
@@ -1168,7 +1168,7 @@ const char* helicsInputGetKey(HelicsInput inp)
     // LCOV_EXCL_STOP
 }
 
-const char* helicsSubscriptionGetKey(HelicsInput sub)
+const char* helicsSubscriptionGetTarget(HelicsInput sub)
 {
     auto* inpObj = verifyInput(sub, nullptr);
     if (inpObj == nullptr) {
@@ -1186,14 +1186,14 @@ const char* helicsSubscriptionGetKey(HelicsInput sub)
     // LCOV_EXCL_STOP
 }
 
-const char* helicsPublicationGetKey(HelicsPublication pub)
+const char* helicsPublicationGetName(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
         return emptyStr.c_str();
     }
     try {
-        const std::string& key = pubObj->pubPtr->getKey();
+        const std::string& key = pubObj->pubPtr->getName();
         return key.c_str();
     }
     // LCOV_EXCL_START

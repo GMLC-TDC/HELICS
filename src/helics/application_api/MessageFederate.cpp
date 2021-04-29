@@ -143,7 +143,7 @@ void MessageFederate::registerInterfaces(const std::string& configString)
 
 void MessageFederate::registerMessageInterfaces(const std::string& configString)
 {
-    if (hasTomlExtension(configString)) {
+    if (fileops::hasTomlExtension(configString)) {
         registerMessageInterfacesToml(configString);
     } else {
         registerMessageInterfacesJson(configString);
@@ -154,6 +154,7 @@ static const std::string emptyStr;
 template<class Inp>
 static void loadOptions(const Inp& data, Endpoint& ept)
 {
+    using fileops::getOrDefault;
     addTargets(data, "flags", [&ept](const std::string& target) {
         if (target.front() != '-') {
             ept.setOption(getOptionIndex(target), true);
@@ -181,7 +182,7 @@ static void loadOptions(const Inp& data, Endpoint& ept)
     });
 
     auto defTarget = getOrDefault(data, "target", emptyStr);
-    replaceIfMember(data, "destination", defTarget);
+    fileops::replaceIfMember(data, "destination", defTarget);
     if (!defTarget.empty()) {
         ept.setDefaultDestination(defTarget);
     }
@@ -189,14 +190,14 @@ static void loadOptions(const Inp& data, Endpoint& ept)
 
 void MessageFederate::registerMessageInterfacesJson(const std::string& jsonString)
 {
-    auto doc = loadJson(jsonString);
+    auto doc = fileops::loadJson(jsonString);
     bool defaultGlobal = false;
-    replaceIfMember(doc, "defaultglobal", defaultGlobal);
+    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
     if (doc.isMember("endpoints")) {
         for (const auto& ept : doc["endpoints"]) {
-            auto eptName = getKey(ept);
-            auto type = getOrDefault(ept, "type", emptyStr);
-            bool global = getOrDefault(ept, "global", defaultGlobal);
+            auto eptName = fileops::getName(ept);
+            auto type = fileops::getOrDefault(ept, "type", emptyStr);
+            bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(eptName, type) : registerEndpoint(eptName, type);
 
@@ -209,24 +210,24 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
 {
     toml::value doc;
     try {
-        doc = loadToml(tomlString);
+        doc = fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
     }
     bool defaultGlobal = false;
-    replaceIfMember(doc, "defaultglobal", defaultGlobal);
+    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
-    if (isMember(doc, "endpoints")) {
+    if (fileops::isMember(doc, "endpoints")) {
         auto epts = toml::find(doc, "endpoints");
         if (!epts.is_array()) {
             throw(helics::InvalidParameter("endpoints section in toml file must be an array"));
         }
         auto& eptArray = epts.as_array();
         for (auto& ept : eptArray) {
-            auto key = getKey(ept);
-            auto type = getOrDefault(ept, "type", emptyStr);
-            bool global = getOrDefault(ept, "global", defaultGlobal);
+            auto key = fileops::getName(ept);
+            auto type = fileops::getOrDefault(ept, "type", emptyStr);
+            bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(key, type) : registerEndpoint(key, type);
 

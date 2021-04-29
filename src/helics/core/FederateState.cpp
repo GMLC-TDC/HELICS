@@ -1690,7 +1690,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     if (query == "interfaces") {
         Json::Value base;
         interfaceInformation.generateInferfaceConfig(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "global_flush") {
         return "{\"status\":true}";
@@ -1730,7 +1730,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["input"] = inputCount();
         base["endpoints"] = endpointCount();
         base["granted_time"] = static_cast<double>(grantedTime());
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "global_state") {
         Json::Value base;
@@ -1738,7 +1738,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["id"] = global_id.load().baseValue();
         base["parent"] = parent_->getGlobalId().baseValue();
         base["state"] = fedStateString(state.load());
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "global_time_debugging") {
         Json::Value base;
@@ -1747,20 +1747,20 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["parent"] = parent_->getGlobalId().baseValue();
         base["state"] = fedStateString(state.load());
         timeCoord->generateDebuggingTimeInfo(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "timeconfig") {
         Json::Value base;
         timeCoord->generateConfig(base);
         generateConfig(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "config") {
         Json::Value base;
         timeCoord->generateConfig(base);
         generateConfig(base);
         interfaceInformation.generateInferfaceConfig(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "dependents") {
         return generateStringVector(timeCoord->getDependents(),
@@ -1772,7 +1772,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["id"] = global_id.load().baseValue();
         base["parent"] = parent_->getGlobalId().baseValue();
         interfaceInformation.GenerateDataFlowGraph(base);
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "global_time") {
         Json::Value base;
@@ -1781,7 +1781,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["parent"] = parent_->getGlobalId().baseValue();
         base["granted_time"] = static_cast<double>(timeCoord->getGrantedTime());
         base["send_time"] = static_cast<double>(timeCoord->allowedSendTime());
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (query == "dependency_graph") {
         Json::Value base;
@@ -1796,7 +1796,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         for (auto& dep : timeCoord->getDependencies()) {
             base["dependencies"].append(dep.baseValue());
         }
-        return generateJsonString(base);
+        return fileops::generateJsonString(base);
     }
     if (queryCallback) {
         return queryCallback(query);

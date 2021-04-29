@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <utility>
 
-namespace helics {
+namespace helics::fileops {
 using stringVector = gmlc::utilities::stringVector;
 
 JsonMapBuilder::JsonMapBuilder() noexcept {}
@@ -162,4 +162,4 @@ void JsonBuilder::reset()
 {
     jMap = nullptr;
 }
-}  // namespace helics
+}  // namespace helics::fileops

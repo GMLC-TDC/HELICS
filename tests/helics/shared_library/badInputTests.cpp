@@ -572,18 +572,18 @@ TEST_F(function_tests, initError2)
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
-    auto k1 = helicsInputGetKey(subid);
+    auto k1 = helicsInputGetName(subid);
 
     // check some other calls
     auto inp2 = helicsFederateGetInput(vFed1, "inp1", &err);
     EXPECT_EQ(err.error_code, 0);
-    auto k2 = helicsInputGetKey(inp2);
+    auto k2 = helicsInputGetName(inp2);
 
     EXPECT_STREQ(k1, k2);
 
     auto inp3 = helicsFederateGetInputByIndex(vFed1, 0, &err);
     EXPECT_EQ(err.error_code, 0);
-    auto k3 = helicsInputGetKey(inp3);
+    auto k3 = helicsInputGetName(inp3);
 
     EXPECT_STREQ(k1, k3);
 

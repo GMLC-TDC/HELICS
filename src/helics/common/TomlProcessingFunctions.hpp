@@ -24,6 +24,7 @@ them using the toml library
 #include <functional>
 #include <string>
 
+namespace helics::fileops {
 /** load a TOML string or filename that points to a TOML file and return a
 toml::Value to the root object
 */
@@ -42,7 +43,7 @@ helics::Time loadTomlTime(const toml::value& timeElement,
                           time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
-std::string getKey(const toml::value& element);
+std::string getName(const toml::value& element);
 
 /** get a string value or use the default if it is not a member*/
 inline std::string
@@ -152,3 +153,5 @@ inline bool isMember(const toml::value& element, const std::string& key)
 
     return (!val.is_uninitialized());
 }
+
+}  // namespace helics::fileops

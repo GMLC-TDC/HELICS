@@ -81,11 +81,11 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // check publications
 
-    const auto& pk = pubid.getKey();
-    const auto& pk2 = pubid2.getKey();
+    const auto& pk = pubid.getName();
+    const auto& pk2 = pubid2.getName();
     EXPECT_EQ(pk, "fed0/pub1");
     EXPECT_EQ(pk2, "pub2");
-    const auto& pub3name = pubid3.getKey();
+    const auto& pub3name = pubid3.getName();
     EXPECT_EQ(pub3name, "fed0/pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");

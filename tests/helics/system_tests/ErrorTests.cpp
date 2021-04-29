@@ -330,7 +330,7 @@ TEST_F(error_tests, duplicate_publication_names4)
     // copy constructor
     helics::Publication pub2(pubid);
 
-    auto& sub = fed1->registerSubscription(pubid.getKey());
+    auto& sub = fed1->registerSubscription(pubid.getName());
     fed1->enterExecutingMode();
     pubid.publish(45.7);
     fed1->requestTime(1.0);

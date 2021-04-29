@@ -588,10 +588,10 @@ void FederateInfo::config_additional(helicsCLI11App* app)
     auto* opt = app->get_option("--config");
     if (opt->count() > 0) {
         auto configString = opt->as<std::string>();
-        if (hasTomlExtension(configString)) {
+        if (fileops::hasTomlExtension(configString)) {
             loadInfoFromToml(configString, false);
             fileInUse = configString;
-        } else if (hasJsonExtension(configString)) {
+        } else if (fileops::hasJsonExtension(configString)) {
             loadInfoFromJson(configString, false);
             fileInUse = configString;
         }
@@ -602,10 +602,10 @@ FederateInfo loadFederateInfo(const std::string& configString)
 {
     FederateInfo ret;
 
-    if (hasTomlExtension(configString)) {
+    if (fileops::hasTomlExtension(configString)) {
         ret.loadInfoFromToml(configString);
         ret.fileInUse = configString;
-    } else if (hasJsonExtension(configString)) {
+    } else if (fileops::hasJsonExtension(configString)) {
         ret.loadInfoFromJson(configString);
         ret.fileInUse = configString;
     } else if (configString.find_first_of('{') != std::string::npos) {
@@ -654,7 +654,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
 {
     Json::Value doc;
     try {
-        doc = loadJson(jsonString);
+        doc = fileops::loadJson(jsonString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
@@ -669,7 +669,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        callIfMember(doc, prop.first, timeCall);
+        fileops::callIfMember(doc, prop.first, timeCall);
     }
 
     processOptions(
@@ -700,7 +700,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
 {
     toml::value doc;
     try {
-        doc = loadToml(tomlString);
+        doc = fileops::loadToml(tomlString);
     }
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
@@ -715,7 +715,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        callIfMember(doc, prop.first, timeCall);
+        fileops::callIfMember(doc, prop.first, timeCall);
     }
 
     processOptions(

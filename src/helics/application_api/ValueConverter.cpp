@@ -212,7 +212,10 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, std::complex<double>& val)
     {
-        std::memcpy(&val, data + 8, 16);
+        // https://en.cppreference.com/w/cpp/numeric/complex
+        //  the layout used here is guaranteed by the standard
+        std::memcpy(&reinterpret_cast<double(&)[2]>(val)[0], data + 8, 8);
+        std::memcpy(&reinterpret_cast<double(&)[2]>(val)[1], data + 16, 8);
         if ((data[0] & endianMask) != littleEndianCode) {
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val));
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val) + 8);
@@ -303,7 +306,7 @@ void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::st
     for (const auto& str : val) {
         V.append(str);
     }
-    auto strgen = generateJsonString(V);
+    auto strgen = fileops::generateJsonString(V);
     return ValueConverter<std::string_view>::convert(strgen, store);
 }
 
@@ -314,7 +317,7 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
     val.clear();
     auto str = ValueConverter<std::string_view>::interpret(block);
     try {
-        Json::Value V = loadJsonStr(str);
+        Json::Value V = fileops::loadJsonStr(str);
         if (V.isArray()) {
             val.reserve(V.size());
             for (auto& av : V) {
