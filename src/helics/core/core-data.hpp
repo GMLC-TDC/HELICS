@@ -106,6 +106,9 @@ class FilterOperator {
     {
         return process(std::move(message));
     }
+    /** indicator if the filter Operator has the capability of generating completely new messages or
+     * redirecting messages*/
+    virtual bool isMessageGenerating() const { return false; }
 };
 
 /** special filter operator defining no operation the original message is simply returned

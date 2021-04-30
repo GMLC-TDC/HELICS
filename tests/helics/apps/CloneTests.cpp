@@ -201,8 +201,16 @@ TEST(clone_tests, simple_clone_test_combo)
     auto cnt = c1.messageCount();
     EXPECT_EQ(cnt, 2U);
 
-    cnt = c1.pointCount();
-    EXPECT_EQ(cnt, 3U);
+    auto pcnt = c1.pointCount();
+    EXPECT_EQ(pcnt, 3U);
+    if (pcnt != 3) {
+        for (int ii = 0; ii < pcnt; ++ii) {
+            auto pv = c1.getValue(ii);
+            std::cout << "Point " << ii << " source:" << std::get<1>(pv) << " at "
+                      << std::get<0>(pv) << ", value: " << std::get<2>(pv) << std::endl;
+        }
+        EXPECT_EQ(std::get<0>(c1.getValue(pcnt)), helics::Time{});
+    }
 
     c1.saveFile("combsave.json");
 
@@ -217,7 +225,7 @@ TEST(clone_tests, simple_clone_test_combo)
 
     EXPECT_EQ(p1.messageCount(), 2U);
     EXPECT_EQ(p1.endpointCount(), 3U);
-    EXPECT_EQ(p1.pointCount(), 3U);
+    EXPECT_EQ(p1.pointCount(), pcnt);
     EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
     ghc::filesystem::remove("combsave.json");

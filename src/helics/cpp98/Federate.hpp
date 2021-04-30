@@ -482,11 +482,11 @@ class Federate {
     */
     std::string query(const std::string& target,
                       const std::string& queryStr,
-                      HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) const
+                      HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) const
     {
         // returns HelicsQuery
         HelicsQuery q = helicsCreateQuery(target.c_str(), queryStr.c_str());
-        if (mode != HELICS_QUERY_MODE_FAST) {
+        if (mode != HELICS_SEQUENCING_MODE_FAST) {
             helicsQuerySetOrdering(q, mode, HELICS_IGNORE_ERROR);
         }
         std::string result(helicsQueryExecute(q, fed, hThrowOnError()));
@@ -508,11 +508,11 @@ class Federate {
     if the query was not valid
     */
     std::string query(const std::string& queryStr,
-                      HelicsQueryModes mode = HELICS_QUERY_MODE_FAST) const
+                      HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) const
     {
         // returns HelicsQuery
         HelicsQuery q = helicsCreateQuery(HELICS_NULL_POINTER, queryStr.c_str());
-        if (mode != HELICS_QUERY_MODE_FAST) {
+        if (mode != HELICS_SEQUENCING_MODE_FAST) {
             helicsQuerySetOrdering(q, mode, HELICS_IGNORE_ERROR);
         }
         std::string result(helicsQueryExecute(q, fed, hThrowOnError()));

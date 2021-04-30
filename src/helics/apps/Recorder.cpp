@@ -352,9 +352,9 @@ namespace apps {
         for (auto& capt : captureInterfaces) {
             auto res = waitForInit(fed.get(), capt);
             if (res) {
-                fed->query("root", "global_flush", HELICS_QUERY_MODE_ORDERED);
+                fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
                 auto pubs = vectorizeQueryResult(
-                    fed->query(capt, "publications", HELICS_QUERY_MODE_ORDERED));
+                    fed->query(capt, "publications", HELICS_SEQUENCING_MODE_ORDERED));
                 for (auto& pub : pubs) {
                     addSubscription(pub);
                 }
@@ -558,7 +558,7 @@ namespace apps {
         if (isValidIndex(index, points)) {
             return {points[index].time, targets[points[index].index], points[index].value};
         }
-        return {Time{}, {}, std::string()};
+        return {Time(), std::string(), std::string()};
     }
 
     std::unique_ptr<Message> Recorder::getMessage(int index) const

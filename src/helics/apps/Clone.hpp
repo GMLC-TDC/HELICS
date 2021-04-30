@@ -78,7 +78,7 @@ namespace apps {
     @param index the number of the point to retrieve
     @return a pair with the tag as the first element and the value as the second
     */
-        std::pair<std::string, std::string> getValue(int index) const;
+        std::tuple<Time, std::string, std::string> getValue(int index) const;
         /** get a message
     @details makes a copy of a message and returns it in a unique_ptr
     @param index the number of the message to retrieve

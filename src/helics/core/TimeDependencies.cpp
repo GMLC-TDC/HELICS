@@ -51,6 +51,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
 
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
+            dep.nonGranting = checkActionFlag(m, non_granting_flag);
             break;
         case CMD_TIME_GRANT:
             dep.time_state = time_state_t::time_granted;
