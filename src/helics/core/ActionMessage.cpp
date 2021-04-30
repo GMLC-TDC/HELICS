@@ -51,8 +51,7 @@ ActionMessage::ActionMessage(const ActionMessage& act):
     messageAction(act.messageAction), messageID(act.messageID), source_id(act.source_id),
     source_handle(act.source_handle), dest_id(act.dest_id), dest_handle(act.dest_handle),
     counter(act.counter), flags(act.flags), sequenceID(act.sequenceID), actionTime(act.actionTime),
-    payload(act.payload), Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso),
-    stringData(act.stringData)
+    payload(act.payload), Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso), stringData(act.stringData)
 
 {
 }

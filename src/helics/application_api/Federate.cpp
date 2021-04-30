@@ -1137,8 +1137,9 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
     return res;
 }
 
-std::string
-    Federate::query(const std::string& target, const std::string& queryStr, HelicsSequencingModes mode)
+std::string Federate::query(const std::string& target,
+                            const std::string& queryStr,
+                            HelicsSequencingModes mode)
 {
     std::string res;
     if ((target.empty()) || (target == "federate") || (target == getName())) {

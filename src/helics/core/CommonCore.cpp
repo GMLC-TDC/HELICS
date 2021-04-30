@@ -2160,7 +2160,7 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     if (queryStr == "isinit") {
         return (fed->init_transmitted.load()) ? "true" : "false";
     }
-    if (queryStr == "state" ) {
+    if (queryStr == "state") {
         if (!force_ordering) {
             return fedStateString(fed->getState());
         }
@@ -2459,8 +2459,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     return generateJsonErrorResponse(400, "unrecognized core query");
 }
 
-std::string
-    CommonCore::query(const std::string& target, const std::string& queryStr, HelicsSequencingModes mode)
+std::string CommonCore::query(const std::string& target,
+                              const std::string& queryStr,
+                              HelicsSequencingModes mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -2489,7 +2490,7 @@ std::string
             return res;
         }
         querycmd.setAction(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
-                                                            CMD_BROKER_QUERY_ORDERED);
+                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
     if (querycmd.dest_id != direct_core_id) {
@@ -2518,7 +2519,9 @@ std::string
                         }
                         case std::future_status::timeout: {  // federate query may need to wait or
                                                              // can get the result now
-                            ret = federateQuery(fed, queryStr, mode == HELICS_SEQUENCING_MODE_ORDERED);
+                            ret = federateQuery(fed,
+                                                queryStr,
+                                                mode == HELICS_SEQUENCING_MODE_ORDERED);
                             if (ret != "#wait") {
                                 activeQueries.finishedWithValue(index);
                                 return ret;

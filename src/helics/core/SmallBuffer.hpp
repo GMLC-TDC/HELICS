@@ -215,8 +215,7 @@ class SmallBuffer {
         std::memcpy(heap + csize, st1, data.size());
     }
 
-    void push_back(char c) { append(&c, 1);
-    }
+    void push_back(char c) { append(&c, 1); }
 
     /** interpret the data as a string*/
     std::string_view to_string() const
