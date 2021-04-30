@@ -1774,7 +1774,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         interfaceInformation.GenerateDataFlowGraph(base);
         return fileops::generateJsonString(base);
     }
-    if (query == "global_time") {
+    if (query == "global_time" || query == "global_status") {
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();

@@ -41,8 +41,8 @@ ActionMessage::ActionMessage(action_message_def::action_t startingAction,
 ActionMessage::ActionMessage(ActionMessage&& act) noexcept:
     messageAction(act.messageAction), messageID(act.messageID), source_id(act.source_id),
     source_handle(act.source_handle), dest_id(act.dest_id), dest_handle(act.dest_handle),
-    counter(act.counter), flags(act.flags), actionTime(act.actionTime), Te(act.Te),
-    Tdemin(act.Tdemin), Tso(act.Tso), payload(std::move(act.payload)),
+    counter(act.counter), flags(act.flags), sequenceID(act.sequenceID), actionTime(act.actionTime),
+    Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso), payload(std::move(act.payload)),
     stringData(std::move(act.stringData))
 {
 }
@@ -50,8 +50,8 @@ ActionMessage::ActionMessage(ActionMessage&& act) noexcept:
 ActionMessage::ActionMessage(const ActionMessage& act):
     messageAction(act.messageAction), messageID(act.messageID), source_id(act.source_id),
     source_handle(act.source_handle), dest_id(act.dest_id), dest_handle(act.dest_handle),
-    counter(act.counter), flags(act.flags), actionTime(act.actionTime), Te(act.Te),
-    Tdemin(act.Tdemin), Tso(act.Tso), payload(act.payload), stringData(act.stringData)
+    counter(act.counter), flags(act.flags), sequenceID(act.sequenceID), actionTime(act.actionTime),
+    Te(act.Te), Tdemin(act.Tdemin), Tso(act.Tso), payload(act.payload), stringData(act.stringData)
 
 {
 }
@@ -93,6 +93,7 @@ ActionMessage& ActionMessage::operator=(const ActionMessage& act)  // NOLINT
     dest_handle = act.dest_handle;
     counter = act.counter;
     flags = act.flags;
+    sequenceID = act.sequenceID;
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
@@ -112,6 +113,7 @@ ActionMessage& ActionMessage::operator=(ActionMessage&& act) noexcept
     dest_handle = act.dest_handle;
     counter = act.counter;
     flags = act.flags;
+    sequenceID = act.sequenceID;
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;

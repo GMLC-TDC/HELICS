@@ -233,22 +233,22 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("pub3 == null");
             }
 
-            String pub1KeyString = helics.helicsPublicationGetKey(pub1);
+            String pub1NameString = helics.helicsPublicationGetName(pub1);
             String pub1TypeString = helics.helicsPublicationGetType(pub1);
             String pub1UnitsString = helics.helicsPublicationGetUnits(pub1);
-            String sub1KeyString = helics.helicsSubscriptionGetKey(sub1);
+            String sub1TargetString = helics.helicsSubscriptionGetTarget(sub1);
             String sub1UnitsString = helics.helicsInputGetUnits(sub1);
-            if (!pub1KeyString.contains("pub1")) {
-                javaHelicsApiTests.helicsAssert("!pub1KeyString.equals(\"pub1\")");
+            if (!pub1NameString.contains("pub1")) {
+                javaHelicsApiTests.helicsAssert("!pub1NameString.equals(\"pub1\")");
             }
             if (!pub1TypeString.contains("double")) {
-                javaHelicsApiTests.helicsAssert("!pub1KeyString.equals(\"double\")");
+                javaHelicsApiTests.helicsAssert("!pub1NameString.equals(\"double\")");
             }
             if (!pub1UnitsString.contains("")) {
                 javaHelicsApiTests.helicsAssert("!pub1UnitsString.equals(\"\")");
             }
-            if (!sub1KeyString.contains("pub1")) {
-                javaHelicsApiTests.helicsAssert("!sub1KeyString.equals(\"pub1\")");
+            if (!sub1TargetString.contains("pub1")) {
+                javaHelicsApiTests.helicsAssert("!sub1TargetString.equals(\"pub1\")");
             }
             if (!sub1UnitsString.contains("")) {
                 javaHelicsApiTests.helicsAssert("!sub1UnitsString.equals(\"\")");

@@ -2100,11 +2100,13 @@ enum subqueries : std::uint16_t {
     data_flow_graph = 4,
     global_state = 6,
     global_time_debugging = 7,
-    global_flush = 8
+    global_flush = 8,
+    global_status = 9
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {current_time_map, true}},
+    {"global_status", {global_status, false}},
     {"dependency_graph", {dependency_graph, false}},
     {"data_flow_graph", {data_flow_graph, false}},
     {"global_state", {global_state, true}},
@@ -2262,6 +2264,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
 
     switch (index) {
         case current_time_map:
+        case global_status:
             if (hasTimeDependency) {
                 base["next_time"] = static_cast<double>(timeCoord->getNextTime());
             }
@@ -2456,8 +2459,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     return generateJsonErrorResponse(400, "unrecognized core query");
 }
 
-std::string
-    CommonCore::query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode)
+std::string CommonCore::query(const std::string& target,
+                              const std::string& queryStr,
+                              HelicsSequencingModes mode)
 {
     if (brokerState.load() >= broker_state_t::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -2468,7 +2472,7 @@ std::string
         }
         return generateJsonErrorResponse(410, "Core has terminated");
     }
-    ActionMessage querycmd(mode == HELICS_QUERY_MODE_FAST ? CMD_QUERY : CMD_QUERY_ORDERED);
+    ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = direct_core_id;
     querycmd.dest_id = parent_broker_id;
     querycmd.payload = queryStr;
@@ -2485,8 +2489,8 @@ std::string
             res = generateJsonQuotedString(getAddress());
             return res;
         }
-        querycmd.setAction(mode == HELICS_QUERY_MODE_FAST ? CMD_BROKER_QUERY :
-                                                            CMD_BROKER_QUERY_ORDERED);
+        querycmd.setAction(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
+                                                                 CMD_BROKER_QUERY_ORDERED);
         querycmd.dest_id = direct_core_id;
     }
     if (querycmd.dest_id != direct_core_id) {
@@ -2495,7 +2499,7 @@ std::string
             (target != "federate") ? getFederate(target) : getFederateAt(LocalFederateId(0));
         if (fed != nullptr) {
             querycmd.dest_id = fed->global_id;
-            if (mode != HELICS_QUERY_MODE_ORDERED) {
+            if (mode != HELICS_SEQUENCING_MODE_ORDERED) {
                 std::string ret = federateQuery(fed, queryStr, false);
                 if (ret != "#wait") {
                     return ret;
@@ -2515,7 +2519,9 @@ std::string
                         }
                         case std::future_status::timeout: {  // federate query may need to wait or
                                                              // can get the result now
-                            ret = federateQuery(fed, queryStr, mode == HELICS_QUERY_MODE_ORDERED);
+                            ret = federateQuery(fed,
+                                                queryStr,
+                                                mode == HELICS_SEQUENCING_MODE_ORDERED);
                             if (ret != "#wait") {
                                 activeQueries.finishedWithValue(index);
                                 return ret;
@@ -3410,6 +3416,11 @@ void CommonCore::connectFilterTiming()
     ad.dest_id = fid;
     ad.source_id = global_broker_id_local;
     filterFed->handleMessage(ad);
+    // TODO(PT) this should be conditional as it probably isn't needed in all cases
+    ad.setAction(CMD_ADD_DEPENDENCY);
+    timeCoord->addDependent(fid);
+    filterFed->handleMessage(ad);
+    //
     filterTiming = true;
 }
 
@@ -4103,10 +4114,15 @@ bool CommonCore::waitCoreRegistration()
 void CommonCore::manageTimeBlocks(const ActionMessage& command)
 {
     if (command.action() == CMD_TIME_BLOCK) {
+        bool found{false};
         for (auto& tb : timeBlocks) {
             if (command.source_id == tb.first) {
                 ++tb.second;
+                found = true;
             }
+        }
+        if (!found) {
+            timeBlocks.emplace_back(command.source_id, 1);
         }
     } else if (command.action() == CMD_TIME_UNBLOCK) {
         for (auto& tb : timeBlocks) {
