@@ -209,9 +209,7 @@ void FilterFederate::acceptProcessReturn(GlobalFederateId fid, uint32_t pid)
     clearTimeReturn(pid);
 }
 
-void FilterFederate::generateDestProcessMarker(GlobalFederateId fid,
-                                               uint32_t pid,
-                                               Time returnTime)
+void FilterFederate::generateDestProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();

@@ -2472,13 +2472,14 @@ void CoreBroker::setLogFile(const std::string& lfile)
 }
 
 // public query function
-std::string
-    CoreBroker::query(const std::string& target, const std::string& queryStr, HelicsSequencingModes mode)
+std::string CoreBroker::query(const std::string& target,
+                              const std::string& queryStr,
+                              HelicsSequencingModes mode)
 {
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
         ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = querycmd.dest_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -2494,7 +2495,7 @@ std::string
             return generateJsonErrorResponse(404, "broker has no parent");  // LCOV_EXCL_LINE
         }
         ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
@@ -2506,7 +2507,7 @@ std::string
     }
     if ((target == "root") || (target == "rootbroker")) {
         ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
-                                                                CMD_BROKER_QUERY_ORDERED);
+                                                                     CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
@@ -3190,7 +3191,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                     str = generateGlobalStatus(builder);
                     break;
                 case global_flush:
-                str = "{\"status\":true}";
+                    str = "{\"status\":true}";
                     break;
                 default:
                     str = builder.generate();

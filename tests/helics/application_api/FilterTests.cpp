@@ -1259,9 +1259,6 @@ TEST_F(filter_tests, reroute_separate_dest_target)
     filt->finalize();
 }
 
-
-
-
 TEST_F(filter_tests, separate_slow_filter_ci_skip)
 {
     auto broker = AddBroker(rerouteType, 3);

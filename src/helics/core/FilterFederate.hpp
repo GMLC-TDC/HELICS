@@ -140,13 +140,12 @@ class FilterFederate {
                                       const ActionMessage& command) const;
     void addTimeReturn(int32_t id, Time TimeVal);
     void clearTimeReturn(int32_t id);
-    
+
     std::pair<ActionMessage&, bool> executeFilter(ActionMessage& command, FilterInfo* filt);
     void generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime);
     void acceptProcessReturn(GlobalFederateId fid, uint32_t pid);
 
     void generateDestProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime);
     void acceptDestProcessReturn(GlobalFederateId fid, uint32_t pid);
-
 };
 }  // namespace helics
