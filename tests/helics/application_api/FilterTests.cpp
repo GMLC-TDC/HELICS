@@ -989,7 +989,7 @@ class rfcheck {
         };
         id = std::thread(act1);
     }
-    void join() { id.join(); };
+    void join() { id.join(); }
 };
 
 /** this test case fails as of yet with no good path to resolving it yet

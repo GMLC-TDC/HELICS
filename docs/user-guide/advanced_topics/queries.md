@@ -50,6 +50,8 @@ Answers to queries can be (in C++ data types):
 - a vector of quoted strings delimited by `','` `["answer1","answer"","answer3"]` \[sv\] this is a JSON compliant string vector
 - a JSON string with an object \[JSON\]
 
+As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing mode. There are currently two modes, `HELICS_SEQUENCING_MODE_FAST` which travels along priority channels and is identical to previous versions in which all queries traveled along those channels. The other mode is `helics_sequencing_mode_ordered` which travels along lower priority channels but is ordered with all other messages in the system. This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run. The `global_flush` query is forced to run in ordered mode at least until after it gets to the specified target.
+
 ### Federate Queries
 
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
@@ -65,6 +67,8 @@ The following queries are defined for federates. Federates may specify a callbac
 | ``isinit``         | If the federate has entered init mode [T/F]                |
 +--------------------+------------------------------------------------------------+
 | ``state``          | Current state of the federate as a string [string]         |
++--------------------+------------------------------------------------------------+
+| ``global_state``   | Current state of the federate as a string [JSON]           |
 +--------------------+------------------------------------------------------------+
 | ``publications``   | current publications of a federate [sv]                    |
 +--------------------+------------------------------------------------------------+
@@ -92,6 +96,8 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 ```
 
+The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them.
+
 ### Local Federate Queries
 
 The following queries are defined for federates but can only be queried on the local federate, that is, the federate making the query. Federates may specify a callback function which allows arbitrary user defined Queries.
@@ -117,131 +123,140 @@ The following queries are defined for federates but can only be queried on the l
 The following queries will be answered by a core:
 
 ```eval_rst
-+----------------------+-------------------------------------------------------------------------------------+
-| queryString          | Description                                                                         |
-+======================+=====================================================================================+
-| ``name``             | the identifier of the core [string]                                                 |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``address``          | the network address of the core [string]                                            |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``isinit``           | If the core has entered init mode [T/F]                                             |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``isconnected``      | If the core has is connected to the network [T/F]                                   |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``publications``     | current publications defined in a core [sv]                                         |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``inputs``           | current named inputs defined in a core [sv]                                         |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``endpoints``        | current endpoints defined in a core [sv]                                            |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``filters``          | current filters of the core [sv]                                                    |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``federates``        | current federates defined in a core [sv]                                            |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependenson``      | list of the objects this core depends on [sv]                                       |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependents``       | list of dependent objects [sv]                                                      |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependencies``     | structure containing dependency information [JSON]                                  |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``federate_map``     | a Hierarchical map of the federates contained in a core [JSON]                      |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [JSON]  |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependency_graph`` | a representation of the dependencies in the core and its contained federates [JSON] |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``data_flow_graph``  | a representation of the data connections from all interfaces in a federation [JSON] |
-+----------------------+-------------------------------------------------------------------------------------+
-|``endpoint_filters``  | data structure containing the filters on endpoints for the core[JSON]               |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``queries``          | list of dependent objects [sv]                                                      |
-+----------------------+-------------------------------------------------------------------------------------+
-|``version_all``       | data structure with the version string and the federates[JSON]                      |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``version``          | the version string for the helics library [string]                                  |
-+----------------------+-------------------------------------------------------------------------------------+
++--------------------------+-------------------------------------------------------------------------------------+
+| queryString              | Description                                                                         |
++==========================+=====================================================================================+
+| ``name``                 | the identifier of the core [string]                                                 |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``address``              | the network address of the core [string]                                            |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``isinit``               | If the core has entered init mode [T/F]                                             |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``isconnected``          | If the core has is connected to the network [T/F]                                   |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``publications``         | current publications defined in a core [sv]                                         |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``inputs``               | current named inputs defined in a core [sv]                                         |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``endpoints``            | current endpoints defined in a core [sv]                                            |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``filters``              | current filters of the core [sv]                                                    |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``federates``            | current federates defined in a core [sv]                                            |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependenson``          | list of the objects this core depends on [sv]                                       |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependents``           | list of dependent objects [sv]                                                      |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependencies``         | structure containing dependency information [JSON]                                  |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``federate_map``         | a Hierarchical map of the federates contained in a core [JSON]                      |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``federation_state``     | a structure with the current known status of the brokers and federates [JSON]       |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``current_time``         | if a time is computed locally that time sequence is returned, otherwise #na [JSON]  |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_time``          | get a structure with the current time status of all the federates/cores [JSON]      |
++------------------------------+-------------------------------------------------------------------------------------+
+| ``current_state``        | The state of all the components of a core as known by the core [JSON]               |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_state``         | The state of all the components from the components [JSON]                          |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependency_graph``     | a representation of the dependencies in the core and its contained federates [JSON] |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``data_flow_graph``      | a representation of the data connections from all interfaces in a federation [JSON] |
++--------------------------+-------------------------------------------------------------------------------------+
+|``filtered_endpoints``    | data structure containing the filters on endpoints for the core[JSON]               |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``queries``              | list of dependent objects [sv]                                                      |
++--------------------------+-------------------------------------------------------------------------------------+
+|``version_all``           | data structure with the version string and the federates[JSON]                      |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``version``              | the version string for the helics library [string]                                  |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``counter``              | A single number with a code, changes indicate core changes [string]                 |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_time_debugging``| return detailed time debugging state [JSON]                                         |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_flush``         | a query that just flushes the current system and returns the id's [JSON]            |
++--------------------------+-------------------------------------------------------------------------------------+
 ```
 
-The last two are valid but are not usually queried directly.
+The `version` and `version_all` queries are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.
 
 ### Broker Queries
 
 The following queries will be answered by a broker:
 
 ```eval_rst
-+----------------------+-------------------------------------------------------------------------------------+
-| queryString          | Description                                                                         |
-+======================+=====================================================================================+
-| ``name``             | the identifier of the broker [string]                                               |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``address``          | the network address of the broker [string]                                          |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``isinit``           | If the broker has entered init mode [T/F]                                           |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``isconnected``      | If the broker is connected to the network [T/F]                                     |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``publications``     | current publications known to a broker [sv]                                         |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``endpoints``        | current endpoints known to a broker [sv]                                            |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``federates``        | current federates under the brokers hierarchy [sv]                                  |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``brokers``          | current cores/brokers connected to a broker [sv]                                    |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependson``        | list of the objects this broker depends on [sv]                                     |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependencies``     | structure containing dependency information for the broker [JSON]                   |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependents``       | list of dependent objects [sv]                                                      |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``counts``           | a simple count of the number of brokers, federates, and handles [JSON]              |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``current_state``    | a structure with the current known status of the brokers and federates [JSON]       |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``status``           | a structure with the current known status (true if connected) of the broker [JSON]  |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]|
-+----------------------+-------------------------------------------------------------------------------------+
-| ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``federate_map``     | a Hierarchical map of the federates contained in a broker [JSON]                    |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``dependency_graph`` | a representation of the dependencies in the broker and all contained members [JSON] |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``data_flow_graph``  | a representation of the data connections from all interfaces in a federation [JSON] |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``queries``          | list of dependent objects [sv]                                                      |
-+----------------------+-------------------------------------------------------------------------------------+
-|``version_all``       | data structure with the version strings of all broker components [JSON]             |
-+----------------------+-------------------------------------------------------------------------------------+
-| ``version``          | the version string for the helics library [string]                                  |
-+----------------------+-------------------------------------------------------------------------------------+
++--------------------------+-------------------------------------------------------------------------------------+
+| queryString              | Description                                                                         |
++==========================+=====================================================================================+
+| ``name``                | the identifier of the broker [string]                                               |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``address``              | the network address of the broker [string]                                          |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``isinit``               | If the broker has entered init mode [T/F]                                           |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``isconnected``          | If the broker is connected to the network [T/F]                                     |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``publications``         | current publications known to a broker [sv]                                         |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``endpoints``            | current endpoints known to a broker [sv]                                            |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``federates``            | current federates under the brokers hierarchy [sv]                                  |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``brokers``              | current cores/brokers connected to a broker [sv]                                    |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependson``            | list of the objects this broker depends on [sv]                                     |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependencies``         | structure containing dependency information for the broker [JSON]                   |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependents``           | list of dependent objects [sv]                                                      |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``counts``               | a simple count of the number of brokers, federates, and handles [JSON]              |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``current_state``        | a structure with the current known status of the brokers and federates [JSON]       |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_state``         | a structure with the current state all system components [JSON]                     |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``status``              | a structure with the current known status (true if connected) of the broker [JSON]  |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``current_time``         | if a time is computed locally that time sequence is returned, otherwise #na [string]|
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_time``          | get a structure with the current time status of all the federates/cores [JSON]      |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``federate_map``         | a Hierarchical map of the federates contained in a broker [JSON]                    |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``dependency_graph``     | a representation of the dependencies in the broker and all contained members [JSON] |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``data_flow_graph``      | a representation of the data connections from all interfaces in a federation [JSON] |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``queries``              | list of dependent objects [sv]                                                      |
++--------------------------+-------------------------------------------------------------------------------------+
+|``version_all``           | data structure with the version strings of all broker components [JSON]             |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``version``              | the version string for the helics library [string]                                  |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``counter``              | A single number with a code, changes indicate federation changes [string]           |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_time_debugging``| return detailed time debugging state [JSON]                                         |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_flush``         | a query that just flushes the current system and returns the id's [JSON]            |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``global_status``        | an aggregate query that returns a combo of global_time and current state [JSON]     |
++--------------------------+-------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried.
+`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower.
 
-### Invalid queries
-
-Queries that are not valid as either the query itself or the target is not recognized will return an error JSON object
-
-```json
-{
-  "error": {
-    "code": 404,
-    "message": "query not recognized"
-  }
-}
-```
-
-The error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".
+ error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".
 
 ## Usage Notes
 
-Queries that act on non-local federation component travel along priority communication channels. The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular value- and message-passing.
+Queries that must traverse the network travel along priority paths unless specified otherwise with a sequencing mode. The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular communication.
+
+The difference between `current_state` and `global_state` is that `current_state` is generated by information contained in the component so doesn't generate secondary queries of other components. Whereas `global_state` will reach out to the other components to get up to date information on the state.
 
 ### Application API
 
