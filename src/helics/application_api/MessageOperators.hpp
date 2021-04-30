@@ -46,6 +46,7 @@ class HELICS_CXX_EXPORT MessageDestOperator: public FilterOperator {
     /** set the function to modify the time of the message*/
     void setDestFunction(
         std::function<std::string(const std::string&, const std::string&)> userDestFunction);
+    virtual bool isMessageGenerating() const override { return true; }
 
   private:
     std::function<std::string(const std::string&, const std::string&)>
@@ -59,13 +60,12 @@ class HELICS_CXX_EXPORT MessageDataOperator: public FilterOperator {
     /** default constructor*/
     MessageDataOperator() = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit MessageDataOperator(std::function<data_view(data_view)> userDataFunction);
+    explicit MessageDataOperator(std::function<void(SmallBuffer&)> userDataFunction);
     /** set the function to modify the data of the message*/
-    void setDataFunction(std::function<data_view(data_view)> userDataFunction);
+    void setDataFunction(std::function<void(SmallBuffer&)> userDataFunction);
 
   private:
-    std::function<data_view(data_view)>
-        dataFunction;  //!< the function actually doing the processing
+    std::function<void(SmallBuffer&)> dataFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
 };
 
@@ -103,6 +103,7 @@ class HELICS_CXX_EXPORT CloneOperator: public FilterOperator {
     /** set the function to modify the data of the message*/
     void setCloneFunction(
         std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction);
+    virtual bool isMessageGenerating() const override { return true; }
 
   private:
     std::function<std::vector<std::unique_ptr<Message>>(const Message*)>

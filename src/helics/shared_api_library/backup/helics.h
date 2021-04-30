@@ -351,12 +351,12 @@ typedef enum {
     HELICS_FILTER_TYPE_FIREWALL = 6
 } HelicsFilterTypes;
 
-/** enumeration of sequencing modes for queries
+/** enumeration of sequencing modes for queries and commands
 fast is the default, meaning the query travels along priority channels and takes precedence of over
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { HELICS_QUERY_MODE_FAST = 0, HELICS_QUERY_MODE_ORDERED = 1 } HelicsQueryModes;
+typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
 
 /**
  * @file
@@ -2895,25 +2895,25 @@ HELICS_EXPORT const char* helicsPublicationGetType(HelicsPublication pub);
  *
  * @param ipt The input to query.
  *
- * @return A void enumeration, HELICS_OK if everything worked.
+ * @return A const char with the input name.
  */
 HELICS_EXPORT const char* helicsInputGetName(HelicsInput ipt);
 
 /**
- * Get the key of a subscription.
+ * Get the target of a subscription.
  *
- * @return A const char with the subscription key.
+ * @return A const char with the subscription target.
  */
 HELICS_EXPORT const char* helicsSubscriptionGetTarget(HelicsInput ipt);
 
 /**
- * Get the key of a publication.
+ * Get the name of a publication.
  *
  * @details This will be the global key used to identify the publication to the federation.
  *
  * @param pub The publication to query.
  *
- * @return A void enumeration, HELICS_OK if everything worked.
+ * @return A const char with the publication name.
  */
 HELICS_EXPORT const char* helicsPublicationGetName(HelicsPublication pub);
 

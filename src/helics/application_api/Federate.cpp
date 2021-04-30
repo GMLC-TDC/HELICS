@@ -59,8 +59,16 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
                     cname = fedName + "_core" + std::to_string(cnt);
                     cobj = CoreFactory::findCore(cname);
                 }
-                coreObject =
-                    CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+                try {
+                    coreObject =
+                        CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+                }
+                catch (const helics::RegistrationFailure&) {
+                    // there is a possibility of race condition here in the naming resulting a
+                    // failure this catches and reverts to previous naming which is randomly
+                    // generated
+                    coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
+                }
             } else {
                 coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
             }
@@ -1103,7 +1111,7 @@ std::string Federate::localQuery(const std::string& /*queryStr*/) const
 {
     return std::string{};
 }
-std::string Federate::query(const std::string& queryStr, HelicsQueryModes mode)
+std::string Federate::query(const std::string& queryStr, HelicsSequencingModes mode)
 {
     std::string res;
     if (queryStr == "name") {
@@ -1129,8 +1137,9 @@ std::string Federate::query(const std::string& queryStr, HelicsQueryModes mode)
     return res;
 }
 
-std::string
-    Federate::query(const std::string& target, const std::string& queryStr, HelicsQueryModes mode)
+std::string Federate::query(const std::string& target,
+                            const std::string& queryStr,
+                            HelicsSequencingModes mode)
 {
     std::string res;
     if ((target.empty()) || (target == "federate") || (target == getName())) {
@@ -1147,7 +1156,7 @@ std::string
 
 query_id_t Federate::queryAsync(const std::string& target,
                                 const std::string& queryStr,
-                                HelicsQueryModes mode)
+                                HelicsSequencingModes mode)
 {
     auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
         return coreObject->query(target, queryStr, mode);
@@ -1159,7 +1168,7 @@ query_id_t Federate::queryAsync(const std::string& target,
     return query_id_t(cnt);
 }
 
-query_id_t Federate::queryAsync(const std::string& queryStr, HelicsQueryModes mode)
+query_id_t Federate::queryAsync(const std::string& queryStr, HelicsSequencingModes mode)
 {
     auto queryFut =
         std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });

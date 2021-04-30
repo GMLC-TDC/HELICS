@@ -1003,7 +1003,7 @@ void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err)
     if (queryObj == nullptr) {
         return;
     }
-    queryObj->mode = (mode == 0) ? HELICS_QUERY_MODE_FAST : HELICS_QUERY_MODE_ORDERED;
+    queryObj->mode = (mode == 0) ? HELICS_SEQUENCING_MODE_FAST : HELICS_SEQUENCING_MODE_ORDERED;
 }
 
 void helicsQueryFree(HelicsQuery query)
