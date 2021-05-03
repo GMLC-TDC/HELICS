@@ -1,4 +1,4 @@
-# Combination Federation with Native HELICS Filters
+# Combination Federation with Native HELICS Filters.
 
 This custom filter federate example expands the TODO example to demonstrate . This example assumes the user has already worked through the [TODO]().
 
