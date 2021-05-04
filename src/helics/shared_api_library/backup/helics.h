@@ -2976,7 +2976,7 @@ HELICS_EXPORT const char* helicsInputGetInfo(HelicsInput inp);
 HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of an input
+ * Get the data in a specified tag of an input.
  *
  * @param inp The input object to query.
  *
@@ -2989,7 +2989,7 @@ HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname
  *
  * @param inp The input object to query.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag
+ * @param tagvalue The string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
@@ -3017,7 +3017,7 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(HelicsPublication pub);
 HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of a publication
+ * Get the data in a specified tag of a publication.
  *
  * @param pub The publication object to query.
  *
@@ -3030,7 +3030,7 @@ HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const c
  *
  * @param pub The publication object to query.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag
+ * @param tagvalue The string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
@@ -3539,11 +3539,11 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
 HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of an endpoint
+ * Get the data in a specified tag of an endpoint.
  *
  * @param end The endpoint to query.
  *
- * @return A string with the info field string.
+ * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint end, const char* tagname);
 
@@ -3552,7 +3552,7 @@ HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint end, const char* t
  *
  * @param endpoint The endpoint to query.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag
+ * @param tagvalue The string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
@@ -4214,11 +4214,11 @@ HELICS_EXPORT const char* helicsFilterGetInfo(HelicsFilter filt);
 HELICS_EXPORT void helicsFilterSetInfo(HelicsFilter filt, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of a filter
+ * Get the data in a specified tag of a filter.
  *
  * @param filt The filter to query.
  *
- * @return A string with the info field string.
+ * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname);
 
@@ -4227,7 +4227,7 @@ HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagn
  *
  * @param filter The filter object to set the tag for.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag
+ * @param tagvalue The string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly

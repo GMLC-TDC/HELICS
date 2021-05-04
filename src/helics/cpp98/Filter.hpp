@@ -81,12 +81,12 @@ class Filter {
     {
         helicsFilterSetInfo(filt, info.c_str(), HELICS_IGNORE_ERROR);
     }
-    /** get the interface information field of the filter*/
+    /** get the value of a tag for the filter*/
     const char* getTag(const std::string& tagname) const
     {
         return helicsFilterGetTag(filt, tagname.c_str());
     }
-    /** set the interface information field of the filter*/
+    /** set the value of a tag for the filter*/
     void setTag(const std::string& tagname, const std::string& tagvalue)
     {
         helicsFilterSetTag(filt, tagname.c_str(), tagvalue.c_str(), HELICS_IGNORE_ERROR);

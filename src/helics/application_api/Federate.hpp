@@ -644,18 +644,18 @@ class HELICS_CXX_EXPORT Interface {
     const std::string& getInfo() const;
     /** set the interface information field of the input*/
     void setInfo(const std::string& info);
-    /** set a tag and value (key value pair) for an interface
-    @details the tag is an arbitrary user defined string and value the tags are queryable for an
-    interface
-    @param tag the key of the key value pair
+    /** set a tag (key-value pair) for an interface
+    @details the tag is an arbitrary user defined string and value; the tags for an interface are
+    queryable
+    @param tag the name of the tag to set the value for
     @param value the value for the given tag*/
     void setTag(const std::string& tag, const std::string& value);
-    /** get the value of a specific tag (key value pair) for an interface
-    @details the tag is an arbitrary user defined string and value the tags are queryable for an
-    interface
+    /** get the value of a specific tag (key-value pair) for an interface
+    @details the tag is an arbitrary user defined string and value; the tags for an interface are
+    queryable
     @param tag the name of the tag to get the value for
-    @return a const std::string & containing the value of the tag, if the tag is not defined the
-    value is and string*/
+    @return a const std::string& containing the value of the tag, if the tag is not defined the
+    value is an empty string*/
     const std::string& getTag(const std::string& tag) const;
     /** set a handle flag for the input*/
     virtual void setOption(int32_t option, int32_t value = 1);

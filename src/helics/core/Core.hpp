@@ -799,8 +799,8 @@ class Core {
      */
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const = 0;
     /**
-     * setter for interface tags which are key value pairs
-     * @param handle the identifiers for the interface to set the info data on
+     * setter for interface tags which are key-value pairs
+     * @param handle the identifier for the interface to set the tag data on
      * @param tag a string containing the name of the tag
      * @param value a string containing the value for the tag
      */
@@ -808,7 +808,7 @@ class Core {
         setTag(InterfaceHandle handle, const std::string& tag, const std::string& value) = 0;
     /**
      * getter for the interface tags
-     * @param handle the identifiers for the interface to set the info data on
+     * @param handle the identifier for the interface to set the info data on
      * @param tag the name of the tag to retrieve
      */
     virtual const std::string& getTag(InterfaceHandle handle, const std::string& tag) const = 0;

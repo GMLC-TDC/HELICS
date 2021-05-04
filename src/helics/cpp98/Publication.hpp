@@ -107,12 +107,12 @@ class Publication {
     {
         helicsPublicationSetInfo(pub, info.c_str(), HELICS_IGNORE_ERROR);
     }
-    /** get the interface information field of the input*/
+    /** get the value of a tag for the publication*/
     const char* getTag(const std::string& tagname) const
     {
         return helicsPublicationGetTag(pub, tagname.c_str());
     }
-    /** set the interface information field of the input*/
+    /** set the value of a tag for the publication*/
     void setTag(const std::string& tagname, const std::string& tagvalue)
     {
         helicsPublicationSetTag(pub, tagname.c_str(), tagvalue.c_str(), HELICS_IGNORE_ERROR);
