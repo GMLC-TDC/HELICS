@@ -110,6 +110,8 @@ TEST_F(vfed_single_tests, publisher_registration)
     auto units = helicsPublicationGetUnits(pubid3);
     EXPECT_STREQ(units, "V");
 
+    CE(helicsPublicationSetTag(pubid3, "tag1", "tagvalue",&err));
+    EXPECT_STREQ(helicsPublicationGetTag(pubid3, "tag1"), "tagvalue");
     // EXPECT_TRUE (vFed1->getPublicationId ("pub1") == pubid.getID ());
     // EXPECT_TRUE (vFed1->getPublicationId ("pub2") == pubid2.getID ());
     // EXPECT_TRUE (vFed1->getPublicationId ("fed0/pub1") == pubid.getID ());
@@ -147,6 +149,9 @@ TEST_F(vfed_single_tests, subscription_registration)
 
     auto units = helicsInputGetUnits(subid3);
     EXPECT_STREQ(units, "V");
+
+    CE(helicsInputSetTag(subid3, "tag1", "tagvalue", &err));
+    EXPECT_STREQ(helicsInputGetTag(subid3, "tag1"), "tagvalue");
 
     // EXPECT_TRUE (vFed1->getSubscriptionId ("sub1") == subid);
     // EXPECT_TRUE (vFed1->getSubscriptionId ("sub2") == subid2);

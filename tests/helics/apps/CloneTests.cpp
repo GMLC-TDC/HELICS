@@ -209,7 +209,7 @@ TEST(clone_tests, simple_clone_test_combo)
             std::cout << "Point " << ii << " source:" << std::get<1>(pv) << " at "
                       << std::get<0>(pv) << ", value: " << std::get<2>(pv) << std::endl;
         }
-        EXPECT_EQ(std::get<0>(c1.getValue(pcnt)), helics::Time{});
+        EXPECT_EQ(std::get<0>(c1.getValue(static_cast<int>(pcnt))), helics::Time{});
     }
 
     c1.saveFile("combsave.json");

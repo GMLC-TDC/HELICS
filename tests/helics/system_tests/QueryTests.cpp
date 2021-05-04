@@ -557,6 +557,47 @@ TEST_F(query, data_flow_graph)
     helics::cleanupHelicsLibrary();
 }
 
+TEST_F(query, interfaces)
+{
+    SetupTest<helics::CombinationFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+    auto& i1 = vFed1->registerGlobalInput<double>("ipt1","kV");
+    auto& p1 = vFed1->registerGlobalPublication<double>("pub1","V");
+    auto& e1 = vFed1->registerGlobalEndpoint("ept1","type1");
+    p1.addTarget("ipt1");
+    p1.setTag("tag1", "val1");
+
+    i1.setTag("tag2", "val2");
+    e1.setTag("tag3", "val3");
+    vFed1->enterInitializingMode();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query("fed0", "interfaces", HELICS_SEQUENCING_MODE_FAST);
+    core = nullptr;
+    vFed1->finalize();
+    auto val = loadJsonStr(res);
+    EXPECT_STREQ(val["inputs"][0]["name"].asCString(), "ipt1");
+    EXPECT_STREQ(val["publications"][0]["name"].asCString(), "pub1");
+    EXPECT_STREQ(val["endpoints"][0]["name"].asCString(), "ept1");
+    EXPECT_STREQ(val["inputs"][0]["type"].asCString(), "double");
+    EXPECT_STREQ(val["publications"][0]["type"].asCString(), "double");
+    EXPECT_STREQ(val["endpoints"][0]["type"].asCString(), "type1");
+
+    EXPECT_STREQ(val["inputs"][0]["units"].asCString(), "kV");
+    EXPECT_STREQ(val["publications"][0]["units"].asCString(), "V");
+
+    ASSERT_EQ(val["inputs"][0]["tags"].size(), 1U);
+    ASSERT_EQ(val["publications"][0]["tags"].size(), 1U);
+    ASSERT_EQ(val["endpoints"][0]["tags"].size(), 1U);
+    EXPECT_STREQ(val["publications"][0]["tags"][0]["name"].asCString(), "tag1");
+    EXPECT_STREQ(val["publications"][0]["tags"][0]["value"].asCString(), "val1");
+    EXPECT_STREQ(val["inputs"][0]["tags"][0]["name"].asCString(), "tag2");
+    EXPECT_STREQ(val["inputs"][0]["tags"][0]["value"].asCString(), "val2");
+    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["name"].asCString(), "tag3");
+    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["value"].asCString(), "val3");
+    helics::cleanupHelicsLibrary();
+}
+
 TEST_F(query, data_flow_graph_ordered)
 {
     SetupTest<helics::ValueFederate>("test", 2);

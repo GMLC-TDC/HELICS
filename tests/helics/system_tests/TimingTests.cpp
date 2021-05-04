@@ -193,12 +193,13 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     auto fed1res = std::async(std::launch::async, rfed1);
 
     fed1res.get();
+    vFed1->finalize();
     auto rvec = fed2res.get();
     EXPECT_EQ(rvec.front(), 5.0);
     EXPECT_EQ(rvec.size(), 20u);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
-    vFed1->finalize();
+    
     vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
                         // it will time out.
 }
