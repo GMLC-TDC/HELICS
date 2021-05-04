@@ -890,7 +890,7 @@ HELICS_EXPORT const char* helicsInputGetInfo(HelicsInput inp);
 HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of an input
+ * Get the data in a specified tag of an input.
  *
  * @param inp The input object to query.
  *
@@ -903,7 +903,7 @@ HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname
  *
  * @param inp The input object to query.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag
+ * @param tagvalue The string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
@@ -931,7 +931,7 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(HelicsPublication pub);
 HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of a publication
+ * Get the data in a specified tag of a publication.
  *
  * @param pub The publication object to query.
  *
@@ -944,7 +944,7 @@ HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const c
  *
  * @param pub The publication object to query.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag
+ * @param tagvalue The string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
