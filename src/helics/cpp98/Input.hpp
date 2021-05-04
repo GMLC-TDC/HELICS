@@ -193,12 +193,19 @@ class Input {
     const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
     const char* getTarget() const { return helicsSubscriptionGetTarget(inp); }
-    /** get the interface information field of the filter*/
+    /** get the interface information field of the input*/
     const char* getInfo() const { return helicsInputGetInfo(inp); }
-    /** set the interface information field of the publication*/
+    /** set the interface information field of the input*/
     void setInfo(const std::string& info)
     {
         helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
+    }
+    /** get the interface information field of the input*/
+    const char* getTag(const std::string& tagname) const { return helicsInputGetTag(inp, tagname.c_str()); }
+    /** set the interface information field of the input*/
+    void setTag(const std::string& tagname, const std::string& tagvalue)
+    {
+        helicsInputSetTag(inp, tagname.c_str(), tagvalue.c_str(), HELICS_IGNORE_ERROR);
     }
     void setOption(int32_t option, int32_t value = 1)
     {

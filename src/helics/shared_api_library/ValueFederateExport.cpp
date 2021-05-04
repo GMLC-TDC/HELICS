@@ -1284,6 +1284,7 @@ void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err)
     }
     // LCOV_EXCL_STOP
 }
+
 const char* helicsPublicationGetInfo(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
@@ -1316,6 +1317,73 @@ void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsErr
     }
     // LCOV_EXCL_STOP
 }
+
+const char* helicsInputGetTag(HelicsInput inp, const char* tagname) {
+    auto* inpObj = verifyInput(inp, nullptr);
+    if (inpObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    try {
+        const std::string& info = inpObj->inputPtr->getTag(AS_STRING(tagname));
+        return info.c_str();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        return emptyStr.c_str();
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalue, HelicsError* err)
+{
+    auto* inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr) {
+        return;
+    }
+    try {
+        inpObj->inputPtr->setTag(AS_STRING(tagname),AS_STRING(tagvalue));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+
+const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname) {
+    auto* pubObj = verifyPublication(pub, nullptr);
+    if (pubObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    try {
+        const std::string& info = pubObj->pubPtr->getTag(AS_STRING(tagname));
+        return info.c_str();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        return emptyStr.c_str();
+    }
+    // LCOV_EXCL_STOP
+}
+
+
+void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const char* tagvalue, HelicsError* err) {
+    auto* pubObj = verifyPublication(pub, err);
+    if (pubObj == nullptr) {
+        return;
+    }
+    try {
+        pubObj->pubPtr->setTag(AS_STRING(tagname),AS_STRING(tagvalue));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+
 
 int helicsInputGetOption(HelicsInput inp, int option)
 {
