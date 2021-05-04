@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 
@@ -56,14 +58,25 @@ class BasicHandleInfo {
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
-    std::string interface_info;  //!< storage for a user info string
     const std::string& type_in;  //!< the input type of a filter
     const std::string& type_out;  //!< the output type of a filter
     /** get the interface handle information */
     InterfaceHandle getInterfaceHandle() const { return handle.handle; }
     /** extract a global federate id */
     GlobalFederateId getFederateId() const { return handle.fed_id; }
-    /** set the user level information field*/
-    void setInfoField(std::string& info) { interface_info = info; }
+    /** set a tag (key-value pair)*/
+    void setTag(const std::string& tag, const std::string& value);
+    /** search for a tag by name*/
+    const std::string& getTag(const std::string& tag) const;
+    /** get a tag (key-value pair) by index*/
+    const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
+    {
+        return tags[index];
+    }
+    /** get the number of tags associated with an interface*/
+    auto tagCount() const { return tags.size(); }
+
+  private:
+    std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
 };
 }  // namespace helics

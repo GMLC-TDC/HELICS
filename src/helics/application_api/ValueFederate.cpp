@@ -210,6 +210,9 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
     if (!info.empty()) {
         objUpdate.setInfo(info);
     }
+    loadTags(data, [&objUpdate](const std::string& tagname, const std::string& tagvalue) {
+        objUpdate.setTag(tagname, tagvalue);
+    });
     addTargets(data, "targets", [&objUpdate](const std::string& target) {
         objUpdate.addTarget(target);
     });

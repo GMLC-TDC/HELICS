@@ -172,6 +172,9 @@ static void loadOptions(const Inp& data, Endpoint& ept)
     if (!info.empty()) {
         ept.setInfo(info);
     }
+    loadTags(data, [&ept](const std::string& tagname, const std::string& tagvalue) {
+        ept.setTag(tagname, tagvalue);
+    });
     addTargets(data, "subscriptions", [&ept](const std::string& sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](const std::string& filt) { ept.addSourceFilter(filt); });
     addTargets(data, "sourceFilters", [&ept](const std::string& filt) {

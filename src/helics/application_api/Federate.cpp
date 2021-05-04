@@ -841,6 +841,9 @@ static void loadOptions(const Inp& data, Filter& filt)
     if (!info.empty()) {
         filt.setInfo(info);
     }
+    loadTags(data, [&filt](const std::string& tagname, const std::string& tagvalue) {
+        filt.setTag(tagname, tagvalue);
+    });
     auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
     auto adest = [&filt](const std::string& target) { filt.addDestinationTarget(target); };
     addTargets(data, "sourcetargets", asrc);
@@ -1397,6 +1400,21 @@ void Interface::setInfo(const std::string& info)
     } else {
         throw(
             InvalidFunctionCall("cannot call set info on uninitialized or disconnected interface"));
+    }
+}
+
+const std::string& Interface::getTag(const std::string& tag) const
+{
+    return (cr != nullptr) ? cr->getTag(handle, tag) : emptyStr;
+}
+
+void Interface::setTag(const std::string& tag, const std::string& value)
+{
+    if (cr != nullptr) {
+        cr->setTag(handle, tag, value);
+    } else {
+        throw(
+            InvalidFunctionCall("cannot call set tag on uninitialized or disconnected interface"));
     }
 }
 
