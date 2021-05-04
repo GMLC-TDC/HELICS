@@ -6,37 +6,36 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "queryHelpers.hpp"
+
 #include "HandleManager.hpp"
 
 namespace helics {
 
-    static void addTags(Json::Value& v, const BasicHandleInfo& bhi) {
-        if (bhi.tagCount()>0) {
-            v["tags"] = Json::arrayValue;
-            for (size_t ii = 0; ii < bhi.tagCount();++ii) {
-                const auto& tg = bhi.getTagByIndex(ii);
-                Json::Value tagBlock;
-                tagBlock["name"] = tg.first;
-                tagBlock["value"] = tg.second;
-                v["tags"].append(tagBlock);
-            }
+static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
+{
+    if (bhi.tagCount() > 0) {
+        v["tags"] = Json::arrayValue;
+        for (size_t ii = 0; ii < bhi.tagCount(); ++ii) {
+            const auto& tg = bhi.getTagByIndex(ii);
+            Json::Value tagBlock;
+            tagBlock["name"] = tg.first;
+            tagBlock["value"] = tg.second;
+            v["tags"].append(tagBlock);
         }
     }
+}
 
-    Json::Value generateInterfaceConfig(
-        const helics::HandleManager& hm,
-        const helics::GlobalFederateId&
-            fed)
-    {
-       Json::Value iblock;
-        generateInterfaceConfig(iblock, hm, fed);
-       return iblock;
-    }
+Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
+                                    const helics::GlobalFederateId& fed)
+{
+    Json::Value iblock;
+    generateInterfaceConfig(iblock, hm, fed);
+    return iblock;
+}
 
-    void generateInterfaceConfig(Json::Value& iblock,
-                                 const helics::HandleManager& hm,
-                                 const helics::GlobalFederateId& fed)
-
+void generateInterfaceConfig(Json::Value& iblock,
+                             const helics::HandleManager& hm,
+                             const helics::GlobalFederateId& fed)
 
 {
     bool hasPubs{false};
@@ -99,4 +98,4 @@ namespace helics {
         }
     }
 }
-}
+}  // namespace helics

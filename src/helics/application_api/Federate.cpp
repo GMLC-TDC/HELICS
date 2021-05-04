@@ -1403,15 +1403,15 @@ void Interface::setInfo(const std::string& info)
     }
 }
 
-const std::string& Interface::getTag(const std::string &tag) const
+const std::string& Interface::getTag(const std::string& tag) const
 {
-    return (cr != nullptr) ? cr->getTag(handle,tag) : emptyStr;
+    return (cr != nullptr) ? cr->getTag(handle, tag) : emptyStr;
 }
 
-void Interface::setTag(const std::string& tag, const std::string &value)
+void Interface::setTag(const std::string& tag, const std::string& value)
 {
     if (cr != nullptr) {
-        cr->setTag(handle, tag,value);
+        cr->setTag(handle, tag, value);
     } else {
         throw(
             InvalidFunctionCall("cannot call set tag on uninitialized or disconnected interface"));

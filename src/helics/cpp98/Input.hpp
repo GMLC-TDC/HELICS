@@ -201,7 +201,10 @@ class Input {
         helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
     }
     /** get the interface information field of the input*/
-    const char* getTag(const std::string& tagname) const { return helicsInputGetTag(inp, tagname.c_str()); }
+    const char* getTag(const std::string& tagname) const
+    {
+        return helicsInputGetTag(inp, tagname.c_str());
+    }
     /** set the interface information field of the input*/
     void setTag(const std::string& tagname, const std::string& tagvalue)
     {

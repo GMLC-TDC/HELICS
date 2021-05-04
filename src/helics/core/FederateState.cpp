@@ -1059,7 +1059,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     mess->data = std::move(cmd.payload);
                     mess->dest = eptI->key;
                     mess->flags = cmd.flags;
-                    mess->time=cmd.actionTime;
+                    mess->time = cmd.actionTime;
                     mess->counter = cmd.counter;
                     mess->messageID = cmd.messageID;
                     mess->original_dest = eptI->key;
@@ -1105,9 +1105,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             } else {
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (eptI != nullptr) {
-                        eptI->addSourceTarget(cmd.getSource(),
-                                              std::string(cmd.name()),
-                                              cmd.getString(typeStringLoc));
+                    eptI->addSourceTarget(cmd.getSource(),
+                                          std::string(cmd.name()),
+                                          cmd.getString(typeStringLoc));
                 }
             }
         } break;

@@ -439,8 +439,8 @@ void helicsFilterSetInfo(HelicsFilter filt, const char* info, HelicsError* err)
     // LCOV_EXCL_STOP
 }
 
-
-const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname) {
+const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname)
+{
     auto* filtObj = getFilterObj(filt, nullptr);
     if (filtObj == nullptr) {
         return emptyStr.c_str();
@@ -456,14 +456,14 @@ const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname) {
     // LCOV_EXCL_STOP
 }
 
-
-void helicsFilterSetTag(HelicsFilter filt, const char* tagname, const char* tagvalue, HelicsError* err) {
+void helicsFilterSetTag(HelicsFilter filt, const char* tagname, const char* tagvalue, HelicsError* err)
+{
     auto* filtObj = getFilterObj(filt, err);
     if (filtObj == nullptr) {
         return;
     }
     try {
-        filtObj->filtPtr->setTag(AS_STRING(tagname),AS_STRING(tagvalue));
+        filtObj->filtPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {
