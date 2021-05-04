@@ -626,6 +626,8 @@ TEST(valuefed_json_tests, file_loadb)
     auto& id2 = vFed.getPublication("pub1");
     EXPECT_EQ(id2.getUnits(), "m");
 
+    EXPECT_EQ(id2.getTag("description"), "a test publication");
+    EXPECT_EQ(id2.getTag("period"), "0.5");
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
@@ -645,6 +647,8 @@ TEST(valuefederate, toml_file_loadb)
 
     auto& id2 = vFed.getPublication("pub1");
     EXPECT_EQ(id2.getUnits(), "m");
+    EXPECT_EQ(id2.getTag("description"), "a test publication");
+    EXPECT_EQ(id2.getTag("period"), "0.5");
     vFed.enterExecutingMode();
     vFed.disconnect();
 }

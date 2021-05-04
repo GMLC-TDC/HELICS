@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "addTargets.hpp"
+#include "TomlProcessingFunctions.hpp"
+#include "JsonProcessingFunctions.hpp"
 
 #include <string>
 #include <type_traits>
@@ -61,4 +63,66 @@ void processOptions(const Json::Value& section,
         }
     }
 }
+
+template<typename TV> 
+static std::pair<std::string, std::string> getTagPair(const TV& tv)
+{
+    std::string name = fileops::getName(tv);
+    if (name.empty()) {
+
+    }
+    else
+    {
+        std::string val = fileops::getOrDefault(tv, std::string("value"), std::string(""));
+        return std::make_pair(name, val);
+    }
+    
+    return std::make_pair(std::string{}, std::string{});
+}
+
+void loadTags(
+    const Json::Value& section,
+    const std::function<void(const std::string&, const std::string&)>& tagAction)
+{
+    if (section.isMember("tags")) {
+        auto tv = section["tags"];
+        if (tv.isArray()) {
+            for (decltype(tv.size()) ii=0;ii<tv.size();++ii) {
+                auto pv = getTagPair(tv[ii]);
+                if (!pv.first.empty()) {
+                    tagAction(pv.first, pv.second);
+                }
+            }
+        } else {
+            auto pv = getTagPair(tv);
+            if (!pv.first.empty()) {
+                tagAction(pv.first, pv.second);
+            }
+            
+        }
+    }
+}
+
+
+void loadTags(const toml::value& section,
+              const std::function<void(const std::string&, const std::string&)>& tagAction)
+{
+    if (section.contains("tags")) {
+        auto tv = section.at("tags");
+        if (tv.is_array()) {
+            for (int ii = 0; ii < tv.size(); ++ii) {
+                auto pv = getTagPair(tv[ii]);
+                if (!pv.first.empty()) {
+                    tagAction(pv.first, pv.second);
+                }
+            }
+        } else {
+            auto pv = getTagPair(tv);
+            if (!pv.first.empty()) {
+                tagAction(pv.first, pv.second);
+            }
+        }
+    }
+}
+
 }  // namespace helics

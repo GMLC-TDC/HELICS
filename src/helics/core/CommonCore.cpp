@@ -1266,6 +1266,9 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
         case InterfaceType::ENDPOINT:
             if (hint == InterfaceType::FILTER) {
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
+            }
+            else if (hint == InterfaceType::PUBLICATION) {
+                cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
             }
@@ -2170,9 +2173,14 @@ std::string CommonCore::federateQuery(const FederateState* fed,
             return filteredEndpointQuery(fed);
         }
     }
+    if (queryStr == "interfaces") {
+        auto jv = generateInterfaceConfig(loopHandles, fed->global_id);
+        jv["name"] = fed->getIdentifier();
+        return fileops::generateJsonString(jv);
+    }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   R"(["exists","isinit","global_state","version","queries","filtered_endpoints",)") +
+                   R"(["exists","isinit","global_state","version","queries","interfaces","filtered_endpoints",)") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr, force_ordering);
@@ -2400,6 +2408,14 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         });
         base["state"] = brokerStateName(brokerState.load());
 
+        return fileops::generateJsonString(base);
+    }
+    if (queryStr == "interfaces")
+    {
+        Json::Value base;
+        loadBasicJsonInfo(base, [this](Json::Value& val, const FedInfo& fed) {
+            generateInterfaceConfig(val, loopHandles, fed->global_id);
+        });
         return fileops::generateJsonString(base);
     }
     auto mi = mapIndex.find(queryStr);
@@ -3235,6 +3251,13 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CORE_CONFIGURE:
             processCoreConfigureCommands(command);
             break;
+        case CMD_INTERFACE_TAG: {
+            auto* handle = loopHandles.findHandle(command.getSource());
+            if (handle != nullptr) {
+                handle->setTag(command.getString(0), command.getString(1));
+            }
+            break;
+        }
         case CMD_INIT: {
             auto* fed = getFederateCore(command.source_id);
             if (fed != nullptr) {
@@ -4355,7 +4378,7 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
-        return handleInfo->interface_info;
+        return handleInfo->getTag("info");
     }
     return emptyStr;
 }
@@ -4363,6 +4386,33 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
 void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string info)
 {
     handles.modify(
-        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->interface_info = info; });
+        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("info",info); });
 }
+
+const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string &tag) const
+{
+    const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr) {
+        return handleInfo->getTag(tag);
+    }
+    return emptyStr;
+}
+
+void CommonCore::setTag(helics::InterfaceHandle handle, const std::string &tag, const std::string &value)
+{
+    handles.modify(
+        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag(tag, value); });
+
+    const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo != nullptr) {
+        ActionMessage tagcmd(CMD_INTERFACE_TAG);
+        tagcmd.setSource(handleInfo->handle);
+        tagcmd.setDestination(handleInfo->handle);
+        tagcmd.setStringData(tag, value);
+        addActionMessage(std::move(tagcmd));
+    }
+    
+    
+}
+
 }  // namespace helics

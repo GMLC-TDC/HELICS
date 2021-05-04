@@ -47,30 +47,6 @@ class Core {
     virtual ~Core() = default;
 
     /**
-     * Simulator control.
-     */
-    /**
-     * Configure the core.
-     *
-     * Should be invoked a single time to configure the co-simulation core for operation
-     *
-     */
-    [[deprecated("please use configure instead")]] void
-        initialize(const std::string& configureString)
-    {
-        configure(configureString);
-    }
-    /**Configure the core from command line arguments.
-     *
-     * Should be invoked a single time to initialize the co-simulation core for operation
-     *
-     */
-    [[deprecated("please use configureFromArgs instead")]] void initializeFromArgs(int argc,
-                                                                                   char* argv[])
-    {
-        configureFromArgs(argc, argv);
-    }
-    /**
      * Configure the core from a configuration string
      *
      * Should be invoked a single time to initialize the co-simulation core.
@@ -95,13 +71,7 @@ class Core {
      * Returns true if the core has been configured.
      */
     virtual bool isConfigured() const = 0;
-    /**
-     * Returns true if the core has been configured.
-     */
-    [[deprecated("please use isConfigured instead")]] bool isInitialized() const
-    {
-        return isConfigured();
-    }
+    
     /**
     * connect the core to a broker if needed
     @return true if the connection was successful
@@ -826,6 +796,22 @@ class Core {
      * @return a string containing the Info data stored in an interface
      */
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const = 0;
+    /**
+     * setter for interface tags which are key value pairs
+     * @param handle the identifiers for the interface to set the info data on
+     * @param tag a string containing the name of the tag
+     * @param value a string containing the value for the tag
+     */
+    virtual void setTag(InterfaceHandle handle,
+                        const std::string& tag,
+                        const std::string& value)=0;
+    /**
+     * getter for the interface tags
+     * @param handle the identifiers for the interface to set the info data on
+     * @param tag the name of the tag to retrieve
+     */
+    virtual const std::string& getTag(InterfaceHandle handle,
+                                      const std::string& tag) const=0;
 };
 
 }  // namespace helics

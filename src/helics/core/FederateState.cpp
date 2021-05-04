@@ -1041,6 +1041,30 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_PUB: {
             auto* subI = interfaceInformation.getInput(InterfaceHandle(cmd.dest_handle));
             if (subI == nullptr) {
+                auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+                if (eptI != nullptr) {
+                    // if (!epi->not_interruptible)
+                    {
+                        timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
+                    }
+                    LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
+                    if (cmd.actionTime < time_granted) {
+                        LOG_WARNING(fmt::format(
+                            "received message {} at time({}) earlier than granted time({})",
+                            prettyPrintString(cmd),
+                            cmd.actionTime,
+                            time_granted));
+                    }
+                    auto mess = std::make_unique<Message>();
+                    mess->data = std::move(cmd.payload);
+                    mess->dest = eptI->key;
+                    mess->flags = cmd.flags;
+                    mess->time=cmd.actionTime;
+                    mess->counter = cmd.counter;
+                    mess->messageID = cmd.messageID;
+                    mess->original_dest = eptI->key;
+                    eptI->addMessage(std::move(mess));
+                }
                 break;
             }
             for (auto& src : subI->input_sources) {
@@ -1077,6 +1101,13 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
                     addDependency(cmd.source_id);
+                }
+            } else {
+                auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
+                if (eptI != nullptr) {
+                        eptI->addSourceTarget(cmd.getSource(),
+                                              std::string(cmd.name()),
+                                              cmd.getString(typeStringLoc));
                 }
             }
         } break;

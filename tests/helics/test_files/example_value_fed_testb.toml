@@ -29,6 +29,7 @@ key="pub1" # the name of the publication
  unit="m"  # the units associated with a publication (optional)
  global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
  info="this is an information string for use by the application"
+ tags=[{name="period",value="0.5"},{name="description",value="a test publication"}]
 
 [[publications]]
 key="pub2" # the name of the publication
