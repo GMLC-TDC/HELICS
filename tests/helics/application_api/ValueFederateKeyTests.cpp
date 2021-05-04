@@ -56,10 +56,13 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // these aren't meant to match the publications
     auto& subid1 = vFed1->registerSubscription("sub1");
+    subid1.setTag("tag1", "tag1_info");
+    EXPECT_EQ(subid1.getTag("tag1"), "tag1_info");
 
     auto subid2 = vFed1->registerGlobalInput<int>("inpA");
     subid2.addTarget("sub2");
-
+    subid2.setTag("tag2", "tag2_info");
+    EXPECT_EQ(subid2.getTag("tag2"), "tag2_info");
     auto& subid3 = vFed1->registerSubscription("sub3", "V");
     // enter execution
     vFed1->enterExecutingMode();

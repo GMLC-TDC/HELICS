@@ -261,6 +261,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override final;
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override final;
 
+    virtual void setTag(InterfaceHandle handle, const std::string& tag, const std::string &value) override final;
+    virtual const std::string& getTag(InterfaceHandle handle, const std::string &tag) const override final;
+
   private:
     /** implementation details of the connection process
      */
