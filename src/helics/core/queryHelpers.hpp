@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class HandleManager;
 class GlobalFederateId;
-}
+}  // namespace helics
 
 template<typename X, typename Proc>
 std::string generateStringVector(const X& data, Proc generator)
@@ -55,9 +55,10 @@ std::string generateStringVector_if(const X& data, Proc generator, validator val
 }
 
 namespace helics {
-void  generateInterfaceConfig(Json::Value &iblock, const helics::HandleManager& hm,
-                                    const helics::GlobalFederateId& fed);
+void generateInterfaceConfig(Json::Value& iblock,
+                             const helics::HandleManager& hm,
+                             const helics::GlobalFederateId& fed);
 
 Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
                                     const helics::GlobalFederateId& fed);
-}
+}  // namespace helics

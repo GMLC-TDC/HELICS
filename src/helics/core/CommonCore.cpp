@@ -1266,8 +1266,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
         case InterfaceType::ENDPOINT:
             if (hint == InterfaceType::FILTER) {
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
-            }
-            else if (hint == InterfaceType::PUBLICATION) {
+            } else if (hint == InterfaceType::PUBLICATION) {
                 cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -2415,8 +2414,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
 
         return fileops::generateJsonString(base);
     }
-    if (queryStr == "interfaces")
-    {
+    if (queryStr == "interfaces") {
         Json::Value base;
         loadBasicJsonInfo(base, [this](Json::Value& val, const FedInfo& fed) {
             generateInterfaceConfig(val, loopHandles, fed->global_id);
@@ -4420,10 +4418,10 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
 void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string info)
 {
     handles.modify(
-        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("info",info); });
+        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("info", info); });
 }
 
-const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string &tag) const
+const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string& tag) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
@@ -4432,10 +4430,11 @@ const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string 
     return emptyStr;
 }
 
-void CommonCore::setTag(helics::InterfaceHandle handle, const std::string &tag, const std::string &value)
+void CommonCore::setTag(helics::InterfaceHandle handle,
+                        const std::string& tag,
+                        const std::string& value)
 {
-    handles.modify(
-        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag(tag, value); });
+    handles.modify([&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag(tag, value); });
 
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
@@ -4445,8 +4444,6 @@ void CommonCore::setTag(helics::InterfaceHandle handle, const std::string &tag, 
         tagcmd.setStringData(tag, value);
         addActionMessage(std::move(tagcmd));
     }
-    
-    
 }
 
 }  // namespace helics

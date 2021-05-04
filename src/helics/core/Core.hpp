@@ -71,7 +71,7 @@ class Core {
      * Returns true if the core has been configured.
      */
     virtual bool isConfigured() const = 0;
-    
+
     /**
     * connect the core to a broker if needed
     @return true if the connection was successful
@@ -804,16 +804,14 @@ class Core {
      * @param tag a string containing the name of the tag
      * @param value a string containing the value for the tag
      */
-    virtual void setTag(InterfaceHandle handle,
-                        const std::string& tag,
-                        const std::string& value)=0;
+    virtual void
+        setTag(InterfaceHandle handle, const std::string& tag, const std::string& value) = 0;
     /**
      * getter for the interface tags
      * @param handle the identifiers for the interface to set the info data on
      * @param tag the name of the tag to retrieve
      */
-    virtual const std::string& getTag(InterfaceHandle handle,
-                                      const std::string& tag) const=0;
+    virtual const std::string& getTag(InterfaceHandle handle, const std::string& tag) const = 0;
 };
 
 }  // namespace helics

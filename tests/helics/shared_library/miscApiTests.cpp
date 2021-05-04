@@ -21,7 +21,7 @@ TEST(misc_tests, misc_tests)
     helicsFederateInfoSetCoreType(fedInfo1, 3, nullptr);
     helicsFederateInfoSetCoreTypeFromString(fedInfo1, "zmq", nullptr);
     helicsFederateInfoSetFlagOption(fedInfo1, 1, HELICS_TRUE, nullptr);
-    helicsFederateInfoSetTimeProperty(fedInfo1, HELICS_PROPERTY_TIME_INPUT_DELAY,1.0, nullptr);
+    helicsFederateInfoSetTimeProperty(fedInfo1, HELICS_PROPERTY_TIME_INPUT_DELAY, 1.0, nullptr);
     helicsFederateInfoSetIntegerProperty(fedInfo1, HELICS_PROPERTY_INT_LOG_LEVEL, 1, nullptr);
     helicsFederateInfoSetIntegerProperty(fedInfo1,
                                          HELICS_PROPERTY_INT_MAX_ITERATIONS,
@@ -54,8 +54,10 @@ TEST(misc_tests, misc_tests)
     helicsFederateSetTimeProperty(fed2, HELICS_PROPERTY_TIME_DELTA, 1.0, nullptr);
 
     helicsFederateRegisterCloningFilter(fed1, "fed1/Ep1", nullptr);
-    auto fed1DestinationFilter =
-        helicsFederateRegisterFilter(fed1, HELICS_FILTER_TYPE_DELAY, "fed1DestinationFilter",nullptr);
+    auto fed1DestinationFilter = helicsFederateRegisterFilter(fed1,
+                                                              HELICS_FILTER_TYPE_DELAY,
+                                                              "fed1DestinationFilter",
+                                                              nullptr);
     helicsFilterAddDestinationTarget(fed1DestinationFilter, "Ep2", nullptr);
 
     auto ep1 = helicsFederateRegisterEndpoint(fed1, "Ep1", "string", nullptr);
