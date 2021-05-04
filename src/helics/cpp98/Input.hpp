@@ -195,7 +195,8 @@ class Input {
     const char* getTarget() const { return helicsSubscriptionGetTarget(inp); }
     /** get the interface information field of the input; equivalent to `getTag("info")`*/
     const char* getInfo() const { return helicsInputGetInfo(inp); }
-    /** set the interface information field of the input; `setInfo("infostr")` is equivalent to `setTag("info", "infostr")`*/
+    /** set the interface information field of the input; `setInfo("infostr")` is equivalent to
+     * `setTag("info", "infostr")`*/
     void setInfo(const std::string& info)
     {
         helicsInputSetInfo(inp, info.c_str(), HELICS_IGNORE_ERROR);
