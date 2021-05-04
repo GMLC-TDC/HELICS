@@ -199,7 +199,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     EXPECT_EQ(rvec.size(), 20u);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
-    
+
     vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
                         // it will time out.
 }

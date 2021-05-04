@@ -1318,7 +1318,8 @@ void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsErr
     // LCOV_EXCL_STOP
 }
 
-const char* helicsInputGetTag(HelicsInput inp, const char* tagname) {
+const char* helicsInputGetTag(HelicsInput inp, const char* tagname)
+{
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
         return emptyStr.c_str();
@@ -1341,7 +1342,7 @@ void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalu
         return;
     }
     try {
-        inpObj->inputPtr->setTag(AS_STRING(tagname),AS_STRING(tagvalue));
+        inpObj->inputPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1350,8 +1351,8 @@ void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalu
     // LCOV_EXCL_STOP
 }
 
-
-const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname) {
+const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname)
+{
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
         return emptyStr.c_str();
@@ -1367,14 +1368,14 @@ const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname) 
     // LCOV_EXCL_STOP
 }
 
-
-void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const char* tagvalue, HelicsError* err) {
+void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const char* tagvalue, HelicsError* err)
+{
     auto* pubObj = verifyPublication(pub, err);
     if (pubObj == nullptr) {
         return;
     }
     try {
-        pubObj->pubPtr->setTag(AS_STRING(tagname),AS_STRING(tagvalue));
+        pubObj->pubPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1382,8 +1383,6 @@ void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const c
     }
     // LCOV_EXCL_STOP
 }
-
-
 
 int helicsInputGetOption(HelicsInput inp, int option)
 {

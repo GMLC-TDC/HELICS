@@ -442,8 +442,6 @@ HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint end, const char* t
  */
 HELICS_EXPORT void helicsEndpointSetTag(HelicsEndpoint endpoint, const char* tagname, const char* tagvalue, HelicsError* err);
 
-
-
 /**
  * Set a handle option on an endpoint.
  *

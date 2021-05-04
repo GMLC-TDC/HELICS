@@ -562,9 +562,9 @@ TEST_F(query, interfaces)
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
-    auto& i1 = vFed1->registerGlobalInput<double>("ipt1","kV");
-    auto& p1 = vFed1->registerGlobalPublication<double>("pub1","V");
-    auto& e1 = vFed1->registerGlobalEndpoint("ept1","type1");
+    auto& i1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
+    auto& p1 = vFed1->registerGlobalPublication<double>("pub1", "V");
+    auto& e1 = vFed1->registerGlobalEndpoint("ept1", "type1");
     p1.addTarget("ipt1");
     p1.setTag("tag1", "val1");
 

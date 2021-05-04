@@ -110,7 +110,7 @@ TEST_F(vfed_single_tests, publisher_registration)
     auto units = helicsPublicationGetUnits(pubid3);
     EXPECT_STREQ(units, "V");
 
-    CE(helicsPublicationSetTag(pubid3, "tag1", "tagvalue",&err));
+    CE(helicsPublicationSetTag(pubid3, "tag1", "tagvalue", &err));
     EXPECT_STREQ(helicsPublicationGetTag(pubid3, "tag1"), "tagvalue");
     // EXPECT_TRUE (vFed1->getPublicationId ("pub1") == pubid.getID ());
     // EXPECT_TRUE (vFed1->getPublicationId ("pub2") == pubid2.getID ());

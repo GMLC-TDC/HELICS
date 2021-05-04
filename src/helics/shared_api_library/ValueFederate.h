@@ -910,7 +910,6 @@ HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname
  */
 HELICS_EXPORT void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalue, HelicsError* err);
 
-
 /**
  * Get the data in the info field of an publication.
  *
@@ -930,7 +929,6 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(HelicsPublication pub);
  * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
-
 
 /**
  * Get the data in a specified tag of a publication

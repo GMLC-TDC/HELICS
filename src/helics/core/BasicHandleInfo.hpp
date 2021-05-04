@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace helics {
 
@@ -69,10 +69,14 @@ class BasicHandleInfo {
     /** search for a tag by name*/
     const std::string& getTag(const std::string& tag) const;
     /** get a tag (key, value) pair by index*/
-    const std::pair<std::string, std::string>& getTagByIndex(size_t index) const { return tags[index]; }
+    const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
+    {
+        return tags[index];
+    }
     /** get the number of tags associated with an interface*/
     auto tagCount() const { return tags.size(); }
+
   private:
-    std::vector<std::pair<std::string,std::string>> tags;  //!< storage for a user info string
+    std::vector<std::pair<std::string, std::string>> tags;  //!< storage for a user info string
 };
 }  // namespace helics

@@ -96,6 +96,7 @@ class Filter {
         helicsFilterSetOption(filt, option, value, HELICS_IGNORE_ERROR);
     }
     int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
+
   protected:
     HelicsFilter filt;  //!< the reference to the underlying publication
 };

@@ -305,7 +305,6 @@ HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagn
  */
 HELICS_EXPORT void helicsFilterSetTag(HelicsFilter filt, const char* tagname, const char* tagvalue, HelicsError* err);
 
-
 /**
  * Set an option value for a filter.
  *

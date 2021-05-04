@@ -216,7 +216,6 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
     addTargets(data, "targets", [&objUpdate](const std::string& target) {
         objUpdate.addTarget(target);
     });
-    
 }
 
 void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
