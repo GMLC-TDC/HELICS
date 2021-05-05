@@ -1218,20 +1218,22 @@ void Federate::setGlobal(const std::string& valueName, const std::string& value)
     coreObject->setGlobal(valueName, value);
 }
 
-void Federate::sendCommand(const std::string& target, const std::string& commandStr)
+void Federate::sendCommand(const std::string& target,
+                           const std::string& commandStr,
+                           HelicsSequencingModes mode)
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "command cannot be called on uninitialized federate or after disconnect call"));
+            "sendCommand cannot be called on uninitialized federate or after disconnect call"));
     }
-    coreObject->sendCommand(target, commandStr, getName());
+    coreObject->sendCommand(target, commandStr, getName(),mode);
 }
 
 std::pair<std::string, std::string> Federate::getCommand()
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "command cannot be called on uninitialized federate or after disconnect call"));
+            "getCommand cannot be called on uninitialized federate or after disconnect call"));
     }
     return coreObject->getCommand(fedID);
 }
@@ -1240,7 +1242,7 @@ std::pair<std::string, std::string> Federate::waitCommand()
 {
     if (!coreObject) {
         throw(InvalidFunctionCall(
-            "command cannot be called on uninitialized federate or after disconnect call"));
+            "waitCommand cannot be called on uninitialized federate or after disconnect call"));
     }
     return coreObject->waitCommand(fedID);
 }

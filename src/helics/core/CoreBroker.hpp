@@ -289,7 +289,8 @@ class CoreBroker: public Broker, public BrokerBase {
               HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) override final;
     virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
     virtual void sendCommand(const std::string& target,
-                             const std::string& commandStr) override final;
+                             const std::string& commandStr,
+                             HelicsSequencingModes mode) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(const std::string& publication, const std::string& input) override final;
 

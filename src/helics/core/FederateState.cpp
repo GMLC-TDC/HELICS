@@ -1154,6 +1154,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_INTERFACE_CONFIGURE:
             setInterfaceProperty(cmd);
             break;
+        case CMD_SEND_COMMAND:
+        case CMD_SEND_COMMAND_ORDERED:
+            sendCommand(cmd);
+            break;
         case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             std::string repStr;
@@ -1625,7 +1629,7 @@ void FederateState::sendCommand(ActionMessage& command)
             parent_->addActionMessage(bye);
         }
     } else if (cmd == "echo") {
-        ActionMessage response(CMD_SEND_COMMAND);
+        ActionMessage response(command.action());
         response.payload = "echo_reply";
         response.dest_id = command.source_id;
         response.source_id = global_id.load();
@@ -1635,7 +1639,7 @@ void FederateState::sendCommand(ActionMessage& command)
             parent_->addActionMessage(response);
         }
     } else if (cmd == "command_status") {
-        ActionMessage response(CMD_SEND_COMMAND);
+        ActionMessage response(command.action());
         response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
         response.dest_id = command.source_id;
         response.source_id = global_id.load();
@@ -1644,6 +1648,10 @@ void FederateState::sendCommand(ActionMessage& command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
+    } else if (cmd.compare(0,4,"log ")==0) {
+        logMessage(HELICS_LOG_LEVEL_SUMMARY,
+                   command.getString(sourceStringLoc),
+                   command.payload.to_string().substr(4));
     } else {
         commandQueue.emplace(cmd, command.getString(sourceStringLoc));
     }
@@ -1654,7 +1662,7 @@ std::pair<std::string, std::string> FederateState::getCommand()
     auto val = commandQueue.try_pop();
     if (val->first == "notify") {
         if (parent_ != nullptr) {
-            parent_->sendCommand(val->second, "notify_response", name);
+            parent_->sendCommand(val->second, "notify_response", name, HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
         }
         val = commandQueue.try_pop();
     }
@@ -1666,7 +1674,10 @@ std::pair<std::string, std::string> FederateState::waitCommand()
     auto val = commandQueue.pop();
     if (val.first == "notify") {
         if (parent_ != nullptr) {
-            parent_->sendCommand(val.second, "notify_response", name);
+            parent_->sendCommand(val.second,
+                                 "notify_response",
+                                 name,
+                                 HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
         }
         val = commandQueue.pop();
     }
