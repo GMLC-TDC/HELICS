@@ -1,4 +1,4 @@
-# Combination Federation with Custom Filter Federates.
+# Combination Federation with Custom Filter Federates
 
 This custom filter federate example expands the Native Filters example to demonstrate . This example assumes the user has already worked through the [Native Filter Example](./fundamental_native_filter.md) and understands the role of filters in a HELICS-based co-simulation.
 
@@ -8,7 +8,7 @@ This tutorial is organized as follows:
 - [Filter Federates](#filter-federates)
 
   - [Co-simulation Execution](co-simulation-execution)
-- [Questions and Help](#questions-and-help)
+- [Questions and Help](#questions-and-help) talk
 
 ## Example files
 
