@@ -31,7 +31,7 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           # For PR builds from this repository, automatically add the compressed images; otherwise just compress images
-          compressOnly: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+          compressOnly: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
       # If steps.calibre.outputs.markdown != '' then images were compressed.
       # An additional enhancement would be to check if the PR was from a fork and post a message saying how much space can be saved with compression.
       # For pushes to some branches, opening a PR with the compressed files could be good (ideally before the images have been merged into the main branch).
