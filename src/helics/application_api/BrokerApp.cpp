@@ -226,10 +226,12 @@ void BrokerApp::setGlobal(const std::string& valueName, const std::string& value
     }
 }
 
-void BrokerApp::sendCommand(const std::string& target, const std::string& commandStr, HelicsSequencingModes mode)
+void BrokerApp::sendCommand(const std::string& target,
+                            const std::string& commandStr,
+                            HelicsSequencingModes mode)
 {
     if (broker) {
-        broker->sendCommand(target, commandStr,mode);
+        broker->sendCommand(target, commandStr, mode);
     }
 }
 

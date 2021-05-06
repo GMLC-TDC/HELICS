@@ -1021,7 +1021,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto &dep : timeCoord->getDependents()) {
+                for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
             } else {
@@ -1043,7 +1043,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 LOG_TIMING(global_broker_id_local,
                            getIdentifier(),
                            fmt::format("time request update {}", prettyPrintString(command)));
-                for (auto &dep : timeCoord->getDependents()) {
+                for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
             } else if (command.dest_id == global_broker_id_local) {
@@ -2050,7 +2050,7 @@ void CoreBroker::executeInitializationOperations()
 void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForInputs(handleInfo.key);
-    for (auto &target : Handles) {
+    for (auto& target : Handles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
 
@@ -2552,7 +2552,8 @@ void CoreBroker::sendCommand(const std::string& target,
                              const std::string& commandStr,
                              HelicsSequencingModes mode)
 {
-    ActionMessage cmdcmd(mode==HELICS_SEQUENCING_MODE_ORDERED?CMD_SEND_COMMAND_ORDERED:CMD_SEND_COMMAND);
+    ActionMessage cmdcmd(mode == HELICS_SEQUENCING_MODE_ORDERED ? CMD_SEND_COMMAND_ORDERED :
+                                                                  CMD_SEND_COMMAND);
     cmdcmd.source_id = global_id.load();
     cmdcmd.payload = commandStr;
     cmdcmd.setString(targetStringLoc, target);
@@ -2808,7 +2809,7 @@ std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
         state = "init_requested";
     }
     for (auto& cr : builder.getJValue()["cores"]) {
-        for (auto &fed : cr["federates"]) {
+        for (auto& fed : cr["federates"]) {
             auto dv = fed["granted_time"].asDouble();
             if (dv < mv) {
                 mv = dv;

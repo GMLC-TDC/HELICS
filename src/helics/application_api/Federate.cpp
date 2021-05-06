@@ -1226,7 +1226,7 @@ void Federate::sendCommand(const std::string& target,
         throw(InvalidFunctionCall(
             "sendCommand cannot be called on uninitialized federate or after disconnect call"));
     }
-    coreObject->sendCommand(target, commandStr, getName(),mode);
+    coreObject->sendCommand(target, commandStr, getName(), mode);
 }
 
 std::pair<std::string, std::string> Federate::getCommand()

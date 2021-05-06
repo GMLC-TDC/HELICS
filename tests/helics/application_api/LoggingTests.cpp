@@ -157,7 +157,7 @@ TEST(logging_tests, check_log_message_command)
         });
 
     Fed->enterExecutingMode();
-    Fed->sendCommand("test1","log test MEXAGE");
+    Fed->sendCommand("test1", "log test MEXAGE");
     Fed->requestNextStep();
     Fed->finalize();
 

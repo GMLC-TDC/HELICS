@@ -1648,7 +1648,7 @@ void FederateState::sendCommand(ActionMessage& command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
-    } else if (cmd.compare(0,4,"log ")==0) {
+    } else if (cmd.compare(0, 4, "log ") == 0) {
         logMessage(HELICS_LOG_LEVEL_SUMMARY,
                    command.getString(sourceStringLoc),
                    command.payload.to_string().substr(4));
@@ -1662,7 +1662,10 @@ std::pair<std::string, std::string> FederateState::getCommand()
     auto val = commandQueue.try_pop();
     if (val->first == "notify") {
         if (parent_ != nullptr) {
-            parent_->sendCommand(val->second, "notify_response", name, HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
+            parent_->sendCommand(val->second,
+                                 "notify_response",
+                                 name,
+                                 HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
         }
         val = commandQueue.try_pop();
     }

@@ -227,7 +227,7 @@ void CoreApp::sendCommand(const std::string& target,
                           HelicsSequencingModes mode)
 {
     if (core) {
-        core->sendCommand(target, commandStr, std::string{},mode);
+        core->sendCommand(target, commandStr, std::string{}, mode);
     }
 }
 
