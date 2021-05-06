@@ -30,9 +30,9 @@
       "info": "this is an information string for use by the application",
       "flags": ["connection_required", "-connection_optional"],
       "tags": {
-        "period":0.5,
-        "description":"a test publication" 
-        }
+        "period": 0.5,
+        "description": "a test publication"
+      }
     },
     {
       "key": "pub2", // the name of the publication
@@ -63,7 +63,7 @@
       "connection_required": true,
       "target": "pub1",
       "global": true,
-       "tags": [
+      "tags": [
         { "name": "period", "value": "0.7" },
         { "name": "description", "value": "a test input" }
       ]

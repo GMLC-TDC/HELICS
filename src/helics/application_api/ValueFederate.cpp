@@ -193,15 +193,12 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
             return;
         }
         objUpdate.setOption(oindex, val);
-    }
-    );
+    });
     processOptions(
         data,
         [](const std::string& option) { return getOptionIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
-        [&objUpdate](int32_t option, int32_t value) {
-            objUpdate.setOption(option, value);
-        });
+        [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
 
     fileops::callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);

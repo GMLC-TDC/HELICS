@@ -97,7 +97,7 @@ void loadTags(const Json::Value& section,
                 tagAction(pv.first, pv.second);
             } else if (tv.isObject()) {
                 auto names = tv.getMemberNames();
-                for (auto &name:names) {
+                for (auto& name : names) {
                     tagAction(name,
                               (tv[name].isString()) ? tv[name].asString() :
                                                       fileops::generateJsonString(tv[name]));
@@ -125,10 +125,8 @@ void loadTags(const toml::value& section,
                 tagAction(pv.first, pv.second);
             } else if (tv.is_table()) {
                 for (auto& values : tv.as_table()) {
-                    tagAction(values.first,
-                             fileops::tomlAsString(values.second));
+                    tagAction(values.first, fileops::tomlAsString(values.second));
                 }
-
             }
         }
     }
