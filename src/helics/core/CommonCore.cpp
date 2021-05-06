@@ -4434,9 +4434,21 @@ void CommonCore::setTag(helics::InterfaceHandle handle,
                         const std::string& tag,
                         const std::string& value)
 {
-    handles.modify([&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag(tag, value); });
-
+    static const std::string trueString{"true"};
+    if (tag.empty()) {
+        throw InvalidParameter("tag cannot be an empty string for setTag");
+    }
     const auto* handleInfo = getHandleInfo(handle);
+    if (handleInfo == nullptr)
+    {
+        throw InvalidIdentifier("the handle specifier for setTag is not valid");
+        return;
+    }
+
+    const std::string& valueStr{value.empty() ? trueString : value};
+
+    handles.modify([&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag(tag, valueStr); });
+    
     if (handleInfo != nullptr) {
         ActionMessage tagcmd(CMD_INTERFACE_TAG);
         tagcmd.setSource(handleInfo->handle);

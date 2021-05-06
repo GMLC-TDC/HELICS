@@ -586,15 +586,12 @@ TEST_F(query, interfaces)
     EXPECT_STREQ(val["inputs"][0]["units"].asCString(), "kV");
     EXPECT_STREQ(val["publications"][0]["units"].asCString(), "V");
 
-    ASSERT_EQ(val["inputs"][0]["tags"].size(), 1U);
-    ASSERT_EQ(val["publications"][0]["tags"].size(), 1U);
-    ASSERT_EQ(val["endpoints"][0]["tags"].size(), 1U);
-    EXPECT_STREQ(val["publications"][0]["tags"][0]["name"].asCString(), "tag1");
-    EXPECT_STREQ(val["publications"][0]["tags"][0]["value"].asCString(), "val1");
-    EXPECT_STREQ(val["inputs"][0]["tags"][0]["name"].asCString(), "tag2");
-    EXPECT_STREQ(val["inputs"][0]["tags"][0]["value"].asCString(), "val2");
-    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["name"].asCString(), "tag3");
-    EXPECT_STREQ(val["endpoints"][0]["tags"][0]["value"].asCString(), "val3");
+    ASSERT_TRUE(val["inputs"][0]["tags"].isObject());
+    ASSERT_TRUE(val["publications"][0]["tags"].isObject());
+    ASSERT_TRUE(val["endpoints"][0]["tags"].isObject());
+    EXPECT_STREQ(val["publications"][0]["tags"]["tag1"].asCString(), "val1");
+    EXPECT_STREQ(val["inputs"][0]["tags"]["tag2"].asCString(), "val2");
+    EXPECT_STREQ(val["endpoints"][0]["tags"]["tag3"].asCString(), "val3");
     helics::cleanupHelicsLibrary();
 }
 
