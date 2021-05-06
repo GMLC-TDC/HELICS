@@ -634,7 +634,7 @@ void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const cha
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{},HELICS_SEQUENCING_MODE_ORDERED);
+    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err)

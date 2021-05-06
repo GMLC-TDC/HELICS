@@ -131,7 +131,9 @@ class HELICS_CXX_EXPORT BrokerApp {
    @param mode the ordering mode to use (fast for asynchronous priority channels, and ordered for
     slower but well ordered queries)
    */
-    void sendCommand(const std::string& target, const std::string& commandStr, HelicsSequencingModes mode=HELICS_SEQUENCING_MODE_FAST);
+    void sendCommand(const std::string& target,
+                     const std::string& commandStr,
+                     HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** set the log file to use for the broker*/
     void setLogFile(const std::string& logFile);

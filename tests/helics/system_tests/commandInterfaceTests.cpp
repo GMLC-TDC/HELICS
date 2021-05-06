@@ -190,7 +190,7 @@ TEST_F(command_tests, broker_federate_command_ordered)
 
     vFed2->registerSubscription("pub1");
 
-    brokers[0]->sendCommand(vFed2->getName(), "test",HELICS_SEQUENCING_MODE_ORDERED);
+    brokers[0]->sendCommand(vFed2->getName(), "test", HELICS_SEQUENCING_MODE_ORDERED);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();

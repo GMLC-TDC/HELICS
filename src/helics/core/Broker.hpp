@@ -105,7 +105,9 @@ class Broker {
     @param mode fast (asynchronous; default) means the query goes on priority channels, ordered
     (synchronous) is slower but has more ordering guarantees
    */
-    virtual void sendCommand(const std::string& target, const std::string& commandStr, HelicsSequencingModes mode=HELICS_SEQUENCING_MODE_FAST) = 0;
+    virtual void sendCommand(const std::string& target,
+                             const std::string& commandStr,
+                             HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) = 0;
 
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/

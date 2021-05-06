@@ -1554,7 +1554,7 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
     }
     auto fid = filterFedID.load();
 
-    const auto &handle = createBasicHandle(
+    const auto& handle = createBasicHandle(
         fid, LocalFederateId(), InterfaceType::FILTER, filterName, type_in, type_out);
     auto id = handle.getInterfaceHandle();
 
@@ -2316,7 +2316,9 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
         command.setString(sourceStringLoc, getIdentifier());
         addActionMessage(command);
     } else if (cmd.compare(0, 4, "log ") == 0) {
-        LOG_SUMMARY(global_broker_id_local, command.getString(sourceStringLoc), command.payload.to_string().substr(4));
+        LOG_SUMMARY(global_broker_id_local,
+                    command.getString(sourceStringLoc),
+                    command.payload.to_string().substr(4));
 
     } else {
         LOG_WARNING(global_broker_id_local,
@@ -2561,7 +2563,9 @@ void CommonCore::sendCommand(const std::string& target,
                              const std::string& source,
                              HelicsSequencingModes mode)
 {
-    ActionMessage cmdcmd(mode==HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED?CMD_SEND_COMMAND_ORDERED:CMD_SEND_COMMAND);
+    ActionMessage cmdcmd(mode == HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED ?
+                             CMD_SEND_COMMAND_ORDERED :
+                             CMD_SEND_COMMAND);
     cmdcmd.dest_id = parent_broker_id;
     cmdcmd.payload = commandStr;
     cmdcmd.setString(targetStringLoc, target);
@@ -2961,7 +2965,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto &dep : timeCoord->getDependents()) {
+                for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
             } else {
