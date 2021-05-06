@@ -142,7 +142,7 @@ const std::string& Endpoint::getDefaultDestination() const
 void Endpoint::subscribe(const std::string& key)
 {
     if (cr != nullptr) {
-        cr->addSourceTarget(handle, key);
+        cr->addSourceTarget(handle, key, helics::InterfaceType::PUBLICATION);
     }
 }
 

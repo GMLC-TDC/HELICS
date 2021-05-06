@@ -257,8 +257,18 @@ class CommonCore: public Core, public BrokerBase {
      * may need a helper class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
+    /** set the `info` tag for the interface; `setInterfaceInfo(handle, "infostr")` is equivalent to
+     * `setTag(handle, "info", "infostr")`*/
     virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override final;
+    /** gets the `info` tag for the interface; `getInterfaceInfo(handle)` is equivalent to
+     * `getTag(handle, "info")`*/
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override final;
+
+    virtual void setTag(InterfaceHandle handle,
+                        const std::string& tag,
+                        const std::string& value) override final;
+    virtual const std::string& getTag(InterfaceHandle handle,
+                                      const std::string& tag) const override final;
 
   private:
     /** implementation details of the connection process

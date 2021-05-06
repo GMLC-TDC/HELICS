@@ -626,6 +626,13 @@ TEST(valuefed_json_tests, file_loadb)
     auto& id2 = vFed.getPublication("pub1");
     EXPECT_EQ(id2.getUnits(), "m");
 
+    EXPECT_EQ(id2.getTag("description"), "a test publication");
+    EXPECT_EQ(std::stod(id2.getTag("period")), 0.5);
+
+    auto& inp2 = vFed.getInput("ipt2");
+    EXPECT_EQ(inp2.getTag("description"), "a test input");
+    EXPECT_EQ(std::stod(inp2.getTag("period")), 0.7);
+
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
@@ -645,6 +652,18 @@ TEST(valuefederate, toml_file_loadb)
 
     auto& id2 = vFed.getPublication("pub1");
     EXPECT_EQ(id2.getUnits(), "m");
+    EXPECT_EQ(id2.getTag("description"), "a test publication");
+    EXPECT_EQ(std::stod(id2.getTag("period")), 0.5);
+
+    auto& inp2 = vFed.getInput("ipt2");
+    EXPECT_EQ(inp2.getTag("description"), "a test input");
+    std::string dval = inp2.getTag("period");
+    EXPECT_FALSE(dval.empty());
+    if (!dval.empty()) {
+        EXPECT_EQ(std::stod(dval), 0.7);
+    }
+    
+
     vFed.enterExecutingMode();
     vFed.disconnect();
 }

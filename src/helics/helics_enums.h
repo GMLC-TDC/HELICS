@@ -214,6 +214,8 @@ typedef enum {
     HELICS_OK = 0
 } HelicsErrorTypes;
 
+const int HELICS_INVALID_OPTION_INDEX = -101;
+
 /** enumeration of properties that apply to federates*/
 typedef enum {
     /** the property controlling the minimum time delta for a federate*/

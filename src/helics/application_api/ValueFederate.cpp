@@ -185,18 +185,23 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 {
     using fileops::getOrDefault;
 
-    addTargets(data, "flags", [&objUpdate](const std::string& target) {
-        if (target.front() != '-') {
-            objUpdate.setOption(getOptionIndex(target), 1);
-        } else {
-            objUpdate.setOption(getOptionIndex(target.substr(2)), 0);
+    addTargets(data, "flags", [&objUpdate, fed](const std::string& target) {
+        auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
+        int val = (target.front() != '-') ? 1 : 0;
+        if (oindex == HELICS_INVALID_OPTION_INDEX) {
+            fed->logWarningMessage(target + " is not a valid flag");
+            return;
         }
-    });
+        objUpdate.setOption(oindex, val);
+    }
+    );
     processOptions(
         data,
         [](const std::string& option) { return getOptionIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
-        [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
+        [&objUpdate](int32_t option, int32_t value) {
+            objUpdate.setOption(option, value);
+        });
 
     fileops::callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
         fed->addAlias(objUpdate, val);
@@ -210,6 +215,9 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
     if (!info.empty()) {
         objUpdate.setInfo(info);
     }
+    loadTags(data, [&objUpdate](const std::string& tagname, const std::string& tagvalue) {
+        objUpdate.setTag(tagname, tagvalue);
+    });
     addTargets(data, "targets", [&objUpdate](const std::string& target) {
         objUpdate.addTarget(target);
     });

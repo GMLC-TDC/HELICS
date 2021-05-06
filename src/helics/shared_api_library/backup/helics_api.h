@@ -452,8 +452,12 @@ const char* helicsInputGetExtractionUnits(HelicsInput ipt);
 const char* helicsPublicationGetUnits(HelicsPublication pub);
 const char* helicsInputGetInfo(HelicsInput inp);
 void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err);
+const char* helicsInputGetTag(HelicsInput inp, const char* tagname);
+void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalue, HelicsError* err);
 const char* helicsPublicationGetInfo(HelicsPublication pub);
 void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
+const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname);
+void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const char* tagvalue, HelicsError* err);
 int helicsInputGetOption(HelicsInput inp, int option);
 void helicsInputSetOption(HelicsInput inp, int option, int value, HelicsError* err);
 int helicsPublicationGetOption(HelicsPublication pub, int option);
@@ -502,6 +506,9 @@ const char* helicsEndpointGetName(HelicsEndpoint endpoint);
 int helicsFederateGetEndpointCount(HelicsFederate fed);
 const char* helicsEndpointGetInfo(HelicsEndpoint end);
 void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
+const char* helicsEndpointGetTag(HelicsEndpoint end, const char* tagname);
+void helicsEndpointSetTag(HelicsEndpoint endpoint, const char* tagname, const char* tagvalue, HelicsError* err);
+
 void helicsEndpointSetOption(HelicsEndpoint endpoint, int option, int value, HelicsError* err);
 int helicsEndpointGetOption(HelicsEndpoint endpoint, int option);
 void helicsEndpointAddSourceTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
@@ -561,6 +568,9 @@ void helicsFilterRemoveTarget(HelicsFilter filt, const char* target, HelicsError
 void helicsFilterRemoveDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);
 const char* helicsFilterGetInfo(HelicsFilter filt);
 void helicsFilterSetInfo(HelicsFilter filt, const char* info, HelicsError* err);
+const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname);
+void helicsFilterSetTag(HelicsFilter filt, const char* tagname, const char* tagvalue, HelicsError* err);
+
 void helicsFilterSetOption(HelicsFilter filt, int option, int value, HelicsError* err);
 int helicsFilterGetOption(HelicsFilter filt, int option);
 

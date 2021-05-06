@@ -81,6 +81,21 @@ class Filter {
     {
         helicsFilterSetInfo(filt, info.c_str(), HELICS_IGNORE_ERROR);
     }
+    /** get the value of a tag for the filter*/
+    const char* getTag(const std::string& tagname) const
+    {
+        return helicsFilterGetTag(filt, tagname.c_str());
+    }
+    /** set the value of a tag for the filter*/
+    void setTag(const std::string& tagname, const std::string& tagvalue)
+    {
+        helicsFilterSetTag(filt, tagname.c_str(), tagvalue.c_str(), HELICS_IGNORE_ERROR);
+    }
+    void setOption(int32_t option, int32_t value = 1)
+    {
+        helicsFilterSetOption(filt, option, value, HELICS_IGNORE_ERROR);
+    }
+    int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
 
   protected:
     HelicsFilter filt;  //!< the reference to the underlying publication
