@@ -155,7 +155,7 @@ template<class Inp>
 static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
 {
     using fileops::getOrDefault;
-    addTargets(data, "flags", [&ept,fed](const std::string& target) {
+    addTargets(data, "flags", [&ept, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
         int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {

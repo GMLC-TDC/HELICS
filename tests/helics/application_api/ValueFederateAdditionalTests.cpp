@@ -662,7 +662,6 @@ TEST(valuefederate, toml_file_loadb)
     if (!dval.empty()) {
         EXPECT_EQ(std::stod(dval), 0.7);
     }
-    
 
     vFed.enterExecutingMode();
     vFed.disconnect();
