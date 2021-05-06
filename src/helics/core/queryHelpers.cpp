@@ -23,7 +23,7 @@ static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
                 tagBlock[tg.first] = true;
             }
         }
-        v["tags"]=tagBlock;
+        v["tags"] = tagBlock;
     }
 }
 

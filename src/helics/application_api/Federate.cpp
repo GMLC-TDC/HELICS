@@ -899,7 +899,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             }
             auto& filter =
                 generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
-            loadOptions(this,filt, filter);
+            loadOptions(this, filt, filter);
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
@@ -1020,7 +1020,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             auto& filter =
                 generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
 
-            loadOptions(this,filt, filter);
+            loadOptions(this, filt, filter);
 
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
