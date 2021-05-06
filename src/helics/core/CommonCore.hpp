@@ -241,7 +241,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void setGlobal(const std::string& valueName, const std::string& value) override;
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,
-                             const std::string& source) override;
+                             const std::string& source,
+                             HelicsSequencingModes mode) override;
     virtual std::pair<std::string, std::string> getCommand(LocalFederateId federateID) override;
 
     virtual std::pair<std::string, std::string> waitCommand(LocalFederateId federateID) override;
