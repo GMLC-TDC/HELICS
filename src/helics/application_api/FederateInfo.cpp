@@ -336,7 +336,7 @@ int getFlagIndex(std::string val)
     if (fnd != flagStringsTranslations.end()) {
         return fnd->second;
     }
-    return -1;
+    return HELICS_INVALID_OPTION_INDEX;
 }
 
 int getOptionIndex(std::string val)
@@ -355,7 +355,7 @@ int getOptionIndex(std::string val)
     if (fnd != optionStringsTranslations.end()) {
         return fnd->second;
     }
-    return -1;
+    return HELICS_INVALID_OPTION_INDEX;
 }
 
 int getOptionValue(std::string val)
@@ -377,7 +377,7 @@ int getOptionValue(std::string val)
     if (fnd != log_level_map.end()) {
         return fnd->second;
     }
-    return -1;
+    return HELICS_INVALID_OPTION_INDEX;
 }
 
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()

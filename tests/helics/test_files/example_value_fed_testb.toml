@@ -18,7 +18,7 @@ subscriptions=[
 ]
 
 inputs=[
-{key="ipt2",  type="double",flags="optional", target="pub1", global=true}
+{key="ipt2",  type="double",flags="connection_optional", target="pub1", global=true,tags=[{name="period",value=0.7},{name="description",value="a test input"}]}
 ]  #specify an input with a target
 
 
@@ -29,7 +29,7 @@ key="pub1" # the name of the publication
  unit="m"  # the units associated with a publication (optional)
  global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
  info="this is an information string for use by the application"
- tags=[{name="period",value="0.5"},{name="description",value="a test publication"}]
+ tags={period=0.5,description="a test publication"}
 
 [[publications]]
 key="pub2" # the name of the publication

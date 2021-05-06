@@ -14,14 +14,16 @@ namespace helics {
 static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
 {
     if (bhi.tagCount() > 0) {
-        v["tags"] = Json::arrayValue;
+        Json::Value tagBlock = Json::objectValue;
         for (size_t ii = 0; ii < bhi.tagCount(); ++ii) {
             const auto& tg = bhi.getTagByIndex(ii);
-            Json::Value tagBlock;
-            tagBlock["name"] = tg.first;
-            tagBlock["value"] = tg.second;
-            v["tags"].append(tagBlock);
+            if (tg.second != "true") {
+                tagBlock[tg.first] = tg.second;
+            } else {
+                tagBlock[tg.first] = true;
+            }
         }
+        v["tags"]=tagBlock;
     }
 }
 
