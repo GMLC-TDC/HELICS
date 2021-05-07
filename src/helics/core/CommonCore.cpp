@@ -2103,25 +2103,25 @@ void CommonCore::setIdentifier(const std::string& name)
 }
 
 // enumeration of subqueries that cascade and need multiple levels of processing
-enum subqueries : std::uint16_t {
-    general_query = 0,
-    current_time_map = 2,
-    dependency_graph = 3,
-    data_flow_graph = 4,
-    global_state = 6,
-    global_time_debugging = 7,
-    global_flush = 8,
-    global_status = 9
+enum Subqueries : std::uint16_t {
+    GENERAL_QUERY = 0,
+    CURRENT_TIME_MAP = 2,
+    DEPENDENCY_GRAPH = 3,
+    DATA_FLOW_GRAPH = 4,
+    GLOBAL_STATE = 6,
+    GLOBAL_TIME_DEBUGGING = 7,
+    GLOBAL_FLUSH = 8,
+    GLOBAL_STATUS = 9
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
-    {"global_time", {current_time_map, true}},
-    {"global_status", {global_status, false}},
-    {"dependency_graph", {dependency_graph, false}},
-    {"data_flow_graph", {data_flow_graph, false}},
-    {"global_state", {global_state, true}},
-    {"global_time_debugging", {global_time_debugging, true}},
-    {"global_flush", {global_flush, true}},
+    {"global_time", {CURRENT_TIME_MAP, true}},
+    {"global_status", {GLOBAL_STATUS, false}},
+    {"dependency_graph", {DEPENDENCY_GRAPH, false}},
+    {"data_flow_graph", {DATA_FLOW_GRAPH, false}},
+    {"global_state", {GLOBAL_STATE, true}},
+    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, true}},
+    {"global_flush", {GLOBAL_FLUSH, true}},
 };
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
@@ -2250,7 +2250,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
     ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
-    if (index == global_flush) {
+    if (index == GLOBAL_FLUSH) {
         queryReq.setAction(CMD_QUERY_ORDERED);
     }
     queryReq.payload = request;
@@ -2278,13 +2278,13 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     }
 
     switch (index) {
-        case current_time_map:
-        case global_status:
+        case CURRENT_TIME_MAP:
+        case GLOBAL_STATUS:
             if (hasTimeDependency) {
                 base["next_time"] = static_cast<double>(timeCoord->getNextTime());
             }
             break;
-        case dependency_graph: {
+        case DEPENDENCY_GRAPH: {
             if (hasTimeDependency) {
                 base["dependents"] = Json::arrayValue;
                 for (const auto& dep : timeCoord->getDependents()) {
@@ -2296,10 +2296,10 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 }
             }
         } break;
-        case global_state:
+        case GLOBAL_STATE:
             base["state"] = brokerStateName(brokerState.load());
             break;
-        case global_time_debugging:
+        case GLOBAL_TIME_DEBUGGING:
             base["state"] = brokerStateName(brokerState.load());
             base["state"] = brokerStateName(brokerState.load());
             if (timeCoord && !timeCoord->empty()) {
@@ -3752,7 +3752,7 @@ void CommonCore::removeTargetFromInterface(ActionMessage& command)
 
 void CommonCore::processQueryResponse(const ActionMessage& m)
 {
-    if (m.counter == general_query) {
+    if (m.counter == GENERAL_QUERY) {
         activeQueries.setDelayedValue(m.messageID, std::string(m.payload.to_string()));
         return;
     }
@@ -3761,7 +3761,7 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
         auto& requestors = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(std::string(m.payload.to_string()), m.messageID)) {
             auto str = builder.generate();
-            if (m.counter == global_flush) {
+            if (m.counter == GLOBAL_FLUSH) {
                 str = "{\"status\":true}";
             }
             for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
